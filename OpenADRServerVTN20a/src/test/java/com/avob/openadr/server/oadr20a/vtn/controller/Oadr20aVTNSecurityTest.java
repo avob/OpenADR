@@ -59,16 +59,16 @@ import com.google.common.collect.Sets;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class Oadr20aVTNSecurityTest {
 
-    @Value("${oadr.security.trustcertificate.oadrRsaRootCertificate}")
+    @Value("${oadr.security.vtn.trustcertificate.oadrRsaRootCertificate}")
     private String oadrRsaRootCertificate;
 
-    @Value("${oadr.security.trustcertificate.oadrRsaIntermediateCertificate}")
+    @Value("${oadr.security.vtn.trustcertificate.oadrRsaIntermediateCertificate}")
     private String oadrRsaIntermediateCertificate;
 
-    @Value("${oadr.security.trustcertificate.oadrEccRootCertificate}")
+    @Value("${oadr.security.vtn.trustcertificate.oadrEccRootCertificate}")
     private String oadrEccRootCertificate;
 
-    @Value("${oadr.security.trustcertificate.oadrEccIntermediateCertificate}")
+    @Value("${oadr.security.vtn.trustcertificate.oadrEccIntermediateCertificate}")
     private String oadrEccIntermediateCertificate;
 
     @Value("${oadr.security.ven.rsaPrivateKeyPath}")
