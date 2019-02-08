@@ -11,19 +11,6 @@
 		<version>1.5.2.RELEASE</version>
 	</parent>
 
-	<distributionManagement>
-		<repository>
-			<id>nexus</id>
-			<name>Internal Releases</name>
-			<url>http://srv-devops:8081/nexus/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus</id>
-			<name>Internal Releases</name>
-			<url>http://srv-devops:8081/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.avob.openadr.client.http</groupId>

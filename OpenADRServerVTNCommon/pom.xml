@@ -116,20 +116,6 @@
 		</dependency>
 	</dependencies>
 
-
-	<distributionManagement>
-		<repository>
-			<id>nexus</id>
-			<name>Internal Releases</name>
-			<url>http://srv-devops:8081/nexus/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus</id>
-			<name>Internal Releases</name>
-			<url>http://srv-devops:8081/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<build>
 		<plugins>
 			<plugin>

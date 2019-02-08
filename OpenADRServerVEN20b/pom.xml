@@ -17,19 +17,6 @@
 		<amq.version>5.7.0</amq.version>
 	</properties>
 
-	<distributionManagement>
-		<repository>
-			<id>nexus</id>
-			<name>Internal Releases</name>
-			<url>http://srv-devops:8081/nexus/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>nexus</id>
-			<name>Internal Releases</name>
-			<url>http://srv-devops:8081/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.avob.openadr.model</groupId>
