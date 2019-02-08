@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="1.635" tests="8" errors="0" skipped="0" failures="0">
+<testsuite name="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="1.89" tests="8" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-8-oracle/jre/lib/amd64"/>
     <property name="java.vm.version" value="25.191-b12"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
-    <property name="maven.multiModuleProjectDirectory" value="/home/bzanni/Documents/workspace-oadr/trunk"/>
+    <property name="maven.multiModuleProjectDirectory" value="/home/bzanni/avob-github/OpenADR"/>
     <property name="javax.xml.accessExternalSchema" value="all"/>
     <property name="java.vendor.url" value="http://java.oracle.com/"/>
     <property name="path.separator" value=":"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.os.patch.level" value="unknown"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="user.dir" value="/home/bzanni/Documents/workspace-oadr/trunk"/>
+    <property name="user.dir" value="/home/bzanni/avob-github/OpenADR"/>
     <property name="java.runtime.version" value="1.8.0_191-b12"/>
     <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
     <property name="java.endorsed.dirs" value="/usr/lib/jvm/java-8-oracle/jre/lib/endorsed"/>
@@ -62,12 +62,12 @@
     <property name="sun.desktop" value="gnome"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase name="changeValueTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="1.043"/>
-  <testcase name="readTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.075"/>
-  <testcase name="findTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.119"/>
-  <testcase name="provideControllerTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.042"/>
-  <testcase name="createTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.139"/>
-  <testcase name="deleteTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.066"/>
-  <testcase name="cancelTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.065"/>
-  <testcase name="activeTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.086"/>
+  <testcase name="changeValueTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.974"/>
+  <testcase name="readTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.122"/>
+  <testcase name="findTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.152"/>
+  <testcase name="provideControllerTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.049"/>
+  <testcase name="createTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.276"/>
+  <testcase name="deleteTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.07"/>
+  <testcase name="cancelTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.124"/>
+  <testcase name="activeTest" classname="com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest" time="0.123"/>
 </testsuite>

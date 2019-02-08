@@ -12,6 +12,7 @@ OpenADRServerVTNCommon,com.avob.openadr.server.common.vtn.service,VenGroupServic
 OpenADRServerVTNCommon,com.avob.openadr.server.common.vtn.models.venresource,VenResource,18,41,1,1,8,14,6,6,5,6
 OpenADRServerVTNCommon,com.avob.openadr.server.common.vtn.models.venresource,VenResourceDto,0,23,0,0,0,11,0,6,0,6
 OpenADRServerVTNCommon,com.avob.openadr.server.common.vtn.models.venrequestcount,VenRequestCount,0,31,0,0,0,12,0,6,0,6
+OpenADRServerVTNCommon,com.avob.openadr.server.common.vtn.service.push,DemandResponseEventPublisherCondition,17,0,2,0,2,0,3,0,2,0
 OpenADRServerVTNCommon,com.avob.openadr.server.common.vtn.service.push,DemandResponseEventPublisher,12,3,0,0,4,1,2,1,2,1
 OpenADRServerVTNCommon,com.avob.openadr.server.common.vtn.service.dtomapper,VenMapper,16,5,4,0,6,2,4,1,2,1
 OpenADRServerVTNCommon,com.avob.openadr.server.common.vtn.service.dtomapper,DtoMapper.new BeanMappingBuilder() {...},0,29,0,0,0,5,0,2,0,2

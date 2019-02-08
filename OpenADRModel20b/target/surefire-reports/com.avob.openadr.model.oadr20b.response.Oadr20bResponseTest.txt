@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.avob.openadr.model.oadr20b.response.Oadr20bResponseTest
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 sec - in com.avob.openadr.model.oadr20b.response.Oadr20bResponseTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 sec - in com.avob.openadr.model.oadr20b.response.Oadr20bResponseTest

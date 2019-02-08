@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDaoTest
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.33 sec - in com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDaoTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.282 sec - in com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDaoTest

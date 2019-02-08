@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.866" tests="24" errors="0" skipped="0" failures="0">
+<testsuite name="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="1.143" tests="24" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-8-oracle/jre/lib/amd64"/>
     <property name="java.vm.version" value="25.191-b12"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
-    <property name="maven.multiModuleProjectDirectory" value="/home/bzanni/Documents/workspace-oadr/trunk"/>
+    <property name="maven.multiModuleProjectDirectory" value="/home/bzanni/avob-github/OpenADR"/>
     <property name="javax.xml.accessExternalSchema" value="all"/>
     <property name="java.vendor.url" value="http://java.oracle.com/"/>
     <property name="path.separator" value=":"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.os.patch.level" value="unknown"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="user.dir" value="/home/bzanni/Documents/workspace-oadr/trunk"/>
+    <property name="user.dir" value="/home/bzanni/avob-github/OpenADR"/>
     <property name="java.runtime.version" value="1.8.0_191-b12"/>
     <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
     <property name="java.endorsed.dirs" value="/usr/lib/jvm/java-8-oracle/jre/lib/endorsed"/>
@@ -62,28 +62,28 @@
     <property name="sun.desktop" value="gnome"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase name="testOadrCreatePartyRegistrationType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.28"/>
-  <testcase name="testOadrCanceledPartyRegistrationType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.042"/>
-  <testcase name="testOadrPollType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.045"/>
-  <testcase name="testCreatedEventType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.044"/>
-  <testcase name="testOadrUpdateReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.102"/>
-  <testcase name="testOadrRequestReregistrationType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.019"/>
-  <testcase name="testOadrCanceledReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.017"/>
-  <testcase name="testOadrDistributeEventType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.065"/>
-  <testcase name="testOadrCanceledOptType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.017"/>
-  <testcase name="testOadrCancelOptType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.015"/>
-  <testcase name="testOadrCancelReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.016"/>
-  <testcase name="testOadrCreatedReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.016"/>
-  <testcase name="testInvalidReplayProtectTimestamp" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.013"/>
-  <testcase name="testOadrCreateOptType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.018"/>
-  <testcase name="testOadrCreatedPartyRegistrationType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.018"/>
-  <testcase name="testOadrCreatedOptType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.018"/>
-  <testcase name="testOadrRequestEventType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.016"/>
-  <testcase name="testOadrOadrQueryRegistrationType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.019"/>
-  <testcase name="testOadrCancelPartyRegistrationType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.015"/>
-  <testcase name="testOadrRegisterReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.014"/>
-  <testcase name="testOadrCreateReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.015"/>
-  <testcase name="testOadrResponseType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.015"/>
-  <testcase name="testOadrUpdatedReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.013"/>
-  <testcase name="testOadrRegisteredReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.014"/>
+  <testcase name="testOadrCreatePartyRegistrationType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.273"/>
+  <testcase name="testOadrCanceledPartyRegistrationType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.035"/>
+  <testcase name="testOadrPollType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.026"/>
+  <testcase name="testCreatedEventType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.046"/>
+  <testcase name="testOadrUpdateReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.165"/>
+  <testcase name="testOadrRequestReregistrationType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.021"/>
+  <testcase name="testOadrCanceledReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.034"/>
+  <testcase name="testOadrDistributeEventType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.128"/>
+  <testcase name="testOadrCanceledOptType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.036"/>
+  <testcase name="testOadrCancelOptType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.028"/>
+  <testcase name="testOadrCancelReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.027"/>
+  <testcase name="testOadrCreatedReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.025"/>
+  <testcase name="testInvalidReplayProtectTimestamp" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.036"/>
+  <testcase name="testOadrCreateOptType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.042"/>
+  <testcase name="testOadrCreatedPartyRegistrationType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.057"/>
+  <testcase name="testOadrCreatedOptType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.059"/>
+  <testcase name="testOadrRequestEventType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.019"/>
+  <testcase name="testOadrOadrQueryRegistrationType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.013"/>
+  <testcase name="testOadrCancelPartyRegistrationType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.012"/>
+  <testcase name="testOadrRegisterReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.012"/>
+  <testcase name="testOadrCreateReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.013"/>
+  <testcase name="testOadrResponseType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.011"/>
+  <testcase name="testOadrUpdatedReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.012"/>
+  <testcase name="testOadrRegisteredReportType" classname="com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest" time="0.013"/>
 </testsuite>

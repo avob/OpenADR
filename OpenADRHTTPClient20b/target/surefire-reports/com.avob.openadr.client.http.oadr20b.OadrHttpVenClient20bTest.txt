@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.avob.openadr.client.http.oadr20b.OadrHttpVenClient20bTest
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.41 sec - in com.avob.openadr.client.http.oadr20b.OadrHttpVenClient20bTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.314 sec - in com.avob.openadr.client.http.oadr20b.OadrHttpVenClient20bTest

@@ -10,20 +10,20 @@ import com.avob.openadr.server.common.vtn.models.ven.Ven;
 @Service
 <span class="fc" id="L11">public class DemandResponseEventPublisher {</span>
 
-    public static final String OADR20A_QUEUE = &quot;queue.oadr20a&quot;;
+	public static final String OADR20A_QUEUE = &quot;queue.oadr20a&quot;;
 
-    public static final String OADR20B_QUEUE = &quot;queue.oadr20b&quot;;
+	public static final String OADR20B_QUEUE = &quot;queue.oadr20b&quot;;
 
-    @Resource
-    private JmsTemplate jmsTemplate;
+	@Resource
+	private JmsTemplate jmsTemplate;
 
-    public void publish20a(Ven ven) {
-<span class="nc" id="L21">        jmsTemplate.convertAndSend(OADR20A_QUEUE, ven);</span>
-<span class="nc" id="L22">    }</span>
+	public void publish20a(Ven ven) {
+<span class="nc" id="L21">		jmsTemplate.convertAndSend(OADR20A_QUEUE, ven);</span>
+<span class="nc" id="L22">	}</span>
 
-    public void publish20b(Ven ven) {
-<span class="nc" id="L25">        jmsTemplate.convertAndSend(OADR20B_QUEUE, ven);</span>
-<span class="nc" id="L26">    }</span>
+	public void publish20b(Ven ven) {
+<span class="nc" id="L25">		jmsTemplate.convertAndSend(OADR20B_QUEUE, ven);</span>
+<span class="nc" id="L26">	}</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

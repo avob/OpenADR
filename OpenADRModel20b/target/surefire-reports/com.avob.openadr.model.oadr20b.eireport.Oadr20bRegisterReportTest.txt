@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.avob.openadr.model.oadr20b.eireport.Oadr20bRegisterReportTest
 -------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 sec - in com.avob.openadr.model.oadr20b.eireport.Oadr20bRegisterReportTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 sec - in com.avob.openadr.model.oadr20b.eireport.Oadr20bRegisterReportTest

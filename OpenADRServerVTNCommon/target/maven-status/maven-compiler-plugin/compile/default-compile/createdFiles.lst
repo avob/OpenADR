@@ -52,6 +52,7 @@ com/avob/openadr/server/common/vtn/exception/OadrVTNInitializationException.clas
 com/avob/openadr/server/common/vtn/EmbeddedSqlDatabaseConfig.class
 com/avob/openadr/server/common/vtn/service/DemandResponseEventService.class
 com/avob/openadr/server/common/vtn/models/ven/VenDao.class
+com/avob/openadr/server/common/vtn/service/push/DemandResponseEventPublisherCondition.class
 com/avob/openadr/server/common/vtn/service/dtomapper/DtoMapper$1.class
 com/avob/openadr/server/common/vtn/models/demandresponseevent/DemandResponseEventSimpleValueEnum.class
 com/avob/openadr/server/common/vtn/models/vengroup/VenGroupDto.class
