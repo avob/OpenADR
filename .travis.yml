@@ -1,0 +1,6 @@
+language: java
+jdk: oraclejdk8
+script: mvn clean package -f OpenADR/pom.xml
+cache:
+  directories:
+  - $HOME/.m2
