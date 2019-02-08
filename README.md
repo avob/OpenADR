@@ -1,4 +1,5 @@
-# OpenADR
+# OpenADR  [![Build Status](https://travis-ci.org/avob/OpenADR.svg?branch=master)](https://travis-ci.org/avob/OpenADR)
+
 
 OpenADR protocol java implementation: *https://www.openadr.org/*
 
