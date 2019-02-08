@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bVENEiRegisterPartyService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVEN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.ven.service</a> &gt; <span class="el_source">Oadr20bVENEiRegisterPartyService.java</span></div><h1>Oadr20bVENEiRegisterPartyService.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.ven.service;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.Resource;
+
+import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
+import com.avob.openadr.model.oadr20b.builders.eiregisterparty.Oadr20bCreatePartyRegistrationBuilder;
+import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
+import com.avob.openadr.model.oadr20b.ei.SchemaVersionEnumeratedType;
+import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
+import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatePartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
+import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
+import com.avob.openadr.server.oadr20b.ven.VenConfig;
+import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
+
+@Service
+<span class="fc" id="L43">public class Oadr20bVENEiRegisterPartyService {</span>
+
+<span class="fc" id="L45">    private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVENEiRegisterPartyService.class);</span>
+
+    @Resource
+    protected VenConfig venConfig;
+
+    @Resource
+    protected MultiVtnConfig multiVtnConfig;
+
+    // @Resource
+    // protected Oadr20bPollService pollService;
+
+    @Resource
+    protected StatePersistenceService statePersistenceService;
+
+<span class="fc" id="L59">    private Map&lt;String, OadrCreatedPartyRegistrationType&gt; registration = new ConcurrentHashMap&lt;String, OadrCreatedPartyRegistrationType&gt;();</span>
+
+    protected List&lt;Oadr20bVENEiRegisterPartyServiceListener&gt; listeners;
+
+    public interface Oadr20bVENEiRegisterPartyServiceListener {
+        public void onRegistrationSuccess(VtnSessionConfiguration vtnConfiguration,
+                OadrCreatedPartyRegistrationType registration);
+
+        public void onRegistrationError(VtnSessionConfiguration vtnConfiguration);
+    }
+
+    public OadrResponseType oadrRequestReregistration(VtnSessionConfiguration vtnConfiguration,
+            OadrRequestReregistrationType oadrRequestReregistrationType) {
+
+<span class="nc" id="L73">        String requestId = &quot;&quot;;</span>
+<span class="nc" id="L74">        String venID = oadrRequestReregistrationType.getVenID();</span>
+<span class="nc" id="L75">        int responseCode = HttpStatus.OK_200;</span>
+<span class="nc" id="L76">        reinitRegistration(vtnConfiguration);</span>
+
+<span class="nc" id="L78">        return Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestId, responseCode, venID).build();</span>
+    }
+
+    public OadrCanceledPartyRegistrationType oadrCancelPartyRegistration(VtnSessionConfiguration vtnConfiguration,
+            OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType) {
+
+<span class="nc" id="L84">        String venID = oadrCancelPartyRegistrationType.getVenID();</span>
+
+<span class="nc" id="L86">        String requestID = oadrCancelPartyRegistrationType.getRequestID();</span>
+<span class="nc" id="L87">        String registrationID = oadrCancelPartyRegistrationType.getRegistrationID();</span>
+<span class="nc" id="L88">        int responseCode = HttpStatus.OK_200;</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">        if (getRegistration(vtnConfiguration).getRegistrationID().equals(registrationID)) {</span>
+<span class="nc" id="L90">            clearRegistration(vtnConfiguration);</span>
+            // pollService.cancelHttpScheduledPullRequestTask(vtnConfiguration,
+            // false);
+        } else {
+<span class="nc" id="L94">            responseCode = Oadr20bApplicationLayerErrorCode.INVALID_ID_452;</span>
+        }
+
+<span class="nc" id="L97">        return Oadr20bEiRegisterPartyBuilders</span>
+<span class="nc" id="L98">                .newOadr20bCanceledPartyRegistrationBuilder(requestID, responseCode, registrationID, venID).build();</span>
+
+    }
+
+    public void clearRegistration(VtnSessionConfiguration vtnConfiguration) {
+        try {
+<span class="nc" id="L104">            statePersistenceService.deleteRegistration(vtnConfiguration);</span>
+<span class="nc" id="L105">            setRegistration(vtnConfiguration, null);</span>
+<span class="nc" id="L106">        } catch (IOException e) {</span>
+<span class="nc" id="L107">            LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L108">        }</span>
+<span class="nc" id="L109">    }</span>
+
+    public void initRegistration(VtnSessionConfiguration vtnConfiguration) {
+<span class="nc" id="L112">        this.initRegistration(vtnConfiguration, null);</span>
+<span class="nc" id="L113">    }</span>
+
+    public void reinitRegistration(VtnSessionConfiguration vtnConfiguration) {
+<span class="nc bnc" id="L116" title="All 2 branches missed.">        String registrationId = (getRegistration(vtnConfiguration) != null)</span>
+<span class="nc" id="L117">                ? getRegistration(vtnConfiguration).getRegistrationID() : null;</span>
+<span class="nc" id="L118">        clearRegistration(vtnConfiguration);</span>
+<span class="nc" id="L119">        this.initRegistration(vtnConfiguration, registrationId);</span>
+<span class="nc" id="L120">    }</span>
+
+    private boolean isSameConfig(VtnSessionConfiguration vtnConfiguration) {
+<span class="nc" id="L123">        return true;</span>
+    }
+
+    private void initRegistration(VtnSessionConfiguration vtnConfiguration, String registrationId) {
+<span class="nc" id="L127">        OadrCreatedPartyRegistrationType loadRegistration = null;</span>
+        try {
+<span class="nc" id="L129">            loadRegistration = statePersistenceService.loadRegistration(vtnConfiguration);</span>
+
+<span class="nc" id="L131">            String requestId = &quot;0&quot;;</span>
+<span class="nc" id="L132">            String reportRequestId = &quot;0&quot;;</span>
+<span class="nc" id="L133">            String reportSpecifierId = &quot;METADATA&quot;;</span>
+<span class="nc" id="L134">            String granularity = &quot;P0D&quot;;</span>
+<span class="nc" id="L135">            String reportBackDuration = &quot;P0D&quot;;</span>
+<span class="nc" id="L136">            OadrReportRequestType oadrReportRequestType = Oadr20bEiReportBuilders</span>
+<span class="nc" id="L137">                    .newOadr20bReportRequestTypeBuilder(reportRequestId, reportSpecifierId, granularity,</span>
+                            reportBackDuration)
+<span class="nc" id="L139">                    .addSpecifierPayload(null, ReadingTypeEnumeratedType.DIRECT_READ, reportSpecifierId).build();</span>
+<span class="nc" id="L140">            OadrCreateReportType build = Oadr20bEiReportBuilders</span>
+<span class="nc" id="L141">                    .newOadr20bCreateReportBuilder(requestId, venConfig.getVenId())</span>
+<span class="nc" id="L142">                    .addReportRequest(oadrReportRequestType).build();</span>
+
+<span class="nc" id="L144">            multiVtnConfig.getMultiClientConfig(vtnConfiguration).oadrCreateReport(build);</span>
+
+<span class="nc" id="L146">        } catch (Oadr20bUnmarshalException e) {</span>
+<span class="nc" id="L147">            LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L148">        } catch (IOException e) {</span>
+<span class="nc" id="L149">            LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L150">        } catch (Oadr20bException e) {</span>
+<span class="nc" id="L151">            LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L152">        } catch (Oadr20bHttpLayerException e) {</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">            if (e.getErrorCode() == HttpStatus.FORBIDDEN_403) {</span>
+<span class="nc" id="L154">                loadRegistration = null;</span>
+                try {
+<span class="nc" id="L156">                    statePersistenceService.deleteRegistration(vtnConfiguration);</span>
+<span class="nc" id="L157">                } catch (IOException e1) {</span>
+<span class="nc" id="L158">                    LOGGER.error(&quot;&quot;, e1);</span>
+<span class="nc" id="L159">                }</span>
+<span class="nc" id="L160">                LOGGER.warn(&quot;Local registration have been rejected by VTN, trying manual registration&quot;);</span>
+            } else {
+<span class="nc" id="L162">                LOGGER.error(&quot;&quot;, e);</span>
+            }
+
+<span class="nc" id="L165">        } catch (Oadr20bXMLSignatureException e) {</span>
+<span class="nc" id="L166">            LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L167">        } catch (Oadr20bXMLSignatureValidationException e) {</span>
+<span class="nc" id="L168">            LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L169">        }</span>
+
+<span class="nc bnc" id="L171" title="All 2 branches missed.">        if (loadRegistration != null) {</span>
+
+<span class="nc bnc" id="L173" title="All 2 branches missed.">            if (isSameConfig(vtnConfiguration)) {</span>
+<span class="nc" id="L174">                LOGGER.debug(&quot;Ven already registered using registrationId: &quot; + loadRegistration.getRegistrationID());</span>
+<span class="nc" id="L175">                LOGGER.debug(&quot;        xmlSignature: &quot; + venConfig.getXmlSignature());</span>
+<span class="nc" id="L176">                LOGGER.debug(&quot;        reportOnly  : &quot; + venConfig.getReportOnly());</span>
+<span class="nc" id="L177">                LOGGER.debug(&quot;        pullModel   : &quot; + venConfig.getPullModel());</span>
+<span class="nc" id="L178">                setRegistration(vtnConfiguration, loadRegistration);</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">                if (listeners != null) {</span>
+<span class="nc" id="L180">                    final OadrCreatedPartyRegistrationType reg = loadRegistration;</span>
+<span class="nc" id="L181">                    listeners.forEach(listener -&gt; listener.onRegistrationSuccess(vtnConfiguration, reg));</span>
+                }
+<span class="nc" id="L183">                return;</span>
+            } else {
+<span class="nc" id="L185">                this.reinitRegistration(vtnConfiguration);</span>
+            }
+
+        }
+
+<span class="nc" id="L190">        LOGGER.info(&quot;Ven is not yet registered&quot;);</span>
+
+<span class="nc" id="L192">        Boolean pullModel = venConfig.getPullModel();</span>
+<span class="nc" id="L193">        String transportAddress = null;</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">        if (!pullModel) {</span>
+<span class="nc" id="L195">            transportAddress = venConfig.getVenUrl();</span>
+        }
+<span class="nc" id="L197">        boolean reportOnly = venConfig.getReportOnly();</span>
+<span class="nc" id="L198">        OadrTransportType transportType = OadrTransportType.SIMPLE_HTTP;</span>
+<span class="nc" id="L199">        String venName = venConfig.getVenName();</span>
+<span class="nc" id="L200">        boolean xmlSignature = venConfig.getXmlSignature();</span>
+<span class="nc" id="L201">        String requestId = &quot;&quot;;</span>
+<span class="nc" id="L202">        Oadr20bCreatePartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders</span>
+<span class="nc" id="L203">                .newOadr20bCreatePartyRegistrationBuilder(requestId, venConfig.getVenId(),</span>
+<span class="nc" id="L204">                        SchemaVersionEnumeratedType.OADR_20B.value())</span>
+<span class="nc" id="L205">                .withOadrHttpPullModel(pullModel).withOadrTransportAddress(transportAddress)</span>
+<span class="nc" id="L206">                .withOadrReportOnly(reportOnly).withOadrTransportName(transportType).withOadrVenName(venName)</span>
+<span class="nc" id="L207">                .withOadrXmlSignature(xmlSignature);</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">        if (registrationId != null) {</span>
+<span class="nc" id="L209">            builder.withRegistrationId(registrationId);</span>
+        }
+
+<span class="nc" id="L212">        OadrCreatePartyRegistrationType createPartyRegistration = builder.build();</span>
+
+        try {
+
+<span class="nc" id="L216">            LOGGER.info(&quot;Ven try to register...&quot;);</span>
+
+<span class="nc" id="L218">            loadRegistration = multiVtnConfig.getMultiClientConfig(vtnConfiguration)</span>
+<span class="nc" id="L219">                    .oadrCreatePartyRegistration(createPartyRegistration);</span>
+
+<span class="nc bnc" id="L221" title="All 2 branches missed.">            if (loadRegistration.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {</span>
+<span class="nc" id="L222">                statePersistenceService.persistRegistration(vtnConfiguration, loadRegistration);</span>
+<span class="nc" id="L223">                LOGGER.info(</span>
+<span class="nc" id="L224">                        &quot;Ven has successfully register using registrationId: &quot; + loadRegistration.getRegistrationID());</span>
+<span class="nc" id="L225">                LOGGER.debug(&quot;        xmlSignature: &quot; + venConfig.getXmlSignature());</span>
+<span class="nc" id="L226">                LOGGER.debug(&quot;        reportOnly  : &quot; + venConfig.getReportOnly());</span>
+<span class="nc" id="L227">                LOGGER.debug(&quot;        pullModel   : &quot; + venConfig.getPullModel());</span>
+            } else {
+<span class="nc" id="L229">                LOGGER.error(&quot;Ven has failed to register - responseCode: &quot;</span>
+<span class="nc" id="L230">                        + loadRegistration.getEiResponse().getResponseCode() + &quot;, responseDescription: &quot;</span>
+<span class="nc" id="L231">                        + loadRegistration.getEiResponse().getResponseDescription());</span>
+            }
+
+<span class="nc" id="L234">            setRegistration(vtnConfiguration, loadRegistration);</span>
+
+<span class="nc bnc" id="L236" title="All 2 branches missed.">            if (listeners != null) {</span>
+<span class="nc" id="L237">                final OadrCreatedPartyRegistrationType reg = loadRegistration;</span>
+<span class="nc" id="L238">                listeners.forEach(listener -&gt; listener.onRegistrationSuccess(vtnConfiguration, reg));</span>
+            }
+<span class="nc" id="L240">            return;</span>
+
+<span class="nc" id="L242">        } catch (Oadr20bHttpLayerException e) {</span>
+<span class="nc" id="L243">            LOGGER.error(&quot;Fail to create registration: HttpLayerException[&quot; + e.getErrorCode() + &quot;]: &quot;</span>
+<span class="nc" id="L244">                    + e.getErrorMessage());</span>
+
+<span class="nc" id="L246">        } catch (Oadr20bMarshalException e) {</span>
+<span class="nc" id="L247">            LOGGER.error(&quot;Fail to create registration&quot;, e);</span>
+<span class="nc" id="L248">        } catch (Oadr20bException e) {</span>
+<span class="nc" id="L249">            LOGGER.error(&quot;Fail to create registration&quot;, e);</span>
+<span class="nc" id="L250">        } catch (IOException e) {</span>
+<span class="nc" id="L251">            LOGGER.error(&quot;Fail to create registration&quot;, e);</span>
+<span class="nc" id="L252">        } catch (Oadr20bXMLSignatureException e) {</span>
+<span class="nc" id="L253">            LOGGER.error(&quot;Fail to sign request payload&quot;, e);</span>
+<span class="nc" id="L254">        } catch (Oadr20bXMLSignatureValidationException e) {</span>
+<span class="nc" id="L255">            LOGGER.error(&quot;Fail to validate response xml signature&quot;, e);</span>
+<span class="nc" id="L256">        } catch (Exception e) {</span>
+<span class="nc" id="L257">            LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L258">        }</span>
+<span class="nc bnc" id="L259" title="All 2 branches missed.">        if (listeners != null) {</span>
+<span class="nc" id="L260">            listeners.forEach(listener -&gt; listener.onRegistrationError(vtnConfiguration));</span>
+        }
+<span class="nc" id="L262">        setRegistration(vtnConfiguration, null);</span>
+<span class="nc" id="L263">    }</span>
+
+    public OadrCreatedPartyRegistrationType getRegistration(VtnSessionConfiguration vtnConfiguration) {
+<span class="nc" id="L266">        return registration.get(vtnConfiguration.getVtnId());</span>
+    }
+
+    private void setRegistration(VtnSessionConfiguration vtnConfiguration,
+            OadrCreatedPartyRegistrationType registration) {
+<span class="nc bnc" id="L271" title="All 2 branches missed.">        if (registration == null) {</span>
+<span class="nc" id="L272">            this.registration.remove(vtnConfiguration.getVtnId());</span>
+        } else {
+<span class="nc" id="L274">            this.registration.put(vtnConfiguration.getVtnId(), registration);</span>
+        }
+<span class="nc" id="L276">    }</span>
+
+    public void addListener(Oadr20bVENEiRegisterPartyServiceListener listener) {
+<span class="nc bnc" id="L279" title="All 2 branches missed.">        if (listeners == null) {</span>
+<span class="nc" id="L280">            listeners = new ArrayList&lt;Oadr20bVENEiRegisterPartyServiceListener&gt;();</span>
+        }
+<span class="nc" id="L282">        listeners.add(listener);</span>
+<span class="nc" id="L283">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KeyValueKeySelector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRModel20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.model.oadr20b.xmlsignature</a> &gt; <span class="el_source">KeyValueKeySelector.java</span></div><h1>KeyValueKeySelector.java</h1><pre class="source lang-java linenums">package com.avob.openadr.model.oadr20b.xmlsignature;
+
+import java.security.Key;
+import java.security.KeyException;
+import java.security.PublicKey;
+import java.util.List;
+
+import javax.xml.crypto.AlgorithmMethod;
+import javax.xml.crypto.KeySelector;
+import javax.xml.crypto.KeySelectorException;
+import javax.xml.crypto.KeySelectorResult;
+import javax.xml.crypto.XMLCryptoContext;
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dsig.SignatureMethod;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
+
+<span class="fc" id="L18">public class KeyValueKeySelector extends KeySelector {</span>
+
+    private static class SimpleKeySelectorResult implements KeySelectorResult {
+        private PublicKey pk;
+
+<span class="fc" id="L23">        SimpleKeySelectorResult(PublicKey pk) {</span>
+<span class="fc" id="L24">            this.pk = pk;</span>
+<span class="fc" id="L25">        }</span>
+
+        @Override
+        public Key getKey() {
+<span class="fc" id="L29">            return pk;</span>
+        }
+    }
+
+    @Override
+    public KeySelectorResult select(KeyInfo keyInfo, KeySelector.Purpose purpose, AlgorithmMethod method,
+            XMLCryptoContext context) throws KeySelectorException {
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        if (keyInfo == null) {</span>
+<span class="nc" id="L37">            throw new KeySelectorException(&quot;Null KeyInfo object!&quot;);</span>
+        }
+<span class="fc" id="L39">        SignatureMethod sm = (SignatureMethod) method;</span>
+<span class="fc" id="L40">        List&lt;?&gt; list = keyInfo.getContent();</span>
+
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        for (int i = 0; i &lt; list.size(); i++) {</span>
+<span class="fc" id="L43">            XMLStructure xmlStructure = (XMLStructure) list.get(i);</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">            if (xmlStructure instanceof KeyValue) {</span>
+<span class="fc" id="L45">                PublicKey pk = null;</span>
+                try {
+<span class="fc" id="L47">                    pk = ((KeyValue) xmlStructure).getPublicKey();</span>
+<span class="nc" id="L48">                } catch (KeyException ke) {</span>
+<span class="nc" id="L49">                    throw new KeySelectorException(ke);</span>
+<span class="fc" id="L50">                }</span>
+                // make sure algorithm is compatible with method
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">                if (algEquals(sm.getAlgorithm(), pk.getAlgorithm())) {</span>
+<span class="fc" id="L53">                    return new SimpleKeySelectorResult(pk);</span>
+                }
+            }
+        }
+<span class="nc" id="L57">        throw new KeySelectorException(&quot;No KeyValue element found!&quot;);</span>
+    }
+
+    // TODO bertrand: this should also work for key types other than DSA/RSA
+    static boolean algEquals(String algURI, String algName) {
+<span class="fc" id="L62">        boolean equals = false;</span>
+<span class="pc bpc" id="L63" title="3 of 4 branches missed.">        if (&quot;DSA&quot;.equalsIgnoreCase(algName) &amp;&amp; algURI.equalsIgnoreCase(SignatureMethod.DSA_SHA1)) {</span>
+<span class="nc" id="L64">            equals = true;</span>
+<span class="pc bpc" id="L65" title="2 of 4 branches missed.">        } else if (&quot;RSA&quot;.equalsIgnoreCase(algName) &amp;&amp; algURI.equalsIgnoreCase(SignatureMethod.RSA_SHA1)) {</span>
+<span class="fc" id="L66">            equals = true;</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        } else if (&quot;RSA&quot;.equalsIgnoreCase(algName)</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">                &amp;&amp; algURI.equalsIgnoreCase(OadrXMLSignatureHandler.RSA_SHA256_ALGORITHM)) {</span>
+<span class="nc" id="L69">            equals = true;</span>
+<span class="nc bnc" id="L70" title="All 4 branches missed.">        } else if (algName.equalsIgnoreCase(&quot;EC&quot;) &amp;&amp; algURI.equalsIgnoreCase(OadrXMLSignatureHandler.ECDSA_SHA256_ALGORITHM)) {</span>
+<span class="nc" id="L71">            return true;</span>
+        } 
+<span class="fc" id="L73">        return equals;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

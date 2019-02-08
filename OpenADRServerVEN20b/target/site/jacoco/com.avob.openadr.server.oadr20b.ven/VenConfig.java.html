@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VenConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVEN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.ven</a> &gt; <span class="el_source">VenConfig.java</span></div><h1>VenConfig.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.ven;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+<span class="fc" id="L10">public class VenConfig {</span>
+
+	@Value(&quot;${oadr.venid}&quot;)
+	private String venId;
+
+	@Value(&quot;${oadr.venName:#{null}}&quot;)
+	private String venName;
+
+	@Value(&quot;${oadr.pullFrequencySeconds:#{null}}&quot;)
+	private Long pullFrequencySeconds;
+
+	@Value(&quot;${oadr.reportOnly}&quot;)
+	private Boolean reportOnly;
+
+	@Value(&quot;${oadr.xmlSignature}&quot;)
+	private Boolean xmlSignature;
+
+	@Value(&quot;${oadr.pullModel}&quot;)
+	private Boolean pullModel;
+
+	@Value(&quot;${oadr.venUrl:#{null}}&quot;)
+	private String venUrl;
+
+	@Value(&quot;${oadr.security.vtn.trustcertificate.oadrRsaRootCertificate:#{null}}&quot;)
+	private String vtnRsaRootCertificate;
+
+	@Value(&quot;${oadr.security.vtn.trustcertificate.oadrRsaIntermediateCertificate:#{null}}&quot;)
+	private String vtnRsaIntermediateCertificate;
+
+	@Value(&quot;${oadr.security.vtn.trustcertificate.oadrEccRootCertificate:#{null}}&quot;)
+	private String vtnEccRootCertificate;
+
+	@Value(&quot;${oadr.security.vtn.trustcertificate.oadrEccIntermediateCertificate:#{null}}&quot;)
+	private String vtnEccIntermediateCertificate;
+
+	@Value(&quot;${oadr.security.ven.privateKeyPath:#{null}}&quot;)
+	private String venPrivateKeyPath;
+
+	@Value(&quot;${oadr.security.ven.certificatePath:#{null}}&quot;)
+	private String venCertificatePath;
+
+	@Value(&quot;${oadr.security.authentication.basic.username:#{null}}&quot;)
+	private String basicUsername;
+
+	@Value(&quot;${oadr.security.authentication.basic.password:#{null}}&quot;)
+	private String basicPassword;
+
+	@Value(&quot;${oadr.security.authentication.digest.username:#{null}}&quot;)
+	private String digestUsername;
+
+	@Value(&quot;${oadr.security.authentication.digest.password:#{null}}&quot;)
+	private String digestPassword;
+
+	@Value(&quot;${oadr.security.replayProtectAcceptedDelaySecond}&quot;)
+	private Long replayProtectAcceptedDelaySecond;
+
+	public String getVenId() {
+<span class="nc" id="L67">		return venId;</span>
+	}
+
+	public void setVenId(String venId) {
+<span class="nc" id="L71">		this.venId = venId;</span>
+<span class="nc" id="L72">	}</span>
+
+	public String getVenName() {
+<span class="nc" id="L75">		return venName;</span>
+	}
+
+	public void setVenName(String venName) {
+<span class="nc" id="L79">		this.venName = venName;</span>
+<span class="nc" id="L80">	}</span>
+
+	public Long getPullFrequencySeconds() {
+<span class="nc" id="L83">		return pullFrequencySeconds;</span>
+	}
+
+	public void setPullFrequencySeconds(Long pullFrequencySeconds) {
+<span class="nc" id="L87">		this.pullFrequencySeconds = pullFrequencySeconds;</span>
+<span class="nc" id="L88">	}</span>
+
+	public Boolean getReportOnly() {
+<span class="nc" id="L91">		return reportOnly;</span>
+	}
+
+	public void setReportOnly(Boolean reportOnly) {
+<span class="nc" id="L95">		this.reportOnly = reportOnly;</span>
+<span class="nc" id="L96">	}</span>
+
+	public Boolean getXmlSignature() {
+<span class="fc" id="L99">		return xmlSignature;</span>
+	}
+
+	public void setXmlSignature(Boolean xmlSignature) {
+<span class="nc" id="L103">		this.xmlSignature = xmlSignature;</span>
+<span class="nc" id="L104">	}</span>
+
+	public Boolean getPullModel() {
+<span class="nc" id="L107">		return pullModel;</span>
+	}
+
+	public void setPullModel(Boolean pullModel) {
+<span class="nc" id="L111">		this.pullModel = pullModel;</span>
+<span class="nc" id="L112">	}</span>
+
+	public String getVenUrl() {
+<span class="nc" id="L115">		return venUrl;</span>
+	}
+
+	public void setVenUrl(String venUrl) {
+<span class="nc" id="L119">		this.venUrl = venUrl;</span>
+<span class="nc" id="L120">	}</span>
+
+	public boolean isBasicAuthenticationConfigured() {
+<span class="nc bnc" id="L123" title="All 4 branches missed.">		return basicUsername != null &amp;&amp; basicPassword != null;</span>
+	}
+
+	public boolean isDigestAuthenticationConfigured() {
+<span class="nc bnc" id="L127" title="All 4 branches missed.">		return digestUsername != null &amp;&amp; digestPassword != null;</span>
+	}
+
+	public Map&lt;String, String&gt; getVtnTrustCertificate() {
+<span class="fc" id="L131">		Map&lt;String, String&gt; trustCertificate = new HashMap&lt;String, String&gt;();</span>
+<span class="fc" id="L132">		trustCertificate.put(&quot;getVtnEccRootCertificate&quot;, this.getVtnEccRootCertificate());</span>
+<span class="fc" id="L133">		trustCertificate.put(&quot;getVtnEccIntermediateCertificate&quot;, this.getVtnEccIntermediateCertificate());</span>
+<span class="fc" id="L134">		trustCertificate.put(&quot;getVtnRsaRootCertificate&quot;, this.getVtnRsaRootCertificate());</span>
+<span class="fc" id="L135">		trustCertificate.put(&quot;getVtnRsaIntermediateCertificate&quot;, this.getVtnRsaIntermediateCertificate());</span>
+<span class="fc" id="L136">		return trustCertificate;</span>
+	}
+
+	public String getBasicUsername() {
+<span class="nc" id="L140">		return basicUsername;</span>
+	}
+
+	public String getBasicPassword() {
+<span class="nc" id="L144">		return basicPassword;</span>
+	}
+
+	public String getDigestUsername() {
+<span class="nc" id="L148">		return digestUsername;</span>
+	}
+
+	public String getDigestPassword() {
+<span class="nc" id="L152">		return digestPassword;</span>
+	}
+
+	public String getVtnRsaRootCertificate() {
+<span class="fc" id="L156">		return vtnRsaRootCertificate;</span>
+	}
+
+	public String getVtnRsaIntermediateCertificate() {
+<span class="fc" id="L160">		return vtnRsaIntermediateCertificate;</span>
+	}
+
+	public String getVtnEccRootCertificate() {
+<span class="fc" id="L164">		return vtnEccRootCertificate;</span>
+	}
+
+	public String getVtnEccIntermediateCertificate() {
+<span class="fc" id="L168">		return vtnEccIntermediateCertificate;</span>
+	}
+
+	public String getVenPrivateKeyPath() {
+<span class="fc" id="L172">		return venPrivateKeyPath;</span>
+	}
+
+	public String getVenCertificatePath() {
+<span class="fc" id="L176">		return venCertificatePath;</span>
+	}
+
+	public Long getReplayProtectAcceptedDelaySecond() {
+<span class="fc" id="L180">		return replayProtectAcceptedDelaySecond;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

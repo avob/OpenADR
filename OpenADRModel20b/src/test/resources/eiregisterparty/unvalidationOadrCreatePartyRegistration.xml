@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--http Pull Reg Request -->
+<oadr:oadrCreatePartyRegistration
+	ei:schemaVersion="2.0a" xsi:schemaLocation="http://openadr.org/oadr-2.0b/2012/07 oadr_20b.xsd"
+	xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110"
+	xmlns:pyld="http://docs.oasis-open.org/ns/energyinterop/201110/payloads"
+	xmlns:oadr="http://openadr.org/oadr-2.0b/2012/07" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<pyld:requestID>REQ_123</pyld:requestID>
+	<oadr:oadrProfileName>2.0b</oadr:oadrProfileName>
+	<oadr:oadrTransportName>simpleHttp</oadr:oadrTransportName>
+	<oadr:oadrReportOnly>false</oadr:oadrReportOnly>
+	<oadr:oadrXmlSignature>false</oadr:oadrXmlSignature>
+	<oadr:oadrVenName>MyVEN</oadr:oadrVenName>
+	<oadr:oadrHttpPullModel>true</oadr:oadrHttpPullModel>
+</oadr:oadrCreatePartyRegistration>

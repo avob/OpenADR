@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bJAXBContext.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRModel20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.model.oadr20b</a> &gt; <span class="el_source">Oadr20bJAXBContext.java</span></div><h1>Oadr20bJAXBContext.java</h1><pre class="source lang-java linenums">package com.avob.openadr.model.oadr20b;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.StringJoiner;
+
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+
+import org.xml.sax.SAXException;
+
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
+import com.avob.openadr.model.oadr20b.oadr.OadrCancelOptType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCanceledOptType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCanceledReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatePartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedOptType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
+import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRegisteredReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
+
+public class Oadr20bJAXBContext {
+
+	private static final boolean DEFAULT_VALIDATE_XML_PAYLOAD = false;
+
+	private static final String XSD_PATH = &quot;/oadr20b_schema/oadr_20b.xsd&quot;;
+
+	private static final String XSD_AVOB_PATH = &quot;/oadr20b_schema/oadr_avob.xsd&quot;;
+
+<span class="fc" id="L60">	private static Oadr20bJAXBContext instance = null;</span>
+
+	private Schema schema;
+
+	private JAXBContext jaxbContext;
+
+<span class="fc" id="L66">	private Oadr20bJAXBContext() throws JAXBException {</span>
+
+<span class="fc" id="L68">		StringJoiner joiner = new StringJoiner(&quot;:&quot;);</span>
+<span class="fc" id="L69">		joiner.add(&quot;com.avob.openadr.model.oadr20b.atom&quot;);</span>
+<span class="fc" id="L70">		joiner.add(&quot;com.avob.openadr.model.oadr20b.ei&quot;);</span>
+<span class="fc" id="L71">		joiner.add(&quot;com.avob.openadr.model.oadr20b.emix&quot;);</span>
+<span class="fc" id="L72">		joiner.add(&quot;com.avob.openadr.model.oadr20b.gml&quot;);</span>
+<span class="fc" id="L73">		joiner.add(&quot;com.avob.openadr.model.oadr20b.greenbutton&quot;);</span>
+<span class="fc" id="L74">		joiner.add(&quot;com.avob.openadr.model.oadr20b.iso&quot;);</span>
+<span class="fc" id="L75">		joiner.add(&quot;com.avob.openadr.model.oadr20b.oadr&quot;);</span>
+<span class="fc" id="L76">		joiner.add(&quot;com.avob.openadr.model.oadr20b.power&quot;);</span>
+<span class="fc" id="L77">		joiner.add(&quot;com.avob.openadr.model.oadr20b.pyld&quot;);</span>
+<span class="fc" id="L78">		joiner.add(&quot;com.avob.openadr.model.oadr20b.siscale&quot;);</span>
+<span class="fc" id="L79">		joiner.add(&quot;com.avob.openadr.model.oadr20b.strm&quot;);</span>
+<span class="fc" id="L80">		joiner.add(&quot;com.avob.openadr.model.oadr20b.xcal&quot;);</span>
+<span class="fc" id="L81">		joiner.add(&quot;com.avob.openadr.model.oadr20b.xmldsig&quot;);</span>
+<span class="fc" id="L82">		joiner.add(&quot;com.avob.openadr.model.oadr20b.xmldsig.properties&quot;);</span>
+<span class="fc" id="L83">		joiner.add(&quot;com.avob.openadr.model.oadr20b.xmldsig11&quot;);</span>
+<span class="fc" id="L84">		joiner.add(&quot;com.avob.openadr.model.oadr20b.avob&quot;);</span>
+
+<span class="fc" id="L86">		jaxbContext = JAXBContext.newInstance(joiner.toString());</span>
+
+<span class="fc" id="L88">		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);</span>
+		try {
+
+<span class="fc" id="L91">			File xsdFile = new File(&quot;src/main/resources/&quot; + XSD_PATH);</span>
+<span class="fc" id="L92">			File xsdAvobFile = new File(&quot;src/main/resources/&quot; + XSD_AVOB_PATH);</span>
+
+			// ClassLoader classLoader = Oadr20bJAXBContext.class.getClassLoader();
+			// File xsdFile = new
+			// File(classLoader.getResource(&quot;oadr20b_schema/oadr_20b.xsd&quot;).getFile());
+			// File xsdAvobFile = new
+			// File(classLoader.getResource(&quot;oadr20b_schema/oadr_avob.xsd&quot;).getFile());
+
+<span class="fc" id="L100">			schema = sf.newSchema(new Source[] { new StreamSource(xsdFile), new StreamSource(xsdAvobFile) });</span>
+
+<span class="nc" id="L102">		} catch (SAXException e) {</span>
+<span class="nc" id="L103">			throw new JAXBException(&quot;can't retreived xsd schema&quot;, e);</span>
+<span class="fc" id="L104">		}</span>
+
+<span class="fc" id="L106">	}</span>
+
+	public static Oadr20bJAXBContext getInstance() throws JAXBException {
+<span class="fc bfc" id="L109" title="All 2 branches covered.">		if (instance == null) {</span>
+<span class="fc" id="L110">			synchronized (Oadr20bJAXBContext.class) {</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">				if (instance == null) {</span>
+<span class="fc" id="L112">					instance = new Oadr20bJAXBContext();</span>
+				}
+<span class="pc" id="L114">			}</span>
+		}
+<span class="fc" id="L116">		return instance;</span>
+	}
+
+	public Object unmarshal(String payload) throws Oadr20bUnmarshalException {
+<span class="nc" id="L120">		return this.unmarshal(payload, DEFAULT_VALIDATE_XML_PAYLOAD);</span>
+	}
+
+	public Object unmarshal(String payload, boolean validate) throws Oadr20bUnmarshalException {
+<span class="nc" id="L124">		return this.unmarshal(new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8)), Object.class,</span>
+				validate);
+	}
+
+	public &lt;T&gt; T unmarshal(String payload, Class&lt;T&gt; responseKlass) throws Oadr20bUnmarshalException {
+<span class="fc" id="L129">		return this.unmarshal(new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8)), responseKlass);</span>
+	}
+
+	public &lt;T&gt; T unmarshal(String payload, Class&lt;T&gt; responseKlass, boolean validate) throws Oadr20bUnmarshalException {
+<span class="nc" id="L133">		return this.unmarshal(new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8)), responseKlass,</span>
+				validate);
+	}
+
+	public &lt;T&gt; T unmarshal(InputStream payload, Class&lt;T&gt; responseKlass) throws Oadr20bUnmarshalException {
+<span class="fc" id="L138">		return this.unmarshal(payload, responseKlass, DEFAULT_VALIDATE_XML_PAYLOAD);</span>
+	}
+
+	public &lt;T&gt; T unmarshal(InputStream payload, Class&lt;T&gt; responseKlass, boolean validate)
+			throws Oadr20bUnmarshalException {
+		Object unmarshal;
+		try {
+<span class="fc" id="L145">			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();</span>
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">			if (validate) {</span>
+<span class="nc" id="L147">				unmarshaller.setSchema(schema);</span>
+			}
+<span class="fc" id="L149">			unmarshal = unmarshaller.unmarshal(payload);</span>
+<span class="nc" id="L150">		} catch (JAXBException e) {</span>
+<span class="nc" id="L151">			throw new Oadr20bUnmarshalException(e);</span>
+<span class="fc" id="L152">		}</span>
+		try {
+<span class="fc bfc" id="L154" title="All 2 branches covered.">			if (unmarshal instanceof JAXBElement) {</span>
+<span class="fc" id="L155">				JAXBElement&lt;?&gt; cast = JAXBElement.class.cast(unmarshal);</span>
+<span class="fc" id="L156">				return responseKlass.cast(cast.getValue());</span>
+			} else {
+<span class="fc" id="L158">				return responseKlass.cast(unmarshal);</span>
+			}
+<span class="fc" id="L160">		} catch (ClassCastException e) {</span>
+<span class="fc" id="L161">			throw new Oadr20bUnmarshalException(e);</span>
+		}
+	}
+
+	public &lt;T&gt; T unmarshal(File payload, Class&lt;T&gt; responseKlass) throws Oadr20bUnmarshalException {
+<span class="fc" id="L166">		return this.unmarshal(payload, responseKlass, DEFAULT_VALIDATE_XML_PAYLOAD);</span>
+	}
+
+	public &lt;T&gt; T unmarshal(File payload, Class&lt;T&gt; responseKlass, boolean validate) throws Oadr20bUnmarshalException {
+		try {
+<span class="fc" id="L171">			return this.unmarshal(new FileInputStream(payload), responseKlass, validate);</span>
+<span class="fc" id="L172">		} catch (FileNotFoundException e) {</span>
+<span class="fc" id="L173">			throw new Oadr20bUnmarshalException(e);</span>
+		}
+	}
+
+	public &lt;T extends JAXBElement&lt;?&gt;&gt; String marshal(T payload) throws Oadr20bMarshalException {
+<span class="fc" id="L178">		return this.marshal(payload, DEFAULT_VALIDATE_XML_PAYLOAD);</span>
+	}
+
+	public &lt;T extends JAXBElement&lt;?&gt;&gt; String marshal(T payload, boolean validate) throws Oadr20bMarshalException {
+<span class="fc" id="L182">		StringWriter writer = new StringWriter();</span>
+		try {
+<span class="fc" id="L184">			Marshaller marshaller = jaxbContext.createMarshaller();</span>
+<span class="fc bfc" id="L185" title="All 2 branches covered.">			if (validate) {</span>
+<span class="fc" id="L186">				marshaller.setSchema(schema);</span>
+			}
+<span class="fc" id="L188">			marshaller.marshal(payload, writer);</span>
+<span class="fc" id="L189">		} catch (JAXBException e) {</span>
+<span class="fc" id="L190">			throw new Oadr20bMarshalException(e);</span>
+<span class="fc" id="L191">		}</span>
+<span class="fc" id="L192">		return writer.toString();</span>
+	}
+
+	public void marshal(Object payload, File file) throws Oadr20bMarshalException {
+		try {
+<span class="fc" id="L197">			Marshaller marshaller = jaxbContext.createMarshaller();</span>
+<span class="fc" id="L198">			marshaller.setSchema(schema);</span>
+<span class="fc" id="L199">			marshaller.marshal(payload, file);</span>
+<span class="nc" id="L200">		} catch (JAXBException e) {</span>
+<span class="nc" id="L201">			throw new Oadr20bMarshalException(e);</span>
+<span class="fc" id="L202">		}</span>
+<span class="fc" id="L203">	}</span>
+
+	public void marshal(Object payload, DOMResult res) throws Oadr20bMarshalException {
+		try {
+<span class="fc" id="L207">			Marshaller marshaller = jaxbContext.createMarshaller();</span>
+<span class="fc" id="L208">			marshaller.setSchema(schema);</span>
+<span class="fc" id="L209">			marshaller.marshal(payload, res);</span>
+<span class="nc" id="L210">		} catch (JAXBException e) {</span>
+<span class="nc" id="L211">			throw new Oadr20bMarshalException(e);</span>
+<span class="fc" id="L212">		}</span>
+<span class="fc" id="L213">	}</span>
+
+	public String marshalRoot(Object payload) throws Oadr20bMarshalException {
+<span class="fc" id="L216">		return this.marshalRoot(payload, DEFAULT_VALIDATE_XML_PAYLOAD);</span>
+	}
+
+	public String marshalRoot(Object payload, boolean validate) throws Oadr20bMarshalException {
+
+<span class="fc" id="L221">		JAXBElement&lt;?&gt; el = null;</span>
+
+<span class="fc bfc" id="L223" title="All 2 branches covered.">		if (payload instanceof OadrDistributeEventType) {</span>
+<span class="fc" id="L224">			OadrDistributeEventType value = (OadrDistributeEventType) payload;</span>
+<span class="fc" id="L225">			el = Oadr20bFactory.createOadrDistributeEvent(value);</span>
+
+<span class="fc bfc" id="L227" title="All 2 branches covered.">		} else if (payload instanceof OadrCreatedEventType) {</span>
+<span class="fc" id="L228">			OadrCreatedEventType value = (OadrCreatedEventType) payload;</span>
+<span class="fc" id="L229">			el = Oadr20bFactory.createOadrCreatedEvent(value);</span>
+
+<span class="fc bfc" id="L231" title="All 2 branches covered.">		} else if (payload instanceof OadrRequestEventType) {</span>
+<span class="fc" id="L232">			OadrRequestEventType value = (OadrRequestEventType) payload;</span>
+<span class="fc" id="L233">			el = Oadr20bFactory.createOadrRequestEvent(value);</span>
+
+<span class="fc bfc" id="L235" title="All 2 branches covered.">		} else if (payload instanceof OadrResponseType) {</span>
+<span class="fc" id="L236">			OadrResponseType value = (OadrResponseType) payload;</span>
+<span class="fc" id="L237">			el = Oadr20bFactory.createOadrResponse(value);</span>
+
+<span class="fc bfc" id="L239" title="All 2 branches covered.">		} else if (payload instanceof OadrCancelOptType) {</span>
+<span class="fc" id="L240">			OadrCancelOptType value = (OadrCancelOptType) payload;</span>
+<span class="fc" id="L241">			el = Oadr20bFactory.createOadrCancelOpt(value);</span>
+
+<span class="fc bfc" id="L243" title="All 2 branches covered.">		} else if (payload instanceof OadrCanceledOptType) {</span>
+<span class="fc" id="L244">			OadrCanceledOptType value = (OadrCanceledOptType) payload;</span>
+<span class="fc" id="L245">			el = Oadr20bFactory.createOadrCanceledOpt(value);</span>
+
+<span class="fc bfc" id="L247" title="All 2 branches covered.">		} else if (payload instanceof OadrCreateOptType) {</span>
+<span class="fc" id="L248">			OadrCreateOptType value = (OadrCreateOptType) payload;</span>
+<span class="fc" id="L249">			el = Oadr20bFactory.createOadrCreateOpt(value);</span>
+
+<span class="fc bfc" id="L251" title="All 2 branches covered.">		} else if (payload instanceof OadrCreatedOptType) {</span>
+<span class="fc" id="L252">			OadrCreatedOptType value = (OadrCreatedOptType) payload;</span>
+<span class="fc" id="L253">			el = Oadr20bFactory.createOadrCreatedOpt(value);</span>
+
+<span class="fc bfc" id="L255" title="All 2 branches covered.">		} else if (payload instanceof OadrCancelReportType) {</span>
+<span class="fc" id="L256">			OadrCancelReportType value = (OadrCancelReportType) payload;</span>
+<span class="fc" id="L257">			el = Oadr20bFactory.createOadrCancelReport(value);</span>
+
+<span class="fc bfc" id="L259" title="All 2 branches covered.">		} else if (payload instanceof OadrCanceledReportType) {</span>
+<span class="fc" id="L260">			OadrCanceledReportType value = (OadrCanceledReportType) payload;</span>
+<span class="fc" id="L261">			el = Oadr20bFactory.createOadrCanceledReport(value);</span>
+
+<span class="fc bfc" id="L263" title="All 2 branches covered.">		} else if (payload instanceof OadrCreateReportType) {</span>
+<span class="fc" id="L264">			OadrCreateReportType value = (OadrCreateReportType) payload;</span>
+<span class="fc" id="L265">			el = Oadr20bFactory.createOadrCreateReport(value);</span>
+
+<span class="fc bfc" id="L267" title="All 2 branches covered.">		} else if (payload instanceof OadrCreatedReportType) {</span>
+<span class="fc" id="L268">			OadrCreatedReportType value = (OadrCreatedReportType) payload;</span>
+<span class="fc" id="L269">			el = Oadr20bFactory.createOadrCreatedReport(value);</span>
+
+<span class="fc bfc" id="L271" title="All 2 branches covered.">		} else if (payload instanceof OadrRegisterReportType) {</span>
+<span class="fc" id="L272">			OadrRegisterReportType value = (OadrRegisterReportType) payload;</span>
+<span class="fc" id="L273">			el = Oadr20bFactory.createOadrRegisterReport(value);</span>
+
+<span class="fc bfc" id="L275" title="All 2 branches covered.">		} else if (payload instanceof OadrRegisteredReportType) {</span>
+<span class="fc" id="L276">			OadrRegisteredReportType value = (OadrRegisteredReportType) payload;</span>
+<span class="fc" id="L277">			el = Oadr20bFactory.createOadrRegisteredReport(value);</span>
+
+<span class="fc bfc" id="L279" title="All 2 branches covered.">		} else if (payload instanceof OadrUpdateReportType) {</span>
+<span class="fc" id="L280">			OadrUpdateReportType value = (OadrUpdateReportType) payload;</span>
+<span class="fc" id="L281">			el = Oadr20bFactory.createOadrUpdateReport(value);</span>
+
+<span class="fc bfc" id="L283" title="All 2 branches covered.">		} else if (payload instanceof OadrUpdatedReportType) {</span>
+<span class="fc" id="L284">			OadrUpdatedReportType value = (OadrUpdatedReportType) payload;</span>
+<span class="fc" id="L285">			el = Oadr20bFactory.createOadrUpdatedReport(value);</span>
+
+<span class="fc bfc" id="L287" title="All 2 branches covered.">		} else if (payload instanceof OadrCancelPartyRegistrationType) {</span>
+<span class="fc" id="L288">			OadrCancelPartyRegistrationType value = (OadrCancelPartyRegistrationType) payload;</span>
+<span class="fc" id="L289">			el = Oadr20bFactory.createOadrCancelPartyRegistration(value);</span>
+
+<span class="fc bfc" id="L291" title="All 2 branches covered.">		} else if (payload instanceof OadrCanceledPartyRegistrationType) {</span>
+<span class="fc" id="L292">			OadrCanceledPartyRegistrationType value = (OadrCanceledPartyRegistrationType) payload;</span>
+<span class="fc" id="L293">			el = Oadr20bFactory.createOadrCanceledPartyRegistration(value);</span>
+
+<span class="fc bfc" id="L295" title="All 2 branches covered.">		} else if (payload instanceof OadrCreatePartyRegistrationType) {</span>
+<span class="fc" id="L296">			OadrCreatePartyRegistrationType value = (OadrCreatePartyRegistrationType) payload;</span>
+<span class="fc" id="L297">			el = Oadr20bFactory.createOadrCreatePartyRegistration(value);</span>
+
+<span class="fc bfc" id="L299" title="All 2 branches covered.">		} else if (payload instanceof OadrCreatedPartyRegistrationType) {</span>
+<span class="fc" id="L300">			OadrCreatedPartyRegistrationType value = (OadrCreatedPartyRegistrationType) payload;</span>
+<span class="fc" id="L301">			el = Oadr20bFactory.createOadrCreatedPartyRegistration(value);</span>
+
+<span class="fc bfc" id="L303" title="All 2 branches covered.">		} else if (payload instanceof OadrRequestReregistrationType) {</span>
+<span class="fc" id="L304">			OadrRequestReregistrationType value = (OadrRequestReregistrationType) payload;</span>
+<span class="fc" id="L305">			el = Oadr20bFactory.createOadrRequestReregistration(value);</span>
+
+<span class="fc bfc" id="L307" title="All 2 branches covered.">		} else if (payload instanceof OadrQueryRegistrationType) {</span>
+<span class="fc" id="L308">			OadrQueryRegistrationType value = (OadrQueryRegistrationType) payload;</span>
+<span class="fc" id="L309">			el = Oadr20bFactory.createOadrQueryRegistration(value);</span>
+
+<span class="pc bpc" id="L311" title="1 of 2 branches missed.">		} else if (payload instanceof OadrPollType) {</span>
+<span class="fc" id="L312">			OadrPollType value = (OadrPollType) payload;</span>
+<span class="fc" id="L313">			el = Oadr20bFactory.createOadrPoll(value);</span>
+
+<span class="fc" id="L315">		} else {</span>
+<span class="nc" id="L316">			throw new Oadr20bMarshalException(&quot;payload have to be an Oadr20b root element&quot;);</span>
+		}
+
+<span class="fc" id="L319">		return this.marshal(el, validate);</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

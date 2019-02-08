@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bVtnController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.vtn.controller</a> &gt; <span class="el_source">Oadr20bVtnController.java</span></div><h1>Oadr20bVtnController.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.vtn.controller;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.avob.openadr.model.oadr20b.dto.ReportCapabilityDescriptionDto;
+import com.avob.openadr.model.oadr20b.dto.ReportCapabilityDto;
+import com.avob.openadr.model.oadr20b.dto.ReportRequestDto;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapability;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapabilityDescription;
+import com.avob.openadr.server.oadr20b.vtn.service.dtomapper.Oadr20bDtoMapper;
+import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportCapabilityDescriptionService;
+import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportCapabilityService;
+import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportRequestService;
+
+@RestController
+@RequestMapping(&quot;/Vtn&quot;)
+@PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
+<span class="fc" id="L35">public class Oadr20bVtnController {</span>
+
+<span class="fc" id="L37">	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVtnController.class);</span>
+
+	@Resource
+	private SelfReportCapabilityService selfReportCapabilityService;
+
+	@Resource
+	private SelfReportCapabilityDescriptionService selfReportCapabilityDescriptionService;
+
+	@Resource
+	private SelfReportRequestService selfReportRequestService;
+
+	@Value(&quot;${oadr.security.vtn.rsaCertificatePath}&quot;)
+	private String rsaCertificatePath;
+
+	@Value(&quot;${oadr.supportPush}&quot;)
+	private Boolean supportPush;
+
+	@Value(&quot;${oadr.supportUnsecuredHttpPush}&quot;)
+	private Boolean supportUnsecuredHttpPush;
+
+	@Value(&quot;${oadr.pullFrequencySeconds}&quot;)
+	private Integer pullFrequencySeconds;
+
+	@Value(&quot;${oadr.server.port}&quot;)
+	private Integer port;
+
+	@Value(&quot;${oadr.server.context_path}&quot;)
+	private String contextPath;
+
+	@Value(&quot;${oadr.server.host:localhost}&quot;)
+	private String host;
+
+	@Resource
+	private Oadr20bDtoMapper oadr20bDtoMapper;
+
+	@RequestMapping(value = &quot;/configuration&quot;, method = RequestMethod.GET)
+	@ResponseBody
+	public VtnConfigurationDto viewConf() throws Oadr20bMarshalException {
+
+<span class="nc" id="L76">		VtnConfigurationDto dto = new VtnConfigurationDto();</span>
+<span class="nc" id="L77">		dto.setContextPath(contextPath);</span>
+<span class="nc" id="L78">		dto.setHost(host);</span>
+<span class="nc" id="L79">		dto.setPort(port);</span>
+<span class="nc" id="L80">		dto.setPullFrequencySeconds(pullFrequencySeconds);</span>
+<span class="nc" id="L81">		dto.setSupportPush(supportPush);</span>
+<span class="nc" id="L82">		dto.setSupportUnsecuredHttpPush(supportUnsecuredHttpPush);</span>
+		String oadr20bFingerprint;
+		try {
+<span class="nc" id="L85">			oadr20bFingerprint = OadrHttpSecurity.getOadr20bFingerprint(rsaCertificatePath);</span>
+<span class="nc" id="L86">			dto.setVtnId(oadr20bFingerprint);</span>
+<span class="nc" id="L87">		} catch (OadrSecurityException e) {</span>
+<span class="nc" id="L88">			LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L89">		}</span>
+
+<span class="nc" id="L91">		return oadr20bDtoMapper.map(dto, VtnConfigurationDto.class);</span>
+	}
+
+	@RequestMapping(value = &quot;/report/available&quot;, method = RequestMethod.GET)
+	@ResponseBody
+	public List&lt;ReportCapabilityDto&gt; viewSelfReportCapability() throws Oadr20bMarshalException {
+
+<span class="fc" id="L98">		return oadr20bDtoMapper.mapList(selfReportCapabilityService.findAll(), ReportCapabilityDto.class);</span>
+	}
+
+	@RequestMapping(value = &quot;/report/available/{reportSpecifierId}&quot;, method = RequestMethod.GET)
+	@ResponseBody
+	public List&lt;ReportCapabilityDescriptionDto&gt; viewOtherReportCapabilityDescription(
+			@PathVariable(&quot;reportSpecifierId&quot;) String reportSpecifierId, HttpServletResponse response)
+			throws Oadr20bMarshalException {
+
+<span class="fc" id="L107">		SelfReportCapability reportCapability = selfReportCapabilityService.findByReportSpecifierId(reportSpecifierId);</span>
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">		if (reportCapability == null) {</span>
+<span class="nc" id="L109">			response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);</span>
+<span class="nc" id="L110">			return null;</span>
+		}
+
+<span class="fc" id="L113">		List&lt;SelfReportCapabilityDescription&gt; findByOtherReportCapability = selfReportCapabilityDescriptionService</span>
+<span class="fc" id="L114">				.findBySelfReportCapability(reportCapability);</span>
+<span class="fc" id="L115">		return oadr20bDtoMapper.mapList(findByOtherReportCapability, ReportCapabilityDescriptionDto.class);</span>
+	}
+
+	@RequestMapping(value = &quot;/report/requested&quot;, method = RequestMethod.GET)
+	@ResponseBody
+	public List&lt;ReportRequestDto&gt; viewReportRequest() throws Oadr20bMarshalException {
+
+<span class="fc" id="L122">		return oadr20bDtoMapper.mapList(selfReportRequestService.findAll(), ReportRequestDto.class);</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

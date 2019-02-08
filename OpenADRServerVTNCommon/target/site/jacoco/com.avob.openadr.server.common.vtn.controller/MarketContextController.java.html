@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MarketContextController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTNCommon</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.common.vtn.controller</a> &gt; <span class="el_source">MarketContextController.java</span></div><h1>MarketContextController.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.common.vtn.controller;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
+import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
+import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
+import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
+
+@RestController
+@RequestMapping(&quot;/MarketContext&quot;)
+@PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
+<span class="fc" id="L28">public class MarketContextController {</span>
+
+<span class="fc" id="L30">    private static final Logger LOGGER = LoggerFactory.getLogger(MarketContextController.class);</span>
+
+    @Resource
+    private VenMarketContextService venMarketContextService;
+
+    @Resource
+    private DtoMapper dtoMapper;
+
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET)
+    @ResponseBody
+    public List&lt;VenMarketContextDto&gt; listMarketContext() {
+<span class="fc" id="L41">        return dtoMapper.mapList(venMarketContextService.findAll(), VenMarketContextDto.class);</span>
+    }
+
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.POST)
+    @ResponseBody
+    public VenMarketContextDto create(@Valid @RequestBody VenMarketContextDto dto, HttpServletResponse response) {
+
+<span class="fc" id="L48">        VenMarketContext marketContext = venMarketContextService.findOneByName(dto.getName());</span>
+
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (marketContext != null) {</span>
+<span class="fc" id="L51">            response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);</span>
+<span class="fc" id="L52">            return null;</span>
+        }
+<span class="fc" id="L54">        marketContext = venMarketContextService.prepare(dto);</span>
+<span class="fc" id="L55">        venMarketContextService.save(marketContext);</span>
+<span class="fc" id="L56">        response.setStatus(HttpStatus.CREATED_201);</span>
+
+<span class="fc" id="L58">        LOGGER.info(&quot;create MarketContext: &quot; + marketContext.getName());</span>
+
+<span class="fc" id="L60">        return dtoMapper.map(marketContext, VenMarketContextDto.class);</span>
+    }
+
+    @RequestMapping(value = &quot;/{marketContextName}&quot;, method = RequestMethod.GET)
+    @ResponseBody
+    public VenMarketContextDto findMarketContextByName(@PathVariable(&quot;marketContextName&quot;) String groupName,
+            HttpServletResponse response) {
+<span class="fc" id="L67">        VenMarketContext group = venMarketContextService.findOneByName(groupName);</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if (group == null) {</span>
+<span class="fc" id="L69">            response.setStatus(HttpStatus.NOT_FOUND_404);</span>
+<span class="fc" id="L70">            return null;</span>
+        }
+<span class="fc" id="L72">        return dtoMapper.map(group, VenMarketContextDto.class);</span>
+    }
+
+    @RequestMapping(value = &quot;/{marketContextName}&quot;, method = RequestMethod.DELETE)
+    @ResponseBody
+    public void deleteMarketContextByName(@PathVariable(&quot;marketContextName&quot;) String groupName, HttpServletResponse response) {
+<span class="fc" id="L78">        VenMarketContext group = venMarketContextService.findOneByName(groupName);</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        if (group == null) {</span>
+<span class="nc" id="L80">            response.setStatus(HttpStatus.NOT_FOUND_404);</span>
+<span class="nc" id="L81">            return;</span>
+        }
+<span class="fc" id="L83">        venMarketContextService.delete(group);</span>
+<span class="fc" id="L84">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

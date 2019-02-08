@@ -1,0 +1,10 @@
+{
+	"start": 1490718520000,
+	"duration": "P1D",
+	"notificationDuration": "P1M",
+	"toleranceDuration": "PT5M",
+	"marketContext": "https://test-oadr.avob.com",
+	"comaSeparatedTargetedVenUsername": "74:3B:28:B5:90:4D:D2:D4:AD:8F",
+	"value": "SIMPLE_SIGNAL_PAYLOAD_NORMAL",
+	"state": "ACTIVE"
+}

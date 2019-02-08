@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XMLSpy v2010 rel. 3 (x64) (http://www.altova.com) by James 
+	Zuber (private) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:avob="http://oadr.avob.com" xmlns:dsig11="http://www.w3.org/2009/xmldsig11#"
+	xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:oadr="http://openadr.org/oadr-2.0b/2012/07"
+	xmlns:clm5ISO42173A="urn:un:unece:uncefact:codelist:standard:5:ISO42173A:2010-04-07"
+	xmlns:pyld="http://docs.oasis-open.org/ns/energyinterop/201110/payloads"
+	xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110"
+	xmlns:scale="http://docs.oasis-open.org/ns/emix/2011/06/siscale"
+	xmlns:emix="http://docs.oasis-open.org/ns/emix/2011/06" xmlns:strm="urn:ietf:params:xml:ns:icalendar-2.0:stream"
+	xmlns:xcal="urn:ietf:params:xml:ns:icalendar-2.0" xmlns:power="http://docs.oasis-open.org/ns/emix/2011/06/power"
+	xmlns:gb="http://naesb.org/espi" xmlns:atom="http://www.w3.org/2005/Atom"
+	targetNamespace="http://oadr.avob.com" elementFormDefault="qualified"
+	attributeFormDefault="qualified">
+
+	<xs:import namespace="http://docs.oasis-open.org/ns/energyinterop/201110"
+		schemaLocation="oadr_ei_20b.xsd" />
+
+	<xs:element name="payloadKeyToken" type="avob:payloadKeyTokenType"
+		substitutionGroup="ei:payloadBase">
+		<xs:annotation>
+			<xs:documentation>Data point value for event signals or for reporting
+				current or historical values.
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:element name="payloadAvobVenServiceRequest" type="avob:payloadAvobVenServiceRequestType"
+		substitutionGroup="ei:payloadBase">
+		<xs:annotation>
+			<xs:documentation>payloadAvobVenService payload
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:complexType name="keyTokenType">
+		<xs:annotation>
+			<xs:documentation>Represent a key-value object
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="key" type="xs:string" />
+			<xs:element name="value" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="avobVenServiceRequestType">
+		<xs:annotation>
+			<xs:documentation>Represent a key-value object
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="serviceName" type="xs:string" />
+			<xs:element name="requestId" type="xs:string" />
+			<xs:element name="command" type="xs:string" />
+			<xs:element name="refresh" type="xs:boolean" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="payloadKeyTokenType">
+		<xs:annotation>
+			<xs:documentation>This is the payload for report sending key-value
+				data
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ei:PayloadBaseType">
+				<xs:sequence>
+					<xs:element name="tokens" type="avob:keyTokenType"
+						minOccurs="1" maxOccurs="unbounded" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="payloadAvobVenServiceRequestType">
+		<xs:annotation>
+			<xs:documentation>This is the payload for report sending key-value
+				data
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ei:PayloadBaseType">
+				<xs:sequence>
+					<xs:element name="requests" type="avob:avobVenServiceRequestType"
+						minOccurs="0" maxOccurs="unbounded" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+</xs:schema>

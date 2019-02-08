@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OadrCreatedEventTask.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVEN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.ven.task</a> &gt; <span class="el_source">OadrCreatedEventTask.java</span></div><h1>OadrCreatedEventTask.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.ven.task;
+
+import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.avob.openadr.client.http.oadr20b.ven.OadrHttpVenClient20b;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+
+public class OadrCreatedEventTask implements Runnable {
+
+<span class="nc" id="L17">    private static final Logger LOGGER = LoggerFactory.getLogger(OadrCreatedEventTask.class);</span>
+
+    private OadrCreatedEventType payload;
+
+    private OadrHttpVenClient20b client;
+
+<span class="nc" id="L23">    public OadrCreatedEventTask(OadrHttpVenClient20b client, OadrCreatedEventType payload) {</span>
+<span class="nc" id="L24">        this.payload = payload;</span>
+<span class="nc" id="L25">    }</span>
+
+    @Override
+    public void run() {
+
+        try {
+<span class="nc" id="L31">            OadrResponseType response = client.oadrCreatedEvent(payload);</span>
+
+<span class="nc" id="L33">            String responseCode = response.getEiResponse().getResponseCode();</span>
+
+<span class="nc bnc" id="L35" title="All 2 branches missed.">            if (HttpStatus.OK_200 != Integer.valueOf(responseCode)) {</span>
+<span class="nc" id="L36">                LOGGER.error(</span>
+<span class="nc" id="L37">                        &quot;Fail oadrCreatedEvent: &quot; + responseCode + response.getEiResponse().getResponseDescription());</span>
+            } else {
+<span class="nc" id="L39">                LOGGER.info(&quot;oadrCreatedEvent: &quot; + responseCode);</span>
+            }
+
+<span class="nc" id="L42">        } catch (Oadr20bException e) {</span>
+<span class="nc" id="L43">            LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L44">        } catch (Oadr20bHttpLayerException e) {</span>
+<span class="nc" id="L45">            LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L46">        } catch (Oadr20bXMLSignatureException e) {</span>
+<span class="nc" id="L47">            LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L48">        } catch (Oadr20bXMLSignatureValidationException e) {</span>
+<span class="nc" id="L49">            LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L50">        }</span>
+<span class="nc" id="L51">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

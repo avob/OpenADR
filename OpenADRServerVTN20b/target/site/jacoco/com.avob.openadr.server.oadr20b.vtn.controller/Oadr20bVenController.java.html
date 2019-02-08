@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bVenController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.vtn.controller</a> &gt; <span class="el_source">Oadr20bVenController.java</span></div><h1>Oadr20bVenController.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.vtn.controller;
+
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.xml.bind.JAXBException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
+import com.avob.openadr.model.oadr20b.dto.ReportCapabilityDescriptionDto;
+import com.avob.openadr.model.oadr20b.dto.ReportCapabilityDto;
+import com.avob.openadr.model.oadr20b.dto.ReportDataDto;
+import com.avob.openadr.model.oadr20b.dto.ReportRequestDto;
+import com.avob.openadr.model.oadr20b.dto.VenOptDto;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
+import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
+import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
+import com.avob.openadr.server.common.vtn.models.ven.Ven;
+import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
+import com.avob.openadr.server.common.vtn.models.venresource.VenResource;
+import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
+import com.avob.openadr.server.common.vtn.service.VenResourceService;
+import com.avob.openadr.server.common.vtn.service.VenService;
+import com.avob.openadr.server.oadr20b.vtn.exception.OadrElementNotFoundException;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportData;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequest;
+import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
+import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
+import com.avob.openadr.server.oadr20b.vtn.service.VenOptService;
+import com.avob.openadr.server.oadr20b.vtn.service.dtomapper.Oadr20bDtoMapper;
+import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityDescriptionService;
+import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityService;
+import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportDataService;
+import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportRequestService;
+import com.google.common.collect.Lists;
+
+@RestController
+@RequestMapping(&quot;/Ven&quot;)
+@PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
+public class Oadr20bVenController {
+
+<span class="fc" id="L64">	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVenController.class);</span>
+
+	@Resource
+	private VenService venService;
+
+	@Resource
+	private VenMarketContextService venMarketContextService;
+
+	@Resource
+	private VenOptService venOptService;
+
+	@Resource
+	private VenResourceService venResourceService;
+
+	@Resource
+	private VenDistributeService venDistributeService;
+
+	@Resource
+	private OtherReportCapabilityService otherReportCapabilityService;
+
+	@Resource
+	private OtherReportCapabilityDescriptionService otherReportCapabilityDescriptionService;
+
+	@Resource
+	private OtherReportRequestService otherReportRequestService;
+
+	@Resource
+	private OtherReportDataService otherReportDataService;
+
+	@Resource
+	private Oadr20bVTNEiReportService reportService;
+
+	@Resource
+	private Oadr20bDtoMapper oadr20bDtoMapper;
+
+	private Oadr20bJAXBContext jaxbContext;
+
+<span class="fc" id="L101">	public Oadr20bVenController() throws JAXBException {</span>
+<span class="fc" id="L102">		jaxbContext = Oadr20bJAXBContext.getInstance();</span>
+<span class="fc" id="L103">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/registerparty/requestReregistration&quot;, method = RequestMethod.POST)
+	@ResponseBody
+	public void registerPartyRequestReregistration(@PathVariable(&quot;venID&quot;) String venID)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="fc" id="L110">		LOGGER.debug(&quot;Request Reregistration VEN: &quot; + venID);</span>
+
+<span class="fc" id="L112">		Ven ven = checkVen(venID);</span>
+<span class="fc" id="L113">		OadrRequestReregistrationType build = Oadr20bEiRegisterPartyBuilders</span>
+<span class="fc" id="L114">				.newOadr20bRequestReregistrationBuilder(ven.getUsername()).build();</span>
+
+<span class="fc" id="L116">		venDistributeService.distribute(ven, build);</span>
+<span class="fc" id="L117">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/registerparty/cancelPartyRegistration&quot;, method = RequestMethod.POST)
+	@ResponseBody
+	public void registerPartyCancelPartyRegistration(@PathVariable(&quot;venID&quot;) String venID)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="fc" id="L124">		LOGGER.debug(&quot;Cancel registration VEN: &quot; + venID);</span>
+
+<span class="fc" id="L126">		Ven ven = checkVen(venID);</span>
+<span class="fc" id="L127">		OadrCancelPartyRegistrationType build = Oadr20bEiRegisterPartyBuilders</span>
+<span class="fc" id="L128">				.newOadr20bCancelPartyRegistrationBuilder(&quot;&quot;, ven.getRegistrationId(), ven.getUsername()).build();</span>
+
+<span class="fc" id="L130">		venDistributeService.distribute(ven, build);</span>
+<span class="fc" id="L131">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/report/available&quot;, method = RequestMethod.GET)
+	@ResponseBody
+	public List&lt;ReportCapabilityDto&gt; viewOtherReportCapability(@PathVariable(&quot;venID&quot;) String venID)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="fc" id="L138">		Ven ven = checkVen(venID);</span>
+<span class="fc" id="L139">		List&lt;OtherReportCapability&gt; findBySource = otherReportCapabilityService.findBySource(ven);</span>
+
+<span class="fc" id="L141">		return oadr20bDtoMapper.mapList(findBySource, ReportCapabilityDto.class);</span>
+	}
+
+	@RequestMapping(value = &quot;/{venID}/report/available/description&quot;, method = RequestMethod.GET)
+	@ResponseBody
+	public List&lt;ReportCapabilityDescriptionDto&gt; viewOtherReportCapabilityDescription(
+			@PathVariable(&quot;venID&quot;) String venID,
+			@RequestParam(value = &quot;reportSpecifierId&quot;, required = true) String reportSpecifierId)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="fc" id="L151">		checkVen(venID);</span>
+<span class="fc" id="L152">		OtherReportCapability reportCapability = checkOtherReportCapability(reportSpecifierId);</span>
+
+<span class="fc" id="L154">		List&lt;OtherReportCapabilityDescription&gt; desc = otherReportCapabilityDescriptionService</span>
+<span class="fc" id="L155">				.findByOtherReportCapability(reportCapability);</span>
+
+<span class="fc" id="L157">		return oadr20bDtoMapper.mapList(desc, ReportCapabilityDescriptionDto.class);</span>
+	}
+
+	@RequestMapping(value = &quot;/{venID}/report/available/description/payload&quot;, method = RequestMethod.GET)
+	@ResponseBody
+	public String viewOtherReportCapabilityDescriptionRid(@PathVariable(&quot;venID&quot;) String venID,
+			@RequestParam(value = &quot;reportSpecifierId&quot;, required = true) String reportSpecifierId,
+			@RequestParam(value = &quot;rid&quot;, required = true) String rid)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="nc" id="L167">		checkVen(venID);</span>
+<span class="nc" id="L168">		OtherReportCapability reportCapability = checkOtherReportCapability(reportSpecifierId);</span>
+
+<span class="nc" id="L170">		OtherReportCapabilityDescription findByOtherReportCapability = otherReportCapabilityDescriptionService</span>
+<span class="nc" id="L171">				.findByOtherReportCapabilityAndRid(reportCapability, rid);</span>
+<span class="nc" id="L172">		return findByOtherReportCapability.getPayload();</span>
+	}
+
+	@RequestMapping(value = &quot;/{venID}/report/available/description/subscribe&quot;, method = RequestMethod.POST)
+	@ResponseBody
+	public void subscribeOtherReportCapabilityDescriptionRid(@PathVariable(&quot;venID&quot;) String venID,
+			@RequestParam(value = &quot;reportSpecifierId&quot;, required = true) String reportSpecifierId,
+			@RequestParam(value = &quot;rid&quot;, required = true) String rid,
+			@RequestParam(value = &quot;granularity&quot;, required = false) String granularity,
+			@RequestParam(value = &quot;reportBackDuration&quot;, required = false) String reportBackDuration)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+<span class="nc" id="L183">		Ven ven = checkVen(venID);</span>
+<span class="nc" id="L184">		OtherReportCapability reportCapability = checkOtherReportCapability(reportSpecifierId);</span>
+
+<span class="nc" id="L186">		String[] split = rid.split(&quot;\\|&quot;);</span>
+<span class="nc" id="L187">		List&lt;String&gt; rids = Arrays.asList(split);</span>
+<span class="nc" id="L188">		reportService.subscribe(ven, reportCapability, rids, reportBackDuration, granularity, null, null);</span>
+<span class="nc" id="L189">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/report/available/description/subscribeAll&quot;, method = RequestMethod.POST)
+	@ResponseBody
+	public void subscribeAllOtherReportCapabilityDescriptionRid(@PathVariable(&quot;venID&quot;) String venID,
+			@RequestParam(value = &quot;reportSpecifierId&quot;, required = true) String reportSpecifierId,
+			@RequestParam(value = &quot;granularity&quot;, required = false) String granularity,
+			@RequestParam(value = &quot;reportBackDuration&quot;, required = false) String reportBackDuration)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+<span class="nc" id="L198">		Ven ven = checkVen(venID);</span>
+
+<span class="nc" id="L200">		String[] split = reportSpecifierId.split(&quot;,&quot;);</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">		for (String s : split) {</span>
+<span class="nc" id="L202">			OtherReportCapability reportCapability = checkOtherReportCapability(s);</span>
+<span class="nc" id="L203">			reportService.subscribe(ven, reportCapability, null, reportBackDuration, granularity, null, null);</span>
+		}
+<span class="nc" id="L205">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/report/available/description/removeFromSubscribe&quot;, method = RequestMethod.POST)
+	@ResponseBody
+	public void removeSubscribeOtherReportCapabilityDescriptionRid(@PathVariable(&quot;venID&quot;) String venID,
+			@RequestParam(value = &quot;reportSpecifierId&quot;, required = true) String reportSpecifierId,
+			@RequestParam(value = &quot;rid&quot;, required = true) String rid)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+<span class="nc" id="L213">		Ven ven = checkVen(venID);</span>
+<span class="nc" id="L214">		OtherReportCapability reportCapability = checkOtherReportCapability(reportSpecifierId);</span>
+
+<span class="nc" id="L216">		String[] split = rid.split(&quot;\\|&quot;);</span>
+<span class="nc" id="L217">		List&lt;String&gt; rids = Arrays.asList(split);</span>
+
+<span class="nc" id="L219">		reportService.removeFromSubscription(ven, reportCapability, rids);</span>
+<span class="nc" id="L220">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/report/available/description/request&quot;, method = RequestMethod.POST)
+	@ResponseBody
+	public void requestOtherReportCapabilityDescriptionRid(@PathVariable(&quot;venID&quot;) String venID,
+			@RequestParam(value = &quot;reportSpecifierId&quot;, required = true) String reportSpecifierId,
+			@RequestParam(value = &quot;rid&quot;, required = true) String rid,
+			@RequestParam(value = &quot;start&quot;, required = false) Long start,
+			@RequestParam(value = &quot;end&quot;, required = false) Long end)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+<span class="nc" id="L230">		Ven ven = checkVen(venID);</span>
+<span class="nc" id="L231">		OtherReportCapability reportCapability = checkOtherReportCapability(reportSpecifierId);</span>
+
+<span class="nc" id="L233">		String[] split = rid.split(&quot;\\|&quot;);</span>
+<span class="nc" id="L234">		List&lt;String&gt; rids = Arrays.asList(split);</span>
+<span class="nc" id="L235">		reportService.request(ven, reportCapability, rids, start, end);</span>
+<span class="nc" id="L236">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/report/available/description/requestAll&quot;, method = RequestMethod.POST)
+	@ResponseBody
+	public void requestAllOtherReportCapabilityDescriptionRid(@PathVariable(&quot;venID&quot;) String venID,
+			@RequestParam(value = &quot;reportSpecifierId&quot;, required = true) String reportSpecifierId,
+			@RequestParam(value = &quot;start&quot;, required = false) Long start,
+			@RequestParam(value = &quot;end&quot;, required = false) Long end)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+<span class="nc" id="L245">		Ven ven = checkVen(venID);</span>
+<span class="nc" id="L246">		OtherReportCapability reportCapability = checkOtherReportCapability(reportSpecifierId);</span>
+
+<span class="nc" id="L248">		reportService.request(ven, reportCapability, null, start, end);</span>
+<span class="nc" id="L249">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/report/requested&quot;, method = RequestMethod.GET)
+	@ResponseBody
+	public List&lt;ReportRequestDto&gt; viewReportRequest(@PathVariable(&quot;venID&quot;) String venID,
+			@RequestParam(value = &quot;reportSpecifierId&quot;, required = false) String reportSpecifierId)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="fc" id="L257">		Ven ven = checkVen(venID);</span>
+<span class="fc" id="L258">		List&lt;OtherReportRequest&gt; findBySource = null;</span>
+<span class="pc bpc" id="L259" title="1 of 2 branches missed.">		if (reportSpecifierId == null) {</span>
+<span class="fc" id="L260">			findBySource = otherReportRequestService.findBySource(ven);</span>
+		} else {
+<span class="nc" id="L262">			findBySource = otherReportRequestService.findBySourceAndReportSpecifierId(ven, reportSpecifierId);</span>
+		}
+
+<span class="fc" id="L265">		return oadr20bDtoMapper.mapList(findBySource, ReportRequestDto.class);</span>
+	}
+
+	// @RequestMapping(value = &quot;/{venID}/report/requested/{reportRequestID}&quot;, method
+	// = RequestMethod.GET)
+	// @ResponseBody
+	// public List&lt;ReportRequestDto&gt;
+	// viewReportRequestByReportRequestId(@PathVariable(&quot;venID&quot;) String venID,
+	// @PathVariable(&quot;reportRequestID&quot;) String reportRequestID)
+	// throws Oadr20bMarshalException, OadrElementNotFoundException {
+	//
+	// checkVen(venID);
+	// List&lt;OtherReportRequest&gt; findBySource =
+	// otherReportRequestService.findByReportRequestId(reportRequestID);
+	//
+	// return oadr20bDtoMapper.mapList(findBySource, ReportRequestDto.class);
+	// }
+
+	@RequestMapping(value = &quot;/{venID}/report/requested/cancelSubscription&quot;, method = RequestMethod.POST)
+	@ResponseBody
+	public void cancelSubscriptionReportRequest(@PathVariable(&quot;venID&quot;) String venID,
+			@RequestParam(&quot;reportRequestId&quot;) String reportRequestId)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="nc" id="L289">		Ven ven = checkVen(venID);</span>
+
+<span class="nc" id="L291">		String[] split = reportRequestId.split(&quot;,&quot;);</span>
+
+<span class="nc bnc" id="L293" title="All 2 branches missed.">		for (String s : split) {</span>
+<span class="nc" id="L294">			reportService.unsubscribe(ven, s);</span>
+		}
+<span class="nc" id="L296">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/report_action/requestRegister&quot;, method = RequestMethod.POST)
+	@ResponseBody
+	public void requestRegisterReport(@PathVariable(&quot;venID&quot;) String venID)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="fc" id="L303">		LOGGER.debug(&quot;Request RegisterReport from VEN: &quot; + venID);</span>
+
+<span class="fc" id="L305">		Ven ven = checkVen(venID);</span>
+<span class="fc" id="L306">		reportService.distributeRequestMetadataOadrCreateReportPayload(ven);</span>
+<span class="fc" id="L307">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/report_action/sendRegister&quot;, method = RequestMethod.POST)
+	@ResponseBody
+	public void sendRegisterReport(@PathVariable(&quot;venID&quot;) String venID)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="fc" id="L314">		LOGGER.debug(&quot;Send RegisterReport to VEN: &quot; + venID);</span>
+
+<span class="fc" id="L316">		Ven ven = checkVen(venID);</span>
+<span class="fc" id="L317">		reportService.distributeOadrRegisterReport(ven);</span>
+<span class="fc" id="L318">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/report_action/create&quot;, method = RequestMethod.POST)
+	@ResponseBody
+	public void createReport(@PathVariable(&quot;venID&quot;) String venID, @RequestBody String oadrReport)
+			throws Oadr20bMarshalException, Oadr20bUnmarshalException, OadrElementNotFoundException {
+
+<span class="nc" id="L325">		Ven ven = checkVen(venID);</span>
+<span class="nc" id="L326">		Object unmarshal = jaxbContext.unmarshal(oadrReport, false);</span>
+<span class="nc bnc" id="L327" title="All 2 branches missed.">		if (unmarshal instanceof OadrReportRequestType) {</span>
+<span class="nc" id="L328">			OadrReportRequestType reportRequest = (OadrReportRequestType) unmarshal;</span>
+<span class="nc" id="L329">			OadrCreateReportType build = Oadr20bEiReportBuilders.newOadr20bCreateReportBuilder(&quot;&quot;, ven.getUsername())</span>
+<span class="nc" id="L330">					.addReportRequest(reportRequest).build();</span>
+<span class="nc" id="L331">			venDistributeService.distribute(ven, build);</span>
+		}
+
+<span class="nc" id="L334">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/report_action/cancel&quot;, method = RequestMethod.POST)
+	@ResponseBody
+	public void cancelReport(@PathVariable(&quot;venID&quot;) String venID,
+			@RequestParam(&quot;reportRequestId&quot;) String reportRequestId)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="fc" id="L342">		Ven ven = checkVen(venID);</span>
+<span class="fc" id="L343">		boolean reportToFollow = false;</span>
+<span class="fc" id="L344">		List&lt;String&gt; reportId = Lists.newArrayList(reportRequestId);</span>
+<span class="fc" id="L345">		OadrCancelReportType build = Oadr20bEiReportBuilders</span>
+<span class="fc" id="L346">				.newOadr20bCancelReportBuilder(&quot;&quot;, ven.getUsername(), reportToFollow).addReportRequestId(reportId)</span>
+<span class="fc" id="L347">				.build();</span>
+
+<span class="fc" id="L349">		venDistributeService.distribute(ven, build);</span>
+<span class="fc" id="L350">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/report_action/update&quot;, method = RequestMethod.POST)
+	@ResponseBody
+	public void updateReport(@PathVariable(&quot;venID&quot;) String venID, @RequestBody String oadrReport)
+			throws Oadr20bMarshalException, Oadr20bUnmarshalException, OadrElementNotFoundException {
+
+<span class="nc" id="L357">		Ven ven = checkVen(venID);</span>
+<span class="nc" id="L358">		Object unmarshal = jaxbContext.unmarshal(oadrReport, false);</span>
+<span class="nc bnc" id="L359" title="All 2 branches missed.">		if (unmarshal instanceof OadrReportType) {</span>
+<span class="nc" id="L360">			OadrReportType report = (OadrReportType) unmarshal;</span>
+<span class="nc" id="L361">			OadrUpdateReportType build = Oadr20bEiReportBuilders.newOadr20bUpdateReportBuilder(&quot;&quot;, ven.getUsername())</span>
+<span class="nc" id="L362">					.addReport(report).build();</span>
+<span class="nc" id="L363">			venDistributeService.distribute(ven, build);</span>
+		}
+
+<span class="nc" id="L366">	}</span>
+
+	@RequestMapping(value = &quot;/{venID}/opt&quot;, method = RequestMethod.GET)
+	@ResponseBody
+	public List&lt;VenOptDto&gt; venOpt(@PathVariable(&quot;venID&quot;) String venID,
+			@RequestParam(value = &quot;start&quot;, required = false) Instant start,
+			@RequestParam(value = &quot;end&quot;, required = false) Instant end,
+			@RequestParam(value = &quot;marketContext&quot;, required = false) String marketContextName)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="fc" id="L376">		Ven ven = checkVen(venID);</span>
+<span class="fc" id="L377">		checkMarketContextExists(marketContextName);</span>
+
+<span class="fc bfc" id="L379" title="All 2 branches covered.">		Long startTimestamp = (start != null) ? start.toEpochMilli() : null;</span>
+<span class="fc bfc" id="L380" title="All 2 branches covered.">		Long endTimestamp = (end != null) ? end.toEpochMilli() : null;</span>
+<span class="fc" id="L381">		return oadr20bDtoMapper.mapList(</span>
+<span class="fc" id="L382">				venOptService.findScheduledOpt(ven.getUsername(), marketContextName, startTimestamp, endTimestamp),</span>
+				VenOptDto.class);
+	}
+
+	@RequestMapping(value = &quot;/{venID}/opt/resource/{resourceName}&quot;, method = RequestMethod.GET)
+	@ResponseBody
+	public List&lt;VenOptDto&gt; venResourceOpt(@PathVariable(&quot;venID&quot;) String venID,
+			@PathVariable(&quot;resourceName&quot;) String resourceName,
+			@RequestParam(value = &quot;start&quot;, required = false) Instant start,
+			@RequestParam(value = &quot;end&quot;, required = false) Instant end,
+			@RequestParam(value = &quot;marketContext&quot;, required = false) String marketContextName)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="fc" id="L395">		Ven ven = checkVen(venID);</span>
+<span class="fc" id="L396">		checkMarketContextExists(marketContextName);</span>
+<span class="fc" id="L397">		checkResource(ven, resourceName);</span>
+
+<span class="fc bfc" id="L399" title="All 2 branches covered.">		Long startTimestamp = (start != null) ? start.toEpochMilli() : null;</span>
+<span class="fc bfc" id="L400" title="All 2 branches covered.">		Long endTimestamp = (end != null) ? end.toEpochMilli() : null;</span>
+
+<span class="fc" id="L402">		return oadr20bDtoMapper.mapList(venOptService.findResourceScheduledOpt(ven.getUsername(), marketContextName,</span>
+				resourceName, startTimestamp, endTimestamp), VenOptDto.class);
+	}
+
+	@RequestMapping(value = &quot;/{venID}/report/data/{reportSpecifierId}&quot;, method = RequestMethod.GET)
+	@ResponseBody
+	public List&lt;ReportDataDto&gt; viewsReportData(@PathVariable(&quot;venID&quot;) String venID,
+			@PathVariable(&quot;reportSpecifierId&quot;) String reportSpecifierId)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="fc" id="L412">		checkVen(venID);</span>
+<span class="fc" id="L413">		checkOtherReportCapability(reportSpecifierId);</span>
+
+<span class="fc" id="L415">		List&lt;OtherReportData&gt; findByReportSpecifierId = otherReportDataService</span>
+<span class="fc" id="L416">				.findByReportSpecifierId(reportSpecifierId);</span>
+<span class="fc" id="L417">		return oadr20bDtoMapper.mapList(findByReportSpecifierId, ReportDataDto.class);</span>
+	}
+
+	@RequestMapping(value = &quot;/{venID}/report/data/{reportSpecifierId}/rid/{rid}&quot;, method = RequestMethod.GET)
+	@ResponseBody
+	public List&lt;ReportDataDto&gt; viewsReportData(@PathVariable(&quot;venID&quot;) String venID,
+			@PathVariable(&quot;reportSpecifierId&quot;) String reportSpecifierId, @PathVariable(&quot;rid&quot;) String rid)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+<span class="fc" id="L426">		checkVen(venID);</span>
+<span class="fc" id="L427">		checkOtherReportCapabilityDescription(reportSpecifierId, rid);</span>
+
+<span class="fc" id="L429">		return oadr20bDtoMapper.mapList(otherReportDataService.findByReportSpecifierIdAndRid(reportSpecifierId, rid),</span>
+				ReportDataDto.class);
+	}
+
+	private void checkResource(Ven ven, String resourceName) throws OadrElementNotFoundException {
+<span class="fc" id="L434">		VenResource resource = venResourceService.findByVenAndName(ven, resourceName);</span>
+<span class="fc bfc" id="L435" title="All 2 branches covered.">		if (resource == null) {</span>
+<span class="fc" id="L436">			throw new OadrElementNotFoundException();</span>
+		}
+<span class="fc" id="L438">	}</span>
+
+	private void checkMarketContextExists(String marketContextName) throws OadrElementNotFoundException {
+<span class="fc bfc" id="L441" title="All 2 branches covered.">		if (marketContextName != null) {</span>
+<span class="fc" id="L442">			VenMarketContext marketContext = venMarketContextService.findOneByName(marketContextName);</span>
+<span class="fc bfc" id="L443" title="All 2 branches covered.">			if (marketContext == null) {</span>
+<span class="fc" id="L444">				throw new OadrElementNotFoundException();</span>
+			}
+		}
+<span class="fc" id="L447">	}</span>
+
+	private OtherReportCapability checkOtherReportCapability(String reportSpecifierId)
+			throws OadrElementNotFoundException {
+<span class="fc" id="L451">		OtherReportCapability otherReportCapability = otherReportCapabilityService</span>
+<span class="fc" id="L452">				.findByReportSpecifierId(reportSpecifierId);</span>
+
+<span class="fc bfc" id="L454" title="All 2 branches covered.">		if (otherReportCapability == null) {</span>
+<span class="fc" id="L455">			throw new OadrElementNotFoundException();</span>
+		}
+
+<span class="fc" id="L458">		return otherReportCapability;</span>
+	}
+
+	private Ven checkVen(String venID) throws OadrElementNotFoundException {
+<span class="fc" id="L462">		Ven ven = venService.findOneByUsername(venID);</span>
+<span class="fc bfc" id="L463" title="All 2 branches covered.">		if (ven == null) {</span>
+<span class="fc" id="L464">			throw new OadrElementNotFoundException();</span>
+		}
+<span class="fc" id="L466">		return ven;</span>
+	}
+
+	private OtherReportCapability checkOtherReportCapabilityDescription(String reportSpecifierId, String rid)
+			throws OadrElementNotFoundException {
+<span class="fc" id="L471">		OtherReportCapability otherReportCapability = checkOtherReportCapability(reportSpecifierId);</span>
+<span class="fc" id="L472">		OtherReportCapabilityDescription otherReportCapabilityDescription = otherReportCapabilityDescriptionService</span>
+<span class="fc" id="L473">				.findByOtherReportCapabilityAndRid(otherReportCapability, rid);</span>
+<span class="fc bfc" id="L474" title="All 2 branches covered.">		if (otherReportCapabilityDescription == null) {</span>
+<span class="fc" id="L475">			throw new OadrElementNotFoundException();</span>
+		}
+<span class="fc" id="L477">		return otherReportCapability;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

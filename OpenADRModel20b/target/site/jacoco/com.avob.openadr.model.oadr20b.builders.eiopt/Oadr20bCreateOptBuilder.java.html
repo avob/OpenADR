@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bCreateOptBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRModel20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.model.oadr20b.builders.eiopt</a> &gt; <span class="el_source">Oadr20bCreateOptBuilder.java</span></div><h1>Oadr20bCreateOptBuilder.java</h1><pre class="source lang-java linenums">package com.avob.openadr.model.oadr20b.builders.eiopt;
+
+import com.avob.openadr.model.oadr20b.Oadr20bFactory;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bEiBuilders;
+import com.avob.openadr.model.oadr20b.ei.EiTargetType;
+import com.avob.openadr.model.oadr20b.ei.OptReasonEnumeratedType;
+import com.avob.openadr.model.oadr20b.ei.OptTypeType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
+import com.avob.openadr.model.oadr20b.xcal.VavailabilityType;
+
+public class Oadr20bCreateOptBuilder {
+
+    private OadrCreateOptType oadrCreateOptType;
+
+    public Oadr20bCreateOptBuilder(String requestId, String venId, Long createdDatetime, String eventId,
+<span class="fc" id="L16">            long modificationNumber, String optId, OptTypeType optType, OptReasonEnumeratedType optReason) {</span>
+<span class="fc" id="L17">        oadrCreateOptType = Oadr20bFactory.createOadrCreateOptType(requestId, venId, createdDatetime, eventId,</span>
+                modificationNumber, optId, optType, optReason);
+<span class="fc" id="L19">        oadrCreateOptType.setEiTarget(Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addVenId(venId).build());</span>
+<span class="fc" id="L20">    }</span>
+
+    public Oadr20bCreateOptBuilder(String requestId, String venId, Long createdDatetime,
+<span class="nc" id="L23">            VavailabilityType vavailabilityType, String optId, OptTypeType optType, OptReasonEnumeratedType optReason) {</span>
+<span class="nc" id="L24">        oadrCreateOptType = Oadr20bFactory.createOadrCreateOptType(requestId, venId, createdDatetime, vavailabilityType,</span>
+                optId, optType, optReason);
+<span class="nc" id="L26">        oadrCreateOptType.setEiTarget(Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addVenId(venId).build());</span>
+<span class="nc" id="L27">    }</span>
+
+    public Oadr20bCreateOptBuilder withSchemaVersion(String schemaVersion) {
+<span class="fc" id="L30">        oadrCreateOptType.setSchemaVersion(schemaVersion);</span>
+<span class="fc" id="L31">        return this;</span>
+    }
+
+    public Oadr20bCreateOptBuilder addTargetedResource(String resourceName) {
+<span class="fc" id="L35">        oadrCreateOptType.getEiTarget().getResourceID().add(resourceName);</span>
+<span class="fc" id="L36">        return this;</span>
+    }
+
+    public Oadr20bCreateOptBuilder withMarketContext(String marketContext) {
+<span class="fc" id="L40">        oadrCreateOptType.setMarketContext(marketContext);</span>
+<span class="fc" id="L41">        return this;</span>
+    }
+
+    public Oadr20bCreateOptBuilder withOadrDeviceClass(EiTargetType oadrDeviceClass) {
+<span class="fc" id="L45">        oadrCreateOptType.setOadrDeviceClass(oadrDeviceClass);</span>
+<span class="fc" id="L46">        return this;</span>
+    }
+
+    public Oadr20bCreateOptBuilder withOptReason(OptReasonEnumeratedType optReason) {
+<span class="fc" id="L50">        oadrCreateOptType.setOptReason(optReason.value());</span>
+<span class="fc" id="L51">        return this;</span>
+    }
+
+    public OadrCreateOptType build() {
+<span class="fc" id="L55">        return oadrCreateOptType;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

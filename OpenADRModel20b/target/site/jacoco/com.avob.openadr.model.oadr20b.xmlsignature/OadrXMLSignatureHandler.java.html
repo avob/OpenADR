@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OadrXMLSignatureHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRModel20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.model.oadr20b.xmlsignature</a> &gt; <span class="el_source">OadrXMLSignatureHandler.java</span></div><h1>OadrXMLSignatureHandler.java</h1><pre class="source lang-java linenums">package com.avob.openadr.model.oadr20b.xmlsignature;
+
+import java.io.StringWriter;
+import java.io.Writer;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.CanonicalizationMethod;
+import javax.xml.crypto.dsig.DigestMethod;
+import javax.xml.crypto.dsig.Reference;
+import javax.xml.crypto.dsig.SignatureMethod;
+import javax.xml.crypto.dsig.SignatureProperties;
+import javax.xml.crypto.dsig.SignatureProperty;
+import javax.xml.crypto.dsig.SignedInfo;
+import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.XMLObject;
+import javax.xml.crypto.dsig.XMLSignature;
+import javax.xml.crypto.dsig.XMLSignatureException;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.dom.DOMSignContext;
+import javax.xml.crypto.dsig.dom.DOMValidateContext;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
+import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
+import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPrivateKey;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
+
+import com.avob.openadr.model.oadr20b.Oadr20bFactory;
+import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bInitializationException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
+import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
+import com.avob.openadr.model.oadr20b.xmldsig.ObjectType;
+import com.avob.openadr.model.oadr20b.xmldsig.SignaturePropertiesType;
+import com.avob.openadr.model.oadr20b.xmldsig.SignaturePropertyType;
+import com.avob.openadr.model.oadr20b.xmldsig.properties.ReplayProtectType;
+
+public class OadrXMLSignatureHandler {
+
+	public static final String RSA_SHA256_ALGORITHM = &quot;http://www.w3.org/2001/04/xmldsig-more#rsa-sha256&quot;;
+
+	public static final String ECDSA_SHA256_ALGORITHM = &quot;http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256&quot;;
+
+	private static final Oadr20bJAXBContext jaxbContext;
+
+	private static final JAXBContext replayProtectContext;
+
+	private static final String SIGNEDOBJECT_PAYLOAD_ID = &quot;signedObject&quot;;
+	private static final String SIGNATUREOBJECT_PAYLOAD_ID = &quot;prop&quot;;
+	static {
+		try {
+<span class="fc" id="L86">			jaxbContext = Oadr20bJAXBContext.getInstance();</span>
+<span class="fc" id="L87">			replayProtectContext = JAXBContext.newInstance(ReplayProtectType.class);</span>
+<span class="nc" id="L88">		} catch (JAXBException e) {</span>
+<span class="nc" id="L89">			throw new Oadr20bInitializationException(e);</span>
+<span class="fc" id="L90">		}</span>
+<span class="fc" id="L91">	}</span>
+
+<span class="nc" id="L93">	private OadrXMLSignatureHandler() {</span>
+<span class="nc" id="L94">	}</span>
+
+	private static &lt;T&gt; List&lt;T&gt; asElement(List&lt;Object&gt; list, Class&lt;T&gt; klass) {
+<span class="fc" id="L97">		List&lt;T&gt; res = new ArrayList&lt;T&gt;();</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">		if (list != null) {</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">			for (Object obj : list) {</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">				if (obj instanceof JAXBElement) {</span>
+<span class="fc" id="L101">					JAXBElement&lt;?&gt; el = (JAXBElement&lt;?&gt;) obj;</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">					if (klass.equals(el.getValue().getClass())) {</span>
+<span class="fc" id="L103">						res.add(klass.cast(el.getValue()));</span>
+					}
+				}
+
+<span class="fc" id="L107">			}</span>
+		}
+<span class="fc" id="L109">		return res;</span>
+	}
+
+	private static void validateReplayProtect(OadrPayload payload, long nowDate, long millisecondAcceptedDelay)
+			throws Oadr20bXMLSignatureValidationException {
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">		if (payload.getSignature() == null) {</span>
+<span class="nc" id="L115">			throw new Oadr20bXMLSignatureValidationException(&quot;XML Signature not found&quot;);</span>
+		}
+<span class="fc" id="L117">		List&lt;ObjectType&gt; objects = payload.getSignature().getObject();</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">		if (objects == null) {</span>
+<span class="nc" id="L119">			throw new Oadr20bXMLSignatureValidationException(&quot;XML Signature must include ReplayProtect payload&quot;);</span>
+		}
+<span class="fc" id="L121">		ReplayProtectType replayProtect = null;</span>
+<span class="fc" id="L122">		List&lt;SignaturePropertiesType&gt; propertiesList = new ArrayList&lt;SignaturePropertiesType&gt;();</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">		for (ObjectType objectType : objects) {</span>
+<span class="fc" id="L124">			propertiesList.addAll(OadrXMLSignatureHandler.&lt;SignaturePropertiesType&gt;asElement(objectType.getContent(),</span>
+					SignaturePropertiesType.class));
+<span class="fc" id="L126">		}</span>
+<span class="fc" id="L127">		List&lt;SignaturePropertyType&gt; propertyList = new ArrayList&lt;SignaturePropertyType&gt;();</span>
+<span class="fc bfc" id="L128" title="All 2 branches covered.">		for (SignaturePropertiesType properties : propertiesList) {</span>
+<span class="fc" id="L129">			propertyList.addAll(properties.getSignatureProperty());</span>
+<span class="fc" id="L130">		}</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">		for (SignaturePropertyType property : propertyList) {</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">			for (Object object : property.getContent()) {</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">				if (object instanceof JAXBElement) {</span>
+<span class="fc" id="L134">					JAXBElement&lt;?&gt; el = (JAXBElement&lt;?&gt;) object;</span>
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">					if (el.getValue() instanceof ReplayProtectType) {</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">						if (replayProtect == null) {</span>
+<span class="fc" id="L137">							replayProtect = (ReplayProtectType) el.getValue();</span>
+						} else {
+<span class="nc" id="L139">							throw new Oadr20bXMLSignatureValidationException(&quot;Multiple ReplayProtect payload found&quot;);</span>
+						}
+					}
+				}
+<span class="fc" id="L143">			}</span>
+<span class="fc" id="L144">		}</span>
+
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">		if (replayProtect == null) {</span>
+<span class="nc" id="L147">			throw new Oadr20bXMLSignatureValidationException(&quot;XML Signature must include ReplayProtect payload&quot;);</span>
+		}
+
+<span class="fc" id="L150">		XMLGregorianCalendar timestamp = replayProtect.getTimestamp();</span>
+
+<span class="fc" id="L152">		Long xmlCalendarToTimestamp = Oadr20bFactory.xmlCalendarToTimestamp(timestamp);</span>
+
+<span class="fc bfc" id="L154" title="All 2 branches covered.">		if (nowDate - xmlCalendarToTimestamp &gt; millisecondAcceptedDelay) {</span>
+<span class="fc" id="L155">			throw new Oadr20bXMLSignatureValidationException(&quot;Invalid ReplayProtect timestamp&quot;);</span>
+		}
+<span class="fc" id="L157">	}</span>
+
+	/**
+	 * validate oadrpayload signature.
+	 * 
+	 * @param payload
+	 * @return
+	 */
+	public static void validate(OadrPayload payload, long nowDate, long millisecondAcceptedDelay)
+			throws Oadr20bXMLSignatureValidationException {
+
+<span class="fc" id="L168">		validateReplayProtect(payload, nowDate, millisecondAcceptedDelay);</span>
+
+<span class="fc" id="L170">		DOMResult res = new DOMResult();</span>
+		try {
+<span class="fc" id="L172">			jaxbContext.marshal(payload, res);</span>
+<span class="nc" id="L173">		} catch (Oadr20bMarshalException e) {</span>
+<span class="nc" id="L174">			throw new Oadr20bXMLSignatureValidationException(e);</span>
+<span class="fc" id="L175">		}</span>
+<span class="fc" id="L176">		Document doc = (Document) res.getNode();</span>
+
+		// Find Signature element
+<span class="fc" id="L179">		NodeList nl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, &quot;Signature&quot;);</span>
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">		if (nl.getLength() == 0) {</span>
+<span class="nc" id="L181">			throw new Oadr20bXMLSignatureValidationException(&quot;Cannot find Signature element&quot;);</span>
+		}
+
+		// Retreive Assertion Node to be signed.
+<span class="fc" id="L185">		XPathFactory xPathfactory = XPathFactory.newInstance();</span>
+
+<span class="fc" id="L187">		XPath xpath = xPathfactory.newXPath();</span>
+<span class="fc" id="L188">		Element assertionNode = null;</span>
+		javax.xml.xpath.XPathExpression compile;
+		try {
+<span class="fc" id="L191">			compile = xpath.compile(&quot;//*[local-name()='oadrSignedObject']&quot;);</span>
+<span class="fc" id="L192">			assertionNode = (Element) compile.evaluate(doc, XPathConstants.NODE);</span>
+<span class="fc" id="L193">			assertionNode.setIdAttribute(&quot;oadr:Id&quot;, true);</span>
+<span class="nc" id="L194">		} catch (XPathExpressionException e) {</span>
+<span class="nc" id="L195">			throw new Oadr20bXMLSignatureValidationException(e);</span>
+<span class="fc" id="L196">		}</span>
+
+		// Create a DOM XMLSignatureFactory that will be used to unmarshal the
+		// document containing the XMLSignature
+<span class="fc" id="L200">		XMLSignatureFactory fac = XMLSignatureFactory.getInstance(&quot;DOM&quot;,</span>
+				new org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI());
+
+		// Create a DOMValidateContext and specify a KeyValue KeySelector
+		// and document context
+<span class="fc" id="L205">		DOMValidateContext valContext = new DOMValidateContext(new KeyValueKeySelector(), nl.item(0));</span>
+<span class="fc" id="L206">		valContext.setIdAttributeNS(assertionNode, &quot;http://openadr.org/oadr-2.0b/2012/07&quot;, &quot;Id&quot;);</span>
+
+		XMLSignature signature;
+		try {
+<span class="fc" id="L210">			signature = fac.unmarshalXMLSignature(valContext);</span>
+<span class="nc" id="L211">		} catch (MarshalException e) {</span>
+<span class="nc" id="L212">			throw new Oadr20bXMLSignatureValidationException(e);</span>
+<span class="fc" id="L213">		}</span>
+
+<span class="fc" id="L215">		DOMValidateContext context = new DOMValidateContext(new KeyValueKeySelector(), doc.getDocumentElement());</span>
+<span class="fc" id="L216">		context.setIdAttributeNS(assertionNode, &quot;http://openadr.org/oadr-2.0b/2012/07&quot;, &quot;Id&quot;);</span>
+
+		try {
+<span class="fc" id="L219">			boolean validate = signature.validate(context);</span>
+<span class="pc bpc" id="L220" title="1 of 2 branches missed.">			if (!validate) {</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">				if (!signature.getSignatureValue().validate(context)) {</span>
+<span class="nc" id="L222">					throw new Oadr20bXMLSignatureValidationException(&quot;XMLSignature SignatureValue validation fail&quot;);</span>
+				}
+<span class="nc bnc" id="L224" title="All 2 branches missed.">				for (Object object : signature.getSignedInfo().getReferences()) {</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">					if (object instanceof Reference) {</span>
+<span class="nc" id="L226">						Reference ref = (Reference) object;</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">						if (!ref.validate(context)) {</span>
+<span class="nc" id="L228">							throw new Oadr20bXMLSignatureValidationException(</span>
+<span class="nc" id="L229">									&quot;XMLSignature Reference uri: &quot; + ref.getURI() + &quot; validation fail&quot;);</span>
+						}
+					}
+<span class="nc" id="L232">				}</span>
+			}
+<span class="nc" id="L234">		} catch (XMLSignatureException e) {</span>
+<span class="nc" id="L235">			throw new Oadr20bXMLSignatureValidationException(e);</span>
+<span class="fc" id="L236">		}</span>
+
+<span class="fc" id="L238">	}</span>
+
+	public static String sign(Object oadrObject, PrivateKey privateKey, X509Certificate certificate, String nonce,
+			Long createdtimestamp) throws Oadr20bXMLSignatureException {
+<span class="fc" id="L242">		return sign(Oadr20bFactory.createOadrPayload(SIGNEDOBJECT_PAYLOAD_ID, oadrObject), privateKey, certificate,</span>
+				nonce, createdtimestamp);
+	}
+
+	/**
+	 * sign oadrpayload and return document as a string
+	 * 
+	 * @param payload
+	 * @param privateKey
+	 * @param certificate
+	 * @param nonce
+	 * @param createdtimestamp
+	 * @return
+	 */
+	private static String sign(OadrPayload payload, PrivateKey privateKey, X509Certificate certificate, String nonce,
+			Long createdtimestamp) throws Oadr20bXMLSignatureException {
+
+		// marshall payload as xmlstructure
+<span class="fc" id="L260">		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();</span>
+<span class="fc" id="L261">		dbf.setNamespaceAware(true);</span>
+<span class="fc" id="L262">		DOMResult res = new DOMResult();</span>
+		try {
+<span class="fc" id="L264">			jaxbContext.marshal(payload, res);</span>
+<span class="nc" id="L265">		} catch (Oadr20bMarshalException e) {</span>
+<span class="nc" id="L266">			throw new Oadr20bXMLSignatureException(e);</span>
+<span class="fc" id="L267">		}</span>
+<span class="fc" id="L268">		Document doc = (Document) res.getNode();</span>
+
+		// Retreive nodes in xmlstructure
+<span class="fc" id="L271">		XPathFactory xPathfactory = XPathFactory.newInstance();</span>
+<span class="fc" id="L272">		XPath xpath = xPathfactory.newXPath();</span>
+<span class="fc" id="L273">		Element signedObjectNode = null;</span>
+<span class="fc" id="L274">		Element oadrPayloadNode = null;</span>
+		javax.xml.xpath.XPathExpression compile;
+		try {
+<span class="fc" id="L277">			compile = xpath.compile(&quot;//*[local-name()='oadrSignedObject']&quot;);</span>
+<span class="fc" id="L278">			signedObjectNode = (Element) compile.evaluate(doc, XPathConstants.NODE);</span>
+<span class="fc" id="L279">			signedObjectNode.setIdAttribute(&quot;oadr:Id&quot;, true);</span>
+<span class="fc" id="L280">			compile = xpath.compile(&quot;//*[local-name()='oadrPayload']&quot;);</span>
+<span class="fc" id="L281">			oadrPayloadNode = (Element) compile.evaluate(doc, XPathConstants.NODE);</span>
+
+<span class="nc" id="L283">		} catch (XPathExpressionException e) {</span>
+<span class="nc" id="L284">			throw new Oadr20bXMLSignatureException(e);</span>
+<span class="fc" id="L285">		}</span>
+
+		// instanciate sign context
+<span class="fc" id="L288">		DOMSignContext dsc = new DOMSignContext(privateKey, oadrPayloadNode, signedObjectNode);</span>
+		// manipulate java signature generation to conform to oadr expectation
+<span class="fc" id="L290">		dsc.setDefaultNamespacePrefix(&quot;xmldsig&quot;);</span>
+<span class="fc" id="L291">		dsc.putNamespacePrefix(&quot;http://openadr.org/oadr-2.0b/2012/07/xmldsig-properties&quot;, &quot;properties&quot;);</span>
+		// set id of signedObjectNode (required for URI reference/sign a part of
+		// doc)
+<span class="fc" id="L294">		dsc.setIdAttributeNS(signedObjectNode, &quot;http://openadr.org/oadr-2.0b/2012/07&quot;, &quot;Id&quot;);</span>
+
+<span class="fc" id="L296">		BouncyCastleProvider provider = new BouncyCastleProvider();</span>
+<span class="fc" id="L297">		Security.addProvider(provider);</span>
+
+<span class="fc" id="L299">		PublicKey publicKey = certificate.getPublicKey();</span>
+
+<span class="fc" id="L301">		XMLSignatureFactory fac = XMLSignatureFactory.getInstance(&quot;DOM&quot;,</span>
+				new org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI());
+
+<span class="fc" id="L304">		SignedInfo si = null;</span>
+		try {
+			// require digest signedObjectNode
+<span class="fc" id="L307">			Reference ref = fac.newReference(&quot;#&quot; + SIGNEDOBJECT_PAYLOAD_ID,</span>
+<span class="fc" id="L308">					fac.newDigestMethod(DigestMethod.SHA256, null),</span>
+<span class="fc" id="L309">					Collections.singletonList(fac.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null)),</span>
+					// null,
+					null, null);
+
+			// require digest replayProtect
+<span class="fc" id="L314">			Reference refProp = fac.newReference(&quot;#&quot; + SIGNATUREOBJECT_PAYLOAD_ID,</span>
+<span class="fc" id="L315">					fac.newDigestMethod(DigestMethod.SHA256, null),</span>
+<span class="fc" id="L316">					Collections.singletonList(</span>
+<span class="fc" id="L317">							fac.newTransform(CanonicalizationMethod.INCLUSIVE, (TransformParameterSpec) null)),</span>
+					null, null);
+
+<span class="fc" id="L320">			List&lt;Reference&gt; refs = new ArrayList&lt;Reference&gt;();</span>
+<span class="fc" id="L321">			refs.add(ref);</span>
+<span class="fc" id="L322">			refs.add(refProp);</span>
+
+			// create signedInfo node containing references
+<span class="pc bpc" id="L325" title="1 of 2 branches missed.">			if (privateKey instanceof BCRSAPrivateKey) {</span>
+<span class="fc" id="L326">				si = fac.newSignedInfo(</span>
+<span class="fc" id="L327">						fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE, (C14NMethodParameterSpec) null),</span>
+<span class="fc" id="L328">						fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null), refs);</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">			} else if (privateKey instanceof BCECPrivateKey) {</span>
+<span class="nc" id="L330">				si = fac.newSignedInfo(</span>
+<span class="nc" id="L331">						fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE, (C14NMethodParameterSpec) null),</span>
+<span class="nc" id="L332">						fac.newSignatureMethod(ECDSA_SHA256_ALGORITHM, null), refs);</span>
+			}
+
+<span class="nc" id="L335">		} catch (NoSuchAlgorithmException e) {</span>
+<span class="nc" id="L336">			throw new Oadr20bXMLSignatureException(e);</span>
+<span class="nc" id="L337">		} catch (InvalidAlgorithmParameterException e) {</span>
+<span class="nc" id="L338">			throw new Oadr20bXMLSignatureException(e);</span>
+<span class="fc" id="L339">		}</span>
+
+<span class="fc" id="L341">		KeyInfo ki = null;</span>
+		try {
+<span class="fc" id="L343">			KeyInfoFactory kif = fac.getKeyInfoFactory();</span>
+<span class="fc" id="L344">			KeyValue kv = kif.newKeyValue(publicKey);</span>
+<span class="fc" id="L345">			List&lt;KeyValue&gt; keyInfoItems = new ArrayList&lt;KeyValue&gt;();</span>
+<span class="fc" id="L346">			keyInfoItems.add(kv);</span>
+
+<span class="fc" id="L348">			ki = kif.newKeyInfo(keyInfoItems);</span>
+<span class="nc" id="L349">		} catch (KeyException e) {</span>
+<span class="nc" id="L350">			throw new Oadr20bXMLSignatureException(e);</span>
+<span class="fc" id="L351">		}</span>
+
+<span class="fc" id="L353">		List&lt;XMLStructure&gt; lstruct = null;</span>
+		try {
+<span class="fc" id="L355">			ReplayProtectType replayProtect = Oadr20bFactory.createReplayProtectType(nonce, createdtimestamp);</span>
+
+<span class="fc" id="L357">			DocumentBuilderFactory newInstance = DocumentBuilderFactory.newInstance();</span>
+<span class="fc" id="L358">			newInstance.setNamespaceAware(true);</span>
+
+<span class="fc" id="L360">			List&lt;DOMStructure&gt; list = new ArrayList&lt;DOMStructure&gt;();</span>
+<span class="fc" id="L361">			JAXBElement&lt;ReplayProtectType&gt; createReplayProtect = Oadr20bFactory.createReplayProtect(replayProtect);</span>
+			DOMResult replayRes;
+<span class="fc" id="L363">			replayRes = new DOMResult(dbf.newDocumentBuilder().newDocument());</span>
+
+<span class="fc" id="L365">			replayProtectContext.createMarshaller().marshal(createReplayProtect, replayRes);</span>
+<span class="fc" id="L366">			Document replay = (Document) replayRes.getNode();</span>
+<span class="fc" id="L367">			Element documentElement = replay.getDocumentElement();</span>
+<span class="fc" id="L368">			list.add(new DOMStructure(documentElement));</span>
+
+<span class="fc" id="L370">			List&lt;XMLStructure&gt; objectContent = new ArrayList&lt;XMLStructure&gt;();</span>
+<span class="fc" id="L371">			SignatureProperty newSignatureProperty = fac.newSignatureProperty(list, &quot;&quot;, null);</span>
+<span class="fc" id="L372">			List&lt;SignatureProperty&gt; listSignatureProperty = new ArrayList&lt;SignatureProperty&gt;();</span>
+<span class="fc" id="L373">			listSignatureProperty.add(newSignatureProperty);</span>
+<span class="fc" id="L374">			SignatureProperties newSignatureProperties = fac.newSignatureProperties(listSignatureProperty, null);</span>
+<span class="fc" id="L375">			objectContent.add(newSignatureProperties);</span>
+<span class="fc" id="L376">			XMLObject newXMLObject = fac.newXMLObject(objectContent, SIGNATUREOBJECT_PAYLOAD_ID, null, null);</span>
+<span class="fc" id="L377">			lstruct = new ArrayList&lt;XMLStructure&gt;();</span>
+<span class="fc" id="L378">			lstruct.add(newXMLObject);</span>
+<span class="nc" id="L379">		} catch (ParserConfigurationException e) {</span>
+<span class="nc" id="L380">			throw new Oadr20bXMLSignatureException(e);</span>
+<span class="nc" id="L381">		} catch (JAXBException e) {</span>
+<span class="nc" id="L382">			throw new Oadr20bXMLSignatureException(e);</span>
+<span class="fc" id="L383">		}</span>
+
+		// sign payload
+<span class="fc" id="L386">		XMLSignature signature = fac.newXMLSignature(si, ki, lstruct, null, null);</span>
+		try {
+<span class="fc" id="L388">			signature.sign(dsc);</span>
+<span class="nc" id="L389">		} catch (MarshalException e) {</span>
+<span class="nc" id="L390">			throw new Oadr20bXMLSignatureException(e);</span>
+<span class="nc" id="L391">		} catch (XMLSignatureException e) {</span>
+<span class="nc" id="L392">			throw new Oadr20bXMLSignatureException(e);</span>
+<span class="fc" id="L393">		}</span>
+
+		// manipulate payload namespace to include those used in Signature
+		// payload
+<span class="fc" id="L397">		oadrPayloadNode.setAttributeNS(&quot;http://www.w3.org/2000/xmlns/&quot;, &quot;xmlns:xmldsig11&quot;,</span>
+				&quot;http://www.w3.org/2009/xmldsig11#&quot;);
+
+<span class="fc" id="L400">		oadrPayloadNode.setAttributeNS(&quot;http://www.w3.org/2000/xmlns/&quot;, &quot;xmlns:xmldsig&quot;,</span>
+				&quot;http://www.w3.org/2000/09/xmldsig#&quot;);
+
+<span class="fc" id="L403">		DOMImplementationLS domImplLS = (DOMImplementationLS) doc.getImplementation();</span>
+<span class="fc" id="L404">		LSSerializer serializer = domImplLS.createLSSerializer();</span>
+
+<span class="fc" id="L406">		LSOutput lsOutput = domImplLS.createLSOutput();</span>
+		// set utf8 xml prolog
+<span class="fc" id="L408">		lsOutput.setEncoding(&quot;UTF-8&quot;);</span>
+<span class="fc" id="L409">		Writer stringWriter = new StringWriter();</span>
+<span class="fc" id="L410">		lsOutput.setCharacterStream(stringWriter);</span>
+<span class="fc" id="L411">		serializer.write(doc, lsOutput);</span>
+
+<span class="fc" id="L413">		return stringWriter.toString();</span>
+
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

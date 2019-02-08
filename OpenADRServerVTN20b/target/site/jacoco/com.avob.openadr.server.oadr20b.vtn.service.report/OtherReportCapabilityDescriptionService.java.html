@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OtherReportCapabilityDescriptionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.vtn.service.report</a> &gt; <span class="el_source">OtherReportCapabilityDescriptionService.java</span></div><h1>OtherReportCapabilityDescriptionService.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.vtn.service.report;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Service;
+
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescriptionDao;
+import com.avob.openadr.server.oadr20b.vtn.service.GenericService;
+
+@Service
+<span class="fc" id="L16">public class OtherReportCapabilityDescriptionService extends GenericService&lt;OtherReportCapabilityDescription&gt; {</span>
+
+	@Resource
+	private OtherReportCapabilityDescriptionDao otherReportCapabilityDescriptionDao;
+
+	public Iterable&lt;OtherReportCapabilityDescription&gt; findByReportRequestId(List&lt;String&gt; payloadReportRequestId) {
+<span class="nc" id="L22">		return otherReportCapabilityDescriptionDao.findByReportRequestIdIn(payloadReportRequestId);</span>
+	}
+
+	public List&lt;OtherReportCapabilityDescription&gt; findByOtherReportCapabilityAndRidIn(
+			OtherReportCapability otherReportCapability, List&lt;String&gt; rid) {
+<span class="nc" id="L27">		return otherReportCapabilityDescriptionDao.findByOtherReportCapabilityAndRidIn(otherReportCapability, rid);</span>
+	}
+
+	public OtherReportCapabilityDescription findByOtherReportCapabilityAndRid(
+			OtherReportCapability otherReportCapability, String rid) {
+<span class="fc" id="L32">		return otherReportCapabilityDescriptionDao.findOneByOtherReportCapabilityAndRid(otherReportCapability, rid);</span>
+	}
+
+	public List&lt;OtherReportCapabilityDescription&gt; findByOtherReportCapability(
+			OtherReportCapability otherReportCapability) {
+<span class="fc" id="L37">		return otherReportCapabilityDescriptionDao.findByOtherReportCapability(otherReportCapability);</span>
+	}
+
+	public List&lt;OtherReportCapabilityDescription&gt; findByOtherReportCapabilityIn(
+			List&lt;OtherReportCapability&gt; otherReportCapabilities) {
+<span class="fc" id="L42">		return otherReportCapabilityDescriptionDao.findByOtherReportCapabilityIn(otherReportCapabilities);</span>
+	}
+
+	@Override
+	public CrudRepository&lt;OtherReportCapabilityDescription, Long&gt; getDao() {
+<span class="fc" id="L47">		return otherReportCapabilityDescriptionDao;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

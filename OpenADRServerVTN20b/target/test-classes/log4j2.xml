@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration package="log4j.test" status="WARN">
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
+	</Appenders>
+	<Loggers>
+		
+		<Logger level="info" name="com.avob" additivity="false">
+			<AppenderRef ref="Console" />
+		</Logger>
+		<Logger level="warn" name="com.avob.openadr.server.oadr20a.vtn.controller.Oadr20aVtnEiEventController" additivity="false">
+			<AppenderRef ref="Console" />
+		</Logger>
+		<Logger level="warn" name="com.avob.openadr.server.common.vtn.controller.EosDemandResponseController" additivity="false">
+			<AppenderRef ref="Console" />
+		</Logger>
+		<Logger level="error" name="org.springframework" additivity="false">
+			<AppenderRef ref="Console" />
+		</Logger>
+		<Root level="warn">
+			<AppenderRef ref="Console" />
+		</Root>
+	</Loggers>
+</Configuration>

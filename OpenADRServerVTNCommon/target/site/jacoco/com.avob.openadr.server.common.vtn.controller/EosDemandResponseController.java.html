@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EosDemandResponseController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTNCommon</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.common.vtn.controller</a> &gt; <span class="el_source">EosDemandResponseController.java</span></div><h1>EosDemandResponseController.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.common.vtn.controller;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.xml.datatype.DatatypeConfigurationException;
+
+import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDtoValidator;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
+import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
+
+@RestController
+@RequestMapping(&quot;/DemandResponseEvent&quot;)
+<span class="fc" id="L34">public class EosDemandResponseController {</span>
+
+<span class="fc" id="L36">    private static final Logger LOGGER = LoggerFactory.getLogger(EosDemandResponseController.class);</span>
+
+    @Resource
+    private DtoMapper dtoMapper;
+
+    @Autowired
+    private DemandResponseEventService demandResponseEventService;
+
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) throws DatatypeConfigurationException {
+<span class="fc" id="L46">        binder.setValidator(new DemandResponseEventDtoValidator());</span>
+<span class="fc" id="L47">    }</span>
+
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET)
+    @ResponseBody
+    public List&lt;DemandResponseEventDto&gt; list(@RequestParam(value = &quot;ven&quot;, required = false) String ven,
+            @RequestParam(value = &quot;state&quot;, required = false) DemandResponseEventStateEnum state) {
+
+<span class="fc" id="L54">        List&lt;DemandResponseEvent&gt; find = demandResponseEventService.find(ven, state);</span>
+<span class="fc" id="L55">        return dtoMapper.mapList(find, DemandResponseEventDto.class);</span>
+    }
+
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.POST)
+    @ResponseBody
+    public DemandResponseEventDto create(@Valid @RequestBody DemandResponseEventDto event,
+            HttpServletResponse response) {
+<span class="fc" id="L62">        DemandResponseEvent map = dtoMapper.map(event, DemandResponseEvent.class);</span>
+
+<span class="fc" id="L64">        DemandResponseEvent save = demandResponseEventService.create(map);</span>
+
+<span class="fc" id="L66">        response.setStatus(HttpStatus.CREATED_201);</span>
+
+<span class="fc" id="L68">        LOGGER.info(&quot;create DR event: &quot; + save.toString());</span>
+
+<span class="fc" id="L70">        return dtoMapper.map(save, DemandResponseEventDto.class);</span>
+
+    }
+
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.GET)
+    @ResponseBody
+    public DemandResponseEventDto read(@PathVariable(value = &quot;id&quot;) Long id, HttpServletResponse response) {
+<span class="fc" id="L77">        DemandResponseEvent event = demandResponseEventService.findById(id);</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        if (event == null) {</span>
+<span class="fc" id="L79">            response.setStatus(HttpStatus.NOT_FOUND_404);</span>
+<span class="fc" id="L80">            return null;</span>
+        }
+
+<span class="fc" id="L83">        LOGGER.info(&quot;read DR event: &quot; + event.toString());</span>
+<span class="fc" id="L84">        return dtoMapper.map(event, DemandResponseEventDto.class);</span>
+
+    }
+
+    @RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.DELETE)
+    @ResponseBody
+    public void delete(@PathVariable(value = &quot;id&quot;) Long id, HttpServletResponse response) {
+<span class="fc" id="L91">        boolean delete = demandResponseEventService.delete(id);</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (!delete) {</span>
+<span class="fc" id="L93">            response.setStatus(HttpStatus.NOT_FOUND_404);</span>
+        }
+<span class="fc" id="L95">    }</span>
+
+    @RequestMapping(value = &quot;/{id}/cancel&quot;, method = RequestMethod.POST)
+    @ResponseBody
+    public DemandResponseEventDto cancel(@PathVariable(value = &quot;id&quot;) Long id, HttpServletResponse response) {
+<span class="fc" id="L100">        DemandResponseEvent event = demandResponseEventService.cancel(id);</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        if (event == null) {</span>
+<span class="fc" id="L102">            response.setStatus(HttpStatus.NOT_FOUND_404);</span>
+<span class="fc" id="L103">            return null;</span>
+        }
+<span class="fc" id="L105">        return dtoMapper.map(event, DemandResponseEventDto.class);</span>
+    }
+
+    @RequestMapping(value = &quot;/{id}/active&quot;, method = RequestMethod.POST)
+    @ResponseBody
+    public DemandResponseEventDto active(@PathVariable(value = &quot;id&quot;) Long id, HttpServletResponse response) {
+<span class="fc" id="L111">        DemandResponseEvent event = demandResponseEventService.active(id);</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        if (event == null) {</span>
+<span class="fc" id="L113">            response.setStatus(HttpStatus.NOT_FOUND_404);</span>
+<span class="fc" id="L114">            return null;</span>
+        }
+<span class="fc" id="L116">        return dtoMapper.map(event, DemandResponseEventDto.class);</span>
+    }
+
+    @RequestMapping(value = &quot;/{id}/normal&quot;, method = RequestMethod.POST)
+    @ResponseBody
+    public DemandResponseEventDto updateValueNormal(@PathVariable(value = &quot;id&quot;) Long id, HttpServletResponse response) {
+<span class="fc" id="L122">        DemandResponseEvent event = demandResponseEventService.updateValue(id,</span>
+                DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_NORMAL);
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (event == null) {</span>
+<span class="fc" id="L125">            response.setStatus(HttpStatus.NOT_FOUND_404);</span>
+<span class="fc" id="L126">            return null;</span>
+        }
+<span class="fc" id="L128">        return dtoMapper.map(event, DemandResponseEventDto.class);</span>
+    }
+
+    @RequestMapping(value = &quot;/{id}/moderate&quot;, method = RequestMethod.POST)
+    @ResponseBody
+    public DemandResponseEventDto updateModerate(@PathVariable(value = &quot;id&quot;) Long id, HttpServletResponse response) {
+<span class="fc" id="L134">        DemandResponseEvent event = demandResponseEventService.updateValue(id,</span>
+                DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE);
+<span class="fc bfc" id="L136" title="All 2 branches covered.">        if (event == null) {</span>
+<span class="fc" id="L137">            response.setStatus(HttpStatus.NOT_FOUND_404);</span>
+<span class="fc" id="L138">            return null;</span>
+        }
+<span class="fc" id="L140">        return dtoMapper.map(event, DemandResponseEventDto.class);</span>
+    }
+
+    @RequestMapping(value = &quot;/{id}/high&quot;, method = RequestMethod.POST)
+    @ResponseBody
+    public DemandResponseEventDto updateValueHigh(@PathVariable(value = &quot;id&quot;) Long id, HttpServletResponse response) {
+<span class="fc" id="L146">        DemandResponseEvent event = demandResponseEventService.updateValue(id,</span>
+                DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH);
+<span class="fc bfc" id="L148" title="All 2 branches covered.">        if (event == null) {</span>
+<span class="fc" id="L149">            response.setStatus(HttpStatus.NOT_FOUND_404);</span>
+<span class="fc" id="L150">            return null;</span>
+        }
+<span class="fc" id="L152">        return dtoMapper.map(event, DemandResponseEventDto.class);</span>
+    }
+
+    @RequestMapping(value = &quot;/{id}/special&quot;, method = RequestMethod.POST)
+    @ResponseBody
+    public DemandResponseEventDto updateValueSpecial(@PathVariable(value = &quot;id&quot;) Long id,
+            HttpServletResponse response) {
+<span class="fc" id="L159">        DemandResponseEvent event = demandResponseEventService.updateValue(id,</span>
+                DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_SPECIAL);
+<span class="fc bfc" id="L161" title="All 2 branches covered.">        if (event == null) {</span>
+<span class="fc" id="L162">            response.setStatus(HttpStatus.NOT_FOUND_404);</span>
+<span class="fc" id="L163">            return null;</span>
+        }
+<span class="fc" id="L165">        return dtoMapper.map(event, DemandResponseEventDto.class);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

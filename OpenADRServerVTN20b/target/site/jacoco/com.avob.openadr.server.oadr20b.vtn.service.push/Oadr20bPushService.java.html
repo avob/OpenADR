@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bPushService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.vtn.service.push</a> &gt; <span class="el_source">Oadr20bPushService.java</span></div><h1>Oadr20bPushService.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.vtn.service.push;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+
+import com.avob.openadr.client.http.OadrHttpClientBuilder;
+import com.avob.openadr.client.http.oadr20b.OadrHttpClient20b;
+import com.avob.openadr.client.http.oadr20b.vtn.OadrHttpVtnClient20b;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bInitializationException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
+import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCanceledReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
+import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
+import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
+import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiRegisterPartyService;
+import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
+
+@Service
+<span class="fc" id="L48">public class Oadr20bPushService {</span>
+<span class="fc" id="L49">	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bPushService.class);</span>
+
+	private static final String HTTP_SCHEME = &quot;http&quot;;
+
+	@Value(&quot;${oadr.security.ven.trustcertificate.oadrRsaRootCertificate}&quot;)
+	private String oadrRsaRootCertificate;
+
+	@Value(&quot;${oadr.security.ven.trustcertificate.oadrEccRootCertificate}&quot;)
+	private String oadrEccRootCertificate;
+
+	@Value(&quot;${oadr.security.ven.trustcertificate.oadrRsaIntermediateCertificate}&quot;)
+	private String oadrRsaIntermediateCertificate;
+
+	@Value(&quot;${oadr.security.ven.trustcertificate.oadrEccIntermediateCertificate}&quot;)
+	private String oadrEccIntermediateCertificate;
+
+	@Value(&quot;${oadr.security.vtn.rsaPrivateKeyPath}&quot;)
+	private String rsaPrivateKeyPemFilePath;
+
+	@Value(&quot;${oadr.security.vtn.rsaCertificatePath}&quot;)
+	private String rsaClientCertPemFilePath;
+
+	@Value(&quot;${oadr.supportUnsecuredHttpPush:#{false}}&quot;)
+	private boolean supportUnsecuredHttpPush;
+
+	@Value(&quot;${oadr.security.replayProtectAcceptedDelaySecond}&quot;)
+	private Long replayProtectAcceptedDelaySecond;
+
+	@Resource
+	private Oadr20bVTNEiEventService oadr20bVTNEiEventService;
+
+	@Resource
+	private Oadr20bVTNEiRegisterPartyService oadr20bVTNEiRegisterPartyService;
+
+	@Resource
+	private Oadr20bVTNEiReportService oadr20bVTNEiReportService;
+
+	@Resource
+	private DemandResponseEventService demandResponseEventService;
+
+	private OadrHttpVtnClient20b oadrHttpVtnClient20b;
+
+	private OadrHttpVtnClient20b securedOadrHttpVtnClient20b;
+
+	@PostConstruct
+	public void init() {
+<span class="fc" id="L95">		String[] trustedCertificateFilePath = { oadrEccRootCertificate, oadrRsaRootCertificate,</span>
+				oadrEccIntermediateCertificate, oadrRsaIntermediateCertificate };
+
+		OadrHttpClientBuilder builder;
+		try {
+<span class="fc" id="L100">			builder = new OadrHttpClientBuilder().withTrustedCertificate(Arrays.asList(trustedCertificateFilePath))</span>
+<span class="fc" id="L101">					.withPooling(5, 5).withX509Authentication(rsaPrivateKeyPemFilePath, rsaClientCertPemFilePath);</span>
+
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">			if (supportUnsecuredHttpPush) {</span>
+<span class="fc" id="L104">				builder.enableHttp(true);</span>
+			}
+
+<span class="fc" id="L107">			setOadrHttpVtnClient20b(new OadrHttpVtnClient20b(new OadrHttpClient20b(builder.build())));</span>
+
+<span class="fc" id="L109">			setSecuredOadrHttpVtnClient20b(new OadrHttpVtnClient20b(new OadrHttpClient20b(builder.build(),</span>
+					rsaPrivateKeyPemFilePath, rsaClientCertPemFilePath, replayProtectAcceptedDelaySecond)));
+
+<span class="nc" id="L112">		} catch (OadrSecurityException e) {</span>
+<span class="nc" id="L113">			throw new Oadr20bInitializationException(e);</span>
+<span class="nc" id="L114">		} catch (JAXBException e) {</span>
+<span class="nc" id="L115">			throw new Oadr20bInitializationException(e);</span>
+<span class="fc" id="L116">		}</span>
+
+<span class="fc" id="L118">	}</span>
+
+	public OadrDistributeEventType createOadrDistributeEvent(String venUsername) {
+<span class="nc" id="L121">		List&lt;DemandResponseEvent&gt; findToSentEventByVenUsername = demandResponseEventService</span>
+<span class="nc" id="L122">				.findToSentEventByVenUsername(venUsername);</span>
+
+<span class="nc" id="L124">		return oadr20bVTNEiEventService.createOadrDistributeEventPayload(venUsername, findToSentEventByVenUsername);</span>
+	}
+
+	public void pushDistributeEventToVen(String venUsername, String venPushUrl, Boolean xmlSignatureRequired) {
+<span class="nc" id="L128">		this.pushMessageToVen(venPushUrl, xmlSignatureRequired, createOadrDistributeEvent(venUsername));</span>
+<span class="nc" id="L129">	}</span>
+
+	@Async
+	public void pushMessageToVen(String venPushUrl, Boolean xmlSignatureRequired, Object payload) {
+		try {
+<span class="nc" id="L134">			URI uri = new URI(venPushUrl);</span>
+
+<span class="nc" id="L136">			OadrHttpVtnClient20b requestClient = getOadrHttpVtnClient20b();</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">			if (xmlSignatureRequired) {</span>
+<span class="nc" id="L138">				requestClient = getSecuredOadrHttpVtnClient20b();</span>
+			}
+
+<span class="nc bnc" id="L141" title="All 4 branches missed.">			if (HTTP_SCHEME.equals(uri.getScheme()) &amp;&amp; !supportUnsecuredHttpPush) {</span>
+<span class="nc" id="L142">				LOGGER.warn(&quot;Unsecured HTTP call unsupported&quot;);</span>
+<span class="nc" id="L143">				return;</span>
+			}
+
+<span class="nc bnc" id="L146" title="All 2 branches missed.">			if (payload instanceof OadrDistributeEventType) {</span>
+<span class="nc" id="L147">				OadrDistributeEventType val = (OadrDistributeEventType) payload;</span>
+<span class="nc" id="L148">				OadrResponseType response = requestClient.oadrDistributeEvent(venPushUrl, val);</span>
+<span class="nc" id="L149">				String eiResponseCode = response.getEiResponse().getResponseCode();</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">				if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {</span>
+<span class="nc" id="L151">					LOGGER.error(&quot;OadrDistributeEventType - Application Layer Error[&quot; + eiResponseCode + &quot;]&quot;);</span>
+				}
+
+<span class="nc bnc" id="L154" title="All 2 branches missed.">			} else if (payload instanceof OadrCancelReportType) {</span>
+<span class="nc" id="L155">				OadrCancelReportType val = (OadrCancelReportType) payload;</span>
+<span class="nc" id="L156">				OadrCanceledReportType oadrCancelReport = requestClient.oadrCancelReport(venPushUrl, val);</span>
+<span class="nc" id="L157">				String eiResponseCode = oadrCancelReport.getEiResponse().getResponseCode();</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">				if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {</span>
+<span class="nc" id="L159">					LOGGER.error(&quot;OadrCancelReportType - Application Layer Error[&quot; + eiResponseCode + &quot;]&quot;);</span>
+<span class="nc" id="L160">					return;</span>
+				}
+
+<span class="nc" id="L163">				oadr20bVTNEiReportService.otherOadrCancelReport(val);</span>
+
+<span class="nc bnc" id="L165" title="All 2 branches missed.">			} else if (payload instanceof OadrCreateReportType) {</span>
+<span class="nc" id="L166">				OadrCreateReportType val = (OadrCreateReportType) payload;</span>
+<span class="nc" id="L167">				OadrCreatedReportType oadrCreateReport = requestClient.oadrCreateReport(venPushUrl, val);</span>
+<span class="nc" id="L168">				String eiResponseCode = oadrCreateReport.getEiResponse().getResponseCode();</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">				if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {</span>
+<span class="nc" id="L170">					LOGGER.error(&quot;OadrCreateReportType - Application Layer Error[&quot; + eiResponseCode + &quot;]&quot;);</span>
+				}
+
+<span class="nc" id="L173">				oadr20bVTNEiReportService.oadrCreatedReport(oadrCreateReport, xmlSignatureRequired);</span>
+
+<span class="nc bnc" id="L175" title="All 2 branches missed.">			} else if (payload instanceof OadrRegisterReportType) {</span>
+<span class="nc" id="L176">				OadrRegisterReportType val = (OadrRegisterReportType) payload;</span>
+<span class="nc" id="L177">				requestClient.oadrRegisterReport(venPushUrl, val);</span>
+
+<span class="nc bnc" id="L179" title="All 2 branches missed.">			} else if (payload instanceof OadrUpdateReportType) {</span>
+<span class="nc" id="L180">				OadrUpdateReportType val = (OadrUpdateReportType) payload;</span>
+<span class="nc" id="L181">				OadrUpdatedReportType oadrUpdateReport = requestClient.oadrUpdateReport(venPushUrl, val);</span>
+<span class="nc" id="L182">				String eiResponseCode = oadrUpdateReport.getEiResponse().getResponseCode();</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">				if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {</span>
+<span class="nc" id="L184">					LOGGER.error(&quot;OadrUpdateReportType - Application Layer Error[&quot; + eiResponseCode + &quot;]&quot;);</span>
+				}
+
+<span class="nc bnc" id="L187" title="All 2 branches missed.">			} else if (payload instanceof OadrCancelPartyRegistrationType) {</span>
+<span class="nc" id="L188">				OadrCancelPartyRegistrationType val = (OadrCancelPartyRegistrationType) payload;</span>
+<span class="nc" id="L189">				OadrCanceledPartyRegistrationType oadrCancelPartyRegistrationType = requestClient</span>
+<span class="nc" id="L190">						.oadrCancelPartyRegistrationType(venPushUrl, val);</span>
+<span class="nc" id="L191">				String eiResponseCode = oadrCancelPartyRegistrationType.getEiResponse().getResponseCode();</span>
+<span class="nc bnc" id="L192" title="All 2 branches missed.">				if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {</span>
+<span class="nc" id="L193">					LOGGER.error(&quot;OadrCancelPartyRegistrationType - Application Layer Error[&quot; + eiResponseCode + &quot;]&quot;);</span>
+<span class="nc" id="L194">					return;</span>
+				}
+
+				// remove ven registration
+<span class="nc" id="L198">				oadr20bVTNEiRegisterPartyService.oadrCancelPartyRegistrationType(val, xmlSignatureRequired);</span>
+
+<span class="nc bnc" id="L200" title="All 2 branches missed.">			} else if (payload instanceof OadrRequestReregistrationType) {</span>
+<span class="nc" id="L201">				OadrRequestReregistrationType val = (OadrRequestReregistrationType) payload;</span>
+<span class="nc" id="L202">				OadrResponseType oadrRequestReregistrationType = requestClient.oadrRequestReregistrationType(venPushUrl,</span>
+						val);
+<span class="nc" id="L204">				String eiResponseCode = oadrRequestReregistrationType.getEiResponse().getResponseCode();</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">				if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {</span>
+<span class="nc" id="L206">					LOGGER.error(&quot;OadrDistributeEventType - Application Layer Error[&quot; + eiResponseCode + &quot;]&quot;);</span>
+				}
+
+			} else {
+				// TODO bzanni: exception cannot be pushed payload (outside
+				// Oadr20b
+				// protocol)
+			}
+
+<span class="nc" id="L215">		} catch (Oadr20bException e) {</span>
+<span class="nc" id="L216">			LOGGER.error(&quot;Fail to distribute payload&quot;, e);</span>
+<span class="nc" id="L217">		} catch (Oadr20bMarshalException e) {</span>
+<span class="nc" id="L218">			LOGGER.error(&quot;Fail to distribute payload&quot;, e);</span>
+<span class="nc" id="L219">		} catch (URISyntaxException e) {</span>
+<span class="nc" id="L220">			LOGGER.error(&quot;VEN Push URL is not a valid URI&quot;, e);</span>
+<span class="nc" id="L221">		} catch (Oadr20bHttpLayerException e) {</span>
+<span class="nc" id="L222">			LOGGER.error(</span>
+<span class="nc" id="L223">					&quot;Fail to distribute event: HttpLayerException[&quot; + e.getErrorCode() + &quot;]: &quot; + e.getErrorMessage(),</span>
+					e);
+<span class="nc" id="L225">		} catch (Oadr20bXMLSignatureException e) {</span>
+<span class="nc" id="L226">			LOGGER.error(&quot;Fail to sign request payload&quot;, e);</span>
+<span class="nc" id="L227">		} catch (Oadr20bXMLSignatureValidationException e) {</span>
+<span class="nc" id="L228">			LOGGER.error(&quot;Fail to validate response xml signature&quot;, e);</span>
+<span class="nc" id="L229">		}</span>
+<span class="nc" id="L230">	}</span>
+
+	/**
+	 * @return the oadrHttpVtnClient20b
+	 */
+	public OadrHttpVtnClient20b getOadrHttpVtnClient20b() {
+<span class="nc" id="L236">		return oadrHttpVtnClient20b;</span>
+	}
+
+	/**
+	 * @param oadrHttpVtnClient20b
+	 *            the oadrHttpVtnClient20b to set
+	 */
+	public void setOadrHttpVtnClient20b(OadrHttpVtnClient20b oadrHttpVtnClient20b) {
+<span class="fc" id="L244">		this.oadrHttpVtnClient20b = oadrHttpVtnClient20b;</span>
+<span class="fc" id="L245">	}</span>
+
+	public OadrHttpVtnClient20b getSecuredOadrHttpVtnClient20b() {
+<span class="nc" id="L248">		return securedOadrHttpVtnClient20b;</span>
+	}
+
+	public void setSecuredOadrHttpVtnClient20b(OadrHttpVtnClient20b securedOadrHttpVtnClient20b) {
+<span class="fc" id="L252">		this.securedOadrHttpVtnClient20b = securedOadrHttpVtnClient20b;</span>
+<span class="fc" id="L253">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

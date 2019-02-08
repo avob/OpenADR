@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.575 sec - in com.avob.openadr.server.common.vtn.controller.EosDemandResponseControllerTest

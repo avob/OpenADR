@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XMLSpy v2011 rel. 2 sp1 (http://www.altova.com) by Paul Lipkin (private) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oadr="http://openadr.org/oadr-2.0a/2012/07" xmlns:pyld="http://docs.oasis-open.org/ns/energyinterop/201110/payloads" xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110" targetNamespace="http://openadr.org/oadr-2.0a/2012/07" elementFormDefault="qualified" attributeFormDefault="qualified">
+   <xs:import namespace="http://docs.oasis-open.org/ns/energyinterop/201110" schemaLocation="oadr_ei_20a.xsd"/>
+   <xs:import namespace="http://docs.oasis-open.org/ns/energyinterop/201110/payloads" schemaLocation="oadr_pyld_20a.xsd"/>
+   <!--
+   <xs:import namespace="http://docs.oasis-open.org/ns/energyinterop/201110" schemaLocation="EiClasses.xsd"/>
+   <xs:import namespace="http://docs.oasis-open.org/ns/energyinterop/201110/payloads" schemaLocation="EiPayloads.xsd"/>
+  -->
+   <!--
+   Change Log:
+      -Modified URI for oadr prefix to end in 07
+      -Removed unused startbefore element from xcal subset schema
+      -test
+  -->
+   <!--  ******* oadrResponse ******** -->
+   <xs:element name="oadrResponse">
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="ei:eiResponse"/>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <!--  ******* oadrDistributeEvent ******** -->
+   <xs:element name="oadrDistributeEvent">
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="ei:eiResponse" minOccurs="0"/>
+            <xs:element ref="pyld:requestID"/>
+            <xs:element ref="ei:vtnID"/>
+            <xs:element name="oadrEvent" minOccurs="0" maxOccurs="unbounded">
+               <xs:complexType>
+                  <xs:sequence>
+                     <xs:element ref="ei:eiEvent"/>
+                     <xs:element name="oadrResponseRequired" type="oadr:ResponseRequiredType">
+                        <xs:annotation>
+                           <xs:documentation>oadr: This defines when repsonses are required Can be always or never</xs:documentation>
+                        </xs:annotation>
+                     </xs:element>
+                  </xs:sequence>
+               </xs:complexType>
+            </xs:element>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <!--  ******* oadrCreatedEvent ******** -->
+   <xs:element name="oadrCreatedEvent">
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="pyld:eiCreatedEvent"/>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <!--  ******* oadrRequestEvent ******** -->
+   <xs:element name="oadrRequestEvent">
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element ref="pyld:eiRequestEvent"/>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <!--  ******* ResponseRequiredType ******** -->
+   <xs:simpleType name="ResponseRequiredType">
+      <xs:annotation>
+         <xs:documentation>Defines what type of response is requried</xs:documentation>
+      </xs:annotation>
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="always">
+            <xs:annotation>
+               <xs:documentation>Always send a repsonse for every event received.</xs:documentation>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="never">
+            <xs:annotation>
+               <xs:documentation>Never repsond.</xs:documentation>
+            </xs:annotation>
+         </xs:enumeration>
+      </xs:restriction>
+   </xs:simpleType>
+</xs:schema>

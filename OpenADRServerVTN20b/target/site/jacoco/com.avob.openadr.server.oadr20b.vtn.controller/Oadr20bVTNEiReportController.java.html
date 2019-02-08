@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bVTNEiReportController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.vtn.controller</a> &gt; <span class="el_source">Oadr20bVTNEiReportController.java</span></div><h1>Oadr20bVTNEiReportController.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.vtn.controller;
+
+import java.security.Principal;
+
+import javax.annotation.Resource;
+import javax.xml.bind.JAXBException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
+import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
+import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
+import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
+import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCreatePartyRegistrationTypeApplicationLayerException;
+import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bQueryRegistrationTypeApplicationLayerException;
+import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCancelReportApplicationLayerException;
+import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCreateReportApplicationLayerException;
+import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCreatedReportApplicationLayerException;
+import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bRegisterReportApplicationLayerException;
+import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bUpdateReportApplicationLayerException;
+import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
+import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
+
+@Controller
+@RequestMapping(Oadr20bUrlPath.OADR_BASE_PATH)
+public class Oadr20bVTNEiReportController {
+
+<span class="fc" id="L45">	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiReportController.class);</span>
+
+	private Oadr20bJAXBContext jaxbContext;
+
+	@Resource
+	private Oadr20bVTNEiReportService reportService;
+
+	@Resource
+	private XmlSignatureService xmlSignatureService;
+
+<span class="fc" id="L55">	public Oadr20bVTNEiReportController() throws JAXBException {</span>
+<span class="fc" id="L56">		jaxbContext = Oadr20bJAXBContext.getInstance();</span>
+<span class="fc" id="L57">	}</span>
+
+	@PreAuthorize(&quot;hasRole('ROLE_VEN') AND hasRole('ROLE_REGISTERED')&quot;)
+	@RequestMapping(value = Oadr20bUrlPath.EI_REPORT_SERVICE, method = RequestMethod.POST)
+	@ResponseBody
+	public String request(@RequestBody String payload, Principal principal)
+			throws Oadr20bUnmarshalException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
+			Oadr20bCreatePartyRegistrationTypeApplicationLayerException,
+			Oadr20bCancelPartyRegistrationTypeApplicationLayerException,
+			Oadr20bQueryRegistrationTypeApplicationLayerException, Oadr20bRegisterReportApplicationLayerException,
+			Oadr20bUpdateReportApplicationLayerException, Oadr20bCancelReportApplicationLayerException,
+			Oadr20bCreateReportApplicationLayerException, Oadr20bCreatedReportApplicationLayerException,
+			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException {
+
+<span class="fc" id="L71">		Object unmarshal = jaxbContext.unmarshal(payload);</span>
+
+<span class="fc" id="L73">		String username = principal.getName();</span>
+
+<span class="fc bfc" id="L75" title="All 2 branches covered.">		if (unmarshal instanceof OadrPayload) {</span>
+
+<span class="fc" id="L77">			OadrPayload obj = (OadrPayload) unmarshal;</span>
+
+<span class="fc" id="L79">			return handle(username, obj);</span>
+
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">		} else if (unmarshal instanceof OadrRegisterReportType) {</span>
+
+<span class="nc" id="L83">			LOGGER.info(username + &quot; - OadrRegisterReport&quot;);</span>
+
+<span class="nc" id="L85">			OadrRegisterReportType obj = (OadrRegisterReportType) unmarshal;</span>
+
+<span class="nc" id="L87">			return handle(username, obj, false);</span>
+
+<span class="fc bfc" id="L89" title="All 2 branches covered.">		} else if (unmarshal instanceof OadrUpdateReportType) {</span>
+
+<span class="fc" id="L91">			LOGGER.info(username + &quot; - OadrUpdateReport&quot;);</span>
+
+<span class="fc" id="L93">			OadrUpdateReportType obj = (OadrUpdateReportType) unmarshal;</span>
+
+<span class="fc" id="L95">			return handle(username, obj, false);</span>
+
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">		} else if (unmarshal instanceof OadrCreatedReportType) {</span>
+
+<span class="nc" id="L99">			LOGGER.info(username + &quot; - OadrCreatedReport&quot;);</span>
+
+<span class="nc" id="L101">			OadrCreatedReportType obj = (OadrCreatedReportType) unmarshal;</span>
+
+<span class="nc" id="L103">			return handle(username, obj, false);</span>
+
+<span class="fc bfc" id="L105" title="All 2 branches covered.">		} else if (unmarshal instanceof OadrCreateReportType) {</span>
+
+<span class="fc" id="L107">			LOGGER.info(username + &quot; - OadrCreateReport&quot;);</span>
+
+<span class="fc" id="L109">			OadrCreateReportType obj = (OadrCreateReportType) unmarshal;</span>
+
+<span class="fc" id="L111">			return handle(username, obj, false);</span>
+
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">		} else if (unmarshal instanceof OadrCancelReportType) {</span>
+
+<span class="fc" id="L115">			LOGGER.info(username + &quot; - OadrCancelReport&quot;);</span>
+
+<span class="fc" id="L117">			OadrCancelReportType obj = (OadrCancelReportType) unmarshal;</span>
+
+<span class="nc" id="L119">			return handle(username, obj, false);</span>
+
+		}
+
+<span class="nc" id="L123">		return null;</span>
+	}
+
+	private String handle(String username, OadrPayload oadrPayload)
+			throws Oadr20bMarshalException, Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException,
+			Oadr20bCreatePartyRegistrationTypeApplicationLayerException,
+			Oadr20bCancelPartyRegistrationTypeApplicationLayerException,
+			Oadr20bQueryRegistrationTypeApplicationLayerException, Oadr20bRegisterReportApplicationLayerException,
+			Oadr20bUpdateReportApplicationLayerException, Oadr20bCancelReportApplicationLayerException,
+			Oadr20bCreateReportApplicationLayerException, Oadr20bCreatedReportApplicationLayerException,
+			Oadr20bXMLSignatureException {
+
+<span class="fc" id="L135">		xmlSignatureService.validate(oadrPayload);</span>
+
+<span class="fc bfc" id="L137" title="All 2 branches covered.">		if (oadrPayload.getOadrSignedObject().getOadrCancelReport() != null) {</span>
+
+<span class="fc" id="L139">			LOGGER.info(username + &quot; - OadrCancelReport signed&quot;);</span>
+
+<span class="fc" id="L141">			return handle(username, oadrPayload.getOadrSignedObject().getOadrCancelReport(), true);</span>
+
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">		} else if (oadrPayload.getOadrSignedObject().getOadrCreateReport() != null) {</span>
+
+<span class="nc" id="L145">			LOGGER.info(username + &quot; - OadrCreateReport signed&quot;);</span>
+
+<span class="nc" id="L147">			return handle(username, oadrPayload.getOadrSignedObject().getOadrCreateReport(), true);</span>
+
+<span class="fc bfc" id="L149" title="All 2 branches covered.">		} else if (oadrPayload.getOadrSignedObject().getOadrCreatedReport() != null) {</span>
+
+<span class="fc" id="L151">			LOGGER.info(username + &quot; - OadrCreatedReport signed&quot;);</span>
+
+<span class="fc" id="L153">			return handle(username, oadrPayload.getOadrSignedObject().getOadrCreatedReport(), true);</span>
+
+<span class="fc bfc" id="L155" title="All 2 branches covered.">		} else if (oadrPayload.getOadrSignedObject().getOadrUpdateReport() != null) {</span>
+
+<span class="fc" id="L157">			LOGGER.info(username + &quot; - OadrUpdateReport signed&quot;);</span>
+
+<span class="nc" id="L159">			return handle(username, oadrPayload.getOadrSignedObject().getOadrUpdateReport(), true);</span>
+
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">		} else if (oadrPayload.getOadrSignedObject().getOadrRegisterReport() != null) {</span>
+
+<span class="fc" id="L163">			LOGGER.info(username + &quot; - OadrRegisterReport signed&quot;);</span>
+
+<span class="fc" id="L165">			return handle(username, oadrPayload.getOadrSignedObject().getOadrRegisterReport(), true);</span>
+
+		}
+
+<span class="nc" id="L169">		throw new Oadr20bApplicationLayerException(&quot;Unacceptable request payload for EiReport&quot;);</span>
+	}
+
+	private String handle(String username, OadrRegisterReportType oadrRegisterReport, boolean signed)
+			throws Oadr20bRegisterReportApplicationLayerException, Oadr20bMarshalException,
+			Oadr20bXMLSignatureException {
+
+<span class="fc" id="L176">		reportService.checkMatchUsernameWithRequestVenId(username, oadrRegisterReport);</span>
+
+<span class="fc" id="L178">		return reportService.oadrRegisterReport(oadrRegisterReport, signed);</span>
+
+	}
+
+	private String handle(String username, OadrUpdateReportType oadrUpdateReport, boolean signed)
+			throws Oadr20bUpdateReportApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
+
+<span class="fc" id="L185">		reportService.checkMatchUsernameWithRequestVenId(username, oadrUpdateReport);</span>
+
+<span class="fc" id="L187">		return reportService.oadrUpdateReport(oadrUpdateReport, signed);</span>
+
+	}
+
+	private String handle(String username, OadrCreatedReportType oadrCreatedReport, boolean signed)
+			throws Oadr20bCreatedReportApplicationLayerException, Oadr20bMarshalException,
+			Oadr20bXMLSignatureException {
+
+<span class="fc" id="L195">		reportService.checkMatchUsernameWithRequestVenId(username, oadrCreatedReport);</span>
+
+<span class="fc" id="L197">		return reportService.oadrCreatedReport(oadrCreatedReport, signed);</span>
+
+	}
+
+	private String handle(String username, OadrCreateReportType oadrCreateReport, boolean signed)
+			throws Oadr20bCreateReportApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
+<span class="fc" id="L203">		reportService.checkMatchUsernameWithRequestVenId(username, oadrCreateReport);</span>
+
+<span class="fc" id="L205">		return reportService.oadrCreateReport(oadrCreateReport, signed);</span>
+
+	}
+
+	private String handle(String username, OadrCancelReportType oadrCancelReport, boolean signed)
+			throws Oadr20bCancelReportApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
+<span class="fc" id="L211">		reportService.checkMatchUsernameWithRequestVenId(username, oadrCancelReport);</span>
+
+<span class="fc" id="L213">		return reportService.oadrCancelReport(oadrCancelReport, signed);</span>
+
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReportDataDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRModel20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.model.oadr20b.dto</a> &gt; <span class="el_source">ReportDataDto.java</span></div><h1>ReportDataDto.java</h1><pre class="source lang-java linenums">package com.avob.openadr.model.oadr20b.dto;
+
+<span class="nc" id="L3">public class ReportDataDto {</span>
+
+    private long id;
+
+    private String reportSpecifierId;
+
+    private String rid;
+
+    private Long confidence;
+
+    private Float accuracy;
+
+    private Long start;
+
+    private String duration;
+
+    private Float value;
+
+    private Float oadrCapacityMin;
+    private Float oadrCapacityMax;
+    private Float oadrCapacityCurrent;
+    private Float oadrCapacityNormal;
+
+    private Float oadrLevelOffsetMin;
+    private Float oadrLevelOffsetMax;
+    private Float oadrLevelOffsetCurrent;
+    private Float oadrLevelOffsetNormal;
+
+    private Float oadrPercentOffsetMin;
+    private Float oadrPercentOffsetMax;
+    private Float oadrPercentOffsetCurrent;
+    private Float oadrPercentOffsetNormal;
+
+    private Float oadrSetPointMin;
+    private Float oadrSetPointMax;
+    private Float oadrSetPointCurrent;
+    private Float oadrSetPointNormal;
+
+    public long getId() {
+<span class="nc" id="L42">        return id;</span>
+    }
+
+    public void setId(long id) {
+<span class="nc" id="L46">        this.id = id;</span>
+<span class="nc" id="L47">    }</span>
+
+    public String getReportSpecifierId() {
+<span class="nc" id="L50">        return reportSpecifierId;</span>
+    }
+
+    public void setReportSpecifierId(String reportSpecifierId) {
+<span class="nc" id="L54">        this.reportSpecifierId = reportSpecifierId;</span>
+<span class="nc" id="L55">    }</span>
+
+    public String getRid() {
+<span class="nc" id="L58">        return rid;</span>
+    }
+
+    public void setRid(String rid) {
+<span class="nc" id="L62">        this.rid = rid;</span>
+<span class="nc" id="L63">    }</span>
+
+    public Long getConfidence() {
+<span class="nc" id="L66">        return confidence;</span>
+    }
+
+    public void setConfidence(Long confidence) {
+<span class="nc" id="L70">        this.confidence = confidence;</span>
+<span class="nc" id="L71">    }</span>
+
+    public Float getAccuracy() {
+<span class="nc" id="L74">        return accuracy;</span>
+    }
+
+    public void setAccuracy(Float accuracy) {
+<span class="nc" id="L78">        this.accuracy = accuracy;</span>
+<span class="nc" id="L79">    }</span>
+
+    public Long getStart() {
+<span class="nc" id="L82">        return start;</span>
+    }
+
+    public void setStart(Long start) {
+<span class="nc" id="L86">        this.start = start;</span>
+<span class="nc" id="L87">    }</span>
+
+    public String getDuration() {
+<span class="nc" id="L90">        return duration;</span>
+    }
+
+    public void setDuration(String duration) {
+<span class="nc" id="L94">        this.duration = duration;</span>
+<span class="nc" id="L95">    }</span>
+
+    public Float getValue() {
+<span class="nc" id="L98">        return value;</span>
+    }
+
+    public void setValue(Float value) {
+<span class="nc" id="L102">        this.value = value;</span>
+<span class="nc" id="L103">    }</span>
+
+    public Float getOadrCapacityMin() {
+<span class="nc" id="L106">        return oadrCapacityMin;</span>
+    }
+
+    public void setOadrCapacityMin(Float oadrCapacityMin) {
+<span class="nc" id="L110">        this.oadrCapacityMin = oadrCapacityMin;</span>
+<span class="nc" id="L111">    }</span>
+
+    public Float getOadrCapacityMax() {
+<span class="nc" id="L114">        return oadrCapacityMax;</span>
+    }
+
+    public void setOadrCapacityMax(Float oadrCapacityMax) {
+<span class="nc" id="L118">        this.oadrCapacityMax = oadrCapacityMax;</span>
+<span class="nc" id="L119">    }</span>
+
+    public Float getOadrCapacityCurrent() {
+<span class="nc" id="L122">        return oadrCapacityCurrent;</span>
+    }
+
+    public void setOadrCapacityCurrent(Float oadrCapacityCurrent) {
+<span class="nc" id="L126">        this.oadrCapacityCurrent = oadrCapacityCurrent;</span>
+<span class="nc" id="L127">    }</span>
+
+    public Float getOadrCapacityNormal() {
+<span class="nc" id="L130">        return oadrCapacityNormal;</span>
+    }
+
+    public void setOadrCapacityNormal(Float oadrCapacityNormal) {
+<span class="nc" id="L134">        this.oadrCapacityNormal = oadrCapacityNormal;</span>
+<span class="nc" id="L135">    }</span>
+
+    public Float getOadrLevelOffsetMin() {
+<span class="nc" id="L138">        return oadrLevelOffsetMin;</span>
+    }
+
+    public void setOadrLevelOffsetMin(Float oadrLevelOffsetMin) {
+<span class="nc" id="L142">        this.oadrLevelOffsetMin = oadrLevelOffsetMin;</span>
+<span class="nc" id="L143">    }</span>
+
+    public Float getOadrLevelOffsetMax() {
+<span class="nc" id="L146">        return oadrLevelOffsetMax;</span>
+    }
+
+    public void setOadrLevelOffsetMax(Float oadrLevelOffsetMax) {
+<span class="nc" id="L150">        this.oadrLevelOffsetMax = oadrLevelOffsetMax;</span>
+<span class="nc" id="L151">    }</span>
+
+    public Float getOadrLevelOffsetCurrent() {
+<span class="nc" id="L154">        return oadrLevelOffsetCurrent;</span>
+    }
+
+    public void setOadrLevelOffsetCurrent(Float oadrLevelOffsetCurrent) {
+<span class="nc" id="L158">        this.oadrLevelOffsetCurrent = oadrLevelOffsetCurrent;</span>
+<span class="nc" id="L159">    }</span>
+
+    public Float getOadrLevelOffsetNormal() {
+<span class="nc" id="L162">        return oadrLevelOffsetNormal;</span>
+    }
+
+    public void setOadrLevelOffsetNormal(Float oadrLevelOffsetNormal) {
+<span class="nc" id="L166">        this.oadrLevelOffsetNormal = oadrLevelOffsetNormal;</span>
+<span class="nc" id="L167">    }</span>
+
+    public Float getOadrPercentOffsetMin() {
+<span class="nc" id="L170">        return oadrPercentOffsetMin;</span>
+    }
+
+    public void setOadrPercentOffsetMin(Float oadrPercentOffsetMin) {
+<span class="nc" id="L174">        this.oadrPercentOffsetMin = oadrPercentOffsetMin;</span>
+<span class="nc" id="L175">    }</span>
+
+    public Float getOadrPercentOffsetMax() {
+<span class="nc" id="L178">        return oadrPercentOffsetMax;</span>
+    }
+
+    public void setOadrPercentOffsetMax(Float oadrPercentOffsetMax) {
+<span class="nc" id="L182">        this.oadrPercentOffsetMax = oadrPercentOffsetMax;</span>
+<span class="nc" id="L183">    }</span>
+
+    public Float getOadrPercentOffsetCurrent() {
+<span class="nc" id="L186">        return oadrPercentOffsetCurrent;</span>
+    }
+
+    public void setOadrPercentOffsetCurrent(Float oadrPercentOffsetCurrent) {
+<span class="nc" id="L190">        this.oadrPercentOffsetCurrent = oadrPercentOffsetCurrent;</span>
+<span class="nc" id="L191">    }</span>
+
+    public Float getOadrPercentOffsetNormal() {
+<span class="nc" id="L194">        return oadrPercentOffsetNormal;</span>
+    }
+
+    public void setOadrPercentOffsetNormal(Float oadrPercentOffsetNormal) {
+<span class="nc" id="L198">        this.oadrPercentOffsetNormal = oadrPercentOffsetNormal;</span>
+<span class="nc" id="L199">    }</span>
+
+    public Float getOadrSetPointMin() {
+<span class="nc" id="L202">        return oadrSetPointMin;</span>
+    }
+
+    public void setOadrSetPointMin(Float oadrSetPointMin) {
+<span class="nc" id="L206">        this.oadrSetPointMin = oadrSetPointMin;</span>
+<span class="nc" id="L207">    }</span>
+
+    public Float getOadrSetPointMax() {
+<span class="nc" id="L210">        return oadrSetPointMax;</span>
+    }
+
+    public void setOadrSetPointMax(Float oadrSetPointMax) {
+<span class="nc" id="L214">        this.oadrSetPointMax = oadrSetPointMax;</span>
+<span class="nc" id="L215">    }</span>
+
+    public Float getOadrSetPointCurrent() {
+<span class="nc" id="L218">        return oadrSetPointCurrent;</span>
+    }
+
+    public void setOadrSetPointCurrent(Float oadrSetPointCurrent) {
+<span class="nc" id="L222">        this.oadrSetPointCurrent = oadrSetPointCurrent;</span>
+<span class="nc" id="L223">    }</span>
+
+    public Float getOadrSetPointNormal() {
+<span class="nc" id="L226">        return oadrSetPointNormal;</span>
+    }
+
+    public void setOadrSetPointNormal(Float oadrSetPointNormal) {
+<span class="nc" id="L230">        this.oadrSetPointNormal = oadrSetPointNormal;</span>
+<span class="nc" id="L231">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

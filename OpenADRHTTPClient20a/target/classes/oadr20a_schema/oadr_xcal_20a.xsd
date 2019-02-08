@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XMLSpy v2011 rel. 2 sp1 (http://www.altova.com) by Paul Lipkin (private) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xcal="urn:ietf:params:xml:ns:icalendar-2.0" xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110" targetNamespace="urn:ietf:params:xml:ns:icalendar-2.0" elementFormDefault="qualified" attributeFormDefault="qualified">
+	<xs:import namespace="http://docs.oasis-open.org/ns/energyinterop/201110" schemaLocation="oadr_ei_20a.xsd"/>
+	<!--  ******* date-time ******** -->
+	<xs:element name="date-time" type="xcal:DateTimeType"/>
+	<!--  ******* DateTimeType ******** -->
+	<xs:simpleType name="DateTimeType">
+		<xs:restriction base="xs:dateTime">
+			<xs:pattern value="(\-|\+)?\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}(\.\d*)?Z?"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--  ******* duration ******** -->
+	<xs:element name="duration" type="xcal:DurationPropType"/>
+	<!--  ******* DurationPropType ******** -->
+	<xs:complexType name="DurationPropType" mixed="false">
+		<xs:sequence>
+			<xs:element name="duration" type="xcal:DurationValueType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  ******* DurationValueType ******** -->
+	<xs:simpleType name="DurationValueType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(\+|\-)?P((\d+Y)?(\d+M)?(\d+D)?T?(\d+H)?(\d+M)?(\d+S)?)|(\d+W)"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--  ******* uid ******** -->
+	<xs:element name="uid">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="xcal:text"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!--  ******* text ******** -->
+	<xs:element name="text" type="xs:string"/>
+	<xs:element name="dtstart">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="xcal:date-time"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!--  ******* properties ******** -->
+	<xs:element name="properties">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="xcal:dtstart"/>
+				<xs:element ref="xcal:duration"/>
+				<xs:element name="tolerance" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="tolerate">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="startafter" type="xcal:DurationValueType" minOccurs="0"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element ref="ei:x-eiNotification"/>
+				<xs:element ref="ei:x-eiRampUp" minOccurs="0"/>
+				<xs:element ref="ei:x-eiRecovery" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!--  ******* components ******** -->
+	<xs:element name="components" nillable="true"/>
+</xs:schema>

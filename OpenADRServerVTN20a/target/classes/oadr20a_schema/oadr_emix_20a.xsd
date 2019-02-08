@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XMLSpy v2011 rel. 2 sp1 (http://www.altova.com) by Paul Lipkin (private) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:emix="http://docs.oasis-open.org/ns/emix/2011/06" xmlns:xcal="urn:ietf:params:xml:ns:icalendar-2.0" targetNamespace="http://docs.oasis-open.org/ns/emix/2011/06" elementFormDefault="qualified" attributeFormDefault="qualified">
+	<!--  ******* marketContext ******** -->
+	<xs:element name="marketContext" type="emix:MarketContextType"/>
+	<xs:simpleType name="MarketContextType">
+		<xs:restriction base="xs:anyURI"/>
+	</xs:simpleType>
+</xs:schema>

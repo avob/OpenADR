@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bPollService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVEN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.ven.service</a> &gt; <span class="el_source">Oadr20bPollService.java</span></div><h1>Oadr20bPollService.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.ven.service;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Resource;
+
+import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import com.avob.openadr.model.oadr20b.Oadr20bFactory;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bPollBuilders;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
+import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCanceledReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
+import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
+import com.avob.openadr.model.oadr20b.xcal.DurationPropType;
+import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
+import com.avob.openadr.server.oadr20b.ven.VenConfig;
+import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
+
+@Service
+<span class="fc" id="L43">public class Oadr20bPollService {</span>
+
+<span class="fc" id="L45">    private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bPollService.class);</span>
+
+    @Resource
+    private VenConfig venConfig;
+
+    @Resource
+    private MultiVtnConfig multiVtnConfig;
+
+    @Resource
+    private Oadr20bVENEiRegisterPartyService registerPartyService;
+
+    @Resource
+    private Oadr20bVENEiReportService reportService;
+
+    @Resource
+    private Oadr20bVENEiEventService eventService;
+
+    @Resource
+    private ScheduledExecutorService scheduledExecutorService;
+
+<span class="fc" id="L65">    private Map&lt;String, ScheduledFuture&lt;?&gt;&gt; httpScheduledPullRequestTask = new ConcurrentHashMap&lt;String, ScheduledFuture&lt;?&gt;&gt;();</span>
+
+    private class OadrPollTask implements Runnable {
+
+        private VtnSessionConfiguration vtnSession;
+
+<span class="nc" id="L71">        public OadrPollTask(VtnSessionConfiguration vtnSession) {</span>
+<span class="nc" id="L72">            this.vtnSession = vtnSession;</span>
+<span class="nc" id="L73">        }</span>
+
+        private void processPollResponse(Object payload) throws Oadr20bException, Oadr20bHttpLayerException,
+                Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            if (payload instanceof OadrPayload) {</span>
+<span class="nc" id="L78">                LOGGER.info(&quot;Retrieved OadrPayload&quot;);</span>
+<span class="nc" id="L79">                OadrPayload val = (OadrPayload) payload;</span>
+<span class="nc" id="L80">                Object signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(val);</span>
+
+<span class="nc" id="L82">                processPollResponse(signedObjectFromOadrPayload);</span>
+
+<span class="nc bnc" id="L84" title="All 2 branches missed.">            } else if (payload instanceof OadrDistributeEventType) {</span>
+<span class="nc" id="L85">                LOGGER.info(&quot;Retrieved OadrDistributeEventType&quot;);</span>
+<span class="nc" id="L86">                OadrDistributeEventType val = (OadrDistributeEventType) payload;</span>
+<span class="nc" id="L87">                OadrResponseType oadrDistributeEvent = eventService.oadrDistributeEvent(vtnSession, val);</span>
+
+<span class="nc" id="L89">                String responseCode = oadrDistributeEvent.getEiResponse().getResponseCode();</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">                if (HttpStatus.OK_200 != Integer.valueOf(responseCode)) {</span>
+<span class="nc" id="L91">                    LOGGER.error(&quot;Fail OadrRequestEvent: &quot; + responseCode</span>
+<span class="nc" id="L92">                            + oadrDistributeEvent.getEiResponse().getResponseDescription());</span>
+                }
+
+<span class="nc bnc" id="L95" title="All 2 branches missed.">            } else if (payload instanceof OadrCancelPartyRegistrationType) {</span>
+<span class="nc" id="L96">                LOGGER.info(&quot;Retrieved OadrCancelPartyRegistrationType&quot;);</span>
+<span class="nc" id="L97">                OadrCancelPartyRegistrationType val = (OadrCancelPartyRegistrationType) payload;</span>
+
+<span class="nc" id="L99">                OadrCanceledPartyRegistrationType oadrCancelPartyRegistration = registerPartyService</span>
+<span class="nc" id="L100">                        .oadrCancelPartyRegistration(vtnSession, val);</span>
+
+<span class="nc" id="L102">                OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)</span>
+<span class="nc" id="L103">                        .oadrCanceledPartyRegistrationType(oadrCancelPartyRegistration);</span>
+
+<span class="nc bnc" id="L105" title="All 2 branches missed.">                if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {</span>
+<span class="nc" id="L106">                    LOGGER.error(&quot;Fail OadrCanceledPartyRegistrationType - requestID:&quot;</span>
+<span class="nc" id="L107">                            + response.getEiResponse().getRequestID() + &quot;, responseCode: &quot;</span>
+<span class="nc" id="L108">                            + response.getEiResponse().getResponseCode() + &quot;, responseDescription: &quot;</span>
+<span class="nc" id="L109">                            + response.getEiResponse().getResponseDescription());</span>
+                } else {
+<span class="nc" id="L111">                    LOGGER.info(&quot;VEN successfully cancel registration&quot;);</span>
+                }
+
+<span class="nc bnc" id="L114" title="All 2 branches missed.">            } else if (payload instanceof OadrRequestReregistrationType) {</span>
+<span class="nc" id="L115">                LOGGER.info(&quot;Retrieved OadrRequestReregistrationType&quot;);</span>
+<span class="nc" id="L116">                OadrRequestReregistrationType val = (OadrRequestReregistrationType) payload;</span>
+
+<span class="nc" id="L118">                OadrResponseType oadrRequestReregistration = registerPartyService.oadrRequestReregistration(vtnSession,</span>
+                        val);
+<span class="nc" id="L120">                reinitPoll(vtnSession);</span>
+<span class="nc" id="L121">                OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)</span>
+<span class="nc" id="L122">                        .oadrResponseReregisterParty(oadrRequestReregistration);</span>
+
+<span class="nc bnc" id="L124" title="All 2 branches missed.">                if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {</span>
+<span class="nc" id="L125">                    LOGGER.error(&quot;Fail OadrCanceledPartyRegistrationType - requestID:&quot;</span>
+<span class="nc" id="L126">                            + response.getEiResponse().getRequestID() + &quot;, responseCode: &quot;</span>
+<span class="nc" id="L127">                            + response.getEiResponse().getResponseCode() + &quot;, responseDescription: &quot;</span>
+<span class="nc" id="L128">                            + response.getEiResponse().getResponseDescription());</span>
+                } else {
+<span class="nc" id="L130">                    LOGGER.info(&quot;VEN successfully initialize registration&quot;);</span>
+                }
+
+<span class="nc bnc" id="L133" title="All 2 branches missed.">            } else if (payload instanceof OadrCancelReportType) {</span>
+<span class="nc" id="L134">                LOGGER.info(&quot;Retrieved OadrCancelReportType&quot;);</span>
+<span class="nc" id="L135">                OadrCancelReportType val = (OadrCancelReportType) payload;</span>
+
+<span class="nc" id="L137">                OadrCanceledReportType oadrCancelReport = reportService.oadrCancelReport(vtnSession, val);</span>
+
+<span class="nc" id="L139">                OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)</span>
+<span class="nc" id="L140">                        .oadrCanceledReport(oadrCancelReport);</span>
+
+<span class="nc bnc" id="L142" title="All 2 branches missed.">                if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {</span>
+<span class="nc" id="L143">                    LOGGER.error(&quot;Fail OadrCancelReportType - requestID:&quot; + response.getEiResponse().getRequestID()</span>
+<span class="nc" id="L144">                            + &quot;, responseCode: &quot; + response.getEiResponse().getResponseCode()</span>
+<span class="nc" id="L145">                            + &quot;, responseDescription: &quot; + response.getEiResponse().getResponseDescription());</span>
+                } else {
+<span class="nc" id="L147">                    LOGGER.info(&quot;VEN successfully cancel report&quot;);</span>
+                }
+
+<span class="nc bnc" id="L150" title="All 2 branches missed.">            } else if (payload instanceof OadrCreateReportType) {</span>
+<span class="nc" id="L151">                LOGGER.info(&quot;Retrieved OadrCreateReportType&quot;);</span>
+<span class="nc" id="L152">                OadrCreateReportType val = (OadrCreateReportType) payload;</span>
+
+<span class="nc" id="L154">                OadrCreatedReportType oadrCreateReport = reportService.oadrCreateReport(vtnSession, val);</span>
+
+<span class="nc" id="L156">                OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)</span>
+<span class="nc" id="L157">                        .oadrCreatedReport(oadrCreateReport);</span>
+
+<span class="nc bnc" id="L159" title="All 2 branches missed.">                if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {</span>
+<span class="nc" id="L160">                    LOGGER.error(&quot;Fail OadrCreateReportType - requestID:&quot; + response.getEiResponse().getRequestID()</span>
+<span class="nc" id="L161">                            + &quot;, responseCode: &quot; + response.getEiResponse().getResponseCode()</span>
+<span class="nc" id="L162">                            + &quot;, responseDescription: &quot; + response.getEiResponse().getResponseDescription());</span>
+                } else {
+<span class="nc" id="L164">                    LOGGER.info(&quot;VEN successfully create report&quot;);</span>
+                }
+
+<span class="nc bnc" id="L167" title="All 2 branches missed.">            } else if (payload instanceof OadrRegisterReportType) {</span>
+<span class="nc" id="L168">                LOGGER.info(&quot;Retrieved OadrRegisterReportType&quot;);</span>
+<span class="nc" id="L169">                OadrRegisterReportType val = (OadrRegisterReportType) payload;</span>
+
+                // OadrResponseType oadrRegisterReport =
+<span class="nc" id="L172">                reportService.oadrRegisterReport(vtnSession, val);</span>
+
+                // TODO bzanni: do VEN has to propagate this response ?
+                // if so, need to add this payload to vtn eireport endpoint
+
+<span class="nc bnc" id="L177" title="All 2 branches missed.">            } else if (payload instanceof OadrUpdateReportType) {</span>
+<span class="nc" id="L178">                LOGGER.info(&quot;Retrieved OadrUpdateReportType&quot;);</span>
+<span class="nc" id="L179">                OadrUpdateReportType val = (OadrUpdateReportType) payload;</span>
+
+<span class="nc" id="L181">                OadrUpdatedReportType oadrUpdateReport = reportService.oadrUpdateReport(vtnSession, val);</span>
+
+<span class="nc" id="L183">                OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)</span>
+<span class="nc" id="L184">                        .oadrUpdatedReport(oadrUpdateReport);</span>
+
+<span class="nc bnc" id="L186" title="All 2 branches missed.">                if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {</span>
+<span class="nc" id="L187">                    LOGGER.error(&quot;Fail OadrUpdateReportType - requestID:&quot; + response.getEiResponse().getRequestID()</span>
+<span class="nc" id="L188">                            + &quot;, responseCode: &quot; + response.getEiResponse().getResponseCode()</span>
+<span class="nc" id="L189">                            + &quot;, responseDescription: &quot; + response.getEiResponse().getResponseDescription());</span>
+                } else {
+<span class="nc" id="L191">                    LOGGER.info(&quot;VEN successfully update report&quot;);</span>
+                }
+
+<span class="nc bnc" id="L194" title="All 2 branches missed.">            } else if (payload instanceof OadrResponseType) {</span>
+<span class="nc" id="L195">                LOGGER.info(&quot;Retrieved OadrResponseType&quot;);</span>
+<span class="nc" id="L196">                OadrResponseType response = (OadrResponseType) payload;</span>
+
+<span class="nc bnc" id="L198" title="All 2 branches missed.">                if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {</span>
+<span class="nc" id="L199">                    LOGGER.error(&quot;Fail OadrResponseType - requestID:&quot; + response.getEiResponse().getRequestID()</span>
+<span class="nc" id="L200">                            + &quot;, responseCode: &quot; + response.getEiResponse().getResponseCode()</span>
+<span class="nc" id="L201">                            + &quot;, responseDescription: &quot; + response.getEiResponse().getResponseDescription());</span>
+                }
+
+<span class="nc bnc" id="L204" title="All 2 branches missed.">            } else if (payload != null) {</span>
+<span class="nc" id="L205">                LOGGER.warn(&quot;Unknown retrieved payload: &quot; + payload.getClass().toString());</span>
+<span class="nc bnc" id="L206" title="All 2 branches missed.">            } else if (payload == null) {</span>
+<span class="nc" id="L207">                LOGGER.warn(&quot;Null payload&quot;);</span>
+            }
+<span class="nc" id="L209">        }</span>
+
+        @Override
+        public void run() {
+
+<span class="nc" id="L214">            OadrCreatedPartyRegistrationType registration = registerPartyService.getRegistration(vtnSession);</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">            if (registration == null) {</span>
+<span class="nc" id="L216">                cancelHttpScheduledPullRequestTask(vtnSession, false);</span>
+            }
+
+<span class="nc" id="L219">            OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(venConfig.getVenId()).build();</span>
+
+            try {
+<span class="nc" id="L222">                Object payload = multiVtnConfig.getMultiClientConfig(vtnSession).oadrPoll(poll);</span>
+
+<span class="nc" id="L224">                processPollResponse(payload);</span>
+
+<span class="nc" id="L226">            } catch (Oadr20bException e) {</span>
+<span class="nc" id="L227">                LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L228">            } catch (Oadr20bHttpLayerException e) {</span>
+<span class="nc" id="L229">                LOGGER.error(&quot;Fail to distribute event: HttpLayerException[&quot; + e.getErrorCode() + &quot;]: &quot;</span>
+<span class="nc" id="L230">                        + e.getErrorMessage());</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">                if (e.getErrorCode() == HttpStatus.FORBIDDEN_403) {</span>
+<span class="nc" id="L232">                    LOGGER.warn(&quot;Receive Forbidden[403]: clear and init registration&quot;);</span>
+<span class="nc" id="L233">                    registerPartyService.reinitRegistration(vtnSession);</span>
+<span class="nc" id="L234">                    reinitPoll(vtnSession);</span>
+                }
+<span class="nc" id="L236">            } catch (Oadr20bXMLSignatureException e) {</span>
+<span class="nc" id="L237">                LOGGER.error(&quot;Fail to sign request payload&quot;, e);</span>
+<span class="nc" id="L238">            } catch (Oadr20bXMLSignatureValidationException e) {</span>
+<span class="nc" id="L239">                LOGGER.error(&quot;Fail to validate response xml signature&quot;, e);</span>
+<span class="nc" id="L240">            } catch (Exception e) {</span>
+<span class="nc" id="L241">                LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L242">            }</span>
+
+<span class="nc" id="L244">        }</span>
+
+    }
+
+    public void cancelHttpScheduledPullRequestTask(VtnSessionConfiguration vtnConfiguration,
+            boolean mayInterruptIfRunning) {
+<span class="nc bnc" id="L250" title="All 2 branches missed.">        if (httpScheduledPullRequestTask.get(vtnConfiguration.getVtnId()) != null) {</span>
+<span class="nc" id="L251">            httpScheduledPullRequestTask.get(vtnConfiguration.getVtnId()).cancel(mayInterruptIfRunning);</span>
+        }
+<span class="nc" id="L253">    }</span>
+
+    public void reinitPoll(VtnSessionConfiguration vtnConfiguration) {
+<span class="nc" id="L256">        cancelHttpScheduledPullRequestTask(vtnConfiguration, false);</span>
+<span class="nc" id="L257">        initPoll(vtnConfiguration);</span>
+<span class="nc" id="L258">    }</span>
+
+    public void initPoll(VtnSessionConfiguration vtnSession) {
+<span class="nc bnc" id="L261" title="All 2 branches missed.">        if (registerPartyService.getRegistration(vtnSession) != null) {</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">            if (venConfig.getPullModel()) {</span>
+<span class="nc" id="L263">                Long xmlDurationToMillisecond = venConfig.getPullFrequencySeconds() * 1000;</span>
+<span class="nc" id="L264">                DurationPropType oadrRequestedOadrPollFreq = registerPartyService.getRegistration(vtnSession)</span>
+<span class="nc" id="L265">                        .getOadrRequestedOadrPollFreq();</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">                if (oadrRequestedOadrPollFreq != null) {</span>
+<span class="nc" id="L267">                    xmlDurationToMillisecond = Oadr20bFactory</span>
+<span class="nc" id="L268">                            .xmlDurationToMillisecond(oadrRequestedOadrPollFreq.getDuration());</span>
+                }
+<span class="nc" id="L270">                LOGGER.debug(&quot;        pullFreq(ms): &quot; + xmlDurationToMillisecond);</span>
+<span class="nc" id="L271">                ScheduledFuture&lt;?&gt; scheduleWithFixedDelay = scheduledExecutorService.scheduleWithFixedDelay(</span>
+<span class="nc" id="L272">                        new OadrPollTask(vtnSession), xmlDurationToMillisecond, xmlDurationToMillisecond,</span>
+                        TimeUnit.MILLISECONDS);
+<span class="nc" id="L274">                httpScheduledPullRequestTask.put(vtnSession.getVtnId(), scheduleWithFixedDelay);</span>
+            }
+        }
+<span class="nc" id="L277">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

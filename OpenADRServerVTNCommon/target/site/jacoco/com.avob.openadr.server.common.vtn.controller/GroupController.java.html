@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GroupController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTNCommon</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.common.vtn.controller</a> &gt; <span class="el_source">GroupController.java</span></div><h1>GroupController.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.common.vtn.controller;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
+import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
+import com.avob.openadr.server.common.vtn.service.VenGroupService;
+import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
+
+@RestController
+@RequestMapping(&quot;/Group&quot;)
+@PreAuthorize(&quot;hasRole('ROLE_ADMIN')&quot;)
+<span class="fc" id="L28">public class GroupController {</span>
+
+<span class="fc" id="L30">    private static final Logger LOGGER = LoggerFactory.getLogger(MarketContextController.class);</span>
+
+    @Resource
+    private VenGroupService venGroupService;
+
+    @Resource
+    private DtoMapper dtoMapper;
+
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.GET)
+    @ResponseBody
+    public List&lt;VenGroupDto&gt; listGroup() {
+<span class="fc" id="L41">        Iterable&lt;VenGroup&gt; findAll = venGroupService.findAll();</span>
+<span class="fc" id="L42">        return dtoMapper.mapList(findAll, VenGroupDto.class);</span>
+    }
+
+    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.POST)
+    @ResponseBody
+    public VenGroupDto createGroup(@Valid @RequestBody VenGroupDto dto, HttpServletResponse response) {
+
+<span class="fc" id="L49">        VenGroup findOneByName = venGroupService.findByName(dto.getName());</span>
+
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if (findOneByName != null) {</span>
+<span class="fc" id="L52">            response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);</span>
+<span class="fc" id="L53">            return null;</span>
+        }
+<span class="fc" id="L55">        findOneByName = venGroupService.prepare(dto);</span>
+<span class="fc" id="L56">        venGroupService.save(findOneByName);</span>
+<span class="fc" id="L57">        response.setStatus(HttpStatus.CREATED_201);</span>
+
+<span class="fc" id="L59">        LOGGER.info(&quot;create Group: &quot; + findOneByName.getName());</span>
+
+<span class="fc" id="L61">        return dtoMapper.map(findOneByName, VenGroupDto.class);</span>
+    }
+
+    @RequestMapping(value = &quot;/{groupName}&quot;, method = RequestMethod.GET)
+    @ResponseBody
+    public VenGroupDto findGroupByName(@PathVariable(&quot;groupName&quot;) String groupName, HttpServletResponse response) {
+<span class="fc" id="L67">        VenGroup group = venGroupService.findByName(groupName);</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">        if (group == null) {</span>
+<span class="fc" id="L69">            response.setStatus(HttpStatus.NOT_FOUND_404);</span>
+<span class="fc" id="L70">            return null;</span>
+        }
+<span class="fc" id="L72">        return dtoMapper.map(group, VenGroupDto.class);</span>
+    }
+
+    @RequestMapping(value = &quot;/{groupName}&quot;, method = RequestMethod.DELETE)
+    @ResponseBody
+    public void deleteGroupByName(@PathVariable(&quot;groupName&quot;) String groupName, HttpServletResponse response) {
+<span class="fc" id="L78">        VenGroup group = venGroupService.findByName(groupName);</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        if (group == null) {</span>
+<span class="nc" id="L80">            response.setStatus(HttpStatus.NOT_FOUND_404);</span>
+<span class="nc" id="L81">            return;</span>
+        }
+<span class="fc" id="L83">        venGroupService.delete(group);</span>
+<span class="fc" id="L84">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

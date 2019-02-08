@@ -1,0 +1,12 @@
+com/avob/openadr/server/oadr20b/vtn/VTN20bSecurityApplicationTest.class
+com/avob/openadr/server/oadr20b/vtn/controller/Oadr20bVenControllerTest.class
+com/avob/openadr/server/oadr20b/vtn/controller/Oadr20bVTNEiReportControllerTest.class
+com/avob/openadr/server/oadr20b/vtn/utils/Oadr20bTestUtils.class
+com/avob/openadr/server/oadr20b/vtn/controller/Oadr20bVTNEiRegisterPartyControllerTest.class
+com/avob/openadr/server/oadr20b/vtn/utils/OadrDataBaseSetup.class
+com/avob/openadr/server/oadr20b/vtn/service/VenPollServiceTest.class
+com/avob/openadr/server/oadr20b/vtn/controller/Oadr20bEventControllerTest.class
+com/avob/openadr/server/oadr20b/vtn/controller/Oadr20bVTNSecurityTest.class
+com/avob/openadr/server/oadr20b/vtn/controller/Oadr20bVTNEiOptControllerTest.class
+com/avob/openadr/server/oadr20b/vtn/controller/Oadr20bVTNEiEventControllerTest.class
+com/avob/openadr/server/oadr20b/vtn/utils/OadrMockMvc.class

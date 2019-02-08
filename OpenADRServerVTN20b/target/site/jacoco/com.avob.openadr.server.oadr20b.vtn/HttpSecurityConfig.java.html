@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HttpSecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.vtn</a> &gt; <span class="el_source">HttpSecurityConfig.java</span></div><h1>HttpSecurityConfig.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.vtn;
+
+import java.io.IOException;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.http.HttpStatus;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
+
+import com.avob.openadr.server.common.vtn.security.BasicAuthenticationManager;
+import com.avob.openadr.server.common.vtn.security.DigestAuthenticationProvider;
+import com.avob.openadr.server.common.vtn.security.DigestUserDetailsService;
+
+/**
+ * Spring security configuration
+ * 
+ * @author bertrand
+ *
+ */
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+<span class="fc" id="L39">public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {</span>
+
+	@Resource
+	private Oadr20bX509AuthenticatedUserDetailsService oadr20bX509AuthenticatedUserDetailsService;
+
+	@Resource
+	private BasicAuthenticationManager basicAuthenticationManager;
+
+	@Resource
+	private DigestUserDetailsService digestUserDetailsService;
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+<span class="fc" id="L52">		DigestAuthenticationEntryPoint authenticationEntryPoint = new DigestAuthenticationEntryPoint();</span>
+<span class="fc" id="L53">		authenticationEntryPoint.setKey(DigestAuthenticationProvider.DIGEST_KEY);</span>
+<span class="fc" id="L54">		authenticationEntryPoint.setRealmName(DigestAuthenticationProvider.DIGEST_REALM);</span>
+
+<span class="fc" id="L56">		DigestAuthenticationFilter digestAuthenticationFilter = new DigestAuthenticationFilter();</span>
+<span class="fc" id="L57">		digestAuthenticationFilter.setAuthenticationEntryPoint(authenticationEntryPoint);</span>
+<span class="fc" id="L58">		digestAuthenticationFilter.setUserDetailsService(digestUserDetailsService);</span>
+<span class="fc" id="L59">		digestAuthenticationFilter.setPasswordAlreadyEncoded(true);</span>
+
+<span class="fc" id="L61">		BasicAuthenticationEntryPoint basicAuthenticationEntryPoint = new BasicAuthenticationEntryPoint();</span>
+<span class="fc" id="L62">		basicAuthenticationEntryPoint.setRealmName(BasicAuthenticationManager.BASIC_REALM);</span>
+
+<span class="fc" id="L64">		BasicAuthenticationFilter basicAuthenticationFilter = new BasicAuthenticationFilter(basicAuthenticationManager);</span>
+
+<span class="fc" id="L66">		http.csrf().disable();</span>
+<span class="fc" id="L67">		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);</span>
+
+<span class="fc" id="L69">		http.authorizeRequests().regexMatchers(HttpMethod.OPTIONS, &quot;.*&quot;).permitAll();</span>
+
+<span class="fc" id="L71">		http.authorizeRequests().anyRequest().authenticated().and().x509().subjectPrincipalRegex(&quot;CN=(.*?)(?:,|$)&quot;)</span>
+<span class="fc" id="L72">				.authenticationUserDetailsService(oadr20bX509AuthenticatedUserDetailsService);</span>
+
+<span class="fc" id="L74">		http.addFilter(digestAuthenticationFilter).addFilter(basicAuthenticationFilter).exceptionHandling().and()</span>
+<span class="fc" id="L75">				.authorizeRequests().anyRequest().authenticated();</span>
+
+<span class="fc" id="L77">		http.exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPoint() {</span>
+
+			@Override
+			public void commence(HttpServletRequest arg0, HttpServletResponse arg1, AuthenticationException arg2)
+					throws IOException, ServletException {
+<span class="nc bnc" id="L82" title="All 4 branches missed.">				if (arg0.getServletPath().contains(&quot;/Ven&quot;) || arg0.getServletPath().contains(&quot;swagger&quot;)</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">						|| arg0.getServletPath().contains(&quot;swagger-resources&quot;)</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">						|| arg0.getServletPath().contains(&quot;v2&quot;)) {</span>
+<span class="nc" id="L85">					arg1.setStatus(HttpStatus.UNAUTHORIZED_401);</span>
+<span class="nc" id="L86">					arg1.addHeader(&quot;WWW-Authenticate&quot;, &quot;Basic&quot;);</span>
+				} else {
+<span class="nc" id="L88">					arg1.setStatus(HttpStatus.FORBIDDEN_403);</span>
+
+				}
+
+<span class="nc" id="L92">			}</span>
+
+		});
+
+<span class="fc" id="L96">	}</span>
+
+	@Override
+	public void configure(WebSecurity web) throws Exception {
+<span class="fc" id="L100">		web.ignoring().regexMatchers(&quot;.*api-docs.*&quot;).regexMatchers(&quot;/health&quot;);</span>
+<span class="fc" id="L101">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

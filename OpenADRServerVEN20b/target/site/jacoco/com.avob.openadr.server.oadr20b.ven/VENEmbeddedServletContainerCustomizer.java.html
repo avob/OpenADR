@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VENEmbeddedServletContainerCustomizer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVEN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.ven</a> &gt; <span class="el_source">VENEmbeddedServletContainerCustomizer.java</span></div><h1>VENEmbeddedServletContainerCustomizer.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.ven;
+
+import java.security.KeyStore;
+
+import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.boot.context.embedded.jetty.JettyEmbeddedServletContainerFactory;
+
+public class VENEmbeddedServletContainerCustomizer implements EmbeddedServletContainerCustomizer {
+
+	private int port;
+	private KeyStore keystore;
+	private KeyStore truststore;
+	private String keystorePass;
+	private String contextPath;
+	private String[] protocols;
+	private String[] ciphers;
+
+	public VENEmbeddedServletContainerCustomizer(int port, String contextPath, KeyStore keystore, String keystorePass,
+<span class="fc" id="L20">			KeyStore truststore, String[] protocols, String[] ciphers) {</span>
+<span class="fc" id="L21">		this.port = port;</span>
+<span class="fc" id="L22">		this.keystore = keystore;</span>
+<span class="fc" id="L23">		this.truststore = truststore;</span>
+<span class="fc" id="L24">		this.keystorePass = keystorePass;</span>
+<span class="fc" id="L25">		this.contextPath = contextPath;</span>
+<span class="fc" id="L26">		this.protocols = protocols;</span>
+<span class="fc" id="L27">		this.ciphers = ciphers;</span>
+<span class="fc" id="L28">	}</span>
+
+	@Override
+	public void customize(ConfigurableEmbeddedServletContainer container) {
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">		if (container instanceof JettyEmbeddedServletContainerFactory) {</span>
+<span class="fc" id="L33">			configureJetty((JettyEmbeddedServletContainerFactory) container);</span>
+		}
+<span class="fc" id="L35">	}</span>
+
+	private void configureJetty(JettyEmbeddedServletContainerFactory jettyFactory) {
+<span class="fc" id="L38">		jettyFactory.setRegisterDefaultServlet(false);</span>
+<span class="pc bpc" id="L39" title="3 of 4 branches missed.">		if (contextPath != null &amp;&amp; !&quot;&quot;.equals(contextPath.trim())) {</span>
+<span class="nc" id="L40">			jettyFactory.setContextPath(contextPath);</span>
+		}
+<span class="fc" id="L42">		jettyFactory.addServerCustomizers(</span>
+				new VENJettyServerCustomizer(port, keystore, keystorePass, truststore, protocols, ciphers));
+<span class="fc" id="L44">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

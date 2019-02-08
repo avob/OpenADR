@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bCreatedPartyRegistrationBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRModel20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.model.oadr20b.builders.eiregisterparty</a> &gt; <span class="el_source">Oadr20bCreatedPartyRegistrationBuilder.java</span></div><h1>Oadr20bCreatedPartyRegistrationBuilder.java</h1><pre class="source lang-java linenums">package com.avob.openadr.model.oadr20b.builders.eiregisterparty;
+
+import java.util.List;
+
+import com.avob.openadr.model.oadr20b.Oadr20bFactory;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType.OadrExtensions;
+import com.avob.openadr.model.oadr20b.oadr.OadrProfiles.OadrProfile;
+import com.avob.openadr.model.oadr20b.oadr.OadrServiceSpecificInfo;
+import com.avob.openadr.model.oadr20b.xcal.DurationPropType;
+
+public class Oadr20bCreatedPartyRegistrationBuilder {
+
+    private OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType;
+
+<span class="fc" id="L16">    public Oadr20bCreatedPartyRegistrationBuilder(String requestId, int responseCode, String venId, String vtnId) {</span>
+<span class="fc" id="L17">        oadrCreatedPartyRegistrationType = Oadr20bFactory.createOadrCreatedPartyRegistrationType(requestId,</span>
+                responseCode, venId, vtnId);
+<span class="fc" id="L19">    }</span>
+
+    public Oadr20bCreatedPartyRegistrationBuilder withResponseDescription(String description) {
+<span class="nc" id="L22">        oadrCreatedPartyRegistrationType.getEiResponse().setResponseDescription(description);</span>
+<span class="nc" id="L23">        return this;</span>
+    }
+
+    public Oadr20bCreatedPartyRegistrationBuilder withOadrServiceSpecificInfo(
+            OadrServiceSpecificInfo oadrServiceSpecificInfo) {
+<span class="nc" id="L28">        oadrCreatedPartyRegistrationType.setOadrServiceSpecificInfo(oadrServiceSpecificInfo);</span>
+<span class="nc" id="L29">        return this;</span>
+    }
+
+    public Oadr20bCreatedPartyRegistrationBuilder withOadrRequestedOadrPollFreq(String duration) {
+<span class="nc" id="L33">        DurationPropType value = Oadr20bFactory.createDurationPropType(duration);</span>
+<span class="nc" id="L34">        oadrCreatedPartyRegistrationType.setOadrRequestedOadrPollFreq(value);</span>
+<span class="nc" id="L35">        return this;</span>
+    }
+
+    public Oadr20bCreatedPartyRegistrationBuilder addOadrProfile(OadrProfile oadrProfile) {
+<span class="fc" id="L39">        oadrCreatedPartyRegistrationType.getOadrProfiles().getOadrProfile().add(oadrProfile);</span>
+<span class="fc" id="L40">        return this;</span>
+    }
+
+    public Oadr20bCreatedPartyRegistrationBuilder addOadrProfile(List&lt;OadrProfile&gt; oadrProfile) {
+<span class="nc" id="L44">        oadrCreatedPartyRegistrationType.getOadrProfiles().getOadrProfile().addAll(oadrProfile);</span>
+<span class="nc" id="L45">        return this;</span>
+    }
+
+    public Oadr20bCreatedPartyRegistrationBuilder withOadrExtensions(OadrExtensions oadrExtensions) {
+<span class="nc" id="L49">        oadrCreatedPartyRegistrationType.setOadrExtensions(oadrExtensions);</span>
+<span class="nc" id="L50">        return this;</span>
+    }
+
+    public Oadr20bCreatedPartyRegistrationBuilder withRegistrationId(String registrationId) {
+<span class="fc" id="L54">        oadrCreatedPartyRegistrationType.setRegistrationID(registrationId);</span>
+<span class="fc" id="L55">        return this;</span>
+    }
+
+    public Oadr20bCreatedPartyRegistrationBuilder withSchemaVersion(String schemaVersion) {
+<span class="fc" id="L59">        oadrCreatedPartyRegistrationType.setSchemaVersion(schemaVersion);</span>
+<span class="fc" id="L60">        return this;</span>
+    }
+
+    public OadrCreatedPartyRegistrationType build() {
+<span class="fc" id="L64">        return oadrCreatedPartyRegistrationType;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

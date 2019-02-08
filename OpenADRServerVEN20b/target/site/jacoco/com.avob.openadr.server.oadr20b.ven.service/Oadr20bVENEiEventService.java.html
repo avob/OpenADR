@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bVENEiEventService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVEN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.ven.service</a> &gt; <span class="el_source">Oadr20bVENEiEventService.java</span></div><h1>Oadr20bVENEiEventService.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.ven.service;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Resource;
+
+import org.eclipse.jetty.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
+import com.avob.openadr.model.oadr20b.Oadr20bFactory;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
+import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
+import com.avob.openadr.model.oadr20b.ei.EventDescriptorType;
+import com.avob.openadr.model.oadr20b.ei.EventResponses.EventResponse;
+import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
+import com.avob.openadr.model.oadr20b.ei.IntervalType;
+import com.avob.openadr.model.oadr20b.ei.OptTypeType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
+import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.model.oadr20b.oadr.ResponseRequiredType;
+import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
+import com.avob.openadr.server.oadr20b.ven.VenConfig;
+import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
+import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bDistributeEventApplicationLayerException;
+
+@Service
+<span class="fc" id="L39">public class Oadr20bVENEiEventService {</span>
+
+    @Resource
+    private VenConfig venConfig;
+
+    @Resource
+    private MultiVtnConfig multiVtnConfig;
+
+    @Resource
+    private PlanRequestService planRequestService;
+
+    @Resource
+    private ScheduledExecutorService scheduledExecutorService;
+
+    protected List&lt;Oadr20bVENEiEventServiceListener&gt; listeners;
+
+    /**
+     * threadsafe repository
+     */
+<span class="fc" id="L58">    private Map&lt;String, Map&lt;String, OadrEvent&gt;&gt; oadrEvents = new ConcurrentHashMap&lt;String, Map&lt;String, OadrEvent&gt;&gt;();</span>
+
+    /**
+     * Map&lt;vtnconf , Map&lt;eventId, List&lt;ScheduledFuture&lt;?&gt;&gt;&gt;&gt;
+     */
+<span class="fc" id="L63">    private Map&lt;String, Map&lt;String, List&lt;ScheduledFuture&lt;?&gt;&gt;&gt;&gt; scheduledTask = new ConcurrentHashMap&lt;String, Map&lt;String, List&lt;ScheduledFuture&lt;?&gt;&gt;&gt;&gt;();</span>
+
+    public interface Oadr20bVENEiEventServiceListener {
+        public void onCreateEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event);
+
+        public void onUpdateEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event);
+
+        public void onDeleteEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event);
+
+        public void onIntervalStart(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+                EiEventSignalType eiEventSignalType, IntervalType intervalType);
+
+        public void onLastIntervalEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+                EiEventSignalType eiEventSignalType, IntervalType intervalType);
+    }
+
+    private abstract class EiEventScheduledTask implements Runnable {
+        protected OadrEvent event;
+        protected EiEventSignalType eiEventSignalType;
+        protected IntervalType intervalType;
+        protected VtnSessionConfiguration vtnConfiguration;
+
+        public EiEventScheduledTask(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+<span class="nc" id="L86">                EiEventSignalType eiEventSignalType, IntervalType intervalType) {</span>
+<span class="nc" id="L87">            this.event = event;</span>
+<span class="nc" id="L88">            this.eiEventSignalType = eiEventSignalType;</span>
+<span class="nc" id="L89">            this.intervalType = intervalType;</span>
+<span class="nc" id="L90">            this.vtnConfiguration = vtnConfiguration;</span>
+<span class="nc" id="L91">        }</span>
+    }
+
+    private class EiEventScheduledOnIntervalStartTask extends EiEventScheduledTask {
+        public EiEventScheduledOnIntervalStartTask(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+<span class="nc" id="L96">                EiEventSignalType eiEventSignalType, IntervalType intervalType) {</span>
+<span class="nc" id="L97">            super(vtnConfiguration, event, eiEventSignalType, intervalType);</span>
+<span class="nc" id="L98">        }</span>
+
+        @Override
+        public void run() {
+<span class="nc" id="L102">            applyActiveOadrEventScheduling(vtnConfiguration, System.currentTimeMillis(), event);</span>
+<span class="nc" id="L103">        }</span>
+    }
+
+    private class EiEventScheduledOnLastIntervalEndTask extends EiEventScheduledTask {
+        public EiEventScheduledOnLastIntervalEndTask(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+<span class="nc" id="L108">                EiEventSignalType eiEventSignalType, IntervalType intervalType) {</span>
+<span class="nc" id="L109">            super(vtnConfiguration, event, eiEventSignalType, intervalType);</span>
+<span class="nc" id="L110">        }</span>
+
+        @Override
+        public void run() {
+<span class="nc" id="L114">            listeners.forEach(</span>
+<span class="nc" id="L115">                    listener -&gt; listener.onLastIntervalEnd(vtnConfiguration, event, eiEventSignalType, intervalType));</span>
+<span class="nc" id="L116">        }</span>
+    }
+
+    private void applyPreActiveOadrEventScheduling(VtnSessionConfiguration vtnConfiguration, long now,
+            OadrEvent event) {
+<span class="nc" id="L121">        String eventId = event.getEiEvent().getEventDescriptor().getEventID();</span>
+<span class="nc" id="L122">        long start = Oadr20bFactory.xmlCalendarToTimestamp(</span>
+<span class="nc" id="L123">                event.getEiEvent().getEiActivePeriod().getProperties().getDtstart().getDateTime());</span>
+<span class="nc" id="L124">        long delay = start - now;</span>
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        for (EiEventSignalType eiEventSignalType : event.getEiEvent().getEiEventSignals().getEiEventSignal()) {</span>
+<span class="nc" id="L126">            IntervalType intervalType = eiEventSignalType.getIntervals().getInterval().get(0);</span>
+<span class="nc" id="L127">            Runnable intervalStartTask = new EiEventScheduledOnIntervalStartTask(vtnConfiguration, event,</span>
+                    eiEventSignalType, intervalType);
+<span class="nc" id="L129">            ScheduledFuture&lt;?&gt; schedule = scheduledExecutorService.schedule(intervalStartTask, delay,</span>
+                    TimeUnit.MILLISECONDS);
+<span class="nc" id="L131">            this.addScheduledTask(vtnConfiguration, eventId, schedule);</span>
+<span class="nc" id="L132">        }</span>
+<span class="nc" id="L133">    }</span>
+
+    private void applyActiveOadrEventScheduling(VtnSessionConfiguration vtnConfiguration, long now, OadrEvent event) {
+<span class="nc" id="L136">        String eventId = event.getEiEvent().getEventDescriptor().getEventID();</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">        for (EiEventSignalType eiEventSignalType : event.getEiEvent().getEiEventSignals().getEiEventSignal()) {</span>
+<span class="nc" id="L138">            boolean selectedInterval = false;</span>
+<span class="nc" id="L139">            Long nextSelectedIntervalEnd = null;</span>
+<span class="nc" id="L140">            IntervalType nextSelectedInterval = null;</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">            for (IntervalType intervalType : eiEventSignalType.getIntervals().getInterval()) {</span>
+<span class="nc" id="L142">                long intervalStart = Oadr20bFactory.xmlCalendarToTimestamp(intervalType.getDtstart().getDateTime());</span>
+<span class="nc" id="L143">                Long intervalEnd = Oadr20bFactory.addXMLDurationToTimestamp(intervalStart,</span>
+<span class="nc" id="L144">                        intervalType.getDuration().getDuration());</span>
+
+<span class="nc bnc" id="L146" title="All 2 branches missed.">                if (selectedInterval) {</span>
+<span class="nc" id="L147">                    long delay = intervalStart - now;</span>
+<span class="nc" id="L148">                    Runnable intervalStartTask = new EiEventScheduledOnIntervalStartTask(vtnConfiguration, event,</span>
+                            eiEventSignalType, intervalType);
+<span class="nc" id="L150">                    ScheduledFuture&lt;?&gt; schedule = scheduledExecutorService.schedule(intervalStartTask, delay,</span>
+                            TimeUnit.MILLISECONDS);
+<span class="nc" id="L152">                    this.addScheduledTask(vtnConfiguration, eventId, schedule);</span>
+<span class="nc" id="L153">                    nextSelectedInterval = intervalType;</span>
+<span class="nc" id="L154">                    nextSelectedIntervalEnd = intervalEnd;</span>
+                }
+
+<span class="nc bnc" id="L157" title="All 4 branches missed.">                if (now &gt;= intervalStart &amp;&amp; now &lt; intervalEnd) {</span>
+
+<span class="nc" id="L159">                    listeners.forEach(listener -&gt; listener.onIntervalStart(vtnConfiguration, event, eiEventSignalType,</span>
+                            intervalType));
+
+<span class="nc" id="L162">                    selectedInterval = true;</span>
+
+                }
+
+<span class="nc" id="L166">            }</span>
+
+<span class="nc bnc" id="L168" title="All 4 branches missed.">            if (nextSelectedInterval != null &amp;&amp; nextSelectedIntervalEnd != null) {</span>
+<span class="nc" id="L169">                long delay = nextSelectedIntervalEnd - now;</span>
+<span class="nc" id="L170">                Runnable intervalStartTask = new EiEventScheduledOnLastIntervalEndTask(vtnConfiguration, event,</span>
+                        eiEventSignalType, nextSelectedInterval);
+<span class="nc" id="L172">                ScheduledFuture&lt;?&gt; schedule = scheduledExecutorService.schedule(intervalStartTask, delay,</span>
+                        TimeUnit.MILLISECONDS);
+
+<span class="nc" id="L175">                this.addScheduledTask(vtnConfiguration, eventId, schedule);</span>
+            }
+<span class="nc" id="L177">        }</span>
+<span class="nc" id="L178">    }</span>
+
+    private void applyOadrEventScheduling(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
+        // if their is no listener, there is no point to schedule event
+<span class="nc bnc" id="L182" title="All 2 branches missed.">        if (listeners == null) {</span>
+<span class="nc" id="L183">            return;</span>
+        }
+<span class="nc" id="L185">        EventDescriptorType eventDescriptor = event.getEiEvent().getEventDescriptor();</span>
+<span class="nc" id="L186">        String eventId = eventDescriptor.getEventID();</span>
+<span class="nc" id="L187">        EventStatusEnumeratedType eventStatus = eventDescriptor.getEventStatus();</span>
+
+<span class="nc" id="L189">        long now = System.currentTimeMillis();</span>
+
+<span class="nc bnc" id="L191" title="All 7 branches missed.">        switch (eventStatus) {</span>
+        case ACTIVE:
+<span class="nc" id="L193">            this.applyActiveOadrEventScheduling(vtnConfiguration, now, event);</span>
+<span class="nc" id="L194">            break;</span>
+        case CANCELLED:
+<span class="nc" id="L196">            this.cancelScheduledTask(vtnConfiguration, eventId);</span>
+<span class="nc" id="L197">            break;</span>
+        case COMPLETED:
+<span class="nc" id="L199">            this.cancelScheduledTask(vtnConfiguration, eventId);</span>
+<span class="nc" id="L200">            break;</span>
+        case FAR:
+<span class="nc" id="L202">            this.applyPreActiveOadrEventScheduling(vtnConfiguration, now, event);</span>
+<span class="nc" id="L203">            break;</span>
+        case NEAR:
+<span class="nc" id="L205">            this.applyPreActiveOadrEventScheduling(vtnConfiguration, now, event);</span>
+<span class="nc" id="L206">            break;</span>
+        case NONE:
+<span class="nc" id="L208">            this.cancelScheduledTask(vtnConfiguration, eventId);</span>
+<span class="nc" id="L209">            break;</span>
+        default:
+<span class="nc" id="L211">            this.cancelScheduledTask(vtnConfiguration, eventId);</span>
+            break;
+
+        }
+
+<span class="nc" id="L216">    }</span>
+
+    private Optional&lt;EventResponse&gt; processOadrEvent(VtnSessionConfiguration vtnConfiguration, String requestId,
+            OadrEvent event) throws Oadr20bDistributeEventApplicationLayerException {
+<span class="nc" id="L220">        ResponseRequiredType oadrResponseRequired = event.getOadrResponseRequired();</span>
+
+<span class="nc" id="L222">        boolean doNeedResponse = ResponseRequiredType.ALWAYS.equals(oadrResponseRequired);</span>
+<span class="nc" id="L223">        int responseCode = HttpStatus.OK_200;</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">        if (!isKnownEvent(vtnConfiguration, event)) {</span>
+<span class="nc" id="L225">            saveOadrEvent(vtnConfiguration, event);</span>
+<span class="nc" id="L226">            doNeedResponse = true;</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">            if (listeners != null) {</span>
+<span class="nc" id="L228">                listeners.forEach(listener -&gt; listener.onCreateEvent(vtnConfiguration, event));</span>
+<span class="nc" id="L229">                applyOadrEventScheduling(vtnConfiguration, event);</span>
+            }
+        }
+<span class="nc bnc" id="L232" title="All 2 branches missed.">        if (isUpdatedEvent(vtnConfiguration, requestId, event)) {</span>
+<span class="nc" id="L233">            saveOadrEvent(vtnConfiguration, event);</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">            if (listeners != null) {</span>
+<span class="nc" id="L235">                listeners.forEach(listener -&gt; listener.onUpdateEvent(vtnConfiguration, event));</span>
+<span class="nc" id="L236">                cancelScheduledTask(vtnConfiguration, event.getEiEvent().getEventDescriptor().getEventID());</span>
+<span class="nc" id="L237">                applyOadrEventScheduling(vtnConfiguration, event);</span>
+            }
+        }
+
+<span class="nc bnc" id="L241" title="All 4 branches missed.">        if (!ResponseRequiredType.NEVER.equals(oadrResponseRequired) &amp;&amp; doNeedResponse) {</span>
+<span class="nc" id="L242">            String eventID = event.getEiEvent().getEventDescriptor().getEventID();</span>
+<span class="nc" id="L243">            long modificationNumber = event.getEiEvent().getEventDescriptor().getModificationNumber();</span>
+
+<span class="nc" id="L245">            return Optional.of(Oadr20bEiEventBuilders.newOadr20bCreatedEventEventResponseBuilder(eventID,</span>
+<span class="nc" id="L246">                    modificationNumber, requestId, responseCode, OptTypeType.OPT_IN).build());</span>
+        }
+
+<span class="nc" id="L249">        return Optional.empty();</span>
+    }
+
+    public OadrResponseType oadrDistributeEvent(VtnSessionConfiguration vtnConfiguration, OadrDistributeEventType event)
+            throws Oadr20bDistributeEventApplicationLayerException {
+
+        // String vtnID = event.getVtnID();
+<span class="nc" id="L256">        String vtnRequestID = event.getRequestID();</span>
+
+<span class="nc" id="L258">        int responseCode = HttpStatus.OK_200;</span>
+<span class="nc" id="L259">        List&lt;String&gt; retrievedEventIdList = new ArrayList&lt;String&gt;();</span>
+<span class="nc" id="L260">        List&lt;EventResponse&gt; eventResponses = new ArrayList&lt;EventResponse&gt;();</span>
+<span class="nc bnc" id="L261" title="All 2 branches missed.">        for (Iterator&lt;OadrEvent&gt; iterator = event.getOadrEvent().iterator(); iterator.hasNext();) {</span>
+<span class="nc" id="L262">            OadrEvent next = iterator.next();</span>
+<span class="nc" id="L263">            String eventID = next.getEiEvent().getEventDescriptor().getEventID();</span>
+<span class="nc" id="L264">            retrievedEventIdList.add(eventID);</span>
+            // the process might lead to an answer
+<span class="nc" id="L266">            Optional&lt;EventResponse&gt; processOadrEvent = processOadrEvent(vtnConfiguration, vtnRequestID, next);</span>
+<span class="nc bnc" id="L267" title="All 2 branches missed.">            if (processOadrEvent.isPresent()) {</span>
+<span class="nc" id="L268">                eventResponses.add(processOadrEvent.get());</span>
+            }
+<span class="nc" id="L270">        }</span>
+
+<span class="nc" id="L272">        List&lt;String&gt; findMissingEventID = findMissingEventID(vtnConfiguration, retrievedEventIdList);</span>
+<span class="nc" id="L273">        removeAll(vtnConfiguration, findMissingEventID);</span>
+
+<span class="nc bnc" id="L275" title="All 2 branches missed.">        if (!eventResponses.isEmpty()) {</span>
+<span class="nc" id="L276">            OadrCreatedEventType build = Oadr20bEiEventBuilders</span>
+<span class="nc" id="L277">                    .newCreatedEventBuilder(venConfig.getVenId(), vtnRequestID, responseCode)</span>
+<span class="nc" id="L278">                    .addEventResponse(eventResponses).build();</span>
+
+<span class="nc" id="L280">            planRequestService.submitCreatedEvent(multiVtnConfig.getMultiClientConfig(vtnConfiguration), build);</span>
+        }
+
+<span class="nc" id="L283">        return Oadr20bResponseBuilders.newOadr20bResponseBuilder(vtnRequestID, responseCode, &quot;&quot;).build();</span>
+    }
+
+    /**
+     * true if the event is already known, based on it's eventID, without
+     * considering it's modification number
+     * 
+     * @param event
+     * @return
+     */
+    public boolean isKnownEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
+<span class="fc" id="L294">        return getOadrEvents(vtnConfiguration).containsKey(event.getEiEvent().getEventDescriptor().getEventID());</span>
+    }
+
+    /**
+     * true if the event have an higher modification number than an already
+     * known event with the same eventID
+     * 
+     * @param event
+     * @return
+     */
+    public boolean isUpdatedEvent(VtnSessionConfiguration vtnConfiguration, String requestId, OadrEvent event)
+            throws Oadr20bDistributeEventApplicationLayerException {
+<span class="fc" id="L306">        String eventID = event.getEiEvent().getEventDescriptor().getEventID();</span>
+<span class="fc" id="L307">        long modificationNumber = event.getEiEvent().getEventDescriptor().getModificationNumber();</span>
+<span class="fc" id="L308">        OadrEvent oadrEvent = getOadrEvents(vtnConfiguration).get(eventID);</span>
+<span class="pc bpc" id="L309" title="1 of 2 branches missed.">        if (oadrEvent == null) {</span>
+<span class="nc" id="L310">            return false;</span>
+        }
+<span class="fc" id="L312">        long knownModificationNumber = oadrEvent.getEiEvent().getEventDescriptor().getModificationNumber();</span>
+<span class="fc bfc" id="L313" title="All 2 branches covered.">        if (knownModificationNumber &gt; modificationNumber) {</span>
+<span class="fc" id="L314">            throw new Oadr20bDistributeEventApplicationLayerException(</span>
+                    &quot;registred event &quot; + eventID + &quot; has a modification number higher than retrieved event&quot;,
+<span class="fc" id="L316">                    Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestId, HttpStatus.NOT_ACCEPTABLE_406, &quot;&quot;)</span>
+<span class="fc" id="L317">                            .build());</span>
+        }
+
+<span class="fc bfc" id="L320" title="All 2 branches covered.">        return modificationNumber &gt; knownModificationNumber;</span>
+    }
+
+    /**
+     * Add event to known event list
+     * 
+     * @param event
+     */
+    public void saveOadrEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
+<span class="fc" id="L329">        putOadrEvents(vtnConfiguration, event);</span>
+<span class="fc" id="L330">    }</span>
+
+    /**
+     * remove all event with id present in given list
+     * 
+     * @param eventIdList
+     */
+    public void removeAll(VtnSessionConfiguration vtnConfiguration, List&lt;String&gt; eventIdList) {
+<span class="fc" id="L338">        eventIdList.forEach(key -&gt; {</span>
+<span class="fc" id="L339">            OadrEvent oadrEvent = oadrEvents.get(vtnConfiguration.getVtnId()).get(key);</span>
+<span class="pc bpc" id="L340" title="1 of 2 branches missed.">            if (oadrEvent != null) {</span>
+<span class="pc bpc" id="L341" title="1 of 2 branches missed.">                if (listeners != null) {</span>
+<span class="nc" id="L342">                    listeners.forEach(listener -&gt; listener.onDeleteEvent(vtnConfiguration, oadrEvent));</span>
+                }
+<span class="fc" id="L344">                oadrEvents.get(vtnConfiguration.getVtnId()).remove(key);</span>
+            }
+
+<span class="fc" id="L347">        });</span>
+<span class="fc" id="L348">    }</span>
+
+    /**
+     * @return the oadrEvents
+     */
+    public Map&lt;String, OadrEvent&gt; getOadrEvents(VtnSessionConfiguration vtnConfiguration) {
+<span class="fc" id="L354">        Map&lt;String, OadrEvent&gt; map = oadrEvents.get(vtnConfiguration.getVtnId());</span>
+<span class="fc bfc" id="L355" title="All 2 branches covered.">        if (map == null) {</span>
+<span class="fc" id="L356">            map = new ConcurrentHashMap&lt;String, OadrEvent&gt;();</span>
+        }
+<span class="fc" id="L358">        return map;</span>
+    }
+
+    public void putOadrEvents(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
+<span class="fc" id="L362">        Map&lt;String, OadrEvent&gt; map = oadrEvents.get(vtnConfiguration.getVtnId());</span>
+<span class="fc bfc" id="L363" title="All 2 branches covered.">        if (map == null) {</span>
+<span class="fc" id="L364">            map = new ConcurrentHashMap&lt;String, OadrEvent&gt;();</span>
+        }
+<span class="fc" id="L366">        map.put(event.getEiEvent().getEventDescriptor().getEventID(), event);</span>
+<span class="fc" id="L367">        oadrEvents.put(vtnConfiguration.getVtnId(), map);</span>
+<span class="fc" id="L368">    }</span>
+
+    public List&lt;ScheduledFuture&lt;?&gt;&gt; getScheduledTask(VtnSessionConfiguration vtnConfiguration, String eventId) {
+<span class="nc" id="L371">        Map&lt;String, List&lt;ScheduledFuture&lt;?&gt;&gt;&gt; map = scheduledTask.get(vtnConfiguration.getVtnId());</span>
+<span class="nc bnc" id="L372" title="All 2 branches missed.">        if (map != null) {</span>
+<span class="nc" id="L373">            List&lt;ScheduledFuture&lt;?&gt;&gt; list = map.get(eventId);</span>
+<span class="nc bnc" id="L374" title="All 2 branches missed.">            if (list != null) {</span>
+<span class="nc" id="L375">                return list;</span>
+            }
+        }
+
+<span class="nc" id="L379">        return Collections.emptyList();</span>
+    }
+
+    public void addScheduledTask(VtnSessionConfiguration vtnConfiguration, String eventId, ScheduledFuture&lt;?&gt; task) {
+<span class="nc" id="L383">        Map&lt;String, List&lt;ScheduledFuture&lt;?&gt;&gt;&gt; map = scheduledTask.get(vtnConfiguration.getVtnId());</span>
+<span class="nc" id="L384">        List&lt;ScheduledFuture&lt;?&gt;&gt; list = null;</span>
+<span class="nc bnc" id="L385" title="All 2 branches missed.">        if (map == null) {</span>
+<span class="nc" id="L386">            map = new ConcurrentHashMap&lt;String, List&lt;ScheduledFuture&lt;?&gt;&gt;&gt;();</span>
+        } else {
+<span class="nc" id="L388">            list = map.get(eventId);</span>
+        }
+<span class="nc bnc" id="L390" title="All 2 branches missed.">        if (list == null) {</span>
+<span class="nc" id="L391">            list = new ArrayList&lt;ScheduledFuture&lt;?&gt;&gt;();</span>
+        }
+<span class="nc" id="L393">        list.add(task);</span>
+<span class="nc" id="L394">        map.put(eventId, list);</span>
+<span class="nc" id="L395">        scheduledTask.put(vtnConfiguration.getVtnId(), map);</span>
+<span class="nc" id="L396">    }</span>
+
+    private void cancelScheduledTask(VtnSessionConfiguration vtnConfiguration, String eventId) {
+<span class="nc" id="L399">        List&lt;ScheduledFuture&lt;?&gt;&gt; tasks = this.getScheduledTask(vtnConfiguration, eventId);</span>
+<span class="nc bnc" id="L400" title="All 2 branches missed.">        for (ScheduledFuture&lt;?&gt; scheduledFuture : tasks) {</span>
+<span class="nc" id="L401">            scheduledFuture.cancel(false);</span>
+<span class="nc" id="L402">        }</span>
+<span class="nc" id="L403">        Map&lt;String, List&lt;ScheduledFuture&lt;?&gt;&gt;&gt; map = scheduledTask.get(vtnConfiguration.getVtnId());</span>
+<span class="nc bnc" id="L404" title="All 2 branches missed.">        if (map != null) {</span>
+<span class="nc" id="L405">            map.clear();</span>
+<span class="nc" id="L406">            scheduledTask.put(vtnConfiguration.getVtnId(), map);</span>
+        }
+<span class="nc" id="L408">    }</span>
+
+    /**
+     * find eventID present in currently hold map but not in the list of given
+     * id
+     * 
+     * @return
+     */
+    public List&lt;String&gt; findMissingEventID(VtnSessionConfiguration vtnConfiguration, List&lt;String&gt; retrievedIdList) {
+<span class="fc" id="L417">        Map&lt;String, OadrEvent&gt; map = oadrEvents.get(vtnConfiguration.getVtnId());</span>
+<span class="pc bpc" id="L418" title="1 of 2 branches missed.">        if (map != null) {</span>
+<span class="fc" id="L419">            List&lt;String&gt; keys = new ArrayList&lt;String&gt;(map.keySet());</span>
+<span class="fc" id="L420">            keys.removeAll(retrievedIdList);</span>
+<span class="fc" id="L421">            return keys;</span>
+        }
+<span class="nc" id="L423">        return Collections.emptyList();</span>
+    }
+
+    public void clearOadrEvents() {
+<span class="fc" id="L427">        this.oadrEvents.clear();</span>
+<span class="fc" id="L428">    }</span>
+
+    public void addListener(Oadr20bVENEiEventServiceListener listener) {
+<span class="nc bnc" id="L431" title="All 2 branches missed.">        if (listeners == null) {</span>
+<span class="nc" id="L432">            listeners = new ArrayList&lt;Oadr20bVENEiEventServiceListener&gt;();</span>
+        }
+<span class="nc" id="L434">        listeners.add(listener);</span>
+<span class="nc" id="L435">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

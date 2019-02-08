@@ -1,0 +1,92 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.avob.openadr.model</groupId>
+	<artifactId>OpenADRModel20a</artifactId>
+
+	<parent>
+		<groupId>com.avob</groupId>
+		<artifactId>OpenADR</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>${project.build.directory}/generated-sources/oadr20a</directory>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.xsd</include>
+				</includes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-remote-resources-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<includes>
+						<include>**/*.xsd</include>
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-remote-resources-plugin</artifactId>
+				<version>1.5</version>
+				<configuration>
+					<resourceBundles>
+						<resourceBundle>com.avob.openadr.model:OpenADRModel20a:0.0.1-SNAPSHOT</resourceBundle>
+					</resourceBundles>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>process</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- The package of your generated sources -->
+					<!-- <generatePackage>com.avob.openadr.model.oadr20a</generatePackage> -->
+					<bindingDirectory>src/main/resources/oadr20a_binding</bindingDirectory>
+					<generateDirectory>${project.build.directory}/generated-sources/oadr20a</generateDirectory>
+					<schemaDirectory>src/main/resources/oadr20a_schema</schemaDirectory>
+					<args>
+						<arg>-extension</arg>
+						<arg>-Xnamespace-prefix</arg>
+					</args>
+				</configuration>
+				<dependencies>
+					<!-- https://mvnrepository.com/artifact/org.jvnet.jaxb2_commons/jaxb2-namespace-prefix -->
+					<dependency>
+						<groupId>org.jvnet.jaxb2_commons</groupId>
+						<artifactId>jaxb2-namespace-prefix</artifactId>
+						<version>1.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+</project>

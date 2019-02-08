@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmbeddedSqlDatabaseInit.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTNCommon</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.common.vtn</a> &gt; <span class="el_source">EmbeddedSqlDatabaseInit.java</span></div><h1>EmbeddedSqlDatabaseInit.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.common.vtn;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+
+import com.avob.openadr.server.common.vtn.models.ven.Ven;
+import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
+import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
+import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
+import com.avob.openadr.server.common.vtn.service.VenService;
+import com.google.common.collect.Sets;
+
+@Profile(&quot;test-functional&quot;)
+@Configuration
+<span class="nc" id="L18">public class EmbeddedSqlDatabaseInit {</span>
+
+	@Resource
+	private VenMarketContextService venMarketContextService;
+
+	@Resource
+	private VenService venService;
+
+	@PostConstruct
+	public void init() {
+<span class="nc" id="L28">		String marketContextName = &quot;http://oadr.avob.com&quot;;</span>
+<span class="nc" id="L29">		VenMarketContext marketContext = venMarketContextService.prepare(new VenMarketContextDto(marketContextName));</span>
+<span class="nc" id="L30">		venMarketContextService.save(marketContext);</span>
+		// rsa test ven
+<span class="nc" id="L32">		Ven prepare = venService.prepare(&quot;2E:55:12:81:B9:EE:9C:46:72:1D&quot;);</span>
+<span class="nc" id="L33">		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));</span>
+<span class="nc" id="L34">		venService.save(prepare);</span>
+		// ecc test ven
+<span class="nc" id="L36">		prepare = venService.prepare(&quot;15:97:7B:DE:1C:1F:C6:D2:64:84&quot;);</span>
+<span class="nc" id="L37">		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));</span>
+<span class="nc" id="L38">		venService.save(prepare);</span>
+<span class="nc" id="L39">		prepare = venService.prepare(&quot;5B:9B:BF:21:33:A0:DF:6B:21:81&quot;);</span>
+<span class="nc" id="L40">		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));</span>
+<span class="nc" id="L41">		venService.save(prepare);</span>
+
+<span class="nc" id="L43">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

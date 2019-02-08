@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DemandResponseEventDtoValidator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTNCommon</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.common.vtn.models.demandresponseevent</a> &gt; <span class="el_source">DemandResponseEventDtoValidator.java</span></div><h1>DemandResponseEventDtoValidator.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.common.vtn.models.demandresponseevent;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+
+@Component
+public class DemandResponseEventDtoValidator implements Validator {
+
+<span class="fc" id="L15">    private static final Logger LOGGER = LoggerFactory.getLogger(DemandResponseEventDtoValidator.class);</span>
+
+<span class="fc" id="L17">    private DatatypeFactory datatypeFactory = null;</span>
+
+<span class="fc" id="L19">    public DemandResponseEventDtoValidator() throws DatatypeConfigurationException {</span>
+<span class="fc" id="L20">        datatypeFactory = DatatypeFactory.newInstance();</span>
+<span class="fc" id="L21">    }</span>
+
+    @Override
+    public boolean supports(Class&lt;?&gt; arg0) {
+<span class="fc" id="L25">        return DemandResponseEventDto.class.equals(arg0);</span>
+    }
+
+    private void checkXmlDuration(String duration, Errors errors, String field) {
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        if (duration != null) {</span>
+            try {
+<span class="fc" id="L31">                datatypeFactory.newDuration(duration);</span>
+<span class="fc" id="L32">            } catch (Exception e) {</span>
+
+<span class="fc" id="L34">                errors.rejectValue(field, &quot;field.&quot; + field + &quot;.invalid&quot;, &quot;Invalid XML duration format&quot;);</span>
+<span class="fc" id="L35">            }</span>
+        }
+<span class="fc" id="L37">    }</span>
+
+    private void checkNullOrEmpty(Object obj, Errors errors, String field) {
+<span class="pc bpc" id="L40" title="1 of 6 branches missed.">        if (obj == null || (obj instanceof String &amp;&amp; &quot;&quot;.equals(((String) obj).trim()))) {</span>
+<span class="fc" id="L41">            errors.rejectValue(field, &quot;field.required&quot;, &quot;Missing mandatory field&quot;);</span>
+        }
+<span class="fc" id="L43">    }</span>
+
+    private void checkNotNull(Object obj, Errors errors, String field) {
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (obj != null) {</span>
+<span class="fc" id="L47">            errors.rejectValue(field, &quot;field.must_not_be_set&quot;, &quot;Field must not be set&quot;);</span>
+        }
+<span class="fc" id="L49">    }</span>
+
+    @Override
+    public void validate(Object arg0, Errors errors) {
+<span class="fc" id="L53">        DemandResponseEventDto dto = (DemandResponseEventDto) arg0;</span>
+
+<span class="fc" id="L55">        checkNullOrEmpty(dto.getEventId(), errors, &quot;eventId&quot;);</span>
+<span class="fc" id="L56">        checkNullOrEmpty(dto.getStart(), errors, &quot;start&quot;);</span>
+<span class="fc" id="L57">        checkNullOrEmpty(dto.getValue(), errors, &quot;value&quot;);</span>
+<span class="fc" id="L58">        checkNullOrEmpty(dto.getComaSeparatedTargetedVenUsername(), errors, &quot;comaSeparatedTargetedVenUsername&quot;);</span>
+<span class="fc" id="L59">        checkNullOrEmpty(dto.getDuration(), errors, &quot;duration&quot;);</span>
+<span class="fc" id="L60">        checkNullOrEmpty(dto.getNotificationDuration(), errors, &quot;notificationDuration&quot;);</span>
+<span class="fc" id="L61">        checkNullOrEmpty(dto.getToleranceDuration(), errors, &quot;toleranceDuration&quot;);</span>
+<span class="fc" id="L62">        checkNullOrEmpty(dto.getMarketContext(), errors, &quot;marketContext&quot;);</span>
+
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (!&quot;0&quot;.equals(dto.getDuration())) {</span>
+<span class="fc" id="L65">            checkXmlDuration(dto.getDuration(), errors, &quot;duration&quot;);</span>
+        }
+
+<span class="fc" id="L68">        checkXmlDuration(dto.getNotificationDuration(), errors, &quot;notificationDuration&quot;);</span>
+<span class="fc" id="L69">        checkXmlDuration(dto.getToleranceDuration(), errors, &quot;toleranceDuration&quot;);</span>
+<span class="fc" id="L70">        checkXmlDuration(dto.getRampUpDuration(), errors, &quot;rampUpDuration&quot;);</span>
+<span class="fc" id="L71">        checkXmlDuration(dto.getRecoveryDuration(), errors, &quot;recoveryDuration&quot;);</span>
+
+<span class="fc" id="L73">        checkNotNull(dto.getModificationNumber(), errors, &quot;modificationNumber&quot;);</span>
+<span class="fc" id="L74">        checkNotNull(dto.getCreatedTimestamp(), errors, &quot;createdTimestamp&quot;);</span>
+<span class="fc" id="L75">        checkNotNull(dto.getLastUpdateTimestamp(), errors, &quot;lastUpdateTimestamp&quot;);</span>
+
+<span class="pc bpc" id="L77" title="2 of 4 branches missed.">        if (dto.getPriority() != null &amp;&amp; dto.getPriority() &lt; 0) {</span>
+<span class="nc" id="L78">            errors.rejectValue(&quot;priority&quot;, &quot;field.priority.invalid&quot;, &quot;Priority MUST be greater than 0&quot;);</span>
+        }
+
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        if (errors.hasErrors()) {</span>
+<span class="fc" id="L82">            LOGGER.warn(errors.getAllErrors().toString());</span>
+        }
+<span class="fc" id="L84">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

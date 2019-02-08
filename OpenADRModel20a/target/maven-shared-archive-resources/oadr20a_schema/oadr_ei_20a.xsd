@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XMLSpy v2011 rel. 2 sp1 (http://www.altova.com) by Paul Lipkin (private) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110" xmlns:pyld="http://docs.oasis-open.org/ns/energyinterop/201110/payloads" xmlns:xcal="urn:ietf:params:xml:ns:icalendar-2.0" xmlns:emix="http://docs.oasis-open.org/ns/emix/2011/06" xmlns:strm="urn:ietf:params:xml:ns:icalendar-2.0:stream" targetNamespace="http://docs.oasis-open.org/ns/energyinterop/201110" elementFormDefault="qualified" attributeFormDefault="qualified">
+	<xs:import namespace="urn:ietf:params:xml:ns:icalendar-2.0" schemaLocation="oadr_xcal_20a.xsd"/>
+	<xs:import namespace="urn:ietf:params:xml:ns:icalendar-2.0:stream" schemaLocation="oadr_strm_20a.xsd"/>
+	<xs:import namespace="http://docs.oasis-open.org/ns/emix/2011/06" schemaLocation="oadr_emix_20a.xsd"/>
+	<xs:import namespace="http://docs.oasis-open.org/ns/energyinterop/201110/payloads" schemaLocation="oadr_pyld_20a.xsd"/>
+	<!-- ########## Miscellaneous ########## -->
+	<!--  ******* eventStatus ******** -->
+	<xs:element name="eventStatus" type="ei:EventStatusEnumeratedType"/>
+	<!--  ******* EventStatusEnumeratedType ******** -->
+	<xs:simpleType name="EventStatusEnumeratedType">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="none">
+				<xs:annotation>
+					<xs:documentation>No event pending</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="far">
+				<xs:annotation>
+					<xs:documentation>event pending in the far future. The exact definition of how far in the future this refers is dependent upon the market context, but typically means the next day.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="near">
+				<xs:annotation>
+					<xs:documentation>event pending in the near future. The exact definition of how near in the future the pending event is active is dependent on the market context</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="active">
+				<xs:annotation>
+					<xs:documentation>The event has been initiated and is currently active.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="completed">
+				<xs:annotation>
+					<xs:documentation>The event has completed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="cancelled">
+				<xs:annotation>
+					<xs:documentation>The event has been canceled.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- ******* resourceID ******* -->
+	<xs:element name="resourceID" type="xs:string"/>
+	<!-- ******* groupID *******-->
+	<xs:element name="groupID" type="xs:string"/>
+	<!-- *******  partyID *******  -->
+	<xs:element name="partyID" type="xs:string"/>
+	<xs:simpleType name="EiExtensionTokenType">
+		<xs:annotation>
+			<xs:documentation>Pattern used for extending string enumeration, where allowed</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token">
+			<xs:pattern value="x-\S.*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--  ******* venID ******** -->
+	<xs:element name="venID" type="xs:string"/>
+	<!--  ******* vtnID ******** -->
+	<xs:element name="vtnID" type="xs:string"/>
+	<!--  ******* eventID ******** -->
+	<xs:element name="eventID" type="xs:string"/>
+	<!--  ******* modificationNumber ******** -->
+	<xs:element name="modificationNumber" type="xs:unsignedInt"/>
+	<!--  ******* qualifiedEventID ******** -->
+	<xs:element name="qualifiedEventID" type="ei:QualifiedEventIDType"/>
+	<!--  ******* QualifiedEventIDType ******** -->
+	<xs:complexType name="QualifiedEventIDType">
+		<xs:annotation>
+			<xs:documentation>Fully Qualified Event ID includes the eventID and the Modification Number</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="ei:eventID"/>
+			<xs:element ref="ei:modificationNumber"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  ******* x-eiNotification ******** -->
+	<xs:element name="x-eiNotification" type="xcal:DurationPropType"/>
+	<!--  ******* x-eiRampUp ******** -->
+	<xs:element name="x-eiRampUp" type="xcal:DurationPropType"/>
+	<!--  *******x-eiRecovery******** -->
+	<xs:element name="x-eiRecovery" type="xcal:DurationPropType"/>
+	<!--  ******* interval ******** -->
+	<xs:element name="interval" type="ei:IntervalType"/>
+	<xs:complexType name="IntervalType">
+		<xs:sequence>
+			<xs:element ref="xcal:duration"/>
+			<xs:element ref="xcal:uid"/>
+			<xs:element ref="strm:streamPayloadBase"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  ******* currentValue ******** -->
+	<xs:element name="currentValue" type="ei:currentValueType"/>
+	<xs:complexType name="currentValueType">
+		<xs:choice>
+			<xs:element ref="ei:payloadFloat"/>
+		</xs:choice>
+	</xs:complexType>
+	<!--  ******* payloadFloat ******** -->
+	<xs:element name="payloadFloat">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="value" type="xs:float"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!-- ########## Message Responses ########## -->
+	<!--  ******* responseCode ******** -->
+	<xs:element name="responseCode" type="ei:ResponseCodeType"/>
+	<!--  ******* responseCodeType ******** -->
+	<xs:simpleType name="ResponseCodeType">
+		<xs:annotation>
+			<xs:documentation>Similar to HTTP 1.1 Error Pattern, 1st digit sufficient for most error processing
+      - 1xx: Informational - Request received, continuing process
+      - 2xx: Success - The action was successfully received, understood, and accepted
+      - 3xx: Pending - Further action must be taken in order to complete the request
+      - 4xx: Requester Error - The request contains bad syntax or cannot be fulfilled
+      - 5xx: Responder Error - The responder failed to fulfill an apparently valid request
+      xx is used for defining more fine grained errors
+	</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9][0-9][0-9]"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--  ******* responseDescription ******** -->
+	<xs:element name="responseDescription" type="xs:string"/>
+	<!--  ******* optType ******** -->
+	<xs:element name="optType" type="ei:OptTypeType"/>
+	<xs:simpleType name="OptTypeType">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="optIn"/>
+			<xs:enumeration value="optOut"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--  ******* eiResponse ******** -->
+	<xs:element name="eiResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ei:responseCode"/>
+				<xs:element ref="ei:responseDescription" minOccurs="0"/>
+				<xs:element ref="pyld:requestID"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!--  ******* eventResponses ******** -->
+	<xs:element name="eventResponses">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="eventResponse" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="ei:responseCode"/>
+							<xs:element ref="ei:responseDescription" minOccurs="0"/>
+							<xs:element ref="pyld:requestID"/>
+							<xs:element ref="ei:qualifiedEventID"/>
+							<xs:element ref="ei:optType"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!--########### eiEvent Section ##########-->
+	<!--  ******* eiEvent ******** -->
+	<xs:element name="eiEvent" type="ei:eiEventType"/>
+	<xs:complexType name="eiEventType">
+		<xs:sequence>
+			<xs:element ref="ei:eventDescriptor"/>
+			<xs:element ref="ei:eiActivePeriod"/>
+			<xs:element ref="ei:eiEventSignals"/>
+			<xs:element ref="ei:eiTarget"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- ***** eventDescriptor ***** -->
+	<xs:element name="eventDescriptor" type="ei:eventDescriptorType"/>
+	<xs:complexType name="eventDescriptorType">
+		<xs:sequence>
+			<xs:element ref="ei:eventID"/>
+			<xs:element ref="ei:modificationNumber"/>
+			<xs:element name="priority" type="xs:unsignedInt" minOccurs="0"/>
+			<xs:element name="eiMarketContext">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element ref="emix:marketContext"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="createdDateTime" type="xcal:DateTimeType"/>
+			<xs:element ref="ei:eventStatus"/>
+			<xs:element name="testEvent" type="xs:string" minOccurs="0"/>
+			<xs:element name="vtnComment" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- ***** eiActivePeriod *****-->
+	<xs:element name="eiActivePeriod" type="ei:eiActivePeriodType"/>
+	<xs:complexType name="eiActivePeriodType">
+		<xs:sequence>
+			<xs:element ref="xcal:properties"/>
+			<xs:element ref="xcal:components"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- ***** eiEventSignals ***** -->
+	<xs:element name="eiEventSignals" type="ei:eiEventSignalsType"/>
+	<xs:complexType name="eiEventSignalsType">
+		<xs:sequence>
+			<xs:element ref="ei:eiEventSignal" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- ***** eiTarget *****-->
+	<xs:element name="eiTarget" type="ei:eiTargetType"/>
+	<xs:complexType name="eiTargetType">
+		<xs:sequence>
+			<xs:element ref="ei:groupID" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="ei:resourceID" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="ei:venID" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="ei:partyID" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--########## Signals ########## -->
+	<xs:element name="eiEventSignal" type="ei:eiEventSignalType"/>
+	<xs:complexType name="eiEventSignalType">
+		<xs:sequence>
+			<xs:element ref="strm:intervals"/>
+			<xs:element name="signalName" type="xs:string"/>
+			<xs:element ref="ei:signalType"/>
+			<xs:element name="signalID" type="xs:string"/>
+			<xs:element ref="ei:currentValue"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  ******* signalType ******** -->
+	<xs:element name="signalType" type="ei:SignalTypeEnumeratedType"/>
+	<!--  ******* SignalTypeEnumeratedType ******** -->
+	<xs:simpleType name="SignalTypeEnumeratedType">
+		<xs:annotation>
+			<xs:documentation>SignalTypeEnumerated lists the pre-defined Types used to specify the Payload Types and conformance in a Stream</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="delta">
+				<xs:annotation>
+					<xs:documentation>Signal indicates the amount to change (denominated in Itembase or in the EMIX Product) from what one would have used without the Signal. This may or may not be accompanied by a baseline. Payload Type Quantity</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="level">
+				<xs:annotation>
+					<xs:documentation>Signal indicates a Program Level. Payload Type is Program Level</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="multiplier">
+				<xs:annotation>
+					<xs:documentation>Signal indicates a multiplier applied to the current rate of  delivery or usage (denominated in Itembase or in the EMIX Product) from what one would have used without the Signal. This may or may not be accompanied by a baseline. Payload Type is Float</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="price">
+				<xs:annotation>
+					<xs:documentation>Signal indicates the Price. Extended Price is the value multiplied by the number of units units (denominated in Itembase or in the EMIX Product). Payload Type is emix:price</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="priceMultiplier">
+				<xs:annotation>
+					<xs:documentation>Signal indicates the Price Multiplier. Extended Price is the computed price (as described in EMIX) the value multiplied by the number of units units (denominated in Itembase or in the EMIX Product). Payload Type is emix:priceMultiplier</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="priceRelative">
+				<xs:annotation>
+					<xs:documentation>Signal indicates the Relative Price. Extended Price is the computed price (as described in EMIX) the value multiplied by the number of units units (denominated in Itembase or in the EMIX Product). Payload Type is emix:priceRelative</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="product">
+				<xs:annotation>
+					<xs:documentation>Signal indicates the Product for each interval. Payload Type is an EMIX Product Description</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="setpoint">
+				<xs:annotation>
+					<xs:documentation>Signal indicates a target amount of units (denominated in Itembase or in the EMIX Product). Payload Type is Quantity</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- ***** Signal Payloads ***** -->
+	<xs:element name="signalPayload" type="ei:signalPayloadType" substitutionGroup="strm:streamPayloadBase">
+		<xs:annotation>
+			<xs:documentation>ei: lmited to 0=normal; 1=moderate; 2=high; 3=special for SIMPLE</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="signalPayloadType">
+		<xs:complexContent>
+			<xs:extension base="strm:StreamPayloadBaseType">
+				<xs:sequence>
+					<xs:element ref="ei:payloadFloat"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

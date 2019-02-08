@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VenCreateDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTNCommon</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.common.vtn.models.ven</a> &gt; <span class="el_source">VenCreateDto.java</span></div><h1>VenCreateDto.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.common.vtn.models.ven;
+
+import java.io.Serializable;
+
+public class VenCreateDto implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3250807214482052191L;
+
+	private String id;
+
+	private String username;
+
+	private String password;
+
+	private String oadrName;
+
+	private String oadrProfil;
+
+	private String transport;
+
+	private String pushUrl;
+
+	private String registrationId;
+
+	private Boolean httpPullModel;
+
+	private Boolean reportOnly;
+
+	private Boolean xmlSignature;
+
+	private Long pullFrequencySeconds;
+
+	private Long lastUpdateDatetime;
+
+<span class="fc" id="L38">	public VenCreateDto() {</span>
+<span class="fc" id="L39">	}</span>
+
+<span class="fc" id="L41">	public VenCreateDto(String username) {</span>
+<span class="fc" id="L42">		this.username = username;</span>
+<span class="fc" id="L43">	}</span>
+
+	public String getUsername() {
+<span class="fc" id="L46">		return username;</span>
+	}
+
+	public void setUsername(String username) {
+<span class="fc" id="L50">		this.username = username;</span>
+<span class="fc" id="L51">	}</span>
+
+	public String getOadrName() {
+<span class="fc" id="L54">		return oadrName;</span>
+	}
+
+	public void setOadrName(String name) {
+<span class="fc" id="L58">		this.oadrName = name;</span>
+<span class="fc" id="L59">	}</span>
+
+	public String getOadrProfil() {
+<span class="fc" id="L62">		return oadrProfil;</span>
+	}
+
+	public void setOadrProfil(String oadrProfil) {
+<span class="fc" id="L66">		this.oadrProfil = oadrProfil;</span>
+<span class="fc" id="L67">	}</span>
+
+	public String getTransport() {
+<span class="fc" id="L70">		return transport;</span>
+	}
+
+	public void setTransport(String transport) {
+<span class="fc" id="L74">		this.transport = transport;</span>
+<span class="fc" id="L75">	}</span>
+
+	public String getPushUrl() {
+<span class="fc" id="L78">		return pushUrl;</span>
+	}
+
+	public void setPushUrl(String pushUrl) {
+<span class="fc" id="L82">		this.pushUrl = pushUrl;</span>
+<span class="fc" id="L83">	}</span>
+
+	/**
+	 * @return the password
+	 */
+	public String getPassword() {
+<span class="fc" id="L89">		return password;</span>
+	}
+
+	/**
+	 * @param password
+	 *            the password to set
+	 */
+	public void setPassword(String password) {
+<span class="fc" id="L97">		this.password = password;</span>
+<span class="fc" id="L98">	}</span>
+
+	public String getRegistrationId() {
+<span class="fc" id="L101">		return registrationId;</span>
+	}
+
+	public void setRegistrationId(String registrationId) {
+<span class="fc" id="L105">		this.registrationId = registrationId;</span>
+<span class="fc" id="L106">	}</span>
+
+	public Boolean getHttpPullModel() {
+<span class="fc" id="L109">		return httpPullModel;</span>
+	}
+
+	public void setHttpPullModel(Boolean httpPullModel) {
+<span class="fc" id="L113">		this.httpPullModel = httpPullModel;</span>
+<span class="fc" id="L114">	}</span>
+
+	public Boolean getReportOnly() {
+<span class="fc" id="L117">		return reportOnly;</span>
+	}
+
+	public void setReportOnly(Boolean reportOnly) {
+<span class="fc" id="L121">		this.reportOnly = reportOnly;</span>
+<span class="fc" id="L122">	}</span>
+
+	public Boolean getXmlSignature() {
+<span class="fc" id="L125">		return xmlSignature;</span>
+	}
+
+	public void setXmlSignature(Boolean xmlSignature) {
+<span class="fc" id="L129">		this.xmlSignature = xmlSignature;</span>
+<span class="fc" id="L130">	}</span>
+
+	public String getId() {
+<span class="fc" id="L133">		return id;</span>
+	}
+
+	public void setId(String id) {
+<span class="fc" id="L137">		this.id = id;</span>
+<span class="fc" id="L138">	}</span>
+
+	public Long getPullFrequencySeconds() {
+<span class="fc" id="L141">		return pullFrequencySeconds;</span>
+	}
+
+	public void setPullFrequencySeconds(Long pullFrequencySeconds) {
+<span class="fc" id="L145">		this.pullFrequencySeconds = pullFrequencySeconds;</span>
+<span class="fc" id="L146">	}</span>
+
+	public Long getLastUpdateDatetime() {
+<span class="fc" id="L149">		return lastUpdateDatetime;</span>
+	}
+
+	public void setLastUpdateDatetime(Long lastUpdateDatetime) {
+<span class="fc" id="L153">		this.lastUpdateDatetime = lastUpdateDatetime;</span>
+<span class="fc" id="L154">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<oadr:oadrPayload
+	xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110"
+	xmlns:gml="http://www.opengis.net/gml/3.2"
+	xmlns:xmldsig="http://www.w3.org/2000/09/xmldsig#"
+	xmlns:strm="urn:ietf:params:xml:ns:icalendar-2.0:stream"
+	xmlns:greenbutton="http://naesb.org/espi"
+	xmlns:xcal="urn:ietf:params:xml:ns:icalendar-2.0"
+	xmlns:oadr="http://openadr.org/oadr-2.0b/2012/07"
+	xmlns:pyld="http://docs.oasis-open.org/ns/energyinterop/201110/payloads"
+	xmlns:emix="http://docs.oasis-open.org/ns/emix/2011/06"
+	xmlns:ns15="urn:un:unece:uncefact:codelist:standard:5:ISO42173A:2010-04-07"
+	xmlns:power="http://docs.oasis-open.org/ns/emix/2011/06/power"
+	xmlns:xmldsig11="http://www.w3.org/2009/xmldsig11#"
+	xmlns:ns14="http://docs.oasis-open.org/ns/emix/2011/06/siscale"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:properties="http://openadr.org/oadr-2.0b/2012/07/xmldsig-properties">
+	<xmldsig:Signature>
+		<xmldsig:SignedInfo>
+			<xmldsig:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
+			<xmldsig:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+			<xmldsig:Reference URI="">
+				<xmldsig:Transforms>
+					<xmldsig:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+				</xmldsig:Transforms>
+				<xmldsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+				<xmldsig:DigestValue>L05O6gYdJ3M2okzo+GjY8abj/18=</xmldsig:DigestValue>
+			</xmldsig:Reference>
+		</xmldsig:SignedInfo>
+		<xmldsig:SignatureValue>D8NEwk82Vf4BUGf0eZfCmOxX3St15zvqWnG46kAMMd0w7X5p7CyX5bzkrEJ7N8XwZsnbw7VmVs45
+badpI049VCQzxhxkscD7BJT8WNdxoS649Spc19cvpyDqDstf8tHBs4VfSngV6FTaQSUSYR2j/L1K
+18TjUo+/7e4QAD2yPdCCaaX0YIqKIuQT5kP5q3U7nmj4nVv+YOK5yBvDgGXNfqea5UjgVd1WSZya
+PXFjKl+1vEFzEd2qZc0z1sk2fZUCkPT2Chb3Vfqmp43CRJV6/vo62/h1yPVJph3PIRgc5/nuTPam
+/3JDJW//3xWQZNyJAosbgMLGnkfuy8kD1x31mA==</xmldsig:SignatureValue>
+		<xmldsig:KeyInfo>
+			<xmldsig:KeyValue>
+				<xmldsig:RSAKeyValue>
+					<xmldsig:Modulus>09gKEill5YGOJIr+vdeFkOfyCc0Yuu3GJjyl0gaHJJz03a6k2SYHbWnAKBEEtnxY/I7oesJ3depj
+jnyAOCCYQEa3Iv9QzYJD6DZ0GlgZ1xxKal2YJwll5dULDdEAc0DAL94JzHdCdEDd2tVGDzVUOpxK
+PKN0QmFXpjYe2H+SHyt6ZZp4FcpI6U7qNfnWn/gT6YCAQJ39PIsNeGfNGXlem9rIEp3JaLMl2fdY
+FmN58q3Ueu1Rifxq6aAZzPKHMkkAuH1yxCKNZzir0qEBRZSAonBahpHoDj7GrenLOl1rejwrO4NR
+m5r3qh6eqFYsrx7mMJgih2m4XEVE1SI2hGBKcw==</xmldsig:Modulus>
+					<xmldsig:Exponent>AQAB</xmldsig:Exponent>
+				</xmldsig:RSAKeyValue>
+			</xmldsig:KeyValue>
+		</xmldsig:KeyInfo>
+	</xmldsig:Signature>
+</oadr:oadrPayload>

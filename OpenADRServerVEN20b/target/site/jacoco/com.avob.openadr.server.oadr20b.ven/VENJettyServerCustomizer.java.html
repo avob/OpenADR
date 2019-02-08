@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VENJettyServerCustomizer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVEN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.ven</a> &gt; <span class="el_source">VENJettyServerCustomizer.java</span></div><h1>VENJettyServerCustomizer.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.ven;
+
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.util.UUID;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.springframework.boot.context.embedded.jetty.JettyServerCustomizer;
+
+import com.avob.openadr.security.exception.OadrSecurityException;
+
+public class VENJettyServerCustomizer implements JettyServerCustomizer {
+
+    private int port;
+    private KeyStore keystore;
+    private KeyStore truststore;
+    private String keystorePass;
+    private String[] protocols;
+    private String[] ciphers;
+
+    public VENJettyServerCustomizer(int port, KeyStore keystore, String keystorePass, KeyStore truststore,
+<span class="fc" id="L39">            String[] protocols, String[] ciphers) {</span>
+<span class="fc" id="L40">        this.port = port;</span>
+<span class="fc" id="L41">        this.keystore = keystore;</span>
+<span class="fc" id="L42">        this.truststore = truststore;</span>
+<span class="fc" id="L43">        this.keystorePass = keystorePass;</span>
+<span class="fc" id="L44">        this.protocols = protocols;</span>
+<span class="fc" id="L45">        this.ciphers = ciphers;</span>
+<span class="fc" id="L46">    }</span>
+
+    private HttpConfiguration getHttpConfiguration() {
+<span class="fc" id="L49">        HttpConfiguration config = new HttpConfiguration();</span>
+<span class="fc" id="L50">        config.setSecureScheme(&quot;https&quot;);</span>
+<span class="fc" id="L51">        config.setSecurePort(port);</span>
+<span class="fc" id="L52">        config.setSendXPoweredBy(false);</span>
+<span class="fc" id="L53">        config.setSendServerVersion(false);</span>
+<span class="fc" id="L54">        config.addCustomizer(new SecureRequestCustomizer());</span>
+
+<span class="fc" id="L56">        return config;</span>
+    }
+
+    private SslContextFactory getSslContextFactory()
+            throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException,
+            OadrSecurityException, UnrecoverableKeyException, KeyManagementException {
+        // SSL Context Factory
+<span class="fc" id="L63">        SslContextFactory sslContextFactory = new SslContextFactory();</span>
+
+<span class="fc" id="L65">        SSLContext sslContext = SSLContext.getInstance(&quot;TLS&quot;);</span>
+
+        // init key manager factory
+<span class="fc" id="L68">        KeyStore createKeyStore = keystore;</span>
+<span class="fc" id="L69">        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());</span>
+<span class="fc" id="L70">        keyManagerFactory.init(createKeyStore, keystorePass.toCharArray());</span>
+
+        // init trust manager factory
+<span class="fc" id="L73">        KeyStore createTrustStore = truststore;</span>
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory
+<span class="fc" id="L75">                .getInstance(TrustManagerFactory.getDefaultAlgorithm());</span>
+<span class="fc" id="L76">        trustManagerFactory.init(createTrustStore);</span>
+
+        // init ssl context
+<span class="fc" id="L79">        String seed = UUID.randomUUID().toString();</span>
+
+<span class="fc" id="L81">        sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),</span>
+<span class="fc" id="L82">                new SecureRandom(seed.getBytes()));</span>
+
+<span class="fc" id="L84">        sslContextFactory.setSslContext(sslContext);</span>
+
+        // jetty 9 silently exclude required oadr20a default
+        // cipher suite
+<span class="fc" id="L88">        sslContextFactory.setExcludeCipherSuites(&quot;^.*_(MD5)$&quot;);</span>
+<span class="fc" id="L89">        sslContextFactory.setExcludeProtocols(&quot;SSLv3&quot;);</span>
+<span class="fc" id="L90">        sslContextFactory.setIncludeProtocols(this.protocols);</span>
+<span class="fc" id="L91">        sslContextFactory.setIncludeCipherSuites(this.ciphers);</span>
+
+        // require client certificate authentication
+<span class="fc" id="L94">        sslContextFactory.setWantClientAuth(true);</span>
+
+<span class="fc" id="L96">        return sslContextFactory;</span>
+
+    }
+
+    @Override
+    public void customize(Server server) {
+
+        try {
+<span class="fc" id="L104">            HttpConfiguration config = getHttpConfiguration();</span>
+
+<span class="fc" id="L106">            HttpConnectionFactory http1 = new HttpConnectionFactory(config);</span>
+
+<span class="fc" id="L108">            SslConnectionFactory ssl = new SslConnectionFactory(this.getSslContextFactory(), &quot;http/1.1&quot;);</span>
+
+<span class="fc" id="L110">            ServerConnector connector = new ServerConnector(server, ssl, http1);</span>
+
+<span class="fc" id="L112">            connector.setPort(port);</span>
+<span class="fc" id="L113">            Connector[] connectors = { connector };</span>
+<span class="fc" id="L114">            server.setConnectors(connectors);</span>
+
+<span class="nc" id="L116">        } catch (OadrSecurityException e) {</span>
+<span class="nc" id="L117">            throw new IllegalArgumentException(e);</span>
+<span class="nc" id="L118">        } catch (NoSuchAlgorithmException e) {</span>
+<span class="nc" id="L119">            throw new IllegalArgumentException(e);</span>
+<span class="nc" id="L120">        } catch (CertificateException e) {</span>
+<span class="nc" id="L121">            throw new IllegalArgumentException(e);</span>
+<span class="nc" id="L122">        } catch (IOException e) {</span>
+<span class="nc" id="L123">            throw new IllegalArgumentException(e);</span>
+<span class="nc" id="L124">        } catch (KeyStoreException e) {</span>
+<span class="nc" id="L125">            throw new IllegalArgumentException(e);</span>
+<span class="nc" id="L126">        } catch (KeyManagementException e) {</span>
+<span class="nc" id="L127">            throw new IllegalArgumentException(e);</span>
+<span class="nc" id="L128">        } catch (UnrecoverableKeyException e) {</span>
+<span class="nc" id="L129">            throw new IllegalArgumentException(e);</span>
+<span class="fc" id="L130">        }</span>
+
+<span class="fc" id="L132">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

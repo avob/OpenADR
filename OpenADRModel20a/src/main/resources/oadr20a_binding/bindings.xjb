@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bindings version="2.0" xmlns="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:namespace="http://jaxb2-commons.dev.java.net/namespace-prefix">
+	<bindings schemaLocation="../oadr20a_schema/oadr_20a.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20a.oadr" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="oadr" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20a_schema/oadr_ei_20a.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20a.ei" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="ei" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20a_schema/oadr_emix_20a.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20a.emix" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="emix" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20a_schema/oadr_pyld_20a.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20a.pyld" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="pyld" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20a_schema/oadr_strm_20a.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20a.strm" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="strm" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20a_schema/oadr_xcal_20a.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20a.xcal" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="xcal" />
+		</bindings>
+	</bindings>
+</bindings>
+

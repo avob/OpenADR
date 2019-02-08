@@ -1,0 +1,96 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.avob.openadr.model</groupId>
+	<artifactId>OpenADRModel20b</artifactId>
+
+	<parent>
+		<groupId>com.avob</groupId>
+		<artifactId>OpenADR</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.avob.openadr.security</groupId>
+			<artifactId>OpenADRSecurity</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.santuario</groupId>
+			<artifactId>xmlsec</artifactId>
+			<version>2.0.8</version>
+		</dependency>
+
+
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>${project.build.directory}/generated-sources/oadr20b</directory>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>src/main/java</directory>
+			</resource>
+		</resources>
+
+		<plugins>
+	<!-- <plugin> <artifactId>maven-remote-resources-plugin</artifactId> <version>1.5</version> 
+		<executions> <execution> <goals> <goal>bundle</goal> </goals> </execution> 
+		</executions> <configuration> <includes> <include>**/*.xsd</include> </includes> 
+		</configuration> </plugin> <plugin> <groupId>org.apache.maven.plugins</groupId> 
+		<artifactId>maven-remote-resources-plugin</artifactId> <version>1.5</version> 
+		<configuration> <resourceBundles> <resourceBundle>com.avob.openadr.model:OpenADRModel20b:0.0.1-SNAPSHOT</resourceBundle> 
+		</resourceBundles> </configuration> <executions> <execution> <goals> <goal>process</goal> 
+		</goals> </execution> </executions> </plugin> -->
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- The package of your generated sources -->
+					<bindingDirectory>src/main/resources/oadr20b_binding</bindingDirectory>
+					<generateDirectory>${project.build.directory}/generated-sources/oadr20b</generateDirectory>
+					<schemaDirectory>src/main/resources/oadr20b_schema</schemaDirectory>
+					<args>
+						<arg>-extension</arg>
+						<arg>-Xnamespace-prefix</arg>
+						<arg>-Xfixed-value</arg>
+						<arg>-Xannotate</arg>
+					</args>
+					<plugins>
+						<plugin>
+							<groupId>com.github.fbdo</groupId>
+							<artifactId>jaxb2-fixed-value</artifactId>
+							<version>1.2</version>
+						</plugin>
+						<dependency>
+							<groupId>org.jvnet.jaxb2_commons</groupId>
+							<artifactId>jaxb2-basics-annotate</artifactId>
+							<version>1.0.2</version>
+						</dependency>
+					</plugins>
+				</configuration>
+				<dependencies>
+					<!-- https://mvnrepository.com/artifact/org.jvnet.jaxb2_commons/jaxb2-namespace-prefix -->
+					<dependency>
+						<groupId>org.jvnet.jaxb2_commons</groupId>
+						<artifactId>jaxb2-namespace-prefix</artifactId>
+						<version>1.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+</project>

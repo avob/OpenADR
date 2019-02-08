@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VTN20bApplication.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.vtn</a> &gt; <span class="el_source">VTN20bApplication.java</span></div><h1>VTN20bApplication.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.vtn;
+
+import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.util.Map;
+import java.util.UUID;
+
+import org.apache.activemq.broker.BrokerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import com.avob.openadr.model.oadr20b.Oadr20bSecurity;
+import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.common.vtn.VTNEmbeddedServletContainerCustomizer;
+import com.google.common.collect.Maps;
+
+@Configuration
+@EnableAutoConfiguration(exclude = { org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class })
+@ComponentScan(basePackages = { &quot;com.avob.openadr.server.common.vtn&quot;, &quot;com.avob.openadr.server.oadr20b.vtn&quot; })
+@EnableJpaRepositories({ &quot;com.avob.openadr.server.common.vtn&quot;, &quot;com.avob.openadr.server.oadr20b.vtn&quot; })
+@EntityScan({ &quot;com.avob.openadr.server.common.vtn&quot;, &quot;com.avob.openadr.server.oadr20b.vtn&quot; })
+<span class="fc" id="L34">public class VTN20bApplication {</span>
+<span class="fc" id="L35">	private static final Logger LOGGER = LoggerFactory.getLogger(VTN20bApplication.class);</span>
+
+	@Value(&quot;${oadr.server.context_path:#{null}}&quot;)
+	private String contextPath;
+
+	@Value(&quot;${oadr.server.port:#{8443}}&quot;)
+	private int port;
+
+	@Value(&quot;${oadr.security.ven.trustcertificate.oadrRsaRootCertificate}&quot;)
+	private String oadrRsaRootCertificate;
+
+	@Value(&quot;${oadr.security.ven.trustcertificate.oadrRsaIntermediateCertificate}&quot;)
+	private String oadrRsaIntermediateCertificate;
+
+	@Value(&quot;${oadr.security.ven.trustcertificate.oadrEccRootCertificate}&quot;)
+	private String oadrEccRootCertificate;
+
+	@Value(&quot;${oadr.security.ven.trustcertificate.oadrEccIntermediateCertificate}&quot;)
+	private String oadrEccIntermediateCertificate;
+
+	@Value(&quot;${oadr.security.vtn.rsaPrivateKeyPath}&quot;)
+	private String rsaPrivateKeyPath;
+
+	@Value(&quot;${oadr.security.vtn.rsaCertificatePath}&quot;)
+	private String rsaCertificatePath;
+
+	@Bean
+	public EmbeddedServletContainerCustomizer servletContainerCustomizer() {
+<span class="fc" id="L63">		Map&lt;String, String&gt; trustedCertificates = Maps.newHashMap();</span>
+<span class="fc" id="L64">		trustedCertificates.put(&quot;oadrRsaRootCertificate&quot;, oadrRsaRootCertificate);</span>
+<span class="fc" id="L65">		trustedCertificates.put(&quot;oadrRsaIntermediateCertificate&quot;, oadrRsaIntermediateCertificate);</span>
+<span class="fc" id="L66">		trustedCertificates.put(&quot;oadrEccRootCertificate&quot;, oadrEccRootCertificate);</span>
+<span class="fc" id="L67">		trustedCertificates.put(&quot;oadrEccIntermediateCertificate&quot;, oadrEccIntermediateCertificate);</span>
+		try {
+<span class="fc" id="L69">			String password = UUID.randomUUID().toString();</span>
+<span class="fc" id="L70">			return new VTNEmbeddedServletContainerCustomizer(port, contextPath,</span>
+<span class="fc" id="L71">					OadrHttpSecurity.createKeyStore(rsaPrivateKeyPath, rsaCertificatePath, password), password,</span>
+<span class="fc" id="L72">					OadrHttpSecurity.createTrustStore(trustedCertificates), Oadr20bSecurity.getProtocols(),</span>
+<span class="fc" id="L73">					Oadr20bSecurity.getCiphers());</span>
+<span class="nc" id="L74">		} catch (KeyStoreException e) {</span>
+<span class="nc" id="L75">			LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L76">		} catch (NoSuchAlgorithmException e) {</span>
+<span class="nc" id="L77">			LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L78">		} catch (CertificateException e) {</span>
+<span class="nc" id="L79">			LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L80">		} catch (IOException e) {</span>
+<span class="nc" id="L81">			LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L82">		} catch (OadrSecurityException e) {</span>
+<span class="nc" id="L83">			LOGGER.error(&quot;&quot;, e);</span>
+<span class="nc" id="L84">		}</span>
+<span class="nc" id="L85">		return null;</span>
+	}
+
+	@Bean(initMethod = &quot;start&quot;, destroyMethod = &quot;stop&quot;)
+	public BrokerService broker() throws Exception {
+<span class="fc" id="L90">		final BrokerService broker = new BrokerService();</span>
+		// broker.addConnector(&quot;tcp://localhost:61616&quot;);
+<span class="fc" id="L92">		broker.addConnector(&quot;vm://localhost&quot;);</span>
+<span class="fc" id="L93">		broker.setPersistent(false);</span>
+		// default messages store is under AMQ_HOME/data/KahaDB/
+<span class="fc" id="L95">		return broker;</span>
+	}
+
+	public static void main(String[] args) {
+<span class="nc" id="L99">		SpringApplication.run(VTN20bApplication.class, args);</span>
+<span class="nc" id="L100">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

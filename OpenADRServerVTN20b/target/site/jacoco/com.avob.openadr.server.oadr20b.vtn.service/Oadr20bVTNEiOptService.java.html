@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bVTNEiOptService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.vtn.service</a> &gt; <span class="el_source">Oadr20bVTNEiOptService.java</span></div><h1>Oadr20bVTNEiOptService.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.vtn.service;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+import javax.xml.bind.JAXBException;
+
+import org.eclipse.jetty.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
+import com.avob.openadr.model.oadr20b.Oadr20bFactory;
+import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bEiOptBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
+import com.avob.openadr.model.oadr20b.ei.EiResponseType;
+import com.avob.openadr.model.oadr20b.ei.EiTargetType;
+import com.avob.openadr.model.oadr20b.ei.OptTypeType;
+import com.avob.openadr.model.oadr20b.ei.QualifiedEventIDType;
+import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
+import com.avob.openadr.model.oadr20b.oadr.OadrCancelOptType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCanceledOptType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedOptType;
+import com.avob.openadr.model.oadr20b.xcal.AvailableType;
+import com.avob.openadr.model.oadr20b.xcal.VavailabilityType;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
+import com.avob.openadr.server.common.vtn.models.ven.Ven;
+import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
+import com.avob.openadr.server.common.vtn.models.venresource.VenResource;
+import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
+import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
+import com.avob.openadr.server.common.vtn.service.VenResourceService;
+import com.avob.openadr.server.common.vtn.service.VenService;
+import com.avob.openadr.server.oadr20b.vtn.converter.OptConverter;
+import com.avob.openadr.server.oadr20b.vtn.exception.eiopt.Oadr20bCancelOptApplicationLayerException;
+import com.avob.openadr.server.oadr20b.vtn.exception.eiopt.Oadr20bCreateOptApplicationLayerException;
+import com.google.common.collect.Lists;
+
+@Service
+public class Oadr20bVTNEiOptService {
+
+	@Resource
+	private VenService venService;
+
+	@Resource
+	private VenMarketContextService venMarketcontextService;
+
+	@Resource
+	private VenResourceService venResourceService;
+
+	@Resource
+	private DemandResponseEventService demandResponseEventService;
+
+	@Resource
+	private VenOptService venOptService;
+
+	@Resource
+	private XmlSignatureService xmlSignatureService;
+
+	private Oadr20bJAXBContext jaxbContext;
+
+<span class="fc" id="L67">	public Oadr20bVTNEiOptService() throws JAXBException {</span>
+<span class="fc" id="L68">		this.jaxbContext = Oadr20bJAXBContext.getInstance();</span>
+<span class="fc" id="L69">	}</span>
+
+	/**
+	 * Does a VEN can sent Opt for another VEN or another VEN's resource ?
+	 * 
+	 * I (bertrand) think it can't, beside OADRa/b specification appears not to deal
+	 * with that point
+	 * 
+	 * Therefore, only sub-element EiTarget::resourceId of
+	 * OadrCreateOptType::eiTarget is used
+	 * 
+	 * @param payload
+	 * @return
+	 * @throws Oadr20bXMLSignatureException
+	 * @throws Oadr20bMarshalException
+	 */
+	public String oadrCreateOpt(OadrCreateOptType payload, boolean signed)
+			throws Oadr20bCreateOptApplicationLayerException, Oadr20bXMLSignatureException, Oadr20bMarshalException {
+<span class="fc" id="L87">		OptTypeType optType = payload.getOptType();</span>
+<span class="fc" id="L88">		DemandResponseEventOptEnum convertedOpt = OptConverter.convert(optType);</span>
+<span class="fc" id="L89">		String venID = payload.getVenID();</span>
+<span class="fc" id="L90">		String requestID = payload.getRequestID();</span>
+<span class="fc" id="L91">		String optID = payload.getOptID();</span>
+<span class="fc" id="L92">		QualifiedEventIDType qualifiedEventID = payload.getQualifiedEventID();</span>
+<span class="fc" id="L93">		VavailabilityType vavailability = payload.getVavailability();</span>
+<span class="fc" id="L94">		String marketContextName = payload.getMarketContext();</span>
+
+<span class="fc" id="L96">		List&lt;VenResource&gt; resources = null;</span>
+<span class="fc" id="L97">		EiTargetType eiTarget = payload.getEiTarget();</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">		if (eiTarget != null) {</span>
+			// here part where I disable opt message on another VEN than the one
+			// sending message
+<span class="pc bpc" id="L101" title="3 of 6 branches missed.">			if (!eiTarget.getGroupID().isEmpty() || !eiTarget.getPartyID().isEmpty() || eiTarget.getVenID().size() &gt; 1</span>
+<span class="pc bpc" id="L102" title="2 of 4 branches missed.">					|| (eiTarget.getVenID().size() == 1 &amp;&amp; !eiTarget.getVenID().get(0).equals(venID))) {</span>
+<span class="nc" id="L103">				throw new Oadr20bCreateOptApplicationLayerException(</span>
+						&quot;Ven can't deliver an Opt message on another Ven or another resource&quot;,
+<span class="nc" id="L105">						Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,</span>
+<span class="nc" id="L106">								Oadr20bApplicationLayerErrorCode.INVALID_ID_452, optID).build());</span>
+			}
+
+<span class="pc bpc" id="L109" title="1 of 4 branches missed.">			if (eiTarget.getResourceID() != null &amp;&amp; !eiTarget.getResourceID().isEmpty()) {</span>
+<span class="fc" id="L110">				resources = venResourceService.findByVenIdAndName(Lists.newArrayList(venID), eiTarget.getResourceID());</span>
+<span class="fc" id="L111">				Set&lt;String&gt; s1 = resources.stream().map(VenResource::getName).collect(Collectors.toSet());</span>
+<span class="fc" id="L112">				Set&lt;String&gt; s2 = eiTarget.getResourceID().stream().collect(Collectors.toSet());</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">				if (!s1.equals(s2)) {</span>
+<span class="fc" id="L114">					s2.removeAll(s1);</span>
+<span class="fc" id="L115">					throw new Oadr20bCreateOptApplicationLayerException(</span>
+<span class="fc" id="L116">							&quot;Resources: &quot; + s2.toString() + &quot; do not exists or do not belongs to Ven: &quot; + venID,</span>
+<span class="fc" id="L117">							Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,</span>
+<span class="fc" id="L118">									Oadr20bApplicationLayerErrorCode.INVALID_ID_452, optID).build());</span>
+				}
+			}
+		}
+
+<span class="fc" id="L123">		Ven ven = venService.findOneByUsername(venID);</span>
+
+<span class="pc bpc" id="L125" title="4 of 6 branches missed.">		if (ven.getXmlSignature() != null &amp;&amp; ven.getXmlSignature() &amp;&amp; !signed) {</span>
+<span class="nc" id="L126">			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders</span>
+<span class="nc" id="L127">					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();</span>
+<span class="nc" id="L128">			throw new Oadr20bCreateOptApplicationLayerException(xmlSignatureRequiredButAbsent.getResponseDescription(),</span>
+<span class="nc" id="L129">					Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,</span>
+<span class="nc" id="L130">							Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), optID).build());</span>
+		}
+
+<span class="pc bpc" id="L133" title="2 of 6 branches missed.">		if (qualifiedEventID != null &amp;&amp; vavailability == null &amp;&amp; marketContextName == null) {</span>
+
+			// TODO bertrand: implement handle eiTarget, ven resource etc ...
+<span class="fc" id="L136">			String eventID = qualifiedEventID.getEventID();</span>
+<span class="fc" id="L137">			long modificationNumber = qualifiedEventID.getModificationNumber();</span>
+<span class="fc" id="L138">			DemandResponseEvent event = demandResponseEventService.findById(Long.parseLong(eventID));</span>
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">			if (event == null) {</span>
+<span class="nc" id="L140">				throw new Oadr20bCreateOptApplicationLayerException(&quot;Unknown eventID: &quot; + eventID, Oadr20bEiOptBuilders</span>
+<span class="nc" id="L141">						.newOadr20bCreatedOptBuilder(requestID, Oadr20bApplicationLayerErrorCode.INVALID_ID_452, optID)</span>
+<span class="nc" id="L142">						.build());</span>
+			}
+
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">			if (modificationNumber != event.getModificationNumber()) {</span>
+<span class="nc" id="L146">				throw new Oadr20bCreateOptApplicationLayerException(</span>
+						&quot;Modification number do not match known event modification number&quot;,
+<span class="nc" id="L148">						Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,</span>
+<span class="nc" id="L149">								Oadr20bApplicationLayerErrorCode.INVALID_DATA_454, optID).build());</span>
+			}
+
+			// override oadrCreatedEvent message
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">			if (resources == null) {</span>
+<span class="fc" id="L154">				demandResponseEventService.updateVenOpt(Long.parseLong(eventID), modificationNumber, venID,</span>
+						convertedOpt);
+			} else {
+<span class="nc bnc" id="L157" title="All 2 branches missed.">				for (VenResource resource : resources) {</span>
+<span class="nc" id="L158">					venOptService.create(ven, resource, null, event, convertedOpt);</span>
+<span class="nc" id="L159">				}</span>
+			}
+
+<span class="pc bpc" id="L162" title="2 of 4 branches missed.">		} else if (qualifiedEventID == null &amp;&amp; vavailability != null) {</span>
+<span class="fc" id="L163">			VenMarketContext marketContext = null;</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">			if (marketContextName != null) {</span>
+<span class="fc" id="L165">				marketContext = venMarketcontextService.findOneByName(marketContextName);</span>
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">				if (marketContext == null) {</span>
+<span class="nc" id="L167">					throw new Oadr20bCreateOptApplicationLayerException(&quot;Unknown MarketContext: &quot; + marketContext,</span>
+<span class="nc" id="L168">							Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,</span>
+<span class="nc" id="L169">									Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, optID).build());</span>
+				}
+			}
+
+			// TODO bertrand: implement vavailability oadrCreateOpt
+<span class="fc bfc" id="L174" title="All 2 branches covered.">			for (AvailableType availableType : vavailability.getComponents().getAvailable()) {</span>
+<span class="fc" id="L175">				Long start = Oadr20bFactory</span>
+<span class="fc" id="L176">						.xmlCalendarToTimestamp(availableType.getProperties().getDtstart().getDateTime());</span>
+<span class="fc" id="L177">				Long end = Oadr20bFactory.addXMLDurationToTimestamp(start,</span>
+<span class="fc" id="L178">						availableType.getProperties().getDuration().getDuration());</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">				if (resources == null) {</span>
+<span class="fc" id="L180">					venOptService.create(ven, null, marketContext, optID, start, end, convertedOpt);</span>
+				} else {
+<span class="fc bfc" id="L182" title="All 2 branches covered.">					for (VenResource resource : resources) {</span>
+<span class="fc" id="L183">						venOptService.create(ven, resource, marketContext, optID, start, end, convertedOpt);</span>
+<span class="fc" id="L184">					}</span>
+				}
+
+<span class="fc" id="L187">			}</span>
+
+<span class="fc" id="L189">		} else {</span>
+<span class="nc" id="L190">			throw new Oadr20bCreateOptApplicationLayerException(</span>
+					&quot;oadrCreateOpt payload MUST specify either qualifiedEventID or vavailability with optional marketContext&quot;,
+<span class="nc" id="L192">					Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,</span>
+<span class="nc" id="L193">							Oadr20bApplicationLayerErrorCode.INVALID_DATA_454, optID).build());</span>
+		}
+
+<span class="fc" id="L196">		OadrCreatedOptType response = Oadr20bEiOptBuilders</span>
+<span class="fc" id="L197">				.newOadr20bCreatedOptBuilder(requestID, HttpStatus.OK_200, optID).build();</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">		if (signed) {</span>
+<span class="fc" id="L199">			return xmlSignatureService.sign(response);</span>
+		} else {
+<span class="fc" id="L201">			return jaxbContext.marshalRoot(response);</span>
+		}
+	}
+
+	public String oadrCancelOptType(OadrCancelOptType payload, boolean signed)
+			throws Oadr20bCancelOptApplicationLayerException, Oadr20bXMLSignatureException, Oadr20bMarshalException {
+<span class="fc" id="L207">		String requestID = payload.getRequestID();</span>
+<span class="fc" id="L208">		String venID = payload.getVenID();</span>
+<span class="fc" id="L209">		String optID = payload.getOptID();</span>
+
+<span class="fc" id="L211">		Ven ven = venService.findOneByUsername(venID);</span>
+
+<span class="pc bpc" id="L213" title="4 of 6 branches missed.">		if (ven.getXmlSignature() != null &amp;&amp; ven.getXmlSignature() &amp;&amp; !signed) {</span>
+<span class="nc" id="L214">			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders</span>
+<span class="nc" id="L215">					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();</span>
+<span class="nc" id="L216">			throw new Oadr20bCancelOptApplicationLayerException(xmlSignatureRequiredButAbsent.getResponseDescription(),</span>
+<span class="nc" id="L217">					Oadr20bEiOptBuilders.newOadr20bCanceledOptBuilder(requestID,</span>
+<span class="nc" id="L218">							Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), optID).build());</span>
+		}
+
+<span class="fc" id="L221">		venOptService.deleteScheduledOpt(ven, optID);</span>
+
+<span class="fc" id="L223">		OadrCanceledOptType response = Oadr20bEiOptBuilders</span>
+<span class="fc" id="L224">				.newOadr20bCanceledOptBuilder(requestID, HttpStatus.OK_200, optID).build();</span>
+
+<span class="pc bpc" id="L226" title="1 of 2 branches missed.">		if (signed) {</span>
+<span class="nc" id="L227">			return xmlSignatureService.sign(response);</span>
+		} else {
+<span class="fc" id="L229">			return jaxbContext.marshalRoot(response);</span>
+		}
+	}
+
+	public void checkMatchUsernameWithRequestVenId(String username, OadrCreateOptType oadrCreateOpt)
+			throws Oadr20bCreateOptApplicationLayerException {
+<span class="fc" id="L235">		String venID = oadrCreateOpt.getVenID();</span>
+<span class="fc" id="L236">		String requestID = oadrCreateOpt.getRequestID();</span>
+<span class="fc" id="L237">		String optID = oadrCreateOpt.getOptID();</span>
+<span class="fc bfc" id="L238" title="All 2 branches covered.">		if (!username.equals(venID)) {</span>
+<span class="fc" id="L239">			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders</span>
+<span class="fc" id="L240">					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();</span>
+<span class="fc" id="L241">			throw new Oadr20bCreateOptApplicationLayerException(</span>
+<span class="fc" id="L242">					mismatchCredentialsVenIdResponse.getResponseDescription(),</span>
+					Oadr20bEiOptBuilders
+<span class="fc" id="L244">							.newOadr20bCreatedOptBuilder(requestID,</span>
+<span class="fc" id="L245">									Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), optID)</span>
+<span class="fc" id="L246">							.build());</span>
+		}
+
+<span class="fc" id="L249">	}</span>
+
+	public void checkMatchUsernameWithRequestVenId(String username, OadrCancelOptType oadrCancelOpt)
+			throws Oadr20bCancelOptApplicationLayerException {
+<span class="fc" id="L253">		String venID = oadrCancelOpt.getVenID();</span>
+<span class="fc" id="L254">		String requestID = oadrCancelOpt.getRequestID();</span>
+<span class="fc" id="L255">		String optID = oadrCancelOpt.getOptID();</span>
+<span class="fc bfc" id="L256" title="All 2 branches covered.">		if (!username.equals(venID)) {</span>
+<span class="fc" id="L257">			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders</span>
+<span class="fc" id="L258">					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();</span>
+<span class="fc" id="L259">			throw new Oadr20bCancelOptApplicationLayerException(</span>
+<span class="fc" id="L260">					mismatchCredentialsVenIdResponse.getResponseDescription(),</span>
+					Oadr20bEiOptBuilders
+<span class="fc" id="L262">							.newOadr20bCanceledOptBuilder(requestID,</span>
+<span class="fc" id="L263">									Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), optID)</span>
+<span class="fc" id="L264">							.build());</span>
+		}
+<span class="fc" id="L266">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

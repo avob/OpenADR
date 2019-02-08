@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.avob.openadr.server.oadr20b.vtn.controller.Oadr20bEventControllerTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.322 sec - in com.avob.openadr.server.oadr20b.vtn.controller.Oadr20bEventControllerTest

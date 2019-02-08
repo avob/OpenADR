@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bRegisterReportOadrReportBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRModel20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.model.oadr20b.builders.eireport</a> &gt; <span class="el_source">Oadr20bRegisterReportOadrReportBuilder.java</span></div><h1>Oadr20bRegisterReportOadrReportBuilder.java</h1><pre class="source lang-java linenums">package com.avob.openadr.model.oadr20b.builders.eireport;
+
+import java.util.Arrays;
+import java.util.List;
+
+import com.avob.openadr.model.oadr20b.Oadr20bFactory;
+import com.avob.openadr.model.oadr20b.ei.IntervalType;
+import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
+import com.avob.openadr.model.oadr20b.oadr.OadrReportDescriptionType;
+import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
+
+public class Oadr20bRegisterReportOadrReportBuilder {
+
+    private OadrReportType report;
+
+    public Oadr20bRegisterReportOadrReportBuilder(String reportSpecifierId, String reportRequestId,
+<span class="fc" id="L17">            ReportNameEnumeratedType reportName, long createdTimestamp) {</span>
+<span class="fc" id="L18">        report = Oadr20bFactory.createOadrRegisterReportOadrReportType(reportSpecifierId, reportRequestId, reportName,</span>
+                createdTimestamp);
+<span class="fc" id="L20">    }</span>
+
+    public Oadr20bRegisterReportOadrReportBuilder withStart(Long start) {
+<span class="fc" id="L23">        report.setDtstart(Oadr20bFactory.createDtstart(start));</span>
+<span class="fc" id="L24">        return this;</span>
+    }
+
+    public Oadr20bRegisterReportOadrReportBuilder withDuration(String duration) {
+<span class="fc" id="L28">        report.setDuration(Oadr20bFactory.createDurationPropType(duration));</span>
+<span class="fc" id="L29">        return this;</span>
+    }
+
+    public Oadr20bRegisterReportOadrReportBuilder addReportDescription(
+            List&lt;OadrReportDescriptionType&gt; oadrReportDescriptionType) {
+<span class="fc" id="L34">        report.getOadrReportDescription().addAll(oadrReportDescriptionType);</span>
+<span class="fc" id="L35">        return this;</span>
+    }
+
+    public Oadr20bRegisterReportOadrReportBuilder addReportDescription(
+            OadrReportDescriptionType oadrReportDescriptionType) {
+<span class="fc" id="L40">        this.addReportDescription(Arrays.asList(oadrReportDescriptionType));</span>
+<span class="fc" id="L41">        return this;</span>
+    }
+
+    public Oadr20bRegisterReportOadrReportBuilder addInterval(List&lt;IntervalType&gt; intervals) {
+<span class="nc bnc" id="L45" title="All 2 branches missed.">        if (report.getIntervals() == null) {</span>
+<span class="nc" id="L46">            report.setIntervals(Oadr20bFactory.createIntervals());</span>
+        }
+<span class="nc" id="L48">        report.getIntervals().getInterval().addAll(intervals);</span>
+<span class="nc" id="L49">        return this;</span>
+    }
+
+    public Oadr20bRegisterReportOadrReportBuilder addInterval(IntervalType interval) {
+<span class="nc" id="L53">        this.addInterval(Arrays.asList(interval));</span>
+<span class="nc" id="L54">        return this;</span>
+    }
+
+    public OadrReportType build() {
+<span class="fc" id="L58">        return report;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

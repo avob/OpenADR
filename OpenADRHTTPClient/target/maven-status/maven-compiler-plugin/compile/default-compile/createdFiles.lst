@@ -1,0 +1,3 @@
+com/avob/openadr/client/http/OadrHttpClient.class
+com/avob/openadr/client/http/OadrHttpClientBuilder.class
+com/avob/openadr/client/http/SSLSocketFactoryBuilder.class

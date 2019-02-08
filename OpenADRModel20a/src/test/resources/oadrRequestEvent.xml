@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oadr:oadrRequestEvent xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110" xmlns:emix="http://docs.oasis-open.org/ns/emix/2011/06" xmlns:oadr="http://openadr.org/oadr-2.0a/2012/07" xmlns:pyld="http://docs.oasis-open.org/ns/energyinterop/201110/payloads" xmlns:strm="urn:ietf:params:xml:ns:icalendar-2.0:stream" xmlns:xcal="urn:ietf:params:xml:ns:icalendar-2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://openadr.org/oadr-2.0a/2012/07 oadr_20a.xsd ">
+  <pyld:eiRequestEvent>
+    <pyld:requestID>pyld:requestID</pyld:requestID>
+    <ei:venID>ei:venID</ei:venID>
+    <pyld:replyLimit>0</pyld:replyLimit>
+  </pyld:eiRequestEvent>
+</oadr:oadrRequestEvent>

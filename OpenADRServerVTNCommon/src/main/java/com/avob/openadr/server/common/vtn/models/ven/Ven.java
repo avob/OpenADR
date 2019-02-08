@@ -1,0 +1,241 @@
+package com.avob.openadr.server.common.vtn.models.ven;
+
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
+import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
+import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
+import com.avob.openadr.server.common.vtn.models.venresource.VenResource;
+
+/**
+ * Ven persistent object - database representation
+ * 
+ * @author bertrand
+ *
+ */
+@Entity
+@Table(name = "ven")
+public class Ven extends AbstractUser {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4462874293418115268L;
+
+	/**
+	 * Ven registered name
+	 */
+	private String oadrName;
+
+	/**
+	 * Ven user given name
+	 */
+	private String name;
+
+	/**
+	 * 20a/20b profil
+	 */
+	private String oadrProfil;
+
+	/**
+	 * http/xmpp transport
+	 */
+	private String transport;
+
+	/**
+	 * push mode url
+	 */
+	private String pushUrl;
+
+	/**
+	 * registrationId
+	 */
+	@Column(name = "registrationId", unique = true)
+	private String registrationId;
+
+	/**
+	 * is http pull model
+	 */
+	private Boolean httpPullModel = true;
+
+	/**
+	 * report only
+	 */
+	private Boolean reportOnly;
+
+	/**
+	 * support xml signature
+	 */
+	private Boolean xmlSignature = false;
+
+	private Long pullFrequencySeconds;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "ven_vengroup", joinColumns = @JoinColumn(name = "ven_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "vengroup_id", referencedColumnName = "id"))
+	private Set<VenGroup> venGroups;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "ven_venmarketcontext", joinColumns = @JoinColumn(name = "ven_id"), inverseJoinColumns = @JoinColumn(name = "venmarketcontext_id"))
+	private Set<VenMarketContext> venMarketContexts;
+
+	@OneToMany(mappedBy = "ven", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<VenResource> venResources;
+
+	private Long lastUpdateDatetime;
+
+	public Ven() {
+	}
+
+	public String getOadrName() {
+		return oadrName;
+	}
+
+	public void setOadrName(String name) {
+		this.oadrName = name;
+	}
+
+	public String getOadrProfil() {
+		return oadrProfil;
+	}
+
+	public void setOadrProfil(String oadrProfil) {
+		this.oadrProfil = oadrProfil;
+	}
+
+	public String getTransport() {
+		return transport;
+	}
+
+	public void setTransport(String transport) {
+		this.transport = transport;
+	}
+
+	@Override
+	public String toString() {
+		return "Ven [id=" + this.getId() + ", username=" + this.getUsername() + ", oadrName=" + oadrName
+				+ ", oadrProfil=" + oadrProfil + ", transport=" + transport + ", pushUrl=" + getPushUrl() + "]";
+	}
+
+	public Set<VenGroup> getVenGroups() {
+		return venGroups;
+	}
+
+	public void setVenGroup(Set<VenGroup> venGroups) {
+		this.venGroups = venGroups;
+	}
+
+	/**
+	 * @return the pushUrl
+	 */
+	public String getPushUrl() {
+		return pushUrl;
+	}
+
+	/**
+	 * @param pushUrl
+	 *            the pushUrl to set
+	 */
+	public void setPushUrl(String pushUrl) {
+		this.pushUrl = pushUrl;
+	}
+
+	public String getRegistrationId() {
+		return registrationId;
+	}
+
+	public void setRegistrationId(String registrationId) {
+		this.registrationId = registrationId;
+	}
+
+	public Boolean getHttpPullModel() {
+		return httpPullModel;
+	}
+
+	public void setHttpPullModel(Boolean httpPullModel) {
+		this.httpPullModel = httpPullModel;
+	}
+
+	public Boolean getReportOnly() {
+		return reportOnly;
+	}
+
+	public void setReportOnly(Boolean reportOnly) {
+		this.reportOnly = reportOnly;
+	}
+
+	public Boolean getXmlSignature() {
+		return xmlSignature;
+	}
+
+	public void setXmlSignature(Boolean xmlSignature) {
+		this.xmlSignature = xmlSignature;
+	}
+
+	public Set<VenMarketContext> getVenMarketContexts() {
+		return venMarketContexts;
+	}
+
+	public void setVenMarketContexts(Set<VenMarketContext> venMarketContexts) {
+		this.venMarketContexts = venMarketContexts;
+	}
+
+	public void removeGroup(VenGroup venGroup) {
+
+		venGroups.remove(venGroup);
+
+	}
+
+	public void removeMarketContext(VenMarketContext venMarketContext) {
+
+		venMarketContexts.remove(venMarketContext);
+
+	}
+
+	public Set<VenResource> getVenResources() {
+		return venResources;
+	}
+
+	public void setVenResources(Set<VenResource> venResources) {
+		this.venResources = venResources;
+	}
+
+	public void removeResource(VenResource venResource) {
+		venResources.remove(venResource);
+
+	}
+
+	public Long getPullFrequencySeconds() {
+		return pullFrequencySeconds;
+	}
+
+	public void setPullFrequencySeconds(Long pullFrequencySeconds) {
+		this.pullFrequencySeconds = pullFrequencySeconds;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Long getLastUpdateDatetime() {
+		return lastUpdateDatetime;
+	}
+
+	public void setLastUpdateDatetime(Long lastUpdateDatetime) {
+		this.lastUpdateDatetime = lastUpdateDatetime;
+	}
+
+}

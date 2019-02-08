@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReportCapabilityDescriptionDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRModel20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.model.oadr20b.dto</a> &gt; <span class="el_source">ReportCapabilityDescriptionDto.java</span></div><h1>ReportCapabilityDescriptionDto.java</h1><pre class="source lang-java linenums">package com.avob.openadr.model.oadr20b.dto;
+
+import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
+import com.avob.openadr.model.oadr20b.ei.ReportEnumeratedType;
+import com.avob.openadr.model.oadr20b.siscale.SiScaleCodeType;
+
+<span class="nc" id="L7">public class ReportCapabilityDescriptionDto {</span>
+
+	private long id;
+
+	private String rid;
+
+	private String reportRequestId;
+
+	private String reportRequestGranularity;
+
+	private String reportRequestBackDuration;
+
+	private ReportEnumeratedType reportType;
+
+	private ReadingTypeEnumeratedType readingType;
+
+	private String oadrMaxPeriod;
+
+	private String oadrMinPeriod;
+
+	private boolean oadrOnChange;
+
+	private String itemDescription;
+
+	private String itemUnits;
+
+	private SiScaleCodeType siScaleCode;
+
+	private String payload;
+
+	public long getId() {
+<span class="nc" id="L38">		return id;</span>
+	}
+
+	public void setId(long id) {
+<span class="nc" id="L42">		this.id = id;</span>
+<span class="nc" id="L43">	}</span>
+
+	public String getRid() {
+<span class="nc" id="L46">		return rid;</span>
+	}
+
+	public void setRid(String rid) {
+<span class="nc" id="L50">		this.rid = rid;</span>
+<span class="nc" id="L51">	}</span>
+
+	public ReportEnumeratedType getReportType() {
+<span class="nc" id="L54">		return reportType;</span>
+	}
+
+	public void setReportType(ReportEnumeratedType reportType) {
+<span class="nc" id="L58">		this.reportType = reportType;</span>
+<span class="nc" id="L59">	}</span>
+
+	public ReadingTypeEnumeratedType getReadingType() {
+<span class="nc" id="L62">		return readingType;</span>
+	}
+
+	public void setReadingType(ReadingTypeEnumeratedType readingType) {
+<span class="nc" id="L66">		this.readingType = readingType;</span>
+<span class="nc" id="L67">	}</span>
+
+	public String getPayload() {
+<span class="nc" id="L70">		return payload;</span>
+	}
+
+	public void setPayload(String payload) {
+<span class="nc" id="L74">		this.payload = payload;</span>
+<span class="nc" id="L75">	}</span>
+
+	public String getOadrMaxPeriod() {
+<span class="nc" id="L78">		return oadrMaxPeriod;</span>
+	}
+
+	public void setOadrMaxPeriod(String oadrMaxPeriod) {
+<span class="nc" id="L82">		this.oadrMaxPeriod = oadrMaxPeriod;</span>
+<span class="nc" id="L83">	}</span>
+
+	public String getOadrMinPeriod() {
+<span class="nc" id="L86">		return oadrMinPeriod;</span>
+	}
+
+	public void setOadrMinPeriod(String oadrMinPeriod) {
+<span class="nc" id="L90">		this.oadrMinPeriod = oadrMinPeriod;</span>
+<span class="nc" id="L91">	}</span>
+
+	public boolean isOadrOnChange() {
+<span class="nc" id="L94">		return oadrOnChange;</span>
+	}
+
+	public void setOadrOnChange(boolean oadrOnChange) {
+<span class="nc" id="L98">		this.oadrOnChange = oadrOnChange;</span>
+<span class="nc" id="L99">	}</span>
+
+	public String getItemDescription() {
+<span class="nc" id="L102">		return itemDescription;</span>
+	}
+
+	public void setItemDescription(String itemDescription) {
+<span class="nc" id="L106">		this.itemDescription = itemDescription;</span>
+<span class="nc" id="L107">	}</span>
+
+	public String getItemUnits() {
+<span class="nc" id="L110">		return itemUnits;</span>
+	}
+
+	public void setItemUnits(String itemUnits) {
+<span class="nc" id="L114">		this.itemUnits = itemUnits;</span>
+<span class="nc" id="L115">	}</span>
+
+	public SiScaleCodeType getSiScaleCode() {
+<span class="nc" id="L118">		return siScaleCode;</span>
+	}
+
+	public void setSiScaleCode(SiScaleCodeType siScaleCode) {
+<span class="nc" id="L122">		this.siScaleCode = siScaleCode;</span>
+<span class="nc" id="L123">	}</span>
+
+	public String getReportRequestId() {
+<span class="nc" id="L126">		return reportRequestId;</span>
+	}
+
+	public void setReportRequestId(String reportRequestId) {
+<span class="nc" id="L130">		this.reportRequestId = reportRequestId;</span>
+<span class="nc" id="L131">	}</span>
+
+	public String getReportRequestGranularity() {
+<span class="nc" id="L134">		return reportRequestGranularity;</span>
+	}
+
+	public void setReportRequestGranularity(String reportRequestGranularity) {
+<span class="nc" id="L138">		this.reportRequestGranularity = reportRequestGranularity;</span>
+<span class="nc" id="L139">	}</span>
+
+	public String getReportRequestBackDuration() {
+<span class="nc" id="L142">		return reportRequestBackDuration;</span>
+	}
+
+	public void setReportRequestBackDuration(String reportRequestBackDuration) {
+<span class="nc" id="L146">		this.reportRequestBackDuration = reportRequestBackDuration;</span>
+<span class="nc" id="L147">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

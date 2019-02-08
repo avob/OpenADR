@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VTNJettyServerCustomizer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTNCommon</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.common.vtn</a> &gt; <span class="el_source">VTNJettyServerCustomizer.java</span></div><h1>VTNJettyServerCustomizer.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.common.vtn;
+
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.util.UUID;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.util.component.LifeCycle;
+import org.eclipse.jetty.util.component.LifeCycle.Listener;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.embedded.jetty.JettyServerCustomizer;
+
+import com.avob.openadr.security.exception.OadrSecurityException;
+
+public class VTNJettyServerCustomizer implements JettyServerCustomizer {
+
+<span class="nc" id="L35">	private static final Logger LOGGER = LoggerFactory.getLogger(VTNJettyServerCustomizer.class);</span>
+
+	private int port;
+	private KeyStore keystore;
+	private KeyStore truststore;
+	private String keystorePass;
+	private String[] protocols;
+	private String[] ciphers;
+
+	public VTNJettyServerCustomizer(int port, KeyStore keystore, String keystorePass, KeyStore truststore,
+<span class="nc" id="L45">			String[] protocols, String[] ciphers) {</span>
+<span class="nc" id="L46">		this.port = port;</span>
+<span class="nc" id="L47">		this.keystore = keystore;</span>
+<span class="nc" id="L48">		this.truststore = truststore;</span>
+<span class="nc" id="L49">		this.keystorePass = keystorePass;</span>
+<span class="nc" id="L50">		this.protocols = protocols;</span>
+<span class="nc" id="L51">		this.ciphers = ciphers;</span>
+<span class="nc" id="L52">	}</span>
+
+	private HttpConfiguration getHttpConfiguration() {
+<span class="nc" id="L55">		HttpConfiguration config = new HttpConfiguration();</span>
+<span class="nc" id="L56">		config.setSecureScheme(&quot;https&quot;);</span>
+<span class="nc" id="L57">		config.setSecurePort(port);</span>
+<span class="nc" id="L58">		config.setSendXPoweredBy(false);</span>
+<span class="nc" id="L59">		config.setSendServerVersion(false);</span>
+<span class="nc" id="L60">		config.addCustomizer(new SecureRequestCustomizer());</span>
+
+<span class="nc" id="L62">		return config;</span>
+	}
+
+	private SslContextFactory getSslContextFactory()
+			throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException,
+			OadrSecurityException, UnrecoverableKeyException, KeyManagementException {
+		// SSL Context Factory
+<span class="nc" id="L69">		SslContextFactory sslContextFactory = new SslContextFactory();</span>
+
+<span class="nc" id="L71">		SSLContext sslContext = SSLContext.getInstance(&quot;TLS&quot;);</span>
+
+		// init key manager factory
+<span class="nc" id="L74">		KeyStore createKeyStore = keystore;</span>
+<span class="nc" id="L75">		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());</span>
+<span class="nc" id="L76">		keyManagerFactory.init(createKeyStore, keystorePass.toCharArray());</span>
+
+		// init trust manager factory
+<span class="nc" id="L79">		KeyStore createTrustStore = truststore;</span>
+		TrustManagerFactory trustManagerFactory = TrustManagerFactory
+<span class="nc" id="L81">				.getInstance(TrustManagerFactory.getDefaultAlgorithm());</span>
+<span class="nc" id="L82">		trustManagerFactory.init(createTrustStore);</span>
+		// init ssl context
+<span class="nc" id="L84">		String seed = UUID.randomUUID().toString();</span>
+
+<span class="nc" id="L86">		sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),</span>
+<span class="nc" id="L87">				new SecureRandom(seed.getBytes()));</span>
+
+<span class="nc" id="L89">		sslContextFactory.setSslContext(sslContext);</span>
+
+		// jetty 9 silently exclude required oadr20a default
+		// cipher suite
+<span class="nc" id="L93">		sslContextFactory.setExcludeCipherSuites(&quot;^.*_(MD5)$&quot;);</span>
+<span class="nc" id="L94">		sslContextFactory.setExcludeProtocols(&quot;SSLv3&quot;);</span>
+<span class="nc" id="L95">		sslContextFactory.setIncludeProtocols(this.protocols);</span>
+<span class="nc" id="L96">		sslContextFactory.setIncludeCipherSuites(this.ciphers);</span>
+
+		// require client certificate authentication
+<span class="nc" id="L99">		sslContextFactory.setWantClientAuth(true);</span>
+
+<span class="nc" id="L101">		sslContextFactory.addLifeCycleListener(new Listener() {</span>
+
+			@Override
+			public void lifeCycleStarting(LifeCycle event) {
+<span class="nc" id="L105">				LOGGER.debug(&quot;Jetty lifeCycleStarting: &quot; + event.toString());</span>
+
+<span class="nc" id="L107">			}</span>
+
+			@Override
+			public void lifeCycleStarted(LifeCycle event) {
+<span class="nc" id="L111">				LOGGER.debug(&quot;Jetty lifeCycleStarted: &quot; + event.toString());</span>
+
+<span class="nc" id="L113">			}</span>
+
+			@Override
+			public void lifeCycleFailure(LifeCycle event, Throwable cause) {
+<span class="nc" id="L117">				LOGGER.debug(&quot;Jetty lifeCycleFailure: &quot; + event.toString());</span>
+
+<span class="nc" id="L119">			}</span>
+
+			@Override
+			public void lifeCycleStopping(LifeCycle event) {
+<span class="nc" id="L123">				LOGGER.debug(&quot;Jetty lifeCycleStopping: &quot; + event.toString());</span>
+
+<span class="nc" id="L125">			}</span>
+
+			@Override
+			public void lifeCycleStopped(LifeCycle event) {
+<span class="nc" id="L129">				LOGGER.debug(&quot;Jetty lifeCycleStopped: &quot; + event.toString());</span>
+
+<span class="nc" id="L131">			}</span>
+
+		});
+
+<span class="nc" id="L135">		return sslContextFactory;</span>
+
+	}
+
+	@Override
+	public void customize(Server server) {
+
+		try {
+<span class="nc" id="L143">			HttpConfiguration config = getHttpConfiguration();</span>
+
+<span class="nc" id="L145">			HttpConnectionFactory http1 = new HttpConnectionFactory(config);</span>
+
+<span class="nc" id="L147">			SslConnectionFactory ssl = new SslConnectionFactory(this.getSslContextFactory(), &quot;http/1.1&quot;);</span>
+
+<span class="nc" id="L149">			ServerConnector connector = new ServerConnector(server, ssl, http1);</span>
+
+<span class="nc" id="L151">			connector.setPort(port);</span>
+<span class="nc" id="L152">			Connector[] connectors = { connector };</span>
+<span class="nc" id="L153">			server.setConnectors(connectors);</span>
+
+<span class="nc" id="L155">		} catch (OadrSecurityException e) {</span>
+<span class="nc" id="L156">			throw new IllegalArgumentException(e);</span>
+<span class="nc" id="L157">		} catch (NoSuchAlgorithmException e) {</span>
+<span class="nc" id="L158">			throw new IllegalArgumentException(e);</span>
+<span class="nc" id="L159">		} catch (CertificateException e) {</span>
+<span class="nc" id="L160">			throw new IllegalArgumentException(e);</span>
+<span class="nc" id="L161">		} catch (IOException e) {</span>
+<span class="nc" id="L162">			throw new IllegalArgumentException(e);</span>
+<span class="nc" id="L163">		} catch (KeyStoreException e) {</span>
+<span class="nc" id="L164">			throw new IllegalArgumentException(e);</span>
+<span class="nc" id="L165">		} catch (KeyManagementException e) {</span>
+<span class="nc" id="L166">			throw new IllegalArgumentException(e);</span>
+<span class="nc" id="L167">		} catch (UnrecoverableKeyException e) {</span>
+<span class="nc" id="L168">			throw new IllegalArgumentException(e);</span>
+<span class="nc" id="L169">		}</span>
+
+<span class="nc" id="L171">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

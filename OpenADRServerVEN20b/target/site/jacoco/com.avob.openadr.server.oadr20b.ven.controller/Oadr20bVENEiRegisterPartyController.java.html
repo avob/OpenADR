@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bVENEiRegisterPartyController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVEN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.ven.controller</a> &gt; <span class="el_source">Oadr20bVENEiRegisterPartyController.java</span></div><h1>Oadr20bVENEiRegisterPartyController.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.ven.controller;
+
+import java.security.Principal;
+
+import javax.annotation.Resource;
+import javax.xml.bind.JAXBException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
+import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
+import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
+import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
+import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyService;
+import com.avob.openadr.server.oadr20b.ven.service.XmlSignatureService;
+
+@ConditionalOnExpression(&quot;#{!${oadr.pullModel}}&quot;)
+@PreAuthorize(&quot;hasRole('ROLE_VTN')&quot;)
+@Controller
+@RequestMapping(Oadr20bUrlPath.OADR_BASE_PATH)
+public class Oadr20bVENEiRegisterPartyController {
+
+<span class="fc" id="L41">	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVENEiRegisterPartyController.class);</span>
+
+	private Oadr20bJAXBContext jaxbContext;
+
+	@Resource
+	private Oadr20bVENEiRegisterPartyService registerPartyService;
+
+	@Resource
+	private XmlSignatureService xmlSignatureService;
+
+	@Resource
+	private MultiVtnConfig multiVtnConfig;
+
+<span class="fc" id="L54">	public Oadr20bVENEiRegisterPartyController() throws JAXBException {</span>
+<span class="fc" id="L55">		jaxbContext = Oadr20bJAXBContext.getInstance();</span>
+<span class="fc" id="L56">	}</span>
+
+	@RequestMapping(value = Oadr20bUrlPath.EI_REGISTER_PARTY_SERVICE, method = RequestMethod.POST)
+	@ResponseBody
+	public String request(@RequestBody String payload, Principal principal)
+			throws Oadr20bMarshalException, Oadr20bUnmarshalException, Oadr20bApplicationLayerException,
+			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException {
+
+<span class="nc" id="L64">		Object unmarshal = jaxbContext.unmarshal(payload);</span>
+
+<span class="nc" id="L66">		String username = principal.getName();</span>
+
+<span class="nc" id="L68">		VtnSessionConfiguration vtnConfig = multiVtnConfig.getMultiConfig(username);</span>
+
+<span class="nc bnc" id="L70" title="All 2 branches missed.">		if (unmarshal instanceof OadrPayload) {</span>
+
+<span class="nc" id="L72">			OadrPayload oadrPayload = (OadrPayload) unmarshal;</span>
+
+<span class="nc" id="L74">			return handle(vtnConfig, oadrPayload);</span>
+
+<span class="nc bnc" id="L76" title="All 2 branches missed.">		} else if (unmarshal instanceof OadrRequestReregistrationType) {</span>
+
+<span class="nc" id="L78">			OadrRequestReregistrationType oadrRequestReregistrationType = (OadrRequestReregistrationType) unmarshal;</span>
+
+<span class="nc" id="L80">			LOGGER.info(username + &quot; - OadrRequestReregistrationType&quot;);</span>
+
+<span class="nc" id="L82">			return handle(vtnConfig, oadrRequestReregistrationType, false);</span>
+
+<span class="nc bnc" id="L84" title="All 2 branches missed.">		} else if (unmarshal instanceof OadrCancelPartyRegistrationType) {</span>
+
+<span class="nc" id="L86">			OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType = (OadrCancelPartyRegistrationType) unmarshal;</span>
+
+<span class="nc" id="L88">			LOGGER.info(username + &quot; - OadrCancelPartyRegistrationType&quot;);</span>
+
+<span class="nc" id="L90">			return handle(vtnConfig, oadrCancelPartyRegistrationType, false);</span>
+
+		}
+
+<span class="nc" id="L94">		throw new Oadr20bApplicationLayerException(&quot;Unacceptable request payload for EiEventService&quot;);</span>
+	}
+
+	private String handle(VtnSessionConfiguration vtnConfig, OadrPayload oadrPayload)
+			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
+			Oadr20bXMLSignatureException {
+<span class="nc" id="L100">		xmlSignatureService.validate(oadrPayload);</span>
+
+<span class="nc bnc" id="L102" title="All 2 branches missed.">		if (oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration() != null) {</span>
+<span class="nc" id="L103">			LOGGER.info(vtnConfig.getVtnId() + &quot; - OadrCancelPartyRegistrationType signed&quot;);</span>
+<span class="nc" id="L104">			return handle(vtnConfig, oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration(), true);</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">		} else if (oadrPayload.getOadrSignedObject().getOadrRequestReregistration() != null) {</span>
+<span class="nc" id="L106">			LOGGER.info(vtnConfig.getVtnId() + &quot; - OadrRequestReregistrationType signed&quot;);</span>
+<span class="nc" id="L107">			return handle(vtnConfig, oadrPayload.getOadrSignedObject().getOadrRequestReregistration(), true);</span>
+		}
+
+<span class="nc" id="L110">		throw new Oadr20bApplicationLayerException(&quot;Unacceptable request payload for EiEventService&quot;);</span>
+	}
+
+	private String handle(VtnSessionConfiguration vtnConfig,
+			OadrRequestReregistrationType oadrRequestReregistrationType, boolean signed)
+			throws Oadr20bMarshalException, Oadr20bXMLSignatureException {
+
+<span class="nc" id="L117">		OadrResponseType response = registerPartyService.oadrRequestReregistration(vtnConfig,</span>
+				oadrRequestReregistrationType);
+
+<span class="nc" id="L120">		String responseStr = null;</span>
+
+<span class="nc bnc" id="L122" title="All 2 branches missed.">		if (signed) {</span>
+<span class="nc" id="L123">			responseStr = xmlSignatureService.sign(response);</span>
+		} else {
+<span class="nc" id="L125">			responseStr = jaxbContext.marshalRoot(response);</span>
+		}
+
+<span class="nc" id="L128">		return responseStr;</span>
+
+	}
+
+	private String handle(VtnSessionConfiguration vtnConfig,
+			OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType, boolean signed)
+			throws Oadr20bMarshalException, Oadr20bXMLSignatureException {
+
+<span class="nc" id="L136">		OadrCanceledPartyRegistrationType response = registerPartyService.oadrCancelPartyRegistration(vtnConfig,</span>
+				oadrCancelPartyRegistrationType);
+
+<span class="nc" id="L139">		String responseStr = null;</span>
+
+<span class="nc bnc" id="L141" title="All 2 branches missed.">		if (signed) {</span>
+<span class="nc" id="L142">			responseStr = xmlSignatureService.sign(response);</span>
+		} else {
+<span class="nc" id="L144">			responseStr = jaxbContext.marshalRoot(response);</span>
+		}
+
+<span class="nc" id="L147">		return responseStr;</span>
+
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

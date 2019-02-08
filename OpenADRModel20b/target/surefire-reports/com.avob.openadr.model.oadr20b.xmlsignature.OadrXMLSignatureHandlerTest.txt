@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest
+-------------------------------------------------------------------------------
+Tests run: 24, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.564 sec - in com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandlerTest

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bCreatedReportApplicationLayerException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRServerVTN20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.server.oadr20b.vtn.exception.eireport</a> &gt; <span class="el_source">Oadr20bCreatedReportApplicationLayerException.java</span></div><h1>Oadr20bCreatedReportApplicationLayerException.java</h1><pre class="source lang-java linenums">package com.avob.openadr.server.oadr20b.vtn.exception.eireport;
+
+import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
+import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.server.oadr20b.vtn.exception.Oadr20bGenericException;
+
+public class Oadr20bCreatedReportApplicationLayerException extends Oadr20bException implements Oadr20bGenericException {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1468896185130868972L;
+
+    private final transient OadrResponseType response;
+
+    public Oadr20bCreatedReportApplicationLayerException(Exception e, OadrResponseType response) {
+<span class="nc" id="L17">        super(e);</span>
+<span class="nc" id="L18">        this.response = response;</span>
+<span class="nc" id="L19">    }</span>
+
+    public Oadr20bCreatedReportApplicationLayerException(String message, OadrResponseType response) {
+<span class="fc" id="L22">        super(message);</span>
+<span class="fc" id="L23">        this.response = response;</span>
+<span class="fc" id="L24">    }</span>
+
+    @Override
+    public OadrResponseType getResponse() {
+<span class="fc" id="L28">        return response;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

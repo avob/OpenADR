@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Query Response - Only profile, transport, and extension info, although other stuff could be in payload-->
+<oadr:oadrCreatedPartyRegistration ei:schemaVersion="2.0b" xsi:schemaLocation="http://openadr.org/oadr-2.0b/2012/07 oadr_20b.xsd" xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110" xmlns:pyld="http://docs.oasis-open.org/ns/energyinterop/201110/payloads" xmlns:oadr="http://openadr.org/oadr-2.0b/2012/07" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xcal="urn:ietf:params:xml:ns:icalendar-2.0">
+	<ei:eiResponse>
+		<ei:responseCode>200</ei:responseCode>
+		<ei:responseDescription>OK</ei:responseDescription>
+		<pyld:requestID>REQ_123</pyld:requestID>
+	</ei:eiResponse>
+	<ei:vtnID>VTN</ei:vtnID>
+	<oadr:oadrProfiles>
+		<oadr:oadrProfile>
+			<oadr:oadrProfileName>2.0a</oadr:oadrProfileName>
+			<oadr:oadrTransports>
+				<oadr:oadrTransport>
+					<oadr:oadrTransportName>simpleHttp</oadr:oadrTransportName>
+				</oadr:oadrTransport>
+			</oadr:oadrTransports>
+		</oadr:oadrProfile>
+				<oadr:oadrProfile>
+			<oadr:oadrProfileName>2.0b</oadr:oadrProfileName>
+			<oadr:oadrTransports>
+				<oadr:oadrTransport>
+					<oadr:oadrTransportName>simpleHttp</oadr:oadrTransportName>
+				</oadr:oadrTransport>
+				<oadr:oadrTransport>
+					<oadr:oadrTransportName>xmpp</oadr:oadrTransportName>
+				</oadr:oadrTransport>
+			</oadr:oadrTransports>
+		</oadr:oadrProfile>
+	</oadr:oadrProfiles>
+	<oadr:oadrExtensions>
+		<oadr:oadrExtension>
+			<oadr:oadrExtensionName>My Extension</oadr:oadrExtensionName>
+			<oadr:oadrInfo>
+				<oadr:oadrKey>A Key</oadr:oadrKey>
+				<oadr:oadrValue>A Value</oadr:oadrValue>
+			</oadr:oadrInfo>
+		</oadr:oadrExtension>
+	</oadr:oadrExtensions>
+</oadr:oadrCreatedPartyRegistration>

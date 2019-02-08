@@ -1,0 +1,6 @@
+{
+	"username": "74:3B:28:B5:90:4D:D2:D4:AD:8F",
+  	"pushUrl": "http://localhost:8081/OpenADR2/Simple/EiEvent",
+	"transport": "http",
+	"oadrProfil": "20a"
+}

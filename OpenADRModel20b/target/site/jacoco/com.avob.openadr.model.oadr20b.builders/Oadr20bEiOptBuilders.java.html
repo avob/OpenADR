@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Oadr20bEiOptBuilders.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">OpenADRModel20b</a> &gt; <a href="index.source.html" class="el_package">com.avob.openadr.model.oadr20b.builders</a> &gt; <span class="el_source">Oadr20bEiOptBuilders.java</span></div><h1>Oadr20bEiOptBuilders.java</h1><pre class="source lang-java linenums">package com.avob.openadr.model.oadr20b.builders;
+
+import com.avob.openadr.model.oadr20b.builders.eiopt.Oadr20bCancelOptBuilder;
+import com.avob.openadr.model.oadr20b.builders.eiopt.Oadr20bCanceledOptBuilder;
+import com.avob.openadr.model.oadr20b.builders.eiopt.Oadr20bCreateOptBuilder;
+import com.avob.openadr.model.oadr20b.builders.eiopt.Oadr20bCreatedOptBuilder;
+import com.avob.openadr.model.oadr20b.builders.eiopt.Oadr20bVavailabilityBuilder;
+import com.avob.openadr.model.oadr20b.ei.OptReasonEnumeratedType;
+import com.avob.openadr.model.oadr20b.ei.OptTypeType;
+import com.avob.openadr.model.oadr20b.ei.SchemaVersionEnumeratedType;
+import com.avob.openadr.model.oadr20b.xcal.VavailabilityType;
+
+public class Oadr20bEiOptBuilders {
+
+<span class="nc" id="L15">    private Oadr20bEiOptBuilders() {</span>
+<span class="nc" id="L16">    }</span>
+
+    public static Oadr20bCanceledOptBuilder newOadr20bCanceledOptBuilder(String requestId, int responseCode,
+            String optId) {
+<span class="fc" id="L20">        return new Oadr20bCanceledOptBuilder(requestId, responseCode, optId)</span>
+<span class="fc" id="L21">                .withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());</span>
+    }
+
+    public static Oadr20bCancelOptBuilder newOadr20bCancelOptBuilder(String requestId, String optId, String venId) {
+<span class="fc" id="L25">        return new Oadr20bCancelOptBuilder(requestId, optId, venId)</span>
+<span class="fc" id="L26">                .withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());</span>
+    }
+
+    public static Oadr20bCreatedOptBuilder newOadr20bCreatedOptBuilder(String requestId, int responseCode,
+            String optId) {
+<span class="fc" id="L31">        return new Oadr20bCreatedOptBuilder(requestId, responseCode, optId)</span>
+<span class="fc" id="L32">                .withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());</span>
+    }
+
+    public static Oadr20bCreateOptBuilder newOadr20bCreateOptBuilder(String requestId, String venId,
+            Long createdDatetime, String eventId, long modificationNumber, String optId, OptTypeType optType,
+            OptReasonEnumeratedType optReason) {
+<span class="fc" id="L38">        return new Oadr20bCreateOptBuilder(requestId, venId, createdDatetime, eventId, modificationNumber, optId,</span>
+<span class="fc" id="L39">                optType, optReason).withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());</span>
+    }
+
+    public static Oadr20bCreateOptBuilder newOadr20bCreateOptBuilder(String requestId, String venId,
+            Long createdDatetime, VavailabilityType vavailabilityType, String optId, OptTypeType optType,
+            OptReasonEnumeratedType optReason) {
+<span class="nc" id="L45">        return new Oadr20bCreateOptBuilder(requestId, venId, createdDatetime, vavailabilityType, optId, optType,</span>
+<span class="nc" id="L46">                optReason).withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());</span>
+    }
+
+    public static Oadr20bVavailabilityBuilder newOadr20bVavailabilityBuilder() {
+<span class="nc" id="L50">        return new Oadr20bVavailabilityBuilder();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span></div></body></html>

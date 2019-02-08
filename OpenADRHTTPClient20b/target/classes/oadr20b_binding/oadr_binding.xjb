@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bindings version="2.0" xmlns="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:namespace="http://jaxb2-commons.dev.java.net/namespace-prefix" xmlns:annox="http://annox.dev.java.net"   xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+    xmlns:gml="http://www.opengis.net/gml/3.2" extensionBindingPrefixes="annox">
+    
+	<bindings schemaLocation="../oadr20b_schema/oadr_20b.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.oadr" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="oadr" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_atom.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.atom" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="atom" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_ei_20b.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.ei" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="ei" />
+			<bindings node="//xs:simpleType[@name='schemaVersionEnumeratedType']">
+	             <typesafeEnumClass name="SchemaVersionEnumeratedType" />
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='schemaVersionEnumeratedType']/xs:restriction/xs:enumeration[@value='2.0a']">
+	            <typesafeEnumMember name="OADR_20A"/>
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='schemaVersionEnumeratedType']/xs:restriction/xs:enumeration[@value='2.0b']">
+	            <typesafeEnumMember name="OADR_20B"/>
+	        </bindings>
+	        
+	        <bindings node="//xs:simpleType[@name='SignalNameEnumeratedType']">
+	             <typesafeEnumClass name="SignalNameEnumeratedType" />
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='SignalNameEnumeratedType']/xs:restriction/xs:enumeration[@value='simple']">
+	             <typesafeEnumMember name="DEPRECATED_OADR20A_SIMPLE"/>
+	        </bindings>
+	      
+	      
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_emix_20b.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.emix" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="emix" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_gml_20b.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.gml" />
+		</schemaBindings>
+		<bindings>
+			<globalBindings>
+	           <javaType name="java.lang.String" xmlType="xs:double"/>
+	       </globalBindings>
+			<namespace:prefix name="gml" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_greenbutton.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.greenbutton" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="greenbutton" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_ISO_ISO3AlphaCurrencyCode_20100407.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.iso" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="iso" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_power_20b.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.power" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="power" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_pyld_20b.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.pyld" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="pyld" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_siscale_20b.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.siscale" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="siscale" />
+			<bindings node="//xs:simpleType[@name='SiScaleCodeType']">
+	               <typesafeEnumClass name="SiScaleCodeType" />
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='SiScaleCodeType']/xs:restriction/xs:enumeration[@value='p']">
+	            <typesafeEnumMember name="PICO"/>
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='SiScaleCodeType']/xs:restriction/xs:enumeration[@value='n']">
+	            <typesafeEnumMember name="NANO"/>
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='SiScaleCodeType']/xs:restriction/xs:enumeration[@value='micro']">
+	            <typesafeEnumMember name="MICRO"/>
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='SiScaleCodeType']/xs:restriction/xs:enumeration[@value='m']">
+	            <typesafeEnumMember name="MILLI"/>
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='SiScaleCodeType']/xs:restriction/xs:enumeration[@value='c']">
+	            <typesafeEnumMember name="CENTI"/>
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='SiScaleCodeType']/xs:restriction/xs:enumeration[@value='d']">
+	            <typesafeEnumMember name="DECI"/>
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='SiScaleCodeType']/xs:restriction/xs:enumeration[@value='k']">
+	            <typesafeEnumMember name="KILO"/>
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='SiScaleCodeType']/xs:restriction/xs:enumeration[@value='M']">
+	            <typesafeEnumMember name="MEGA"/>
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='SiScaleCodeType']/xs:restriction/xs:enumeration[@value='G']">
+	            <typesafeEnumMember name="GIGA"/>
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='SiScaleCodeType']/xs:restriction/xs:enumeration[@value='T']">
+	            <typesafeEnumMember name="TERA"/>
+	        </bindings>
+	        <bindings node="//xs:simpleType[@name='SiScaleCodeType']/xs:restriction/xs:enumeration[@value='none']">
+	            <typesafeEnumMember name="NONE"/>
+	        </bindings>
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_strm_20b.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.strm" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="strm" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_xcal_20b.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.xcal" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="xcal" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_xml.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.xml" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="xml" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_xmldsig-properties-schema.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.xmldsig.properties" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="properties" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_xmldsig.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.xmldsig" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="xmldsig" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_xmldsig11.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.xmldsig11" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="xmldsig11" />
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="../oadr20b_schema/oadr_avob.xsd">
+		<schemaBindings>
+			<package name="com.avob.openadr.model.oadr20b.avob" />
+		</schemaBindings>
+		<bindings>
+			<namespace:prefix name="avob" />
+		</bindings>
+	</bindings>	
+</bindings>
+
