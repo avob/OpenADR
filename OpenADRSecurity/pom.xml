@@ -10,7 +10,7 @@
 		<groupId>com.avob</groupId>
 		<artifactId>OpenADR</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath></relativePath>
+		<relativePath>../OpenADR</relativePath>
 	</parent>
 	<dependencies>
 		<dependency>
