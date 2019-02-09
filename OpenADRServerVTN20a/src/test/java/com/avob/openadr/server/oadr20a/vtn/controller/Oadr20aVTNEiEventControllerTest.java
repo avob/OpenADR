@@ -225,9 +225,13 @@ public class Oadr20aVTNEiEventControllerTest {
     @Test
     public void testPullOadrRequestEventActiveSuccessCase() throws Exception {
 
-        VenMarketContext marketContext = venMarketContextService.prepare(new VenMarketContextDto(MARKET_CONTEXT_NAME));
-        venMarketContextService.save(marketContext);
-
+    	VenMarketContext marketContext = venMarketContextService.findOneByName(MARKET_CONTEXT_NAME);
+    	if(marketContext == null) {
+    		  marketContext = venMarketContextService.prepare(new VenMarketContextDto(MARKET_CONTEXT_NAME));
+    	        venMarketContextService.save(marketContext);
+    	}
+       
+        
         Ven ven = venService.prepare(VEN);
         ven.setVenMarketContexts(Sets.newHashSet(marketContext));
         venService.save(ven);

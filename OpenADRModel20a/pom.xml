@@ -40,23 +40,23 @@
 					</includes>
 				</configuration>
 			</plugin>
-			<!-- <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-remote-resources-plugin</artifactId>
-				<version>1.5</version>
-				<configuration>
-					<resourceBundles>
-						<resourceBundle>com.avob.openadr.model:OpenADRModel20a:0.0.1-SNAPSHOT</resourceBundle>
-					</resourceBundles>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>process</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin> -->
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-remote-resources-plugin</artifactId> -->
+			<!-- <version>1.5</version> -->
+			<!-- <configuration> -->
+			<!-- <resourceBundles> -->
+			<!-- <resourceBundle>com.avob.openadr.model:OpenADRModel20a:0.0.1-SNAPSHOT</resourceBundle> -->
+			<!-- </resourceBundles> -->
+			<!-- </configuration> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <goals> -->
+			<!-- <goal>process</goal> -->
+			<!-- </goals> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>

@@ -39,8 +39,8 @@ public class MultiVtnConfig {
 	@Resource
 	private VenConfig venConfig;
 
-	@Value("${avob.home:#{null}}")
-	private String avobHome;
+	@Value("${ven.home:#{null}}")
+	private String venHome;
 
 	private Map<String, VtnSessionConfiguration> multiConfig = new HashMap<String, VtnSessionConfiguration>();
 
@@ -77,12 +77,13 @@ public class MultiVtnConfig {
 
 	@PostConstruct
 	public void init() {
-		if (avobHome == null) {
-			return;
+		if (venHome == null) {
+			LOGGER.error("Ven home config must point to a local folder");
+			throw new IllegalArgumentException("Ven home config must point to a local folder");
 		}
 		URI uri;
 		try {
-			uri = new URI(avobHome);
+			uri = new URI(venHome);
 			File fileFromUri = FileUtils.fileFromUri(uri);
 			if (fileFromUri.isDirectory()) {
 
@@ -112,8 +113,8 @@ public class MultiVtnConfig {
 				}
 
 			} else {
-				LOGGER.error("Avob home config must point to a local folder");
-				throw new IllegalArgumentException();
+				LOGGER.error("Ven home config must point to a local folder");
+				throw new IllegalArgumentException("Ven home config must point to a local folder");
 			}
 		} catch (URISyntaxException e) {
 			LOGGER.error("Avob home config must point to a local folder", e);

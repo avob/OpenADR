@@ -7,7 +7,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
-@Profile({ "test-functional", "test" })
+@Profile({ "test-functional" })
 @Configuration
 public class EmbeddedSqlDatabaseConfig {
 

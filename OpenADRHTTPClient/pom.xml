@@ -9,12 +9,23 @@
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../OpenADR</relativePath>
 	</parent>
+	<repositories>
+		<repository>
+			<id>central</id>
+			<name>Maven Repository Switchboard</name>
+			<layout>default</layout>
+			<url>http://repo1.maven.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<dependencies>
 	
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.5.3</version>
+			<version>4.5.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.avob.openadr.security</groupId>

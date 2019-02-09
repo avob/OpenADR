@@ -173,22 +173,17 @@ public class DemandResponseEventService {
 
 			@Override
 			public void run() {
-				try {
-					Thread.sleep(2000);
-					for (Ven ven : vens) {
-						// the receiver check if ven is a push ven and how it
-						// does
-						// make
-						// event available if not
-						if (DemandResponseEventOadrProfileEnum.OADR20B.equals(profile)
-								&& DemandResponseEventOadrProfileEnum.OADR20B.getCode().equals(ven.getOadrProfil())) {
-							demandResponseEventPublisher.publish20b(ven);
-						} else if (DemandResponseEventOadrProfileEnum.OADR20A.equals(profile)) {
-							demandResponseEventPublisher.publish20a(ven);
-						}
+				for (Ven ven : vens) {
+					// the receiver check if ven is a push ven and how it
+					// does
+					// make
+					// event available if not
+					if (DemandResponseEventOadrProfileEnum.OADR20B.equals(profile)
+							&& DemandResponseEventOadrProfileEnum.OADR20B.getCode().equals(ven.getOadrProfil())) {
+						demandResponseEventPublisher.publish20b(ven);
+					} else if (DemandResponseEventOadrProfileEnum.OADR20A.equals(profile)) {
+						demandResponseEventPublisher.publish20a(ven);
 					}
-				} catch (InterruptedException e) {
-					LOGGER.error("", e);
 				}
 			}
 

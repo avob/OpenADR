@@ -15,6 +15,8 @@
 		<sonar.sources>src/main/java</sonar.sources>
 	</properties>
 
+	
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -103,6 +105,6 @@
 		<module>../OpenADRServerVTN20a</module>
 		<module>../OpenADRServerVEN20b</module>
 		<module>../OpenADRServerVTN20b</module>
-		
+
 	</modules>
 </project>

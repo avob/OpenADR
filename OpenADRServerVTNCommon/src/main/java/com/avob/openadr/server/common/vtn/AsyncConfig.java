@@ -15,25 +15,25 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableAsync
 public class AsyncConfig implements AsyncConfigurer {
 
-    public static final String PUSH_PROFILE = "http_push";
+	public static final String PUSH_PROFILE = "http_push";
 
-    @Override
-    @Bean
-    public Executor getAsyncExecutor() {
-        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setMaxPoolSize(10);
-        taskExecutor.setCorePoolSize(2);
-        taskExecutor.setAwaitTerminationSeconds(120);
-        taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
-        taskExecutor.setThreadNamePrefix("Oadr20DREventPushServiceExecutor-");
-        taskExecutor.setDaemon(true);
-        taskExecutor.initialize();
-        return taskExecutor;
-    }
+	@Override
+	@Bean
+	public Executor getAsyncExecutor() {
+		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setMaxPoolSize(10);
+		taskExecutor.setCorePoolSize(2);
+		taskExecutor.setAwaitTerminationSeconds(1);
+		taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
+		taskExecutor.setThreadNamePrefix("Oadr20DREventPushServiceExecutor-");
+		taskExecutor.setDaemon(true);
+		taskExecutor.initialize();
+		return taskExecutor;
+	}
 
-    @Override
-    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return new SimpleAsyncUncaughtExceptionHandler();
-    }
+	@Override
+	public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+		return new SimpleAsyncUncaughtExceptionHandler();
+	}
 
 }

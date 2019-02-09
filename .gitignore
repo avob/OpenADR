@@ -1,58 +1,55 @@
-.metadata
-bin/
-tmp/
-*.tmp
-*.bak
-*.swp
-*~.nib
-local.properties
-.settings/
-.loadpath
-.recommenders
+*/.metadata
+*/bin/
+*/tmp/
+*/*.tmp
+*/*.bak
+*/*.swp
+*/*~.nib
+*/local.properties
+*/.settings/
+*/.loadpath
+*/.recommenders
 
 # External tool builders
 .externalToolBuilders/
 
 # Locally stored "Eclipse launch configurations"
-*.launch
+*/*.launch
 
 # PyDev specific (Python IDE for Eclipse)
-*.pydevproject
+*/*.pydevproject
 
 # CDT-specific (C/C++ Development Tooling)
-.cproject
+*/.cproject
 
 # CDT- autotools
-.autotools
+*/.autotools
 
 # Java annotation processor (APT)
-.factorypath
+*/.factorypath
 
 # PDT-specific (PHP Development Tools)
-.buildpath
+*/.buildpath
 
 # sbteclipse plugin
-.target
+*/.target
 
 # Tern plugin
-.tern-project
+*/.tern-project
 
 # TeXlipse plugin
-.texlipse
+*/.texlipse
 
 # STS (Spring Tool Suite)
-.springBeans
+*/.springBeans
+*/.classpath
+*/.project
 
 # Code Recommenders
-.recommenders/
+*/.recommenders/
 
 # Annotation Processing
-.apt_generated/
+*/.apt_generated/
 
-# Scala IDE specific (Scala & Java development for Eclipse)
-.cache-main
-.scala_dependencies
-.worksheet
-
-# Java compile folder
-*/target/**
+# compile foolder
+*/target
