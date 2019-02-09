@@ -56,9 +56,9 @@ import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20a.vtn.VTN20aSecurityApplicationTest;
 import com.google.common.collect.Sets;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(classes = { VTN20aSecurityApplicationTest.class })
-//@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = { VTN20aSecurityApplicationTest.class })
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class Oadr20aEventControllerTest {
 
     private static final String VEN = "ven1";
@@ -143,7 +143,7 @@ public class Oadr20aEventControllerTest {
         return Oadr20aFactory.createEiEvent(event.getEiEvent());
     }
 
-//    @Test
+    @Test
     public void test() throws Exception {
         VenMarketContext marketContext = venMarketContextService.prepare(new VenMarketContextDto(MARKET_CONTEXT_NAME));
         venMarketContextService.save(marketContext);
