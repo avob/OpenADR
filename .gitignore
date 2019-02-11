@@ -9,6 +9,8 @@
 */.settings/
 */.loadpath
 */.recommenders
+.project
+.settings/
 
 # External tool builders
 .externalToolBuilders/

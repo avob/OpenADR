@@ -8,7 +8,6 @@ This project aims to provide minimal VEN / VTN 2.0a / 2.0b squeleton implementat
 
 Module | Description
 ------------- | ------------- 
-OpenADR | maven parent POM project
 OpenADRSecurity | OADR security framework (authentication, xmlSignature)
 OpenADRModel20a | OADR 2.0a model java classes generated from XSDL definition file
 OpenADRModel20b | OADR 2.0b model java classes generated from XSDL definition file
@@ -29,5 +28,5 @@ OpenADRServerVTN20b | OADR 2.0b VTN squeleton implementation
 
 ## Build
 ```shell
-    mvn clean package -f OpenADR/pom.xml
+    mvn clean package
 ```
