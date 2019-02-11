@@ -69,7 +69,7 @@ public class VenService extends AbstractUserService<Ven> {
 
     @Override
     public void delete(Iterable<Ven> instances) {
-        venDao.delete(instances);
+        venDao.deleteAll(instances);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class VenService extends AbstractUserService<Ven> {
 
     @Override
     public void save(Iterable<Ven> instances) {
-        venDao.save(instances);
+        venDao.saveAll(instances);
     }
 
     public Ven findOneByUsername(String username) {
@@ -104,7 +104,7 @@ public class VenService extends AbstractUserService<Ven> {
     }
 
     public Ven findOne(Long id) {
-        return venDao.findOne(id);
+        return venDao.findById(id).get();
     }
 
     public Iterable<Ven> findAll() {

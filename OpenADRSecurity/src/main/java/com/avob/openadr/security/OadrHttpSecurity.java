@@ -22,6 +22,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
+import org.bouncycastle.util.encoders.Hex;
 
 import com.avob.openadr.security.exception.OadrSecurityException;
 
@@ -191,6 +192,17 @@ public class OadrHttpSecurity {
 			ts.setCertificateEntry(next.getKey(), OadrHttpSecurity.parseCertificate(next.getValue()));
 		}
 		return ts;
+	}
+
+	public static String md5Hex(String data) {
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalStateException("No MD5 algorithm available!", e);
+		}
+
+		return new String(Hex.encode(digest.digest(data.getBytes())));
 	}
 
 	public static void main(String[] args) throws OadrSecurityException {

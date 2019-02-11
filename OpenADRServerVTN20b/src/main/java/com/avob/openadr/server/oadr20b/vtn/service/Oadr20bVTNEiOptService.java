@@ -1,6 +1,7 @@
 package com.avob.openadr.server.oadr20b.vtn.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -135,12 +136,15 @@ public class Oadr20bVTNEiOptService {
 			// TODO bertrand: implement handle eiTarget, ven resource etc ...
 			String eventID = qualifiedEventID.getEventID();
 			long modificationNumber = qualifiedEventID.getModificationNumber();
-			DemandResponseEvent event = demandResponseEventService.findById(Long.parseLong(eventID));
-			if (event == null) {
+			Optional<DemandResponseEvent> op = demandResponseEventService.findById(Long.parseLong(eventID));
+
+			if (!op.isPresent()) {
 				throw new Oadr20bCreateOptApplicationLayerException("Unknown eventID: " + eventID, Oadr20bEiOptBuilders
 						.newOadr20bCreatedOptBuilder(requestID, Oadr20bApplicationLayerErrorCode.INVALID_ID_452, optID)
 						.build());
 			}
+
+			DemandResponseEvent event = op.get();
 
 			if (modificationNumber != event.getModificationNumber()) {
 				throw new Oadr20bCreateOptApplicationLayerException(

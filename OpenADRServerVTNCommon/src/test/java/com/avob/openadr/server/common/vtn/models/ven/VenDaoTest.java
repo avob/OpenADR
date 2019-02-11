@@ -58,7 +58,7 @@ public class VenDaoTest {
         assertEquals(ven.getUsername(), saved.getUsername());
 
         // test find by id
-        Ven findOne = venDao.findOne(saved.getId());
+        Ven findOne = venDao.findById(saved.getId()).get();
 
         assertEquals(saved.getId(), findOne.getId());
         assertEquals(saved.getPushUrl(), findOne.getPushUrl());
@@ -84,7 +84,7 @@ public class VenDaoTest {
         findOne.setOadrName(updatedName);
 
         venDao.save(findOne);
-        Ven findAnotherOne = venDao.findOne(saved.getId());
+        Ven findAnotherOne = venDao.findById(saved.getId()).get();
         assertEquals(findOne.getOadrName(), findAnotherOne.getOadrName());
 
         // test find all

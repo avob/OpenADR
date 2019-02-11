@@ -7,14 +7,15 @@ import java.security.cert.CertificateException;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.activemq.broker.BrokerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -27,11 +28,12 @@ import com.avob.openadr.server.common.vtn.VTNEmbeddedServletContainerCustomizer;
 import com.google.common.collect.Maps;
 
 @Configuration
-@EnableAutoConfiguration(exclude = { org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class })
+@EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class })
 @ComponentScan(basePackages = { "com.avob.openadr.server.common.vtn", "com.avob.openadr.server.oadr20b.vtn" })
 @EnableJpaRepositories({ "com.avob.openadr.server.common.vtn", "com.avob.openadr.server.oadr20b.vtn" })
 @EntityScan({ "com.avob.openadr.server.common.vtn", "com.avob.openadr.server.oadr20b.vtn" })
 public class VTN20bApplication {
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(VTN20bApplication.class);
 
 	@Value("${oadr.server.context_path:#{null}}")
@@ -59,7 +61,7 @@ public class VTN20bApplication {
 	private String rsaCertificatePath;
 
 	@Bean
-	public EmbeddedServletContainerCustomizer servletContainerCustomizer() {
+	public WebServerFactoryCustomizer<JettyServletWebServerFactory> servletContainerCustomizer() {
 		Map<String, String> trustedCertificates = Maps.newHashMap();
 		trustedCertificates.put("oadrRsaRootCertificate", oadrRsaRootCertificate);
 		trustedCertificates.put("oadrRsaIntermediateCertificate", oadrRsaIntermediateCertificate);
@@ -85,15 +87,15 @@ public class VTN20bApplication {
 		return null;
 	}
 
-	@Bean(initMethod = "start", destroyMethod = "stop")
-	public BrokerService broker() throws Exception {
-		final BrokerService broker = new BrokerService();
-		// broker.addConnector("tcp://localhost:61616");
-		broker.addConnector("vm://localhost");
-		broker.setPersistent(false);
-		// default messages store is under AMQ_HOME/data/KahaDB/
-		return broker;
-	}
+//	@Bean(initMethod = "start", destroyMethod = "stop")
+//	public BrokerService broker() throws Exception {
+//		final BrokerService broker = new BrokerService();
+//		// broker.addConnector("tcp://localhost:61616");
+//		broker.addConnector("vm://localhost");
+//		broker.setPersistent(false);
+//		// default messages store is under AMQ_HOME/data/KahaDB/
+//		return broker;
+//	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(VTN20bApplication.class, args);

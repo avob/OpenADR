@@ -2,11 +2,10 @@ package com.avob.openadr.server.oadr20b.ven;
 
 import java.security.KeyStore;
 
-import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
-import org.springframework.boot.context.embedded.jetty.JettyEmbeddedServletContainerFactory;
+import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 
-public class VENEmbeddedServletContainerCustomizer implements EmbeddedServletContainerCustomizer {
+public class VENEmbeddedServletContainerCustomizer implements WebServerFactoryCustomizer<JettyServletWebServerFactory> {
 
 	private int port;
 	private KeyStore keystore;
@@ -28,13 +27,8 @@ public class VENEmbeddedServletContainerCustomizer implements EmbeddedServletCon
 	}
 
 	@Override
-	public void customize(ConfigurableEmbeddedServletContainer container) {
-		if (container instanceof JettyEmbeddedServletContainerFactory) {
-			configureJetty((JettyEmbeddedServletContainerFactory) container);
-		}
-	}
+	public void customize(JettyServletWebServerFactory jettyFactory) {
 
-	private void configureJetty(JettyEmbeddedServletContainerFactory jettyFactory) {
 		jettyFactory.setRegisterDefaultServlet(false);
 		if (contextPath != null && !"".equals(contextPath.trim())) {
 			jettyFactory.setContextPath(contextPath);
@@ -42,4 +36,5 @@ public class VENEmbeddedServletContainerCustomizer implements EmbeddedServletCon
 		jettyFactory.addServerCustomizers(
 				new VENJettyServerCustomizer(port, keystore, keystorePass, truststore, protocols, ciphers));
 	}
+
 }

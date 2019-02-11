@@ -49,6 +49,7 @@ import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
+import com.avob.openadr.server.common.vtn.security.DigestAuthenticationProvider;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.OadrUserService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
@@ -185,13 +186,13 @@ public class Oadr20bVTNSecurityTest {
 
 		String username = "securityVen1";
 		String password = "securityVen1";
-		String realm = "";
-		String nonce = "";
+		String realm = DigestAuthenticationProvider.DIGEST_REALM;
+		String key = DigestAuthenticationProvider.DIGEST_KEY;
 
 		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
 				.withTrustedCertificate(Arrays.asList(allCerts))
 				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers())
-				.withDefaultDigestAuthentication(eiEventEndpointUrl, realm, nonce, username, password);
+				.withDefaultDigestAuthentication(eiEventEndpointUrl, realm, key, username, password);
 
 		OadrHttpVenClient20b digestHttpClient = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
 

@@ -3,6 +3,7 @@ package com.avob.openadr.server.oadr20b.vtn.service;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBElement;
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.avob.openadr.model.oadr20a.builders.Oadr20aBuilders;
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiBuilders;
@@ -63,8 +63,6 @@ import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketConte
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenRequestCountService;
 import com.avob.openadr.server.common.vtn.service.VenService;
-import com.avob.openadr.server.oadr20a.vtn.exception.Oadr20aCreatedEventApplicationLayerException;
-import com.avob.openadr.server.oadr20a.vtn.service.Oadr20aVTNEiEventService;
 import com.avob.openadr.server.oadr20b.vtn.converter.OptConverter;
 import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bCreatedEventApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bRequestEventApplicationLayerException;
@@ -72,446 +70,446 @@ import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bRequestEvent
 @Service
 public class Oadr20bVTNEiEventService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20aVTNEiEventService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiEventService.class);
 
-    private static final String SIMPLE_SIGNAL_NAME = "simple";
+	private static final String SIMPLE_SIGNAL_NAME = "simple";
 
-    @Value("${oadr.vtnid}")
-    private String vtnId;
+	@Value("${oadr.vtnid}")
+	private String vtnId;
 
-    @Resource
-    private DemandResponseEventService demandResponseEventService;
+	@Resource
+	private DemandResponseEventService demandResponseEventService;
 
-    @Resource
-    private VenRequestCountService venRequestCountService;
+	@Resource
+	private VenRequestCountService venRequestCountService;
 
-    @Resource
-    private VenService venService;
+	@Resource
+	private VenService venService;
 
-    @Resource
-    private XmlSignatureService xmlSignatureService;
+	@Resource
+	private XmlSignatureService xmlSignatureService;
 
-    /**
-     * xml date/duration factory
-     */
-    private static DatatypeFactory datatypeFactory;
+	/**
+	 * xml date/duration factory
+	 */
+	private static DatatypeFactory datatypeFactory;
 
-    static {
-        try {
-            datatypeFactory = DatatypeFactory.newInstance();
-        } catch (DatatypeConfigurationException e) {
-            throw new OadrVTNInitializationException(e);
-        }
-    }
+	static {
+		try {
+			datatypeFactory = DatatypeFactory.newInstance();
+		} catch (DatatypeConfigurationException e) {
+			throw new OadrVTNInitializationException(e);
+		}
+	}
 
-    private Oadr20bJAXBContext jaxbContext;
+	private Oadr20bJAXBContext jaxbContext;
 
-    public Oadr20bVTNEiEventService() throws JAXBException {
-        jaxbContext = Oadr20bJAXBContext.getInstance();
-    }
+	public Oadr20bVTNEiEventService() throws JAXBException {
+		jaxbContext = Oadr20bJAXBContext.getInstance();
+	}
 
-    public void checkMatchUsernameWithRequestVenId(String username, OadrCreatedEventType oadrCreatedEvent)
-            throws Oadr20bCreatedEventApplicationLayerException {
-        if (!username.equals(oadrCreatedEvent.getEiCreatedEvent().getVenID())) {
-            String requestID = oadrCreatedEvent.getEiCreatedEvent().getEiResponse().getRequestID();
-            EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-                    .newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username,
-                            oadrCreatedEvent.getEiCreatedEvent().getVenID())
-                    .build();
-            throw new Oadr20bCreatedEventApplicationLayerException(
-                    mismatchCredentialsVenIdResponse.getResponseDescription(), Oadr20bResponseBuilders
-                            .newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, username).build());
-        }
-    }
+	public void checkMatchUsernameWithRequestVenId(String username, OadrCreatedEventType oadrCreatedEvent)
+			throws Oadr20bCreatedEventApplicationLayerException {
+		if (!username.equals(oadrCreatedEvent.getEiCreatedEvent().getVenID())) {
+			String requestID = oadrCreatedEvent.getEiCreatedEvent().getEiResponse().getRequestID();
+			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username,
+							oadrCreatedEvent.getEiCreatedEvent().getVenID())
+					.build();
+			throw new Oadr20bCreatedEventApplicationLayerException(
+					mismatchCredentialsVenIdResponse.getResponseDescription(), Oadr20bResponseBuilders
+							.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, username).build());
+		}
+	}
 
-    public void checkMatchUsernameWithRequestVenId(String username, OadrRequestEventType oadrRequestEvent)
-            throws Oadr20bRequestEventApplicationLayerException {
-        String requestID = oadrRequestEvent.getEiRequestEvent().getRequestID();
-        String venID = oadrRequestEvent.getEiRequestEvent().getVenID();
-        if (!username.equals(venID)) {
-            EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-                    .newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();
-            throw new Oadr20bRequestEventApplicationLayerException(
-                    mismatchCredentialsVenIdResponse.getResponseDescription(),
-                    Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder(vtnId, requestID)
-                            .withEiResponse(mismatchCredentialsVenIdResponse).build());
-        }
-    }
+	public void checkMatchUsernameWithRequestVenId(String username, OadrRequestEventType oadrRequestEvent)
+			throws Oadr20bRequestEventApplicationLayerException {
+		String requestID = oadrRequestEvent.getEiRequestEvent().getRequestID();
+		String venID = oadrRequestEvent.getEiRequestEvent().getVenID();
+		if (!username.equals(venID)) {
+			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();
+			throw new Oadr20bRequestEventApplicationLayerException(
+					mismatchCredentialsVenIdResponse.getResponseDescription(),
+					Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder(vtnId, requestID)
+							.withEiResponse(mismatchCredentialsVenIdResponse).build());
+		}
+	}
 
-    private void processEventResponseFromOadrCreatedEvent(Ven ven, EventResponse response)
-            throws Oadr20aCreatedEventApplicationLayerException {
-        String requestID = response.getRequestID();
+	private void processEventResponseFromOadrCreatedEvent(Ven ven, EventResponse response)
+			throws Oadr20bCreatedEventApplicationLayerException {
+		String requestID = response.getRequestID();
 
-        QualifiedEventIDType qualifiedEventID = response.getQualifiedEventID();
-        String eventID = qualifiedEventID.getEventID();
-        long modificationNumber = qualifiedEventID.getModificationNumber();
+		QualifiedEventIDType qualifiedEventID = response.getQualifiedEventID();
+		String eventID = qualifiedEventID.getEventID();
+		long modificationNumber = qualifiedEventID.getModificationNumber();
 
-        DemandResponseEvent findById = demandResponseEventService.findById(Long.parseLong(eventID));
+		Optional<DemandResponseEvent> op = demandResponseEventService.findById(Long.parseLong(eventID));
 
-        if (findById == null) {
-            String description = "eiCreatedEvent:unknown event with id: " + eventID;
-            throw new Oadr20aCreatedEventApplicationLayerException(description,
-                    Oadr20aBuilders.newOadr20aResponseBuilder(requestID, HttpStatus.NOT_FOUND_404)
-                            .withDescription(description).build());
-        }
+		if (!op.isPresent()) {
+			String description = "eiCreatedEvent:unknown event with id: " + eventID;
+			throw new Oadr20bCreatedEventApplicationLayerException(description, Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder(requestID, HttpStatus.NOT_FOUND_404, ven.getUsername()).build());
 
-        if (findById.getModificationNumber() != modificationNumber) {
+		}
 
-            String description = "eiCreatedEvent:mismatch modification number for event with id: " + eventID;
-            throw new Oadr20aCreatedEventApplicationLayerException(description,
-                    Oadr20aBuilders.newOadr20aResponseBuilder(requestID, HttpStatus.NOT_ACCEPTABLE_406)
-                            .withDescription(description).build());
-        }
+		DemandResponseEvent findById = op.get();
 
-        int responseCode = Integer.valueOf(response.getResponseCode());
+		if (findById.getModificationNumber() != modificationNumber) {
 
-        if (HttpStatus.OK_200 == responseCode) {
-            OptTypeType optType = response.getOptType();
-            demandResponseEventService.updateVenOpt(Long.parseLong(eventID), modificationNumber, ven.getUsername(),
-                    OptConverter.convert(optType));
-        }
-        // TODO bertrand: if responseCode is not OK, that's mean VEN somehow
-        // could not understand previously sent DREvent. Maybe we should here
-        // invalidate this event for this VEN or something...
+			String description = "eiCreatedEvent:mismatch modification number for event with id: " + eventID;
+			throw new Oadr20bCreatedEventApplicationLayerException(description, Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder(requestID, HttpStatus.NOT_ACCEPTABLE_406, ven.getUsername()).build());
+		}
 
-    }
+		int responseCode = Integer.valueOf(response.getResponseCode());
 
-    public String oadrCreatedEvent(OadrCreatedEventType event, boolean signed)
-            throws Oadr20bCreatedEventApplicationLayerException, Oadr20bXMLSignatureException, Oadr20bMarshalException {
-        EiCreatedEvent eiCreatedEvent = event.getEiCreatedEvent();
+		if (HttpStatus.OK_200 == responseCode) {
+			OptTypeType optType = response.getOptType();
+			demandResponseEventService.updateVenOpt(Long.parseLong(eventID), modificationNumber, ven.getUsername(),
+					OptConverter.convert(optType));
+		}
+		// TODO bertrand: if responseCode is not OK, that's mean VEN somehow
+		// could not understand previously sent DREvent. Maybe we should here
+		// invalidate this event for this VEN or something...
 
-        String requestID = eiCreatedEvent.getEiResponse().getRequestID();
+	}
 
-        String venID = eiCreatedEvent.getVenID();
+	public String oadrCreatedEvent(OadrCreatedEventType event, boolean signed)
+			throws Oadr20bCreatedEventApplicationLayerException, Oadr20bXMLSignatureException, Oadr20bMarshalException {
+		EiCreatedEvent eiCreatedEvent = event.getEiCreatedEvent();
 
-        Ven ven = venService.findOneByUsername(venID);
+		String requestID = eiCreatedEvent.getEiResponse().getRequestID();
 
-        if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
-            EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-                    .newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
-            throw new Oadr20bCreatedEventApplicationLayerException(
-                    xmlSignatureRequiredButAbsent.getResponseDescription(),
-                    Oadr20bResponseBuilders.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build());
-        }
+		String venID = eiCreatedEvent.getVenID();
 
-        int responseCode = HttpStatus.OK_200;
-        for (EventResponse response : eiCreatedEvent.getEventResponses().getEventResponse()) {
-            try {
-                processEventResponseFromOadrCreatedEvent(ven, response);
-            } catch (Oadr20aCreatedEventApplicationLayerException e) {
-                LOGGER.warn(e.getMessage(), e);
-                responseCode = HttpStatus.NOT_ACCEPTABLE_406;
-            }
-        }
+		Ven ven = venService.findOneByUsername(venID);
 
-        OadrResponseType response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID, responseCode, venID)
-                .build();
-        if (signed) {
-            return xmlSignatureService.sign(response);
-        } else {
-            return jaxbContext.marshalRoot(response);
-        }
-    }
+		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
+			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
+			throw new Oadr20bCreatedEventApplicationLayerException(
+					xmlSignatureRequiredButAbsent.getResponseDescription(),
+					Oadr20bResponseBuilders.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build());
+		}
 
-    public String oadrRequestEvent(OadrRequestEventType event, boolean signed)
-            throws Oadr20bRequestEventApplicationLayerException, Oadr20bXMLSignatureException, Oadr20bMarshalException {
+		int responseCode = HttpStatus.OK_200;
+		for (EventResponse response : eiCreatedEvent.getEventResponses().getEventResponse()) {
+			try {
+				processEventResponseFromOadrCreatedEvent(ven, response);
+			} catch (Oadr20bCreatedEventApplicationLayerException e) {
+				LOGGER.warn(e.getMessage(), e);
+				responseCode = HttpStatus.NOT_ACCEPTABLE_406;
+			}
+		}
 
-        String venRequestID = event.getEiRequestEvent().getRequestID();
+		OadrResponseType response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID, responseCode, venID)
+				.build();
+		if (signed) {
+			return xmlSignatureService.sign(response);
+		} else {
+			return jaxbContext.marshalRoot(response);
+		}
+	}
 
-        Long replyLimit = event.getEiRequestEvent().getReplyLimit();
+	public String oadrRequestEvent(OadrRequestEventType event, boolean signed)
+			throws Oadr20bRequestEventApplicationLayerException, Oadr20bXMLSignatureException, Oadr20bMarshalException {
 
-        String venID = event.getEiRequestEvent().getVenID();
+		String venRequestID = event.getEiRequestEvent().getRequestID();
 
-        Ven ven = venService.findOneByUsername(venID);
+		Long replyLimit = event.getEiRequestEvent().getReplyLimit();
 
-        if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
-            EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-                    .newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(venRequestID, venID).build();
-            throw new Oadr20bRequestEventApplicationLayerException(
-                    xmlSignatureRequiredButAbsent.getResponseDescription(),
-                    Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder(vtnId, venRequestID)
-                            .withEiResponse(xmlSignatureRequiredButAbsent).build());
-        }
+		String venID = event.getEiRequestEvent().getVenID();
 
-        List<DemandResponseEvent> findByVenId = demandResponseEventService.findToSentEventByVen(ven, replyLimit);
+		Ven ven = venService.findOneByUsername(venID);
 
-        // oadr events
-        OadrDistributeEventType response = null;
-        if (findByVenId == null || findByVenId.isEmpty()) {
-            Long andIncrease = venRequestCountService.getAndIncrease(venID);
-            EiResponseType eiResponse = Oadr20bResponseBuilders
-                    .newOadr20bEiResponseBuilder(venRequestID, HttpStatus.OK_200).build();
-            response = Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder(vtnId, Long.toString(andIncrease))
-                    .withEiResponse(eiResponse).build();
-        } else {
-            response = createOadrDistributeEventPayload(venID, venRequestID, findByVenId);
-        }
-        if (signed) {
-            return xmlSignatureService.sign(response);
-        } else {
-            return jaxbContext.marshalRoot(response);
-        }
+		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
+			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(venRequestID, venID).build();
+			throw new Oadr20bRequestEventApplicationLayerException(
+					xmlSignatureRequiredButAbsent.getResponseDescription(),
+					Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder(vtnId, venRequestID)
+							.withEiResponse(xmlSignatureRequiredButAbsent).build());
+		}
 
-    }
+		List<DemandResponseEvent> findByVenId = demandResponseEventService.findToSentEventByVen(ven, replyLimit);
 
-    public OadrDistributeEventType createOadrDistributeEventPayload(String venId, List<DemandResponseEvent> events) {
-        return createOadrDistributeEventPayload(venId, "", events);
-    }
+		// oadr events
+		OadrDistributeEventType response = null;
+		if (findByVenId == null || findByVenId.isEmpty()) {
+			Long andIncrease = venRequestCountService.getAndIncrease(venID);
+			EiResponseType eiResponse = Oadr20bResponseBuilders
+					.newOadr20bEiResponseBuilder(venRequestID, HttpStatus.OK_200).build();
+			response = Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder(vtnId, Long.toString(andIncrease))
+					.withEiResponse(eiResponse).build();
+		} else {
+			response = createOadrDistributeEventPayload(venID, venRequestID, findByVenId);
+		}
+		if (signed) {
+			return xmlSignatureService.sign(response);
+		} else {
+			return jaxbContext.marshalRoot(response);
+		}
 
-    private OadrDistributeEventType createOadrDistributeEventPayload(String venId, String eiResponseRequestId,
-            List<DemandResponseEvent> events) {
-        Long now = System.currentTimeMillis();
-        // vtn request id
-        Long andIncrease = venRequestCountService.getAndIncrease(venId);
-        EiResponseType eiResponse = Oadr20bResponseBuilders
-                .newOadr20bEiResponseBuilder(eiResponseRequestId, HttpStatus.OK_200).build();
-        Oadr20bDistributeEventBuilder builder = Oadr20bEiEventBuilders
-                .newOadr20bDistributeEventBuilder(vtnId, Long.toString(andIncrease)).withEiResponse(eiResponse);
+	}
 
-        for (DemandResponseEvent drEvent : events) {
-            EventDescriptorType createEventDescriptor = createEventDescriptor(drEvent);
+	public OadrDistributeEventType createOadrDistributeEventPayload(String venId, List<DemandResponseEvent> events) {
+		return createOadrDistributeEventPayload(venId, "", events);
+	}
 
-            boolean needResponse = !demandResponseEventService.hasResponded(venId, drEvent);
+	private OadrDistributeEventType createOadrDistributeEventPayload(String venId, String eiResponseRequestId,
+			List<DemandResponseEvent> events) {
+		Long now = System.currentTimeMillis();
+		// vtn request id
+		Long andIncrease = venRequestCountService.getAndIncrease(venId);
+		EiResponseType eiResponse = Oadr20bResponseBuilders
+				.newOadr20bEiResponseBuilder(eiResponseRequestId, HttpStatus.OK_200).build();
+		Oadr20bDistributeEventBuilder builder = Oadr20bEiEventBuilders
+				.newOadr20bDistributeEventBuilder(vtnId, Long.toString(andIncrease)).withEiResponse(eiResponse);
 
-            if (drEvent.getEvent() == null) {
-                builder.addOadrEvent(Oadr20bEiEventBuilders.newOadr20bDistributeEventOadrEventBuilder()
-                        .withEventDescriptor(createEventDescriptor).withActivePeriod(createActivePeriod(drEvent))
-                        .addEiEventSignal(createEventSignal(drEvent, createEventDescriptor))
-                        .withEiTarget(createEventTarget(venId)).withResponseRequired(needResponse).build());
-            } else {
-                Object unmarshal;
-                try {
-                    unmarshal = jaxbContext.unmarshal(drEvent.getEvent(), false);
-                    if (unmarshal instanceof EiEventType) {
+		for (DemandResponseEvent drEvent : events) {
+			EventDescriptorType createEventDescriptor = createEventDescriptor(drEvent);
 
-                        EiEventType eventType = (EiEventType) unmarshal;
-                        EiEventSignalsType eiEventSignals = eventType.getEiEventSignals();
+			boolean needResponse = !demandResponseEventService.hasResponded(venId, drEvent);
 
-                        setSignalsCurrentValue(eiEventSignals, createEventDescriptor, now);
+			if (drEvent.getEvent() == null) {
+				builder.addOadrEvent(Oadr20bEiEventBuilders.newOadr20bDistributeEventOadrEventBuilder()
+						.withEventDescriptor(createEventDescriptor).withActivePeriod(createActivePeriod(drEvent))
+						.addEiEventSignal(createEventSignal(drEvent, createEventDescriptor))
+						.withEiTarget(createEventTarget(venId)).withResponseRequired(needResponse).build());
+			} else {
+				Object unmarshal;
+				try {
+					unmarshal = jaxbContext.unmarshal(drEvent.getEvent(), false);
+					if (unmarshal instanceof EiEventType) {
 
-                        Oadr20bDistributeEventOadrEventBuilder oadrEventBuilder = Oadr20bEiEventBuilders
-                                .newOadr20bDistributeEventOadrEventBuilder(eventType)
-                                .withEventDescriptor(createEventDescriptor)
+						EiEventType eventType = (EiEventType) unmarshal;
+						EiEventSignalsType eiEventSignals = eventType.getEiEventSignals();
+
+						setSignalsCurrentValue(eiEventSignals, createEventDescriptor, now);
+
+						Oadr20bDistributeEventOadrEventBuilder oadrEventBuilder = Oadr20bEiEventBuilders
+								.newOadr20bDistributeEventOadrEventBuilder(eventType)
+								.withEventDescriptor(createEventDescriptor)
 //                                .addEiEventSignal(eiEventSignals.getEiEventSignal())
-                                .withEiEventBaseline(eiEventSignals.getEiEventBaseline())
-                                .withEiTarget(eventType.getEiTarget())
-                                .withResponseRequired(needResponse);
+								.withEiEventBaseline(eiEventSignals.getEiEventBaseline())
+								.withEiTarget(eventType.getEiTarget()).withResponseRequired(needResponse);
 
-                        builder.addOadrEvent(oadrEventBuilder.build());
-                    }
+						builder.addOadrEvent(oadrEventBuilder.build());
+					}
 
-                } catch (Oadr20bUnmarshalException e) {
-                    // TODO bertrand: do something ? It could be normal not to
-                    // be able to unmarshal this because of profile b events
-                    LOGGER.warn("", e);
-                }
+				} catch (Oadr20bUnmarshalException e) {
+					// TODO bertrand: do something ? It could be normal not to
+					// be able to unmarshal this because of profile b events
+					LOGGER.warn("", e);
+				}
 
-            }
+			}
 
-        }
+		}
 
-        return builder.build();
-    }
+		return builder.build();
+	}
 
-    /**
-     * @param drEvent
-     * @return
-     * @throws DatatypeConfigurationException
-     */
-    private EiActivePeriodType createActivePeriod(DemandResponseEvent drEvent) {
+	/**
+	 * @param drEvent
+	 * @return
+	 * @throws DatatypeConfigurationException
+	 */
+	private EiActivePeriodType createActivePeriod(DemandResponseEvent drEvent) {
 
-        Long start = drEvent.getStart();
-        String xmlDuration = drEvent.getDuration();
-        String toleranceDuration = drEvent.getToleranceDuration();
-        String rampUpDuration = drEvent.getRampUpDuration();
-        String recoveryDuration = drEvent.getRecoveryDuration();
-        String notificationDuration = drEvent.getNotificationDuration();
+		Long start = drEvent.getStart();
+		String xmlDuration = drEvent.getDuration();
+		String toleranceDuration = drEvent.getToleranceDuration();
+		String rampUpDuration = drEvent.getRampUpDuration();
+		String recoveryDuration = drEvent.getRecoveryDuration();
+		String notificationDuration = drEvent.getNotificationDuration();
 
-        Oadr20bEiActivePeriodTypeBuilder builder = Oadr20bEiEventBuilders.newOadr20bEiActivePeriodTypeBuilder(start,
-                xmlDuration, toleranceDuration, notificationDuration);
+		Oadr20bEiActivePeriodTypeBuilder builder = Oadr20bEiEventBuilders.newOadr20bEiActivePeriodTypeBuilder(start,
+				xmlDuration, toleranceDuration, notificationDuration);
 
-        if (rampUpDuration != null) {
-            builder.withRampUp(rampUpDuration);
-        }
+		if (rampUpDuration != null) {
+			builder.withRampUp(rampUpDuration);
+		}
 
-        if (recoveryDuration != null) {
-            builder.withRecovery(recoveryDuration);
-        }
+		if (recoveryDuration != null) {
+			builder.withRecovery(recoveryDuration);
+		}
 
-        return builder.build();
+		return builder.build();
 
-    }
+	}
 
-    /**
-     * Calling ven is the only target onf the drEvent
-     * 
-     * @param drEvent
-     * @return
-     */
-    private EiTargetType createEventTarget(String callingVenUsername) {
-        Oadr20bEiTargetTypeBuilder builder = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder();
-        builder.addVenId(callingVenUsername);
-        return builder.build();
-    }
+	/**
+	 * Calling ven is the only target onf the drEvent
+	 * 
+	 * @param drEvent
+	 * @return
+	 */
+	private EiTargetType createEventTarget(String callingVenUsername) {
+		Oadr20bEiTargetTypeBuilder builder = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder();
+		builder.addVenId(callingVenUsername);
+		return builder.build();
+	}
 
-    private void setSignalsCurrentValue(EiEventSignalsType eiEventSignals, EventDescriptorType descriptor,
-            Long nowTimestamp) {
+	private void setSignalsCurrentValue(EiEventSignalsType eiEventSignals, EventDescriptorType descriptor,
+			Long nowTimestamp) {
 
-        for (EiEventSignalType eiEventSignalType : eiEventSignals.getEiEventSignal()) {
+		for (EiEventSignalType eiEventSignalType : eiEventSignals.getEiEventSignal()) {
 
-            // the current value of a signal is undefined when signal is not
-            // active, except for a "simple" signal which default to "0" (normal
-            // behavior)
-            Float currentValue = null;
-            if (SIMPLE_SIGNAL_NAME.equals(eiEventSignalType.getSignalName().trim())) {
-                currentValue = 0F;
-            }
+			// the current value of a signal is undefined when signal is not
+			// active, except for a "simple" signal which default to "0" (normal
+			// behavior)
+			Float currentValue = null;
+			if (SIMPLE_SIGNAL_NAME.equals(eiEventSignalType.getSignalName().trim())) {
+				currentValue = 0F;
+			}
 
-            for (IntervalType intervalType : eiEventSignalType.getIntervals().getInterval()) {
+			for (IntervalType intervalType : eiEventSignalType.getIntervals().getInterval()) {
 
-                Dtstart dtstart = intervalType.getDtstart();
-                DurationPropType duration = intervalType.getDuration();
+				Dtstart dtstart = intervalType.getDtstart();
+				DurationPropType duration = intervalType.getDuration();
 
-                Long start = Oadr20bFactory.xmlCalendarToTimestamp(dtstart.getDateTime());
-                Long end = Oadr20bFactory.addXMLDurationToTimestamp(start, duration.getDuration());
+				Long start = Oadr20bFactory.xmlCalendarToTimestamp(dtstart.getDateTime());
+				Long end = Oadr20bFactory.addXMLDurationToTimestamp(start, duration.getDuration());
 
-                List<JAXBElement<? extends StreamPayloadBaseType>> streamPayloadBases = intervalType
-                        .getStreamPayloadBase();
-                for (JAXBElement<? extends StreamPayloadBaseType> streamPayloadBase : streamPayloadBases) {
-                    if (streamPayloadBase.getDeclaredType().equals(SignalPayloadType.class)) {
-                        SignalPayloadType value = (SignalPayloadType) streamPayloadBase.getValue();
-                        JAXBElement<? extends PayloadBaseType> payloadBase = value.getPayloadBase();
-                        if (payloadBase.getDeclaredType().equals(PayloadFloatType.class)) {
+				List<JAXBElement<? extends StreamPayloadBaseType>> streamPayloadBases = intervalType
+						.getStreamPayloadBase();
+				for (JAXBElement<? extends StreamPayloadBaseType> streamPayloadBase : streamPayloadBases) {
+					if (streamPayloadBase.getDeclaredType().equals(SignalPayloadType.class)) {
+						SignalPayloadType value = (SignalPayloadType) streamPayloadBase.getValue();
+						JAXBElement<? extends PayloadBaseType> payloadBase = value.getPayloadBase();
+						if (payloadBase.getDeclaredType().equals(PayloadFloatType.class)) {
 
-                            PayloadFloatType payloadFloatType = (PayloadFloatType) payloadBase.getValue();
-                            // if event and interval is active
-                            if (EventStatusEnumeratedType.ACTIVE.equals(descriptor.getEventStatus())
-                                    && start <= nowTimestamp && (end > nowTimestamp || end == null)) {
-                                currentValue = payloadFloatType.getValue();
-                            }
+							PayloadFloatType payloadFloatType = (PayloadFloatType) payloadBase.getValue();
+							// if event and interval is active
+							if (EventStatusEnumeratedType.ACTIVE.equals(descriptor.getEventStatus())
+									&& start <= nowTimestamp && (end > nowTimestamp || end == null)) {
+								currentValue = payloadFloatType.getValue();
+							}
 
-                        } else if (payloadBase.getDeclaredType().equals(OadrPayloadResourceStatusType.class)) {
-                            // TODO bertrand: deal with those kind of interval
-                        }
+						} else if (payloadBase.getDeclaredType().equals(OadrPayloadResourceStatusType.class)) {
+							// TODO bertrand: deal with those kind of interval
+						}
 
-                    }
-                }
+					}
+				}
 
-            }
-            if (currentValue != null) {
-                eiEventSignalType.setCurrentValue(Oadr20bFactory.createCurrentValueType(currentValue));
-            }
-        }
-    }
+			}
+			if (currentValue != null) {
+				eiEventSignalType.setCurrentValue(Oadr20bFactory.createCurrentValueType(currentValue));
+			}
+		}
+	}
 
-    /**
-     * create event signals for a specific DREvent
-     * 
-     * current implementation only specified 1 signal with one interval
-     * 
-     * @param drEvent
-     * @return
-     */
-    private EiEventSignalType createEventSignal(DemandResponseEvent drEvent, EventDescriptorType descriptor) {
+	/**
+	 * create event signals for a specific DREvent
+	 * 
+	 * current implementation only specified 1 signal with one interval
+	 * 
+	 * @param drEvent
+	 * @return
+	 */
+	private EiEventSignalType createEventSignal(DemandResponseEvent drEvent, EventDescriptorType descriptor) {
 
-        Long start = drEvent.getStart();
-        String signalId = "0";
-        // signal name: MUST be 'simple' for 20a spec
-        String signalName = SIMPLE_SIGNAL_NAME;
-        String intervalId = "0";
-        String xmlDuration = drEvent.getDuration();
-        SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
+		Long start = drEvent.getStart();
+		String signalId = "0";
+		// signal name: MUST be 'simple' for 20a spec
+		String signalName = SIMPLE_SIGNAL_NAME;
+		String intervalId = "0";
+		String xmlDuration = drEvent.getDuration();
+		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
 
-        // signal value: either 0,1,2,3 for 20a spec
-        // spec conformance 14: current value must be set to 0 when event is not
-        // active
-        float currentValue = 0F;
+		// signal value: either 0,1,2,3 for 20a spec
+		// spec conformance 14: current value must be set to 0 when event is not
+		// active
+		float currentValue = 0F;
 
-        if (EventStatusEnumeratedType.ACTIVE.equals(descriptor.getEventStatus())) {
-            currentValue = (float) drEvent.getValue().getValue();
-        }
-        List<Float> currentValues = Arrays.asList(currentValue);
+		if (EventStatusEnumeratedType.ACTIVE.equals(descriptor.getEventStatus())) {
+			currentValue = (float) drEvent.getValue().getValue();
+		}
+		List<Float> currentValues = Arrays.asList(currentValue);
 
-        IntervalType interval = Oadr20bEiBuilders
-                .newOadr20bSignalIntervalTypeBuilder(intervalId, start, xmlDuration, currentValues).build();
+		IntervalType interval = Oadr20bEiBuilders
+				.newOadr20bSignalIntervalTypeBuilder(intervalId, start, xmlDuration, currentValues).build();
 
-        return Oadr20bEiEventBuilders.newOadr20bEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue)
-                .addInterval(interval).build();
+		return Oadr20bEiEventBuilders.newOadr20bEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue)
+				.addInterval(interval).build();
 
-    }
+	}
 
-    private EventStatusEnumeratedType getOadrEventStatus(Date now, long start, long end, long startNotification,
-            String rampUpDuration) {
-        EventStatusEnumeratedType status = null;
-        Date dateStart = new Date();
-        dateStart.setTime(start);
+	private EventStatusEnumeratedType getOadrEventStatus(Date now, long start, long end, long startNotification,
+			String rampUpDuration) {
+		EventStatusEnumeratedType status = null;
+		Date dateStart = new Date();
+		dateStart.setTime(start);
 
-        Date dateEnd = new Date();
-        dateEnd.setTime(end);
+		Date dateEnd = new Date();
+		dateEnd.setTime(end);
 
-        Date dateStartNotification = new Date();
-        dateStartNotification.setTime(startNotification);
+		Date dateStartNotification = new Date();
+		dateStartNotification.setTime(startNotification);
 
-        Date dateStartNear = new Date();
-        dateStartNear.setTime(start);
-        if (rampUpDuration != null) {
-            Duration newDuration = datatypeFactory.newDuration(rampUpDuration);
-            long timeInMillis = newDuration.getTimeInMillis(dateStart);
-            dateStartNear.setTime(start - timeInMillis);
-        }
+		Date dateStartNear = new Date();
+		dateStartNear.setTime(start);
+		if (rampUpDuration != null) {
+			Duration newDuration = datatypeFactory.newDuration(rampUpDuration);
+			long timeInMillis = newDuration.getTimeInMillis(dateStart);
+			dateStartNear.setTime(start - timeInMillis);
+		}
 
-        if (now.equals(dateEnd) || now.after(dateEnd)) {
-            status = EventStatusEnumeratedType.COMPLETED;
-        } else if (now.equals(dateStart) || (now.before(dateEnd) && now.after(dateStart))) {
-            status = EventStatusEnumeratedType.ACTIVE;
-        } else if (now.equals(dateStartNear) || (now.before(dateStart) && now.after(dateStartNear))) {
-            status = EventStatusEnumeratedType.NEAR;
-        } else if (now.equals(dateStartNotification)
-                || (now.before(dateStartNear) && now.after(dateStartNotification))) {
-            status = EventStatusEnumeratedType.FAR;
-        } else {
-            status = EventStatusEnumeratedType.NONE;
-        }
+		if (now.equals(dateEnd) || now.after(dateEnd)) {
+			status = EventStatusEnumeratedType.COMPLETED;
+		} else if (now.equals(dateStart) || (now.before(dateEnd) && now.after(dateStart))) {
+			status = EventStatusEnumeratedType.ACTIVE;
+		} else if (now.equals(dateStartNear) || (now.before(dateStart) && now.after(dateStartNear))) {
+			status = EventStatusEnumeratedType.NEAR;
+		} else if (now.equals(dateStartNotification)
+				|| (now.before(dateStartNear) && now.after(dateStartNotification))) {
+			status = EventStatusEnumeratedType.FAR;
+		} else {
+			status = EventStatusEnumeratedType.NONE;
+		}
 
-        return status;
-    }
+		return status;
+	}
 
-    /**
-     * create EventDescriptorType for a specific DemandResponseEvent
-     * 
-     * @param drEvent
-     * @return
-     * @throws DatatypeConfigurationException
-     */
-    private EventDescriptorType createEventDescriptor(DemandResponseEvent drEvent) {
+	/**
+	 * create EventDescriptorType for a specific DemandResponseEvent
+	 * 
+	 * @param drEvent
+	 * @return
+	 * @throws DatatypeConfigurationException
+	 */
+	private EventDescriptorType createEventDescriptor(DemandResponseEvent drEvent) {
 
-        String eventId = String.valueOf(drEvent.getId());
-        Long start = drEvent.getStart();
-        Long createdTimestamp = drEvent.getCreatedTimestamp();
-        Long end = drEvent.getEnd();
-        Long startNotification = drEvent.getStartNotification();
-        String rampUpDuration = drEvent.getRampUpDuration();
-        VenMarketContext marketContext = drEvent.getMarketContext();
-        DemandResponseEventStateEnum state = drEvent.getState();
+		String eventId = String.valueOf(drEvent.getId());
+		Long start = drEvent.getStart();
+		Long createdTimestamp = drEvent.getCreatedTimestamp();
+		Long end = drEvent.getEnd();
+		Long startNotification = drEvent.getStartNotification();
+		String rampUpDuration = drEvent.getRampUpDuration();
+		VenMarketContext marketContext = drEvent.getMarketContext();
+		DemandResponseEventStateEnum state = drEvent.getState();
 
-        long priority = drEvent.getPriority();
-        boolean testEvent = drEvent.isTestEvent();
-        long modificationNumber = drEvent.getModificationNumber();
-        String vtnComment = drEvent.getVtnComment();
+		long priority = drEvent.getPriority();
+		boolean testEvent = drEvent.isTestEvent();
+		long modificationNumber = drEvent.getModificationNumber();
+		String vtnComment = drEvent.getVtnComment();
 
-        // event status
-        Date now = new Date();
-        EventStatusEnumeratedType status = null;
-        if (DemandResponseEventStateEnum.ACTIVE.equals(state)) {
-            status = getOadrEventStatus(now, start, end, startNotification, rampUpDuration);
-        } else if (DemandResponseEventStateEnum.CANCELED.equals(state)) {
-            status = EventStatusEnumeratedType.CANCELLED;
-        }
+		// event status
+		Date now = new Date();
+		EventStatusEnumeratedType status = null;
+		if (DemandResponseEventStateEnum.ACTIVE.equals(state)) {
+			status = getOadrEventStatus(now, start, end, startNotification, rampUpDuration);
+		} else if (DemandResponseEventStateEnum.CANCELED.equals(state)) {
+			status = EventStatusEnumeratedType.CANCELLED;
+		}
 
-        return Oadr20bEiEventBuilders
-                .newOadr20bEventDescriptorTypeBuilder(createdTimestamp, eventId, modificationNumber,
-                        marketContext.getName(), status)
-                .withPriority(priority).withTestEvent(testEvent).withVtnComment(vtnComment).build();
+		return Oadr20bEiEventBuilders
+				.newOadr20bEventDescriptorTypeBuilder(createdTimestamp, eventId, modificationNumber,
+						marketContext.getName(), status)
+				.withPriority(priority).withTestEvent(testEvent).withVtnComment(vtnComment).build();
 
-    }
+	}
 }

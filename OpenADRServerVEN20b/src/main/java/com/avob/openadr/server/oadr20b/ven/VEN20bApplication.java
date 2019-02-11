@@ -15,7 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -54,7 +55,7 @@ public class VEN20bApplication {
 	private int port;
 
 	@Bean
-	public EmbeddedServletContainerCustomizer servletContainerCustomizer() {
+	public WebServerFactoryCustomizer<JettyServletWebServerFactory> servletContainerCustomizer() {
 
 		try {
 			String password = UUID.randomUUID().toString();

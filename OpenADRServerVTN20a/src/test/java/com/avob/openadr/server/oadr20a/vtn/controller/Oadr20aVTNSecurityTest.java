@@ -45,6 +45,7 @@ import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
+import com.avob.openadr.server.common.vtn.security.DigestAuthenticationProvider;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.OadrUserService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
@@ -59,210 +60,210 @@ import com.google.common.collect.Sets;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class Oadr20aVTNSecurityTest {
 
-    @Value("${oadr.security.vtn.trustcertificate.oadrRsaRootCertificate}")
-    private String oadrRsaRootCertificate;
+	@Value("${oadr.security.vtn.trustcertificate.oadrRsaRootCertificate}")
+	private String oadrRsaRootCertificate;
 
-    @Value("${oadr.security.vtn.trustcertificate.oadrRsaIntermediateCertificate}")
-    private String oadrRsaIntermediateCertificate;
+	@Value("${oadr.security.vtn.trustcertificate.oadrRsaIntermediateCertificate}")
+	private String oadrRsaIntermediateCertificate;
 
-    @Value("${oadr.security.vtn.trustcertificate.oadrEccRootCertificate}")
-    private String oadrEccRootCertificate;
+	@Value("${oadr.security.vtn.trustcertificate.oadrEccRootCertificate}")
+	private String oadrEccRootCertificate;
 
-    @Value("${oadr.security.vtn.trustcertificate.oadrEccIntermediateCertificate}")
-    private String oadrEccIntermediateCertificate;
+	@Value("${oadr.security.vtn.trustcertificate.oadrEccIntermediateCertificate}")
+	private String oadrEccIntermediateCertificate;
 
-    @Value("${oadr.security.ven.rsaPrivateKeyPath}")
-    private String rsaPrivateKeyPemFilePath;
+	@Value("${oadr.security.ven.rsaPrivateKeyPath}")
+	private String rsaPrivateKeyPemFilePath;
 
-    @Value("${oadr.security.ven.rsaCertificatePath}")
-    private String rsaClientCertPemFilePath;
+	@Value("${oadr.security.ven.rsaCertificatePath}")
+	private String rsaClientCertPemFilePath;
 
-    @Value("${oadr.security.ven.eccPrivateKeyPath}")
-    private String eccPrivateKeyPemFilePath;
+	@Value("${oadr.security.ven.eccPrivateKeyPath}")
+	private String eccPrivateKeyPemFilePath;
 
-    @Value("${oadr.security.ven.eccCertificatePath}")
-    private String eccClientCertPemFilePath;
+	@Value("${oadr.security.ven.eccCertificatePath}")
+	private String eccClientCertPemFilePath;
 
-    private static final String eiEventEndpointUrl = "https://localhost:8181/testvtn";
+	private static final String eiEventEndpointUrl = "https://localhost:8181/testvtn";
 
-    private static final String demandResponseEnpointUrl = "https://localhost:8181/testvtn/DemandResponseEvent/";
+	private static final String demandResponseEnpointUrl = "https://localhost:8181/testvtn/DemandResponseEvent/";
 
-    private static final String MARKET_CONTEXT_NAME = "http://oadr.avob.com";
+	private static final String MARKET_CONTEXT_NAME = "http://oadr.avob.com";
 
-    @Resource
-    private VenService venService;
+	@Resource
+	private VenService venService;
 
-    @Resource
-    private VenMarketContextService venMarketContextService;
+	@Resource
+	private VenMarketContextService venMarketContextService;
 
-    @Resource
-    private OadrUserService oadrUserService;
+	@Resource
+	private OadrUserService oadrUserService;
 
-    @Resource
-    private DemandResponseEventService demandResponseEventService;
+	@Resource
+	private DemandResponseEventService demandResponseEventService;
 
-    @Resource
-    private Oadr20aPushService oadr20aDemandResponseEventPushService;
+	@Resource
+	private Oadr20aPushService oadr20aDemandResponseEventPushService;
 
-    private void genericTest(OadrHttpVenClient20a client, Ven ven) throws Oadr20aException, Oadr20aHttpLayerException {
+	private void genericTest(OadrHttpVenClient20a client, Ven ven) throws Oadr20aException, Oadr20aHttpLayerException {
 
-        // valid request
-        OadrRequestEvent event = Oadr20aBuilders.newOadrRequestEventBuilder(ven.getUsername(), "0").build();
-        OadrDistributeEvent oadrRequestEvent = client.oadrRequestEvent(event);
-        assertEquals(String.valueOf(HttpStatus.OK_200), oadrRequestEvent.getEiResponse().getResponseCode());
-        assertEquals(0, oadrRequestEvent.getOadrEvent().size());
+		// valid request
+		OadrRequestEvent event = Oadr20aBuilders.newOadrRequestEventBuilder(ven.getUsername(), "0").build();
+		OadrDistributeEvent oadrRequestEvent = client.oadrRequestEvent(event);
+		assertEquals(String.valueOf(HttpStatus.OK_200), oadrRequestEvent.getEiResponse().getResponseCode());
+		assertEquals(0, oadrRequestEvent.getOadrEvent().size());
 
-        // mismatch request venId and username
-        event = Oadr20aBuilders.newOadrRequestEventBuilder(ven.getUsername() + "2", "0").build();
-        oadrRequestEvent = client.oadrRequestEvent(event);
-        assertEquals(String.valueOf(HttpStatus.UNAUTHORIZED_401), oadrRequestEvent.getEiResponse().getResponseCode());
-        assertEquals(0, oadrRequestEvent.getOadrEvent().size());
+		// mismatch request venId and username
+		event = Oadr20aBuilders.newOadrRequestEventBuilder(ven.getUsername() + "2", "0").build();
+		oadrRequestEvent = client.oadrRequestEvent(event);
+		assertEquals(String.valueOf(HttpStatus.UNAUTHORIZED_401), oadrRequestEvent.getEiResponse().getResponseCode());
+		assertEquals(0, oadrRequestEvent.getOadrEvent().size());
 
-    }
+	}
 
-    @Test
-    public void testX509() throws Oadr20aException, OadrSecurityException, JAXBException, UnrecoverableKeyException,
-            NoSuchAlgorithmException, KeyStoreException, URISyntaxException, Oadr20aHttpLayerException {
+	@Test
+	public void testX509() throws Oadr20aException, OadrSecurityException, JAXBException, UnrecoverableKeyException,
+			NoSuchAlgorithmException, KeyStoreException, URISyntaxException, Oadr20aHttpLayerException {
 
-        String[] allCerts = { oadrRsaRootCertificate, oadrRsaIntermediateCertificate };
+		String[] allCerts = { oadrRsaRootCertificate, oadrRsaIntermediateCertificate };
 
-        // using rsa oadr20a certificate fingerprint as Ven username grant
-        // access
+		// using rsa oadr20a certificate fingerprint as Ven username grant
+		// access
 
-        OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
-                .withTrustedCertificate(Arrays.asList(allCerts))
-                .withProtocol(Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers())
-                .withX509Authentication(rsaPrivateKeyPemFilePath, rsaClientCertPemFilePath);
+		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
+				.withTrustedCertificate(Arrays.asList(allCerts))
+				.withProtocol(Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers())
+				.withX509Authentication(rsaPrivateKeyPemFilePath, rsaClientCertPemFilePath);
 
-        OadrHttpVenClient20a x509HttpClient = new OadrHttpVenClient20a(new OadrHttpClient20a(builder.build()));
+		OadrHttpVenClient20a x509HttpClient = new OadrHttpVenClient20a(new OadrHttpClient20a(builder.build()));
 
-        String username = "0D:4C:E8:02:9B:80:D7:82:8D:11";// "2E:55:12:81:B9:EE:9C:46:72:1D";
-        Ven ven = venService.prepare(username);
-        venService.save(ven);
-        genericTest(x509HttpClient, ven);
-        venService.delete(ven);
+		String username = "0D:4C:E8:02:9B:80:D7:82:8D:11";// "2E:55:12:81:B9:EE:9C:46:72:1D";
+		Ven ven = venService.prepare(username);
+		venService.save(ven);
+		genericTest(x509HttpClient, ven);
+		venService.delete(ven);
 
-        // using ecc oadr20a certificate fingerprint as Ven username grant
-        // access
+		// using ecc oadr20a certificate fingerprint as Ven username grant
+		// access
 
-        builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
-                .withTrustedCertificate(Arrays.asList(allCerts))
-                .withProtocol(Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers())
-                .withX509Authentication(eccPrivateKeyPemFilePath, eccClientCertPemFilePath);
+		builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
+				.withTrustedCertificate(Arrays.asList(allCerts))
+				.withProtocol(Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers())
+				.withX509Authentication(eccPrivateKeyPemFilePath, eccClientCertPemFilePath);
 
-        x509HttpClient = new OadrHttpVenClient20a(new OadrHttpClient20a(builder.build()));
+		x509HttpClient = new OadrHttpVenClient20a(new OadrHttpClient20a(builder.build()));
 
-        username = "B4:50:35:21:C6:02:80:0A:93:D8";// "15:97:7B:DE:1C:1F:C6:D2:64:84";
-        ven = venService.prepare(username);
-        venService.save(ven);
-        genericTest(x509HttpClient, ven);
-        venService.delete(ven);
-    }
+		username = "B4:50:35:21:C6:02:80:0A:93:D8";// "15:97:7B:DE:1C:1F:C6:D2:64:84";
+		ven = venService.prepare(username);
+		venService.save(ven);
+		genericTest(x509HttpClient, ven);
+		venService.delete(ven);
+	}
 
-    @Test
-    public void testDigest() throws Oadr20aException, OadrSecurityException, JAXBException, Oadr20aHttpLayerException {
+	@Test
+	public void testDigest() throws Oadr20aException, OadrSecurityException, JAXBException, Oadr20aHttpLayerException {
 
-        String[] allCerts = { oadrRsaRootCertificate, oadrRsaIntermediateCertificate };
+		String[] allCerts = { oadrRsaRootCertificate, oadrRsaIntermediateCertificate };
 
-        String username = "ven1";
-        String password = "ven1";
-        String realm = "";
-        String nonce = "";
+		String username = "ven1";
+		String password = "ven1";
+		String realm = DigestAuthenticationProvider.DIGEST_REALM;
+		String key = DigestAuthenticationProvider.DIGEST_KEY;
 
-        OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
-                .withTrustedCertificate(Arrays.asList(allCerts))
-                .withProtocol(Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers())
-                .withDefaultDigestAuthentication(eiEventEndpointUrl, realm, nonce, username, password);
+		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
+				.withTrustedCertificate(Arrays.asList(allCerts))
+				.withProtocol(Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers())
+				.withDefaultDigestAuthentication(eiEventEndpointUrl, realm, key, username, password);
 
-        OadrHttpVenClient20a digestHttpClient = new OadrHttpVenClient20a(new OadrHttpClient20a(builder.build()));
+		OadrHttpVenClient20a digestHttpClient = new OadrHttpVenClient20a(new OadrHttpClient20a(builder.build()));
 
-        Ven ven = venService.prepare(username, password);
-        venService.save(ven);
-        genericTest(digestHttpClient, ven);
-        venService.delete(ven);
+		Ven ven = venService.prepare(username, password);
+		venService.save(ven);
+		genericTest(digestHttpClient, ven);
+		venService.delete(ven);
 
-    }
+	}
 
-    @Test
-    public void testBasic() throws Oadr20aException, OadrSecurityException, JAXBException, ClientProtocolException,
-            IOException, URISyntaxException, Oadr20aHttpLayerException {
+	@Test
+	public void testBasic() throws Oadr20aException, OadrSecurityException, JAXBException, ClientProtocolException,
+			IOException, URISyntaxException, Oadr20aHttpLayerException {
 
-        String[] allCerts = { oadrRsaRootCertificate, oadrRsaIntermediateCertificate };
+		String[] allCerts = { oadrRsaRootCertificate, oadrRsaIntermediateCertificate };
 
-        String venUsername = "ven1";
-        String venPassword = "ven1";
+		String venUsername = "ven1";
+		String venPassword = "ven1";
 
-        OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
-                .withTrustedCertificate(Arrays.asList(allCerts))
-                .withProtocol(Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers())
-                .withDefaultBasicAuthentication(eiEventEndpointUrl, venUsername, venPassword);
+		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
+				.withTrustedCertificate(Arrays.asList(allCerts))
+				.withProtocol(Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers())
+				.withDefaultBasicAuthentication(eiEventEndpointUrl, venUsername, venPassword);
 
-        OadrHttpVenClient20a venBasicHttpClient = new OadrHttpVenClient20a(new OadrHttpClient20a(builder.build()));
+		OadrHttpVenClient20a venBasicHttpClient = new OadrHttpVenClient20a(new OadrHttpClient20a(builder.build()));
 
-        VenMarketContext marketContext = venMarketContextService.prepare(new VenMarketContextDto(MARKET_CONTEXT_NAME));
-        venMarketContextService.save(marketContext);
+		VenMarketContext marketContext = venMarketContextService.prepare(new VenMarketContextDto(MARKET_CONTEXT_NAME));
+		venMarketContextService.save(marketContext);
 
-        Ven ven = venService.prepare(venUsername, venPassword);
-        ven.setVenMarketContexts(Sets.newHashSet(marketContext));
-        ven.setPushUrl("http://localhost");
-        venService.save(ven);
+		Ven ven = venService.prepare(venUsername, venPassword);
+		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
+		ven.setPushUrl("http://localhost");
+		venService.save(ven);
 
-        genericTest(venBasicHttpClient, ven);
+		genericTest(venBasicHttpClient, ven);
 
-        String venUsername2 = "ven2";
-        String venPassword2 = "ven2";
-        Ven ven2 = venService.prepare(venUsername2, venPassword2);
-        ven2.setVenMarketContexts(Sets.newHashSet(marketContext));
-        ven2.setPushUrl("http://localhost");
-        venService.save(ven2);
+		String venUsername2 = "ven2";
+		String venPassword2 = "ven2";
+		Ven ven2 = venService.prepare(venUsername2, venPassword2);
+		ven2.setVenMarketContexts(Sets.newHashSet(marketContext));
+		ven2.setPushUrl("http://localhost");
+		venService.save(ven2);
 
-        String userUsername = "bof";
-        String userPassword = "bof";
+		String userUsername = "bof";
+		String userPassword = "bof";
 
-        OadrUser user = oadrUserService.prepare(userUsername, userPassword);
-        oadrUserService.save(user);
+		OadrUser user = oadrUserService.prepare(userUsername, userPassword);
+		oadrUserService.save(user);
 
-        OadrHttpClient userBasicHttpClient = new OadrHttpClientBuilder()
-                .withDefaultBasicAuthentication(demandResponseEnpointUrl, userUsername, userPassword)
-                .withProtocol(Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers())
-                .withTrustedCertificate(Arrays.asList(allCerts))
-                .withHeader(HttpHeaders.CONTENT_TYPE, "application/json").build();
+		OadrHttpClient userBasicHttpClient = new OadrHttpClientBuilder()
+				.withDefaultBasicAuthentication(demandResponseEnpointUrl, userUsername, userPassword)
+				.withProtocol(Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers())
+				.withTrustedCertificate(Arrays.asList(allCerts))
+				.withHeader(HttpHeaders.CONTENT_TYPE, "application/json").build();
 
-        ObjectMapper mapper = new ObjectMapper();
-        DemandResponseEventDto dto = new DemandResponseEventDto();
-        dto.setComaSeparatedTargetedVenUsername(String.join(",", venUsername, venUsername2));
-        dto.setEventId("eventId");
-        dto.setDuration("PT1H");
-        dto.setNotificationDuration("P1D");
-        dto.setToleranceDuration("PT5M");
-        dto.setStart(System.currentTimeMillis());
-        dto.setState(DemandResponseEventStateEnum.ACTIVE);
-        dto.setValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH);
-        dto.setMarketContext(MARKET_CONTEXT_NAME);
+		ObjectMapper mapper = new ObjectMapper();
+		DemandResponseEventDto dto = new DemandResponseEventDto();
+		dto.setComaSeparatedTargetedVenUsername(String.join(",", venUsername, venUsername2));
+		dto.setEventId("eventId");
+		dto.setDuration("PT1H");
+		dto.setNotificationDuration("P1D");
+		dto.setToleranceDuration("PT5M");
+		dto.setStart(System.currentTimeMillis());
+		dto.setState(DemandResponseEventStateEnum.ACTIVE);
+		dto.setValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH);
+		dto.setMarketContext(MARKET_CONTEXT_NAME);
 
-        String payload = mapper.writeValueAsString(dto);
-        HttpPost post = new HttpPost(demandResponseEnpointUrl);
-        StringEntity stringEntity = new StringEntity(payload);
-        post.setEntity(stringEntity);
+		String payload = mapper.writeValueAsString(dto);
+		HttpPost post = new HttpPost(demandResponseEnpointUrl);
+		StringEntity stringEntity = new StringEntity(payload);
+		post.setEntity(stringEntity);
 
-        HttpResponse execute = userBasicHttpClient.execute(post, "");
-        assertEquals(HttpStatus.CREATED_201, execute.getStatusLine().getStatusCode());
+		HttpResponse execute = userBasicHttpClient.execute(post, "");
+		assertEquals(HttpStatus.CREATED_201, execute.getStatusLine().getStatusCode());
 
-        dto = mapper.readValue(execute.getEntity().getContent(), DemandResponseEventDto.class);
-        assertNotNull(dto.getId());
+		dto = mapper.readValue(execute.getEntity().getContent(), DemandResponseEventDto.class);
+		assertNotNull(dto.getId());
 
-        OadrRequestEvent event = Oadr20aBuilders.newOadrRequestEventBuilder(ven.getUsername(), "0").build();
-        OadrDistributeEvent oadrRequestEvent = venBasicHttpClient.oadrRequestEvent(event);
-        assertEquals(String.valueOf(HttpStatus.OK_200), oadrRequestEvent.getEiResponse().getResponseCode());
-        assertEquals(1, oadrRequestEvent.getOadrEvent().size());
+		OadrRequestEvent event = Oadr20aBuilders.newOadrRequestEventBuilder(ven.getUsername(), "0").build();
+		OadrDistributeEvent oadrRequestEvent = venBasicHttpClient.oadrRequestEvent(event);
+		assertEquals(String.valueOf(HttpStatus.OK_200), oadrRequestEvent.getEiResponse().getResponseCode());
+		assertEquals(1, oadrRequestEvent.getOadrEvent().size());
 
-        demandResponseEventService.delete(dto.getId());
+		demandResponseEventService.delete(dto.getId());
 
-        venService.delete(ven);
-        venService.delete(ven2);
+		venService.delete(ven);
+		venService.delete(ven2);
 
-        venMarketContextService.delete(marketContext);
+		venMarketContextService.delete(marketContext);
 
-    }
+	}
 
 }

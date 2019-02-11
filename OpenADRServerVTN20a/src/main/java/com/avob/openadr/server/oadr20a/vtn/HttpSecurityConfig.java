@@ -28,39 +28,40 @@ import com.avob.openadr.server.common.vtn.security.DigestUserDetailsService;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Resource
-    private Oadr20aX509AuthenticatedUserDetailsService oadr20aX509AuthenticatedUserDetailsService;
+	@Resource
+	private Oadr20aX509AuthenticatedUserDetailsService oadr20aX509AuthenticatedUserDetailsService;
 
-    @Resource
-    private BasicAuthenticationManager basicAuthenticationManager;
+	@Resource
+	private BasicAuthenticationManager basicAuthenticationManager;
 
-    @Resource
-    private DigestUserDetailsService digestUserDetailsService;
+	@Resource
+	private DigestUserDetailsService digestUserDetailsService;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        DigestAuthenticationEntryPoint authenticationEntryPoint = new DigestAuthenticationEntryPoint();
-        authenticationEntryPoint.setKey(DigestAuthenticationProvider.DIGEST_KEY);
-        authenticationEntryPoint.setRealmName(DigestAuthenticationProvider.DIGEST_REALM);
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		DigestAuthenticationEntryPoint authenticationEntryPoint = new DigestAuthenticationEntryPoint();
+		authenticationEntryPoint.setKey(DigestAuthenticationProvider.DIGEST_KEY);
+		authenticationEntryPoint.setRealmName(DigestAuthenticationProvider.DIGEST_REALM);
 
-        DigestAuthenticationFilter digestAuthenticationFilter = new DigestAuthenticationFilter();
-        digestAuthenticationFilter.setAuthenticationEntryPoint(authenticationEntryPoint);
-        digestAuthenticationFilter.setUserDetailsService(digestUserDetailsService);
-        digestAuthenticationFilter.setPasswordAlreadyEncoded(true);
+		DigestAuthenticationFilter digestAuthenticationFilter = new DigestAuthenticationFilter();
+		digestAuthenticationFilter.setAuthenticationEntryPoint(authenticationEntryPoint);
+		digestAuthenticationFilter.setUserDetailsService(digestUserDetailsService);
+		digestAuthenticationFilter.setPasswordAlreadyEncoded(true);
 
-        BasicAuthenticationEntryPoint basicAuthenticationEntryPoint = new BasicAuthenticationEntryPoint();
-        basicAuthenticationEntryPoint.setRealmName(BasicAuthenticationManager.BASIC_REALM);
+		BasicAuthenticationEntryPoint basicAuthenticationEntryPoint = new BasicAuthenticationEntryPoint();
+		basicAuthenticationEntryPoint.setRealmName(BasicAuthenticationManager.BASIC_REALM);
 
-        BasicAuthenticationFilter basicAuthenticationFilter = new BasicAuthenticationFilter(basicAuthenticationManager);
+		BasicAuthenticationFilter basicAuthenticationFilter = new BasicAuthenticationFilter(basicAuthenticationManager);
 
-        http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.csrf().disable();
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.authorizeRequests().anyRequest().authenticated().and().x509().subjectPrincipalRegex("CN=(.*?)(?:,|$)")
-                .authenticationUserDetailsService(oadr20aX509AuthenticatedUserDetailsService);
+		http.authorizeRequests().anyRequest().authenticated().and().x509().subjectPrincipalRegex("CN=(.*?)(?:,|$)")
+				.authenticationUserDetailsService(oadr20aX509AuthenticatedUserDetailsService);
 
-        http.addFilter(digestAuthenticationFilter).addFilter(basicAuthenticationFilter).exceptionHandling().and()
-                .authorizeRequests().anyRequest().authenticated();
-    }
+		http.addFilter(digestAuthenticationFilter).authorizeRequests().anyRequest().authenticated().and()
+				.addFilter(basicAuthenticationFilter).authorizeRequests().anyRequest().authenticated();
+
+	}
 
 }

@@ -44,7 +44,7 @@ public class AbstractUserDaoTest {
         long count = abstractUserdao.count();
         assertEquals(2L, count);
 
-        AbstractUser findOne = abstractUserdao.findOne(ven.getId());
+        AbstractUser findOne = abstractUserdao.findById(ven.getId()).get();
         assertTrue(findOne instanceof Ven);
         assertFalse(findOne instanceof OadrUser);
 
@@ -52,7 +52,7 @@ public class AbstractUserDaoTest {
         assertTrue(findOne instanceof Ven);
         assertFalse(findOne instanceof OadrUser);
 
-        findOne = abstractUserdao.findOne(user.getId());
+        findOne = abstractUserdao.findById(user.getId()).get();
         assertFalse(findOne instanceof Ven);
         assertTrue(findOne instanceof OadrUser);
 

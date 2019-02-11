@@ -54,8 +54,8 @@ public class VenMarketContextDaoTest {
         ven2.setVenMarketContexts(Sets.newHashSet(venGroup, venGroup2));
         venService.save(ven2);
 
-        venGroup = venMarketContextDao.findOne(venGroup.getId());
-        venGroup2 = venMarketContextDao.findOne(venGroup2.getId());
+        venGroup = venMarketContextDao.findById(venGroup.getId()).get();
+        venGroup2 = venMarketContextDao.findById(venGroup2.getId()).get();
 
         Iterable<Ven> findByVenGroupIterable = venService.findAll();
         List<Ven> findByVenGroup = Lists.newArrayList(findByVenGroupIterable);

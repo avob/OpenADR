@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface VenPollDao extends CrudRepository<VenPoll, Long> {
 
-    @Query(value = "select poll from VenPoll poll inner join poll.ven ven where poll.ven.username = :venUsername")
-    public List<VenPoll> findByVenUsername(@Param("venUsername") String venUsername, Pageable pageable);
+	@Query(value = "select poll from VenPoll poll inner join poll.ven ven where poll.ven.username = :venUsername")
+	public List<VenPoll> findByVenUsername(@Param("venUsername") String venUsername, Pageable pageable);
 
 }

@@ -80,11 +80,11 @@ public class Ven extends AbstractUser {
 
 	private Long pullFrequencySeconds;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "ven_vengroup", joinColumns = @JoinColumn(name = "ven_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "vengroup_id", referencedColumnName = "id"))
 	private Set<VenGroup> venGroups;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "ven_venmarketcontext", joinColumns = @JoinColumn(name = "ven_id"), inverseJoinColumns = @JoinColumn(name = "venmarketcontext_id"))
 	private Set<VenMarketContext> venMarketContexts;
 

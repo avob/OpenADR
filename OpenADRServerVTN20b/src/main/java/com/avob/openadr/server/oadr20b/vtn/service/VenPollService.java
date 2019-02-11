@@ -23,17 +23,17 @@ public class VenPollService {
 	@Transactional
 	public String retrievePollForVenUsername(String venUsername) {
 
-		Pageable page = new PageRequest(0, 1, Sort.Direction.ASC, "createdTimestamp");
+		Pageable page = PageRequest.of(0, 1, Sort.Direction.ASC, "createdTimestamp");
 
 		List<VenPoll> list = venPollDao.findByVenUsername(venUsername, page);
-
+		
 		if (list == null || list.isEmpty()) {
 			return null;
 		}
 
 		VenPoll venPoll = list.get(0);
 
-		venPollDao.delete(venPoll.getId());
+		venPollDao.deleteById(venPoll.getId());
 
 		return venPoll.getMessage();
 

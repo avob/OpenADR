@@ -11,19 +11,19 @@ public abstract class GenericService<T> {
 	}
 
 	public Iterable<T> save(Iterable<T> entities) {
-		return getDao().save(entities);
+		return getDao().saveAll(entities);
 	}
 
 	public void delete(Long id) {
-		getDao().delete(id);
+		getDao().deleteById(id);
 	}
 
 	public void delete(Iterable<T> entities) {
-		getDao().delete(entities);
+		getDao().deleteAll(entities);
 	}
 
 	public T findOne(Long id) {
-		return getDao().findOne(id);
+		return getDao().findById(id).get();
 	}
 
 	public Iterable<T> findAll() {

@@ -30,3 +30,10 @@ OpenADRServerVTN20b | OADR 2.0b VTN squeleton implementation
 ```shell
     mvn clean package
 ```
+## Functional testing
+use in-memory h2 SQL bdd / activemq broker
+use RSA/ECC test certificates from *https://portal.kyrio.com/*
+configuration: *https://github.com/avob/OpenADR/blob/master/OpenADRServerVTN20b/src/main/resources/application-test-functional.properties*
+```shell
+    java -jar target/OpenADRServerVTN20b*.jar --spring.profiles.active=test-functional
+```

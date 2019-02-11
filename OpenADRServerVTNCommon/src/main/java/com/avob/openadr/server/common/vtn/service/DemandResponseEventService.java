@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 
 import javax.annotation.Resource;
@@ -81,7 +82,7 @@ public class DemandResponseEventService {
 		Pageable limit = null;
 		if (size != null) {
 			int i = (int) (long) size;
-			limit = new PageRequest(0, i);
+			limit = PageRequest.of(0, i);
 		}
 
 		Iterable<DemandResponseEvent> events = new ArrayList<DemandResponseEvent>();
@@ -152,7 +153,7 @@ public class DemandResponseEventService {
 			}
 			list.add(new VenDemandResponseEvent(event, ven));
 		}
-		venDemandResponseEventDao.save(list);
+		venDemandResponseEventDao.saveAll(list);
 		return demandResponseEventDao.save(event);
 	}
 
@@ -164,7 +165,7 @@ public class DemandResponseEventService {
 	 */
 	@Transactional(readOnly = false)
 	private DemandResponseEvent persist(DemandResponseEvent event, List<VenDemandResponseEvent> list) {
-		venDemandResponseEventDao.save(list);
+		venDemandResponseEventDao.saveAll(list);
 		return demandResponseEventDao.save(event);
 	}
 
@@ -251,8 +252,8 @@ public class DemandResponseEventService {
 				targetedVenUsername, marketContext, state, payload, profile);
 	}
 
-	public DemandResponseEvent findById(Long id) {
-		return demandResponseEventDao.findOne(id);
+	public Optional<DemandResponseEvent> findById(Long id) {
+		return demandResponseEventDao.findById(id);
 	}
 
 	public DemandResponseEvent findByEventId(String eventId) {
@@ -260,24 +261,25 @@ public class DemandResponseEventService {
 	}
 
 	public boolean delete(Long id) {
-		boolean exists = demandResponseEventDao.exists(id);
+		boolean exists = demandResponseEventDao.existsById(id);
 		if (exists) {
 			venDemandResponseEventDao.deleteByEventId(id);
-			demandResponseEventDao.delete(id);
+			demandResponseEventDao.deleteById(id);
 		}
 		return exists;
 	}
 
 	public void delete(Iterable<DemandResponseEvent> entities) {
 		venDemandResponseEventDao.deleteByEventIn(Lists.newArrayList(entities));
-		demandResponseEventDao.delete(entities);
+		demandResponseEventDao.deleteAll(entities);
 	}
 
 	private DemandResponseEvent updateState(Long id, DemandResponseEventStateEnum state) {
-		DemandResponseEvent event = demandResponseEventDao.findOne(id);
-		if (event == null) {
+		Optional<DemandResponseEvent> op = demandResponseEventDao.findById(id);
+		if (!op.isPresent()) {
 			return null;
 		}
+		DemandResponseEvent event = op.get();
 		if (!event.getState().equals(state)) {
 			event.setState(state);
 			event.setModificationNumber(event.getModificationNumber() + 1);
@@ -297,10 +299,11 @@ public class DemandResponseEventService {
 	}
 
 	public DemandResponseEvent updateValue(Long id, DemandResponseEventSimpleValueEnum value) {
-		DemandResponseEvent event = demandResponseEventDao.findOne(id);
-		if (event == null) {
+		Optional<DemandResponseEvent> op = demandResponseEventDao.findById(id);
+		if (!op.isPresent()) {
 			return null;
 		}
+		DemandResponseEvent event = op.get();
 
 		if (!value.equals(event.getValue())) {
 			event.setValue(value);
@@ -322,7 +325,7 @@ public class DemandResponseEventService {
 		if (size != null && size > 0) {
 			Pageable limit = null;
 			int i = (int) (long) size;
-			limit = new PageRequest(0, i);
+			limit = PageRequest.of(0, i);
 			return demandResponseEventDao.findToSentEventByVen(ven, currentTimeMillis, limit);
 		} else {
 			return demandResponseEventDao.findToSentEventByVen(ven, currentTimeMillis);
@@ -381,7 +384,7 @@ public class DemandResponseEventService {
 		if (size != null && size > 0) {
 			Pageable limit = null;
 			int i = (int) (long) size;
-			limit = new PageRequest(0, i);
+			limit = PageRequest.of(0, i);
 			return demandResponseEventDao.findToSentEventByVenUsername(username, currentTimeMillis, limit);
 		} else {
 			return demandResponseEventDao.findToSentEventByVenUsername(username, currentTimeMillis);

@@ -51,149 +51,149 @@ import com.google.common.collect.Lists;
 @RequestMapping("/OadrEvent")
 public class Oadr20aEventController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20aVTNEiEventController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20aVTNEiEventController.class);
 
-    private Oadr20aJAXBContext jaxbContext;
+	private Oadr20aJAXBContext jaxbContext;
 
-    private Mapper mapper = new DozerBeanMapper();
+	private Mapper mapper = new DozerBeanMapper();
 
-    @Resource
-    private DemandResponseEventService demandResponseEventService;
+	@Resource
+	private DemandResponseEventService demandResponseEventService;
 
-    @Resource
-    private VenMarketContextService venMarketContextService;
+	@Resource
+	private VenMarketContextService venMarketContextService;
 
-    @Resource
-    private VenGroupService venGroupService;
+	@Resource
+	private VenGroupService venGroupService;
 
-    @Resource
-    private VenResourceService venResourceService;
+	@Resource
+	private VenResourceService venResourceService;
 
-    @Resource
-    private VenService venService;
+	@Resource
+	private VenService venService;
 
-    public Oadr20aEventController() throws JAXBException {
-        jaxbContext = Oadr20aJAXBContext.getInstance();
-    }
+	public Oadr20aEventController() throws JAXBException {
+		jaxbContext = Oadr20aJAXBContext.getInstance();
+	}
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @RequestMapping(value = "/", method = RequestMethod.POST)
-    @ResponseBody
-    public DemandResponseEventDto create(@RequestBody String payload, Principal principal, HttpServletResponse response)
-            throws Oadr20aUnmarshalException, Oadr20aMarshalException, Oadr20aApplicationLayerException,
-            Oadr20aCreatedEventApplicationLayerException, Oadr20aRequestEventApplicationLayerException {
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@RequestMapping(value = "/", method = RequestMethod.POST)
+	@ResponseBody
+	public DemandResponseEventDto create(@RequestBody String payload, Principal principal, HttpServletResponse response)
+			throws Oadr20aUnmarshalException, Oadr20aMarshalException, Oadr20aApplicationLayerException,
+			Oadr20aCreatedEventApplicationLayerException, Oadr20aRequestEventApplicationLayerException {
 
-        Object unmarshal = jaxbContext.unmarshal(payload, false);
+		Object unmarshal = jaxbContext.unmarshal(payload, false);
 
-        String username = principal.getName();
+		String username = principal.getName();
 
-        if (unmarshal instanceof JAXBElement) {
-            JAXBElement<?> el = (JAXBElement<?>) unmarshal;
+		if (unmarshal instanceof JAXBElement) {
+			JAXBElement<?> el = (JAXBElement<?>) unmarshal;
 
-            if (el.getDeclaredType().equals(EiEventType.class)) {
+			if (el.getDeclaredType().equals(EiEventType.class)) {
 
-                LOGGER.info(username + " - OadrCreatedEvent");
+				LOGGER.info(username + " - OadrCreatedEvent");
 
-                EiEventType event = (EiEventType) el.getValue();
+				EiEventType event = (EiEventType) el.getValue();
 
-                LOGGER.info(event.getEventDescriptor().getEventID());
+				LOGGER.info(event.getEventDescriptor().getEventID());
 
-                String eventId = event.getEventDescriptor().getEventID();
+				String eventId = event.getEventDescriptor().getEventID();
 
-                Properties properties = event.getEiActivePeriod().getProperties();
+				Properties properties = event.getEiActivePeriod().getProperties();
 
-                Date start = properties.getDtstart().getDateTime().toGregorianCalendar().getTime();
+				Date start = properties.getDtstart().getDateTime().toGregorianCalendar().getTime();
 
-                String durationXml = properties.getDuration().getDuration();
+				String durationXml = properties.getDuration().getDuration();
 
-                String notificationDurationXml = properties.getXEiNotification().getDuration();
+				String notificationDurationXml = properties.getXEiNotification().getDuration();
 
-                String marketContext = event.getEventDescriptor().getEiMarketContext().getMarketContext();
+				String marketContext = event.getEventDescriptor().getEiMarketContext().getMarketContext();
 
-                VenMarketContext findOneByName = venMarketContextService.findOneByName(marketContext);
+				VenMarketContext findOneByName = venMarketContextService.findOneByName(marketContext);
 
-                if (findOneByName == null) {
-                    LOGGER.warn("Unknown MarketContext: " + marketContext);
-                    response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
-                    return null;
-                }
+				if (findOneByName == null) {
+					LOGGER.warn("Unknown MarketContext: " + marketContext);
+					response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
+					return null;
+				}
 
-                List<String> listVenId = Lists.newArrayList();
+				List<String> listVenId = Lists.newArrayList();
 
-                if (event.getEiTarget().getVenID() != null && !event.getEiTarget().getVenID().isEmpty()) {
-                    List<Ven> vens = venService.findByUsernameInAndVenMarketContextsContains(
-                            event.getEiTarget().getVenID(), findOneByName);
-                    Set<String> s1 = vens.stream().map(Ven::getUsername).collect(Collectors.toSet());
-                    Set<String> s2 = new HashSet<String>(event.getEiTarget().getVenID());
-                    if (!s1.equals(s2)) {
-                        s2.remove(s1);
-                        LOGGER.warn("Unknown Ven: " + s2.toString() + " in marketcontext: " + findOneByName.getName());
-                        response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
-                        return null;
-                    }
+				if (event.getEiTarget().getVenID() != null && !event.getEiTarget().getVenID().isEmpty()) {
+					List<Ven> vens = venService.findByUsernameInAndVenMarketContextsContains(
+							event.getEiTarget().getVenID(), findOneByName);
+					Set<String> s1 = vens.stream().map(Ven::getUsername).collect(Collectors.toSet());
+					Set<String> s2 = new HashSet<String>(event.getEiTarget().getVenID());
+					if (!s1.equals(s2)) {
+						s2.removeAll(s1);
+						LOGGER.warn("Unknown Ven: " + s2.toString() + " in marketcontext: " + findOneByName.getName());
+						response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
+						return null;
+					}
 
-                    listVenId.addAll(event.getEiTarget().getVenID());
-                }
+					listVenId.addAll(event.getEiTarget().getVenID());
+				}
 
-                if (event.getEiTarget().getGroupID() != null && !event.getEiTarget().getGroupID().isEmpty()) {
-                    List<VenGroup> findByName = venGroupService.findByName(event.getEiTarget().getGroupID());
-                    Set<String> s1 = findByName.stream().map(VenGroup::getName).collect(Collectors.toSet());
-                    Set<String> s2 = new HashSet<String>(event.getEiTarget().getGroupID());
+				if (event.getEiTarget().getGroupID() != null && !event.getEiTarget().getGroupID().isEmpty()) {
+					List<VenGroup> findByName = venGroupService.findByName(event.getEiTarget().getGroupID());
+					Set<String> s1 = findByName.stream().map(VenGroup::getName).collect(Collectors.toSet());
+					Set<String> s2 = new HashSet<String>(event.getEiTarget().getGroupID());
 
-                    if (!s1.equals(s2)) {
-                        s2.remove(s1);
-                        LOGGER.warn("Unknown Group: " + s2.toString());
-                        response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
-                        return null;
-                    }
+					if (!s1.equals(s2)) {
+						s2.removeAll(s1);
+						LOGGER.warn("Unknown Group: " + s2.toString());
+						response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
+						return null;
+					}
 
-                    List<Ven> vens = venService.findByGroupName(event.getEiTarget().getGroupID());
-                    Set<String> s3 = vens.stream().filter(ven -> ven.getVenMarketContexts().contains(findOneByName))
-                            .map(Ven::getUsername).collect(Collectors.toSet());
-                    Set<String> s4 = vens.stream().map(Ven::getUsername).collect(Collectors.toSet());
-                    if (!s3.equals(s4)) {
-                        s4.remove(s3);
-                        LOGGER.warn("Ven: " + s4.toString() + " not belonging to marketcontext: "
-                                + findOneByName.getName());
-                        response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
-                        return null;
-                    }
-                    for (Ven ven : vens) {
-                        listVenId.add(ven.getUsername());
-                    }
-                }
+					List<Ven> vens = venService.findByGroupName(event.getEiTarget().getGroupID());
+					Set<String> s3 = vens.stream().filter(ven -> ven.getVenMarketContexts().contains(findOneByName))
+							.map(Ven::getUsername).collect(Collectors.toSet());
+					Set<String> s4 = vens.stream().map(Ven::getUsername).collect(Collectors.toSet());
+					if (!s3.equals(s4)) {
+						s4.removeAll(s3);
+						LOGGER.warn("Ven: " + s4.toString() + " not belonging to marketcontext: "
+								+ findOneByName.getName());
+						response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
+						return null;
+					}
+					for (Ven ven : vens) {
+						listVenId.add(ven.getUsername());
+					}
+				}
 
-                if (listVenId.isEmpty()) {
-                    LOGGER.warn("No VEN targeted by processed event");
-                    response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
-                    return null;
-                }
+				if (listVenId.isEmpty()) {
+					LOGGER.warn("No VEN targeted by processed event");
+					response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
+					return null;
+				}
 
-                if (event.getEiTarget().getResourceID() != null && !event.getEiTarget().getResourceID().isEmpty()) {
-                    List<VenResource> resources = venResourceService.findByVenIdAndName(listVenId,
-                            event.getEiTarget().getResourceID());
-                    Set<String> s1 = resources.stream().map(VenResource::getName).collect(Collectors.toSet());
-                    Set<String> s2 = new HashSet<String>(event.getEiTarget().getResourceID());
-                    if (!s1.equals(s2)) {
-                        s2.remove(s1);
-                        LOGGER.warn("Unknown Resource(s): " + s2.toString());
-                        response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
-                        return null;
-                    }
-                }
+				if (event.getEiTarget().getResourceID() != null && !event.getEiTarget().getResourceID().isEmpty()) {
+					List<VenResource> resources = venResourceService.findByVenIdAndName(listVenId,
+							event.getEiTarget().getResourceID());
+					Set<String> s1 = resources.stream().map(VenResource::getName).collect(Collectors.toSet());
+					Set<String> s2 = new HashSet<String>(event.getEiTarget().getResourceID());
+					if (!s1.equals(s2)) {
+						s2.removeAll(s1);
+						LOGGER.warn("Unknown Resource(s): " + s2.toString());
+						response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
+						return null;
+					}
+				}
 
-                DemandResponseEvent create = demandResponseEventService.create(eventId, start.getTime(), durationXml,
-                        notificationDurationXml, listVenId, findOneByName, DemandResponseEventStateEnum.ACTIVE, payload,
-                        DemandResponseEventOadrProfileEnum.OADR20A);
+				DemandResponseEvent create = demandResponseEventService.create(eventId, start.getTime(), durationXml,
+						notificationDurationXml, listVenId, findOneByName, DemandResponseEventStateEnum.ACTIVE, payload,
+						DemandResponseEventOadrProfileEnum.OADR20A);
 
-                response.setStatus(HttpStatus.CREATED_201);
+				response.setStatus(HttpStatus.CREATED_201);
 
-                return mapper.map(create, DemandResponseEventDto.class);
-            }
-        }
+				return mapper.map(create, DemandResponseEventDto.class);
+			}
+		}
 
-        response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
+		response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
 
-        return null;
-    }
+		return null;
+	}
 }

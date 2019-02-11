@@ -178,7 +178,9 @@ public class Oadr20bEventController {
 				}
 
 				List<Ven> vens = venService.findByGroupName(event.getEiTarget().getGroupID());
-				Set<String> s3 = vens.stream().filter(ven -> ven.getVenMarketContexts().contains(findOneByName))
+				Set<String> s3 = vens.stream()
+						.filter(ven -> ven.getVenMarketContexts().stream()
+								.anyMatch(market -> market.getName().equals(findOneByName.getName())))
 						.map(Ven::getUsername).collect(Collectors.toSet());
 				Set<String> s4 = vens.stream().map(Ven::getUsername).collect(Collectors.toSet());
 				if (!s3.equals(s4)) {

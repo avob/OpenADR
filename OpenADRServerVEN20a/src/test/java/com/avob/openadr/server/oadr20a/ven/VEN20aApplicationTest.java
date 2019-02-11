@@ -10,10 +10,10 @@ import org.springframework.context.annotation.PropertySource;
 @EnableAutoConfiguration
 @ComponentScan(basePackages = { "com.avob.openadr.server.oadr20a.ven" })
 @PropertySource("classpath:application.properties")
-public class VEN20aApplicationTest extends VEN20aApplication {
+public class VEN20aApplicationTest {
 
-    public static void main(String[] args) {
-        SpringApplication.run(VEN20aApplicationTest.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(VEN20aApplication.class, args);
+	}
 
 }

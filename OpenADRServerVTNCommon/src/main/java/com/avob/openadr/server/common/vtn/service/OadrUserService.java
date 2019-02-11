@@ -28,7 +28,7 @@ public class OadrUserService extends AbstractUserService<OadrUser> {
 
     @Override
     public void delete(Iterable<OadrUser> instances) {
-        userdao.delete(instances);
+        userdao.deleteAll(instances);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class OadrUserService extends AbstractUserService<OadrUser> {
 
     @Override
     public void save(Iterable<OadrUser> instances) {
-        userdao.save(instances);
+        userdao.saveAll(instances);
     }
 
     public OadrUser findByUsername(String username) {

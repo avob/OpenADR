@@ -3,6 +3,8 @@ package com.avob.openadr.client.http;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.http.Header;
@@ -28,218 +30,226 @@ import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 
+import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 
 public class OadrHttpClientBuilder {
 
-    private HttpClientBuilder create;
+	private HttpClientBuilder create;
 
-    /**
-     * protocol config
-     */
-    private String[] protocols;
-    private String[] ciphers;
+	/**
+	 * protocol config
+	 */
+	private String[] protocols;
+	private String[] ciphers;
 
-    /**
-     * SSL trusted certificate
-     */
-    private List<String> trustedCertificateFilePath;
+	/**
+	 * SSL trusted certificate
+	 */
+	private List<String> trustedCertificateFilePath;
 
-    /**
-     * default x509 client certificate
-     */
-    private String clientPrivateKeyPemFilePath;
-    private String clientCertificatePemFilePath;
+	/**
+	 * default x509 client certificate
+	 */
+	private String clientPrivateKeyPemFilePath;
+	private String clientCertificatePemFilePath;
 
-    /**
-     * default Digest/Basic authentication
-     */
-    private CredentialsProvider credsProvider;
-    private HttpClientContext localContext = HttpClientContext.create();
+	/**
+	 * default Digest/Basic authentication
+	 */
+	private CredentialsProvider credsProvider;
+	private HttpClientContext localContext = HttpClientContext.create();
 
-    /**
-     * polling client
-     */
-    private Integer totalConnection;
-    private Integer totalPerRouteConnection;
+	/**
+	 * polling client
+	 */
+	private Integer totalConnection;
+	private Integer totalPerRouteConnection;
 
-    /**
-     * timeout
-     */
-    private RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
+	/**
+	 * timeout
+	 */
+	private RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
 
-    /**
-     * default host
-     */
-    private URI defaultUri;
+	/**
+	 * default host
+	 */
+	private URI defaultUri;
 
-    /**
-     * default http headers
-     */
-    private List<Header> headers = new ArrayList<Header>();
+	/**
+	 * default http headers
+	 */
+	private List<Header> headers = new ArrayList<Header>();
 
-    /**
-     * enable http
-     */
-    private boolean enableHttp = false;
+	/**
+	 * enable http
+	 */
+	private boolean enableHttp = false;
 
-    public OadrHttpClientBuilder() {
-        create = HttpClientBuilder.create();
-    }
+	public OadrHttpClientBuilder() {
+		create = HttpClientBuilder.create();
+	}
 
-    public OadrHttpClientBuilder withTrustedCertificate(List<String> trustedCertificateFilePath) {
-        this.trustedCertificateFilePath = trustedCertificateFilePath;
-        return this;
-    }
+	public OadrHttpClientBuilder withTrustedCertificate(List<String> trustedCertificateFilePath) {
+		this.trustedCertificateFilePath = trustedCertificateFilePath;
+		return this;
+	}
 
-    public OadrHttpClientBuilder withProtocol(String[] protocols, String[] ciphers) {
-        this.protocols = protocols;
-        this.ciphers = ciphers;
-        return this;
-    }
+	public OadrHttpClientBuilder withProtocol(String[] protocols, String[] ciphers) {
+		this.protocols = protocols;
+		this.ciphers = ciphers;
+		return this;
+	}
 
-    public OadrHttpClientBuilder withX509Authentication(String clientPrivateKeyPemFilePath,
-            String clientCertificatePemFilePath) throws OadrSecurityException {
-        this.clientPrivateKeyPemFilePath = clientPrivateKeyPemFilePath;
-        this.clientCertificatePemFilePath = clientCertificatePemFilePath;
-        return this;
-    }
+	public OadrHttpClientBuilder withX509Authentication(String clientPrivateKeyPemFilePath,
+			String clientCertificatePemFilePath) throws OadrSecurityException {
+		this.clientPrivateKeyPemFilePath = clientPrivateKeyPemFilePath;
+		this.clientCertificatePemFilePath = clientCertificatePemFilePath;
+		return this;
+	}
 
-    public OadrHttpClientBuilder withDefaultDigestAuthentication(String host, String realm, String nonce,
-            String username, String password) throws OadrSecurityException {
+	public static String buildNonce(String key) {
+		// expirationTime + ":" + md5Hex(expirationTime + ":" + key)
+		String dateTimeString = Long.toString(new Date().getTime());
+		String nonce = dateTimeString + ":" + OadrHttpSecurity.md5Hex(dateTimeString + ":" + key);
+		return Base64.getEncoder().encodeToString(nonce.getBytes());
+	}
 
-        this.withDefaultHost(host);
+	public OadrHttpClientBuilder withDefaultDigestAuthentication(String host, String realm, String key, String username,
+			String password) throws OadrSecurityException {
 
-        HttpHost target = new HttpHost(defaultUri.getHost(), defaultUri.getPort(), defaultUri.getScheme());
+		this.withDefaultHost(host);
 
-        credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(new AuthScope(target.getHostName(), target.getPort()),
-                new UsernamePasswordCredentials(username, password));
+		HttpHost target = new HttpHost(defaultUri.getHost(), defaultUri.getPort(), defaultUri.getScheme());
 
-        // Create AuthCache instance
-        AuthCache authCache = new BasicAuthCache();
-        // Generate DIGEST scheme object, initialize it and add it to the local
-        // auth cache
-        DigestScheme digestAuth = new DigestScheme();
-        // Suppose we already know the realm name
-        digestAuth.overrideParamter("realm", realm);
-        // Suppose we already know the expected nonce value
-        digestAuth.overrideParamter("nonce", nonce);
-        authCache.put(target, digestAuth);
+		credsProvider = new BasicCredentialsProvider();
+		credsProvider.setCredentials(new AuthScope(target.getHostName(), target.getPort()),
+				new UsernamePasswordCredentials(username, password));
 
-        localContext.setAuthCache(authCache);
+		// Create AuthCache instance
+		AuthCache authCache = new BasicAuthCache();
+		// Generate DIGEST scheme object, initialize it and add it to the local
+		// auth cache
+		DigestScheme digestAuth = new DigestScheme();
+		// Suppose we already know the realm name
+		digestAuth.overrideParamter("realm", realm);
+		// Suppose we already know the expected nonce value
+		digestAuth.overrideParamter("nonce", buildNonce(key));
+		authCache.put(target, digestAuth);
 
-        return this;
-    }
+		localContext.setAuthCache(authCache);
 
-    public OadrHttpClientBuilder withDefaultBasicAuthentication(String host, String username, String password)
-            throws OadrSecurityException {
+		return this;
+	}
 
-        this.withDefaultHost(host);
-        HttpHost target = new HttpHost(defaultUri.getHost(), defaultUri.getPort(), defaultUri.getScheme());
+	public OadrHttpClientBuilder withDefaultBasicAuthentication(String host, String username, String password)
+			throws OadrSecurityException {
 
-        credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(new AuthScope(target.getHostName(), target.getPort()),
-                new UsernamePasswordCredentials(username, password));
+		this.withDefaultHost(host);
+		HttpHost target = new HttpHost(defaultUri.getHost(), defaultUri.getPort(), defaultUri.getScheme());
 
-        // Create AuthCache instance
-        AuthCache authCache = new BasicAuthCache();
-        BasicScheme basicAuth = new BasicScheme();
-        authCache.put(target, basicAuth);
+		credsProvider = new BasicCredentialsProvider();
+		credsProvider.setCredentials(new AuthScope(target.getHostName(), target.getPort()),
+				new UsernamePasswordCredentials(username, password));
 
-        localContext.setAuthCache(authCache);
+		// Create AuthCache instance
+		AuthCache authCache = new BasicAuthCache();
+		BasicScheme basicAuth = new BasicScheme();
+		authCache.put(target, basicAuth);
 
-        return this;
-    }
+		localContext.setAuthCache(authCache);
 
-    /**
-     * setup default header
-     * 
-     * @param header
-     * @param value
-     * @return
-     */
-    public OadrHttpClientBuilder withHeader(String header, String value) {
-        headers.add(new BasicHeader(header, value));
-        return this;
-    }
+		return this;
+	}
 
-    /**
-     * set default host
-     * 
-     * @param host
-     * @return
-     * @throws URISyntaxException
-     */
-    public OadrHttpClientBuilder withDefaultHost(String defaultHost) throws OadrSecurityException {
-        try {
-            defaultUri = new URI(defaultHost);
+	/**
+	 * setup default header
+	 * 
+	 * @param header
+	 * @param value
+	 * @return
+	 */
+	public OadrHttpClientBuilder withHeader(String header, String value) {
+		headers.add(new BasicHeader(header, value));
+		return this;
+	}
 
-            if (defaultUri.getHost() == null) {
-                throw new OadrSecurityException("given url must specify target host");
-            }
-        } catch (URISyntaxException e) {
-            throw new OadrSecurityException(e);
-        }
-        return this;
-    }
+	/**
+	 * set default host
+	 * 
+	 * @param host
+	 * @return
+	 * @throws URISyntaxException
+	 */
+	public OadrHttpClientBuilder withDefaultHost(String defaultHost) throws OadrSecurityException {
+		try {
+			defaultUri = new URI(defaultHost);
 
-    /**
-     * setup PoolingHttpClientConnectionManager
-     * 
-     * @param totalConnection
-     * @param totalPerRouteConnection
-     * @return
-     */
-    public OadrHttpClientBuilder withPooling(int totalConnection, int totalPerRouteConnection) {
-        this.totalConnection = totalConnection;
-        this.totalPerRouteConnection = totalPerRouteConnection;
-        return this;
-    }
+			if (defaultUri.getHost() == null) {
+				throw new OadrSecurityException("given url must specify target host");
+			}
+		} catch (URISyntaxException e) {
+			throw new OadrSecurityException(e);
+		}
+		return this;
+	}
 
-    public OadrHttpClientBuilder withTimeout(int timeoutMilli) {
-        requestConfigBuilder.setConnectTimeout(timeoutMilli);
-        return this;
-    }
+	/**
+	 * setup PoolingHttpClientConnectionManager
+	 * 
+	 * @param totalConnection
+	 * @param totalPerRouteConnection
+	 * @return
+	 */
+	public OadrHttpClientBuilder withPooling(int totalConnection, int totalPerRouteConnection) {
+		this.totalConnection = totalConnection;
+		this.totalPerRouteConnection = totalPerRouteConnection;
+		return this;
+	}
 
-    public OadrHttpClientBuilder enableHttp(boolean enable) {
-        this.enableHttp = enable;
-        return this;
-    }
+	public OadrHttpClientBuilder withTimeout(int timeoutMilli) {
+		requestConfigBuilder.setConnectTimeout(timeoutMilli);
+		return this;
+	}
 
-    public OadrHttpClient build() throws OadrSecurityException {
+	public OadrHttpClientBuilder enableHttp(boolean enable) {
+		this.enableHttp = enable;
+		return this;
+	}
 
-        SSLConnectionSocketFactory createSSLSocketFactory = SSLSocketFactoryBuilder.createSSLSocketFactory(
-                clientPrivateKeyPemFilePath, clientCertificatePemFilePath, trustedCertificateFilePath, protocols,
-                ciphers);
+	public OadrHttpClient build() throws OadrSecurityException {
 
-        RegistryBuilder<ConnectionSocketFactory> register = RegistryBuilder.<ConnectionSocketFactory>create()
-                .register("https", createSSLSocketFactory);
+		SSLConnectionSocketFactory createSSLSocketFactory = SSLSocketFactoryBuilder.createSSLSocketFactory(
+				clientPrivateKeyPemFilePath, clientCertificatePemFilePath, trustedCertificateFilePath, protocols,
+				ciphers);
 
-        if (this.enableHttp) {
-            register.register("http", PlainConnectionSocketFactory.getSocketFactory());
-        }
+		RegistryBuilder<ConnectionSocketFactory> register = RegistryBuilder.<ConnectionSocketFactory>create()
+				.register("https", createSSLSocketFactory);
 
-        Registry<ConnectionSocketFactory> build = register.build();
+		if (this.enableHttp) {
+			register.register("http", PlainConnectionSocketFactory.getSocketFactory());
+		}
 
-        HttpClientConnectionManager connectionManager;
-        if (totalConnection != null && totalPerRouteConnection != null) {
-            connectionManager = new PoolingHttpClientConnectionManager(build);
-            ((PoolingHttpClientConnectionManager) connectionManager).setMaxTotal(totalConnection);
-            ((PoolingHttpClientConnectionManager) connectionManager).setDefaultMaxPerRoute(totalPerRouteConnection);
-        } else {
-            connectionManager = new BasicHttpClientConnectionManager(build);
-        }
+		Registry<ConnectionSocketFactory> build = register.build();
 
-        HttpClientBuilder builder = create.setConnectionManager(connectionManager)
-                .setDefaultRequestConfig(requestConfigBuilder.build());
+		HttpClientConnectionManager connectionManager;
+		if (totalConnection != null && totalPerRouteConnection != null) {
+			connectionManager = new PoolingHttpClientConnectionManager(build);
+			((PoolingHttpClientConnectionManager) connectionManager).setMaxTotal(totalConnection);
+			((PoolingHttpClientConnectionManager) connectionManager).setDefaultMaxPerRoute(totalPerRouteConnection);
+		} else {
+			connectionManager = new BasicHttpClientConnectionManager(build);
+		}
 
-        if (credsProvider != null) {
-            builder.setDefaultCredentialsProvider(credsProvider);
-        }
+		HttpClientBuilder builder = create.setConnectionManager(connectionManager)
+				.setDefaultRequestConfig(requestConfigBuilder.build());
 
-        return new OadrHttpClient(builder.setDefaultHeaders(headers).build(), defaultUri, localContext);
+		if (credsProvider != null) {
+			builder.setDefaultCredentialsProvider(credsProvider);
+		}
 
-    }
+		return new OadrHttpClient(builder.setDefaultHeaders(headers).build(), defaultUri, localContext);
+
+	}
 
 }

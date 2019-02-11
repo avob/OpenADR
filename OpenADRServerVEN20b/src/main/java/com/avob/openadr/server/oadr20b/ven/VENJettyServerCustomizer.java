@@ -22,112 +22,112 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.springframework.boot.context.embedded.jetty.JettyServerCustomizer;
+import org.springframework.boot.web.embedded.jetty.JettyServerCustomizer;
 
 import com.avob.openadr.security.exception.OadrSecurityException;
 
 public class VENJettyServerCustomizer implements JettyServerCustomizer {
 
-    private int port;
-    private KeyStore keystore;
-    private KeyStore truststore;
-    private String keystorePass;
-    private String[] protocols;
-    private String[] ciphers;
+	private int port;
+	private KeyStore keystore;
+	private KeyStore truststore;
+	private String keystorePass;
+	private String[] protocols;
+	private String[] ciphers;
 
-    public VENJettyServerCustomizer(int port, KeyStore keystore, String keystorePass, KeyStore truststore,
-            String[] protocols, String[] ciphers) {
-        this.port = port;
-        this.keystore = keystore;
-        this.truststore = truststore;
-        this.keystorePass = keystorePass;
-        this.protocols = protocols;
-        this.ciphers = ciphers;
-    }
+	public VENJettyServerCustomizer(int port, KeyStore keystore, String keystorePass, KeyStore truststore,
+			String[] protocols, String[] ciphers) {
+		this.port = port;
+		this.keystore = keystore;
+		this.truststore = truststore;
+		this.keystorePass = keystorePass;
+		this.protocols = protocols;
+		this.ciphers = ciphers;
+	}
 
-    private HttpConfiguration getHttpConfiguration() {
-        HttpConfiguration config = new HttpConfiguration();
-        config.setSecureScheme("https");
-        config.setSecurePort(port);
-        config.setSendXPoweredBy(false);
-        config.setSendServerVersion(false);
-        config.addCustomizer(new SecureRequestCustomizer());
+	private HttpConfiguration getHttpConfiguration() {
+		HttpConfiguration config = new HttpConfiguration();
+		config.setSecureScheme("https");
+		config.setSecurePort(port);
+		config.setSendXPoweredBy(false);
+		config.setSendServerVersion(false);
+		config.addCustomizer(new SecureRequestCustomizer());
 
-        return config;
-    }
+		return config;
+	}
 
-    private SslContextFactory getSslContextFactory()
-            throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException,
-            OadrSecurityException, UnrecoverableKeyException, KeyManagementException {
-        // SSL Context Factory
-        SslContextFactory sslContextFactory = new SslContextFactory();
+	private SslContextFactory getSslContextFactory()
+			throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException,
+			OadrSecurityException, UnrecoverableKeyException, KeyManagementException {
+		// SSL Context Factory
+		SslContextFactory sslContextFactory = new SslContextFactory();
 
-        SSLContext sslContext = SSLContext.getInstance("TLS");
+		SSLContext sslContext = SSLContext.getInstance("TLS");
 
-        // init key manager factory
-        KeyStore createKeyStore = keystore;
-        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        keyManagerFactory.init(createKeyStore, keystorePass.toCharArray());
+		// init key manager factory
+		KeyStore createKeyStore = keystore;
+		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+		keyManagerFactory.init(createKeyStore, keystorePass.toCharArray());
 
-        // init trust manager factory
-        KeyStore createTrustStore = truststore;
-        TrustManagerFactory trustManagerFactory = TrustManagerFactory
-                .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        trustManagerFactory.init(createTrustStore);
+		// init trust manager factory
+		KeyStore createTrustStore = truststore;
+		TrustManagerFactory trustManagerFactory = TrustManagerFactory
+				.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		trustManagerFactory.init(createTrustStore);
 
-        // init ssl context
-        String seed = UUID.randomUUID().toString();
+		// init ssl context
+		String seed = UUID.randomUUID().toString();
 
-        sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
-                new SecureRandom(seed.getBytes()));
+		sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
+				new SecureRandom(seed.getBytes()));
 
-        sslContextFactory.setSslContext(sslContext);
+		sslContextFactory.setSslContext(sslContext);
 
-        // jetty 9 silently exclude required oadr20a default
-        // cipher suite
-        sslContextFactory.setExcludeCipherSuites("^.*_(MD5)$");
-        sslContextFactory.setExcludeProtocols("SSLv3");
-        sslContextFactory.setIncludeProtocols(this.protocols);
-        sslContextFactory.setIncludeCipherSuites(this.ciphers);
+		// jetty 9 silently exclude required oadr20a default
+		// cipher suite
+		sslContextFactory.setExcludeCipherSuites("^.*_(MD5)$");
+		sslContextFactory.setExcludeProtocols("SSLv3");
+		sslContextFactory.setIncludeProtocols(this.protocols);
+		sslContextFactory.setIncludeCipherSuites(this.ciphers);
 
-        // require client certificate authentication
-        sslContextFactory.setWantClientAuth(true);
+		// require client certificate authentication
+		sslContextFactory.setWantClientAuth(true);
 
-        return sslContextFactory;
+		return sslContextFactory;
 
-    }
+	}
 
-    @Override
-    public void customize(Server server) {
+	@Override
+	public void customize(Server server) {
 
-        try {
-            HttpConfiguration config = getHttpConfiguration();
+		try {
+			HttpConfiguration config = getHttpConfiguration();
 
-            HttpConnectionFactory http1 = new HttpConnectionFactory(config);
+			HttpConnectionFactory http1 = new HttpConnectionFactory(config);
 
-            SslConnectionFactory ssl = new SslConnectionFactory(this.getSslContextFactory(), "http/1.1");
+			SslConnectionFactory ssl = new SslConnectionFactory(this.getSslContextFactory(), "http/1.1");
 
-            ServerConnector connector = new ServerConnector(server, ssl, http1);
+			ServerConnector connector = new ServerConnector(server, ssl, http1);
 
-            connector.setPort(port);
-            Connector[] connectors = { connector };
-            server.setConnectors(connectors);
+			connector.setPort(port);
+			Connector[] connectors = { connector };
+			server.setConnectors(connectors);
 
-        } catch (OadrSecurityException e) {
-            throw new IllegalArgumentException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException(e);
-        } catch (CertificateException e) {
-            throw new IllegalArgumentException(e);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        } catch (KeyStoreException e) {
-            throw new IllegalArgumentException(e);
-        } catch (KeyManagementException e) {
-            throw new IllegalArgumentException(e);
-        } catch (UnrecoverableKeyException e) {
-            throw new IllegalArgumentException(e);
-        }
+		} catch (OadrSecurityException e) {
+			throw new IllegalArgumentException(e);
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalArgumentException(e);
+		} catch (CertificateException e) {
+			throw new IllegalArgumentException(e);
+		} catch (IOException e) {
+			throw new IllegalArgumentException(e);
+		} catch (KeyStoreException e) {
+			throw new IllegalArgumentException(e);
+		} catch (KeyManagementException e) {
+			throw new IllegalArgumentException(e);
+		} catch (UnrecoverableKeyException e) {
+			throw new IllegalArgumentException(e);
+		}
 
-    }
+	}
 }

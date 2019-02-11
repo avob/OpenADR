@@ -342,7 +342,7 @@ public class Oadr20bVTNEiOptControllerTest {
         Long modificationNumber = find.get(0).getModificationNumber();
 
         // test no opt for this ven and this event
-        DemandResponseEvent findById = demandResponseEventService.findById(eventId);
+        DemandResponseEvent findById = demandResponseEventService.findById(eventId).get();
         assertNotNull(findById);
         assertFalse(demandResponseEventService.hasResponded(OadrDataBaseSetup.VEN, findById));
 

@@ -54,8 +54,8 @@ public class VenGroupDaoTest {
         ven2.setVenGroup(Sets.newHashSet(venGroup, venGroup2));
         venService.save(ven2);
 
-        venGroup = venGroupDao.findOne(venGroup.getId());
-        venGroup2 = venGroupDao.findOne(venGroup2.getId());
+        venGroup = venGroupDao.findById(venGroup.getId()).get();
+        venGroup2 = venGroupDao.findById(venGroup2.getId()).get();
 
         Iterable<Ven> findByVenGroupIterable = venService.findAll();
         List<Ven> findByVenGroup = Lists.newArrayList(findByVenGroupIterable);
