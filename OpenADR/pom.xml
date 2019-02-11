@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.avob</groupId>
 	<artifactId>OpenADR</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${project.version}</version>
 	<name>OpenADR</name>
 	<description>OpenADR</description>
 	<packaging>pom</packaging>
@@ -13,6 +13,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<sonar.sources>src/main/java</sonar.sources>
+		<project.version>0.0.1-SNAPSHOT</project.version>
 	</properties>
 
 	

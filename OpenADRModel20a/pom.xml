@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.avob.openadr.model</groupId>
@@ -26,7 +27,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-remote-resources-plugin</artifactId>
-				<version>1.5</version>
+				<version>1.6.0</version>
 				<executions>
 					<execution>
 						<goals>
@@ -40,23 +41,6 @@
 					</includes>
 				</configuration>
 			</plugin>
-			<!-- <plugin> -->
-			<!-- <groupId>org.apache.maven.plugins</groupId> -->
-			<!-- <artifactId>maven-remote-resources-plugin</artifactId> -->
-			<!-- <version>1.5</version> -->
-			<!-- <configuration> -->
-			<!-- <resourceBundles> -->
-			<!-- <resourceBundle>com.avob.openadr.model:OpenADRModel20a:0.0.1-SNAPSHOT</resourceBundle> -->
-			<!-- </resourceBundles> -->
-			<!-- </configuration> -->
-			<!-- <executions> -->
-			<!-- <execution> -->
-			<!-- <goals> -->
-			<!-- <goal>process</goal> -->
-			<!-- </goals> -->
-			<!-- </execution> -->
-			<!-- </executions> -->
-			<!-- </plugin> -->
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>

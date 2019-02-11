@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.StringJoiner;
 
@@ -88,17 +89,12 @@ public class Oadr20bJAXBContext {
 		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		try {
 
-			File xsdFile = new File("src/main/resources/" + XSD_PATH);
-			File xsdAvobFile = new File("src/main/resources/" + XSD_AVOB_PATH);
-
-			// ClassLoader classLoader = Oadr20bJAXBContext.class.getClassLoader();
-			// File xsdFile = new
-			// File(classLoader.getResource("oadr20b_schema/oadr_20b.xsd").getFile());
-			// File xsdAvobFile = new
-			// File(classLoader.getResource("oadr20b_schema/oadr_avob.xsd").getFile());
+			URL url = this.getClass().getResource(XSD_PATH);
+			File xsdFile = new File(url.getPath());
+			url = this.getClass().getResource(XSD_AVOB_PATH);
+			File xsdAvobFile = new File(url.getPath());
 
 			schema = sf.newSchema(new Source[] { new StreamSource(xsdFile), new StreamSource(xsdAvobFile) });
-
 		} catch (SAXException e) {
 			throw new JAXBException("can't retreived xsd schema", e);
 		}
