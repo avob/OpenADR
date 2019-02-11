@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>com.avob</groupId>
 		<artifactId>OpenADR</artifactId>
-		<version>${project.version}</version>
+		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../OpenADR</relativePath>
 	</parent>
 	<dependencies>

@@ -11,27 +11,35 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.5.8.RELEASE</version>
 	</parent>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<project.version>0.0.1-SNAPSHOT</project.version>
+	</properties>
+	
 
 	<dependencies>
 		<dependency>
 			<groupId>com.avob.openadr.model</groupId>
 			<artifactId>OpenADRModel20b</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.avob.openadr.client.http</groupId>
 			<artifactId>OpenADRHTTPClient20b</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.avob.openadr.server.common.vtn</groupId>
 			<artifactId>OpenADRServerVTNCommon</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.avob.openadr.server.oadr20a</groupId>
 			<artifactId>OpenADRServerVTN20a</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
