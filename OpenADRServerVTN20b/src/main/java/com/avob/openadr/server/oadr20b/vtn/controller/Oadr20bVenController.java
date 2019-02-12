@@ -101,7 +101,7 @@ public class Oadr20bVenController {
 	public Oadr20bVenController() throws JAXBException {
 		jaxbContext = Oadr20bJAXBContext.getInstance();
 	}
-
+	
 	@RequestMapping(value = "/{venID}/registerparty/requestReregistration", method = RequestMethod.POST)
 	@ResponseBody
 	public void registerPartyRequestReregistration(@PathVariable("venID") String venID)
@@ -264,21 +264,6 @@ public class Oadr20bVenController {
 
 		return oadr20bDtoMapper.mapList(findBySource, ReportRequestDto.class);
 	}
-
-	// @RequestMapping(value = "/{venID}/report/requested/{reportRequestID}", method
-	// = RequestMethod.GET)
-	// @ResponseBody
-	// public List<ReportRequestDto>
-	// viewReportRequestByReportRequestId(@PathVariable("venID") String venID,
-	// @PathVariable("reportRequestID") String reportRequestID)
-	// throws Oadr20bMarshalException, OadrElementNotFoundException {
-	//
-	// checkVen(venID);
-	// List<OtherReportRequest> findBySource =
-	// otherReportRequestService.findByReportRequestId(reportRequestID);
-	//
-	// return oadr20bDtoMapper.mapList(findBySource, ReportRequestDto.class);
-	// }
 
 	@RequestMapping(value = "/{venID}/report/requested/cancelSubscription", method = RequestMethod.POST)
 	@ResponseBody
