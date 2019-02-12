@@ -26,6 +26,10 @@ OpenADRServerVTN20b | OADR 2.0b VTN squeleton implementation
 ## Functional Testing
 - use in-memory h2 SQL bdd / activemq broker
 - use RSA/ECC test certificates from *https://portal.kyrio.com/*
+- VTN 2.0b @ https://localhost:8181/testvtn
+- VEN 2.0b x509 ECC auth @ https://localhost:8081/
+- VEN 2.0b x509 RSA auth @ https://localhost:8082/
+- VENs create registrationParty at application startup
 
 ```shell
 	# build and install
@@ -37,10 +41,16 @@ OpenADRServerVTN20b | OADR 2.0b VTN squeleton implementation
 
 
     cd OpenADRServerVEN20b
-    # Launch VEN 2.0b using x509 RSA auth
+    # Launch VEN 2.0b RSA
     mvn spring-boot:run -Dspring.profiles.active=test-functional-rsa
 
-    # Launch VEN 2.0b using x509 ECC auth
+    # Launch VEN 2.0b ECC
     mvn spring-boot:run -Dspring.profiles.active=test-functional-ecc
+
+    # Create new basic/digest VEN on VTN using HTTP request
+    curl -d '{"username": "test-vtn",  "password": "test-vtn"}' -H "Content-Type: application/json" -X POST https://localhost:8181/testvtn/Ven/ 
+
+    # Create new x509 VEN on VTN using HTTP request
+    curl -d '{"username": "{certificat 2.0b fingerprint}"}' -H "Content-Type: application/json" -X POST https://localhost:8181/testvtn/Ven/ 
     
 ```
