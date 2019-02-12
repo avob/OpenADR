@@ -43,7 +43,7 @@ public class Oadr20bVENEiRegisterPartyController {
 	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
-	private Oadr20bVENEiRegisterPartyService registerPartyService;
+	private Oadr20bVENEiRegisterPartyService oadr20bVENEiRegisterPartyService;
 
 	@Resource
 	private XmlSignatureService xmlSignatureService;
@@ -114,7 +114,7 @@ public class Oadr20bVENEiRegisterPartyController {
 			OadrRequestReregistrationType oadrRequestReregistrationType, boolean signed)
 			throws Oadr20bMarshalException, Oadr20bXMLSignatureException {
 
-		OadrResponseType response = registerPartyService.oadrRequestReregistration(vtnConfig,
+		OadrResponseType response = oadr20bVENEiRegisterPartyService.oadrRequestReregistration(vtnConfig,
 				oadrRequestReregistrationType);
 
 		String responseStr = null;
@@ -133,8 +133,8 @@ public class Oadr20bVENEiRegisterPartyController {
 			OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType, boolean signed)
 			throws Oadr20bMarshalException, Oadr20bXMLSignatureException {
 
-		OadrCanceledPartyRegistrationType response = registerPartyService.oadrCancelPartyRegistration(vtnConfig,
-				oadrCancelPartyRegistrationType);
+		OadrCanceledPartyRegistrationType response = oadr20bVENEiRegisterPartyService
+				.oadrCancelPartyRegistration(vtnConfig, oadrCancelPartyRegistrationType);
 
 		String responseStr = null;
 

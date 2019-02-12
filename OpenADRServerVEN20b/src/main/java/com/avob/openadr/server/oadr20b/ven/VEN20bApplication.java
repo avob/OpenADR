@@ -12,18 +12,23 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 
 import com.avob.openadr.model.oadr20b.Oadr20bSecurity;
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.oadr20b.ven.service.Oadr20bPollService;
+import com.avob.openadr.server.oadr20b.ven.service.autostart.Oadr20bVENAutoStartRegisterPartyService;
 
 @Configuration
 @EnableAutoConfiguration
@@ -36,7 +41,13 @@ public class VEN20bApplication {
 	private VenConfig venConfig;
 
 	@Resource
+	private Oadr20bPollService oadr20bPollService;
+
+	@Resource
 	private MultiVtnConfig multiVtnConfig;
+
+	@Autowired(required = false)
+	private Oadr20bVENAutoStartRegisterPartyService oadr20bVENAutoStartRegisterPartyService;
 
 	@Bean
 	public ScheduledExecutorService scheduledExecutorService() {
@@ -76,6 +87,14 @@ public class VEN20bApplication {
 			LOGGER.error("", e);
 		}
 		return null;
+	}
+
+	@EventListener({ ApplicationReadyEvent.class })
+	void applicationReadyEvent() {
+		for (VtnSessionConfiguration vtnSessionConfiguration : multiVtnConfig.getMultiConfig().values()) {
+			oadr20bVENAutoStartRegisterPartyService.initRegistration(vtnSessionConfiguration);
+			oadr20bPollService.initPoll(vtnSessionConfiguration);
+		}
 	}
 
 	public static void main(String[] args) {

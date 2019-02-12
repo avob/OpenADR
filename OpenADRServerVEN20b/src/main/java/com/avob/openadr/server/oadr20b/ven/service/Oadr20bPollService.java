@@ -51,13 +51,13 @@ public class Oadr20bPollService {
     private MultiVtnConfig multiVtnConfig;
 
     @Resource
-    private Oadr20bVENEiRegisterPartyService registerPartyService;
+    private Oadr20bVENEiRegisterPartyService oadr20bVENEiRegisterPartyService;
 
     @Resource
-    private Oadr20bVENEiReportService reportService;
+    private Oadr20bVENEiReportService oadr20bVENEiReportService;
 
     @Resource
-    private Oadr20bVENEiEventService eventService;
+    private Oadr20bVENEiEventService oadr20bVENEiEventService;
 
     @Resource
     private ScheduledExecutorService scheduledExecutorService;
@@ -84,7 +84,7 @@ public class Oadr20bPollService {
             } else if (payload instanceof OadrDistributeEventType) {
                 LOGGER.info("Retrieved OadrDistributeEventType");
                 OadrDistributeEventType val = (OadrDistributeEventType) payload;
-                OadrResponseType oadrDistributeEvent = eventService.oadrDistributeEvent(vtnSession, val);
+                OadrResponseType oadrDistributeEvent = oadr20bVENEiEventService.oadrDistributeEvent(vtnSession, val);
 
                 String responseCode = oadrDistributeEvent.getEiResponse().getResponseCode();
                 if (HttpStatus.OK_200 != Integer.valueOf(responseCode)) {
@@ -96,7 +96,7 @@ public class Oadr20bPollService {
                 LOGGER.info("Retrieved OadrCancelPartyRegistrationType");
                 OadrCancelPartyRegistrationType val = (OadrCancelPartyRegistrationType) payload;
 
-                OadrCanceledPartyRegistrationType oadrCancelPartyRegistration = registerPartyService
+                OadrCanceledPartyRegistrationType oadrCancelPartyRegistration = oadr20bVENEiRegisterPartyService
                         .oadrCancelPartyRegistration(vtnSession, val);
 
                 OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)
@@ -115,7 +115,7 @@ public class Oadr20bPollService {
                 LOGGER.info("Retrieved OadrRequestReregistrationType");
                 OadrRequestReregistrationType val = (OadrRequestReregistrationType) payload;
 
-                OadrResponseType oadrRequestReregistration = registerPartyService.oadrRequestReregistration(vtnSession,
+                OadrResponseType oadrRequestReregistration = oadr20bVENEiRegisterPartyService.oadrRequestReregistration(vtnSession,
                         val);
                 reinitPoll(vtnSession);
                 OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)
@@ -134,7 +134,7 @@ public class Oadr20bPollService {
                 LOGGER.info("Retrieved OadrCancelReportType");
                 OadrCancelReportType val = (OadrCancelReportType) payload;
 
-                OadrCanceledReportType oadrCancelReport = reportService.oadrCancelReport(vtnSession, val);
+                OadrCanceledReportType oadrCancelReport = oadr20bVENEiReportService.oadrCancelReport(vtnSession, val);
 
                 OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)
                         .oadrCanceledReport(oadrCancelReport);
@@ -151,7 +151,7 @@ public class Oadr20bPollService {
                 LOGGER.info("Retrieved OadrCreateReportType");
                 OadrCreateReportType val = (OadrCreateReportType) payload;
 
-                OadrCreatedReportType oadrCreateReport = reportService.oadrCreateReport(vtnSession, val);
+                OadrCreatedReportType oadrCreateReport = oadr20bVENEiReportService.oadrCreateReport(vtnSession, val);
 
                 OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)
                         .oadrCreatedReport(oadrCreateReport);
@@ -169,7 +169,7 @@ public class Oadr20bPollService {
                 OadrRegisterReportType val = (OadrRegisterReportType) payload;
 
                 // OadrResponseType oadrRegisterReport =
-                reportService.oadrRegisterReport(vtnSession, val);
+                oadr20bVENEiReportService.oadrRegisterReport(vtnSession, val);
 
                 // TODO bzanni: do VEN has to propagate this response ?
                 // if so, need to add this payload to vtn eireport endpoint
@@ -178,7 +178,7 @@ public class Oadr20bPollService {
                 LOGGER.info("Retrieved OadrUpdateReportType");
                 OadrUpdateReportType val = (OadrUpdateReportType) payload;
 
-                OadrUpdatedReportType oadrUpdateReport = reportService.oadrUpdateReport(vtnSession, val);
+                OadrUpdatedReportType oadrUpdateReport = oadr20bVENEiReportService.oadrUpdateReport(vtnSession, val);
 
                 OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)
                         .oadrUpdatedReport(oadrUpdateReport);
@@ -211,7 +211,7 @@ public class Oadr20bPollService {
         @Override
         public void run() {
 
-            OadrCreatedPartyRegistrationType registration = registerPartyService.getRegistration(vtnSession);
+            OadrCreatedPartyRegistrationType registration = oadr20bVENEiRegisterPartyService.getRegistration(vtnSession);
             if (registration == null) {
                 cancelHttpScheduledPullRequestTask(vtnSession, false);
             }
@@ -230,7 +230,7 @@ public class Oadr20bPollService {
                         + e.getErrorMessage());
                 if (e.getErrorCode() == HttpStatus.FORBIDDEN_403) {
                     LOGGER.warn("Receive Forbidden[403]: clear and init registration");
-                    registerPartyService.reinitRegistration(vtnSession);
+                    oadr20bVENEiRegisterPartyService.reinitRegistration(vtnSession);
                     reinitPoll(vtnSession);
                 }
             } catch (Oadr20bXMLSignatureException e) {
@@ -258,10 +258,10 @@ public class Oadr20bPollService {
     }
 
     public void initPoll(VtnSessionConfiguration vtnSession) {
-        if (registerPartyService.getRegistration(vtnSession) != null) {
+        if (oadr20bVENEiRegisterPartyService.getRegistration(vtnSession) != null) {
             if (venConfig.getPullModel()) {
                 Long xmlDurationToMillisecond = venConfig.getPullFrequencySeconds() * 1000;
-                DurationPropType oadrRequestedOadrPollFreq = registerPartyService.getRegistration(vtnSession)
+                DurationPropType oadrRequestedOadrPollFreq = oadr20bVENEiRegisterPartyService.getRegistration(vtnSession)
                         .getOadrRequestedOadrPollFreq();
                 if (oadrRequestedOadrPollFreq != null) {
                     xmlDurationToMillisecond = Oadr20bFactory
