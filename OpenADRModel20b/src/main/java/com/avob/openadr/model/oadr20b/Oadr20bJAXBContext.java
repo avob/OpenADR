@@ -90,9 +90,12 @@ public class Oadr20bJAXBContext {
 		try {
 
 			URL url = this.getClass().getResource(XSD_PATH);
+			System.out.println("Path: " + url.getPath());
 			File xsdFile = new File(url.getPath());
 			url = this.getClass().getResource(XSD_AVOB_PATH);
 			File xsdAvobFile = new File(url.getPath());
+			
+			System.out.println(url.getPath());
 
 			schema = sf.newSchema(new Source[] { new StreamSource(xsdFile), new StreamSource(xsdAvobFile) });
 		} catch (SAXException e) {

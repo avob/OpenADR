@@ -26,14 +26,13 @@ OpenADRServerVTN20b | OADR 2.0b VTN squeleton implementation
 - Jetty 9
 - VEN/VTN server implementation uses SQL Database
 
-## Build
-```shell
-    mvn clean package
-```
-## Functional testing
+## VTN Functional testing
 - use in-memory h2 SQL bdd / activemq broker
 - use RSA/ECC test certificates from *https://portal.kyrio.com/*
 - configuration: *https://github.com/avob/OpenADR/blob/master/OpenADRServerVTN20b/src/main/resources/application-test-functional.properties*
 ```shell
-    java -jar target/OpenADRServerVTN20b*.jar --spring.profiles.active=test-functional
+	# build and install
+	mvn clean package install
+	cd cd OpenADRServerVTN20b
+    mvn spring-boot:run -Dspring.profiles.active=test-functional
 ```
