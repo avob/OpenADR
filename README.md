@@ -4,7 +4,7 @@
 
 OpenADR protocol java implementation: *https://www.openadr.org/*
 
-This project aims to provide minimal VEN / VTN 2.0a / 2.0b squeleton implementations. Relevant projects has to be extended to implement specific business logic: data source integration for a VEN stack, aggregation mechanism for VTN stack etc...
+This project aims to provide minimal VEN / VTN 2.0a / 2.0b skeleton implementations. Relevant projects has to be extended to implement specific business logic: data source integration for a VEN stack, aggregation mechanism for VTN stack etc...
 
 Module | Description
 ------------- | ------------- 
@@ -14,17 +14,17 @@ OpenADRModel20b | OADR 2.0b model java classes generated from XSDL definition fi
 OpenADRHttpClient | OADR http transport client framework
 OpenADRHttpClient20a | OADR 2.0a simple http client
 OpenADRHttpClient20b | OADR 2.0b simple http client
-OpenADRServerVEN20a | OADR 2.0a VEN squeleton implementation
-OpenADRServerVEN20b | OADR 2.0b VEN squeleton implementation
-OpenADRServerVTN20a | OADR 2.0a VTN squeleton implementation
-OpenADRServerVTN20b | OADR 2.0b VTN squeleton implementation
+OpenADRServerVEN20a | OADR 2.0a VEN skeleton implementation
+OpenADRServerVEN20b | OADR 2.0b VEN skeleton implementation
+OpenADRServerVTN20a | OADR 2.0a VTN skeleton implementation
+OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 
 ## Dependencies
 - Java 8
 - Maven 3 
 
 ## Functional Testing
-- use in-memory h2 SQL bdd / activemq broker
+- use in-memory h2 SQL db / activemq broker
 - use RSA/ECC test certificates from *https://portal.kyrio.com/*
 - VTN 2.0b @ https://localhost:8181/testvtn
 - VEN 2.0b x509 ECC auth @ https://localhost:8081/
