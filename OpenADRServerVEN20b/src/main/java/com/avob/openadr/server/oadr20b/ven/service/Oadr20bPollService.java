@@ -36,16 +36,12 @@ import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.model.oadr20b.xcal.DurationPropType;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
-import com.avob.openadr.server.oadr20b.ven.VenConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 
 @Service
 public class Oadr20bPollService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bPollService.class);
-
-    @Resource
-    private VenConfig venConfig;
 
     @Resource
     private MultiVtnConfig multiVtnConfig;
@@ -216,7 +212,7 @@ public class Oadr20bPollService {
                 cancelHttpScheduledPullRequestTask(vtnSession, false);
             }
 
-            OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(venConfig.getVenId()).build();
+            OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(vtnSession.getVenSessionConfig().getVenId()).build();
 
             try {
                 Object payload = multiVtnConfig.getMultiClientConfig(vtnSession).oadrPoll(poll);
@@ -259,8 +255,8 @@ public class Oadr20bPollService {
 
     public void initPoll(VtnSessionConfiguration vtnSession) {
         if (oadr20bVENEiRegisterPartyService.getRegistration(vtnSession) != null) {
-            if (venConfig.getPullModel()) {
-                Long xmlDurationToMillisecond = venConfig.getPullFrequencySeconds() * 1000;
+            if (vtnSession.getVenSessionConfig().getPullModel()) {
+                Long xmlDurationToMillisecond = vtnSession.getVenSessionConfig().getPullFrequencySeconds() * 1000;
                 DurationPropType oadrRequestedOadrPollFreq = oadr20bVENEiRegisterPartyService.getRegistration(vtnSession)
                         .getOadrRequestedOadrPollFreq();
                 if (oadrRequestedOadrPollFreq != null) {

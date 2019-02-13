@@ -36,16 +36,12 @@ import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
-import com.avob.openadr.server.oadr20b.ven.VenConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 
 @Service
 public class Oadr20bVENEiRegisterPartyService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVENEiRegisterPartyService.class);
-
-	@Resource
-	protected VenConfig venConfig;
 
 	@Resource
 	protected MultiVtnConfig multiVtnConfig;
@@ -98,7 +94,8 @@ public class Oadr20bVENEiRegisterPartyService {
 
 	public void clearRegistration(VtnSessionConfiguration vtnConfiguration) {
 		try {
-			statePersistenceService.deleteRegistration(venConfig.getVenId(), vtnConfiguration);
+			statePersistenceService.deleteRegistration(vtnConfiguration.getVenSessionConfig().getVenId(),
+					vtnConfiguration);
 			setRegistration(vtnConfiguration, null);
 		} catch (IOException e) {
 			LOGGER.error("", e);
@@ -124,7 +121,8 @@ public class Oadr20bVENEiRegisterPartyService {
 	private void initRegistration(VtnSessionConfiguration vtnConfiguration, String registrationId) {
 		OadrCreatedPartyRegistrationType loadRegistration = null;
 		try {
-			loadRegistration = statePersistenceService.loadRegistration(venConfig.getVenId(), vtnConfiguration);
+			loadRegistration = statePersistenceService
+					.loadRegistration(vtnConfiguration.getVenSessionConfig().getVenId(), vtnConfiguration);
 
 			String requestId = "0";
 			String reportRequestId = "0";
@@ -136,7 +134,7 @@ public class Oadr20bVENEiRegisterPartyService {
 							reportBackDuration)
 					.addSpecifierPayload(null, ReadingTypeEnumeratedType.DIRECT_READ, reportSpecifierId).build();
 			OadrCreateReportType build = Oadr20bEiReportBuilders
-					.newOadr20bCreateReportBuilder(requestId, venConfig.getVenId())
+					.newOadr20bCreateReportBuilder(requestId, vtnConfiguration.getVenSessionConfig().getVenId())
 					.addReportRequest(oadrReportRequestType).build();
 
 			multiVtnConfig.getMultiClientConfig(vtnConfiguration).oadrCreateReport(build);
@@ -151,7 +149,8 @@ public class Oadr20bVENEiRegisterPartyService {
 			if (e.getErrorCode() == HttpStatus.FORBIDDEN_403) {
 				loadRegistration = null;
 				try {
-					statePersistenceService.deleteRegistration(venConfig.getVenId(), vtnConfiguration);
+					statePersistenceService.deleteRegistration(vtnConfiguration.getVenSessionConfig().getVenId(),
+							vtnConfiguration);
 				} catch (IOException e1) {
 					LOGGER.error("", e1);
 				}
@@ -170,9 +169,9 @@ public class Oadr20bVENEiRegisterPartyService {
 
 			if (isSameConfig(vtnConfiguration)) {
 				LOGGER.debug("Ven already registered using registrationId: " + loadRegistration.getRegistrationID());
-				LOGGER.debug("        xmlSignature: " + venConfig.getXmlSignature());
-				LOGGER.debug("        reportOnly  : " + venConfig.getReportOnly());
-				LOGGER.debug("        pullModel   : " + venConfig.getPullModel());
+				LOGGER.debug("        xmlSignature: " + vtnConfiguration.getVenSessionConfig().getXmlSignature());
+				LOGGER.debug("        reportOnly  : " + vtnConfiguration.getVenSessionConfig().getReportOnly());
+				LOGGER.debug("        pullModel   : " + vtnConfiguration.getVenSessionConfig().getPullModel());
 				setRegistration(vtnConfiguration, loadRegistration);
 				if (listeners != null) {
 					final OadrCreatedPartyRegistrationType reg = loadRegistration;
@@ -187,18 +186,18 @@ public class Oadr20bVENEiRegisterPartyService {
 
 		LOGGER.info("Ven is not yet registered");
 
-		Boolean pullModel = venConfig.getPullModel();
+		Boolean pullModel = vtnConfiguration.getVenSessionConfig().getPullModel();
 		String transportAddress = null;
 		if (!pullModel) {
-			transportAddress = venConfig.getVenUrl();
+			transportAddress = vtnConfiguration.getVenSessionConfig().getVenUrl();
 		}
-		boolean reportOnly = venConfig.getReportOnly();
+		boolean reportOnly = vtnConfiguration.getVenSessionConfig().getReportOnly();
 		OadrTransportType transportType = OadrTransportType.SIMPLE_HTTP;
-		String venName = venConfig.getVenName();
-		boolean xmlSignature = venConfig.getXmlSignature();
+		String venName = vtnConfiguration.getVenSessionConfig().getVenName();
+		boolean xmlSignature = vtnConfiguration.getVenSessionConfig().getXmlSignature();
 		String requestId = "";
 		Oadr20bCreatePartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCreatePartyRegistrationBuilder(requestId, venConfig.getVenId(),
+				.newOadr20bCreatePartyRegistrationBuilder(requestId, vtnConfiguration.getVenSessionConfig().getVenId(),
 						SchemaVersionEnumeratedType.OADR_20B.value())
 				.withOadrHttpPullModel(pullModel).withOadrTransportAddress(transportAddress)
 				.withOadrReportOnly(reportOnly).withOadrTransportName(transportType).withOadrVenName(venName)
@@ -217,12 +216,13 @@ public class Oadr20bVENEiRegisterPartyService {
 					.oadrCreatePartyRegistration(createPartyRegistration);
 
 			if (loadRegistration.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
-				statePersistenceService.persistRegistration(venConfig.getVenId(), vtnConfiguration, loadRegistration);
+				statePersistenceService.persistRegistration(vtnConfiguration.getVenSessionConfig().getVenId(),
+						vtnConfiguration, loadRegistration);
 				LOGGER.info(
 						"Ven has successfully register using registrationId: " + loadRegistration.getRegistrationID());
-				LOGGER.debug("        xmlSignature: " + venConfig.getXmlSignature());
-				LOGGER.debug("        reportOnly  : " + venConfig.getReportOnly());
-				LOGGER.debug("        pullModel   : " + venConfig.getPullModel());
+				LOGGER.debug("        xmlSignature: " + vtnConfiguration.getVenSessionConfig().getXmlSignature());
+				LOGGER.debug("        reportOnly  : " + vtnConfiguration.getVenSessionConfig().getReportOnly());
+				LOGGER.debug("        pullModel   : " + vtnConfiguration.getVenSessionConfig().getPullModel());
 			} else {
 				LOGGER.error("Ven has failed to register - responseCode: "
 						+ loadRegistration.getEiResponse().getResponseCode() + ", responseDescription: "

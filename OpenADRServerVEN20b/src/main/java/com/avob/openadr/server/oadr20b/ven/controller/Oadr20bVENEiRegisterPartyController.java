@@ -27,6 +27,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyService;
@@ -59,7 +60,7 @@ public class Oadr20bVENEiRegisterPartyController {
 	@ResponseBody
 	public String request(@RequestBody String payload, Principal principal)
 			throws Oadr20bMarshalException, Oadr20bUnmarshalException, Oadr20bApplicationLayerException,
-			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException {
+			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException {
 
 		Object unmarshal = jaxbContext.unmarshal(payload);
 
@@ -96,8 +97,8 @@ public class Oadr20bVENEiRegisterPartyController {
 
 	private String handle(VtnSessionConfiguration vtnConfig, OadrPayload oadrPayload)
 			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
-			Oadr20bXMLSignatureException {
-		xmlSignatureService.validate(oadrPayload);
+			Oadr20bXMLSignatureException, OadrSecurityException {
+		xmlSignatureService.validate(oadrPayload, vtnConfig);
 
 		if (oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration() != null) {
 			LOGGER.info(vtnConfig.getVtnId() + " - OadrCancelPartyRegistrationType signed");
@@ -112,7 +113,7 @@ public class Oadr20bVENEiRegisterPartyController {
 
 	private String handle(VtnSessionConfiguration vtnConfig,
 			OadrRequestReregistrationType oadrRequestReregistrationType, boolean signed)
-			throws Oadr20bMarshalException, Oadr20bXMLSignatureException {
+			throws Oadr20bMarshalException, Oadr20bXMLSignatureException, OadrSecurityException {
 
 		OadrResponseType response = oadr20bVENEiRegisterPartyService.oadrRequestReregistration(vtnConfig,
 				oadrRequestReregistrationType);
@@ -120,7 +121,7 @@ public class Oadr20bVENEiRegisterPartyController {
 		String responseStr = null;
 
 		if (signed) {
-			responseStr = xmlSignatureService.sign(response);
+			responseStr = xmlSignatureService.sign(response, vtnConfig);
 		} else {
 			responseStr = jaxbContext.marshalRoot(response);
 		}
@@ -131,7 +132,7 @@ public class Oadr20bVENEiRegisterPartyController {
 
 	private String handle(VtnSessionConfiguration vtnConfig,
 			OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType, boolean signed)
-			throws Oadr20bMarshalException, Oadr20bXMLSignatureException {
+			throws Oadr20bMarshalException, Oadr20bXMLSignatureException, OadrSecurityException {
 
 		OadrCanceledPartyRegistrationType response = oadr20bVENEiRegisterPartyService
 				.oadrCancelPartyRegistration(vtnConfig, oadrCancelPartyRegistrationType);
@@ -139,7 +140,7 @@ public class Oadr20bVENEiRegisterPartyController {
 		String responseStr = null;
 
 		if (signed) {
-			responseStr = xmlSignatureService.sign(response);
+			responseStr = xmlSignatureService.sign(response, vtnConfig);
 		} else {
 			responseStr = jaxbContext.marshalRoot(response);
 		}

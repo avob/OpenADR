@@ -39,9 +39,6 @@ import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bDistributeEventAppli
 public class Oadr20bVENEiEventService {
 
     @Resource
-    private VenConfig venConfig;
-
-    @Resource
     private MultiVtnConfig multiVtnConfig;
 
     @Resource
@@ -274,7 +271,7 @@ public class Oadr20bVENEiEventService {
 
         if (!eventResponses.isEmpty()) {
             OadrCreatedEventType build = Oadr20bEiEventBuilders
-                    .newCreatedEventBuilder(venConfig.getVenId(), vtnRequestID, responseCode)
+                    .newCreatedEventBuilder(vtnConfiguration.getVenSessionConfig().getVenId(), vtnRequestID, responseCode)
                     .addEventResponse(eventResponses).build();
 
             planRequestService.submitCreatedEvent(multiVtnConfig.getMultiClientConfig(vtnConfiguration), build);

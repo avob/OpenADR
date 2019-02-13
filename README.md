@@ -35,18 +35,20 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 	# build and install
 	mvn clean package install
 
-	# Launch VTN 2.0b
+	# Launch VTN 2.0b
 	cd OpenADRServerVTN20b
-    mvn spring-boot:run -Dspring.profiles.active=test-functional,oadr-cert
+    mvn spring-boot:run \
+        -Dspring.profiles.active=test-functional,oadr-cert
 
 
     cd OpenADRServerVEN20b
-    # Launch VEN 2.0b RSA
-    mvn spring-boot:run -Dspring.profiles.active=test-functional,oadr-cert-rsa
+    # Launch VEN 2.0b RSA
+    mvn spring-boot:run \
+        -Dspring.profiles.active=test-functional,oadr-cert-rsa
 
-    # Launch VEN 2.0b ECC
-    mvn spring-boot:run -Dspring.profiles.active=test-functional,oadr-cert-ecc
-    
+    # Launch VEN 2.0b ECC
+    mvn spring-boot:run \
+        -Dspring.profiles.active=test-functional,oadr-cert-ecc
 ```
 
 ## Custom PKI Architecture
@@ -66,22 +68,36 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 	cd cert
 	./gen.sh
 
-	# Launch VTN 2.0b
+	# Launch VTN 2.0b
 	cd OpenADRServerVTN20b
-    mvn spring-boot:run -Dspring.profiles.active=test-functional,custom-cert -Doadr.security.admin.username={client.oadr.com.fingerprint}
+    mvn spring-boot:run \
+        -Dspring.profiles.active=test-functional,custom-cert \
+        -Doadr.security.admin.username={client.oadr.com.fingerprint}
 
     # Create Ven1 / Ven2 on VTN
     cd cert
-    curl --key client.oadr.com.key --cert client.oadr.com.crt --cacert oadr.com.crt  -d '{"username": "'.$(cat ven1.oadr.com.fingerprint).'"}' -H "Content-Type: application/json" -X POST https://vtn.oadr.com:8181/testvtn/Ven/
-    curl --key client.oadr.com.key --cert client.oadr.com.crt --cacert oadr.com.crt  -d '{"username": "'.$(cat ven2.oadr.com.fingerprint).'"}' -H "Content-Type: application/json" -X POST https://vtn.oadr.com:8181/testvtn/Ven/
+    curl --key client.oadr.com.key --cert client.oadr.com.crt \ 
+        --cacert oadr.com.crt \
+        -d '{"username": "'.$(cat ven1.oadr.com.fingerprint).'"}' \
+        -H "Content-Type: application/json" \
+        -X POST https://vtn.oadr.com:8181/testvtn/Ven/
+    curl --key client.oadr.com.key --cert client.oadr.com.crt \
+        --cacert oadr.com.crt  \
+        -d '{"username": "'.$(cat ven2.oadr.com.fingerprint).'"}' \
+        -H "Content-Type: application/json" \
+        -X POST https://vtn.oadr.com:8181/testvtn/Ven/
 
-    # Launch VEN1
+    # Launch VEN1
     cd OpenADRServerVEN20b
-    mvn spring-boot:run -Dspring.profiles.active=test-functional,custom-cert-ven1 -Doadr.venid={ven1.oadr.com.fingerprint}
+    mvn spring-boot:run \
+        -Dspring.profiles.active=test-functional,custom-cert-ven1 \
+        -Doadr.venid={ven1.oadr.com.fingerprint}
 
-    # Launch VEN2
+    # Launch VEN2
     cd OpenADRServerVEN20b
-    mvn spring-boot:run -Dspring.profiles.active=test-functional,custom-cert-ven2 -Doadr.venid={ven2.oadr.com.fingerprint}
+    mvn spring-boot:run \
+        -Dspring.profiles.active=test-functional,custom-cert-ven2 \
+        -Doadr.venid={ven2.oadr.com.fingerprint}
 
     
 ```

@@ -2,10 +2,9 @@ package com.avob.openadr.server.oadr20b.ven.service;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
@@ -15,33 +14,50 @@ import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandler;
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
-import com.avob.openadr.server.oadr20b.ven.VenConfig;
+import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 
 @Service
 public class XmlSignatureService {
 
-	@Resource
-	private VenConfig venConfig;
+	private Map<String, PrivateKey> cachedKey = new HashMap<>();
+	private Map<String, X509Certificate> cachedCert = new HashMap<>();
 
-	private PrivateKey parsePrivateKey;
-
-	private X509Certificate parseCertificate;
-
-	@PostConstruct
-	public void init() throws OadrSecurityException {
-		parsePrivateKey = OadrHttpSecurity.parsePrivateKey(venConfig.getVenPrivateKeyPath());
-		parseCertificate = OadrHttpSecurity.parseCertificate(venConfig.getVenCertificatePath());
+	private X509Certificate loadCert(String path) throws OadrSecurityException {
+		X509Certificate cert = null;
+		if (!cachedCert.containsKey(path)) {
+			cert = OadrHttpSecurity.parseCertificate(path);
+			cachedCert.put(path, cert);
+		} else {
+			cert = cachedCert.get(path);
+		}
+		return cert;
 	}
 
-	public String sign(Object object) throws Oadr20bXMLSignatureException {
+	private PrivateKey loadKey(String path) throws OadrSecurityException {
+		PrivateKey cert = null;
+		if (!cachedKey.containsKey(path)) {
+			cert = OadrHttpSecurity.parsePrivateKey(path);
+			cachedKey.put(path, cert);
+		} else {
+			cert = cachedKey.get(path);
+		}
+		return cert;
+	}
+
+	public String sign(Object object, VtnSessionConfiguration multiConfig)
+			throws Oadr20bXMLSignatureException, OadrSecurityException {
+		PrivateKey loadKey = loadKey(multiConfig.getVenSessionConfig().getVenPrivateKeyPath());
+		X509Certificate loadCert = loadCert(multiConfig.getVenSessionConfig().getVenCertificatePath());
 		String nonce = UUID.randomUUID().toString();
 		Long createdtimestamp = System.currentTimeMillis();
-		return OadrXMLSignatureHandler.sign(object, parsePrivateKey, parseCertificate, nonce, createdtimestamp);
+		return OadrXMLSignatureHandler.sign(object, loadKey, loadCert, nonce, createdtimestamp);
 	}
 
-	public void validate(OadrPayload payload) throws Oadr20bXMLSignatureValidationException {
+	public void validate(OadrPayload payload, VtnSessionConfiguration multiConfig)
+			throws Oadr20bXMLSignatureValidationException {
 		long nowDate = System.currentTimeMillis();
-		OadrXMLSignatureHandler.validate(payload, nowDate, venConfig.getReplayProtectAcceptedDelaySecond() * 1000L);
+		OadrXMLSignatureHandler.validate(payload, nowDate,
+				multiConfig.getVenSessionConfig().getReplayProtectAcceptedDelaySecond() * 1000L);
 	}
 
 }

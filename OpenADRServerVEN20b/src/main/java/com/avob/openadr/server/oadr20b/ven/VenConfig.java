@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class VenConfig {
+public class VenConfig implements Cloneable{
 
 	@Value("${oadr.venid}")
 	private String venId;
@@ -154,6 +154,52 @@ public class VenConfig {
 
 	public Long getReplayProtectAcceptedDelaySecond() {
 		return replayProtectAcceptedDelaySecond;
+	}
+	
+	public List<String> getTrustCertificates() {
+		return trustCertificates;
+	}
+
+	public void setTrustCertificates(List<String> trustCertificates) {
+		this.trustCertificates = trustCertificates;
+	}
+
+	public void setVenPrivateKeyPath(String venPrivateKeyPath) {
+		this.venPrivateKeyPath = venPrivateKeyPath;
+	}
+
+	public void setVenCertificatePath(String venCertificatePath) {
+		this.venCertificatePath = venCertificatePath;
+	}
+
+	public void setBasicUsername(String basicUsername) {
+		this.basicUsername = basicUsername;
+	}
+
+	public void setBasicPassword(String basicPassword) {
+		this.basicPassword = basicPassword;
+	}
+
+	public void setDigestUsername(String digestUsername) {
+		this.digestUsername = digestUsername;
+	}
+
+	public void setDigestPassword(String digestPassword) {
+		this.digestPassword = digestPassword;
+	}
+
+	public void setReplayProtectAcceptedDelaySecond(Long replayProtectAcceptedDelaySecond) {
+		this.replayProtectAcceptedDelaySecond = replayProtectAcceptedDelaySecond;
+	}
+
+	public VenConfig clone() {
+		VenConfig o = null;
+		try {
+			o = (VenConfig) super.clone();
+		} catch(CloneNotSupportedException cnse) {
+			cnse.printStackTrace(System.err);
+		}
+		return o;
 	}
 
 }

@@ -26,6 +26,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationExc
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bDistributeEventApplicationLayerException;
@@ -78,7 +79,8 @@ public class Oadr20bVENEiEventController {
 	@ResponseBody
 	public String request(@RequestBody String payload, Principal principal)
 			throws Oadr20bMarshalException, Oadr20bUnmarshalException, Oadr20bDistributeEventApplicationLayerException,
-			Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException {
+			Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException,
+			OadrSecurityException {
 
 		Object unmarshal = jaxbContext.unmarshal(payload);
 
@@ -109,9 +111,9 @@ public class Oadr20bVENEiEventController {
 
 	private String handle(VtnSessionConfiguration multiConfig, OadrPayload oadrPayload)
 			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
-			Oadr20bXMLSignatureException {
+			Oadr20bXMLSignatureException, OadrSecurityException {
 
-		xmlSignatureService.validate(oadrPayload);
+		xmlSignatureService.validate(oadrPayload, multiConfig);
 
 		if (oadrPayload.getOadrSignedObject().getOadrDistributeEvent() != null) {
 			LOGGER.info(multiConfig.getVtnId() + " - OadrDistributeEventType signed");
@@ -123,14 +125,14 @@ public class Oadr20bVENEiEventController {
 
 	private String handle(VtnSessionConfiguration multiConfig, OadrDistributeEventType oadrDistributeEvent,
 			boolean signed) throws Oadr20bDistributeEventApplicationLayerException, Oadr20bMarshalException,
-			Oadr20bXMLSignatureException {
+			Oadr20bXMLSignatureException, OadrSecurityException {
 
 		OadrResponseType response = eventService.oadrDistributeEvent(multiConfig, oadrDistributeEvent);
 
 		String responseStr = null;
 
 		if (signed) {
-			responseStr = xmlSignatureService.sign(response);
+			responseStr = xmlSignatureService.sign(response, multiConfig);
 		} else {
 			responseStr = jaxbContext.marshalRoot(response);
 		}

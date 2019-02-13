@@ -50,25 +50,25 @@ public class MultiVtnConfig {
 			throws OadrSecurityException, JAXBException {
 
 		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(session.getVtnUrl())
-				.withTrustedCertificate(new ArrayList<String>(venConfig.getVtnTrustCertificate().values()))
+				.withTrustedCertificate(new ArrayList<String>(session.getVenSessionConfig().getVtnTrustCertificate().values()))
 				.withPooling(1, 1).withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers());
 
 		if (session.isBasicAuthenticationConfigured()) {
 			LOGGER.info("Init HTTP VEN client with basic authentication");
-			builder.withDefaultBasicAuthentication(session.getVtnUrl(), session.getBasicUser(), session.getBasicPass());
+			builder.withDefaultBasicAuthentication(session.getVtnUrl(), session.getVenSessionConfig().getBasicUsername(), session.getVenSessionConfig().getBasicPassword());
 
 		} else if (session.isDigestAuthenticationConfigured()) {
 			LOGGER.info("Init HTTP VEN client with digest authentication");
-			builder.withDefaultDigestAuthentication(session.getVtnUrl(), "", "", session.getDigestUser(),
-					session.getDigestPass());
+			builder.withDefaultDigestAuthentication(session.getVtnUrl(), "", "", session.getVenSessionConfig().getDigestUsername(),
+					session.getVenSessionConfig().getDigestPassword());
 
 		} else {
-			builder.withX509Authentication(venConfig.getVenPrivateKeyPath(), venConfig.getVenCertificatePath());
+			builder.withX509Authentication(session.getVenSessionConfig().getVenPrivateKeyPath(), session.getVenSessionConfig().getVenCertificatePath());
 		}
 
 		if (venConfig.getXmlSignature()) {
-			return new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build(), venConfig.getVenPrivateKeyPath(),
-					venConfig.getVenCertificatePath(), venConfig.getReplayProtectAcceptedDelaySecond()));
+			return new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build(), session.getVenSessionConfig().getVenPrivateKeyPath(),
+					session.getVenSessionConfig().getVenCertificatePath(), session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond()));
 		} else {
 			return new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
 		}
@@ -97,7 +97,7 @@ public class MultiVtnConfig {
 						try {
 							propertiesFactoryBean.afterPropertiesSet();
 							Properties properties = propertiesFactoryBean.getObject();
-							VtnSessionConfiguration session = new VtnSessionConfiguration(properties);
+							VtnSessionConfiguration session = new VtnSessionConfiguration(properties, venConfig);
 							LOGGER.debug("Valid vtn configuration file: " + file.getName());
 							LOGGER.info(session.toString());
 							getMultiConfig().put(session.getVtnId(), session);

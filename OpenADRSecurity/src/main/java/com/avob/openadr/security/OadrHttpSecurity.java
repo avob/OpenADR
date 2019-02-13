@@ -204,12 +204,4 @@ public class OadrHttpSecurity {
 
 		return new String(Hex.encode(digest.digest(data.getBytes())));
 	}
-
-	public static void main(String[] args) throws OadrSecurityException {
-		String oadr20bFingerprint = OadrHttpSecurity
-				.getOadr20bFingerprint("/home/bzanni/Downloads/oadr/TEST_RSA_VTN_180411105205_cert.pem");
-
-		System.out.println(oadr20bFingerprint);
-	}
-
 }

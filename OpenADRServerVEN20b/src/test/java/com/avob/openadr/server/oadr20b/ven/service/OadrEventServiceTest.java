@@ -29,6 +29,7 @@ import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
 import com.avob.openadr.server.oadr20b.ven.VEN20bApplicationTest;
+import com.avob.openadr.server.oadr20b.ven.VenConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bDistributeEventApplicationLayerException;
 
@@ -44,7 +45,7 @@ public class OadrEventServiceTest {
     static {
         PROPERTIES.setProperty("oadr.vtnid", "AVOB_TEST_VTN");
         PROPERTIES.setProperty("oadr.vtnUrl", "https://localhost:8181/testvtn");
-        VTN_SOURCE = new VtnSessionConfiguration(PROPERTIES);
+        VTN_SOURCE = new VtnSessionConfiguration(PROPERTIES, new VenConfig());
     }
 
     @Resource

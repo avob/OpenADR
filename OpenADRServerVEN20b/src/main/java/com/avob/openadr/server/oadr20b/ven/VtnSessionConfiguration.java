@@ -14,13 +14,10 @@ public class VtnSessionConfiguration {
 	private static final String AUTHENTIFICATION_DIGEST_PASS = "oadr.security.authentication.digest.password";
 	private String vtnId;
 	private String vtnUrl;
-	private String basicUser;
-	private String basicPass;
-	private String digestUser;
-	private String digestPass;
+	private VenConfig venSessionConfig;
 
-	public VtnSessionConfiguration(Properties properties) {
-
+	public VtnSessionConfiguration(Properties properties, VenConfig defaultVenSessionConfig) {
+		setVenSessionConfig(defaultVenSessionConfig.clone());
 		for (Map.Entry<Object, Object> e : properties.entrySet()) {
 			String keyStr = (String) e.getKey();
 			String prop = (String) e.getValue();
@@ -29,13 +26,13 @@ public class VtnSessionConfiguration {
 			} else if (VTN_URL.equals(keyStr)) {
 				this.setVtnUrl(prop);
 			} else if (AUTHENTIFICATION_BASIC_USER.equals(keyStr)) {
-				this.setBasicUser(prop);
+				getVenSessionConfig().setBasicUsername(prop);
 			} else if (AUTHENTIFICATION_BASIC_PASS.equals(keyStr)) {
-				this.setBasicPass(prop);
+				getVenSessionConfig().setBasicPassword(prop);
 			} else if (AUTHENTIFICATION_DIGEST_USER.equals(keyStr)) {
-				this.setDigestUser(prop);
+				getVenSessionConfig().setDigestUsername(prop);
 			} else if (AUTHENTIFICATION_DIGEST_PASS.equals(keyStr)) {
-				this.setDigestPass(prop);
+				getVenSessionConfig().setDigestPassword(prop);
 			}
 		}
 
@@ -57,50 +54,22 @@ public class VtnSessionConfiguration {
 		this.vtnUrl = vtnUrl;
 	}
 
-	public String getBasicUser() {
-		return basicUser;
-	}
-
-	public void setBasicUser(String basicUser) {
-		this.basicUser = basicUser;
-	}
-
-	public String getBasicPass() {
-		return basicPass;
-	}
-
-	public void setBasicPass(String basicPass) {
-		this.basicPass = basicPass;
-	}
-
-	public String getDigestUser() {
-		return digestUser;
-	}
-
-	public void setDigestUser(String digestUser) {
-		this.digestUser = digestUser;
-	}
-
-	public String getDigestPass() {
-		return digestPass;
-	}
-
-	public void setDigestPass(String digestPass) {
-		this.digestPass = digestPass;
-	}
-
-	public boolean isBasicAuthenticationConfigured() {
-		return basicUser != null && basicPass != null;
-	}
 
 	public boolean isDigestAuthenticationConfigured() {
-		return digestUser != null && digestPass != null;
+		return getVenSessionConfig().getDigestUsername() != null && getVenSessionConfig().getDigestPassword() != null;
+	}
+	
+	public boolean isBasicAuthenticationConfigured() {
+		return getVenSessionConfig().getBasicUsername() != null && getVenSessionConfig().getBasicPassword() != null;
 	}
 
-	@Override
-	public String toString() {
-		return "VtnSessionConfiguration [vtnId=" + vtnId + ", vtnUrl=" + vtnUrl + ", basicUser=" + basicUser
-				+ ", basicPass=" + basicPass + ", digestUser=" + digestUser + ", digestPass=" + digestPass + "]";
+	public VenConfig getVenSessionConfig() {
+		return venSessionConfig;
 	}
+
+	public void setVenSessionConfig(VenConfig venSessionConfig) {
+		this.venSessionConfig = venSessionConfig;
+	}
+
 
 }
