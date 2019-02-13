@@ -1,28 +1,58 @@
 package com.avob.openadr.security;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.security.auth.x500.X500Principal;
+
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemWriter;
 
 import com.avob.openadr.security.exception.OadrSecurityException;
 
@@ -176,7 +206,7 @@ public class OadrHttpSecurity {
 		// create keystore
 		KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 		ks.load(null, null);
-		ks.setKeyEntry("oadrRsaPrivateKey", parsePrivateKey, password.toCharArray(), certs);
+		ks.setKeyEntry("key", parsePrivateKey, password.toCharArray(), certs);
 		return ks;
 	}
 
@@ -203,5 +233,87 @@ public class OadrHttpSecurity {
 		}
 
 		return new String(Hex.encode(digest.digest(data.getBytes())));
+	}
+
+	public static KeyPair generateRsaKeyPair() throws NoSuchAlgorithmException {
+		return generateKeyPair("RSA", 2048);
+	}
+
+	public static KeyPair generateEccKeyPair() throws NoSuchAlgorithmException {
+		return generateKeyPair("DSA", 512);
+	}
+
+	public static KeyPair generateKeyPair(String algo, int length) throws NoSuchAlgorithmException {
+		KeyPairGenerator keyGen = KeyPairGenerator.getInstance(algo);
+		keyGen.initialize(length);
+		return keyGen.generateKeyPair();
+
+	}
+
+	public static PKCS10CertificationRequest generateCsr(KeyPair pair) {
+		PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(
+				new X500Principal("C=US, L=Vienna, O=Your Company Inc, CN=yourdomain.com/emailAddress=your@email.com"),
+				pair.getPublic());
+		JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256withRSA");
+		ContentSigner signer = null;
+		try {
+			signer = csBuilder.build(pair.getPrivate());
+		} catch (OperatorCreationException e) {
+			throw new RuntimeException(e);
+		}
+		return p10Builder.build(signer);
+	}
+
+	public static X509Certificate signCsr(PKCS10CertificationRequest csr, KeyPair caKeyPair, String caSubject,
+			BigInteger serialNumber)
+			throws IOException, OperatorCreationException, CertificateException, NoSuchProviderException {
+		AlgorithmIdentifier sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find("SHA256withRSA");
+		AlgorithmIdentifier digAlgId = new DefaultDigestAlgorithmIdentifierFinder().find(sigAlgId);
+		PKCS10CertificationRequest csrHolder = new PKCS10CertificationRequest(csr.getEncoded());
+		X509v3CertificateBuilder certificateGenerator = new X509v3CertificateBuilder(
+				// These are the details of the CA
+				new X500Name(caSubject),
+				// This should be a serial number that the CA keeps track of
+				serialNumber,
+				// Certificate validity start
+				Date.from(LocalDateTime.now().toInstant(ZoneOffset.UTC)),
+				// Certificate validity end
+				Date.from(LocalDateTime.now().plusDays(365).toInstant(ZoneOffset.UTC)),
+				// Blanket grant the subject as requested in the CSR
+				// A real CA would want to vet this.
+				csrHolder.getSubject(),
+				// Public key of the certificate authority
+				SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(caKeyPair.getPublic().getEncoded())));
+		ContentSigner sigGen = new BcRSAContentSignerBuilder(sigAlgId, digAlgId)
+				.build(PrivateKeyFactory.createKey(caKeyPair.getPrivate().getEncoded()));
+
+		X509CertificateHolder holder = certificateGenerator.build(sigGen);
+		CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509", "BC");
+		return (X509Certificate) certificateFactory
+				.generateCertificate(new ByteArrayInputStream(holder.toASN1Structure().getEncoded()));
+
+	}
+
+	public static String writeCsrToString(PKCS10CertificationRequest csr) throws IOException {
+		return writePemToString("CERTIFICATE REQUEST", csr.getEncoded());
+	}
+
+	public static String writeCrtToString(X509Certificate certificate)
+			throws IOException, CertificateEncodingException {
+		return writePemToString("CERTIFICATE", certificate.getEncoded());
+	}
+
+	public static String writeKeyToString(KeyPair pair) throws IOException, CertificateEncodingException {
+		return writePemToString("PRIVATE KEY", pair.getPrivate().getEncoded());
+	}
+
+	private static String writePemToString(String type, byte[] content) {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		try (PemWriter pemWriter = new PemWriter(new OutputStreamWriter(outputStream))) {
+			pemWriter.writeObject(new PemObject(type, content));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return new String(outputStream.toByteArray());
 	}
 }
