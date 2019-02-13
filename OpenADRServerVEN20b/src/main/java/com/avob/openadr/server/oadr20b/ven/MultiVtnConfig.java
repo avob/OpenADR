@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.PathResource;
+import org.springframework.core.io.FileSystemResource;
 
 import com.avob.openadr.client.http.OadrHttpClientBuilder;
 import com.avob.openadr.client.http.oadr20b.OadrHttpClient20b;
@@ -93,7 +93,7 @@ public class MultiVtnConfig {
 					if (matcher.find()) {
 
 						PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
-						propertiesFactoryBean.setLocation(new PathResource(file.getAbsolutePath()));
+						propertiesFactoryBean.setLocation(new FileSystemResource(file.getAbsolutePath()));
 						try {
 							propertiesFactoryBean.afterPropertiesSet();
 							Properties properties = propertiesFactoryBean.getObject();

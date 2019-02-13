@@ -7,6 +7,7 @@ import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,6 +36,9 @@ public class Oadr20bVTNOadrPollController {
 
 	private Oadr20bJAXBContext jaxbContext;
 
+	@Value("${oadr.validateOadrPayloadAgainstXsd:false}")
+	private Boolean validateOadrPayloadAgainstXsd;
+	
 	@Resource
 	private Oadr20bVTNOadrPollService oadr20bVTNOadrPollService;
 
@@ -51,7 +55,8 @@ public class Oadr20bVTNOadrPollController {
 	public String request(@RequestBody String payload, Principal principal)
 			throws Oadr20bUnmarshalException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
 			Oadr20bPollApplicationLayerException, Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException {
-		Object unmarshal = jaxbContext.unmarshal(payload);
+		
+		Object unmarshal = jaxbContext.unmarshal(payload, validateOadrPayloadAgainstXsd);
 
 		String username = principal.getName();
 

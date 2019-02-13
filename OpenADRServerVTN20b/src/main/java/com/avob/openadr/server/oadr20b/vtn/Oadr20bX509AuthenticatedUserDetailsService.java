@@ -26,6 +26,7 @@ import com.avob.openadr.server.common.vtn.security.OadrSecurityRoleService;
 public class Oadr20bX509AuthenticatedUserDetailsService
         implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
 
+	
     @Resource
     private OadrSecurityRoleService oadrSecurityRoleService;
 

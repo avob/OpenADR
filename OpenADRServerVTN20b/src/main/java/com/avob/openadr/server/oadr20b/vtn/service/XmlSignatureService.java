@@ -19,33 +19,33 @@ import com.avob.openadr.security.exception.OadrSecurityException;
 @Service
 public class XmlSignatureService {
 
-    @Value("${oadr.security.vtn.rsaPrivateKeyPath}")
-    private String rsaPrivateKeyPath;
+	@Value("${oadr.security.vtn.key}")
+	private String rsaPrivateKeyPath;
 
-    @Value("${oadr.security.vtn.rsaCertificatePath}")
-    private String rsaCertificatePath;
+	@Value("${oadr.security.vtn.cert}")
+	private String rsaCertificatePath;
 
-    @Value("${oadr.security.replayProtectAcceptedDelaySecond}")
-    private Long replayProtectAcceptedDelaySecond;
+	@Value("${oadr.security.replayProtectAcceptedDelaySecond}")
+	private Long replayProtectAcceptedDelaySecond;
 
-    private PrivateKey parsePrivateKey;
+	private PrivateKey parsePrivateKey;
 
-    private X509Certificate parseCertificate;
+	private X509Certificate parseCertificate;
 
-    @PostConstruct
-    public void init() throws OadrSecurityException {
-        parsePrivateKey = OadrHttpSecurity.parsePrivateKey(rsaPrivateKeyPath);
-        parseCertificate = OadrHttpSecurity.parseCertificate(rsaCertificatePath);
-    }
+	@PostConstruct
+	public void init() throws OadrSecurityException {
+		parsePrivateKey = OadrHttpSecurity.parsePrivateKey(rsaPrivateKeyPath);
+		parseCertificate = OadrHttpSecurity.parseCertificate(rsaCertificatePath);
+	}
 
-    public String sign(Object object) throws Oadr20bXMLSignatureException {
-        String nonce = UUID.randomUUID().toString();
-        Long createdtimestamp = System.currentTimeMillis();
-        return OadrXMLSignatureHandler.sign(object, parsePrivateKey, parseCertificate, nonce, createdtimestamp);
-    }
+	public String sign(Object object) throws Oadr20bXMLSignatureException {
+		String nonce = UUID.randomUUID().toString();
+		Long createdtimestamp = System.currentTimeMillis();
+		return OadrXMLSignatureHandler.sign(object, parsePrivateKey, parseCertificate, nonce, createdtimestamp);
+	}
 
-    public void validate(OadrPayload payload) throws Oadr20bXMLSignatureValidationException {
-        long nowDate = System.currentTimeMillis();
-        OadrXMLSignatureHandler.validate(payload, nowDate, replayProtectAcceptedDelaySecond * 1000L);
-    }
+	public void validate(OadrPayload payload) throws Oadr20bXMLSignatureValidationException {
+		long nowDate = System.currentTimeMillis();
+		OadrXMLSignatureHandler.validate(payload, nowDate, replayProtectAcceptedDelaySecond * 1000L);
+	}
 }

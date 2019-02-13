@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -26,6 +27,9 @@ import com.google.common.collect.Lists;
 @Service
 public class OadrSecurityRoleService {
 
+	@Value("${oadr.security.admin.username:#{null}}")
+    private String adminUsername;
+	
     @Resource
     private AbstractUserDao abstractUserDao;
 
@@ -53,6 +57,10 @@ public class OadrSecurityRoleService {
     }
 
     public User grantX509Role(String username) {
+    	if(adminUsername != null && adminUsername.equals(username)) {
+    		return new User(username, "",
+                    Lists.newArrayList(new SimpleGrantedAuthority("ROLE_ADMIN")));
+    	}
         return this.grantRole(saveFindUser(username), "");
     }
 

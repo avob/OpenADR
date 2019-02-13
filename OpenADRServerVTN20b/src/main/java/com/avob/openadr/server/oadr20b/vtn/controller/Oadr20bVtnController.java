@@ -45,8 +45,8 @@ public class Oadr20bVtnController {
 	@Resource
 	private SelfReportRequestService selfReportRequestService;
 
-	@Value("${oadr.security.vtn.rsaCertificatePath}")
-	private String rsaCertificatePath;
+	@Value("${oadr.security.vtn.cert}")
+	private String cert;
 
 	@Value("${oadr.supportPush}")
 	private Boolean supportPush;
@@ -82,7 +82,7 @@ public class Oadr20bVtnController {
 		dto.setSupportUnsecuredHttpPush(supportUnsecuredHttpPush);
 		String oadr20bFingerprint;
 		try {
-			oadr20bFingerprint = OadrHttpSecurity.getOadr20bFingerprint(rsaCertificatePath);
+			oadr20bFingerprint = OadrHttpSecurity.getOadr20bFingerprint(cert);
 			dto.setVtnId(oadr20bFingerprint);
 		} catch (OadrSecurityException e) {
 			LOGGER.error("", e);

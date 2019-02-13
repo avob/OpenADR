@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -42,35 +43,27 @@ public class VTN20bApplication {
 	@Value("${oadr.server.port:#{8443}}")
 	private int port;
 
-	@Value("${oadr.security.ven.trustcertificate.oadrRsaRootCertificate}")
-	private String oadrRsaRootCertificate;
+	@Value("#{'${oadr.security.ven.trustcertificate}'.split(',')}") 
+	private List<String> trustCertificates;
 
-	@Value("${oadr.security.ven.trustcertificate.oadrRsaIntermediateCertificate}")
-	private String oadrRsaIntermediateCertificate;
+	@Value("${oadr.security.vtn.key}")
+	private String key;
 
-	@Value("${oadr.security.ven.trustcertificate.oadrEccRootCertificate}")
-	private String oadrEccRootCertificate;
-
-	@Value("${oadr.security.ven.trustcertificate.oadrEccIntermediateCertificate}")
-	private String oadrEccIntermediateCertificate;
-
-	@Value("${oadr.security.vtn.rsaPrivateKeyPath}")
-	private String rsaPrivateKeyPath;
-
-	@Value("${oadr.security.vtn.rsaCertificatePath}")
-	private String rsaCertificatePath;
+	@Value("${oadr.security.vtn.cert}")
+	private String cert;
 
 	@Bean
 	public WebServerFactoryCustomizer<JettyServletWebServerFactory> servletContainerCustomizer() {
 		Map<String, String> trustedCertificates = Maps.newHashMap();
-		trustedCertificates.put("oadrRsaRootCertificate", oadrRsaRootCertificate);
-		trustedCertificates.put("oadrRsaIntermediateCertificate", oadrRsaIntermediateCertificate);
-		trustedCertificates.put("oadrEccRootCertificate", oadrEccRootCertificate);
-		trustedCertificates.put("oadrEccIntermediateCertificate", oadrEccIntermediateCertificate);
+		int i = 0;
+		for (String path : trustCertificates) {
+			trustedCertificates.put("cert_" + (i++), path);
+		}
+
 		try {
 			String password = UUID.randomUUID().toString();
 			return new VTNEmbeddedServletContainerCustomizer(port, contextPath,
-					OadrHttpSecurity.createKeyStore(rsaPrivateKeyPath, rsaCertificatePath, password), password,
+					OadrHttpSecurity.createKeyStore(key, cert, password), password,
 					OadrHttpSecurity.createTrustStore(trustedCertificates), Oadr20bSecurity.getProtocols(),
 					Oadr20bSecurity.getCiphers());
 		} catch (KeyStoreException e) {
@@ -86,16 +79,6 @@ public class VTN20bApplication {
 		}
 		return null;
 	}
-
-//	@Bean(initMethod = "start", destroyMethod = "stop")
-//	public BrokerService broker() throws Exception {
-//		final BrokerService broker = new BrokerService();
-//		// broker.addConnector("tcp://localhost:61616");
-//		broker.addConnector("vm://localhost");
-//		broker.setPersistent(false);
-//		// default messages store is under AMQ_HOME/data/KahaDB/
-//		return broker;
-//	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(VTN20bApplication.class, args);

@@ -7,6 +7,7 @@ import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,6 +46,9 @@ public class Oadr20bVTNEiRegisterPartyController {
 
 	private Oadr20bJAXBContext jaxbContext;
 
+	@Value("${oadr.validateOadrPayloadAgainstXsd:false}")
+	private Boolean validateOadrPayloadAgainstXsd;
+	
 	@Resource
 	private Oadr20bVTNEiRegisterPartyService oadr20bVTNEiRegisterPartyService;
 
@@ -69,7 +73,7 @@ public class Oadr20bVTNEiRegisterPartyController {
 			Oadr20bCanceledPartyRegistrationTypeApplicationLayerException, Oadr20bXMLSignatureException,
 			Oadr20bResponsePartyReregistrationApplicationLayerException {
 
-		Object unmarshal = jaxbContext.unmarshal(payload);
+		Object unmarshal = jaxbContext.unmarshal(payload, validateOadrPayloadAgainstXsd);
 
 		String username = principal.getName();
 

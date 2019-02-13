@@ -1,6 +1,7 @@
 package com.avob.openadr.server.oadr20b.ven;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -30,22 +31,13 @@ public class VenConfig {
 	@Value("${oadr.venUrl:#{null}}")
 	private String venUrl;
 
-	@Value("${oadr.security.vtn.trustcertificate.oadrRsaRootCertificate:#{null}}")
-	private String vtnRsaRootCertificate;
+	@Value("#{'${oadr.security.vtn.trustcertificate}'.split(',')}")
+	private List<String> trustCertificates;
 
-	@Value("${oadr.security.vtn.trustcertificate.oadrRsaIntermediateCertificate:#{null}}")
-	private String vtnRsaIntermediateCertificate;
-
-	@Value("${oadr.security.vtn.trustcertificate.oadrEccRootCertificate:#{null}}")
-	private String vtnEccRootCertificate;
-
-	@Value("${oadr.security.vtn.trustcertificate.oadrEccIntermediateCertificate:#{null}}")
-	private String vtnEccIntermediateCertificate;
-
-	@Value("${oadr.security.ven.privateKeyPath:#{null}}")
+	@Value("${oadr.security.ven.key:#{null}}")
 	private String venPrivateKeyPath;
 
-	@Value("${oadr.security.ven.certificatePath:#{null}}")
+	@Value("${oadr.security.ven.cert:#{null}}")
 	private String venCertificatePath;
 
 	@Value("${oadr.security.authentication.basic.username:#{null}}")
@@ -128,12 +120,12 @@ public class VenConfig {
 	}
 
 	public Map<String, String> getVtnTrustCertificate() {
-		Map<String, String> trustCertificate = new HashMap<String, String>();
-		trustCertificate.put("getVtnEccRootCertificate", this.getVtnEccRootCertificate());
-		trustCertificate.put("getVtnEccIntermediateCertificate", this.getVtnEccIntermediateCertificate());
-		trustCertificate.put("getVtnRsaRootCertificate", this.getVtnRsaRootCertificate());
-		trustCertificate.put("getVtnRsaIntermediateCertificate", this.getVtnRsaIntermediateCertificate());
-		return trustCertificate;
+		Map<String, String> trustedCertificates = new HashMap<String, String>();
+		int i = 0;
+		for (String path : trustCertificates) {
+			trustedCertificates.put("cert_" + (i++), path);
+		}
+		return trustedCertificates;
 	}
 
 	public String getBasicUsername() {
@@ -150,22 +142,6 @@ public class VenConfig {
 
 	public String getDigestPassword() {
 		return digestPassword;
-	}
-
-	public String getVtnRsaRootCertificate() {
-		return vtnRsaRootCertificate;
-	}
-
-	public String getVtnRsaIntermediateCertificate() {
-		return vtnRsaIntermediateCertificate;
-	}
-
-	public String getVtnEccRootCertificate() {
-		return vtnEccRootCertificate;
-	}
-
-	public String getVtnEccIntermediateCertificate() {
-		return vtnEccIntermediateCertificate;
 	}
 
 	public String getVenPrivateKeyPath() {

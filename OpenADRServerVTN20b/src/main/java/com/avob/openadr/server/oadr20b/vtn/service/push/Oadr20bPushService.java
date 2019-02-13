@@ -2,7 +2,6 @@ package com.avob.openadr.server.oadr20b.vtn.service.push;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -50,23 +49,14 @@ public class Oadr20bPushService {
 
 	private static final String HTTP_SCHEME = "http";
 
-	@Value("${oadr.security.ven.trustcertificate.oadrRsaRootCertificate}")
-	private String oadrRsaRootCertificate;
+	@Value("#{'${oadr.security.ven.trustcertificate}'.split(',')}")
+	private List<String> trustCertificates;
 
-	@Value("${oadr.security.ven.trustcertificate.oadrEccRootCertificate}")
-	private String oadrEccRootCertificate;
+	@Value("${oadr.security.vtn.key}")
+	private String key;
 
-	@Value("${oadr.security.ven.trustcertificate.oadrRsaIntermediateCertificate}")
-	private String oadrRsaIntermediateCertificate;
-
-	@Value("${oadr.security.ven.trustcertificate.oadrEccIntermediateCertificate}")
-	private String oadrEccIntermediateCertificate;
-
-	@Value("${oadr.security.vtn.rsaPrivateKeyPath}")
-	private String rsaPrivateKeyPemFilePath;
-
-	@Value("${oadr.security.vtn.rsaCertificatePath}")
-	private String rsaClientCertPemFilePath;
+	@Value("${oadr.security.vtn.cert}")
+	private String cert;
 
 	@Value("${oadr.supportUnsecuredHttpPush:#{false}}")
 	private boolean supportUnsecuredHttpPush;
@@ -92,13 +82,11 @@ public class Oadr20bPushService {
 
 	@PostConstruct
 	public void init() {
-		String[] trustedCertificateFilePath = { oadrEccRootCertificate, oadrRsaRootCertificate,
-				oadrEccIntermediateCertificate, oadrRsaIntermediateCertificate };
 
 		OadrHttpClientBuilder builder;
 		try {
-			builder = new OadrHttpClientBuilder().withTrustedCertificate(Arrays.asList(trustedCertificateFilePath))
-					.withPooling(5, 5).withX509Authentication(rsaPrivateKeyPemFilePath, rsaClientCertPemFilePath);
+			builder = new OadrHttpClientBuilder().withTrustedCertificate(trustCertificates).withPooling(5, 5)
+					.withX509Authentication(key, cert);
 
 			if (supportUnsecuredHttpPush) {
 				builder.enableHttp(true);
@@ -106,8 +94,8 @@ public class Oadr20bPushService {
 
 			setOadrHttpVtnClient20b(new OadrHttpVtnClient20b(new OadrHttpClient20b(builder.build())));
 
-			setSecuredOadrHttpVtnClient20b(new OadrHttpVtnClient20b(new OadrHttpClient20b(builder.build(),
-					rsaPrivateKeyPemFilePath, rsaClientCertPemFilePath, replayProtectAcceptedDelaySecond)));
+			setSecuredOadrHttpVtnClient20b(new OadrHttpVtnClient20b(
+					new OadrHttpClient20b(builder.build(), key, cert, replayProtectAcceptedDelaySecond)));
 
 		} catch (OadrSecurityException e) {
 			throw new Oadr20bInitializationException(e);
@@ -237,8 +225,7 @@ public class Oadr20bPushService {
 	}
 
 	/**
-	 * @param oadrHttpVtnClient20b
-	 *            the oadrHttpVtnClient20b to set
+	 * @param oadrHttpVtnClient20b the oadrHttpVtnClient20b to set
 	 */
 	public void setOadrHttpVtnClient20b(OadrHttpVtnClient20b oadrHttpVtnClient20b) {
 		this.oadrHttpVtnClient20b = oadrHttpVtnClient20b;

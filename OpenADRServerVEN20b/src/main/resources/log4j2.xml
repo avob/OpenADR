@@ -2,11 +2,11 @@
 <Configuration package="log4j.test" status="WARN">
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %c{1.} - %m%n" />
 		</Console>
 	</Appenders>
 	<Loggers>
-		<Logger level="debug" name="com.avob" additivity="false">
+		<Logger level="info" name="com.avob" additivity="false">
 			<AppenderRef ref="Console" />
 		</Logger>
 		<Logger level="warn" name="org.springframework" additivity="false">
