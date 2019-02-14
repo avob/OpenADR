@@ -22,6 +22,7 @@ public class VtnConfig {
 	public static final String SAVE_VEN_UPDATE_REPORT_CONF = "oadr.saveVenData";
 	public static final String REPLAY_PROTECTACCEPTED_DELAY_SECONDS_CONF = "oadr.security.replayProtectAcceptedDelaySecond";
 	public static final String CA_KEY_CONF = "oadr.security.ca.key";
+	public static final String CA_CERT_CONF = "oadr.security.ca.cert";
 
 	@Value("${" + CONTEXT_PATH_CONF + ":#{null}}")
 	private String contextPath;
@@ -62,8 +63,11 @@ public class VtnConfig {
 	@Value("${" + REPLAY_PROTECTACCEPTED_DELAY_SECONDS_CONF + "}")
 	private Long replayProtectAcceptedDelaySecond;
 
-	@Value("${"+CA_KEY_CONF+":null}")
-	private String ca;
+	@Value("${" + CA_KEY_CONF + ":null}")
+	private String caKey;
+
+	@Value("${" + CA_CERT_CONF + ":null}")
+	private String caCert;
 
 	public String getContextPath() {
 		return contextPath;
@@ -169,11 +173,19 @@ public class VtnConfig {
 		this.replayProtectAcceptedDelaySecond = replayProtectAcceptedDelaySecond;
 	}
 
-	public String getCa() {
-		return ca;
+	public String getCaKey() {
+		return caKey;
 	}
 
-	public void setCa(String ca) {
-		this.ca = ca;
+	public void setCaKey(String ca) {
+		this.caKey = ca;
+	}
+
+	public String getCertKey() {
+		return caCert;
+	}
+
+	public void setCaCert(String caPubKey) {
+		this.caCert = caPubKey;
 	}
 }

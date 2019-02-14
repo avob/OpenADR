@@ -1,4 +1,4 @@
-package com.avob.openadr.server.oadr20b.vtn.controller;
+package com.avob.openadr.server.oadr20b.vtn.controller.ei;
 
 import java.security.Principal;
 

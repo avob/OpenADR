@@ -15,6 +15,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -250,11 +251,10 @@ public class OadrHttpSecurity {
 
 	}
 
-	public static PKCS10CertificationRequest generateCsr(KeyPair pair) {
+	public static PKCS10CertificationRequest generateCsr(KeyPair pair, String venCN, String algo) {
 		PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(
-				new X500Principal("C=US, L=Vienna, O=Your Company Inc, CN=yourdomain.com/emailAddress=your@email.com"),
-				pair.getPublic());
-		JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256withRSA");
+				new X500Principal("CN=" + venCN), pair.getPublic());
+		JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(algo);
 		ContentSigner signer = null;
 		try {
 			signer = csBuilder.build(pair.getPrivate());
@@ -267,6 +267,7 @@ public class OadrHttpSecurity {
 	public static X509Certificate signCsr(PKCS10CertificationRequest csr, KeyPair caKeyPair, String caSubject,
 			BigInteger serialNumber)
 			throws IOException, OperatorCreationException, CertificateException, NoSuchProviderException {
+		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 		AlgorithmIdentifier sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find("SHA256withRSA");
 		AlgorithmIdentifier digAlgId = new DefaultDigestAlgorithmIdentifierFinder().find(sigAlgId);
 		PKCS10CertificationRequest csrHolder = new PKCS10CertificationRequest(csr.getEncoded());
