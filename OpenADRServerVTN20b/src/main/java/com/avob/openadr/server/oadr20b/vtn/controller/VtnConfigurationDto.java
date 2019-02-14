@@ -7,7 +7,7 @@ public class VtnConfigurationDto {
 
 	private Boolean supportUnsecuredHttpPush;
 
-	private Integer pullFrequencySeconds;
+	private Long pullFrequencySeconds;
 
 	private Integer port;
 
@@ -41,11 +41,11 @@ public class VtnConfigurationDto {
 		this.supportUnsecuredHttpPush = supportUnsecuredHttpPush;
 	}
 
-	public Integer getPullFrequencySeconds() {
+	public Long getPullFrequencySeconds() {
 		return pullFrequencySeconds;
 	}
 
-	public void setPullFrequencySeconds(Integer pullFrequencySeconds) {
+	public void setPullFrequencySeconds(Long pullFrequencySeconds) {
 		this.pullFrequencySeconds = pullFrequencySeconds;
 	}
 

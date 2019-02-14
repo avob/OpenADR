@@ -7,7 +7,6 @@ import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +24,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationExc
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
+import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiopt.Oadr20bCancelOptApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiopt.Oadr20bCreateOptApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiOptService;
@@ -38,8 +38,8 @@ public class Oadr20bVTNEiOptController {
 
     private Oadr20bJAXBContext jaxbContext;
 
-    @Value("${oadr.validateOadrPayloadAgainstXsd:false}")
-	private Boolean validateOadrPayloadAgainstXsd;
+	@Resource
+	private VtnConfig vtnConfig;
     
     @Resource
     private Oadr20bVTNEiOptService oadr20bVTNEiOptService;
@@ -59,7 +59,7 @@ public class Oadr20bVTNEiOptController {
             Oadr20bCreateOptApplicationLayerException, Oadr20bCancelOptApplicationLayerException,
             Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException {
 
-        Object unmarshal = jaxbContext.unmarshal(payload, validateOadrPayloadAgainstXsd);
+        Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
 
         String username = principal.getName();
 

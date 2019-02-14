@@ -7,7 +7,6 @@ import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +28,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.server.common.vtn.service.VenService;
+import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bCreatedEventApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCanceledPartyRegistrationTypeApplicationLayerException;
@@ -46,9 +46,9 @@ public class Oadr20bVTNEiRegisterPartyController {
 
 	private Oadr20bJAXBContext jaxbContext;
 
-	@Value("${oadr.validateOadrPayloadAgainstXsd:false}")
-	private Boolean validateOadrPayloadAgainstXsd;
-	
+	@Resource
+	private VtnConfig vtnConfig;
+
 	@Resource
 	private Oadr20bVTNEiRegisterPartyService oadr20bVTNEiRegisterPartyService;
 
@@ -73,7 +73,7 @@ public class Oadr20bVTNEiRegisterPartyController {
 			Oadr20bCanceledPartyRegistrationTypeApplicationLayerException, Oadr20bXMLSignatureException,
 			Oadr20bResponsePartyReregistrationApplicationLayerException {
 
-		Object unmarshal = jaxbContext.unmarshal(payload, validateOadrPayloadAgainstXsd);
+		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
 
 		String username = principal.getName();
 

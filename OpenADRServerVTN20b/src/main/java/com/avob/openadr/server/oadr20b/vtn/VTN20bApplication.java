@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -37,33 +37,21 @@ public class VTN20bApplication {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(VTN20bApplication.class);
 
-	@Value("${oadr.server.context_path:#{null}}")
-	private String contextPath;
-
-	@Value("${oadr.server.port:#{8443}}")
-	private int port;
-
-	@Value("#{'${oadr.security.ven.trustcertificate}'.split(',')}") 
-	private List<String> trustCertificates;
-
-	@Value("${oadr.security.vtn.key}")
-	private String key;
-
-	@Value("${oadr.security.vtn.cert}")
-	private String cert;
+	@Resource
+	private VtnConfig vtnConfig;
 
 	@Bean
 	public WebServerFactoryCustomizer<JettyServletWebServerFactory> servletContainerCustomizer() {
 		Map<String, String> trustedCertificates = Maps.newHashMap();
 		int i = 0;
-		for (String path : trustCertificates) {
+		for (String path : vtnConfig.getTrustCertificates()) {
 			trustedCertificates.put("cert_" + (i++), path);
 		}
 
 		try {
 			String password = UUID.randomUUID().toString();
-			return new VTNEmbeddedServletContainerCustomizer(port, contextPath,
-					OadrHttpSecurity.createKeyStore(key, cert, password), password,
+			return new VTNEmbeddedServletContainerCustomizer(vtnConfig.getPort(), vtnConfig.getContextPath(),
+					OadrHttpSecurity.createKeyStore(vtnConfig.getKey(), vtnConfig.getCert(), password), password,
 					OadrHttpSecurity.createTrustStore(trustedCertificates), Oadr20bSecurity.getProtocols(),
 					Oadr20bSecurity.getCiphers());
 		} catch (KeyStoreException e) {

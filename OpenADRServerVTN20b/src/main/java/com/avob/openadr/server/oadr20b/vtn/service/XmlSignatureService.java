@@ -5,8 +5,8 @@ import java.security.cert.X509Certificate;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
@@ -15,18 +15,13 @@ import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandler;
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
 
 @Service
 public class XmlSignatureService {
 
-	@Value("${oadr.security.vtn.key}")
-	private String rsaPrivateKeyPath;
-
-	@Value("${oadr.security.vtn.cert}")
-	private String rsaCertificatePath;
-
-	@Value("${oadr.security.replayProtectAcceptedDelaySecond}")
-	private Long replayProtectAcceptedDelaySecond;
+	@Resource
+	private VtnConfig vtnConfig;
 
 	private PrivateKey parsePrivateKey;
 
@@ -34,8 +29,8 @@ public class XmlSignatureService {
 
 	@PostConstruct
 	public void init() throws OadrSecurityException {
-		parsePrivateKey = OadrHttpSecurity.parsePrivateKey(rsaPrivateKeyPath);
-		parseCertificate = OadrHttpSecurity.parseCertificate(rsaCertificatePath);
+		parsePrivateKey = OadrHttpSecurity.parsePrivateKey(vtnConfig.getKey());
+		parseCertificate = OadrHttpSecurity.parseCertificate(vtnConfig.getCert());
 	}
 
 	public String sign(Object object) throws Oadr20bXMLSignatureException {
@@ -46,6 +41,6 @@ public class XmlSignatureService {
 
 	public void validate(OadrPayload payload) throws Oadr20bXMLSignatureValidationException {
 		long nowDate = System.currentTimeMillis();
-		OadrXMLSignatureHandler.validate(payload, nowDate, replayProtectAcceptedDelaySecond * 1000L);
+		OadrXMLSignatureHandler.validate(payload, nowDate, vtnConfig.getReplayProtectAcceptedDelaySecond() * 1000L);
 	}
 }

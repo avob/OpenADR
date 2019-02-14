@@ -11,7 +11,6 @@ import javax.xml.bind.JAXBException;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +38,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
+import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiRegisterPartyService;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
@@ -49,20 +49,8 @@ public class Oadr20bPushService {
 
 	private static final String HTTP_SCHEME = "http";
 
-	@Value("#{'${oadr.security.ven.trustcertificate}'.split(',')}")
-	private List<String> trustCertificates;
-
-	@Value("${oadr.security.vtn.key}")
-	private String key;
-
-	@Value("${oadr.security.vtn.cert}")
-	private String cert;
-
-	@Value("${oadr.supportUnsecuredHttpPush:#{false}}")
-	private boolean supportUnsecuredHttpPush;
-
-	@Value("${oadr.security.replayProtectAcceptedDelaySecond}")
-	private Long replayProtectAcceptedDelaySecond;
+	@Resource
+	private VtnConfig vtnConfig;
 
 	@Resource
 	private Oadr20bVTNEiEventService oadr20bVTNEiEventService;
@@ -85,17 +73,17 @@ public class Oadr20bPushService {
 
 		OadrHttpClientBuilder builder;
 		try {
-			builder = new OadrHttpClientBuilder().withTrustedCertificate(trustCertificates).withPooling(5, 5)
-					.withX509Authentication(key, cert);
+			builder = new OadrHttpClientBuilder().withTrustedCertificate(vtnConfig.getTrustCertificates())
+					.withPooling(5, 5).withX509Authentication(vtnConfig.getKey(), vtnConfig.getCert());
 
-			if (supportUnsecuredHttpPush) {
+			if (vtnConfig.getSupportUnsecuredHttpPush()) {
 				builder.enableHttp(true);
 			}
 
 			setOadrHttpVtnClient20b(new OadrHttpVtnClient20b(new OadrHttpClient20b(builder.build())));
 
-			setSecuredOadrHttpVtnClient20b(new OadrHttpVtnClient20b(
-					new OadrHttpClient20b(builder.build(), key, cert, replayProtectAcceptedDelaySecond)));
+			setSecuredOadrHttpVtnClient20b(new OadrHttpVtnClient20b(new OadrHttpClient20b(builder.build(),
+					vtnConfig.getKey(), vtnConfig.getCert(), vtnConfig.getReplayProtectAcceptedDelaySecond())));
 
 		} catch (OadrSecurityException e) {
 			throw new Oadr20bInitializationException(e);
@@ -126,7 +114,7 @@ public class Oadr20bPushService {
 				requestClient = getSecuredOadrHttpVtnClient20b();
 			}
 
-			if (HTTP_SCHEME.equals(uri.getScheme()) && !supportUnsecuredHttpPush) {
+			if (HTTP_SCHEME.equals(uri.getScheme()) && !vtnConfig.getSupportUnsecuredHttpPush()) {
 				LOGGER.warn("Unsecured HTTP call unsupported");
 				return;
 			}

@@ -15,7 +15,6 @@ import javax.xml.bind.JAXBException;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -80,6 +79,7 @@ import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenService;
+import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCancelReportApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCreateReportApplicationLayerException;
@@ -146,9 +146,9 @@ public class Oadr20bVTNEiReportService {
 
 	@Resource
 	protected VenDistributeService venDistributeService;
-
-	@Value("${oadr.saveVenData}")
-	private Boolean saveVenData;
+	
+	@Resource
+	private VtnConfig vtnConfig;
 
 	public Oadr20bVTNEiReportService() {
 		try {
@@ -791,7 +791,7 @@ public class Oadr20bVTNEiReportService {
 				}
 			}
 
-			if (saveVenData) {
+			if (vtnConfig.getSaveVenData()) {
 				otherReportDataService.save(list);
 			}
 

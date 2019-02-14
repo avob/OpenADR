@@ -15,7 +15,6 @@ import javax.xml.datatype.Duration;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -63,6 +62,7 @@ import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketConte
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenRequestCountService;
 import com.avob.openadr.server.common.vtn.service.VenService;
+import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.converter.OptConverter;
 import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bCreatedEventApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bRequestEventApplicationLayerException;
@@ -74,8 +74,8 @@ public class Oadr20bVTNEiEventService {
 
 	private static final String SIMPLE_SIGNAL_NAME = "simple";
 
-	@Value("${oadr.vtnid}")
-	private String vtnId;
+	@Resource
+	private VtnConfig vtnConfig;
 
 	@Resource
 	private DemandResponseEventService demandResponseEventService;
@@ -131,7 +131,7 @@ public class Oadr20bVTNEiEventService {
 					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();
 			throw new Oadr20bRequestEventApplicationLayerException(
 					mismatchCredentialsVenIdResponse.getResponseDescription(),
-					Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder(vtnId, requestID)
+					Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder(vtnConfig.getVtnId(), requestID)
 							.withEiResponse(mismatchCredentialsVenIdResponse).build());
 		}
 	}
@@ -228,7 +228,7 @@ public class Oadr20bVTNEiEventService {
 					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(venRequestID, venID).build();
 			throw new Oadr20bRequestEventApplicationLayerException(
 					xmlSignatureRequiredButAbsent.getResponseDescription(),
-					Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder(vtnId, venRequestID)
+					Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder(vtnConfig.getVtnId(), venRequestID)
 							.withEiResponse(xmlSignatureRequiredButAbsent).build());
 		}
 
@@ -240,7 +240,8 @@ public class Oadr20bVTNEiEventService {
 			Long andIncrease = venRequestCountService.getAndIncrease(venID);
 			EiResponseType eiResponse = Oadr20bResponseBuilders
 					.newOadr20bEiResponseBuilder(venRequestID, HttpStatus.OK_200).build();
-			response = Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder(vtnId, Long.toString(andIncrease))
+			response = Oadr20bEiEventBuilders
+					.newOadr20bDistributeEventBuilder(vtnConfig.getVtnId(), Long.toString(andIncrease))
 					.withEiResponse(eiResponse).build();
 		} else {
 			response = createOadrDistributeEventPayload(venID, venRequestID, findByVenId);
@@ -265,7 +266,8 @@ public class Oadr20bVTNEiEventService {
 		EiResponseType eiResponse = Oadr20bResponseBuilders
 				.newOadr20bEiResponseBuilder(eiResponseRequestId, HttpStatus.OK_200).build();
 		Oadr20bDistributeEventBuilder builder = Oadr20bEiEventBuilders
-				.newOadr20bDistributeEventBuilder(vtnId, Long.toString(andIncrease)).withEiResponse(eiResponse);
+				.newOadr20bDistributeEventBuilder(vtnConfig.getVtnId(), Long.toString(andIncrease))
+				.withEiResponse(eiResponse);
 
 		for (DemandResponseEvent drEvent : events) {
 			EventDescriptorType createEventDescriptor = createEventDescriptor(drEvent);

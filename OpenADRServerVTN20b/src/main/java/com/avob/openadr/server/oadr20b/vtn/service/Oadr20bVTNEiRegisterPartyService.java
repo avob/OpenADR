@@ -8,7 +8,6 @@ import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.jetty.http.HttpStatus;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
@@ -30,6 +29,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.VenService;
+import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCanceledPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCreatePartyRegistrationTypeApplicationLayerException;
@@ -57,11 +57,8 @@ public class Oadr20bVTNEiRegisterPartyService {
 
 	private Oadr20bJAXBContext jaxbContext;
 
-	@Value("${oadr.vtnid}")
-	private String vtnId;
-
-	@Value("${oadr.pullFrequencySeconds}")
-	private Long pullFrequencySeconds;
+	@Resource
+	private VtnConfig vtnConfig;
 
 	@Resource
 	private VenService venService;
@@ -77,7 +74,7 @@ public class Oadr20bVTNEiRegisterPartyService {
 			String venId) {
 		Oadr20bCreatedPartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatedPartyRegistrationBuilder(requestId, Oadr20bApplicationLayerErrorCode.INVALID_ID_452,
-						venId, vtnId);
+						venId, vtnConfig.getVtnId());
 		for (OadrProfile profile : supportedProfiles) {
 			builder.addOadrProfile(profile);
 		}
@@ -108,7 +105,7 @@ public class Oadr20bVTNEiRegisterPartyService {
 					xmlSignatureRequiredButAbsent.getResponseDescription(),
 					Oadr20bEiRegisterPartyBuilders
 							.newOadr20bCreatedPartyRegistrationBuilder(requestID,
-									Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID, vtnId)
+									Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID, vtnConfig.getVtnId())
 							.build());
 		}
 
@@ -134,13 +131,13 @@ public class Oadr20bVTNEiRegisterPartyService {
 		venService.save(ven);
 
 		Oadr20bCreatedPartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCreatedPartyRegistrationBuilder(requestID, HttpStatus.OK_200, venID, vtnId)
+				.newOadr20bCreatedPartyRegistrationBuilder(requestID, HttpStatus.OK_200, venID, vtnConfig.getVtnId())
 				.addOadrProfile(Oadr20bEiRegisterPartyBuilders.newOadr20bOadrProfileBuilder(oadrProfileName)
 						.addTransport(oadrTransportName).build())
 				.withRegistrationId(registrationID);
 
 		if (ven.getHttpPullModel()) {
-			String pollFreq = "PT" + pullFrequencySeconds + "S";
+			String pollFreq = "PT" + vtnConfig.getPullFrequencySeconds() + "S";
 			if (ven.getPullFrequencySeconds() != null) {
 				pollFreq = "PT" + ven.getPullFrequencySeconds() + "S";
 			}
@@ -204,7 +201,7 @@ public class Oadr20bVTNEiRegisterPartyService {
 					xmlSignatureRequiredButAbsent.getResponseDescription(),
 					Oadr20bEiRegisterPartyBuilders
 							.newOadr20bCanceledPartyRegistrationBuilder(requestID,
-									Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID, vtnId)
+									Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID, vtnConfig.getVtnId())
 							.build());
 		}
 
@@ -245,13 +242,13 @@ public class Oadr20bVTNEiRegisterPartyService {
 		Ven ven = venService.findOneByUsername(username);
 		Long pullFrequency = ven.getPullFrequencySeconds();
 		if (pullFrequency == null) {
-			pullFrequency = pullFrequencySeconds;
+			pullFrequency = vtnConfig.getPullFrequencySeconds();
 		}
 
 		String duration = "PT" + pullFrequency + "S";
 		OadrCreatedPartyRegistrationType response = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatedPartyRegistrationBuilder(payload.getRequestID(), HttpStatus.OK_200, ven.getUsername(),
-						vtnId)
+						vtnConfig.getVtnId())
 				.addOadrProfile(Oadr20bVTNEiRegisterPartyService.supportedProfiles)
 				.withOadrRequestedOadrPollFreq(duration).withRegistrationId(ven.getRegistrationId()).build();
 
@@ -298,7 +295,8 @@ public class Oadr20bVTNEiRegisterPartyService {
 					mismatchCredentialsVenIdResponse.getResponseDescription(),
 					Oadr20bEiRegisterPartyBuilders
 							.newOadr20bCreatedPartyRegistrationBuilder(requestID,
-									Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID, vtnId)
+									Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID,
+									vtnConfig.getVtnId())
 							.addOadrProfile(Oadr20bVTNEiRegisterPartyService.supportedProfiles).build());
 		}
 	}

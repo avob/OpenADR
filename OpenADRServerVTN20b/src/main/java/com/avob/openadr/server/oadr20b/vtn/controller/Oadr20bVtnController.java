@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +21,7 @@ import com.avob.openadr.model.oadr20b.dto.ReportRequestDto;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapabilityDescription;
 import com.avob.openadr.server.oadr20b.vtn.service.dtomapper.Oadr20bDtoMapper;
@@ -45,26 +45,8 @@ public class Oadr20bVtnController {
 	@Resource
 	private SelfReportRequestService selfReportRequestService;
 
-	@Value("${oadr.security.vtn.cert}")
-	private String cert;
-
-	@Value("${oadr.supportPush}")
-	private Boolean supportPush;
-
-	@Value("${oadr.supportUnsecuredHttpPush}")
-	private Boolean supportUnsecuredHttpPush;
-
-	@Value("${oadr.pullFrequencySeconds}")
-	private Integer pullFrequencySeconds;
-
-	@Value("${oadr.server.port}")
-	private Integer port;
-
-	@Value("${oadr.server.context_path}")
-	private String contextPath;
-
-	@Value("${oadr.server.host:localhost}")
-	private String host;
+	@Resource
+	private VtnConfig vtnConfig;
 
 	@Resource
 	private Oadr20bDtoMapper oadr20bDtoMapper;
@@ -74,15 +56,15 @@ public class Oadr20bVtnController {
 	public VtnConfigurationDto viewConf() throws Oadr20bMarshalException {
 
 		VtnConfigurationDto dto = new VtnConfigurationDto();
-		dto.setContextPath(contextPath);
-		dto.setHost(host);
-		dto.setPort(port);
-		dto.setPullFrequencySeconds(pullFrequencySeconds);
-		dto.setSupportPush(supportPush);
-		dto.setSupportUnsecuredHttpPush(supportUnsecuredHttpPush);
+		dto.setContextPath(vtnConfig.getContextPath());
+		dto.setHost(vtnConfig.getHost());
+		dto.setPort(vtnConfig.getPort());
+		dto.setPullFrequencySeconds(vtnConfig.getPullFrequencySeconds());
+		dto.setSupportPush(vtnConfig.getSupportPush());
+		dto.setSupportUnsecuredHttpPush(vtnConfig.getSupportUnsecuredHttpPush());
 		String oadr20bFingerprint;
 		try {
-			oadr20bFingerprint = OadrHttpSecurity.getOadr20bFingerprint(cert);
+			oadr20bFingerprint = OadrHttpSecurity.getOadr20bFingerprint(vtnConfig.getCert());
 			dto.setVtnId(oadr20bFingerprint);
 		} catch (OadrSecurityException e) {
 			LOGGER.error("", e);

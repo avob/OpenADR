@@ -7,7 +7,6 @@ import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +23,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
+import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.exception.poll.Oadr20bPollApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNOadrPollService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
@@ -36,8 +36,8 @@ public class Oadr20bVTNOadrPollController {
 
 	private Oadr20bJAXBContext jaxbContext;
 
-	@Value("${oadr.validateOadrPayloadAgainstXsd:false}")
-	private Boolean validateOadrPayloadAgainstXsd;
+	@Resource
+	private VtnConfig vtnConfig;
 	
 	@Resource
 	private Oadr20bVTNOadrPollService oadr20bVTNOadrPollService;
@@ -56,7 +56,7 @@ public class Oadr20bVTNOadrPollController {
 			throws Oadr20bUnmarshalException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
 			Oadr20bPollApplicationLayerException, Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException {
 		
-		Object unmarshal = jaxbContext.unmarshal(payload, validateOadrPayloadAgainstXsd);
+		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
 
 		String username = principal.getName();
 
