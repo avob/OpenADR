@@ -7,44 +7,63 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class VtnConfig {
-	@Value("${oadr.server.context_path:#{null}}")
+
+	public static final String CONTEXT_PATH_CONF = "oadr.server.context_path";
+	public static final String PORT_CONF = "oadr.server.port";
+	public static final String TRUSTED_CERTIFICATES_CONF = "oadr.security.ven.trustcertificate";
+	public static final String PRIVATE_KEY_CONF = "oadr.security.vtn.key";
+	public static final String CERTIFICATE_CONF = "oadr.security.vtn.cert";
+	public static final String SUPPORT_PUSH_CONF = "oadr.supportPush";
+	public static final String SUPPORT_UNSECURED_PHTTP_PUSH_CONF = "oadr.supportUnsecuredHttpPush";
+	public static final String PULL_FREQUENCY_SECONDS_CONF = "oadr.pullFrequencySeconds";
+	public static final String HOST_CONF = "oadr.server.host";
+	public static final String VALIDATE_OADR_PAYLOAD_XSD_CONF = "oadr.validateOadrPayloadAgainstXsd";
+	public static final String VTN_ID_CONF = "oadr.vtnid";
+	public static final String SAVE_VEN_UPDATE_REPORT_CONF = "oadr.saveVenData";
+	public static final String REPLAY_PROTECTACCEPTED_DELAY_SECONDS_CONF = "oadr.security.replayProtectAcceptedDelaySecond";
+	public static final String CA_KEY_CONF = "oadr.security.ca.key";
+
+	@Value("${" + CONTEXT_PATH_CONF + ":#{null}}")
 	private String contextPath;
 
-	@Value("${oadr.server.port:#{8443}}")
+	@Value("${" + PORT_CONF + ":#{8443}}")
 	private int port;
 
-	@Value("#{'${oadr.security.ven.trustcertificate}'.split(',')}")
+	@Value("#{'${" + TRUSTED_CERTIFICATES_CONF + "}'.split(',')}")
 	private List<String> trustCertificates;
 
-	@Value("${oadr.security.vtn.key}")
+	@Value("${" + PRIVATE_KEY_CONF + "}")
 	private String key;
 
-	@Value("${oadr.security.vtn.cert}")
+	@Value("${" + CERTIFICATE_CONF + "}")
 	private String cert;
 
-	@Value("${oadr.supportPush}")
+	@Value("${" + SUPPORT_PUSH_CONF + "}")
 	private Boolean supportPush;
 
-	@Value("${oadr.supportUnsecuredHttpPush}")
+	@Value("${" + SUPPORT_UNSECURED_PHTTP_PUSH_CONF + "}")
 	private Boolean supportUnsecuredHttpPush;
 
-	@Value("${oadr.pullFrequencySeconds}")
+	@Value("${" + PULL_FREQUENCY_SECONDS_CONF + "}")
 	private Long pullFrequencySeconds;
 
-	@Value("${oadr.server.host:localhost}")
+	@Value("${" + HOST_CONF + ":localhost}")
 	private String host;
 
-	@Value("${oadr.validateOadrPayloadAgainstXsd:false}")
+	@Value("${" + VALIDATE_OADR_PAYLOAD_XSD_CONF + ":false}")
 	private Boolean validateOadrPayloadAgainstXsd;
 
-	@Value("${oadr.vtnid}")
+	@Value("${" + VTN_ID_CONF + "}")
 	private String vtnId;
 
-	@Value("${oadr.saveVenData}")
+	@Value("${" + SAVE_VEN_UPDATE_REPORT_CONF + "}")
 	private Boolean saveVenData;
-	
-	@Value("${oadr.security.replayProtectAcceptedDelaySecond}")
+
+	@Value("${" + REPLAY_PROTECTACCEPTED_DELAY_SECONDS_CONF + "}")
 	private Long replayProtectAcceptedDelaySecond;
+
+	@Value("${"+CA_KEY_CONF+":null}")
+	private String ca;
 
 	public String getContextPath() {
 		return contextPath;
@@ -148,5 +167,13 @@ public class VtnConfig {
 
 	public void setReplayProtectAcceptedDelaySecond(Long replayProtectAcceptedDelaySecond) {
 		this.replayProtectAcceptedDelaySecond = replayProtectAcceptedDelaySecond;
+	}
+
+	public String getCa() {
+		return ca;
+	}
+
+	public void setCa(String ca) {
+		this.ca = ca;
 	}
 }
