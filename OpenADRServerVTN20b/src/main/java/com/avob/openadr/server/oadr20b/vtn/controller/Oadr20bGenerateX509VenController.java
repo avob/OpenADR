@@ -37,9 +37,10 @@ public class Oadr20bGenerateX509VenController {
 
 		File generateCredentials = generateX509VenService.generateCredentials(dto);
 
+
 		InputStreamResource resource = new InputStreamResource(new FileInputStream(generateCredentials));
 
-		generateCredentials.delete();
+//		generateCredentials.delete();
 		return ResponseEntity.ok().contentLength(generateCredentials.length())
 				.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
 

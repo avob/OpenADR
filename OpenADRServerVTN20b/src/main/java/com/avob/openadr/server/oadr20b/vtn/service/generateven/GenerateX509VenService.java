@@ -46,7 +46,8 @@ public class GenerateX509VenService {
 	private VenService venService;
 
 	private KeyPair caKeyPair = null;
-	private Principal caSubject;
+	private X509Certificate caCert = null;
+	private Principal caSubject = null;
 
 	private File writeToFile(String fileName, String content) throws IOException {
 		File file = new File(fileName);
@@ -62,7 +63,7 @@ public class GenerateX509VenService {
 	private KeyPair loadCaKeyPair() throws OadrSecurityException {
 		if (caKeyPair == null) {
 			PrivateKey caKey = OadrHttpSecurity.parsePrivateKey(vtnConfig.getCaKey());
-			X509Certificate caCert = OadrHttpSecurity.parseCertificate(vtnConfig.getCertKey());
+			caCert = OadrHttpSecurity.parseCertificate(vtnConfig.getCertKey());
 			caSubject = caCert.getSubjectDN();
 			caKeyPair = new KeyPair(caCert.getPublicKey(), caKey);
 		}
@@ -93,10 +94,11 @@ public class GenerateX509VenService {
 
 			File csrFile = writeToFile(venName + ".csr", OadrHttpSecurity.writeCsrToString(csr));
 			File crtFile = writeToFile(venName + ".crt", OadrHttpSecurity.writeCrtToString(crt));
+			File caCrtFile = writeToFile("ca.crt", OadrHttpSecurity.writeCrtToString(caCert));
 			File keyPairFile = writeToFile(venName + ".pem", OadrHttpSecurity.writeKeyToString(venCred));
 			File fingerprintFile = writeToFile(venName + ".fingerprint", fingerprint);
 
-			Collection<File> filesToArchive = Lists.newArrayList(csrFile, crtFile, keyPairFile, fingerprintFile);
+			Collection<File> filesToArchive = Lists.newArrayList(csrFile, crtFile, keyPairFile, fingerprintFile, caCrtFile);
 			String archiveName = now + "-" + venName + "-credentials.tar.gz";
 			File outFile = new File(archiveName);
 			FileOutputStream out = new FileOutputStream(outFile);
