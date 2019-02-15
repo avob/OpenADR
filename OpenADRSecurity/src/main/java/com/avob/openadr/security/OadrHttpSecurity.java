@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -23,6 +25,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -30,14 +33,20 @@ import java.util.Map.Entry;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
+import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
@@ -253,8 +262,8 @@ public class OadrHttpSecurity {
 
 	public static PKCS10CertificationRequest generateCsr(KeyPair pair, String venCN, String algo) {
 		PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(
-				new X500Principal("CN=" + venCN), pair.getPublic());
-		JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(algo);
+				new X500Principal(" C=FR, ST=Paris, L=Paris, O=Avob, OU=Avob, CN=" + venCN), pair.getPublic());
+		JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256withRSA");
 		ContentSigner signer = null;
 		try {
 			signer = csBuilder.build(pair.getPrivate());
@@ -264,27 +273,29 @@ public class OadrHttpSecurity {
 		return p10Builder.build(signer);
 	}
 
-	public static X509Certificate signCsr(PKCS10CertificationRequest csr, KeyPair caKeyPair, String caSubject,
+	public static X509Certificate signCsr(PKCS10CertificationRequest csr, KeyPair caKeyPair, X509Certificate caCert,
 			BigInteger serialNumber)
 			throws IOException, OperatorCreationException, CertificateException, NoSuchProviderException {
+
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 		AlgorithmIdentifier sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find("SHA256withRSA");
 		AlgorithmIdentifier digAlgId = new DefaultDigestAlgorithmIdentifierFinder().find(sigAlgId);
-		PKCS10CertificationRequest csrHolder = new PKCS10CertificationRequest(csr.getEncoded());
+		X500Name x500name = new JcaX509CertificateHolder(caCert).getSubject();
 		X509v3CertificateBuilder certificateGenerator = new X509v3CertificateBuilder(
 				// These are the details of the CA
-				new X500Name(caSubject),
+				x500name,
 				// This should be a serial number that the CA keeps track of
 				serialNumber,
 				// Certificate validity start
-				Date.from(LocalDateTime.now().toInstant(ZoneOffset.UTC)),
+				Date.from(LocalDateTime.now().minusDays(1).toInstant(ZoneOffset.UTC)),
 				// Certificate validity end
 				Date.from(LocalDateTime.now().plusDays(365).toInstant(ZoneOffset.UTC)),
 				// Blanket grant the subject as requested in the CSR
 				// A real CA would want to vet this.
-				csrHolder.getSubject(),
+				csr.getSubject(),
 				// Public key of the certificate authority
-				SubjectPublicKeyInfo.getInstance(ASN1Sequence.getInstance(caKeyPair.getPublic().getEncoded())));
+				csr.getSubjectPublicKeyInfo());
+	
 		ContentSigner sigGen = new BcRSAContentSignerBuilder(sigAlgId, digAlgId)
 				.build(PrivateKeyFactory.createKey(caKeyPair.getPrivate().getEncoded()));
 
@@ -305,6 +316,12 @@ public class OadrHttpSecurity {
 	}
 
 	public static String writeKeyToString(KeyPair pair) throws IOException, CertificateEncodingException {
+		Base64.Encoder encoder = Base64.getEncoder();
+		Writer out = new StringWriter();
+		out.write("-----BEGIN RSA PRIVATE KEY-----\n");
+		out.write(encoder.encodeToString(pair.getPrivate().getEncoded()));
+		out.write("\n-----END RSA PRIVATE KEY-----\n");
+		out.close();
 		return writePemToString("PRIVATE KEY", pair.getPrivate().getEncoded());
 	}
 
