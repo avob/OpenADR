@@ -41,7 +41,7 @@ public class Oadr20bDemandResponseEventCreateListener {
     @JmsListener(destination = DemandResponseEventPublisher.OADR20B_QUEUE)
     public void receiveEvent(Ven ven) {
         if (ven != null && ven.getUsername() != null) {
-            if (ven.getPushUrl() != null) {
+            if (!ven.getHttpPullModel() &&  ven.getPushUrl() != null) {
                 oadr20bPushService.pushDistributeEventToVen(ven.getUsername(), ven.getPushUrl(), ven.getXmlSignature());
                 LOGGER.info("pushed event to: " + ven.getUsername() + " at:" + ven.getPushUrl());
                 return;

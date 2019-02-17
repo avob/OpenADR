@@ -31,7 +31,7 @@ public class VenDistributeService {
 
 	public void distribute(Ven ven, Object build) throws Oadr20bMarshalException {
 
-		if (ven.getPushUrl() != null) {
+		if (!ven.getHttpPullModel() && ven.getPushUrl() != null) {
 			oadr20bPushService.pushMessageToVen(ven.getPushUrl(), ven.getXmlSignature(), build);
 		} else {
 			String msg = jaxbContext.marshalRoot(build);
