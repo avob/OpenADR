@@ -310,7 +310,7 @@ public class Oadr20bFactory {
 		createOadrDistributeEventType.setRequestID(requestId);
 		return createOadrDistributeEventType;
 	}
-
+	
 	public static OadrPayload createOadrPayload(String id, Object value) {
 		OadrSignedObject createOadrSignedObject = factory.createOadrSignedObject();
 		createOadrSignedObject.setId(id);

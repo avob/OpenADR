@@ -1,22 +1,30 @@
 package com.avob.openadr.model.oadr20b.xmlsignature;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.security.InvalidAlgorithmParameterException;
+import java.security.Key;
 import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.crypto.AlgorithmMethod;
+import javax.xml.crypto.KeySelector;
+import javax.xml.crypto.KeySelectorException;
+import javax.xml.crypto.KeySelectorResult;
 import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
@@ -36,9 +44,11 @@ import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.dom.DOMResult;
@@ -49,13 +59,14 @@ import javax.xml.xpath.XPathFactory;
 
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPrivateKey;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
@@ -143,17 +154,19 @@ public class OadrXMLSignatureHandler {
 			}
 		}
 
-		if (replayProtect == null) {
-			throw new Oadr20bXMLSignatureValidationException("XML Signature must include ReplayProtect payload");
+//		if (replayProtect == null) {
+//			throw new Oadr20bXMLSignatureValidationException("XML Signature must include ReplayProtect payload");
+//		}
+		if (replayProtect != null) {
+			XMLGregorianCalendar timestamp = replayProtect.getTimestamp();
+
+			Long xmlCalendarToTimestamp = Oadr20bFactory.xmlCalendarToTimestamp(timestamp);
+
+			if (nowDate - xmlCalendarToTimestamp > millisecondAcceptedDelay) {
+				throw new Oadr20bXMLSignatureValidationException("Invalid ReplayProtect timestamp");
+			}
 		}
 
-		XMLGregorianCalendar timestamp = replayProtect.getTimestamp();
-
-		Long xmlCalendarToTimestamp = Oadr20bFactory.xmlCalendarToTimestamp(timestamp);
-
-		if (nowDate - xmlCalendarToTimestamp > millisecondAcceptedDelay) {
-			throw new Oadr20bXMLSignatureValidationException("Invalid ReplayProtect timestamp");
-		}
 	}
 
 	/**
@@ -162,48 +175,35 @@ public class OadrXMLSignatureHandler {
 	 * @param payload
 	 * @return
 	 */
-	public static void validate(OadrPayload payload, long nowDate, long millisecondAcceptedDelay)
+	public static void validate(String raw, OadrPayload payload, long nowDate, long millisecondAcceptedDelay)
 			throws Oadr20bXMLSignatureValidationException {
 
 		validateReplayProtect(payload, nowDate, millisecondAcceptedDelay);
 
-		DOMResult res = new DOMResult();
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		DocumentBuilder builder = null;
+		Document doc;
 		try {
-			jaxbContext.marshal(payload, res);
-		} catch (Oadr20bMarshalException e) {
+			builder = dbf.newDocumentBuilder();
+			doc = builder.parse(new InputSource(new StringReader(raw)));
+		} catch (ParserConfigurationException e) {
+			throw new Oadr20bXMLSignatureValidationException(e);
+
+		} catch (SAXException e) {
+			throw new Oadr20bXMLSignatureValidationException(e);
+		} catch (IOException e) {
 			throw new Oadr20bXMLSignatureValidationException(e);
 		}
-		Document doc = (Document) res.getNode();
 
-		// Find Signature element
+		XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
+
 		NodeList nl = doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
 		if (nl.getLength() == 0) {
 			throw new Oadr20bXMLSignatureValidationException("Cannot find Signature element");
 		}
 
-		// Retreive Assertion Node to be signed.
-		XPathFactory xPathfactory = XPathFactory.newInstance();
-
-		XPath xpath = xPathfactory.newXPath();
-		Element assertionNode = null;
-		javax.xml.xpath.XPathExpression compile;
-		try {
-			compile = xpath.compile("//*[local-name()='oadrSignedObject']");
-			assertionNode = (Element) compile.evaluate(doc, XPathConstants.NODE);
-			assertionNode.setIdAttribute("oadr:Id", true);
-		} catch (XPathExpressionException e) {
-			throw new Oadr20bXMLSignatureValidationException(e);
-		}
-
-		// Create a DOM XMLSignatureFactory that will be used to unmarshal the
-		// document containing the XMLSignature
-		XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM",
-				new org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI());
-
-		// Create a DOMValidateContext and specify a KeyValue KeySelector
-		// and document context
 		DOMValidateContext valContext = new DOMValidateContext(new KeyValueKeySelector(), nl.item(0));
-		valContext.setIdAttributeNS(assertionNode, "http://openadr.org/oadr-2.0b/2012/07", "Id");
 
 		XMLSignature signature;
 		try {
@@ -211,20 +211,16 @@ public class OadrXMLSignatureHandler {
 		} catch (MarshalException e) {
 			throw new Oadr20bXMLSignatureValidationException(e);
 		}
-
-		DOMValidateContext context = new DOMValidateContext(new KeyValueKeySelector(), doc.getDocumentElement());
-		context.setIdAttributeNS(assertionNode, "http://openadr.org/oadr-2.0b/2012/07", "Id");
-
 		try {
-			boolean validate = signature.validate(context);
+			boolean validate = signature.validate(valContext);
 			if (!validate) {
-				if (!signature.getSignatureValue().validate(context)) {
+				if (!signature.getSignatureValue().validate(valContext)) {
 					throw new Oadr20bXMLSignatureValidationException("XMLSignature SignatureValue validation fail");
 				}
 				for (Object object : signature.getSignedInfo().getReferences()) {
 					if (object instanceof Reference) {
 						Reference ref = (Reference) object;
-						if (!ref.validate(context)) {
+						if (!ref.validate(valContext)) {
 							throw new Oadr20bXMLSignatureValidationException(
 									"XMLSignature Reference uri: " + ref.getURI() + " validation fail");
 						}
@@ -270,13 +266,9 @@ public class OadrXMLSignatureHandler {
 		// Retreive nodes in xmlstructure
 		XPathFactory xPathfactory = XPathFactory.newInstance();
 		XPath xpath = xPathfactory.newXPath();
-		Element signedObjectNode = null;
 		Element oadrPayloadNode = null;
 		javax.xml.xpath.XPathExpression compile;
 		try {
-			compile = xpath.compile("//*[local-name()='oadrSignedObject']");
-			signedObjectNode = (Element) compile.evaluate(doc, XPathConstants.NODE);
-			signedObjectNode.setIdAttribute("oadr:Id", true);
 			compile = xpath.compile("//*[local-name()='oadrPayload']");
 			oadrPayloadNode = (Element) compile.evaluate(doc, XPathConstants.NODE);
 
@@ -285,27 +277,22 @@ public class OadrXMLSignatureHandler {
 		}
 
 		// instanciate sign context
-		DOMSignContext dsc = new DOMSignContext(privateKey, oadrPayloadNode, signedObjectNode);
+		DOMSignContext dsc = new DOMSignContext(privateKey, oadrPayloadNode);
 		// manipulate java signature generation to conform to oadr expectation
 		dsc.setDefaultNamespacePrefix("xmldsig");
-		dsc.putNamespacePrefix("http://openadr.org/oadr-2.0b/2012/07/xmldsig-properties", "properties");
+//		dsc.putNamespacePrefix("http://openadr.org/oadr-2.0b/2012/07/xmldsig-properties", "properties");
 		// set id of signedObjectNode (required for URI reference/sign a part of
 		// doc)
-		dsc.setIdAttributeNS(signedObjectNode, "http://openadr.org/oadr-2.0b/2012/07", "Id");
-
-		BouncyCastleProvider provider = new BouncyCastleProvider();
-		Security.addProvider(provider);
+//		dsc.setIdAttributeNS(signedObjectNode, "http://openadr.org/oadr-2.0b/2012/07", "Id");
 
 		PublicKey publicKey = certificate.getPublicKey();
 
-		XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM",
-				new org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI());
+		XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
 
 		SignedInfo si = null;
 		try {
 			// require digest signedObjectNode
-			Reference ref = fac.newReference("#" + SIGNEDOBJECT_PAYLOAD_ID,
-					fac.newDigestMethod(DigestMethod.SHA256, null),
+			Reference ref = fac.newReference("", fac.newDigestMethod(DigestMethod.SHA256, null),
 					Collections.singletonList(fac.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null)),
 					// null,
 					null, null);
@@ -325,7 +312,7 @@ public class OadrXMLSignatureHandler {
 			if (privateKey instanceof BCRSAPrivateKey) {
 				si = fac.newSignedInfo(
 						fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE, (C14NMethodParameterSpec) null),
-						fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null), refs);
+						fac.newSignatureMethod(RSA_SHA256_ALGORITHM, null), refs);
 			} else if (privateKey instanceof BCECPrivateKey) {
 				si = fac.newSignedInfo(
 						fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE, (C14NMethodParameterSpec) null),
@@ -392,26 +379,123 @@ public class OadrXMLSignatureHandler {
 			throw new Oadr20bXMLSignatureException(e);
 		}
 
-		// manipulate payload namespace to include those used in Signature
-		// payload
-		oadrPayloadNode.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xmldsig11",
-				"http://www.w3.org/2009/xmldsig11#");
-
-		oadrPayloadNode.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xmldsig",
-				"http://www.w3.org/2000/09/xmldsig#");
-
 		DOMImplementationLS domImplLS = (DOMImplementationLS) doc.getImplementation();
-		LSSerializer serializer = domImplLS.createLSSerializer();
 
+		LSSerializer serializer = domImplLS.createLSSerializer();
+		serializer.getDomConfig().setParameter("xml-declaration", Boolean.FALSE);
 		LSOutput lsOutput = domImplLS.createLSOutput();
 		// set utf8 xml prolog
 		lsOutput.setEncoding("UTF-8");
 		Writer stringWriter = new StringWriter();
 		lsOutput.setCharacterStream(stringWriter);
 		serializer.write(doc, lsOutput);
+		String signed = stringWriter.toString();
+		signed = signed.replaceAll("\n", "");
+		return signed;
 
-		return stringWriter.toString();
+	}
 
+	private static class X509KeySelector extends KeySelector {
+		public KeySelectorResult select(KeyInfo keyInfo, KeySelector.Purpose purpose, AlgorithmMethod method,
+				XMLCryptoContext context) throws KeySelectorException {
+			Iterator ki = keyInfo.getContent().iterator();
+			while (ki.hasNext()) {
+				XMLStructure info = (XMLStructure) ki.next();
+				if (!(info instanceof X509Data))
+					continue;
+				X509Data x509Data = (X509Data) info;
+				Iterator xi = x509Data.getContent().iterator();
+				while (xi.hasNext()) {
+					Object o = xi.next();
+					if (!(o instanceof X509Certificate))
+						continue;
+					final PublicKey key = ((X509Certificate) o).getPublicKey();
+					// Make sure the algorithm is compatible
+					// with the method.
+					if (algEquals(method.getAlgorithm(), key.getAlgorithm())) {
+						return new KeySelectorResult() {
+							public Key getKey() {
+								return key;
+							}
+						};
+					}
+				}
+			}
+			throw new KeySelectorException("No key found!");
+		}
+
+	}
+
+	private static class KeyValueKeySelector extends KeySelector {
+
+		private class SimpleKeySelectorResult implements KeySelectorResult {
+			private PublicKey pk;
+
+			SimpleKeySelectorResult(PublicKey pk) {
+				this.pk = pk;
+			}
+
+			public Key getKey() {
+				return pk;
+			}
+		}
+
+		public KeySelectorResult select(KeyInfo keyInfo, KeySelector.Purpose purpose, AlgorithmMethod method,
+				XMLCryptoContext context) throws KeySelectorException {
+
+			if (keyInfo == null) {
+				throw new KeySelectorException("Null KeyInfo object!");
+			}
+			SignatureMethod sm = (SignatureMethod) method;
+			List list = keyInfo.getContent();
+
+			for (int i = 0; i < list.size(); i++) {
+				XMLStructure xmlStructure = (XMLStructure) list.get(i);
+				if (xmlStructure instanceof KeyValue) {
+					PublicKey pk = null;
+					try {
+						pk = ((KeyValue) xmlStructure).getPublicKey();
+					} catch (KeyException ke) {
+						throw new KeySelectorException(ke);
+					}
+					// make sure algorithm is compatible with method
+					if (algEquals(sm.getAlgorithm(), pk.getAlgorithm())) {
+						return new SimpleKeySelectorResult(pk);
+					}
+				}
+			}
+			throw new KeySelectorException("No KeyValue element found!");
+		}
+
+		static boolean algEquals(String algURI, String algName) {
+			if (algName.equalsIgnoreCase("DSA")
+					&& algURI.equalsIgnoreCase("http://www.w3.org/2009/xmldsig11#dsa-sha256")) {
+				return true;
+			} else if (algName.equalsIgnoreCase("RSA")
+					&& algURI.equalsIgnoreCase("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256")) {
+				return true;
+			} else if (algName.equalsIgnoreCase("RSA")
+					&& algURI.equalsIgnoreCase("http://www.w3.org/2000/09/xmldsig#rsa-sha1")) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+	}
+
+	static boolean algEquals(String algURI, String algName) {
+		if (algName.equalsIgnoreCase("DSA") && algURI.equalsIgnoreCase("http://www.w3.org/2009/xmldsig11#dsa-sha256")) {
+			return true;
+		} else if (algName.equalsIgnoreCase("RSA")
+				&& algURI.equalsIgnoreCase("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256")) {
+			return true;
+		} else if (algName.equalsIgnoreCase("RSA")
+				&& algURI.equalsIgnoreCase("http://www.w3.org/2000/09/xmldsig#rsa-sha1")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

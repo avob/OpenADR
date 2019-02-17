@@ -40,6 +40,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreatedOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
@@ -117,8 +118,16 @@ public class Oadr20bJAXBContext {
 	}
 
 	public Object unmarshal(String payload, boolean validate) throws Oadr20bUnmarshalException {
-		return this.unmarshal(new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8)), Object.class,
-				validate);
+		if(payload.indexOf("oadrPayload") >= 0) {
+			return this.unmarshal(new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8)), Object.class,
+					false);
+		}
+		else {
+			return this.unmarshal(new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8)), Object.class,
+					validate);
+		}
+		
+		
 	}
 
 	public <T> T unmarshal(String payload, Class<T> responseKlass) throws Oadr20bUnmarshalException {
@@ -139,11 +148,14 @@ public class Oadr20bJAXBContext {
 		Object unmarshal;
 		try {
 			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-			if (validate) {
-				unmarshaller.setSchema(schema);
+			if(!OadrPayload.class.equals(responseKlass) && validate) {
+				if (validate) {
+					unmarshaller.setSchema(schema);
+				}
 			}
 			unmarshal = unmarshaller.unmarshal(payload);
 		} catch (JAXBException e) {
+		
 			throw new Oadr20bUnmarshalException(e);
 		}
 		try {

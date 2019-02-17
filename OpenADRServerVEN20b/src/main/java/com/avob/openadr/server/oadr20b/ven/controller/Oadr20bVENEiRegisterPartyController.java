@@ -72,7 +72,7 @@ public class Oadr20bVENEiRegisterPartyController {
 
 			OadrPayload oadrPayload = (OadrPayload) unmarshal;
 
-			return handle(vtnConfig, oadrPayload);
+			return handle(vtnConfig, payload, oadrPayload);
 
 		} else if (unmarshal instanceof OadrRequestReregistrationType) {
 
@@ -95,10 +95,10 @@ public class Oadr20bVENEiRegisterPartyController {
 		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
 	}
 
-	private String handle(VtnSessionConfiguration vtnConfig, OadrPayload oadrPayload)
+	private String handle(VtnSessionConfiguration vtnConfig, String raw, OadrPayload oadrPayload)
 			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureException, OadrSecurityException {
-		xmlSignatureService.validate(oadrPayload, vtnConfig);
+		xmlSignatureService.validate(raw, oadrPayload, vtnConfig);
 
 		if (oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration() != null) {
 			LOGGER.info(vtnConfig.getVtnId() + " - OadrCancelPartyRegistrationType signed");

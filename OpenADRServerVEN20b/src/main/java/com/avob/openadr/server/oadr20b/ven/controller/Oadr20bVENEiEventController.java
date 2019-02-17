@@ -94,7 +94,7 @@ public class Oadr20bVENEiEventController {
 
 			OadrPayload oadrPayload = (OadrPayload) unmarshal;
 
-			return handle(multiConfig, oadrPayload);
+			return handle(multiConfig, payload, oadrPayload);
 
 		} else if (unmarshal instanceof OadrDistributeEventType) {
 
@@ -109,11 +109,11 @@ public class Oadr20bVENEiEventController {
 		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
 	}
 
-	private String handle(VtnSessionConfiguration multiConfig, OadrPayload oadrPayload)
+	private String handle(VtnSessionConfiguration multiConfig, String raw, OadrPayload oadrPayload)
 			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureException, OadrSecurityException {
 
-		xmlSignatureService.validate(oadrPayload, multiConfig);
+		xmlSignatureService.validate(raw, oadrPayload, multiConfig);
 
 		if (oadrPayload.getOadrSignedObject().getOadrDistributeEvent() != null) {
 			LOGGER.info(multiConfig.getVtnId() + " - OadrDistributeEventType signed");

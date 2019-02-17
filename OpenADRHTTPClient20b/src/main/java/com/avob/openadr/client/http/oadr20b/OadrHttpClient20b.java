@@ -97,9 +97,9 @@ public class OadrHttpClient20b {
 		return OadrXMLSignatureHandler.sign(object, this.privateKey, this.clientCertificate, nonce, createdtimestamp);
 	}
 
-	private void validate(OadrPayload payload) throws Oadr20bXMLSignatureValidationException {
+	private void validate(String raw, OadrPayload payload) throws Oadr20bXMLSignatureValidationException {
 		long nowDate = System.currentTimeMillis();
-		OadrXMLSignatureHandler.validate(payload, nowDate, replayProtectAcceptedDelaySecond * 1000L);
+		OadrXMLSignatureHandler.validate(raw, payload, nowDate, replayProtectAcceptedDelaySecond * 1000L);
 	}
 
 	/**
@@ -138,10 +138,11 @@ public class OadrHttpClient20b {
 			} else {
 				if (isXmlSignatureEnabled()) {
 					try {
+						String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
 						OadrPayload unmarshal = jaxbContext.unmarshal(
-								EntityUtils.toString(response.getEntity(), "UTF-8"), OadrPayload.class,
+								entity, OadrPayload.class,
 								validateXmlPayload);
-						this.validate(unmarshal);
+						this.validate(entity, unmarshal);
 						EntityUtils.consumeQuietly(response.getEntity());
 						if (Object.class.equals(responseKlass)) {
 							Object signedObjectFromOadrPayload = Oadr20bFactory

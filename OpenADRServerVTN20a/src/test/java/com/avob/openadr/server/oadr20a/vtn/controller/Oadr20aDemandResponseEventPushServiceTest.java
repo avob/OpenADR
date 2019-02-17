@@ -1,6 +1,6 @@
 package com.avob.openadr.server.oadr20a.vtn.controller;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.net.URISyntaxException;

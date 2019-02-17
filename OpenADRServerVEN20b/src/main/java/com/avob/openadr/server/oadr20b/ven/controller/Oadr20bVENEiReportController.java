@@ -76,7 +76,7 @@ public class Oadr20bVENEiReportController {
 
 			OadrPayload oadrPayload = (OadrPayload) unmarshal;
 
-			return handle(multiConfig, oadrPayload);
+			return handle(multiConfig, payload, oadrPayload);
 
 		} else if (unmarshal instanceof OadrCancelReportType) {
 
@@ -187,10 +187,10 @@ public class Oadr20bVENEiReportController {
 		return responseStr;
 	}
 
-	private String handle(VtnSessionConfiguration multiConfig, OadrPayload oadrPayload)
+	private String handle(VtnSessionConfiguration multiConfig, String raw, OadrPayload oadrPayload)
 			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureException, OadrSecurityException {
-		xmlSignatureService.validate(oadrPayload, multiConfig);
+		xmlSignatureService.validate(raw, oadrPayload, multiConfig);
 
 		if (oadrPayload.getOadrSignedObject().getOadrUpdateReport() != null) {
 			LOGGER.info(multiConfig.getVtnId() + " - OadrUpdateReport signed");

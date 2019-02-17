@@ -91,8 +91,8 @@ public class OadrXMLSignatureHandlerTest {
     }
 
     private void validate(String payload) throws Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {
-        OadrPayload unmarshal = jaxbContext.unmarshal(payload, OadrPayload.class);
-        OadrXMLSignatureHandler.validate(unmarshal, 0, 10);
+        OadrPayload unmarshal = jaxbContext.unmarshal(payload, OadrPayload.class, true);
+        OadrXMLSignatureHandler.validate(payload, unmarshal, 0, 10);
     }
 
     @Test
@@ -493,6 +493,7 @@ public class OadrXMLSignatureHandlerTest {
             throws Oadr20bXMLSignatureException, Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {
         String venId = "venId";
         OadrPollType request = Oadr20bPollBuilders.newOadr20bPollBuilder(venId).build();
+        
         validate(OadrXMLSignatureHandler.sign(request, privateKey, certificate, "nonce", 0L));
     }
 
