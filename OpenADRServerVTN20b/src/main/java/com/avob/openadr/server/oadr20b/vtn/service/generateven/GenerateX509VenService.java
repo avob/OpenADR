@@ -47,7 +47,6 @@ public class GenerateX509VenService {
 
 	private KeyPair caKeyPair = null;
 	private X509Certificate caCert = null;
-	private Principal caSubject = null;
 
 	private File writeToFile(String fileName, String content) throws IOException {
 		File file = new File(fileName);

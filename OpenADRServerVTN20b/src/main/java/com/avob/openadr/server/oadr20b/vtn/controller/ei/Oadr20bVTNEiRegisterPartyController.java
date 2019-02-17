@@ -75,6 +75,8 @@ public class Oadr20bVTNEiRegisterPartyController {
 
 		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
 
+//		Object unmarshal = jaxbContext.unmarshal(payload, false);
+
 		String username = principal.getName();
 
 		if (unmarshal instanceof OadrPayload) {

@@ -187,9 +187,14 @@ public class Oadr20bVTNEiReportControllerTest {
 				oadrRegisteredReportType.getEiResponse().getResponseCode());
 
 		// sign and push this payload into EiReport controller
-		OadrPayload payload = mockMvc.postEiReportAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
-				xmlSignatureService.sign(oadrRegisterReportType), HttpStatus.OK_200, OadrPayload.class);
-		xmlSignatureService.validate(payload);
+//		OadrPayload payload = mockMvc.postEiReportAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
+//				xmlSignatureService.sign(oadrRegisterReportType), HttpStatus.OK_200, OadrPayload.class);
+		String str = mockMvc.postEiReportAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
+				xmlSignatureService.sign(oadrRegisterReportType), HttpStatus.OK_200, String.class);
+		OadrPayload payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
+		xmlSignatureService.validate(str, payload);
+
+		xmlSignatureService.validate(str, payload);
 		oadrRegisteredReportType = payload.getOadrSignedObject().getOadrRegisteredReport();
 
 		assertNotNull(oadrRegisteredReportType);
@@ -253,9 +258,12 @@ public class Oadr20bVTNEiReportControllerTest {
 				response.getEiResponse().getResponseCode());
 
 		// push this payload into EiReport controller
-		payload = mockMvc.postEiReportAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
-				xmlSignatureService.sign(oadrCreatedReportType), HttpStatus.OK_200, OadrPayload.class);
-		xmlSignatureService.validate(payload);
+//		payload = mockMvc.postEiReportAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
+//				xmlSignatureService.sign(oadrCreatedReportType), HttpStatus.OK_200, OadrPayload.class);
+		str = mockMvc.postEiReportAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
+				xmlSignatureService.sign(oadrCreatedReportType), HttpStatus.OK_200, String.class);
+		payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
+		xmlSignatureService.validate(str, payload);
 		response = payload.getOadrSignedObject().getOadrResponse();
 		assertNotNull(response);
 		assertEquals(String.valueOf(HttpStatus.OK_200), response.getEiResponse().getResponseCode());
@@ -423,9 +431,12 @@ public class Oadr20bVTNEiReportControllerTest {
 		// as there is nothing to distribute to VEN, VTN shall respond with an
 		// OadrResponseType
 		OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(OadrDataBaseSetup.VEN).build();
-		OadrPayload payload = mockMvc.postOadrPollAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
-				xmlSignatureService.sign(poll), HttpStatus.OK_200, OadrPayload.class);
-		xmlSignatureService.validate(payload);
+//		OadrPayload payload = mockMvc.postOadrPollAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
+//				xmlSignatureService.sign(poll), HttpStatus.OK_200, OadrPayload.class);
+		String str = mockMvc.postOadrPollAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
+				xmlSignatureService.sign(poll), HttpStatus.OK_200, String.class);
+		OadrPayload payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
+		xmlSignatureService.validate(str, payload);
 		OadrResponseType oadrResponse = payload.getOadrSignedObject().getOadrResponse();
 		assertEquals(String.valueOf(HttpStatus.OK_200), oadrResponse.getEiResponse().getResponseCode());
 
@@ -581,10 +592,13 @@ public class Oadr20bVTNEiReportControllerTest {
 				oadrCanceledReportType.getEiResponse().getResponseCode());
 
 		// push cancel to ei report
-		payload = mockMvc.postEiReportAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
-				xmlSignatureService.sign(oadrCancelReportType), HttpStatus.OK_200, OadrPayload.class);
+//		payload = mockMvc.postEiReportAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
+//				xmlSignatureService.sign(oadrCancelReportType), HttpStatus.OK_200, OadrPayload.class);
+		str = mockMvc.postEiReportAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
+				xmlSignatureService.sign(oadrCancelReportType), HttpStatus.OK_200, String.class);
+		payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
 
-		xmlSignatureService.validate(payload);
+		xmlSignatureService.validate(str, payload);
 		oadrCanceledReportType = payload.getOadrSignedObject().getOadrCanceledReport();
 		assertEquals(String.valueOf(HttpStatus.OK_200), oadrCanceledReportType.getEiResponse().getResponseCode());
 

@@ -39,8 +39,8 @@ public class XmlSignatureService {
 		return OadrXMLSignatureHandler.sign(object, parsePrivateKey, parseCertificate, nonce, createdtimestamp);
 	}
 
-	public void validate(OadrPayload payload) throws Oadr20bXMLSignatureValidationException {
+	public void validate(String raw, OadrPayload payload) throws Oadr20bXMLSignatureValidationException {
 		long nowDate = System.currentTimeMillis();
-		OadrXMLSignatureHandler.validate(payload, nowDate, vtnConfig.getReplayProtectAcceptedDelaySecond() * 1000L);
+		OadrXMLSignatureHandler.validate(raw, payload, nowDate, vtnConfig.getReplayProtectAcceptedDelaySecond() * 1000L);
 	}
 }

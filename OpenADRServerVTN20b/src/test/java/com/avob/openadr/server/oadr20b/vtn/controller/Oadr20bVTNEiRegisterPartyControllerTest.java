@@ -18,6 +18,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
 import com.avob.openadr.model.oadr20b.ei.SchemaVersionEnumeratedType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
@@ -180,10 +181,10 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
 
 		// push signed oadrCreateRegitration to VTN
-		payload = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
-				xmlSignatureService.sign(oadrCreatePartyRegistrationType), HttpStatus.OK_200, OadrPayload.class);
-
-		xmlSignatureService.validate(payload);
+		String str = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
+				xmlSignatureService.sign(oadrCreatePartyRegistrationType), HttpStatus.OK_200, String.class);
+		payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
+		xmlSignatureService.validate(str, payload);
 		oadrCreatedPartyRegistrationType = payload.getOadrSignedObject().getOadrCreatedPartyRegistration();
 
 		assertNotNull(oadrCreatedPartyRegistrationType);
@@ -266,10 +267,18 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 				oadrCanceledPartyRegistration.getEiResponse().getResponseCode());
 
 		// test signed create oadrcancelRegistration
-		payload = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
-				xmlSignatureService.sign(oadrCancelPartyRegistration), HttpStatus.OK_200, OadrPayload.class);
+//		payload = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
+//				xmlSignatureService.sign(oadrCancelPartyRegistration), HttpStatus.OK_200, OadrPayload.class);
 
-		xmlSignatureService.validate(payload);
+		 str = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
+				xmlSignatureService.sign(oadrCancelPartyRegistration), HttpStatus.OK_200, String.class);
+		payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
+		xmlSignatureService.validate(str, payload);
+		
+//		xmlSignatureService.validate(payload);
+		
+		
+		
 		oadrCanceledPartyRegistration = payload.getOadrSignedObject().getOadrCanceledPartyRegistration();
 
 		assertNotNull(oadrCanceledPartyRegistration);

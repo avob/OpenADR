@@ -43,6 +43,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
+import com.avob.openadr.model.oadr20b.oadr.OadrSignedObject;
 import com.avob.openadr.model.oadr20b.xcal.VavailabilityType;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
@@ -119,7 +120,7 @@ public class Oadr20bVTNEiOptControllerTest {
         OadrCreateOptType oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId,
                 OadrDataBaseSetup.VEN, createdDatetime, vavailabilityType, optId, optType, optReason)
                 .withMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
-
+        
         String signed = xmlSignatureService.sign(oadrCreateOptType);
         OadrPayload oadrPayload = this.oadrMockMvc.postEiOptAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, signed,
                 HttpStatus.OK_200, OadrPayload.class);

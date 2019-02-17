@@ -67,7 +67,7 @@ public class Oadr20bVTNEiOptController {
 
             OadrPayload oadrPayload = (OadrPayload) unmarshal;
 
-            return handle(username, oadrPayload);
+            return handle(username, payload, oadrPayload);
 
         } else if (unmarshal instanceof OadrCreateOptType) {
 
@@ -90,12 +90,12 @@ public class Oadr20bVTNEiOptController {
         throw new Oadr20bApplicationLayerException("Unacceptable request payload for OadrPoll");
     }
 
-    private String handle(String username, OadrPayload oadrPayload)
+    private String handle(String username, String raw, OadrPayload oadrPayload)
             throws Oadr20bMarshalException, Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException,
             Oadr20bCancelOptApplicationLayerException, Oadr20bCreateOptApplicationLayerException,
             Oadr20bXMLSignatureException {
 
-        xmlSignatureService.validate(oadrPayload);
+        xmlSignatureService.validate(raw, oadrPayload);
         if (oadrPayload.getOadrSignedObject().getOadrCreateOpt() != null) {
 
             LOGGER.info(username + " - OadrCreateOptType signed");

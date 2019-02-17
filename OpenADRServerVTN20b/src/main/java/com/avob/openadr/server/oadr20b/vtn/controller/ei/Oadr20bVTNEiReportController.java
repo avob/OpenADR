@@ -49,7 +49,7 @@ public class Oadr20bVTNEiReportController {
 
 	@Resource
 	private VtnConfig vtnConfig;
-	
+
 	@Resource
 	private Oadr20bVTNEiReportService reportService;
 
@@ -80,7 +80,7 @@ public class Oadr20bVTNEiReportController {
 
 			OadrPayload obj = (OadrPayload) unmarshal;
 
-			return handle(username, obj);
+			return handle(username, payload, obj);
 
 		} else if (unmarshal instanceof OadrRegisterReportType) {
 
@@ -127,7 +127,7 @@ public class Oadr20bVTNEiReportController {
 		return null;
 	}
 
-	private String handle(String username, OadrPayload oadrPayload)
+	private String handle(String username, String raw, OadrPayload oadrPayload)
 			throws Oadr20bMarshalException, Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException,
 			Oadr20bCreatePartyRegistrationTypeApplicationLayerException,
 			Oadr20bCancelPartyRegistrationTypeApplicationLayerException,
@@ -136,7 +136,7 @@ public class Oadr20bVTNEiReportController {
 			Oadr20bCreateReportApplicationLayerException, Oadr20bCreatedReportApplicationLayerException,
 			Oadr20bXMLSignatureException {
 
-		xmlSignatureService.validate(oadrPayload);
+		xmlSignatureService.validate(raw, oadrPayload);
 
 		if (oadrPayload.getOadrSignedObject().getOadrCancelReport() != null) {
 

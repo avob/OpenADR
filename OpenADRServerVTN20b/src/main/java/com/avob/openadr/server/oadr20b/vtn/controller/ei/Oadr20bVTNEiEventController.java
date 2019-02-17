@@ -87,7 +87,7 @@ public class Oadr20bVTNEiEventController {
 
 			OadrPayload oadrPayload = (OadrPayload) unmarshal;
 
-			return handle(username, oadrPayload);
+			return handle(username,payload, oadrPayload);
 
 		} else if (unmarshal instanceof OadrCreatedEventType) {
 
@@ -121,12 +121,12 @@ public class Oadr20bVTNEiEventController {
 	 * @throws Oadr20bRequestEventApplicationLayerException
 	 * @throws Oadr20bXMLSignatureException
 	 */
-	private String handle(String username, OadrPayload oadrPayload)
+	private String handle(String username, String raw, OadrPayload oadrPayload)
 			throws Oadr20bMarshalException, Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException,
 			Oadr20bCreatedEventApplicationLayerException, Oadr20bRequestEventApplicationLayerException,
 			Oadr20bXMLSignatureException {
 
-		xmlSignatureService.validate(oadrPayload);
+		xmlSignatureService.validate(raw, oadrPayload);
 
 		if (oadrPayload.getOadrSignedObject().getOadrCreatedEvent() != null) {
 

@@ -106,6 +106,10 @@ public class OadrMockMvc {
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(endpoint).content(content).with(authSession))
 				.andExpect(MockMvcResultMatchers.status().is(status)).andReturn();
+		
+		if(String.class.equals(klass)) {
+			return (T) andReturn.getResponse().getContentAsString();
+		}
 		T unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), klass);
 		assertNotNull(unmarshal);
 		return unmarshal;
