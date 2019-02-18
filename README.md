@@ -130,5 +130,5 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
         --oadr.security.vtn.cert={ven4.oadr.com.cert} \
         --oadr.security.vtn.trustcertificate={oadr.com.crt} \
         --oadr.server.port = 8084 \
-        --oadr.venUrl https://ven3.oadr.com:8084
+        --oadr.venUrl https://ven4.oadr.com:8084
 ```
