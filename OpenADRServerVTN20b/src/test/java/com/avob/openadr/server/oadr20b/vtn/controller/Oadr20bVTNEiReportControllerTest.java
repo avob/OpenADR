@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.LinkedMultiValueMap;
@@ -87,12 +88,8 @@ import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockMvc;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VTN20bSecurityApplicationTest.class })
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-// @TestPropertySource(properties = { "oadr.saveVenData=true", })
+@ActiveProfiles( "test")
 public class Oadr20bVTNEiReportControllerTest {
-
-	// private static final String VEN = "ven1";
-	//
-	// private static final String MARKET_CONTEXT_NAME = "http://oadr.avob.com";
 
 	private static final String VEN_ENDPOINT = "/Ven/";
 	private static final String VTN_ENDPOINT = "/Vtn/";

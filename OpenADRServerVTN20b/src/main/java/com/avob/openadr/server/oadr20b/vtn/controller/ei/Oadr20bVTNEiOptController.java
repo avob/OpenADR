@@ -36,7 +36,8 @@ public class Oadr20bVTNEiOptController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiOptController.class);
 
-    private Oadr20bJAXBContext jaxbContext;
+    @Resource
+	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
 	private VtnConfig vtnConfig;
@@ -46,10 +47,6 @@ public class Oadr20bVTNEiOptController {
 
     @Resource
     private XmlSignatureService xmlSignatureService;
-
-    public Oadr20bVTNEiOptController() throws JAXBException {
-        jaxbContext = Oadr20bJAXBContext.getInstance();
-    }
 
     @PreAuthorize("hasRole('ROLE_VEN') AND hasRole('ROLE_REGISTERED')")
     @RequestMapping(value = Oadr20bUrlPath.EI_OPT_SERVICE, method = RequestMethod.POST)

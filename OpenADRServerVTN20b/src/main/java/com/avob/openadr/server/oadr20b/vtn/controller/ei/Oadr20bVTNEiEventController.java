@@ -3,7 +3,6 @@ package com.avob.openadr.server.oadr20b.vtn.controller.ei;
 import java.security.Principal;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +41,7 @@ public class Oadr20bVTNEiEventController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiEventController.class);
 
+	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
@@ -52,10 +52,6 @@ public class Oadr20bVTNEiEventController {
 
 	@Resource
 	private XmlSignatureService xmlSignatureService;
-
-	public Oadr20bVTNEiEventController() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
 
 	/**
 	 * Service HTTP Endpoint
@@ -87,7 +83,7 @@ public class Oadr20bVTNEiEventController {
 
 			OadrPayload oadrPayload = (OadrPayload) unmarshal;
 
-			return handle(username,payload, oadrPayload);
+			return handle(username, payload, oadrPayload);
 
 		} else if (unmarshal instanceof OadrCreatedEventType) {
 

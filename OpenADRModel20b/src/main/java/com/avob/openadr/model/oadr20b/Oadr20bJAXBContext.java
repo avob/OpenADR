@@ -54,10 +54,9 @@ import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 public class Oadr20bJAXBContext {
 
 	private static final boolean DEFAULT_VALIDATE_XML_PAYLOAD = false;
-
-	private static final String XSD_PATH = "/oadr20b_schema/oadr_20b.xsd";
-
-	private static final String XSD_AVOB_PATH = "/oadr20b_schema/oadr_avob.xsd";
+	public static final String SHARED_RESOURCE_PATH = "target/maven-shared-archive-resources";
+	public static final String XSD_PATH = "/oadr20b_schema/oadr_20b.xsd";
+	public static final String XSD_AVOB_PATH = "/oadr20b_schema/oadr_avob.xsd";
 
 	private static Oadr20bJAXBContext instance = null;
 
@@ -65,7 +64,7 @@ public class Oadr20bJAXBContext {
 
 	private JAXBContext jaxbContext;
 
-	private Oadr20bJAXBContext() throws JAXBException {
+	private Oadr20bJAXBContext(Schema schema) throws JAXBException {
 
 		StringJoiner joiner = new StringJoiner(":");
 		joiner.add("com.avob.openadr.model.oadr20b.atom");
@@ -87,26 +86,37 @@ public class Oadr20bJAXBContext {
 
 		jaxbContext = JAXBContext.newInstance(joiner.toString());
 
-		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		try {
-
-			URL url = this.getClass().getResource(XSD_PATH);
-			File xsdFile = new File(url.getPath());
-			url = this.getClass().getResource(XSD_AVOB_PATH);
-			File xsdAvobFile = new File(url.getPath());
-			
-			schema = sf.newSchema(new Source[] { new StreamSource(xsdFile), new StreamSource(xsdAvobFile) });
-		} catch (SAXException e) {
-			throw new JAXBException("can't retreived xsd schema", e);
-		}
+		this.schema = schema;
 
 	}
 
 	public static Oadr20bJAXBContext getInstance() throws JAXBException {
+		return Oadr20bJAXBContext.getInstance(null);
+	}
+
+	public static Oadr20bJAXBContext getInstance(Schema schema) throws JAXBException {
 		if (instance == null) {
 			synchronized (Oadr20bJAXBContext.class) {
+				Schema loadedSchema = schema;
+				if (schema == null) {
+					SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+					URL url = Oadr20bJAXBContext.class.getResource(XSD_PATH);
+					File xsdFile = new File(url.getPath());
+					url = Oadr20bJAXBContext.class.getResource(XSD_AVOB_PATH);
+					File xsdAvobFile = new File(url.getPath());
+					if (xsdFile.exists() && xsdAvobFile.exists()) {
+						try {
+							loadedSchema = sf.newSchema(
+									new Source[] { new StreamSource(xsdFile), new StreamSource(xsdAvobFile) });
+						} catch (SAXException e) {
+							loadedSchema = null;
+						}
+					}
+				}
+
 				if (instance == null) {
-					instance = new Oadr20bJAXBContext();
+					instance = new Oadr20bJAXBContext(loadedSchema);
 				}
 			}
 		}
@@ -118,16 +128,14 @@ public class Oadr20bJAXBContext {
 	}
 
 	public Object unmarshal(String payload, boolean validate) throws Oadr20bUnmarshalException {
-		if(payload.indexOf("oadrPayload") >= 0) {
+		if (payload.indexOf("oadrPayload") >= 0) {
 			return this.unmarshal(new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8)), Object.class,
 					false);
-		}
-		else {
+		} else {
 			return this.unmarshal(new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8)), Object.class,
 					validate);
 		}
-		
-		
+
 	}
 
 	public <T> T unmarshal(String payload, Class<T> responseKlass) throws Oadr20bUnmarshalException {
@@ -148,14 +156,14 @@ public class Oadr20bJAXBContext {
 		Object unmarshal;
 		try {
 			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-			if(!OadrPayload.class.equals(responseKlass) && validate) {
+			if (!OadrPayload.class.equals(responseKlass) && validate) {
 				if (validate) {
 					unmarshaller.setSchema(schema);
 				}
 			}
 			unmarshal = unmarshaller.unmarshal(payload);
 		} catch (JAXBException e) {
-		
+
 			throw new Oadr20bUnmarshalException(e);
 		}
 		try {

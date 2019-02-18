@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,12 +95,9 @@ public class Oadr20bVenController {
 	@Resource
 	private Oadr20bDtoMapper oadr20bDtoMapper;
 
+	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
-	public Oadr20bVenController() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
-	
 	@RequestMapping(value = "/{venID}/registerparty/requestReregistration", method = RequestMethod.POST)
 	@ResponseBody
 	public void registerPartyRequestReregistration(@PathVariable("venID") String venID)

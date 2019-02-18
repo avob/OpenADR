@@ -1,11 +1,19 @@
 package com.avob.openadr.server.oadr20a.vtn;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.Map;
 import java.util.UUID;
+
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBException;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +27,12 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.util.ResourceUtils;
+import org.xml.sax.SAXException;
 
+import com.avob.openadr.model.oadr20a.Oadr20aJAXBContext;
 import com.avob.openadr.model.oadr20a.Oadr20aSecurity;
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
@@ -86,6 +98,32 @@ public class VTN20aApplication {
 		}
 		return null;
 	}
+
+	@Bean
+	@Profile({ "!test" })
+	public Oadr20aJAXBContext jaxbContextProd() throws JAXBException, SAXException, IOException {
+		File folder = ResourceUtils.getFile(Oadr20aJAXBContext.SHARED_RESOURCE_PATH);
+		Schema loadedSchema = null;
+		SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		File xsdFile = new File(folder.getAbsolutePath() + Oadr20aJAXBContext.XSD_PATH);
+		if (xsdFile.exists()) {
+			try {
+				loadedSchema = sf.newSchema(new Source[] { new StreamSource(xsdFile) });
+			} catch (SAXException e) {
+				loadedSchema = null;
+			}
+		} else {
+			LOGGER.warn("Oadr20b XSD schema not loaded");
+		}
+
+		return Oadr20aJAXBContext.getInstance(loadedSchema);
+	};
+
+	@Bean
+	@Profile({ "test" })
+	public Oadr20aJAXBContext jaxbContextTest() throws JAXBException, SAXException {
+		return Oadr20aJAXBContext.getInstance();
+	};
 
 	public static void main(String[] args) {
 		SpringApplication.run(VTN20aApplication.class, args);

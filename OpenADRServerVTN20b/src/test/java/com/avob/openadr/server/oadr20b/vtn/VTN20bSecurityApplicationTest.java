@@ -17,9 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 @Configuration
 @EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class })
 @ComponentScan(basePackages = { "com.avob.openadr.server.oadr20b.vtn" })
-//@EnableJpaRepositories({ "com.avob.openadr.server.oadr20b.vtn" })
-//@EntityScan(basePackages = { "com.avob.openadr.server.oadr20b.vtn" })
-@ActiveProfiles({ "test" })
+@ActiveProfiles("test")
 public class VTN20bSecurityApplicationTest {
 
 	private static final String BROKER_NAME = "mybroker.avob.com";
@@ -35,6 +33,7 @@ public class VTN20bSecurityApplicationTest {
 	}
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(VTN20bSecurityApplicationTest.class, args);
 	}
 

@@ -45,6 +45,7 @@ public class Oadr20bVTNEiReportController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiReportController.class);
 
+	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
@@ -55,10 +56,6 @@ public class Oadr20bVTNEiReportController {
 
 	@Resource
 	private XmlSignatureService xmlSignatureService;
-
-	public Oadr20bVTNEiReportController() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
 
 	@PreAuthorize("hasRole('ROLE_VEN') AND hasRole('ROLE_REGISTERED')")
 	@RequestMapping(value = Oadr20bUrlPath.EI_REPORT_SERVICE, method = RequestMethod.POST)

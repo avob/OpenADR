@@ -41,6 +41,7 @@ public class Oadr20bVENEiRegisterPartyController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVENEiRegisterPartyController.class);
 
+	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
@@ -51,10 +52,6 @@ public class Oadr20bVENEiRegisterPartyController {
 
 	@Resource
 	private MultiVtnConfig multiVtnConfig;
-
-	public Oadr20bVENEiRegisterPartyController() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
 
 	@RequestMapping(value = Oadr20bUrlPath.EI_REGISTER_PARTY_SERVICE, method = RequestMethod.POST)
 	@ResponseBody

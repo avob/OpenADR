@@ -35,19 +35,13 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 	mvn clean package install
 
 	# Launch VTN 2.0b
-	cd OpenADRServerVTN20b
-    mvn spring-boot:run \
-        -Dspring.profiles.active=test-functional,oadr-cert
-
-
-    cd OpenADRServerVEN20b
+    java -jar OpenADRServerVEN20b/target/OpenADRServerVTN20b-*.jar --spring.profiles.active=test-functional,oadr-cert 
+        
     # Launch VEN 2.0b RSA
-    mvn spring-boot:run \
-        -Dspring.profiles.active=test-functional,oadr-cert-rsa
+    java -jar OpenADRServerVEN20b/target/OpenADRServerVEN20b-*.jar --spring.profiles.active=test-functional,oadr-cert-rsa 
 
     # Launch VEN 2.0b ECC
-    mvn spring-boot:run \
-        -Dspring.profiles.active=test-functional,oadr-cert-ecc
+    java -jar OpenADRServerVEN20b/target/OpenADRServerVEN20b-*.jar --spring.profiles.active=test-functional,oadr-cert-ecc
 ```
 
 ## Custom PKI Architecture Example
@@ -68,79 +62,73 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 	mvn clean package install
 
 	# Generate keys and certificates
-	cd cert
-	./gen.sh
+	./cert/gen.sh
 
 	# Launch VTN 2.0b
-	cd OpenADRServerVTN20b
-    mvn spring-boot:run \
-        -Dspring.profiles.active=test-functional,custom-cert \
-        -Doadr.security.admin.username={client.oadr.com.fingerprint}
+	java -jar OpenADRServerVEN20b/target/OpenADRServerVTN20b-*.jar \
+        --spring.profiles.active=test-functional,custom-cert \
+        --oadr.security.admin.username={client.oadr.com.fingerprint}  
 
     # Create generated Ven1 / Ven2 on VTN
-    cd cert
-    curl --key client.oadr.com.key  \
-    	--cert client.oadr.com.crt \ 
-        --cacert oadr.com.crt \
+    curl --key cert/client.oadr.com.key  \
+    	--cert cert/client.oadr.com.crt \ 
+        --cacert cert/oadr.com.crt \
         -d '{"username": "'.$(cat ven1.oadr.com.fingerprint).'"}' \
         -H "Content-Type: application/json" \
         -X POST https://vtn.oadr.com:8181/testvtn/Ven/
-    curl --key client.oadr.com.key \
-    	--cert client.oadr.com.crt \
-        --cacert oadr.com.crt  \
+    curl --key cert/client.oadr.com.key \
+    	--cert cert/client.oadr.com.crt \
+        --cacert cert/oadr.com.crt  \
         -d '{"username": "'.$(cat ven2.oadr.com.fingerprint).'"}' \
         -H "Content-Type: application/json" \
         -X POST https://vtn.oadr.com:8181/testvtn/Ven/
 
     # Launch VEN1
-    cd OpenADRServerVEN20b
-    mvn spring-boot:run \
-        -Dspring.profiles.active=test-functional,custom-cert-ven1 \
-        -Doadr.venid={ven1.oadr.com.fingerprint}
+    java -jar OpenADRServerVEN20b/target/OpenADRServerVEN20b-*.jar \
+        --spring.profiles.active=test-functional,custom-cert-ven1 \
+        --oadr.venid={ven1.oadr.com.fingerprint} 
 
     # Launch VEN2
     cd OpenADRServerVEN20b
-    mvn spring-boot:run \
-        -Dspring.profiles.active=test-functional,custom-cert-ven2 \
-        -Doadr.venid={ven2.oadr.com.fingerprint}
+    java -jar OpenADRServerVEN20b/target/OpenADRServerVEN20b-*.jar \
+        --spring.profiles.active=test-functional,custom-cert-ven2 \
+        --oadr.venid={ven2.oadr.com.fingerprint} 
 
     # Generate Ven3 credentials directly on VTN
-    cd cert
-    curl --key client.oadr.com.key \
-    	--cert client.oadr.com.crt \
-    	--cacert oadr.com.crt \
+    curl --key cert/client.oadr.com.key \
+    	--cert cert/client.oadr.com.crt \
+    	--cacert cert/oadr.com.crt \
     	-H "Content-Type: application/json" \
     	-d '{"venName":"ven3.oadr.com","venCN":"ven3.oadr.com","type":"RSA"}' \
     	-X POST https://vtn.oadr.com:8181/testvtn/Ven/create/x509 >> ven3.oadr.com.tar
     tar xvf ven3.oadr.com.tar
 
     # Launch VEN3
-    mvn spring-boot:run \
-        -Dspring.profiles.active=test-functional \
-        -Doadr.venid={ven3.oadr.com.fingerprint} \
-        -Doadr.security.vtn.key={ven3.oadr.com.key} \
-        -Doadr.security.vtn.cert={ven3.oadr.com.cert} \
-        -Doadr.security.vtn.trustcertificate={oadr.com.crt} \
-        -Doadr.server.port = 8083 \
-        -Doadr.venUrl https://ven3.oadr.com:8083
+    java -jar OpenADRServerVEN20b/target/OpenADRServerVEN20b-*.jar \
+        --spring.profiles.active=test-functional \
+        --oadr.venid={ven3.oadr.com.fingerprint} \
+        --oadr.security.vtn.key={ven3.oadr.com.key} \
+        --oadr.security.vtn.cert={ven3.oadr.com.cert} \
+        --oadr.security.vtn.trustcertificate={oadr.com.crt} \
+        --oadr.server.port = 8083 \
+        --oadr.venUrl https://ven3.oadr.com:8083
         
     # Generate Ven4 credentials directly on VTN
-    cd cert
-    curl --key client.oadr.com.key \
-    	--cert client.oadr.com.crt \
-    	--cacert oadr.com.crt \
+    curl --key cert/client.oadr.com.key \
+    	--cert cert/client.oadr.com.crt \
+    	--cacert cert/oadr.com.crt \
     	-H "Content-Type: application/json" \
     	-d '{"venName":"ven4.oadr.com","venCN":"ven4.oadr.com","type":"ECC"}' \
     	-X POST https://vtn.oadr.com:8181/testvtn/Ven/create/x509 >> ven4.oadr.com.tar
-    tar xvf ven3.oadr.com.tar
+    tar xvf ven4.oadr.com.tar
 
     # Launch VEN4
-    mvn spring-boot:run \
-        -Dspring.profiles.active=test-functional,custom-cert-ven2 \
-        -Doadr.venid={ven4.oadr.com.fingerprint} \
-        -Doadr.security.vtn.key={ven4.oadr.com.key} \
-        -Doadr.security.vtn.cert={ven4.oadr.com.cert} \
-        -Doadr.security.vtn.trustcertificate={oadr.com.crt} \
-        -Doadr.server.port = 8084 \
-        -Doadr.venUrl https://ven3.oadr.com:8084
+   java -jar OpenADRServerVEN20b/target/OpenADRServerVEN20b-*.jar \
+        --spring.profiles.active=test-functional \
+        --oadr.venid={ven4.oadr.com.fingerprint} \
+        --oadr.security.vtn.key={ven4.oadr.com.key} \
+        --oadr.security.vtn.cert={ven4.oadr.com.cert} \
+        --oadr.security.vtn.trustcertificate={oadr.com.crt} \
+        --oadr.server.port = 8084 \
+        --oadr.venUrl https://ven3.oadr.com:8084
 ```

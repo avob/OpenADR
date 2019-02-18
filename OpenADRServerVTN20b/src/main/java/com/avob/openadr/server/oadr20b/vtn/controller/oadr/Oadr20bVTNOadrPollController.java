@@ -3,7 +3,6 @@ package com.avob.openadr.server.oadr20b.vtn.controller.oadr;
 import java.security.Principal;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,20 +33,17 @@ public class Oadr20bVTNOadrPollController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNOadrPollController.class);
 
+	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
 	private VtnConfig vtnConfig;
-	
+
 	@Resource
 	private Oadr20bVTNOadrPollService oadr20bVTNOadrPollService;
 
 	@Resource
 	private XmlSignatureService xmlSignatureService;
-
-	public Oadr20bVTNOadrPollController() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
 
 	@PreAuthorize("hasRole('ROLE_VEN') AND hasRole('ROLE_REGISTERED')")
 	@RequestMapping(value = Oadr20bUrlPath.OADR_POLL_SERVICE, method = RequestMethod.POST)
@@ -55,7 +51,7 @@ public class Oadr20bVTNOadrPollController {
 	public String request(@RequestBody String payload, Principal principal)
 			throws Oadr20bUnmarshalException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
 			Oadr20bPollApplicationLayerException, Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException {
-		
+
 		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
 
 		String username = principal.getName();

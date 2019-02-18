@@ -33,6 +33,9 @@
 				<directory>${project.build.directory}/generated-sources/oadr20b</directory>
 			</resource>
 			<resource>
+				<directory>${project.build.directory}/maven-shared-archive-resources/oadr20b_schema/*</directory>
+			</resource>
+			<resource>
 				<directory>src/main/resources</directory>
 			</resource>
 			<resource>
@@ -41,7 +44,7 @@
 		</resources>
 
 		<plugins>
-			<plugin>
+		<plugin>
 				<artifactId>maven-remote-resources-plugin</artifactId>
 				<version>1.6.0</version>
 				<executions>
@@ -58,8 +61,26 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-remote-resources-plugin</artifactId>
+				<version>1.6.0</version>
+				<configuration>
+					<resourceBundles>
+						<resourceBundle>com.avob.openadr.model:OpenADRModel20b:${project.version}</resourceBundle>
+					</resourceBundles>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>process</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.14.0</version>
 				<executions>
 					<execution>
 						<id>generate</id>

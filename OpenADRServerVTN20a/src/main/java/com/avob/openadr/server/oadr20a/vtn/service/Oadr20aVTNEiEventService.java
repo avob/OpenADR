@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
@@ -90,11 +89,8 @@ public class Oadr20aVTNEiEventService {
 		}
 	}
 
+	@Resource
 	private Oadr20aJAXBContext jaxbContext;
-
-	public Oadr20aVTNEiEventService() throws JAXBException {
-		jaxbContext = Oadr20aJAXBContext.getInstance();
-	}
 
 	private EiResponse venNotFoundResponse(String requestId, String venId) {
 		return Oadr20aBuilders.newOadr20aEiResponseBuilder(requestId, HttpStatus.NOT_FOUND_404)

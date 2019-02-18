@@ -53,6 +53,7 @@ public class Oadr20aEventController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20aVTNEiEventController.class);
 
+	@Resource
 	private Oadr20aJAXBContext jaxbContext;
 
 	private Mapper mapper = new DozerBeanMapper();
@@ -71,10 +72,6 @@ public class Oadr20aEventController {
 
 	@Resource
 	private VenService venService;
-
-	public Oadr20aEventController() throws JAXBException {
-		jaxbContext = Oadr20aJAXBContext.getInstance();
-	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/", method = RequestMethod.POST)

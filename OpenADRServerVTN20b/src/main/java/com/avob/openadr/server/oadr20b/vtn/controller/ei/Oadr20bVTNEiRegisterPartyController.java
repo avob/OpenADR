@@ -3,7 +3,6 @@ package com.avob.openadr.server.oadr20b.vtn.controller.ei;
 import java.security.Principal;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +43,7 @@ public class Oadr20bVTNEiRegisterPartyController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiRegisterPartyController.class);
 
+	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
@@ -57,10 +57,6 @@ public class Oadr20bVTNEiRegisterPartyController {
 
 	@Resource
 	private VenService venService;
-
-	public Oadr20bVTNEiRegisterPartyController() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
 
 	@PreAuthorize("hasRole('ROLE_VEN')")
 	@RequestMapping(value = Oadr20bUrlPath.EI_REGISTER_PARTY_SERVICE, method = RequestMethod.POST)

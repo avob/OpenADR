@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBException;
+import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
@@ -23,11 +23,8 @@ public class StatePersistenceService {
 
 	private static final String CURRENT_REGISTRATION_PATH = "oadrCreatePartyRegistration.xml";
 
+	@Resource
 	private Oadr20bJAXBContext jaxbContext;
-
-	public StatePersistenceService() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
 
 	private static Path getPath(String venId, VtnSessionConfiguration vtnConfiguration) {
 		return Paths.get(venId + "." + vtnConfiguration.getVtnId() + "." + CURRENT_REGISTRATION_PATH);

@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -28,67 +29,68 @@ import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VTN20bSecurityApplicationTest.class })
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public class VenPollServiceTest {
 
-    @Resource
-    private VenService venService;
+	@Resource
+	private VenService venService;
 
-    @Resource
-    private VenPollService venPollService;
+	@Resource
+	private VenPollService venPollService;
 
-    private Oadr20bJAXBContext jaxbContext;
+	private Oadr20bJAXBContext jaxbContext;
 
-    public VenPollServiceTest() {
-        try {
-            jaxbContext = Oadr20bJAXBContext.getInstance();
-        } catch (JAXBException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	public VenPollServiceTest() {
+		try {
+			jaxbContext = Oadr20bJAXBContext.getInstance();
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-    @Test
-    public void crudTest() throws Oadr20bMarshalException {
-        Ven ven = venService.findOneByUsername(OadrDataBaseSetup.VEN);
+	@Test
+	public void crudTest() throws Oadr20bMarshalException {
+		Ven ven = venService.findOneByUsername(OadrDataBaseSetup.VEN);
 
-        String retrievePollForVenUsername = venPollService.retrievePollForVenUsername(OadrDataBaseSetup.VEN);
+		String retrievePollForVenUsername = venPollService.retrievePollForVenUsername(OadrDataBaseSetup.VEN);
 
-        assertNull(retrievePollForVenUsername);
+		assertNull(retrievePollForVenUsername);
 
-        OadrRequestReregistrationType oadrRequestReregistrationType = Oadr20bEiRegisterPartyBuilders
-                .newOadr20bRequestReregistrationBuilder(OadrDataBaseSetup.VEN).build();
+		OadrRequestReregistrationType oadrRequestReregistrationType = Oadr20bEiRegisterPartyBuilders
+				.newOadr20bRequestReregistrationBuilder(OadrDataBaseSetup.VEN).build();
 
-        String oadrRequestReregistrationTypeStr = jaxbContext
-                .marshal(Oadr20bFactory.createOadrRequestReregistration(oadrRequestReregistrationType));
+		String oadrRequestReregistrationTypeStr = jaxbContext
+				.marshal(Oadr20bFactory.createOadrRequestReregistration(oadrRequestReregistrationType));
 
-        venPollService.create(ven, oadrRequestReregistrationTypeStr);
+		venPollService.create(ven, oadrRequestReregistrationTypeStr);
 
-        String requestId = "requestId";
-        String registrationId = "registrationId";
-        String venId = "venId";
-        OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType = Oadr20bEiRegisterPartyBuilders
-                .newOadr20bCancelPartyRegistrationBuilder(requestId, registrationId, venId).build();
+		String requestId = "requestId";
+		String registrationId = "registrationId";
+		String venId = "venId";
+		OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType = Oadr20bEiRegisterPartyBuilders
+				.newOadr20bCancelPartyRegistrationBuilder(requestId, registrationId, venId).build();
 
-        String oadrCancelPartyRegistrationTypeStr = jaxbContext
-                .marshal(Oadr20bFactory.createOadrCancelPartyRegistration(oadrCancelPartyRegistrationType));
+		String oadrCancelPartyRegistrationTypeStr = jaxbContext
+				.marshal(Oadr20bFactory.createOadrCancelPartyRegistration(oadrCancelPartyRegistrationType));
 
-        venPollService.create(ven, oadrCancelPartyRegistrationTypeStr);
+		venPollService.create(ven, oadrCancelPartyRegistrationTypeStr);
 
-        retrievePollForVenUsername = venPollService.retrievePollForVenUsername(OadrDataBaseSetup.VEN);
+		retrievePollForVenUsername = venPollService.retrievePollForVenUsername(OadrDataBaseSetup.VEN);
 
-        assertNotNull(retrievePollForVenUsername);
+		assertNotNull(retrievePollForVenUsername);
 
-        assertEquals(oadrRequestReregistrationTypeStr, retrievePollForVenUsername);
+		assertEquals(oadrRequestReregistrationTypeStr, retrievePollForVenUsername);
 
-        retrievePollForVenUsername = venPollService.retrievePollForVenUsername(OadrDataBaseSetup.VEN);
+		retrievePollForVenUsername = venPollService.retrievePollForVenUsername(OadrDataBaseSetup.VEN);
 
-        assertNotNull(retrievePollForVenUsername);
+		assertNotNull(retrievePollForVenUsername);
 
-        assertEquals(oadrCancelPartyRegistrationTypeStr, retrievePollForVenUsername);
+		assertEquals(oadrCancelPartyRegistrationTypeStr, retrievePollForVenUsername);
 
-        retrievePollForVenUsername = venPollService.retrievePollForVenUsername(OadrDataBaseSetup.VEN);
+		retrievePollForVenUsername = venPollService.retrievePollForVenUsername(OadrDataBaseSetup.VEN);
 
-        assertNull(retrievePollForVenUsername);
+		assertNull(retrievePollForVenUsername);
 
-    }
+	}
 }

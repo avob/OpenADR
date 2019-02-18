@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -48,6 +49,7 @@ import com.google.common.collect.Sets;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VTN20bSecurityApplicationTest.class })
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public class Oadr20bVTNEiRegisterPartyControllerTest {
 
 	private static final String VEN_URL = "/Ven/";
@@ -270,15 +272,13 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 //		payload = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
 //				xmlSignatureService.sign(oadrCancelPartyRegistration), HttpStatus.OK_200, OadrPayload.class);
 
-		 str = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
+		str = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
 				xmlSignatureService.sign(oadrCancelPartyRegistration), HttpStatus.OK_200, String.class);
 		payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
 		xmlSignatureService.validate(str, payload);
-		
+
 //		xmlSignatureService.validate(payload);
-		
-		
-		
+
 		oadrCanceledPartyRegistration = payload.getOadrSignedObject().getOadrCanceledPartyRegistration();
 
 		assertNotNull(oadrCanceledPartyRegistration);

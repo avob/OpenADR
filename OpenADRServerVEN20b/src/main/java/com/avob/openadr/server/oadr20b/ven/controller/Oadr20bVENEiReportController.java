@@ -3,7 +3,6 @@ package com.avob.openadr.server.oadr20b.ven.controller;
 import java.security.Principal;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +44,7 @@ public class Oadr20bVENEiReportController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVENEiRegisterPartyController.class);
 
+	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
@@ -55,10 +55,6 @@ public class Oadr20bVENEiReportController {
 
 	@Resource
 	private MultiVtnConfig multiVtnConfig;
-
-	public Oadr20bVENEiReportController() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
 
 	@RequestMapping(value = Oadr20bUrlPath.EI_REPORT_SERVICE, method = RequestMethod.POST)
 	@ResponseBody

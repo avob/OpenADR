@@ -53,6 +53,7 @@ public class Oadr20bEventController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bEventController.class);
 
+	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
@@ -72,10 +73,6 @@ public class Oadr20bEventController {
 
 	@Resource
 	private Oadr20bDtoMapper oadr20bDtoMapper;
-
-	public Oadr20bEventController() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	@ResponseBody
