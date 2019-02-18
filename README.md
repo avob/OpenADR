@@ -35,7 +35,7 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 	mvn clean package install
 
 	# Launch VTN 2.0b
-    java -jar OpenADRServerVEN20b/target/OpenADRServerVTN20b-*.jar --spring.profiles.active=test-functional,oadr-cert 
+    java -jar OpenADRServerVTN20b/target/OpenADRServerVTN20b-*.jar --spring.profiles.active=test-functional,oadr-cert 
         
     # Launch VEN 2.0b RSA
     java -jar OpenADRServerVEN20b/target/OpenADRServerVEN20b-*.jar --spring.profiles.active=test-functional,oadr-cert-rsa 
