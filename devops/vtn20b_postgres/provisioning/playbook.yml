@@ -1,0 +1,20 @@
+---
+- hosts: all
+  strategy: debug
+  gather_facts: yes
+  become: yes
+  pre_tasks:
+    - name: 'update'
+      raw: sudo apt-get update
+    - name: 'upgrade'
+      raw: sudo apt-get -y upgrade
+    - name: 'install python2'
+      raw: sudo apt-get -y install python
+
+  vars_files:
+    - vars/main.yml
+
+  roles:
+    - ansiblebit.oracle-java
+    - geerlingguy.postgresql
+    - remyma.ansible-springboot

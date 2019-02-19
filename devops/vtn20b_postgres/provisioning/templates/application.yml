@@ -1,0 +1,24 @@
+# ===============================
+# = OADR VTN CONFIG
+# ===============================
+# oadr port
+oadr.server.port = 8181
+# context path
+oadr.server.context_path = /testvtn
+# vtnID
+oadr.vtnid AVOB_TEST_VTN_20b
+# support push https request
+oadr.supportPush true
+# support push http request
+oadr.supportUnsecuredHttpPush true
+# default pull frequency
+oadr.pullFrequencySeconds 10
+# validate incoming payloads against oadr xsd files
+oadr.validateOadrPayloadAgainstXsd = true
+# insert updateReport payload in db
+oadr.saveVenData false
+# replay protect xml signature payload validation accepted delay
+oadr.security.replayProtectAcceptedDelaySecond 1200
+# default admin user
+oadr.security.admin.username mouaiccool
+oadr.security.admin.password $2a$10$BLBWcxCCXEgybknJVVNZHu/yIOslIe0LFGObE3bCyHrMOWbKeGJ/W

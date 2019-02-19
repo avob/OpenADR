@@ -55,3 +55,4 @@
 
 # compile foolder
 */target
+**/.vagrant
