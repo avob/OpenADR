@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "user")
+@Table(name = "oadr_user")
 public class OadrUser extends AbstractUser implements Serializable {
 
     /**

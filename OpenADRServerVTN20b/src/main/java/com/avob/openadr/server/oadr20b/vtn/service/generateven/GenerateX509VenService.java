@@ -6,10 +6,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -49,8 +50,9 @@ public class GenerateX509VenService {
 	private X509Certificate caCert = null;
 
 	private File writeToFile(String fileName, String content) throws IOException {
-		File file = new File(fileName);
-		if(file.exists()) {
+		Path path = Files.createTempFile(fileName, "");
+		File file = path.toFile();
+		if (file.exists()) {
 			file.delete();
 		}
 		FileOutputStream outputStream = new FileOutputStream(file, true);
@@ -93,15 +95,16 @@ public class GenerateX509VenService {
 			X509Certificate crt = OadrHttpSecurity.signCsr(csr, loadCaKeyPair, caCert, serialNumber);
 			String fingerprint = OadrHttpSecurity.getOadr20bFingerprint(crt);
 
-			File csrFile = writeToFile(venName + ".csr", OadrHttpSecurity.writeCsrToString(csr));
 			File crtFile = writeToFile(venName + ".crt", OadrHttpSecurity.writeCrtToString(crt));
 			File caCrtFile = writeToFile("ca.crt", OadrHttpSecurity.writeCrtToString(caCert));
 			File keyPairFile = writeToFile(venName + ".key", OadrHttpSecurity.writeKeyToString(venCred));
 			File fingerprintFile = writeToFile(venName + ".fingerprint", fingerprint);
 
-			Collection<File> filesToArchive = Lists.newArrayList(csrFile, crtFile, keyPairFile, fingerprintFile, caCrtFile);
+			Collection<File> filesToArchive = Lists.newArrayList( crtFile, keyPairFile, fingerprintFile,
+					caCrtFile);
 			String archiveName = now + "-" + venName + "-credentials.tar.gz";
-			File outFile = new File(archiveName);
+			Path path = Files.createTempFile(archiveName, "");
+			File outFile = path.toFile();
 			FileOutputStream out = new FileOutputStream(outFile);
 			ArchiveOutputStream o = new TarArchiveOutputStream(out);
 

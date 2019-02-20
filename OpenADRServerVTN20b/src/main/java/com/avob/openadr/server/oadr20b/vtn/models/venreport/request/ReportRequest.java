@@ -1,5 +1,6 @@
 package com.avob.openadr.server.oadr20b.vtn.models.venreport.request;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,8 +31,10 @@ public abstract class ReportRequest {
 
 	private String reportBackDuration;
 
+	@Column(name = "startReportRequest")
 	private Long start;
 
+	@Column(name = "endReportRequest")
 	private Long end;
 
 	private ReadingTypeEnumeratedType readingType;

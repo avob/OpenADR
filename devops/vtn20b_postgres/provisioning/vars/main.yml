@@ -1,15 +1,15 @@
 ---
 # ntp_timezone: UTC
 
-# oracle_java_use_defaults: no
-# oracle_java_apt_repository: "ppa:webupd8team/java"
-# oracle_java_cache_valid_time: 3600
-# oracle_java_deb_package: 'oracle-java8-installer'
-# oracle_java_debconf_package_default: 'oracle-java8-set-default'
-# oracle_java_home: "/usr/lib/jvm/java-8-oracle"
-# # oracle_java_license_version: "shared/accepted-oracle-license-v1-1"
-# oracle_java_set_as_default: no
-# oracle_java_state: latest
+oracle_java_use_defaults: no
+oracle_java_apt_repository: "ppa:webupd8team/java"
+oracle_java_cache_valid_time: 3600
+oracle_java_deb_package: 'oracle-java8-installer'
+oracle_java_debconf_package_default: 'oracle-java8-set-default'
+oracle_java_home: "/usr/lib/jvm/java-8-oracle"
+oracle_java_license_version: "shared/accepted-oracle-license-v1-1"
+oracle_java_set_as_default: no
+oracle_java_state: latest
 
 postgresql_databases:
   - name: oadr-vtn20b
@@ -20,5 +20,7 @@ postgresql_users:
 
 springboot_application_name: oadr-vtn20b
 springboot_src_file: ../../../OpenADRServerVTN20b/target/OpenADRServerVTN20b-0.0.1-SNAPSHOT.jar
-springboot_propertyfile_template: templates/application.yml
-springboot_configuration_template: templates/OadrServerVTN20b-0.0.1-SNAPSHOT.conf
+springboot_propertyfile_template: templates/application.properties
+springboot_configuration_template: templates/oadr-vtn20b.conf
+springboot_user: oadr-vtn20b
+springboot_group: oadr-vtn20b

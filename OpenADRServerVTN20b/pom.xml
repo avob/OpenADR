@@ -108,6 +108,11 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>org.springframework.boot.loader.PropertiesLauncher</mainClass>
+					<startClass>com.avob.openadr.server.oadr20b.vtn.VTN20bApplication</startClass>
+					<executable>true</executable>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
