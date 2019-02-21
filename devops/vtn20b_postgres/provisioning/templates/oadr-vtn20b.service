@@ -1,0 +1,11 @@
+[Unit]
+Description=oadr-vtn20b
+After=syslog.target
+
+[Service]
+User=oadr-vtn20b
+ExecStart=/opt/oadr-vtn20b/oadr-vtn20b.jar --logging.config=/opt/oadr-vtn20b/log4j2.xml
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
