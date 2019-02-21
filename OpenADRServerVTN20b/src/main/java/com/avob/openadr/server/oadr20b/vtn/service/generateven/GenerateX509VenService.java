@@ -49,8 +49,8 @@ public class GenerateX509VenService {
 	private KeyPair caKeyPair = null;
 	private X509Certificate caCert = null;
 
-	private File writeToFile(String fileName, String content) throws IOException {
-		Path path = Files.createTempFile(fileName, "");
+	private File writeToFile(String fileName, String fileExtension, String content) throws IOException {
+		Path path = Files.createTempFile(fileName + "-", "." + fileExtension);
 		File file = path.toFile();
 		if (file.exists()) {
 			file.delete();
@@ -81,27 +81,26 @@ public class GenerateX509VenService {
 			String venName = dto.getVenName();
 			BigInteger serialNumber = BigInteger.valueOf(now);
 
-			String algo = null;
+			String algoCsr = null;
 			KeyPair venCred = null;
 			if (dto.getType().toLowerCase().equals("ecc")) {
-				algo = "SHA256withDSA";
+				algoCsr = "SHA256withDSA";
 				venCred = OadrHttpSecurity.generateEccKeyPair();
 			} else if (dto.getType().toLowerCase().equals("rsa")) {
-				algo = "SHA256withRSA";
+				algoCsr = "SHA256withRSA";
 				venCred = OadrHttpSecurity.generateRsaKeyPair();
 			}
 			KeyPair loadCaKeyPair = loadCaKeyPair();
-			PKCS10CertificationRequest csr = OadrHttpSecurity.generateCsr(venCred, venCN, algo);
+			PKCS10CertificationRequest csr = OadrHttpSecurity.generateCsr(venCred, venCN, algoCsr);
 			X509Certificate crt = OadrHttpSecurity.signCsr(csr, loadCaKeyPair, caCert, serialNumber);
 			String fingerprint = OadrHttpSecurity.getOadr20bFingerprint(crt);
 
-			File crtFile = writeToFile(venName + ".crt", OadrHttpSecurity.writeCrtToString(crt));
-			File caCrtFile = writeToFile("ca.crt", OadrHttpSecurity.writeCrtToString(caCert));
-			File keyPairFile = writeToFile(venName + ".key", OadrHttpSecurity.writeKeyToString(venCred));
-			File fingerprintFile = writeToFile(venName + ".fingerprint", fingerprint);
+			File crtFile = writeToFile(venName, "crt", OadrHttpSecurity.writeCrtToString(crt));
+			File caCrtFile = writeToFile("ca", "crt", OadrHttpSecurity.writeCrtToString(caCert));
+			File keyPairFile = writeToFile(venName, "key", OadrHttpSecurity.writeKeyToString(venCred));
+			File fingerprintFile = writeToFile(venName, "fingerprint", fingerprint);
 
-			Collection<File> filesToArchive = Lists.newArrayList( crtFile, keyPairFile, fingerprintFile,
-					caCrtFile);
+			Collection<File> filesToArchive = Lists.newArrayList(crtFile, keyPairFile, fingerprintFile, caCrtFile);
 			String archiveName = now + "-" + venName + "-credentials.tar.gz";
 			Path path = Files.createTempFile(archiveName, "");
 			File outFile = path.toFile();

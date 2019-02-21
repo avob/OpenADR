@@ -256,7 +256,7 @@ public class OadrHttpSecurity {
 	public static PKCS10CertificationRequest generateCsr(KeyPair pair, String venCN, String algo) {
 		PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(
 				new X500Principal(" C=FR, ST=Paris, L=Paris, O=Avob, OU=Avob, CN=" + venCN), pair.getPublic());
-		JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder("SHA256withRSA");
+		JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(algo);
 		ContentSigner signer = null;
 		try {
 			signer = csBuilder.build(pair.getPrivate());
@@ -309,12 +309,6 @@ public class OadrHttpSecurity {
 	}
 
 	public static String writeKeyToString(KeyPair pair) throws IOException, CertificateEncodingException {
-		Base64.Encoder encoder = Base64.getEncoder();
-		Writer out = new StringWriter();
-		out.write("-----BEGIN RSA PRIVATE KEY-----\n");
-		out.write(encoder.encodeToString(pair.getPrivate().getEncoded()));
-		out.write("\n-----END RSA PRIVATE KEY-----\n");
-		out.close();
 		return writePemToString("PRIVATE KEY", pair.getPrivate().getEncoded());
 	}
 
