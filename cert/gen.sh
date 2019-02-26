@@ -33,10 +33,14 @@ openssl req -newkey rsa:2048 -nodes -keyout $CLIENT_NAME.key -out $CLIENT_NAME.c
 
 # Signing Server Certificate with previously created CA.
 # $CLIENT_NAME.crt = $CLIENT_NAME.csr + $CA_NAME.crt + $CA_NAME.key
-openssl x509 -req -days 365 -in $CLIENT_NAME.csr -CA $CA_NAME.crt -CAkey $CA_NAME.key -set_serial 02 -out $CLIENT_NAME.crt
+openssl x509 -req -days 365 -in $CLIENT_NAME.csr -CA $CA_NAME.crt -CAkey $CA_NAME.key -set_serial 01 -out $CLIENT_NAME.crt
 
-# Compute VEN fingerprint
+# Compute client fingerprint
 openssl x509 -in $CLIENT_NAME.crt -fingerprint -sha256 -noout | cut -d'=' -f2 | cat | tail -c 30 > $CLIENT_NAME.fingerprint
+
+# Creating PKCS12 for the Client
+# $CLIENT_NAME.p12 = $CLIENT_NAME.key + $CLIENT_NAME.crt + $CA_NAME.crt
+openssl pkcs12 -export  -inkey $CLIENT_NAME.key -in $CLIENT_NAME.crt -certfile $CA_NAME.crt -out $CLIENT_NAME.p12
 
 ###################################
 # VTN RSA
@@ -59,7 +63,7 @@ openssl req -new -key $VTN_NAME-ecc.key -out $VTN_NAME-ecc.csr -subj "/C=FR/ST=P
 
 # Signing Server Certificate with previously created CA.
 # $VTN_NAME-ecc = $VTN_NAME-ecc.csr + $CA_NAME.crt + $CA_NAME.key
-openssl x509 -req -days 365 -in $VTN_NAME-ecc.csr -CA $CA_NAME.crt -CAkey $CA_NAME.key -set_serial 02 -out $VTN_NAME-ecc.crt
+openssl x509 -req -days 365 -in $VTN_NAME-ecc.csr -CA $CA_NAME.crt -CAkey $CA_NAME.key -set_serial 03 -out $VTN_NAME-ecc.crt
 
 ###################################
 # VEN1 RSA
@@ -70,7 +74,7 @@ openssl req -newkey rsa:2048 -nodes -keyout $VEN1_NAME.key -out $VEN1_NAME.csr -
 
 # Signing Server Certificate with previously created CA.
 # $VEN1_NAME.crt = $VEN1_NAME.csr + $CA_NAME.crt + $CA_NAME.key
-openssl x509 -req -days 365 -in $VEN1_NAME.csr -CA $CA_NAME.crt -CAkey $CA_NAME.key -set_serial 02 -out $VEN1_NAME.crt
+openssl x509 -req -days 365 -in $VEN1_NAME.csr -CA $CA_NAME.crt -CAkey $CA_NAME.key -set_serial 04 -out $VEN1_NAME.crt
 
 # Compute VEN fingerprint
 openssl x509 -in $VEN1_NAME.crt -fingerprint -sha256 -noout | cut -d'=' -f2 | cat | tail -c 30 > $VEN1_NAME.fingerprint

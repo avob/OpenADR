@@ -1,6 +1,7 @@
 package com.avob.openadr.server.oadr20b.vtn;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -22,6 +24,9 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationEn
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.avob.openadr.server.common.vtn.security.BasicAuthenticationManager;
 import com.avob.openadr.server.common.vtn.security.DigestAuthenticationProvider;
@@ -63,7 +68,8 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		BasicAuthenticationFilter basicAuthenticationFilter = new BasicAuthenticationFilter(basicAuthenticationManager);
 
-		http.csrf().disable();
+		http.cors().and().csrf().disable();
+
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		http.authorizeRequests().regexMatchers(HttpMethod.OPTIONS, ".*").permitAll();
@@ -72,7 +78,7 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 				.authenticationUserDetailsService(oadr20bX509AuthenticatedUserDetailsService);
 
 		http.addFilter(digestAuthenticationFilter).authorizeRequests().anyRequest().authenticated().and()
-		.addFilter(basicAuthenticationFilter).authorizeRequests().anyRequest().authenticated();
+				.addFilter(basicAuthenticationFilter).authorizeRequests().anyRequest().authenticated();
 
 		http.exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPoint() {
 
@@ -80,8 +86,8 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 			public void commence(HttpServletRequest arg0, HttpServletResponse arg1, AuthenticationException arg2)
 					throws IOException, ServletException {
 				if (arg0.getServletPath().contains("/Ven") || arg0.getServletPath().contains("swagger")
-						|| arg0.getServletPath().contains("swagger-resources")
-						|| arg0.getServletPath().contains("v2")) {
+						|| arg0.getServletPath().contains("swagger-resources") || arg0.getServletPath().contains("v2")
+						|| arg0.getServletPath().contains("swagger-ui")) {
 					arg1.setStatus(HttpStatus.UNAUTHORIZED_401);
 					arg1.addHeader("WWW-Authenticate", "Basic");
 				} else {
@@ -97,7 +103,24 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().regexMatchers(".*api-docs.*").regexMatchers("/health");
+		web.ignoring()
+		
+		.regexMatchers("/health");
 	}
+	
+	@Bean
+    public CorsConfigurationSource corsConfigurationSource()
+    {
+        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowCredentials(true);
+//        configuration.setAllowedOrigins(Arrays.asList("*"));
+//        configuration.setAllowedMethods(Arrays.asList("GET","POST", "OPTIONS", "HEAD"));
+        configuration.applyPermitDefaultValues();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+	
+
 
 }

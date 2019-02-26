@@ -32,7 +32,7 @@ public class Oadr20bGenerateX509VenController {
 
 	@RequestMapping(value = "/create/x509", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<InputStreamResource> createX509RsaVen(@RequestBody GenerateX509VenDto dto)
+	public ResponseEntity<InputStreamResource> createX509Ven(@RequestBody GenerateX509VenDto dto)
 			throws GenerateX509VenException, FileNotFoundException {
 
 		File generateCredentials = generateX509VenService.generateCredentials(dto);
@@ -40,7 +40,6 @@ public class Oadr20bGenerateX509VenController {
 
 		InputStreamResource resource = new InputStreamResource(new FileInputStream(generateCredentials));
 
-//		generateCredentials.delete();
 		return ResponseEntity.ok().contentLength(generateCredentials.length())
 				.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
 

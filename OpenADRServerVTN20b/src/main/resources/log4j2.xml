@@ -9,6 +9,9 @@
 		<Logger level="debug" name="com.avob" additivity="false">
 			<AppenderRef ref="Console" />
 		</Logger>
+		<Logger level="warn" name="org.springframework.web" additivity="false">
+			<AppenderRef ref="Console" />
+		</Logger>
 		<Logger level="warn" name="org.springframework" additivity="false">
 			<AppenderRef ref="Console" />
 		</Logger>
