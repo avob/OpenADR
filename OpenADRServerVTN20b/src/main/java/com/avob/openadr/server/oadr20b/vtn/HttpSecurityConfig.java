@@ -112,10 +112,12 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource()
     {
         CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(true);
 //        configuration.setAllowedOrigins(Arrays.asList("*"));
-//        configuration.setAllowedMethods(Arrays.asList("GET","POST", "OPTIONS", "HEAD"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST", "OPTIONS", "HEAD"));
+        configuration.setAllowedOrigins(Arrays.asList("http://vtn.oadr.com:3000"));
         configuration.applyPermitDefaultValues();
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

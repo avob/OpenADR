@@ -15,7 +15,7 @@ public class VenMarketContextService {
     private VenMarketContextDao venMarketcontextDao;
 
     public VenMarketContext prepare(VenMarketContextDto dto) {
-        return new VenMarketContext(dto.getName());
+        return new VenMarketContext(dto.getName(), dto.getDescription());
     }
 
     public VenMarketContext save(VenMarketContext entity) {

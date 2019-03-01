@@ -43,7 +43,7 @@ public class MarketContextController {
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ResponseBody
-    public VenMarketContextDto create(@Valid @RequestBody VenMarketContextDto dto, HttpServletResponse response) {
+    public VenMarketContextDto createMarketContext(@Valid @RequestBody VenMarketContextDto dto, HttpServletResponse response) {
 
         VenMarketContext marketContext = venMarketContextService.findOneByName(dto.getName());
 

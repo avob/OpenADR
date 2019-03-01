@@ -41,9 +41,9 @@ public class VenMarketContextDaoTest {
         venService.save(ven2);
 
         String groupName = "myubergroup";
-        VenMarketContext venGroup = new VenMarketContext(groupName);
+        VenMarketContext venGroup = new VenMarketContext(groupName, "");
 
-        VenMarketContext venGroup2 = new VenMarketContext(groupName + "2");
+        VenMarketContext venGroup2 = new VenMarketContext(groupName + "2", "");
 
         venMarketContextDao.save(venGroup);
         venMarketContextDao.save(venGroup2);
