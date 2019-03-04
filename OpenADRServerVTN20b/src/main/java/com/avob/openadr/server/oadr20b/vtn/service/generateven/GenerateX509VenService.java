@@ -67,7 +67,7 @@ public class GenerateX509VenService {
 	private KeyPair loadCaKeyPair() throws OadrSecurityException {
 		if (caKeyPair == null) {
 			PrivateKey caKey = OadrHttpSecurity.parsePrivateKey(vtnConfig.getCaKey());
-			caCert = OadrHttpSecurity.parseCertificate(vtnConfig.getCertKey());
+			caCert = OadrHttpSecurity.parseCertificate(vtnConfig.getCaCert());
 			caKeyPair = new KeyPair(caCert.getPublicKey(), caKey);
 		}
 		return caKeyPair;

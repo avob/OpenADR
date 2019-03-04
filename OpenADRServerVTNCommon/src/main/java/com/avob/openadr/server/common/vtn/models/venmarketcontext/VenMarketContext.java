@@ -42,6 +42,8 @@ public class VenMarketContext implements Serializable {
 	private String name;
 
 	private String description;
+	
+	private String color;
 
 	@ManyToMany(mappedBy = "venMarketContexts")
 	private Set<Ven> vens;
@@ -93,5 +95,13 @@ public class VenMarketContext implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
 	}
 }

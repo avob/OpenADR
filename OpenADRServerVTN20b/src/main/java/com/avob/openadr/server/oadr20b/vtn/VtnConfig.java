@@ -181,7 +181,7 @@ public class VtnConfig {
 		this.caKey = ca;
 	}
 
-	public String getCertKey() {
+	public String getCaCert() {
 		return caCert;
 	}
 

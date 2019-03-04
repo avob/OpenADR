@@ -1,6 +1,7 @@
 package com.avob.openadr.server.common.vtn.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -60,6 +61,25 @@ public class GroupController {
 
         return dtoMapper.map(findOneByName, VenGroupDto.class);
     }
+    
+    @RequestMapping(value = "/", method = RequestMethod.PUT)
+    @ResponseBody
+    public VenGroupDto updateGroup(@Valid @RequestBody VenGroupDto dto, HttpServletResponse response) {
+
+        VenGroup findOneByName = venGroupService.findByName(dto.getName());
+
+        if (findOneByName == null) {
+            response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
+            return null;
+        }
+        findOneByName.setDescription(dto.getDescription());
+        venGroupService.save(findOneByName);
+        response.setStatus(HttpStatus.OK_200);
+
+        LOGGER.info("update Group: " + findOneByName.getName());
+
+        return dtoMapper.map(findOneByName, VenGroupDto.class);
+    }
 
     @RequestMapping(value = "/{groupName}", method = RequestMethod.GET)
     @ResponseBody
@@ -72,15 +92,15 @@ public class GroupController {
         return dtoMapper.map(group, VenGroupDto.class);
     }
 
-    @RequestMapping(value = "/{groupName}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{groupId}", method = RequestMethod.DELETE)
     @ResponseBody
-    public void deleteGroupByName(@PathVariable("groupName") String groupName, HttpServletResponse response) {
-        VenGroup group = venGroupService.findByName(groupName);
-        if (group == null) {
+    public void deleteGroupById(@PathVariable("groupId") Long groupId, HttpServletResponse response) {
+        Optional<VenGroup> group = venGroupService.findById(groupId);
+        if (!group.isPresent()) {
             response.setStatus(HttpStatus.NOT_FOUND_404);
             return;
         }
-        venGroupService.delete(group);
+        venGroupService.delete(group.get());
     }
 
 }

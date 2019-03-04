@@ -1,4 +1,4 @@
-import {createStore, compose, applyMiddleware} from 'redux';
+import { createStore, compose, applyMiddleware } from 'redux';
 import reduxImmutableStateInvariant from 'redux-immutable-state-invariant';
 import thunk from 'redux-thunk';
 import createHistory from 'history/createBrowserHistory';
@@ -10,34 +10,34 @@ import rootReducer from '../reducers';
 
 
 export const history = createHistory();
-const connectRouterHistory = connectRouter(history);
+const connectRouterHistory = connectRouter( history );
 
 var config = {
-  vtnSwaggerUrl: "https://vtn.oadr.com:8181/testvtn/v2/api-docs"
+  vtnSwaggerUrl: 'https://vtn.oadr.com:8181/testvtn/v2/api-docs'
 };
 
 function configureSwaggerMiddleware() {
 
   swagger.http.withCredentials = true
   const swaggerOpts = {
-    url:config.vtnSwaggerUrl,
-    success: function(e){
-      console.log("Successfully connect to Swagger Backend")
-      config.isConnectionPending = false; 
+    url: config.vtnSwaggerUrl,
+    success: function ( e ) {
+      console.log( 'Successfully connect to Swagger Backend' )
+      config.isConnectionPending = false;
       config.isConnected = true;
     },
-    failure: function(e){
-      console.error("Can't connect to Swagger Backend");
-      console.log(e);
-      config.isConnectionPending = false; 
-      config.isConnected = false; 
+    failure: function ( e ) {
+      console.error( 'Can\'t connect to Swagger Backend' );
+      console.log( e );
+      config.isConnectionPending = false;
+      config.isConnected = false;
     }
   };
-  return swaggerMiddleware(swaggerOpts);
+  return swaggerMiddleware( swaggerOpts );
 }
 
-function configureStoreProd(initialState) {
-  const reactRouterMiddleware = routerMiddleware(history);
+function configureStoreProd( initialState ) {
+  const reactRouterMiddleware = routerMiddleware( history );
 
 
   const middlewares = [
@@ -47,14 +47,14 @@ function configureStoreProd(initialState) {
   ];
 
   return createStore(
-    connectRouterHistory(rootReducer), 
-    initialState, 
-    compose(applyMiddleware(...middlewares))
+    connectRouterHistory( rootReducer ),
+    initialState,
+    compose( applyMiddleware( ...middlewares ) )
   );
 }
 
-function configureStoreDev(initialState) {
-  const reactRouterMiddleware = routerMiddleware(history);
+function configureStoreDev( initialState ) {
+  const reactRouterMiddleware = routerMiddleware( history );
   const middlewares = [
     reduxImmutableStateInvariant(),
     thunk,
@@ -64,17 +64,17 @@ function configureStoreDev(initialState) {
 
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose; // add support for Redux dev tools
   const store = createStore(
-    connectRouterHistory(rootReducer),  
-    initialState, 
-    composeEnhancers(applyMiddleware(...middlewares))
+    connectRouterHistory( rootReducer ),
+    initialState,
+    composeEnhancers( applyMiddleware( ...middlewares ) )
   );
 
-  if (module.hot) {
+  if ( module.hot ) {
     // Enable Webpack hot module replacement for reducers
-    module.hot.accept('../reducers', () => {
-      const nextRootReducer = require('../reducers').default; // eslint-disable-line global-require
-      store.replaceReducer(connectRouterHistory(nextRootReducer));
-    });
+    module.hot.accept( '../reducers', () => {
+      const nextRootReducer = require( '../reducers' ).default; // eslint-disable-line global-require
+      store.replaceReducer( connectRouterHistory( nextRootReducer ) );
+    } );
   }
 
   return store;

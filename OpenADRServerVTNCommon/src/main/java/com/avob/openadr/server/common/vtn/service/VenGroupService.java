@@ -1,6 +1,7 @@
 package com.avob.openadr.server.common.vtn.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 
@@ -17,7 +18,9 @@ public class VenGroupService {
     private VenGroupDao venGroupDao;
 
     public VenGroup prepare(VenGroupDto dto) {
-        return new VenGroup(dto.getName());
+    	VenGroup venGroup = new VenGroup(dto.getName());
+    	venGroup.setDescription(dto.getDescription());
+        return venGroup;
     }
 
     public VenGroup save(VenGroup entity) {
@@ -30,6 +33,10 @@ public class VenGroupService {
 
     public VenGroup findByName(String name) {
         return venGroupDao.findOneByName(name);
+    }
+    
+    public Optional<VenGroup> findById(Long id) {
+        return venGroupDao.findById(id);
     }
 
     public List<VenGroup> findByName(List<String> name) {

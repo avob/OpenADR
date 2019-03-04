@@ -1,5 +1,7 @@
 package com.avob.openadr.server.common.vtn.service;
 
+import java.util.Optional;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -15,7 +17,9 @@ public class VenMarketContextService {
     private VenMarketContextDao venMarketcontextDao;
 
     public VenMarketContext prepare(VenMarketContextDto dto) {
-        return new VenMarketContext(dto.getName(), dto.getDescription());
+    	VenMarketContext context =  new VenMarketContext(dto.getName(), dto.getDescription()); 
+        context.setColor(dto.getColor());
+    	return context;
     }
 
     public VenMarketContext save(VenMarketContext entity) {
@@ -28,6 +32,10 @@ public class VenMarketContextService {
 
     public VenMarketContext findOneByName(String name) {
         return venMarketcontextDao.findOneByName(name);
+    }
+    
+    public Optional<VenMarketContext> findById(Long id) {
+        return venMarketcontextDao.findById(id);
     }
 
     public void delete(VenMarketContext venMarketContext) {

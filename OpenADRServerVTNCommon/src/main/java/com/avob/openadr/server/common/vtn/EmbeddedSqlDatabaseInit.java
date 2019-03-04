@@ -27,7 +27,9 @@ public class EmbeddedSqlDatabaseInit {
 	public void init() {
 		String marketContextName = "http://oadr.avob.com";
 		String marketContextDescription = "Avob Test Market Context";
-		VenMarketContext marketContext = venMarketContextService.prepare(new VenMarketContextDto(marketContextName, marketContextDescription));
+		String marketcontextColor = "#90CAF9";
+		VenMarketContext marketContext = venMarketContextService
+				.prepare(new VenMarketContextDto(marketContextName, marketContextDescription, marketcontextColor));
 		venMarketContextService.save(marketContext);
 		// rsa test ven
 		Ven prepare = venService.prepare("2E:55:12:81:B9:EE:9C:46:72:1D");

@@ -1,22 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
 import * as actions from '../../actions/vtnConfigurationActions';
 import VtnConfigurationParameter from '../VtnConfiguration/VtnConfigurationParameter';
 import VtnConfigurationMarketContext from '../VtnConfiguration/VtnConfigurationMarketContext';
+import VtnConfigurationGroup from '../VtnConfiguration/VtnConfigurationGroup';
 
 import { withStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
+import Divider from '@material-ui/core/Divider';
 
-function TabContainer(props) {
+function TabContainer( props ) {
   return (
-    <Typography component="div" style={{ padding: 8 * 3 }}>
-      {props.children}
-    </Typography>
+  <Typography component="div" style={ { padding: 8 * 3 } }>
+    { props.children }
+  </Typography>
   );
 }
 
@@ -38,16 +40,18 @@ const styles = theme => ({
   menu: {
     width: 200,
   },
-   formControl: {
+  formControl: {
     margin: theme.spacing.unit,
     minWidth: 500,
   },
   card: {
-    maxWidth: 300,
-    minWidth: 300,
+    maxWidth: 350,
+    minWidth: 350,
   },
   media: {
     height: 40,
+    paddingTop: 10,
+    paddingRight: 10
   },
   button: {
     margin: theme.spacing.unit,
@@ -60,41 +64,52 @@ export class VtnConfigurationPage extends React.Component {
   };
 
   handleChange = (event, value) => {
-    this.setState({ value });
+    this.setState( {
+      value
+    } );
   };
 
 
   componentDidMount() {
     this.props.actions.loadVtnConfiguration();
     this.props.actions.loadMarketContext();
+    this.props.actions.loadGroup();
   }
 
   render() {
-    const { classes, vtnConfiguration } = this.props;
-    const { value } = this.state;
+    const {classes, vtnConfiguration} = this.props;
+    const {value} = this.state;
     return (
-      <Paper className={classes.root}>
-        <Tabs
-          value={this.state.value}
-          onChange={this.handleChange}
-          indicatorColor="primary"
-          textColor="primary"
-          centered
-        >
-          <Tab label="Market Contexts" />           
-          <Tab label="Targets" />
-          <Tab label="Units" />
-          <Tab label="Parameters" /> 
-        </Tabs>
-        
-        {value === 0 && <TabContainer>
-          <VtnConfigurationMarketContext classes={classes} marketContext={vtnConfiguration.marketContext} createMarketContext={this.props.actions.createMarketContext}/>
-        </TabContainer>}
-        {value === 1 && <TabContainer></TabContainer>}
-        {value === 2 && <TabContainer></TabContainer>}
-        {value === 3 && <TabContainer><VtnConfigurationParameter classes={classes} vtnConfiguration={vtnConfiguration.parameters}/></TabContainer>}
-      </Paper>
-     
+    <div className={ classes.root }>
+      <Tabs value={ this.state.value }
+            onChange={ this.handleChange }
+            indicatorColor="primary"
+            textColor="primary"
+            centered>
+        <Tab label="Market Contexts" />
+        <Tab label="Groups" />
+        <Tab label="Parameters" />
+      </Tabs>
+      <Divider variant="middle" />
+      { value === 0 && <TabContainer>
+                         <VtnConfigurationMarketContext classes={ classes }
+                                                        marketContext={ vtnConfiguration.marketContext }
+                                                        createMarketContext={ this.props.actions.createMarketContext }
+                                                        updateMarketContext={ this.props.actions.updateMarketContext }
+                                                        deleteMarketContext={ this.props.actions.deleteMarketContext } />
+                       </TabContainer> }
+      { value === 1 && <TabContainer>
+                         <VtnConfigurationGroup classes={ classes }
+                                                group={ vtnConfiguration.group }
+                                                createGroup={ this.props.actions.createGroup }
+                                                updateGroup={ this.props.actions.updateGroup }
+                                                deleteGroup={ this.props.actions.deleteGroup } />
+                       </TabContainer> }
+      { value === 2 && <TabContainer>
+                         <VtnConfigurationParameter classes={ classes } vtnConfiguration={ vtnConfiguration.parameters } />
+                       </TabContainer> }
+    </div>
+
     );
   }
 }
@@ -103,19 +118,19 @@ VtnConfigurationPage.propTypes = {
   actions: PropTypes.object.isRequired
 };
 
-function mapStateToProps(state) {
+function mapStateToProps( state ) {
   return {
     vtnConfiguration: state.vtnConfiguration
   };
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps( dispatch ) {
   return {
-    actions: bindActionCreators(actions, dispatch)
+    actions: bindActionCreators( actions, dispatch )
   };
 }
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(VtnConfigurationPage));
+)( withStyles( styles )( VtnConfigurationPage ) );

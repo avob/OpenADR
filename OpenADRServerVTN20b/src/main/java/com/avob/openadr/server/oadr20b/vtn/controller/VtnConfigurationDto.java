@@ -16,6 +16,14 @@ public class VtnConfigurationDto {
 	private String host;
 
 	private String oadrVersion = "OpenADR 20b";
+	
+	private boolean supportCertificateGeneration = false;
+	
+	private boolean xsdValidation = false;
+	
+	private Long xmlSignatureReplayProtectSecond;
+	
+	private boolean saveVenDate = false;
 
 	public String getVtnId() {
 		return vtnId;
@@ -79,5 +87,37 @@ public class VtnConfigurationDto {
 
 	public void setOadrVersion(String oadrVersion) {
 		this.oadrVersion = oadrVersion;
+	}
+
+	public boolean isSupportCertificateGeneration() {
+		return supportCertificateGeneration;
+	}
+
+	public void setSupportCertificateGeneration(boolean supportCertificateGeneration) {
+		this.supportCertificateGeneration = supportCertificateGeneration;
+	}
+
+	public boolean isXsdValidation() {
+		return xsdValidation;
+	}
+
+	public void setXsdValidation(boolean xsdValidation) {
+		this.xsdValidation = xsdValidation;
+	}
+
+	public Long getXmlSignatureReplayProtectSecond() {
+		return xmlSignatureReplayProtectSecond;
+	}
+
+	public void setXmlSignatureReplayProtectSecond(Long xmlSignatureReplayProtectSecond) {
+		this.xmlSignatureReplayProtectSecond = xmlSignatureReplayProtectSecond;
+	}
+
+	public boolean isSaveVenDate() {
+		return saveVenDate;
+	}
+
+	public void setSaveVenDate(boolean saveVenDate) {
+		this.saveVenDate = saveVenDate;
 	}
 }

@@ -1,15 +1,19 @@
 /* eslint-disable import/no-named-as-default */
-import { NavLink, Route, Switch } from "react-router-dom";
+import { NavLink, Route, Switch } from 'react-router-dom';
 
-import AboutPage from "./AboutPage";
-import HomePage from "./HomePage";
-import NotFoundPage from "./NotFoundPage";
-import VtnConfigurationPage from "./containers/VtnConfigurationPage";
+import AboutPage from './AboutPage';
+import HomePage from './HomePage';
+import NotFoundPage from './NotFoundPage';
+import VtnConfigurationPage from './containers/VtnConfigurationPage';
+import VenPage from './containers/VenPage'
+import AccountPage from './containers/AccountPage'
+import EventPage from './containers/EventPage'
+import VenDetailPage from './containers/VenDetailPage'
+import VenCreatePage from './containers/VenCreatePage'
 
-
-import PropTypes from "prop-types";
-import React from "react";
-import { hot } from "react-hot-loader";
+import PropTypes from 'prop-types';
+import React from 'react';
+import { hot } from 'react-hot-loader';
 
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -46,18 +50,18 @@ const styles = theme => ({
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
+    transition: theme.transitions.create( [ 'width', 'margin' ], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
-    }),
+    } ),
   },
   appBarShift: {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
+    transition: theme.transitions.create( [ 'width', 'margin' ], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
-    }),
+    } ),
   },
   menuButton: {
     marginLeft: 12,
@@ -73,19 +77,19 @@ const styles = theme => ({
     position: 'relative',
     whiteSpace: 'nowrap',
     width: drawerWidth,
-    transition: theme.transitions.create('width', {
+    transition: theme.transitions.create( 'width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
-    }),
+    } ),
   },
   drawerPaperClose: {
     overflowX: 'hidden',
-    transition: theme.transitions.create('width', {
+    transition: theme.transitions.create( 'width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
-    }),
+    } ),
     width: theme.spacing.unit * 7,
-    [theme.breakpoints.up('sm')]: {
+    [ theme.breakpoints.up( 'sm' )]: {
       width: theme.spacing.unit * 9,
     },
   },
@@ -118,82 +122,85 @@ class App extends React.Component {
   };
 
   handleDrawerOpen = () => {
-    this.setState({ open: true });
+    this.setState( {
+      open: true
+    } );
   };
 
   handleDrawerClose = () => {
-    this.setState({ open: false });
+    this.setState( {
+      open: false
+    } );
   };
 
 
   render() {
-    const { classes } = this.props;
-    const activeStyle = { color: 'blue' };
+    const {classes} = this.props;
+    const activeStyle = {
+      color: 'blue'
+    };
     return (
-      <div className={classes.root}>
-         <CssBaseline />
-        <AppBar
-          position="absolute"
-          className={classNames(classes.appBar, this.state.open && classes.appBarShift)}
-        >
-          <Toolbar disableGutters={!this.state.open} className={classes.toolbar}>
-            <IconButton
-              color="inherit"
-              aria-label="Open drawer"
-              onClick={this.handleDrawerOpen}
-              className={classNames(
-                classes.menuButton,
-                this.state.open && classes.menuButtonHidden,
-              )}
-            > 
-              <MenuIcon />
-            </IconButton>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              className={classes.title}
-            >
-              Dashboard
-            </Typography>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: classNames(classes.drawerPaper, !this.state.open && classes.drawerPaperClose),
-          }}
-          open={this.state.open}
-        >
-          <div className={classes.toolbarIcon}>
-            <IconButton onClick={this.handleDrawerClose}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </div>
-          <Divider />
-          <List>{mainListItems}</List>
-          <Divider />
-          <List>{secondaryListItems}</List>
-        </Drawer>
-        <main className={classes.content}>
-          <div className={classes.appBarSpacer} />
-          <Switch>
-            <Route exact path="/" component={HomePage} />
-            <Route path="/about" component={AboutPage} />
-            <Route path="/vtn_configuration" component={VtnConfigurationPage} />
-
-            
-            <Route component={NotFoundPage} />
-          </Switch>
-        </main>
-
-      </div>
+    <div className={ classes.root }>
+      <CssBaseline />
+      <AppBar position="absolute" className={ classNames( classes.appBar, this.state.open && classes.appBarShift ) }>
+        <Toolbar disableGutters={ !this.state.open } className={ classes.toolbar }>
+          <IconButton color="inherit"
+                      aria-label="Open drawer"
+                      onClick={ this.handleDrawerOpen }
+                      className={ classNames(
+                                    classes.menuButton,
+                                    this.state.open && classes.menuButtonHidden,
+                                  ) }>
+            <MenuIcon />
+          </IconButton>
+          <Typography component="h1"
+                      variant="h6"
+                      color="inherit"
+                      noWrap
+                      className={ classes.title }>
+            Dashboard
+          </Typography>
+          <IconButton color="inherit">
+            <Badge badgeContent={ 4 } color="secondary">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+      <Drawer variant="permanent"
+              classes={ { paper: classNames( classes.drawerPaper, !this.state.open && classes.drawerPaperClose ), } }
+              open={ this.state.open }>
+        <div className={ classes.toolbarIcon }>
+          <IconButton onClick={ this.handleDrawerClose }>
+            <ChevronLeftIcon />
+          </IconButton>
+        </div>
+        <Divider />
+        <List>
+          { mainListItems }
+        </List>
+        <Divider />
+        <List>
+          { secondaryListItems }
+        </List>
+      </Drawer>
+      <main className={ classes.content }>
+        <div className={ classes.appBarSpacer } />
+        <Switch>
+          <Route exact
+                 path="/"
+                 component={ HomePage } />
+          <Route path="/about" component={ AboutPage } />
+          <Route path="/vtn_configuration" component={ VtnConfigurationPage } />
+          <Route path="/ven/detail/:username" component={ VenDetailPage } />
+          <Route path="/ven/create" component={ VenCreatePage } />
+          <Route path="/ven" component={ VenPage } />
+          <Route path="/account" component={ AccountPage } />
+          <Route path="/event" component={ EventPage } />
+          <Route component={ NotFoundPage } />
+        </Switch>
+      </main>
+    </div>
     );
   }
 }
@@ -202,4 +209,4 @@ App.propTypes = {
   children: PropTypes.element
 };
 
-export default hot(module)(withStyles(styles)(App));
+export default hot( module )( withStyles( styles )( App ) );

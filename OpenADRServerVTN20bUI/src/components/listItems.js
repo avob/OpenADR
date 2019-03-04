@@ -10,51 +10,62 @@ import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 
-import { NavLink, Route, Switch } from "react-router-dom";
+import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
+import SettingsIcon from '@material-ui/icons/Settings';
+
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
+import AccountBoxIcon from '@material-ui/icons/AccountBox';
+
+
+import { NavLink, Route, Switch } from 'react-router-dom';
 
 export const mainListItems = (
-  <div>
-    <ListItem button component={NavLink} to="/">
-      <ListItemIcon>
-        <DashboardIcon />
-      </ListItemIcon>
-      <ListItemText primary="Home"/>
-    </ListItem>
-    <ListItem button component={NavLink} to="/vtn_configuration">
-      <ListItemIcon>
-        <ShoppingCartIcon />
-      </ListItemIcon>
-      <ListItemText primary="VTN Config"/>
-    </ListItem>
-    <ListItem button component={NavLink} to="/about">
-      <ListItemIcon>
-        <ShoppingCartIcon />
-      </ListItemIcon>
-      <ListItemText primary="About"/>
-    </ListItem>
-  </div>
+<div>
+  <ListItem button
+            component={ NavLink }
+            to="/event">
+    <ListItemIcon>
+      <CalendarTodayIcon />
+    </ListItemIcon>
+    <ListItemText primary="Events" />
+  </ListItem>
+  <ListItem button
+            component={ NavLink }
+            to="/ven">
+    <ListItemIcon>
+      <SettingsInputComponentIcon />
+    </ListItemIcon>
+    <ListItemText primary="VENs" />
+  </ListItem>
+  <ListItem button
+            component={ NavLink }
+            to="/vtn_configuration">
+    <ListItemIcon>
+      <SettingsIcon />
+    </ListItemIcon>
+    <ListItemText primary="VTN Config" />
+  </ListItem>
+  <ListItem button
+            component={ NavLink }
+            to="/account">
+    <ListItemIcon>
+      <AccountBoxIcon />
+    </ListItemIcon>
+    <ListItemText primary="Accounts" />
+  </ListItem>
+</div>
 );
 
 export const secondaryListItems = (
-  <div>
-    <ListSubheader inset>Saved reports</ListSubheader>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Current month" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Last quarter" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Year-end sale" />
-    </ListItem>
-  </div>
+<div>
+  <ListSubheader inset>
+    Exports
+  </ListSubheader>
+  <ListItem button>
+    <ListItemIcon>
+      <AssignmentIcon />
+    </ListItemIcon>
+    <ListItemText primary="Export VENs" />
+  </ListItem>
+</div>
 );

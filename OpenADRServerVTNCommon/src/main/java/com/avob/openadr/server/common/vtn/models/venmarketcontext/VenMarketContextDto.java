@@ -8,6 +8,8 @@ public class VenMarketContextDto {
 
 	private String description;
 
+	private String color;
+
 	public VenMarketContextDto() {
 	}
 
@@ -15,9 +17,10 @@ public class VenMarketContextDto {
 		this.name = name;
 	}
 
-	public VenMarketContextDto(String name, String description) {
+	public VenMarketContextDto(String name, String description, String color) {
 		this.name = name;
 		this.description = description;
+		this.color = color;
 	}
 
 	public Long getId() {
@@ -42,5 +45,13 @@ public class VenMarketContextDto {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
 	}
 }

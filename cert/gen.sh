@@ -89,7 +89,7 @@ openssl req -new -key $VEN2_NAME.key -out $VEN2_NAME.csr -subj "/C=FR/ST=Paris/L
 
 # Signing Server Certificate with previously created CA.
 # $VEN2_NAME.crt = $VEN2_NAME.csr + $CA_NAME.crt + $CA_NAME.key
-openssl x509 -req -days 365 -in $VEN2_NAME.csr -CA $CA_NAME.crt -CAkey $CA_NAME.key -set_serial 02 -out $VEN2_NAME.crt
+openssl x509 -req -days 365 -in $VEN2_NAME.csr -CA $CA_NAME.crt -CAkey $CA_NAME.key -set_serial 05 -out $VEN2_NAME.crt
 
 # Compute VEN fingerprint
 openssl x509 -in $VEN2_NAME.crt -fingerprint -sha256 -noout | cut -d'=' -f2 | cat | tail -c 30 > $VEN2_NAME.fingerprint

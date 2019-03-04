@@ -69,8 +69,12 @@ public class Oadr20bVtnController {
 		} catch (OadrSecurityException e) {
 			LOGGER.error("", e);
 		}
-
-		return oadr20bDtoMapper.map(dto, VtnConfigurationDto.class);
+		
+		dto.setSupportCertificateGeneration(vtnConfig.getCaKey() != null && vtnConfig.getCaCert() != null);
+		dto.setXmlSignatureReplayProtectSecond(vtnConfig.getReplayProtectAcceptedDelaySecond());
+		dto.setSaveVenDate(vtnConfig.getSaveVenData());
+		dto.setXsdValidation(vtnConfig.getValidateOadrPayloadAgainstXsd());
+		return dto;
 	}
 
 	@RequestMapping(value = "/report/available", method = RequestMethod.GET)
