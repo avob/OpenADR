@@ -92,6 +92,8 @@ public class Ven extends AbstractUser {
 	private Set<VenResource> venResources;
 
 	private Long lastUpdateDatetime;
+	
+	private String commonName;
 
 	public Ven() {
 	}
@@ -236,6 +238,14 @@ public class Ven extends AbstractUser {
 
 	public void setLastUpdateDatetime(Long lastUpdateDatetime) {
 		this.lastUpdateDatetime = lastUpdateDatetime;
+	}
+
+	public String getCommonName() {
+		return commonName;
+	}
+
+	public void setCommonName(String commonName) {
+		this.commonName = commonName;
 	}
 
 }

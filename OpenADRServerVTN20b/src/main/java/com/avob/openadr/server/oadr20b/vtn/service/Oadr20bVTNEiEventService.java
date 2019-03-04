@@ -54,6 +54,7 @@ import com.avob.openadr.model.oadr20b.pyld.EiCreatedEvent;
 import com.avob.openadr.model.oadr20b.strm.StreamPayloadBaseType;
 import com.avob.openadr.model.oadr20b.xcal.Dtstart;
 import com.avob.openadr.model.oadr20b.xcal.DurationPropType;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
@@ -62,7 +63,6 @@ import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketConte
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenRequestCountService;
 import com.avob.openadr.server.common.vtn.service.VenService;
-import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.converter.OptConverter;
 import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bCreatedEventApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bRequestEventApplicationLayerException;

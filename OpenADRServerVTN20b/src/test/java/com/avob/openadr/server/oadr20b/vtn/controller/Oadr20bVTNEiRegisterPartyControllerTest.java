@@ -107,7 +107,6 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		assertNull(venDto.getOadrProfil());
 		assertNull(venDto.getPushUrl());
 		assertNull(venDto.getTransport());
-		assertNull(venDto.getRegistrationId());
 
 		// test oadrQueryRegistration
 		String requestId = "requestId";
@@ -159,7 +158,6 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		assertNull(venDto.getOadrProfil());
 		assertNull(venDto.getPushUrl());
 		assertNull(venDto.getTransport());
-		assertNull(venDto.getRegistrationId());
 
 		// test create oadrCreateRegistration
 		String venName = "venName";
@@ -174,6 +172,8 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 				.withOadrVenName(venName).withOadrHttpPullModel(pullModel).withOadrTransportAddress(transportAddress)
 				.withOadrTransportName(transport).withOadrXmlSignature(xmlSignature).withOadrReportOnly(reportOnly)
 				.build();
+		
+		
 
 		// invalid mismatch payload venID and username auth session
 		oadrCreatedPartyRegistrationType = oadrMockMvc.postEiRegisterPartyAndExpect(anotherVenSession,
@@ -188,7 +188,7 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
 		xmlSignatureService.validate(str, payload);
 		oadrCreatedPartyRegistrationType = payload.getOadrSignedObject().getOadrCreatedPartyRegistration();
-
+		String registrationId = oadrCreatedPartyRegistrationType.getRegistrationID();
 		assertNotNull(oadrCreatedPartyRegistrationType);
 		assertEquals(String.valueOf(HttpStatus.OK_200),
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
@@ -211,9 +211,8 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		assertEquals(SchemaVersionEnumeratedType.OADR_20B.value(), venDto.getOadrProfil());
 		assertEquals(transportAddress, venDto.getPushUrl());
 		assertEquals(transport.value(), venDto.getTransport());
-		assertNotNull(venDto.getRegistrationId());
 
-		String registrationId = venDto.getRegistrationId();
+		
 
 		// test invalid create oadrCreateRegistration because already registered
 		// and not specifying registrationId
@@ -237,6 +236,7 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 				VenCreateDto.class);
 		assertEquals(pullModel, venDto.getHttpPullModel());
 
+		
 		// test update oadrCreateRegistration
 		oadrCreatePartyRegistrationType = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatePartyRegistrationBuilder(requestId, VEN_ID,
@@ -269,15 +269,10 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 				oadrCanceledPartyRegistration.getEiResponse().getResponseCode());
 
 		// test signed create oadrcancelRegistration
-//		payload = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
-//				xmlSignatureService.sign(oadrCancelPartyRegistration), HttpStatus.OK_200, OadrPayload.class);
-
 		str = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
 				xmlSignatureService.sign(oadrCancelPartyRegistration), HttpStatus.OK_200, String.class);
 		payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
 		xmlSignatureService.validate(str, payload);
-
-//		xmlSignatureService.validate(payload);
 
 		oadrCanceledPartyRegistration = payload.getOadrSignedObject().getOadrCanceledPartyRegistration();
 
@@ -294,7 +289,6 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		assertNull(venDto.getOadrProfil());
 		assertNull(venDto.getPushUrl());
 		assertNull(venDto.getTransport());
-		assertNull(venDto.getRegistrationId());
 		assertNull(venDto.getOadrName());
 
 		// test invalid create oadrcancelRegistration

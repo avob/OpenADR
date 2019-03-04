@@ -27,9 +27,9 @@ import com.avob.openadr.model.oadr20b.oadr.OadrProfiles.OadrProfile;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.VenService;
-import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCanceledPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCreatePartyRegistrationTypeApplicationLayerException;
@@ -103,10 +103,9 @@ public class Oadr20bVTNEiRegisterPartyService {
 					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
 			throw new Oadr20bCreatePartyRegistrationTypeApplicationLayerException(
 					xmlSignatureRequiredButAbsent.getResponseDescription(),
-					Oadr20bEiRegisterPartyBuilders
-							.newOadr20bCreatedPartyRegistrationBuilder(requestID,
-									Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID, vtnConfig.getVtnId())
-							.build());
+					Oadr20bEiRegisterPartyBuilders.newOadr20bCreatedPartyRegistrationBuilder(requestID,
+							Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID,
+							vtnConfig.getVtnId()).build());
 		}
 
 		if (ven.getRegistrationId() == null && registrationID == null) {
@@ -199,10 +198,9 @@ public class Oadr20bVTNEiRegisterPartyService {
 					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
 			throw new Oadr20bCancelPartyRegistrationTypeApplicationLayerException(
 					xmlSignatureRequiredButAbsent.getResponseDescription(),
-					Oadr20bEiRegisterPartyBuilders
-							.newOadr20bCanceledPartyRegistrationBuilder(requestID,
-									Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID, vtnConfig.getVtnId())
-							.build());
+					Oadr20bEiRegisterPartyBuilders.newOadr20bCanceledPartyRegistrationBuilder(requestID,
+							Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID,
+							vtnConfig.getVtnId()).build());
 		}
 
 		if (ven.getRegistrationId() == null || !ven.getRegistrationId().equals(registrationID)) {

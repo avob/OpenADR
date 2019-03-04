@@ -1,14 +1,18 @@
 package com.avob.openadr.server.common.vtn.service;
 
+import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenDao;
@@ -19,100 +23,119 @@ import com.avob.openadr.server.common.vtn.models.venresource.VenResourceDao;
 @Service
 public class VenService extends AbstractUserService<Ven> {
 
-    @Resource
-    private VenDao venDao;
+	@Resource
+	private VenDao venDao;
 
-    @Resource
-    private VenResourceDao venResourceDao;
+	@Resource
+	private VenResourceDao venResourceDao;
 
-    @Resource
-    private VenDemandResponseEventDao venDemandResponseEventDao;
+	@Resource
+	private VenDemandResponseEventDao venDemandResponseEventDao;
 
-    private Mapper mapper = new DozerBeanMapper();
+	@Autowired(required = false)
+	private GenerateX509VenService generateX509VenService;
 
-    public Ven prepare(String username, String password) {
-        return super.prepare(new Ven(), username, password);
-    }
+	private Mapper mapper = new DozerBeanMapper();
 
-    /**
-     * @param username
-     * @return
-     */
-    public Ven prepare(String username) {
-        return super.prepare(new Ven(), username);
-    }
+	public Ven prepare(String username, String password) {
+		return super.prepare(new Ven(), username, password);
+	}
 
-    /**
-     * @param username
-     * @return
-     */
-    public Ven prepare(VenCreateDto dto) {
-        Ven prepare;
-        if (dto.getPassword() != null) {
-            prepare = super.prepare(new Ven(), dto.getUsername(), dto.getPassword());
-        } else {
-            prepare = super.prepare(new Ven(), dto.getUsername());
-        }
+	/**
+	 * @param username
+	 * @return
+	 */
+	public Ven prepare(String username) {
+		return super.prepare(new Ven(), username);
+	}
 
-        mapper.map(dto, prepare);
+	/**
+	 * @param username
+	 * @return
+	 */
+	public Ven prepare(VenCreateDto dto) {
+		Ven prepare;
+		if (dto.getPassword() != null) {
+			prepare = super.prepare(new Ven(), dto.getUsername(), dto.getPassword());
+		} else {
+			prepare = super.prepare(new Ven(), dto.getUsername());
+		}
 
-        return prepare;
-    }
+		mapper.map(dto, prepare);
 
-    @Override
-    @Transactional
-    public void delete(Ven instance) {
-        venResourceDao.deleteByVenId(instance.getId());
-        venDemandResponseEventDao.deleteByVenId(instance.getId());
-        venDao.delete(instance);
-    }
+		return prepare;
+	}
 
-    @Override
-    public void delete(Iterable<Ven> instances) {
-        venDao.deleteAll(instances);
-    }
+	public Optional<File> generateCertificateIfRequired(VenCreateDto dto, Ven ven) throws GenerateX509VenException {
 
-    @Override
-    public Ven save(Ven instance) {
-        return venDao.save(instance);
-    }
+		if (generateX509VenService != null) {
 
-    @Override
-    public void save(Iterable<Ven> instances) {
-        venDao.saveAll(instances);
-    }
+			if (!"no".equals(dto.getAuthenticationType())) {
+				File generateCredentials = generateX509VenService.generateCredentials(dto, ven);
+				return Optional.of(generateCredentials);
+			}
 
-    public Ven findOneByUsername(String username) {
-        return venDao.findOneByUsername(username);
-    }
+			return Optional.empty();
+		}
 
-    public Ven findOneByRegistrationId(String registrationId) {
-        return venDao.findOneByRegistrationId(registrationId);
-    }
+		throw new GenerateX509VenException(
+				"Client certificate feature require CA certificate to be provided to the vtn");
+	}
 
-    public List<Ven> findByUsernameInAndVenMarketContextsContains(List<String> username,
-            VenMarketContext venMarketContext) {
-        return venDao.findByUsernameInAndVenMarketContextsContains(username, venMarketContext);
-    }
+	@Override
+	@Transactional
+	public void delete(Ven instance) {
+		venResourceDao.deleteByVenId(instance.getId());
+		venDemandResponseEventDao.deleteByVenId(instance.getId());
+		venDao.delete(instance);
+	}
 
-    public List<Ven> findByGroupName(List<String> groupName) {
-        return venDao.findByVenGroupsName(groupName);
-    }
+	@Override
+	public void delete(Iterable<Ven> instances) {
+		venDao.deleteAll(instances);
+	}
 
-    public List<Ven> findByMarketContextName(List<String> groupName) {
-        return venDao.findByVenMarketContextsName(groupName);
-    }
+	@Override
+	public Ven save(Ven instance) {
+		return venDao.save(instance);
+	}
 
-    public Ven findOne(Long id) {
-        return venDao.findById(id).get();
-    }
+	@Override
+	public void save(Iterable<Ven> instances) {
+		venDao.saveAll(instances);
+	}
 
-    public Iterable<Ven> findAll() {
-        return venDao.findAll();
-    }
+	public Ven findOneByUsername(String username) {
+		return venDao.findOneByUsername(username);
+	}
 
-    public long count() {
-        return venDao.count();
-    }
+	public Ven findOneByRegistrationId(String registrationId) {
+		return venDao.findOneByRegistrationId(registrationId);
+	}
+
+	public List<Ven> findByUsernameInAndVenMarketContextsContains(List<String> username,
+			VenMarketContext venMarketContext) {
+		return venDao.findByUsernameInAndVenMarketContextsContains(username, venMarketContext);
+	}
+
+	public List<Ven> findByGroupName(List<String> groupName) {
+		return venDao.findByVenGroupsName(groupName);
+	}
+
+	public List<Ven> findByMarketContextName(List<String> groupName) {
+		return venDao.findByVenMarketContextsName(groupName);
+	}
+
+	public Ven findOne(Long id) {
+		return venDao.findById(id).get();
+	}
+
+	public Iterable<Ven> findAll() {
+		return venDao.findAll();
+	}
+
+	public long count() {
+		return venDao.count();
+	}
 
 }

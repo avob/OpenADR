@@ -2,6 +2,8 @@ import * as types from '../constants/actionTypes';
 import objectAssign from 'object-assign';
 import initialState from './initialState';
 
+
+
 // IMPORTANT: Note that with Redux, state should NEVER be changed.
 // State is considered immutable. Instead,
 // create a copy of the state passed and set new values on the copy.
@@ -24,6 +26,27 @@ export default function venCreateReducer( state = initialState.ven_create, actio
       return newState;
 
     case types.LOAD_VTN_CONFIGURATION_ERROR:
+      return state;
+
+     // VEN
+     case types.CREATE_VEN:
+      return state;
+
+    case types.CREATE_VEN_SUCCESS:
+
+      return state;
+
+    case types.CREATE_VEN_ERROR:
+      return state;
+
+    case types.DELETE_VEN:
+      return state;
+
+    case types.DELETE_VEN_SUCCESS:
+      
+      return state;
+
+    case types.DELETE_VEN_ERROR:
       return state;
       
     default:

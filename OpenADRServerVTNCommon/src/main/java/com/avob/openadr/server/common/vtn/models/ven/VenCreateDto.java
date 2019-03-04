@@ -23,17 +23,13 @@ public class VenCreateDto implements Serializable {
 
 	private String pushUrl;
 
-	private String registrationId;
-
 	private Boolean httpPullModel;
 
-	private Boolean reportOnly;
+	private String authenticationType;
 
-	private Boolean xmlSignature;
+	private String needCertificateGeneration;
 
-	private Long pullFrequencySeconds;
-
-	private Long lastUpdateDatetime;
+	private String commonName;
 
 	public VenCreateDto() {
 	}
@@ -90,43 +86,10 @@ public class VenCreateDto implements Serializable {
 	}
 
 	/**
-	 * @param password
-	 *            the password to set
+	 * @param password the password to set
 	 */
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public String getRegistrationId() {
-		return registrationId;
-	}
-
-	public void setRegistrationId(String registrationId) {
-		this.registrationId = registrationId;
-	}
-
-	public Boolean getHttpPullModel() {
-		return httpPullModel;
-	}
-
-	public void setHttpPullModel(Boolean httpPullModel) {
-		this.httpPullModel = httpPullModel;
-	}
-
-	public Boolean getReportOnly() {
-		return reportOnly;
-	}
-
-	public void setReportOnly(Boolean reportOnly) {
-		this.reportOnly = reportOnly;
-	}
-
-	public Boolean getXmlSignature() {
-		return xmlSignature;
-	}
-
-	public void setXmlSignature(Boolean xmlSignature) {
-		this.xmlSignature = xmlSignature;
 	}
 
 	public String getId() {
@@ -137,19 +100,36 @@ public class VenCreateDto implements Serializable {
 		this.id = id;
 	}
 
-	public Long getPullFrequencySeconds() {
-		return pullFrequencySeconds;
+	public String getAuthenticationType() {
+		return authenticationType;
 	}
 
-	public void setPullFrequencySeconds(Long pullFrequencySeconds) {
-		this.pullFrequencySeconds = pullFrequencySeconds;
+	public void setAuthenticationType(String authenticationType) {
+		this.authenticationType = authenticationType;
 	}
 
-	public Long getLastUpdateDatetime() {
-		return lastUpdateDatetime;
+	public String getNeedCertificateGeneration() {
+		return needCertificateGeneration;
 	}
 
-	public void setLastUpdateDatetime(Long lastUpdateDatetime) {
-		this.lastUpdateDatetime = lastUpdateDatetime;
+	public void setNeedCertificateGeneration(String needCertificateGeneration) {
+		this.needCertificateGeneration = needCertificateGeneration;
 	}
+
+	public String getCommonName() {
+		return commonName;
+	}
+
+	public void setCommonName(String commonName) {
+		this.commonName = commonName;
+	}
+
+	public Boolean getHttpPullModel() {
+		return httpPullModel;
+	}
+
+	public void setHttpPullModel(Boolean httpPullModel) {
+		this.httpPullModel = httpPullModel;
+	}
+
 }

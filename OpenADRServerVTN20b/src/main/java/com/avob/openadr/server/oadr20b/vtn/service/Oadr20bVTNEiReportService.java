@@ -74,12 +74,12 @@ import com.avob.openadr.model.oadr20b.xcal.Dtstart;
 import com.avob.openadr.model.oadr20b.xcal.DurationPropType;
 import com.avob.openadr.model.oadr20b.xcal.Properties;
 import com.avob.openadr.model.oadr20b.xcal.WsCalendarIntervalType;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenService;
-import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCancelReportApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCreateReportApplicationLayerException;
@@ -146,7 +146,7 @@ public class Oadr20bVTNEiReportService {
 
 	@Resource
 	protected VenDistributeService venDistributeService;
-	
+
 	@Resource
 	private VtnConfig vtnConfig;
 

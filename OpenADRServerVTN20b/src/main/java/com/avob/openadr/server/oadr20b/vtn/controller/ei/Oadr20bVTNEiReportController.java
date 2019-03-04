@@ -3,7 +3,6 @@ package com.avob.openadr.server.oadr20b.vtn.controller.ei;
 import java.security.Principal;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
-import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCreatePartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bQueryRegistrationTypeApplicationLayerException;

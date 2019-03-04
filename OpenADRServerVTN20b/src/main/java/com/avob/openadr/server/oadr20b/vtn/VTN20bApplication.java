@@ -37,6 +37,7 @@ import com.avob.openadr.model.oadr20b.Oadr20bSecurity;
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VTNEmbeddedServletContainerCustomizer;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.google.common.collect.Maps;
 
 @Configuration

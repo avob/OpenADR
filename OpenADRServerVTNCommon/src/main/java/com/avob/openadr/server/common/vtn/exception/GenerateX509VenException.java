@@ -1,4 +1,4 @@
-package com.avob.openadr.server.oadr20b.vtn.exception.service;
+package com.avob.openadr.server.common.vtn.exception;
 
 public class GenerateX509VenException extends Exception {
 

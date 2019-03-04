@@ -1,6 +1,10 @@
-package com.avob.openadr.server.oadr20b.vtn;
+package com.avob.openadr.server.common.vtn;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -30,22 +34,24 @@ public class VtnConfig {
 	@Value("${" + PORT_CONF + ":#{8443}}")
 	private int port;
 
-	@Value("#{'${" + TRUSTED_CERTIFICATES_CONF + "}'.split(',')}")
-	private List<String> trustCertificates;
+	@Value("${" + TRUSTED_CERTIFICATES_CONF + ":#{null}}")
+	private String trustCertificatesStr;
 
-	@Value("${" + PRIVATE_KEY_CONF + "}")
+	private List<String> trustCertificates = null;
+
+	@Value("${" + PRIVATE_KEY_CONF + ":#{null}}")
 	private String key;
 
-	@Value("${" + CERTIFICATE_CONF + "}")
+	@Value("${" + CERTIFICATE_CONF + ":#{null}}")
 	private String cert;
 
-	@Value("${" + SUPPORT_PUSH_CONF + "}")
+	@Value("${" + SUPPORT_PUSH_CONF + ":#{null}}")
 	private Boolean supportPush;
 
-	@Value("${" + SUPPORT_UNSECURED_PHTTP_PUSH_CONF + "}")
+	@Value("${" + SUPPORT_UNSECURED_PHTTP_PUSH_CONF + ":#{null}}")
 	private Boolean supportUnsecuredHttpPush;
 
-	@Value("${" + PULL_FREQUENCY_SECONDS_CONF + "}")
+	@Value("${" + PULL_FREQUENCY_SECONDS_CONF + ":#{null}}")
 	private Long pullFrequencySeconds;
 
 	@Value("${" + HOST_CONF + ":localhost}")
@@ -54,13 +60,13 @@ public class VtnConfig {
 	@Value("${" + VALIDATE_OADR_PAYLOAD_XSD_CONF + ":false}")
 	private Boolean validateOadrPayloadAgainstXsd;
 
-	@Value("${" + VTN_ID_CONF + "}")
+	@Value("${" + VTN_ID_CONF + ":#{null}}")
 	private String vtnId;
 
-	@Value("${" + SAVE_VEN_UPDATE_REPORT_CONF + "}")
+	@Value("${" + SAVE_VEN_UPDATE_REPORT_CONF + ":#{false}}")
 	private Boolean saveVenData;
 
-	@Value("${" + REPLAY_PROTECTACCEPTED_DELAY_SECONDS_CONF + "}")
+	@Value("${" + REPLAY_PROTECTACCEPTED_DELAY_SECONDS_CONF + ":#{1200}}")
 	private Long replayProtectAcceptedDelaySecond;
 
 	@Value("${" + CA_KEY_CONF + ":null}")
@@ -68,6 +74,16 @@ public class VtnConfig {
 
 	@Value("${" + CA_CERT_CONF + ":null}")
 	private String caCert;
+
+	@PostConstruct
+	public void init() {
+		if (trustCertificatesStr != null) {
+			trustCertificates = Arrays.asList(trustCertificatesStr.split(","));
+		}
+		else {
+			trustCertificates = new ArrayList<>();
+		}
+	}
 
 	public String getContextPath() {
 		return contextPath;

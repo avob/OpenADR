@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.JAXBException;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;

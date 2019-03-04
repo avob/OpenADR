@@ -26,8 +26,8 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreatePartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.service.VenService;
-import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bCreatedEventApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCanceledPartyRegistrationTypeApplicationLayerException;
@@ -70,8 +70,6 @@ public class Oadr20bVTNEiRegisterPartyController {
 			Oadr20bResponsePartyReregistrationApplicationLayerException {
 
 		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
-
-//		Object unmarshal = jaxbContext.unmarshal(payload, false);
 
 		String username = principal.getName();
 

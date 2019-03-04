@@ -22,7 +22,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
-import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.exception.poll.Oadr20bPollApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNOadrPollService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;

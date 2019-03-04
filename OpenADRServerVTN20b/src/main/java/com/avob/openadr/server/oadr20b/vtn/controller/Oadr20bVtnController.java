@@ -21,7 +21,7 @@ import com.avob.openadr.model.oadr20b.dto.ReportRequestDto;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
-import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapabilityDescription;
 import com.avob.openadr.server.oadr20b.vtn.service.dtomapper.Oadr20bDtoMapper;
@@ -69,7 +69,7 @@ public class Oadr20bVtnController {
 		} catch (OadrSecurityException e) {
 			LOGGER.error("", e);
 		}
-		
+
 		dto.setSupportCertificateGeneration(vtnConfig.getCaKey() != null && vtnConfig.getCaCert() != null);
 		dto.setXmlSignatureReplayProtectSecond(vtnConfig.getReplayProtectAcceptedDelaySecond());
 		dto.setSaveVenDate(vtnConfig.getSaveVenData());

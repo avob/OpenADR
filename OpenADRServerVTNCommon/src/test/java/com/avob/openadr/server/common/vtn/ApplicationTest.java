@@ -11,12 +11,14 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.test.context.ActiveProfiles;
 
 @Configuration
 @EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class })
 @ComponentScan({ "com.avob.openadr.server.common.vtn" })
 @EnableJpaRepositories({ "com.avob.openadr.server.common.vtn" })
 @EntityScan({ "com.avob.openadr.server.common.vtn" })
+@ActiveProfiles("test")
 public class ApplicationTest {
 
 	@Bean(destroyMethod = "shutdown")

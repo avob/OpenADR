@@ -56,6 +56,7 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
   },
+ 
 });
 
 export class VenDetailPage extends React.Component {

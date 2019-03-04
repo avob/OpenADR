@@ -1,4 +1,4 @@
-package com.avob.openadr.server.oadr20b.vtn.service.generateven;
+package com.avob.openadr.server.common.vtn.service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,11 +29,10 @@ import org.springframework.stereotype.Service;
 
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.common.vtn.VtnConfig;
+import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
-import com.avob.openadr.server.common.vtn.service.VenService;
-import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
-import com.avob.openadr.server.oadr20b.vtn.controller.GenerateX509VenDto;
-import com.avob.openadr.server.oadr20b.vtn.exception.service.GenerateX509VenException;
+import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.google.common.collect.Lists;
 
 @ConditionalOnProperty(value = VtnConfig.CA_KEY_CONF)
@@ -42,9 +41,6 @@ public class GenerateX509VenService {
 
 	@Resource
 	private VtnConfig vtnConfig;
-
-	@Resource
-	private VenService venService;
 
 	private KeyPair caKeyPair = null;
 	private X509Certificate caCert = null;
@@ -73,35 +69,36 @@ public class GenerateX509VenService {
 		return caKeyPair;
 	}
 
-	public File generateCredentials(GenerateX509VenDto dto) throws GenerateX509VenException {
+	public File generateCredentials(VenCreateDto dto, Ven ven) throws GenerateX509VenException {
 		try {
 
 			long now = System.currentTimeMillis();
-			String venCN = dto.getvenCN();
-			String venName = dto.getVenName();
+			String venCN = dto.getCommonName();
 			BigInteger serialNumber = BigInteger.valueOf(now);
 
 			String algoCsr = null;
 			KeyPair venCred = null;
-			if (dto.getType().toLowerCase().equals("ecc")) {
+			if (dto.getNeedCertificateGeneration().toLowerCase().equals("ecc")) {
 				algoCsr = "SHA256withDSA";
 				venCred = OadrHttpSecurity.generateEccKeyPair();
-			} else if (dto.getType().toLowerCase().equals("rsa")) {
+			} else if (dto.getNeedCertificateGeneration().toLowerCase().equals("rsa")) {
 				algoCsr = "SHA256withRSA";
 				venCred = OadrHttpSecurity.generateRsaKeyPair();
 			}
 			KeyPair loadCaKeyPair = loadCaKeyPair();
 			PKCS10CertificationRequest csr = OadrHttpSecurity.generateCsr(venCred, venCN, algoCsr);
 			X509Certificate crt = OadrHttpSecurity.signCsr(csr, loadCaKeyPair, caCert, serialNumber);
-			String fingerprint = OadrHttpSecurity.getOadr20bFingerprint(crt);
 
-			File crtFile = writeToFile(venName, "crt", OadrHttpSecurity.writeCrtToString(crt));
+			String fingerprint = OadrHttpSecurity.getOadr20bFingerprint(crt);
+			ven.setUsername(fingerprint);
+
+			File crtFile = writeToFile(venCN, "crt", OadrHttpSecurity.writeCrtToString(crt));
 			File caCrtFile = writeToFile("ca", "crt", OadrHttpSecurity.writeCrtToString(caCert));
-			File keyPairFile = writeToFile(venName, "key", OadrHttpSecurity.writeKeyToString(venCred));
-			File fingerprintFile = writeToFile(venName, "fingerprint", fingerprint);
+			File keyPairFile = writeToFile(venCN, "key", OadrHttpSecurity.writeKeyToString(venCred));
+			File fingerprintFile = writeToFile(venCN, "fingerprint", fingerprint);
 
 			Collection<File> filesToArchive = Lists.newArrayList(crtFile, keyPairFile, fingerprintFile, caCrtFile);
-			String archiveName = now + "-" + venName + "-credentials.tar.gz";
+			String archiveName = now + "-" + venCN + "-credentials.tar.gz";
 			Path path = Files.createTempFile(archiveName, "");
 			File outFile = path.toFile();
 			FileOutputStream out = new FileOutputStream(outFile);
@@ -121,9 +118,6 @@ public class GenerateX509VenService {
 			}
 			o.finish();
 			out.close();
-
-			Ven prepare = venService.prepare(fingerprint);
-			venService.save(prepare);
 
 			return outFile;
 

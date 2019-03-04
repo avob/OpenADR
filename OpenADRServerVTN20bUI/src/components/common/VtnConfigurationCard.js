@@ -118,8 +118,8 @@ export function VtnConfigurationVenCard( props ) {
   return (
   <VtnConfigurationCard classes={ props.classes }
                         color="#bbb"
-                        name={ props.ven.username }
-                        description={ props.ven.oadrName }
+                        name={ props.ven.commonName }
+                        description={ props.ven.username }
                         close={ props.handleDeleteVen }
                         edit={ props.handleEditVen }
                         cardType={ "VEN" }

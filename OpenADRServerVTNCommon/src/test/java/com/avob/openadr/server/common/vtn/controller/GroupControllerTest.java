@@ -139,18 +139,19 @@ public class GroupControllerTest {
         assertNotNull(dto);
         assertNotNull(dto.getId());
         assertEquals(groupName, dto.getName());
+        Long groupId = dto.getId();
 
         // delete
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + groupName).with(venSession))
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + groupId).with(venSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + groupName).with(userSession))
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + groupId).with(userSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
         this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL + "mouaiccool").with(adminSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + groupName).with(adminSession))
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + groupId).with(adminSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
         // empty find all

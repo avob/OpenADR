@@ -15,7 +15,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandler;
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
-import com.avob.openadr.server.oadr20b.vtn.VtnConfig;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 
 @Service
 public class XmlSignatureService {
@@ -41,6 +41,7 @@ public class XmlSignatureService {
 
 	public void validate(String raw, OadrPayload payload) throws Oadr20bXMLSignatureValidationException {
 		long nowDate = System.currentTimeMillis();
-		OadrXMLSignatureHandler.validate(raw, payload, nowDate, vtnConfig.getReplayProtectAcceptedDelaySecond() * 1000L);
+		OadrXMLSignatureHandler.validate(raw, payload, nowDate,
+				vtnConfig.getReplayProtectAcceptedDelaySecond() * 1000L);
 	}
 }

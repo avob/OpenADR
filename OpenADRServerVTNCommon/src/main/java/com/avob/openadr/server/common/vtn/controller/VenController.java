@@ -1,7 +1,11 @@
 package com.avob.openadr.server.common.vtn.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -10,6 +14,9 @@ import javax.validation.Valid;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenUpdateDto;
@@ -64,20 +72,45 @@ public class VenController {
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	@ResponseBody
-	public VenCreateDto createVen(@Valid @RequestBody VenCreateDto dto, HttpServletResponse response) {
+	public ResponseEntity<InputStreamResource> createVen(@Valid @RequestBody VenCreateDto dto,
+			HttpServletResponse response) {
 
 		Ven findOneByUsername = venService.findOneByUsername(dto.getUsername());
 
 		if (findOneByUsername != null) {
 			LOGGER.warn("Ven: " + dto.getUsername() + " already exists");
-			response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
-			return null;
+			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE_406)
+					.contentType(MediaType.parseMediaType("application/octet-stream")).body(null);
 		}
 		Ven prepare = venService.prepare(dto);
+		 ResponseEntity<InputStreamResource> body = null;
+		try {
+			Optional<File> generateCertificateIfRequired = venService.generateCertificateIfRequired(dto, prepare);
+
+			if (generateCertificateIfRequired.isPresent()) {
+				InputStreamResource resource = new InputStreamResource(
+						new FileInputStream(generateCertificateIfRequired.get()));
+				body = ResponseEntity.ok().header("Content-Disposition", "attachment; filename=\"archive.tar\"").contentLength(generateCertificateIfRequired.get().length())
+						.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+			}
+			else {
+				body = ResponseEntity.status(HttpStatus.CREATED_201).body(null);
+			}
+
+		} catch (GenerateX509VenException e) {
+			LOGGER.error("", e);
+			response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
+		} catch (FileNotFoundException e) {
+			LOGGER.error("", e);
+			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
+		}
+
 		venService.save(prepare);
-		response.setStatus(HttpStatus.CREATED_201);
 		LOGGER.info("Create Ven: " + prepare.getUsername());
-		return dtoMapper.map(prepare, VenCreateDto.class);
+
+		
+		
+		return body;
 	}
 
 	@RequestMapping(value = "/{venID}", method = RequestMethod.PUT)

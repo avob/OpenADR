@@ -72,7 +72,7 @@ export class VenPage extends React.Component {
       </Tabs>
       <Divider variant="middle" />
       <Typography component="div" style={ { padding: 8 * 3 } }>
-        <VenList classes={ classes } ven={ ven.ven } />
+        <VenList classes={ classes } ven={ ven.ven } deleteVen={this.props.actions.deleteVen}/>
       </Typography>
     </div>
 

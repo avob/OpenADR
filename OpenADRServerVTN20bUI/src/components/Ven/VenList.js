@@ -186,6 +186,7 @@ export class VenList extends React.Component {
     var that = this;
     return function ( event ) {
       event.preventDefault();
+      that.props.deleteVen(username)
 
     }
 

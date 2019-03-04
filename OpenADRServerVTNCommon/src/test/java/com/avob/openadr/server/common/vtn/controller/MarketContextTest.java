@@ -109,6 +109,8 @@ public class MarketContextTest {
         assertNotNull(dto);
         assertNotNull(dto.getId());
         assertEquals(marketContextName, dto.getName());
+        
+       
 
         this.mockMvc.perform(MockMvcRequestBuilders.post(MARKET_CONTEXT_URL).header("Content-Type", "application/json")
                 .content(mapper.writeValueAsString(new VenMarketContextDto(marketContextName))).with(adminSession))
@@ -139,17 +141,18 @@ public class MarketContextTest {
         assertNotNull(dto.getId());
         assertEquals(marketContextName, dto.getName());
 
+        Long marketContextNameId = dto.getId();
         // delete
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + marketContextName).with(venSession))
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + marketContextNameId).with(venSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + marketContextName).with(userSession))
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + marketContextNameId).with(userSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
         this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL + "mouaiccool").with(adminSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + marketContextName).with(adminSession))
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + marketContextNameId).with(adminSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
         // empty find all

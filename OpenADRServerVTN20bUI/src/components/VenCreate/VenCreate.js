@@ -37,6 +37,10 @@ const authenticationTypes = {
   }
 }
 
+function getSteps() {
+      return [ 'Identification settings', 'Authentication settings', 'Confirmation' ];
+    }
+
 
 export class VenCreate extends React.Component {
   constructor( props ) {
@@ -51,15 +55,25 @@ export class VenCreate extends React.Component {
       authenticationPassword: '',
       authenticationPasswordConfirm: '',
       needLogin: false,
-      needCertificateGeneration: 'no'
+      needCertificateGeneration: 'rsa'
     };
+  }
+
+  handleFinish = () => {
+    this.handleCreateVen();
   }
 
   handleNext = () => {
     const {activeStep} = this.state;
-    this.setState( {
-      activeStep: activeStep + 1,
-    } );
+    if(activeStep === getSteps().length - 1 ){
+      this.handleFinish();
+    }
+    else {
+      this.setState( {
+        activeStep: activeStep + 1,
+      } );
+    }
+     
   };
 
   handleBack = () => {
@@ -98,7 +112,7 @@ export class VenCreate extends React.Component {
 
   handleAuthenticationVenIdChange = (e) => {
     this.setState( {
-      authenticationLogin: e.target.value,
+      authenticationVenId: e.target.value,
     } );
   };
   handleAuthenticationPasswordChange = (e) => {
@@ -112,14 +126,29 @@ export class VenCreate extends React.Component {
     } );
   };
 
+  handleCreateVen = () => {
+    var dto = {
+      "authenticationType": this.state.authenticationType,
+      "commonName": this.state.venCommonName,
+      "needCertificateGeneration": this.state.needCertificateGeneration,
+      "oadrProfil": this.state.venOadrProfile,
+      "username": this.state.authenticationVenId
+    }
+
+    if(this.state.authenticationType == "login") {
+      dto.password = this.state.authenticationPassword
+    }
+
+    this.props.createVen(dto);
+  }
+  
+
   render() {
     const {classes, vtnConfiguration} = this.props;
     const steps = getSteps();
     const {activeStep} = this.state;
     var that = this;
-    function getSteps() {
-      return [ 'Identification settings', 'Authentication settings', 'Confirmation' ];
-    }
+    
 
     function getStepContent( step ) {
       switch (step) {
@@ -161,7 +190,14 @@ export class VenCreate extends React.Component {
         case 0:
           return that.state.venCommonName != ''
         case 1:
-          return true
+
+        var hasVenIdWhenNoCertificateGeneration = that.state.needCertificateGeneration != 'no' 
+          || (that.state.needCertificateGeneration == 'no' && that.state.authenticationVenId != '');
+
+        var hasValidLoginPasswordWhenLoginAuthentication = that.state.authenticationType != 'login' ||( that.state.authenticationPassword != '' &&
+           that.state.authenticationPasswordConfirm != "" &&  that.state.authenticationPassword == that.state.authenticationPasswordConfirm);
+
+          return hasVenIdWhenNoCertificateGeneration && hasValidLoginPasswordWhenLoginAuthentication
         case 2:
           return true;
         default:

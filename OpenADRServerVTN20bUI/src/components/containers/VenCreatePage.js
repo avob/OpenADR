@@ -5,6 +5,8 @@ import { bindActionCreators } from 'redux';
 
 import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions';
 
+import * as venActions from '../../actions/venActions';
+
 import { withStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
@@ -12,6 +14,9 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 
 import VenCreate from '../VenCreate/VenCreate'
+
+import amber from '@material-ui/core/colors/amber';
+
 
 function TabContainer( props ) {
   return (
@@ -56,7 +61,22 @@ const styles = theme => ({
   },
   stepper: {
     backgroundColor: '#fafafa'
-  }
+  },
+   warning: {
+    backgroundColor: amber[700],
+  },
+  icon: {
+    fontSize: 20,
+  },
+  iconVariant: {
+    opacity: 0.9,
+    marginRight: theme.spacing.unit,
+  },
+  message: {
+    display: 'flex',
+  
+
+  },
 });
 
 export class VenCreatePage extends React.Component {
@@ -89,7 +109,7 @@ export class VenCreatePage extends React.Component {
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
-                         <VenCreate classes={ classes } vtnConfiguration={ven_create.parameters}/>
+                         <VenCreate classes={ classes } vtnConfiguration={ven_create.parameters} createVen={this.props.venActions.createVen}/>
                        </TabContainer> }
     </div>
 
@@ -109,7 +129,8 @@ function mapStateToProps( state ) {
 
 function mapDispatchToProps( dispatch ) {
   return {
-    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch )
+    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch ),
+    venActions: bindActionCreators( venActions, dispatch ),
   };
 }
 

@@ -23,7 +23,7 @@ export default function venReducer( state = initialState.ven, action ) {
       return newState;
 
     case types.LOAD_VEN_ERROR:
-      return state;
+      return state;   
 
     default:
       return state;

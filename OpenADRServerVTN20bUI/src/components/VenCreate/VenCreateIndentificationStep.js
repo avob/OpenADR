@@ -74,11 +74,11 @@ export class VenCreateIndentificationStep extends React.Component {
           <FormControlLabel key="generate_rsa_radio" value="rsa"
                       control={ <Radio color="primary" /> }
                       label="Generate RSA certificate"
-                      labelPlacement="start" />,
+                      labelPlacement="end" />,
     <FormControlLabel key="generate_ecc_radio"  value="ecc"
                       control={ <Radio color="primary" /> }
                       label="Generate ECC certificate"
-                      labelPlacement="start" />
+                      labelPlacement="end" />
         ]
       }
 
@@ -149,7 +149,7 @@ export class VenCreateIndentificationStep extends React.Component {
               <FormControlLabel value="no" style={{marginLeft:0}}
                                 control={ <Radio color="primary" /> }
                                 label="Provide VenID fingerprint"
-                                labelPlacement="start" />
+                                labelPlacement="end" />
 
               {generateOptionView }
 
