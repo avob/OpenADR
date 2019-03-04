@@ -68,18 +68,19 @@ public class VenService extends AbstractUserService<Ven> {
 
 	public Optional<File> generateCertificateIfRequired(VenCreateDto dto, Ven ven) throws GenerateX509VenException {
 
-		if (generateX509VenService != null) {
+		if (dto.getAuthenticationType() != null && !"no".equals(dto.getAuthenticationType())) {
 
-			if (!"no".equals(dto.getAuthenticationType())) {
+			if (generateX509VenService != null) {
 				File generateCredentials = generateX509VenService.generateCredentials(dto, ven);
 				return Optional.of(generateCredentials);
+			} else {
+				throw new GenerateX509VenException(
+						"Client certificate feature require CA certificate to be provided to the vtn");
 			}
-
-			return Optional.empty();
 		}
 
-		throw new GenerateX509VenException(
-				"Client certificate feature require CA certificate to be provided to the vtn");
+		return Optional.empty();
+
 	}
 
 	@Override
