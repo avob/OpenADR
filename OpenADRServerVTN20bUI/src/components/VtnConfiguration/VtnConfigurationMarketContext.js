@@ -132,8 +132,7 @@ export class VtnConfigurationMarketContext extends React.Component {
                                            classes={ classes }
                                            context={ context }
                                            handleDeleteMarketContext={ this.handleDeleteMarketContext( context.id ) }
-                                           handleEditMarketContext={ this.handleEditMarketContext( context ) }
-                                           handleCancelMarketContextButtonClick={ this.handleCancelMarketContextButtonClick } />
+                                           handleEditMarketContext={ this.handleEditMarketContext( context ) } />
       );
     }
 

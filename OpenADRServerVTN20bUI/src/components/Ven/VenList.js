@@ -23,13 +23,6 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 
 
 
-import Avatar from '@material-ui/core/Avatar';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemText from '@material-ui/core/ListItemText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Dialog from '@material-ui/core/Dialog';
 
 import ChipInput from 'material-ui-chip-input'
 
@@ -42,71 +35,12 @@ import GridListTile from '@material-ui/core/GridListTile';
 
 import { VtnConfigurationVenCard } from '../common/VtnConfigurationCard'
 
+import { MarketContextSelectDialog, GroupSelectDialog } from '../common/VtnconfigurationDialog'
+
 import { history } from '../../store/configureStore';
 
 
 
-var MarketContextSelectDialog = (props) => {
-  const {close} = props;
-  return (
-  <Dialog open={ props.open } onClose={ () => {
-                                        props.close()
-                                      } }>
-    <DialogTitle>
-      Filter by Market Context
-    </DialogTitle>
-    <div>
-      <List>
-        { props.marketContext.map( context => (
-            <ListItem button
-                      onClick={ () => {
-                                  props.close( context )
-                                } }
-                      key={ context }>
-              <ListItemAvatar>
-                <Avatar style={ { backgroundColor: context.color } }>
-                  <ExtensionIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary={ context.name } />
-            </ListItem>
-          ) ) }
-      </List>
-    </div>
-  </Dialog>
-  );
-}
-
-var GroupSelectDialog = (props) => {
-  const {close} = props;
-  return (
-  <Dialog open={ props.open } onClose={ () => {
-                                        props.close()
-                                      } }>
-    <DialogTitle>
-      Filter by Group
-    </DialogTitle>
-    <div>
-      <List>
-        { props.group.map( g => (
-            <ListItem button
-                      onClick={ () => {
-                                  props.close( g )
-                                } }
-                      key={ g }>
-              <ListItemAvatar>
-                <Avatar style={ { backgroundColor: '#bbb' } }>
-                  <GroupWorkIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary={ g.name } />
-            </ListItem>
-          ) ) }
-      </List>
-    </div>
-  </Dialog>
-  );
-}
 
 var MarketContextChip = (props) => {
   return (
@@ -251,7 +185,8 @@ export class VenList extends React.Component {
               </IconButton>
               <MarketContextSelectDialog marketContext={ [ { name: 'http://oadr.avob.com', color: '#0000ff' } ] }
                                          open={ this.state.marketContextSelectDialogOpen }
-                                         close={ this.handleMarketContextSelectClose } />
+                                         close={ this.handleMarketContextSelectClose } 
+                                         title="Filter by Market Context"/>
               <IconButton className={ classes.iconButton }
                           aria-label="group"
                           onClick={ this.handleGroupSelectOpen }>
@@ -260,7 +195,8 @@ export class VenList extends React.Component {
               </IconButton>
               <GroupSelectDialog group={ [ { name: 'mouaiccool' } ] }
                                  open={ this.state.groupSelectDialogOpen }
-                                 close={ this.handleGroupSelectClose } />
+                                 close={ this.handleGroupSelectClose }
+                                 title="Filter by Group" />
               <IconButton className={ classes.iconButton } aria-label="Search">
                 <SearchIcon />
               </IconButton>

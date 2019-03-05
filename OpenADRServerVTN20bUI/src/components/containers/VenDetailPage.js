@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import * as actions from '../../actions/venActions';
+import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions';
+import * as venActions from '../../actions/venActions';
 
 import { withStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
@@ -56,7 +57,17 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
   },
- 
+
+  gridList: {
+    flexWrap: 'nowrap',
+    // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
+    transform: 'translateZ(0)',
+  },
+  title: {
+    color: theme.palette.primary.light,
+  },
+
+
 });
 
 export class VenDetailPage extends React.Component {
@@ -72,13 +83,16 @@ export class VenDetailPage extends React.Component {
 
 
   componentDidMount() {
-    this.props.actions.loadVenDetail( this.props.match.params.username );
+    this.props.vtnConfigurationActions.loadMarketContext();
+    this.props.vtnConfigurationActions.loadGroup();
+    this.props.venActions.loadVenDetail( this.props.match.params.username );
+    this.props.venActions.loadVenGroup( this.props.match.params.username );
+    this.props.venActions.loadVenMarketContext( this.props.match.params.username );
   }
 
   render() {
     const {classes, ven_detail} = this.props;
     const {value} = this.state;
-    console.log( ven_detail );
     return (
     <div className={ classes.root }>
       <Tabs value={ this.state.value }
@@ -87,22 +101,26 @@ export class VenDetailPage extends React.Component {
             textColor="primary"
             centered>
         <Tab label="VEN Settings" />
-        <Tab label="Registrations" />
-        <Tab label="Subscriptions" />
         <Tab label="Reports" />
         <Tab label="OptSchedules" />
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
-                         <VenDetailSettings />
+                         <VenDetailSettings classes={classes}
+                          ven={ven_detail.ven} 
+                          marketContext={ven_detail.marketContext} 
+                          group={ven_detail.group} 
+                          venMarketContext={ven_detail.venMarketContext} 
+                          venGroup={ven_detail.venGroup}
+                          addVenMarketContext={this.props.venActions.addVenMarketContext}
+                          removeVenMarketContext={this.props.venActions.removeVenMarketContext}
+                          addVenGroup={this.props.venActions.addVenGroup}
+                          removeVenGroup={this.props.venActions.removeVenGroup}
+                          />
                        </TabContainer> }
       { value === 1 && <TabContainer>
                        </TabContainer> }
       { value === 2 && <TabContainer>
-                       </TabContainer> }
-      { value === 3 && <TabContainer>
-                       </TabContainer> }
-      { value === 4 && <TabContainer>
                        </TabContainer> }
     </div>
 
@@ -111,7 +129,10 @@ export class VenDetailPage extends React.Component {
 }
 
 VenDetailPage.propTypes = {
-  actions: PropTypes.object.isRequired
+  venActions: PropTypes.object.isRequired,
+  vtnConfigurationActions: PropTypes.object.isRequired,
+
+  
 };
 
 function mapStateToProps( state ) {
@@ -122,7 +143,8 @@ function mapStateToProps( state ) {
 
 function mapDispatchToProps( dispatch ) {
   return {
-    actions: bindActionCreators( actions, dispatch )
+    venActions: bindActionCreators( venActions, dispatch ),
+    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch ),
   };
 }
 

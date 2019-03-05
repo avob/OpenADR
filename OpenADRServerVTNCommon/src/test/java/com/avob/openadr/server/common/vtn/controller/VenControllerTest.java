@@ -163,35 +163,41 @@ public class VenControllerTest {
 
 		// create group
 		String groupName = "group1";
-		this.mockMvc
+		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(GROUP_URL).header("Content-Type", "application/json")
 						.content(mapper.writeValueAsString(new VenGroupDto(groupName))).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201));
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
+		VenGroupDto dto = this.convertMvcResultToDto(andReturn, VenGroupDto.class);
+		assertNotNull(dto);
+		assertNotNull(dto.getId());
+		assertEquals(groupName, dto.getName());
 
 		// add ven to group
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/group")
-						.header("Content-Type", "application/json").param("group", groupName).with(venSession))
+						.header("Content-Type", "application/json").param("groupId", "" + dto.getId()).with(venSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/group")
-						.header("Content-Type", "application/json").param("group", groupName).with(userSession))
+		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/group")
+				.header("Content-Type", "application/json").param("groupId", "" + dto.getId()).with(userSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.post(VEN_URL + "mouaiccool" + "/group")
-						.header("Content-Type", "application/json").param("group", groupName).with(adminSession))
+		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + "mouaiccool" + "/group")
+				.header("Content-Type", "application/json").param("groupId", "" + dto.getId()).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/group")
-						.header("Content-Type", "application/json").param("group", "mouaiccool").with(adminSession))
+						.header("Content-Type", "application/json").param("groupId", "99999999").with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/group")
-						.header("Content-Type", "application/json").param("group", groupName).with(adminSession))
+						.header("Content-Type", "application/json").param("groupId", "mouaiccook").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/group")
+				.header("Content-Type", "application/json").param("groupId", "" + dto.getId()).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		// test ven is member of group
@@ -225,27 +231,32 @@ public class VenControllerTest {
 		// remove ven from group
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/group/remove")
-						.header("Content-Type", "application/json").param("group", groupName).with(venSession))
+						.header("Content-Type", "application/json").param("groupId", "" + groupId).with(venSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/group/remove")
-						.header("Content-Type", "application/json").param("group", groupName).with(userSession))
+						.header("Content-Type", "application/json").param("groupId", "" + groupId).with(userSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + "mouaiccool" + "/group/remove")
-						.header("Content-Type", "application/json").param("group", groupName).with(adminSession))
+						.header("Content-Type", "application/json").param("groupId", "" + groupId).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/group/remove")
-						.header("Content-Type", "application/json").param("group", "mouaiccool").with(adminSession))
+						.header("Content-Type", "application/json").param("groupId", "mouaiccool").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/group/remove")
+						.header("Content-Type", "application/json").param("groupId", "99999999").with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/group/remove")
-						.header("Content-Type", "application/json").param("group", groupName).with(adminSession))
+						.header("Content-Type", "application/json").param("groupId", "" + groupId).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		// test ven is no longer a member of group
@@ -259,29 +270,37 @@ public class VenControllerTest {
 
 		// create marketContext
 		String marketContextName = "marketContext1";
-		this.mockMvc.perform(MockMvcRequestBuilders.post(MARKET_CONTEXT_URL).header("Content-Type", "application/json")
+		andReturn = this.mockMvc.perform(MockMvcRequestBuilders.post(MARKET_CONTEXT_URL).header("Content-Type", "application/json")
 				.content(mapper.writeValueAsString(new VenMarketContextDto(marketContextName))).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201));
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
+		VenMarketContextDto marketContextDto = this.convertMvcResultToDto(andReturn, VenMarketContextDto.class);
+		assertNotNull(marketContextDto);
+		assertNotNull(marketContextDto.getId());
+		assertEquals(marketContextName, marketContextDto.getName());
 
 		// add ven to marketContext
 		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/marketContext")
-				.header("Content-Type", "application/json").param("marketContext", marketContextName).with(venSession))
+				.header("Content-Type", "application/json").param("marketContextId","" + marketContextDto.getId()).with(venSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/marketContext")
-				.header("Content-Type", "application/json").param("marketContext", marketContextName).with(userSession))
+				.header("Content-Type", "application/json").param("marketContextId", "" + marketContextDto.getId()).with(userSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + "mouaiccool" + "/marketContext")
-				.header("Content-Type", "application/json").param("marketContext", marketContextName)
+				.header("Content-Type", "application/json").param("marketContextId", "" + marketContextDto.getId())
 				.with(adminSession)).andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/marketContext")
-				.header("Content-Type", "application/json").param("marketContext", "mouaiccool").with(adminSession))
+				.header("Content-Type", "application/json").param("marketContextId", "mouaiccool").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+		
+		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/marketContext")
+				.header("Content-Type", "application/json").param("marketContextId", "999999").with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/marketContext")
-				.header("Content-Type", "application/json").param("marketContext", marketContextName)
+				.header("Content-Type", "application/json").param("marketContextId", "" + marketContextDto.getId())
 				.with(adminSession)).andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		// test ven is member of marketContext
@@ -314,23 +333,27 @@ public class VenControllerTest {
 
 		// remove ven from marketContext
 		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/marketContext/remove")
-				.header("Content-Type", "application/json").param("marketContext", marketContextName).with(venSession))
+				.header("Content-Type", "application/json").param("marketContextId", ""+marketcontextId).with(venSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/marketContext/remove")
-				.header("Content-Type", "application/json").param("marketContext", marketContextName).with(userSession))
+				.header("Content-Type", "application/json").param("marketContextId",  ""+marketcontextId).with(userSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + "mouaiccool" + "/marketContext/remove")
-				.header("Content-Type", "application/json").param("marketContext", marketContextName)
+				.header("Content-Type", "application/json").param("marketContextId",  ""+marketcontextId)
 				.with(adminSession)).andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/marketContext/remove")
-				.header("Content-Type", "application/json").param("marketContext", "mouaiccool").with(adminSession))
+				.header("Content-Type", "application/json").param("marketContextId", "mouaiccool").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+		
+		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/marketContext/remove")
+				.header("Content-Type", "application/json").param("marketContextId", "99999999").with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/marketContext/remove")
-				.header("Content-Type", "application/json").param("marketContext", marketContextName)
+				.header("Content-Type", "application/json").param("marketContextId",  ""+marketcontextId)
 				.with(adminSession)).andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		// test ven is no longer a member of marketContext

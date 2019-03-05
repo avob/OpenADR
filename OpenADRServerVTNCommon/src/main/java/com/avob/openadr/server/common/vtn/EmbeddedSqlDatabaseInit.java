@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
+import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
@@ -32,16 +33,25 @@ public class EmbeddedSqlDatabaseInit {
 				.prepare(new VenMarketContextDto(marketContextName, marketContextDescription, marketcontextColor));
 		venMarketContextService.save(marketContext);
 		// rsa test ven
-		Ven prepare = venService.prepare("2E:55:12:81:B9:EE:9C:46:72:1D");
+		VenCreateDto dto = new VenCreateDto();
+		dto.setUsername("2E:55:12:81:B9:EE:9C:46:72:1D");
+		dto.setAuthenticationType("x509");
+		dto.setCommonName("test-rsa.oadr.com");
+		dto.setOadrProfil("20b");
+		Ven prepare = venService.prepare(dto);
 		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
 		venService.save(prepare);
+		
 		// ecc test ven
-		prepare = venService.prepare("15:97:7B:DE:1C:1F:C6:D2:64:84");
+		dto = new VenCreateDto();
+		dto.setUsername("15:97:7B:DE:1C:1F:C6:D2:64:84");
+		dto.setAuthenticationType("x509");
+		dto.setCommonName("test-ecc.oadr.com");
+		dto.setOadrProfil("20b");
+		prepare = venService.prepare(dto);
 		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
 		venService.save(prepare);
-		prepare = venService.prepare("5B:9B:BF:21:33:A0:DF:6B:21:81");
-		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
-		venService.save(prepare);
+		
 
 	}
 }

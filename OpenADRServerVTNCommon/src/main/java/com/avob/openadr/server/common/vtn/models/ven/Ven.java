@@ -94,6 +94,8 @@ public class Ven extends AbstractUser {
 	private Long lastUpdateDatetime;
 	
 	private String commonName;
+	
+	private String authenticationType;
 
 	public Ven() {
 	}

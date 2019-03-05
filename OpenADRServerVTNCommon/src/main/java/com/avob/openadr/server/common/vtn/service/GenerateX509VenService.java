@@ -14,7 +14,8 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
@@ -33,7 +34,7 @@ import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @ConditionalOnProperty(value = VtnConfig.CA_KEY_CONF)
 @Service
@@ -48,6 +49,7 @@ public class GenerateX509VenService {
 	private File writeToFile(String fileName, String fileExtension, String content) throws IOException {
 		Path path = Files.createTempFile(fileName + "-", "." + fileExtension);
 		File file = path.toFile();
+
 		if (file.exists()) {
 			file.delete();
 		}
@@ -97,20 +99,22 @@ public class GenerateX509VenService {
 			File keyPairFile = writeToFile(venCN, "key", OadrHttpSecurity.writeKeyToString(venCred));
 			File fingerprintFile = writeToFile(venCN, "fingerprint", fingerprint);
 
-			Collection<File> filesToArchive = Lists.newArrayList(crtFile, keyPairFile, fingerprintFile, caCrtFile);
+			HashMap<String, File> fileMap = Maps.newHashMap();
+			fileMap.put(venCN + ".crt", crtFile);
+			fileMap.put("ca.crt", caCrtFile);
+			fileMap.put(venCN + ".key", keyPairFile);
+			fileMap.put(venCN + ".fingerprint", fingerprintFile);
 			String archiveName = now + "-" + venCN + "-credentials.tar.gz";
 			Path path = Files.createTempFile(archiveName, "");
 			File outFile = path.toFile();
 			FileOutputStream out = new FileOutputStream(outFile);
 			ArchiveOutputStream o = new TarArchiveOutputStream(out);
+			for (Entry<String, File> fileEntry : fileMap.entrySet()) {
 
-			for (File f : filesToArchive) {
-				// maybe skip directories for formats like AR that don't store directories
-				ArchiveEntry entry = o.createArchiveEntry(f, f.getName());
-				// potentially add more flags to entry
+				ArchiveEntry entry = o.createArchiveEntry(fileEntry.getValue(), fileEntry.getKey());
 				o.putArchiveEntry(entry);
-				if (f.isFile()) {
-					try (InputStream i = new FileInputStream(f.getAbsolutePath())) {
+				if (fileEntry.getValue().isFile()) {
+					try (InputStream i = new FileInputStream(fileEntry.getValue().getAbsolutePath())) {
 						IOUtils.copy(i, o);
 					}
 				}

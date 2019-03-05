@@ -17,15 +17,114 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
       return state;
 
     case types.LOAD_VEN_DETAIL_SUCCESS:
-      console.log( action.payload )
       newState = objectAssign( {}, state, {
-        ven_detail: action.payload
+        ven: action.payload
       } );
       return newState;
 
     case types.LOAD_VEN_DETAIL_ERROR:
       return state;
 
+    case types.LOAD_VEN_MARKET_CONTEXT:
+      return state;
+
+    case types.LOAD_VEN_MARKET_CONTEXT_SUCCESS:
+      newState = objectAssign( {}, state, {
+        venMarketContext: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_VEN_MARKET_CONTEXT_ERROR:
+      return state;
+
+    case types.LOAD_VEN_GROUP:
+      return state;
+
+    case types.LOAD_VEN_GROUP_SUCCESS:
+      newState = objectAssign( {}, state, {
+        venGroup: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_VEN_GROUP_ERROR:
+      return state;
+
+
+
+
+
+     case types.ADD_VEN_MARKET_CONTEXT:
+      return state;
+
+    case types.ADD_VEN_MARKET_CONTEXT_SUCCESS:
+      return state;
+
+
+    case types.ADD_VEN_MARKET_CONTEXT_ERROR:
+      return state;
+
+
+      case types.REMOVE_VEN_MARKET_CONTEXT:
+      return state;
+
+    case types.REMOVE_VEN_MARKET_CONTEXT_SUCCESS:
+      return state;
+
+
+    case types.REMOVE_VEN_MARKET_CONTEXT_ERROR:
+      return state;
+
+
+     case types.ADD_VEN_GROUP:
+      return state;
+
+    case types.ADD_VEN_GROUP_SUCCESS:
+      return state;
+
+
+    case types.ADD_VEN_GROUP_ERROR:
+      return state;
+
+
+      case types.REMOVE_VEN_GROUP:
+      return state;
+
+    case types.REMOVE_VEN_GROUP_SUCCESS:
+      return state;
+
+
+    case types.REMOVE_VEN_GROUP_ERROR:
+      return state;
+
+
+
+
+
+      // MARKET CONTEXT
+    case types.LOAD_MARKET_CONTEXT:
+      return state;
+
+    case types.LOAD_MARKET_CONTEXT_SUCCESS:
+      newState = objectAssign( {}, state, {
+        marketContext: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_MARKET_CONTEXT_ERROR:
+      return state;
+
+     // GROUPS
+    case types.LOAD_GROUP:
+      return state;
+
+    case types.LOAD_GROUP_SUCCESS:
+      newState = objectAssign( {}, state, {
+        group: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_GROUP_ERROR:
+      return state;
 
     default:
       return state;

@@ -83,17 +83,17 @@ public class VenController {
 					.contentType(MediaType.parseMediaType("application/octet-stream")).body(null);
 		}
 		Ven prepare = venService.prepare(dto);
-		 ResponseEntity<InputStreamResource> body = null;
+		ResponseEntity<InputStreamResource> body = null;
 		try {
 			Optional<File> generateCertificateIfRequired = venService.generateCertificateIfRequired(dto, prepare);
 
 			if (generateCertificateIfRequired.isPresent()) {
 				InputStreamResource resource = new InputStreamResource(
 						new FileInputStream(generateCertificateIfRequired.get()));
-				body = ResponseEntity.ok().header("Content-Disposition", "attachment; filename=\"archive.tar\"").contentLength(generateCertificateIfRequired.get().length())
+				body = ResponseEntity.ok().header("Content-Disposition", "attachment; filename=\"archive.tar\"")
+						.contentLength(generateCertificateIfRequired.get().length())
 						.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
-			}
-			else {
+			} else {
 				body = ResponseEntity.status(HttpStatus.CREATED_201).body(null);
 			}
 
@@ -108,8 +108,6 @@ public class VenController {
 		venService.save(prepare);
 		LOGGER.info("Create Ven: " + prepare.getUsername());
 
-		
-		
 		return body;
 	}
 
@@ -221,24 +219,24 @@ public class VenController {
 
 	@RequestMapping(value = "/{venID}/group", method = RequestMethod.POST)
 	@ResponseBody
-	public VenCreateDto addGroupToVen(@PathVariable("venID") String venUsername,
-			@RequestParam("group") String groupName, HttpServletResponse response) {
+	public VenCreateDto addGroupToVen(@PathVariable("venID") String venUsername, @RequestParam("groupId") Long groupId,
+			HttpServletResponse response) {
 		Ven ven = venService.findOneByUsername(venUsername);
 		if (ven == null) {
 			LOGGER.warn("Unknown Ven: " + venUsername);
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return null;
 		}
-		VenGroup findByName = venGroupService.findByName(groupName);
-		if (findByName == null) {
-			LOGGER.warn("Unknown Group: " + groupName);
+		Optional<VenGroup> findByName = venGroupService.findById(groupId);
+		if (!findByName.isPresent()) {
+			LOGGER.warn("Unknown Group: " + groupId);
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return null;
 		}
-		ven.getVenGroups().add(findByName);
+		ven.getVenGroups().add(findByName.get());
 		venService.save(ven);
 		response.setStatus(HttpStatus.OK_200);
-		LOGGER.info("Add Group: " + groupName + " to Ven: " + ven.getUsername());
+		LOGGER.info("Add Group: " + findByName.get().getName() + " to Ven: " + ven.getUsername());
 		return dtoMapper.map(ven, VenCreateDto.class);
 	}
 
@@ -256,7 +254,7 @@ public class VenController {
 
 	@RequestMapping(value = "/{venID}/group/remove", method = RequestMethod.POST)
 	@ResponseBody
-	public void deleteVenGroup(@PathVariable("venID") String venUsername, @RequestParam("group") String groupName,
+	public void deleteVenGroup(@PathVariable("venID") String venUsername, @RequestParam("groupId") Long groupId,
 			HttpServletResponse response) {
 		Ven ven = venService.findOneByUsername(venUsername);
 		if (ven == null) {
@@ -264,38 +262,38 @@ public class VenController {
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return;
 		}
-		VenGroup findByName = venGroupService.findByName(groupName);
-		if (findByName == null) {
-			LOGGER.warn("Unknown Group: " + groupName);
+		Optional<VenGroup> findByName = venGroupService.findById(groupId);
+		if (!findByName.isPresent()) {
+			LOGGER.warn("Unknown Group: " + groupId);
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return;
 		}
-		ven.getVenGroups().remove(findByName);
+		ven.getVenGroups().remove(findByName.get());
 		venService.save(ven);
-		LOGGER.info("Remove Group: " + groupName + " from Ven: " + ven.getUsername());
+		LOGGER.info("Remove Group: " + findByName.get().getName() + " from Ven: " + ven.getUsername());
 		response.setStatus(HttpStatus.OK_200);
 	}
 
 	@RequestMapping(value = "/{venID}/marketContext", method = RequestMethod.POST)
 	@ResponseBody
 	public VenCreateDto addMarketContextToVen(@PathVariable("venID") String venUsername,
-			@RequestParam("marketContext") String marketContextName, HttpServletResponse response) {
+			@RequestParam("marketContextId") Long marketContextId, HttpServletResponse response) {
 		Ven ven = venService.findOneByUsername(venUsername);
 		if (ven == null) {
 			LOGGER.warn("Unknown Ven: " + venUsername);
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return null;
 		}
-		VenMarketContext marketContext = venMarketContextService.findOneByName(marketContextName);
-		if (marketContext == null) {
-			LOGGER.warn("Unknown MarketContext: " + marketContextName);
+		Optional<VenMarketContext> marketContext = venMarketContextService.findById(marketContextId);
+		if (!marketContext.isPresent()) {
+			LOGGER.warn("Unknown MarketContext: " + marketContextId);
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return null;
 		}
-		ven.getVenMarketContexts().add(marketContext);
+		ven.getVenMarketContexts().add(marketContext.get());
 		venService.save(ven);
 		response.setStatus(HttpStatus.OK_200);
-		LOGGER.info("Add MarketContext: " + marketContextName + " to Ven: " + ven.getUsername());
+		LOGGER.info("Add MarketContext: " + marketContext.get().getName() + " to Ven: " + ven.getUsername());
 		return dtoMapper.map(ven, VenCreateDto.class);
 	}
 
@@ -315,23 +313,23 @@ public class VenController {
 	@RequestMapping(value = "/{venID}/marketContext/remove", method = RequestMethod.POST)
 	@ResponseBody
 	public void deleteVenMarketContext(@PathVariable("venID") String venUsername,
-			@RequestParam("marketContext") String marketContextName, HttpServletResponse response) {
+			@RequestParam("marketContextId") Long marketContextId, HttpServletResponse response) {
 		Ven ven = venService.findOneByUsername(venUsername);
 		if (ven == null) {
 			LOGGER.warn("Unknown Ven: " + venUsername);
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return;
 		}
-		VenMarketContext marketContext = venMarketContextService.findOneByName(marketContextName);
-		if (marketContext == null) {
-			LOGGER.warn("Unknown MarketContext: " + marketContextName);
+		Optional<VenMarketContext> marketContext = venMarketContextService.findById(marketContextId);
+		if (!marketContext.isPresent()) {
+			LOGGER.warn("Unknown MarketContext: " + marketContextId);
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return;
 		}
-		ven.getVenMarketContexts().remove(marketContext);
+		ven.getVenMarketContexts().remove(marketContext.get());
 		venService.save(ven);
 		response.setStatus(HttpStatus.OK_200);
-		LOGGER.info("Remove MarketContext: " + marketContextName + " from Ven: " + ven.getUsername());
+		LOGGER.info("Remove MarketContext: " + marketContext.get().getName() + " from Ven: " + ven.getUsername());
 	}
 
 	@RequestMapping(value = "/{venID}/cleanRegistration", method = RequestMethod.POST)
