@@ -62,8 +62,8 @@ const styles = theme => ({
   stepper: {
     backgroundColor: '#fafafa'
   },
-   warning: {
-    backgroundColor: amber[700],
+  warning: {
+    backgroundColor: amber[ 700 ],
   },
   icon: {
     fontSize: 20,
@@ -74,7 +74,7 @@ const styles = theme => ({
   },
   message: {
     display: 'flex',
-  
+
 
   },
 });
@@ -109,7 +109,9 @@ export class VenCreatePage extends React.Component {
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
-                         <VenCreate classes={ classes } vtnConfiguration={ven_create.parameters} createVen={this.props.venActions.createVen}/>
+                         <VenCreate classes={ classes }
+                                    vtnConfiguration={ ven_create.parameters }
+                                    createVen={ this.props.venActions.createVen } />
                        </TabContainer> }
     </div>
 

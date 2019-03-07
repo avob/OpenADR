@@ -46,7 +46,9 @@ var VtnConfigurationCard = (props) => {
                            <CancelIcon />
                          </IconButton> } />
     <Divider variant="middle" />
-    <CardActionArea onClick={ (e) => { if(props.edit) props.edit(e) } }>
+    <CardActionArea onClick={ (e) => {
+                                if ( props.edit ) props.edit( e )
+                              } }>
       <CardContent style={ { minHeight: 120, maxHeight: 120 } }>
         <Typography gutterBottom
                     variant="title"
@@ -88,10 +90,9 @@ var VtnConfigurationCard = (props) => {
 
 export function VtnConfigurationMarketContextCard( props ) {
   var close = null;
-  if(props.handleDeleteMarketContext){
+  if ( props.handleDeleteMarketContext ) {
     close = props.handleDeleteMarketContext
-  }
-  else if(props.handleRemoveVenMarketContext){
+  } else if ( props.handleRemoveVenMarketContext ) {
     close = props.handleRemoveVenMarketContext
   }
   return (
@@ -109,10 +110,9 @@ export function VtnConfigurationMarketContextCard( props ) {
 
 export function VtnConfigurationGroupCard( props ) {
   var close = null;
-  if(props.handleDeleteGroup){
+  if ( props.handleDeleteGroup ) {
     close = props.handleDeleteGroup
-  }
-  else if(props.handleRemoveVenGroup){
+  } else if ( props.handleRemoveVenGroup ) {
     close = props.handleRemoveVenGroup
   }
   return (
@@ -120,7 +120,7 @@ export function VtnConfigurationGroupCard( props ) {
                         color="#bbb"
                         name={ props.group.name }
                         description={ props.group.description }
-                        close={ close}
+                        close={ close }
                         edit={ props.handleEditGroup }
                         cardType={ "Group" }
                         icon={ <GroupWorkIcon style={ { height: 30, width: 30 } } /> }

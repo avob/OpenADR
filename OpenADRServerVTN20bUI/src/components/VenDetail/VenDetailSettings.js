@@ -39,21 +39,22 @@ import SearchIcon from '@material-ui/icons/Search';
 
 
 
-const theme = createMuiTheme({
+const theme = createMuiTheme( {
   palette: {
     primary: green,
   },
-  typography: { useNextVariants: true },
-});
+  typography: {
+    useNextVariants: true
+  },
+} );
 
 
-var VenTextField = ( props ) => {
+var VenTextField = (props) => {
   return (
   <TextField label={ props.field }
-             defaultValue={ props.value }
+             value={ props.value }
              className={ props.className }
              margin="normal"
-             fullWidth={true}
              InputProps={ { readOnly: true, } } />
 
   );
@@ -61,40 +62,40 @@ var VenTextField = ( props ) => {
 
 var MarketContextGridList = (props) => {
   return (
-    <div className={props.classes.root}>
-      <GridList className={props.classes.gridList} cols={3} spacing={0} cellHeight="auto">
-        {props.marketContext.map(context => (
-          <GridListTile key={context.id} className={props.classes.tile}>
-            <VtnConfigurationMarketContextCard 
-                                           classes={ props.classes }
-                                           context={ context }
-                                           handleRemoveVenMarketContext={ props.handleRemoveVenMarketContext(context) }
-                                           />
-            
+  <div className={ props.classes.root }>
+    <GridList className={ props.classes.gridList }
+              cols={ 3 }
+              spacing={ 0 }
+              cellHeight="auto">
+      { props.marketContext.map( context => (
+          <GridListTile key={ context.id } className={ props.classes.tile }>
+            <VtnConfigurationMarketContextCard classes={ props.classes }
+                                               context={ context }
+                                               handleRemoveVenMarketContext={ props.handleRemoveVenMarketContext( context ) } />
           </GridListTile>
-        ))}
-      </GridList>
-    </div>
+        ) ) }
+    </GridList>
+  </div>
   );
 }
 
 var GroupGridList = (props) => {
 
   return (
-    <div className={props.classes.root}>
-      <GridList className={props.classes.gridList} cols={3} spacing={0} cellHeight="auto">
-        {props.group.map(g => (
-          <GridListTile key={g.id} className={props.classes.tile}>
-            <VtnConfigurationGroupCard 
-                                           classes={ props.classes }
-                                           group={ g }
-                                           handleRemoveVenGroup={ props.handleRemoveVenGroup(g) }
-                                           />
-            
+  <div className={ props.classes.root }>
+    <GridList className={ props.classes.gridList }
+              cols={ 3 }
+              spacing={ 0 }
+              cellHeight="auto">
+      { props.group.map( g => (
+          <GridListTile key={ g.id } className={ props.classes.tile }>
+            <VtnConfigurationGroupCard classes={ props.classes }
+                                       group={ g }
+                                       handleRemoveVenGroup={ props.handleRemoveVenGroup( g ) } />
           </GridListTile>
-        ))}
-      </GridList>
-    </div>
+        ) ) }
+    </GridList>
+  </div>
   );
 }
 
@@ -110,275 +111,255 @@ export class VenDetailSettings extends React.Component {
   }
 
   handleMarketContextSelectOpen = () => {
-    this.setState({marketContextSelectDialogOpen: true});
+    this.setState( {
+      marketContextSelectDialogOpen: true
+    } );
   }
 
   handleMarketContextSelectClose = (context) => {
-    if(context) {
-      this.props.addVenMarketContext(this.props.ven.username, context.id)
+    if ( context ) {
+      this.props.addVenMarketContext( this.props.ven.username, context.id )
     }
-    this.setState({marketContextSelectDialogOpen: false});
+    this.setState( {
+      marketContextSelectDialogOpen: false
+    } );
   }
 
   handleGroupSelectOpen = () => {
-    this.setState({groupSelectDialogOpen: true});
+    this.setState( {
+      groupSelectDialogOpen: true
+    } );
   }
 
   handleGroupSelectClose = (group) => {
-    console.log(group)
-    if(group) {
-      this.props.addVenGroup(this.props.ven.username, group.id)
+    console.log( group )
+    if ( group ) {
+      this.props.addVenGroup( this.props.ven.username, group.id )
     }
-    this.setState({groupSelectDialogOpen: false});
+    this.setState( {
+      groupSelectDialogOpen: false
+    } );
   }
 
   handleRemoveVenMarketContext = (context) => {
     return () => {
-      console.log(context)
-      this.props.removeVenMarketContext(this.props.ven.username, context.id)
+      console.log( context )
+      this.props.removeVenMarketContext( this.props.ven.username, context.id )
     }
   }
 
   handleRemoveVenGroup = (group) => {
     return () => {
-      console.log(group)
-      this.props.removeVenGroup(this.props.ven.username, group.id)
+      console.log( group )
+      this.props.removeVenGroup( this.props.ven.username, group.id )
     }
   }
 
   render() {
     const {classes, ven, marketContext, group, venMarketContext, venGroup} = this.props;
-
+    console.log(ven)
     var registrationPanel = null;
 
     var notSubscribedMarketContext = [];
     var venMarketContextId = [];
-    for(var i in venMarketContext){
-      venMarketContextId.push(venMarketContext[i].id);
+    for (var i in venMarketContext) {
+      venMarketContextId.push( venMarketContext[ i ].id );
     }
-    for(var i in marketContext){
-      if(venMarketContextId.indexOf(marketContext[i].id) == -1) {
-        notSubscribedMarketContext.push(marketContext[i])
+    for (var i in marketContext) {
+      if ( venMarketContextId.indexOf( marketContext[ i ].id ) == -1 ) {
+        notSubscribedMarketContext.push( marketContext[ i ] )
       }
     }
 
     var notAddedGroup = [];
     var venGroupId = [];
-    for(var i in venGroup){
-      venGroupId.push(venGroup[i].id);
+    for (var i in venGroup) {
+      venGroupId.push( venGroup[ i ].id );
     }
-    for(var i in group){
-      if(venGroupId.indexOf(group[i].id) == -1) {
-        notAddedGroup.push(group[i])
+    for (var i in group) {
+      if ( venGroupId.indexOf( group[ i ].id ) == -1 ) {
+        notAddedGroup.push( group[ i ] )
       }
     }
 
     var name = ven.username;
-    if(ven.commonName) {
+    if ( ven.commonName ) {
       name = ven.commonName
     }
-    if(ven.registrationId == null) {
-      registrationPanel = <FormControl className={ classes.formControl } fullWidth={true}>
-            <TextField
-                  className={classes.textField}
-                  label="Not Registered"
-                  value="VEN has not created a registration party"
-                  variant="outlined"
-                  InputProps={ { readOnly: true } }
-                />
-                </FormControl>
-                
+    if ( ven.registrationId == null ) {
+      registrationPanel = <FormControl className={ classes.formControl } fullWidth={ true }>
+                            <TextField className={ classes.textField }
+                                       label="Not Registered"
+                                       value="VEN has not created a registration party"
+                                       variant="outlined"
+                                       InputProps={ { readOnly: true, shrink: true  } } />
+                          </FormControl>
+
+    } else {
+      registrationPanel = <MuiThemeProvider theme={theme}>
+                          <FormControl className={ classes.formControl } >
+                            <TextField className={ classes.textField }
+                                       label="Registered"
+                                       fullwidth={ true }
+                                       value="Registered"
+                                       variant="filled"
+                                       InputProps={ { readOnly: true, shrink: true  } } />
+                          </FormControl>
+                          </MuiThemeProvider>
     }
-    else {
-      registrationPanel = <MuiThemeProvider >
-                <TextField
-                  className={classes.textField}
-                  label="Not Registered"
-                  fullwidth={true}
-                  value="VEN has not created a registration party"
-                  variant="outlined"
-                  InputProps={ { readOnly: true } }
-                />
-              </MuiThemeProvider>
-    }
-    
+
     return (
-    <div  className={ classes.root }>
-     <Typography gutterBottom
-                    variant="title"
-                    component="h2">
-         Status
-        </Typography>
-    <Grid container>
-      <Grid container
-            spacing={ 24 }>
-
-        <Grid item xs={ 4 }>
-          <VtnConfigurationVenCard key={ 'ven_card_'  }
-                                 classes={ classes }
-                                 ven={ ven }
-                      />
-        </Grid>
-
-        <Grid item xs={ 8 }>
+    <div className={ classes.root }>
+      <Typography gutterBottom
+                  variant="title"
+                  component="h2">
+        Status
+      </Typography>
+      <Grid container>
+        <Grid container spacing={ 24 }>
+          <Grid item xs={ 4 }>
+            <VtnConfigurationVenCard key={ 'ven_card_' }
+                                     classes={ classes }
+                                     ven={ ven } />
+          </Grid>
+          <Grid item xs={ 8 }>
             <Grid container>
-              <Grid container 
-                    spacing={ 24 }>
+              <Grid container spacing={ 24 }>
                 <Grid item xs={ 12 }>
-                   <Typography gutterBottom
+                  <Typography gutterBottom
                               align="center"
                               variant="headline"
                               component="h3">
-                   {(ven.oadrProfil) == "20b" ? "Oadr 2.0b VEN": "Oadr 2.0a VEN"}  - {name}
+                    { (ven.oadrProfil) == '20b' ? 'Oadr 2.0b VEN' : 'Oadr 2.0a VEN' } -
+                    { name }
                   </Typography>
-
                 </Grid>
-        
               </Grid>
-              <Grid container 
-                    spacing={ 24 }>
-                    
-                    <Grid item xs={ 12 }>
-                       {registrationPanel}
-                    </Grid>
-               </Grid>
+              <Grid container spacing={ 24 }>
+                <Grid item xs={ 12 }>
+                  { registrationPanel }
+                </Grid>
+              </Grid>
             </Grid>
-            
-                            
+          </Grid>
         </Grid>
-
-
-
-      </Grid>
       </Grid>
       <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
       <Typography gutterBottom
                   variant="title"
                   component="h2">
-       Settings
+        Settings
       </Typography>
-      <Grid container
-          spacing={ 24 }>
-
-      <Grid item xs={ 3 }>
-          <VenTextField field="Transport" value={ven.transport} />
+      <Grid container spacing={ 24 }>
+        <Grid item xs={ 3 }>
+          <FormControl className={ classes.formControl }>
+            <VenTextField className={ classes.textField } field="Transport" value={ ven.transport } />
+          </FormControl>
+        </Grid>
+        <Grid item xs={ 3 }>
+          <FormControl className={ classes.formControl }>
+            <VenTextField className={ classes.textField } field="Authentication Method" value={ ven.authenticationType } />
+          </FormControl>
+        </Grid>
+        <Grid item xs={ 3 }>
+          <FormControl className={ classes.formControl }>
+            <VenTextField className={ classes.textField } field="Pull Model" value={ ven.httpPullModel } />
+          </FormControl>
+        </Grid>
+        <Grid item xs={ 3 }>
+          <FormControl className={ classes.formControl }>
+            <VenTextField className={ classes.textField } field="Push Url" value={ ven.pushUrl } />
+          </FormControl>
+        </Grid>
       </Grid>
-      <Grid item xs={ 3 }>
-          <VenTextField field="Authentication Method" value={ven.authenticationType} />
-      </Grid>
-      <Grid item xs={ 3 }>
-          <VenTextField field="Pull Model" value={ven.httpPullModel} />
-      </Grid>
-      <Grid item xs={ 3 }>
-          <VenTextField field="Push Url" value={ven.pushUrl} />
-      </Grid>
-
-      </Grid>
-
-
-      {/* MarketContext Row */}
+      { /* MarketContext Row */ }
       <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
       <Typography gutterBottom
                   variant="title"
                   component="h2">
         Market Context
       </Typography>
-
-       <Grid container
-          spacing={ 24 }>
-          <Grid item xs={ 6 }>
-            <ChipInput label="Filters"
-                       placeholder="Filters"
-                       value={ this.state.filter }
-                       onAdd={ this.handleAddChip }
-                       onDelete={ this.handleDeleteChip }
-                       fullWidth={ true } />
-          </Grid>
-           <Grid item xs={1} >
-              <IconButton className={ classes.iconButton } aria-label="Search">
-                <SearchIcon />
-              </IconButton>
-          </Grid>
-          <Grid item xs={ 3 }>
-            <Button key="btn_create"
-                    style={ { marginTop: 15 } }
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                    className={ classes.button }
-                    onClick={ this.handleMarketContextSelectOpen }>
-              <AddIcon />Subscribe to a Market Context
-            </Button>
-             <MarketContextSelectDialog marketContext={ notSubscribedMarketContext }
-                                         open={ this.state.marketContextSelectDialogOpen }
-                                         close={ this.handleMarketContextSelectClose } 
-                                         title="Add VEN to Market Context"/>
-          </Grid>
-
-         
+      <Grid container spacing={ 24 }>
+        <Grid item xs={ 6 }>
+          <ChipInput label="Filters"
+                     placeholder="Filters"
+                     value={ this.state.filter }
+                     onAdd={ this.handleAddChip }
+                     onDelete={ this.handleDeleteChip }
+                     fullWidth={ true } />
         </Grid>
-
-
-      <Grid container
-          spacing={ 24 }>
-        <Grid item xs={ 12 }>
-            <MarketContextGridList classes={classes} marketContext={venMarketContext} handleRemoveVenMarketContext={this.handleRemoveVenMarketContext}/>
+        <Grid item xs={ 1 }>
+          <IconButton className={ classes.iconButton } aria-label="Search">
+            <SearchIcon />
+          </IconButton>
         </Grid>
-    
+        <Grid item xs={ 3 }>
+          <Button key="btn_create"
+                  style={ { marginTop: 15 } }
+                  variant="outlined"
+                  color="primary"
+                  size="small"
+                  className={ classes.button }
+                  onClick={ this.handleMarketContextSelectOpen }>
+            <AddIcon />Subscribe to a Market Context
+          </Button>
+          <MarketContextSelectDialog marketContext={ notSubscribedMarketContext }
+                                     open={ this.state.marketContextSelectDialogOpen }
+                                     close={ this.handleMarketContextSelectClose }
+                                     title="Add VEN to Market Context" />
+        </Grid>
       </Grid>
-
-    {/* Group Row */}
+      <Grid container spacing={ 24 }>
+        <Grid item xs={ 12 }>
+          <MarketContextGridList classes={ classes }
+                                 marketContext={ venMarketContext }
+                                 handleRemoveVenMarketContext={ this.handleRemoveVenMarketContext } />
+        </Grid>
+      </Grid>
+      { /* Group Row */ }
       <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
       <Typography gutterBottom
                   variant="title"
                   component="h2">
         Group
       </Typography>
-
-       <Grid container
-          spacing={ 24 }>
-          <Grid item xs={ 6 }>
-            <ChipInput label="Filters"
-                       placeholder="Filters"
-                       value={ this.state.filter }
-                       onAdd={ this.handleAddChip }
-                       onDelete={ this.handleDeleteChip }
-                       fullWidth={ true } />
-          </Grid>
-           <Grid item xs={1} >
-              <IconButton className={ classes.iconButton } aria-label="Search">
-                <SearchIcon />
-              </IconButton>
-          </Grid>
-          <Grid item xs={ 3 }>
-            <Button key="btn_create"
-                    style={ { marginTop: 15 } }
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                    className={ classes.button }
-                    onClick={ this.handleGroupSelectOpen }>
-              <AddIcon />Add to a Group
-            </Button>
-
-             <GroupSelectDialog group={ notAddedGroup }
-                                 open={ this.state.groupSelectDialogOpen }
-                                 close={ this.handleGroupSelectClose }
-                                 title="Add VEN to group:" />
-          </Grid>
-
-         
+      <Grid container spacing={ 24 }>
+        <Grid item xs={ 6 }>
+          <ChipInput label="Filters"
+                     placeholder="Filters"
+                     value={ this.state.filter }
+                     onAdd={ this.handleAddChip }
+                     onDelete={ this.handleDeleteChip }
+                     fullWidth={ true } />
         </Grid>
-
-
-      <Grid container
-          spacing={ 24 }>
-        <Grid item xs={ 12 }>
-            <GroupGridList classes={classes} group={venGroup} handleRemoveVenGroup={this.handleRemoveVenGroup}/>
+        <Grid item xs={ 1 }>
+          <IconButton className={ classes.iconButton } aria-label="Search">
+            <SearchIcon />
+          </IconButton>
         </Grid>
-    
+        <Grid item xs={ 3 }>
+          <Button key="btn_create"
+                  style={ { marginTop: 15 } }
+                  variant="outlined"
+                  color="primary"
+                  size="small"
+                  className={ classes.button }
+                  onClick={ this.handleGroupSelectOpen }>
+            <AddIcon />Add to a Group
+          </Button>
+          <GroupSelectDialog group={ notAddedGroup }
+                             open={ this.state.groupSelectDialogOpen }
+                             close={ this.handleGroupSelectClose }
+                             title="Add VEN to group:" />
+        </Grid>
       </Grid>
-
+      <Grid container spacing={ 24 }>
+        <Grid item xs={ 12 }>
+          <GroupGridList classes={ classes }
+                         group={ venGroup }
+                         handleRemoveVenGroup={ this.handleRemoveVenGroup } />
+        </Grid>
+      </Grid>
     </div>
     );
   }

@@ -38,8 +38,8 @@ const authenticationTypes = {
 }
 
 function getSteps() {
-      return [ 'Identification settings', 'Authentication settings', 'Confirmation' ];
-    }
+  return [ 'Identification settings', 'Authentication settings', 'Confirmation' ];
+}
 
 
 export class VenCreate extends React.Component {
@@ -65,15 +65,14 @@ export class VenCreate extends React.Component {
 
   handleNext = () => {
     const {activeStep} = this.state;
-    if(activeStep === getSteps().length - 1 ){
+    if ( activeStep === getSteps().length - 1 ) {
       this.handleFinish();
-    }
-    else {
+    } else {
       this.setState( {
         activeStep: activeStep + 1,
       } );
     }
-     
+
   };
 
   handleBack = () => {
@@ -128,27 +127,27 @@ export class VenCreate extends React.Component {
 
   handleCreateVen = () => {
     var dto = {
-      "authenticationType": this.state.authenticationType,
-      "commonName": this.state.venCommonName,
-      "needCertificateGeneration": this.state.needCertificateGeneration,
-      "oadrProfil": this.state.venOadrProfile,
-      "username": this.state.authenticationVenId
+      'authenticationType': this.state.authenticationType,
+      'commonName': this.state.venCommonName,
+      'needCertificateGeneration': this.state.needCertificateGeneration,
+      'oadrProfil': this.state.venOadrProfile,
+      'username': this.state.authenticationVenId
     }
 
-    if(this.state.authenticationType == "login") {
+    if ( this.state.authenticationType == 'login' ) {
       dto.password = this.state.authenticationPassword
     }
 
-    this.props.createVen(dto);
+    this.props.createVen( dto );
   }
-  
+
 
   render() {
     const {classes, vtnConfiguration} = this.props;
     const steps = getSteps();
     const {activeStep} = this.state;
     var that = this;
-    
+
 
     function getStepContent( step ) {
       switch (step) {
@@ -161,8 +160,8 @@ export class VenCreate extends React.Component {
                                                needCertificateGeneration={ that.state.needCertificateGeneration }
                                                handleVenCommonNameChange={ that.handleVenCommonNameChange }
                                                handleVenOadrProfileChange={ that.handleVenOadrProfileChange }
-                                               handleNeedCertificateGenerationChange={ that.handleNeedCertificateGenerationChange } 
-                                               vtnConfiguration={vtnConfiguration}/>;
+                                               handleNeedCertificateGenerationChange={ that.handleNeedCertificateGenerationChange }
+                                               vtnConfiguration={ vtnConfiguration } />;
         case 1:
           return <VenCreateAuthenticationStep classes={ classes }
                                               hasError={ that.state.hasError }
@@ -175,11 +174,11 @@ export class VenCreate extends React.Component {
                                               handleAuthenticationVenIdChange={ that.handleAuthenticationVenIdChange }
                                               handleAuthenticationPasswordChange={ that.handleAuthenticationPasswordChange }
                                               authenticationPasswordConfirm={ that.authenticationPasswordConfirm }
-                                              needLogin={ that.state.authenticationType == 'login' } 
-                                              needCertificateGeneration={that.state.needCertificateGeneration != 'no'}
-                                              vtnConfiguration={vtnConfiguration}/>;
+                                              needLogin={ that.state.authenticationType == 'login' }
+                                              needCertificateGeneration={ that.state.needCertificateGeneration != 'no' }
+                                              vtnConfiguration={ vtnConfiguration } />;
         case 2:
-          return <VenCreateConfirmationStep classes={ classes } ven={that.state}/>;
+          return <VenCreateConfirmationStep classes={ classes } ven={ that.state } />;
         default:
           return 'Unknown step';
       }
@@ -191,11 +190,11 @@ export class VenCreate extends React.Component {
           return that.state.venCommonName != ''
         case 1:
 
-        var hasVenIdWhenNoCertificateGeneration = that.state.needCertificateGeneration != 'no' 
-          || (that.state.needCertificateGeneration == 'no' && that.state.authenticationVenId != '');
+          var hasVenIdWhenNoCertificateGeneration = that.state.needCertificateGeneration != 'no'
+            || (that.state.needCertificateGeneration == 'no' && that.state.authenticationVenId != '');
 
-        var hasValidLoginPasswordWhenLoginAuthentication = that.state.authenticationType != 'login' ||( that.state.authenticationPassword != '' &&
-           that.state.authenticationPasswordConfirm != "" &&  that.state.authenticationPassword == that.state.authenticationPasswordConfirm);
+          var hasValidLoginPasswordWhenLoginAuthentication = that.state.authenticationType != 'login' || (that.state.authenticationPassword != '' &&
+            that.state.authenticationPasswordConfirm != '' && that.state.authenticationPassword == that.state.authenticationPasswordConfirm);
 
           return hasVenIdWhenNoCertificateGeneration && hasValidLoginPasswordWhenLoginAuthentication
         case 2:

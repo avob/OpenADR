@@ -120,7 +120,7 @@ export class VenList extends React.Component {
     var that = this;
     return function ( event ) {
       event.preventDefault();
-      that.props.deleteVen(username)
+      that.props.deleteVen( username )
 
     }
 
@@ -185,8 +185,8 @@ export class VenList extends React.Component {
               </IconButton>
               <MarketContextSelectDialog marketContext={ [ { name: 'http://oadr.avob.com', color: '#0000ff' } ] }
                                          open={ this.state.marketContextSelectDialogOpen }
-                                         close={ this.handleMarketContextSelectClose } 
-                                         title="Filter by Market Context"/>
+                                         close={ this.handleMarketContextSelectClose }
+                                         title="Filter by Market Context" />
               <IconButton className={ classes.iconButton }
                           aria-label="group"
                           onClick={ this.handleGroupSelectOpen }>

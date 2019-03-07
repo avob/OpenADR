@@ -106,17 +106,16 @@ export class VenDetailPage extends React.Component {
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
-                         <VenDetailSettings classes={classes}
-                          ven={ven_detail.ven} 
-                          marketContext={ven_detail.marketContext} 
-                          group={ven_detail.group} 
-                          venMarketContext={ven_detail.venMarketContext} 
-                          venGroup={ven_detail.venGroup}
-                          addVenMarketContext={this.props.venActions.addVenMarketContext}
-                          removeVenMarketContext={this.props.venActions.removeVenMarketContext}
-                          addVenGroup={this.props.venActions.addVenGroup}
-                          removeVenGroup={this.props.venActions.removeVenGroup}
-                          />
+                         <VenDetailSettings classes={ classes }
+                                            ven={ ven_detail.ven }
+                                            marketContext={ ven_detail.marketContext }
+                                            group={ ven_detail.group }
+                                            venMarketContext={ ven_detail.venMarketContext }
+                                            venGroup={ ven_detail.venGroup }
+                                            addVenMarketContext={ this.props.venActions.addVenMarketContext }
+                                            removeVenMarketContext={ this.props.venActions.removeVenMarketContext }
+                                            addVenGroup={ this.props.venActions.addVenGroup }
+                                            removeVenGroup={ this.props.venActions.removeVenGroup } />
                        </TabContainer> }
       { value === 1 && <TabContainer>
                        </TabContainer> }
@@ -132,7 +131,7 @@ VenDetailPage.propTypes = {
   venActions: PropTypes.object.isRequired,
   vtnConfigurationActions: PropTypes.object.isRequired,
 
-  
+
 };
 
 function mapStateToProps( state ) {

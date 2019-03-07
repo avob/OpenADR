@@ -250,4 +250,12 @@ public class Ven extends AbstractUser {
 		this.commonName = commonName;
 	}
 
+	public String getAuthenticationType() {
+		return authenticationType;
+	}
+
+	public void setAuthenticationType(String authenticationType) {
+		this.authenticationType = authenticationType;
+	}
+
 }

@@ -7,13 +7,13 @@ export default {
   ven: [],
   ven_detail: {
     ven: {},
-    marketContext:[],
-    group:[],
-    venMarketContext:[],
-    venGroup:[]
+    marketContext: [],
+    group: [],
+    venMarketContext: [],
+    venGroup: []
   },
   ven_create: {
-    parameters:{}
+    parameters: {}
   },
   account: [],
   event: []

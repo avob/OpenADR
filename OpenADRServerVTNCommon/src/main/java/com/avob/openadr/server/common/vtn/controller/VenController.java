@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
+import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenUpdateDto;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
@@ -66,8 +67,8 @@ public class VenController {
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	@ResponseBody
-	public List<VenCreateDto> listVen() {
-		return dtoMapper.mapList(venService.findAll(), VenCreateDto.class);
+	public List<VenDto> listVen() {
+		return dtoMapper.mapList(venService.findAll(), VenDto.class);
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)
@@ -137,14 +138,14 @@ public class VenController {
 
 	@RequestMapping(value = "/{venID}", method = RequestMethod.GET)
 	@ResponseBody
-	public VenCreateDto findVenByUsername(@PathVariable("venID") String venUsername, HttpServletResponse response) {
+	public VenDto findVenByUsername(@PathVariable("venID") String venUsername, HttpServletResponse response) {
 		Ven ven = venService.findOneByUsername(venUsername);
 		if (ven == null) {
 			LOGGER.warn("Unknown Ven: " + venUsername);
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return null;
 		}
-		return dtoMapper.map(ven, VenCreateDto.class);
+		return dtoMapper.map(ven, VenDto.class);
 	}
 
 	@RequestMapping(value = "/{venID}", method = RequestMethod.DELETE)

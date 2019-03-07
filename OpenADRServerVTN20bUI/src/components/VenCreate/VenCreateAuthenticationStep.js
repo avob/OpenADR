@@ -58,51 +58,50 @@ export class VenCreateAuthenticationStep extends React.Component {
     var loginPasswordView = null;
 
     var missingVenId = false;
-    if(hasError && !this.props.needCertificateGeneration && this.props.authenticationVenId == ""){
+    if ( hasError && !this.props.needCertificateGeneration && this.props.authenticationVenId == '' ) {
       missingVenId = true;
     }
 
-    console.log(this.props)
+    console.log( this.props )
     var missingPassword = null;
-    if(hasError && this.props.needLogin && this.props.authenticationPassword == ""){
+    if ( hasError && this.props.needLogin && this.props.authenticationPassword == '' ) {
       missingPassword = true;
     }
 
     if ( this.props.needLogin ) {
 
       loginPasswordView = <Grid container spacing={ 24 }>
-            <Grid item xs={ 2 } />
-            <Grid item xs={ 4 }>
-               <FormControl className={ classes.formControl }>
-           <TextField required={ true } type="password"
-                                         id="password_textfield"
-                                         label="Password"
-                                         value={ this.props.authenticationPassword }
-                                         className={ classes.textField }
-                                         error={ missingPassword }
-                                         onChange={ this.props.handleAuthenticationPasswordChange }
-                                         InputLabelProps={ { shrink: true, } } />
-          </FormControl>
-            </Grid>
-
-
-
-            <Grid item xs={ 4 }>
-            <FormControl className={ classes.formControl }>
-                                  <TextField required type="password"
-                                        fullWidth={true}
-                                         id="password_confirm_textfield"
-                                         label="Password Confirm"
-                                         value={ this.props.authenticationPasswordConfirm }
-                                         className={ classes.textField }
-                                         error={ this.props.hasError }
-                                         onChange={ this.props.handleAuthenticationPasswordConfirmChange }
-                                         InputLabelProps={ { shrink: true, } } />
-                                </FormControl>
-            </Grid>
-            <Grid item xs={ 2 } />
-          </Grid>
-    } 
+                            <Grid item xs={ 2 } />
+                            <Grid item xs={ 4 }>
+                              <FormControl className={ classes.formControl }>
+                                <TextField required={ true }
+                                           type="password"
+                                           id="password_textfield"
+                                           label="Password"
+                                           value={ this.props.authenticationPassword }
+                                           className={ classes.textField }
+                                           error={ missingPassword }
+                                           onChange={ this.props.handleAuthenticationPasswordChange }
+                                           InputLabelProps={ { shrink: true, } } />
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={ 4 }>
+                              <FormControl className={ classes.formControl }>
+                                <TextField required
+                                           type="password"
+                                           fullWidth={ true }
+                                           id="password_confirm_textfield"
+                                           label="Password Confirm"
+                                           value={ this.props.authenticationPasswordConfirm }
+                                           className={ classes.textField }
+                                           error={ this.props.hasError }
+                                           onChange={ this.props.handleAuthenticationPasswordConfirmChange }
+                                           InputLabelProps={ { shrink: true, } } />
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={ 2 } />
+                          </Grid>
+    }
 
     return (
     <Grid container
@@ -111,38 +110,35 @@ export class VenCreateAuthenticationStep extends React.Component {
       <Grid container spacing={ 24 }>
         <Grid item xs={ 2 } />
         <Grid item xs={ 4 }>
-           <FormControl className={ classes.formControl }>
-       
-        <FormLabel style={ labelStyle } component="label">
+          <FormControl className={ classes.formControl }>
+            <FormLabel style={ labelStyle } component="label">
               VEN Authentication
             </FormLabel>
-        <Select value={ this.props.authenticationType } style={ { marginTop: 0 } }
-                onChange={ this.props.handleAuthenticationTypeChange }
-                inputProps={ { name: 'VEN Authentication Type', id: 'oadr_authentication_select', } }>
-          { authenticationTypeView }
-        </Select>
-      </FormControl>
+            <Select value={ this.props.authenticationType }
+                    style={ { marginTop: 0 } }
+                    onChange={ this.props.handleAuthenticationTypeChange }
+                    inputProps={ { name: 'VEN Authentication Type', id: 'oadr_authentication_select', } }>
+              { authenticationTypeView }
+            </Select>
+          </FormControl>
         </Grid>
-
-
         <Grid item xs={ 4 }>
-        <FormControl className={ classes.formControl }>
-                              <TextField required error={missingVenId}
-                                         id="login_textfield"
-                                         label="VEN Id"
-                                         value={ (this.props.needCertificateGeneration) ? "<generated>" : this.props.authenticationVenId }
-                                         className={ classes.textField }
-                                         error={ missingVenId }
-                                         onChange={ this.props.handleAuthenticationVenIdChange }
-                                         InputLabelProps={ { shrink: true, } } 
-                                         disabled={this.props.needCertificateGeneration}/>
-                            </FormControl>
+          <FormControl className={ classes.formControl }>
+            <TextField required
+                       error={ missingVenId }
+                       id="login_textfield"
+                       label="VEN Id"
+                       value={ (this.props.needCertificateGeneration) ? '<generated>' : this.props.authenticationVenId }
+                       className={ classes.textField }
+                       error={ missingVenId }
+                       onChange={ this.props.handleAuthenticationVenIdChange }
+                       InputLabelProps={ { shrink: true, } }
+                       disabled={ this.props.needCertificateGeneration } />
+          </FormControl>
         </Grid>
         <Grid item xs={ 2 } />
       </Grid>
-
       { loginPasswordView }
-      
     </Grid>
     );
   }

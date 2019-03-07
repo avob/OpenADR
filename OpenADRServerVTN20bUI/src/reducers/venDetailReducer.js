@@ -53,7 +53,7 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
 
 
 
-     case types.ADD_VEN_MARKET_CONTEXT:
+    case types.ADD_VEN_MARKET_CONTEXT:
       return state;
 
     case types.ADD_VEN_MARKET_CONTEXT_SUCCESS:
@@ -64,7 +64,7 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
       return state;
 
 
-      case types.REMOVE_VEN_MARKET_CONTEXT:
+    case types.REMOVE_VEN_MARKET_CONTEXT:
       return state;
 
     case types.REMOVE_VEN_MARKET_CONTEXT_SUCCESS:
@@ -75,7 +75,7 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
       return state;
 
 
-     case types.ADD_VEN_GROUP:
+    case types.ADD_VEN_GROUP:
       return state;
 
     case types.ADD_VEN_GROUP_SUCCESS:
@@ -86,7 +86,7 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
       return state;
 
 
-      case types.REMOVE_VEN_GROUP:
+    case types.REMOVE_VEN_GROUP:
       return state;
 
     case types.REMOVE_VEN_GROUP_SUCCESS:
@@ -113,7 +113,7 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
     case types.LOAD_MARKET_CONTEXT_ERROR:
       return state;
 
-     // GROUPS
+      // GROUPS
     case types.LOAD_GROUP:
       return state;
 

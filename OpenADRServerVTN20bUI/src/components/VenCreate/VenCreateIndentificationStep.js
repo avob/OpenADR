@@ -69,18 +69,20 @@ export class VenCreateIndentificationStep extends React.Component {
     }
 
     var generateOptionView = null;
-    if(this.props.vtnConfiguration && this.props.vtnConfiguration.supportCertificateGeneration){
-        generateOptionView= [
-          <FormControlLabel key="generate_rsa_radio" value="rsa"
-                      control={ <Radio color="primary" /> }
-                      label="Generate RSA certificate"
-                      labelPlacement="end" />,
-    <FormControlLabel key="generate_ecc_radio"  value="ecc"
-                      control={ <Radio color="primary" /> }
-                      label="Generate ECC certificate"
-                      labelPlacement="end" />
-        ]
-      }
+    if ( this.props.vtnConfiguration && this.props.vtnConfiguration.supportCertificateGeneration ) {
+      generateOptionView = [
+        <FormControlLabel key="generate_rsa_radio"
+                          value="rsa"
+                          control={ <Radio color="primary" /> }
+                          label="Generate RSA certificate"
+                          labelPlacement="end" />,
+        <FormControlLabel key="generate_ecc_radio"
+                          value="ecc"
+                          control={ <Radio color="primary" /> }
+                          label="Generate ECC certificate"
+                          labelPlacement="end" />
+      ]
+    }
 
     return (
 
@@ -95,7 +97,7 @@ export class VenCreateIndentificationStep extends React.Component {
               VEN Profile
             </FormLabel>
             <Select autoWidth={ true }
-                    style={ { marginTop: "0" } }
+                    style={ { marginTop: '0' } }
                     value={ this.props.venOadrProfile }
                     onChange={ this.props.handleVenOadrProfileChange }
                     inputProps={ { name: 'OpenADR Profile', id: 'oadr_profile_select', } }>
@@ -104,33 +106,30 @@ export class VenCreateIndentificationStep extends React.Component {
           </FormControl>
         </Grid>
         <Grid item xs={ 4 }>
-        <FormControl className={ classes.formControl }>
-          <TextField required
-                     id="oadr_cn_textfield"
-                     fullWidth={ true }
-                     label="VEN Common Name"
-                     placeholder="myven.oadr.com"
-                     value={ this.props.venCommonName }
-                     className={ classes.textField }
-                     error={ this.props.hasError }
-                     onChange={ this.props.handleVenCommonNameChange }
-                     InputLabelProps={ { shrink: true, } } />
-                 </FormControl>
+          <FormControl className={ classes.formControl }>
+            <TextField required
+                       id="oadr_cn_textfield"
+                       fullWidth={ true }
+                       label="VEN Common Name"
+                       placeholder="myven.oadr.com"
+                       value={ this.props.venCommonName }
+                       className={ classes.textField }
+                       error={ this.props.hasError }
+                       onChange={ this.props.handleVenCommonNameChange }
+                       InputLabelProps={ { shrink: true, } } />
+          </FormControl>
         </Grid>
         <Grid item xs={ 2 } />
       </Grid>
-
       <Grid container
-            style={ { marginTop: 20 } } 
+            style={ { marginTop: 20 } }
             spacing={ 24 }>
         <Grid item xs={ 2 } />
         <Grid item xs={ 8 }>
-        <Divider/>
+          <Divider />
         </Grid>
         <Grid item xs={ 2 } />
       </Grid>
-
-
       <Grid container
             style={ { marginTop: 20 } }
             spacing={ 24 }>
@@ -145,57 +144,46 @@ export class VenCreateIndentificationStep extends React.Component {
                         value={ this.props.needCertificateGeneration }
                         onChange={ this.props.handleNeedCertificateGenerationChange }
                         row>
-
-              <FormControlLabel value="no" style={{marginLeft:0}}
+              <FormControlLabel value="no"
+                                style={ { marginLeft: 0 } }
                                 control={ <Radio color="primary" /> }
                                 label="Provide VenID fingerprint"
                                 labelPlacement="end" />
-
-              {generateOptionView }
-
-              
+              { generateOptionView }
             </RadioGroup>
           </FormControl>
         </Grid>
         <Grid item xs={ 2 } />
       </Grid>
-      
-
       <Grid container
-            style={ { marginTop: 20 } } 
+            style={ { marginTop: 20 } }
             spacing={ 24 }>
         <Grid item xs={ 2 } />
         <Grid item xs={ 8 }>
-        <Divider/>
+          <Divider />
         </Grid>
         <Grid item xs={ 2 } />
       </Grid>
-
       <Grid container
-            style={ { marginTop: 20 } } 
+            style={ { marginTop: 20 } }
             spacing={ 24 }>
         <Grid item xs={ 2 } />
-
         <Grid item xs={ 1 }>
-        <HelpIcon color="disabled" style={{width:40, height:40}}/>
+          <HelpIcon color="disabled" style={ { width: 40, height: 40 } } />
         </Grid>
-
         <Grid item xs={ 6 }>
-        <Typography variant="caption" gutterBottom>
-          VEN MUST have a valid SSL certificate to securely communicate with VTN. VEN identifier (VenID) is a fingerprint of VEN certificate.
-        </Typography>
-
-        <Typography variant="caption" gutterBottom>
-          In case VEN certificate is not generated by VTN, user have to provide VenID corresponding to it's certificate fingerprint
-        </Typography>
-
-        <Typography variant="caption" gutterBottom>
-          In case VEN certificate is generated by VTN, VenID will be computed after certificate generation. 
-          Ven Common Name is used as certificate CN subject entry
-          Certificate will available for download at the confirmation of this form and only at that time.
-          VTN can't re-generate certificate without re-creating a VEN.
-        </Typography>
-
+          <Typography variant="caption" gutterBottom>
+            VEN MUST have a valid SSL certificate to securely communicate with VTN. VEN identifier (VenID) is a fingerprint of VEN certificate.
+          </Typography>
+          <Typography variant="caption" gutterBottom>
+            In case VEN certificate is not generated by VTN, user have to provide VenID corresponding to it's certificate fingerprint
+          </Typography>
+          <Typography variant="caption" gutterBottom>
+            In case VEN certificate is generated by VTN, VenID will be computed after certificate generation.
+            Ven Common Name is used as certificate CN subject entry
+            Certificate will available for download at the confirmation of this form and only at that time.
+            VTN can't re-generate certificate without re-creating a VEN.
+          </Typography>
         </Grid>
         <Grid item xs={ 2 } />
       </Grid>

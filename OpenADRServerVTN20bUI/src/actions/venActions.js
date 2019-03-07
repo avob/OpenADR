@@ -56,18 +56,18 @@ export const loadVenDetail = (username) => {
   }
 }
 
-var saveData = (function () {
-    var a = document.createElement("a");
-    document.body.appendChild(a);
-    a.style = "display: none";
-    return function (data, fileName) {
+var saveData = ( function () {
+  var a = document.createElement( 'a' );
+  document.body.appendChild( a );
+  a.style = 'display: none';
+  return function ( data, fileName ) {
 
-        var url = window.URL.createObjectURL(data);
-        a.href = url;
-        a.download = fileName;
-        a.click();
-        window.URL.revokeObjectURL(url);
-    };
+    var url = window.URL.createObjectURL( data );
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL( url );
+  };
 }());
 
 export const createVen = (ven) => {
@@ -81,7 +81,7 @@ export const createVen = (ven) => {
           responseContentType: 'multipart/form-data'
         } )
           .then( data => {
-            saveData(data.data, ven.commonName+"-credentials.tar")
+            saveData( data.data, ven.commonName + '-credentials.tar' )
             dispatch( {
               type: types.CREATE_VEN_SUCCESS,
               payload: ven
@@ -89,7 +89,7 @@ export const createVen = (ven) => {
             history.push( '/ven' )
           } )
           .catch( err => {
-            console.log(err)
+            console.log( err )
             dispatch( {
               type: types.CREATE_VEN_ERROR,
               payload: err
@@ -111,14 +111,14 @@ export const deleteVen = (venId) => {
           responseContentType: 'application/json'
         } )
           .then( data => {
-       
+
             dispatch( {
               type: types.DELETE_VEN_SUCCESS,
             } );
-            loadVen()(dispatch, getState)
+            loadVen()( dispatch, getState )
           } )
           .catch( err => {
-            console.log(err)
+            console.log( err )
             dispatch( {
               type: types.DELETE_VEN_ERROR,
               payload: err
@@ -147,7 +147,7 @@ export const loadVenGroup = (username) => {
             } );
           } )
           .catch( err => {
-            console.log(err)
+            console.log( err )
             dispatch( {
               type: types.LOAD_VEN_GROUP_ERROR,
               payload: err
@@ -176,7 +176,7 @@ export const loadVenMarketContext = (username) => {
             } );
           } )
           .catch( err => {
-            console.log(err)
+            console.log( err )
             dispatch( {
               type: types.LOAD_VEN_MARKET_CONTEXT_ERROR,
               payload: err
@@ -200,14 +200,14 @@ export const addVenMarketContext = (username, marketContextId) => {
         } )
           .then( data => {
             var marketContext = JSON.parse( data.data );
-            loadVenMarketContext(username)(dispatch, getState)
+            loadVenMarketContext( username )( dispatch, getState )
             dispatch( {
               type: types.ADD_VEN_MARKET_CONTEXT_SUCCESS,
               payload: marketContext
             } );
           } )
           .catch( err => {
-            console.log(err)
+            console.log( err )
             dispatch( {
               type: types.ADD_VEN_MARKET_CONTEXT_ERROR,
               payload: err
@@ -231,14 +231,14 @@ export const addVenGroup = (username, groupId) => {
         } )
           .then( data => {
             var marketContext = JSON.parse( data.data );
-            loadVenGroup(username)(dispatch, getState)
+            loadVenGroup( username )( dispatch, getState )
             dispatch( {
               type: types.ADD_VEN_GROUP_SUCCESS,
               payload: marketContext
             } );
           } )
           .catch( err => {
-            console.log(err)
+            console.log( err )
             dispatch( {
               type: types.ADD_VEN_GROUP_ERROR,
               payload: err
@@ -263,13 +263,13 @@ export const removeVenMarketContext = (username, marketContextId) => {
           responseContentType: 'application/json'
         } )
           .then( data => {
-            loadVenMarketContext(username)(dispatch, getState)
+            loadVenMarketContext( username )( dispatch, getState )
             dispatch( {
               type: types.REMOVE_VEN_MARKET_CONTEXT_SUCCESS,
             } );
           } )
           .catch( err => {
-            console.log(err)
+            console.log( err )
             dispatch( {
               type: types.REMOVE_VEN_MARKET_CONTEXT_ERROR,
               payload: err
@@ -292,13 +292,13 @@ export const removeVenGroup = (username, groupId) => {
           responseContentType: 'application/json'
         } )
           .then( data => {
-            loadVenGroup(username)(dispatch, getState)
+            loadVenGroup( username )( dispatch, getState )
             dispatch( {
               type: types.REMOVE_VEN_GROUP_SUCCESS,
             } );
           } )
           .catch( err => {
-            console.log(err)
+            console.log( err )
             dispatch( {
               type: types.REMOVE_VEN_GROUP_ERROR,
               payload: err
