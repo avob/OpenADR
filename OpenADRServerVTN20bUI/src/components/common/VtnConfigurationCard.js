@@ -129,15 +129,16 @@ export function VtnConfigurationGroupCard( props ) {
 }
 
 export function VtnConfigurationVenCard( props ) {
+  var color = (props.ven.registrationId != null) ? "green" : "#bbb";
   return (
   <VtnConfigurationCard classes={ props.classes }
-                        color="#bbb"
+                        color={color}
                         name={ props.ven.commonName }
                         description={ props.ven.username }
                         close={ props.handleDeleteVen }
                         edit={ props.handleEditVen }
                         cardType={ "VEN" }
-                        icon={ <SettingsInputComponentIcon style={ { height: 30, width: 30 } } /> }
+                        icon={ <SettingsInputComponentIcon style={ { height: 30, width: 30} } /> }
                         actions={ [ <Button key="action_group_vens" size="small" color="primary"> Detail </Button> ] } />
   );
 }

@@ -1,7 +1,5 @@
 package com.avob.openadr.server.oadr20b.vtn.models.venreport.capability;
 
-import java.util.List;
-
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
@@ -10,5 +8,4 @@ public interface ReportCapabilityDescriptionDao<T extends ReportCapabilityDescri
 
 	public T findByRid(String rid);
 
-	public Iterable<T> findByReportRequestIdIn(List<String> reportRequestId);
 }

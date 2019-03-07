@@ -32,7 +32,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrProfiles.OadrProfile;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
-import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
+import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
@@ -98,8 +98,8 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		venService.save(ven);
 
 		// test ven is not registred
-		VenCreateDto venDto = oadrMockMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID,
-				HttpStatus.OK_200, VenCreateDto.class);
+		VenDto venDto = oadrMockMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
+				VenDto.class);
 
 		assertEquals(String.valueOf(ven.getId()), venDto.getId());
 		assertEquals(ven.getUsername(), venDto.getUsername());
@@ -150,7 +150,7 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 
 		// test ven is still not registred
 		venDto = oadrMockMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
-				VenCreateDto.class);
+				VenDto.class);
 
 		assertEquals(String.valueOf(ven.getId()), venDto.getId());
 		assertEquals(ven.getUsername(), venDto.getUsername());
@@ -172,8 +172,6 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 				.withOadrVenName(venName).withOadrHttpPullModel(pullModel).withOadrTransportAddress(transportAddress)
 				.withOadrTransportName(transport).withOadrXmlSignature(xmlSignature).withOadrReportOnly(reportOnly)
 				.build();
-		
-		
 
 		// invalid mismatch payload venID and username auth session
 		oadrCreatedPartyRegistrationType = oadrMockMvc.postEiRegisterPartyAndExpect(anotherVenSession,
@@ -203,7 +201,7 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 
 		// test ven is registred
 		venDto = oadrMockMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
-				VenCreateDto.class);
+				VenDto.class);
 		assertEquals(String.valueOf(ven.getId()), venDto.getId());
 		assertEquals(VEN_ID, venDto.getUsername());
 		assertEquals(venName, venDto.getOadrName());
@@ -211,8 +209,6 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		assertEquals(SchemaVersionEnumeratedType.OADR_20B.value(), venDto.getOadrProfil());
 		assertEquals(transportAddress, venDto.getPushUrl());
 		assertEquals(transport.value(), venDto.getTransport());
-
-		
 
 		// test invalid create oadrCreateRegistration because already registered
 		// and not specifying registrationId
@@ -233,10 +229,9 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 
 		// test ven registration not changed
 		venDto = oadrMockMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
-				VenCreateDto.class);
+				VenDto.class);
 		assertEquals(pullModel, venDto.getHttpPullModel());
 
-		
 		// test update oadrCreateRegistration
 		oadrCreatePartyRegistrationType = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatePartyRegistrationBuilder(requestId, VEN_ID,
@@ -254,7 +249,7 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 
 		// test ven registration changed
 		venDto = oadrMockMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
-				VenCreateDto.class);
+				VenDto.class);
 		assertEquals(newPullModel, venDto.getHttpPullModel());
 
 		// create oadrcancelregistration payload
@@ -282,7 +277,7 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 
 		// test ven is not registred
 		venDto = oadrMockMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
-				VenCreateDto.class);
+				VenDto.class);
 		assertEquals(String.valueOf(ven.getId()), venDto.getId());
 		assertEquals(ven.getUsername(), venDto.getUsername());
 		assertNull(venDto.getHttpPullModel());

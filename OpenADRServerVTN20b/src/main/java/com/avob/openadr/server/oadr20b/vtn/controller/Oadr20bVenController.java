@@ -3,6 +3,7 @@ package com.avob.openadr.server.oadr20b.vtn.controller;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 
@@ -120,8 +121,8 @@ public class Oadr20bVenController {
 		LOGGER.debug("Cancel registration VEN: " + venID);
 
 		Ven ven = checkVen(venID);
-		OadrCancelPartyRegistrationType build = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCancelPartyRegistrationBuilder("", ven.getRegistrationId(), ven.getUsername()).build();
+		OadrCancelPartyRegistrationType build = Oadr20bEiRegisterPartyBuilders.newOadr20bCancelPartyRegistrationBuilder(
+				UUID.randomUUID().toString(), ven.getRegistrationId(), ven.getUsername()).build();
 
 		venDistributeService.distribute(ven, build);
 	}

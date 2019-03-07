@@ -10,7 +10,9 @@ export default {
     marketContext: [],
     group: [],
     venMarketContext: [],
-    venGroup: []
+    venGroup: [],
+    availableReport:[],
+    requestedReport:[]
   },
   ven_create: {
     parameters: {}

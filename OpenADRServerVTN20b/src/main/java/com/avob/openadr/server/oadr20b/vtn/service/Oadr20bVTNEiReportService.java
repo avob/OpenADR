@@ -225,13 +225,7 @@ public class Oadr20bVTNEiReportService {
 
 			otherReportCapability.setReportName(ReportNameEnumeratedType.fromValue(reportName));
 			otherReportCapability.setReportSpecifierId(reportSpecifierID);
-			if (otherReportCapability.getReportRequestId() == null) {
-				otherReportCapability.setReportRequestId(reportRequestID);
-			} else if (!otherReportCapability.getReportRequestId().equals(reportRequestID)) {
-				if ("0".equals(otherReportCapability.getReportRequestId())) {
-					otherReportCapability.setReportRequestId(reportRequestID);
-				}
-			}
+			otherReportCapability.setReportRequestId(reportRequestID);
 
 			if (duration != null) {
 				otherReportCapability.setDuration(duration.getDuration());
@@ -364,15 +358,6 @@ public class Oadr20bVTNEiReportService {
 
 				String marketContext = oadrReportDescriptionType.getMarketContext();
 				description.setRid(rid);
-				if (description.getReportRequestId() == null) {
-					description.setReportRequestId(reportRequestID);
-				} else if (!description.getReportRequestId().equals(reportRequestID)) {
-					if ("0".equals(description.getReportRequestId())) {
-						description.setReportRequestId(reportRequestID);
-					}
-				}
-
-				// description.setReportRequestId(reportRequestID);
 				description.setReportType(ReportEnumeratedType.fromValue(reportType));
 				description.setReadingType(ReadingTypeEnumeratedType.fromValue(readingType));
 				description.setItemDescription(itemDescription);
@@ -935,12 +920,6 @@ public class Oadr20bVTNEiReportService {
 
 		Long granularityMillisecond = null;
 		Long reportBackDurationMillisecond = null;
-		if (granularity == null && reportBackDuration == null && reportCapability.getReportRequestBackDuration() != null
-				&& reportCapability.getReportRequestGranularity() != null) {
-			granularity = reportCapability.getReportRequestGranularity();
-			reportBackDuration = reportCapability.getReportRequestBackDuration();
-
-		}
 
 		granularityMillisecond = Oadr20bFactory.xmlDurationToMillisecond(granularity);
 		reportBackDurationMillisecond = Oadr20bFactory.xmlDurationToMillisecond(reportBackDuration);
@@ -971,23 +950,11 @@ public class Oadr20bVTNEiReportService {
 
 				otherReportRequests.add(otherReportRequest);
 
-				if (reportCapability.getReportName().equals(ReportNameEnumeratedType.METADATA_TELEMETRY_USAGE)
-						|| reportCapability.getReportName().equals(ReportNameEnumeratedType.METADATA_TELEMETRY_STATUS)
-						|| reportCapability.getReportName().equals(ReportNameEnumeratedType.METADATA_HISTORY_USAGE)) {
-
-					description.setReportRequestBackDuration(reportBackDuration);
-					description.setReportRequestGranularity(granularity);
-
-				}
+				
 
 			}
 
-			if (reportCapability.getReportName().equals(ReportNameEnumeratedType.METADATA_TELEMETRY_USAGE)
-					|| reportCapability.getReportName().equals(ReportNameEnumeratedType.METADATA_TELEMETRY_STATUS)
-					|| reportCapability.getReportName().equals(ReportNameEnumeratedType.METADATA_HISTORY_USAGE)) {
-
-				description.setReportRequestId(reportRequestId);
-			}
+	
 
 		}
 
@@ -996,8 +963,6 @@ public class Oadr20bVTNEiReportService {
 				|| reportCapability.getReportName().equals(ReportNameEnumeratedType.METADATA_HISTORY_USAGE)) {
 
 			reportCapability.setReportRequestId(reportRequestId);
-			reportCapability.setReportRequestBackDuration(reportBackDuration);
-			reportCapability.setReportRequestGranularity(granularity);
 
 			otherReportCapabilityService.save(reportCapability);
 
@@ -1072,15 +1037,8 @@ public class Oadr20bVTNEiReportService {
 					otherReportRequests.add(otherReportRequest);
 				}
 
-				description.setReportRequestBackDuration(null);
-				description.setReportRequestGranularity(null);
 
-			} else if (description.getReportRequestGranularity() != null
-					&& description.getReportRequestBackDuration() != null) {
-				stillSubscribed = true;
 			}
-
-			description.setReportRequestId(reportRequestId);
 
 		}
 
@@ -1103,22 +1061,11 @@ public class Oadr20bVTNEiReportService {
 				.findByReportRequestId(Arrays.asList(reportRequestID));
 		for (OtherReportCapability cap : findByPayloadReportRequestId2) {
 			cap.setReportRequestId("0");
-			cap.setReportRequestBackDuration(null);
-			cap.setReportRequestGranularity(null);
 		}
 
 		otherReportCapabilityService.save(findByPayloadReportRequestId2);
 
-		Iterable<OtherReportCapabilityDescription> findByPayloadReportRequestId = otherReportCapabilityDescriptionService
-				.findByReportRequestId(Arrays.asList(reportRequestID));
-		for (OtherReportCapabilityDescription description : findByPayloadReportRequestId) {
-			description.setReportRequestId("0");
-			description.setReportRequestBackDuration(null);
-			description.setReportRequestGranularity(null);
-		}
-
-		otherReportCapabilityDescriptionService.save(findByPayloadReportRequestId);
-
+	
 		List<OtherReportRequest> findByReportRequestId = otherReportRequestService
 				.findByReportRequestId(reportRequestID);
 		otherReportRequestService.delete(findByReportRequestId);

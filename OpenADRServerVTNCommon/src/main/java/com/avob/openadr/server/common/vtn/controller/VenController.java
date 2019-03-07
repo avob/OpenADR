@@ -342,14 +342,7 @@ public class VenController {
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return;
 		}
-
-		Ven newVen = new Ven();
-		newVen.setId(ven.getId());
-		newVen.setUsername(ven.getUsername());
-		newVen.setBasicPassword(ven.getBasicPassword());
-		newVen.setDigestPassword(ven.getDigestPassword());
-		newVen.setName(ven.getName());
-		venService.save(newVen);
+		venService.cleanRegistration(ven);
 		response.setStatus(HttpStatus.OK_200);
 		LOGGER.info("Clean registration of Ven: " + ven.getUsername());
 	}

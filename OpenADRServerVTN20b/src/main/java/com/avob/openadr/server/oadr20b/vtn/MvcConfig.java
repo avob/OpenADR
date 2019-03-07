@@ -2,7 +2,6 @@ package com.avob.openadr.server.oadr20b.vtn;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -16,7 +15,6 @@ public class MvcConfig implements WebMvcConfigurer {
 	public void addFormatters(FormatterRegistry registry) {
 		registry.addConverter(new InstantConverter());
 	}
-
 
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {

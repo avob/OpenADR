@@ -41,7 +41,7 @@ public class EmbeddedSqlDatabaseInit {
 		Ven prepare = venService.prepare(dto);
 		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
 		venService.save(prepare);
-		
+
 		// ecc test ven
 		dto = new VenCreateDto();
 		dto.setUsername("15:97:7B:DE:1C:1F:C6:D2:64:84");
@@ -51,7 +51,16 @@ public class EmbeddedSqlDatabaseInit {
 		prepare = venService.prepare(dto);
 		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
 		venService.save(prepare);
-		
+
+		// ven1.oadr.com
+		dto = new VenCreateDto();
+		dto.setUsername("05:8F:6B:7B:47:AF:EB:47:2A:7B");
+		dto.setAuthenticationType("x509");
+		dto.setCommonName("ven1.oadr.com");
+		dto.setOadrProfil("20b");
+		prepare = venService.prepare(dto);
+		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
+		venService.save(prepare);
 
 	}
 }

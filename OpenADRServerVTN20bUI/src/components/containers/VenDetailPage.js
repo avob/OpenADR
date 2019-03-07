@@ -13,6 +13,10 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 
 import VenDetailSettings from '../VenDetail/VenDetailSettings'
+import VenDetailReport from '../VenDetail/VenDetailReport'
+
+import green from '@material-ui/core/colors/green';
+
 
 
 function TabContainer( props ) {
@@ -66,7 +70,9 @@ const styles = theme => ({
   title: {
     color: theme.palette.primary.light,
   },
-
+  success: {
+    backgroundColor: green[600],
+  }
 
 });
 
@@ -88,6 +94,8 @@ export class VenDetailPage extends React.Component {
     this.props.venActions.loadVenDetail( this.props.match.params.username );
     this.props.venActions.loadVenGroup( this.props.match.params.username );
     this.props.venActions.loadVenMarketContext( this.props.match.params.username );
+    this.props.venActions.loadVenAvailableReport( this.props.match.params.username );
+    this.props.venActions.loadVenRequestedReport( this.props.match.params.username );
   }
 
   render() {
@@ -115,9 +123,23 @@ export class VenDetailPage extends React.Component {
                                             addVenMarketContext={ this.props.venActions.addVenMarketContext }
                                             removeVenMarketContext={ this.props.venActions.removeVenMarketContext }
                                             addVenGroup={ this.props.venActions.addVenGroup }
-                                            removeVenGroup={ this.props.venActions.removeVenGroup } />
+                                            removeVenGroup={ this.props.venActions.removeVenGroup }
+                                            registerPartyRequestReregistration={this.props.venActions.registerPartyRequestReregistration}
+                                            registerPartyCancelPartyRegistration={this.props.venActions.registerPartyCancelPartyRegistration}
+                                            cleanRegistration={this.props.venActions.cleanRegistration}
+                                             />
+                                            
+                                            
                        </TabContainer> }
       { value === 1 && <TabContainer>
+                        <VenDetailReport classes={ classes }
+                                            ven={ ven_detail.ven }
+                                            marketContext={ ven_detail.marketContext }
+                                            availableReport={ven_detail.availableReport}
+                                            requestedReport={ven_detail.requestedReport}
+                                             />
+                                          
+        
                        </TabContainer> }
       { value === 2 && <TabContainer>
                        </TabContainer> }

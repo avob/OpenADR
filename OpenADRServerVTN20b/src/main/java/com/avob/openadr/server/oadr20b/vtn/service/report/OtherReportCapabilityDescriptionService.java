@@ -18,10 +18,6 @@ public class OtherReportCapabilityDescriptionService extends GenericService<Othe
 	@Resource
 	private OtherReportCapabilityDescriptionDao otherReportCapabilityDescriptionDao;
 
-	public Iterable<OtherReportCapabilityDescription> findByReportRequestId(List<String> payloadReportRequestId) {
-		return otherReportCapabilityDescriptionDao.findByReportRequestIdIn(payloadReportRequestId);
-	}
-
 	public List<OtherReportCapabilityDescription> findByOtherReportCapabilityAndRidIn(
 			OtherReportCapability otherReportCapability, List<String> rid) {
 		return otherReportCapabilityDescriptionDao.findByOtherReportCapabilityAndRidIn(otherReportCapability, rid);

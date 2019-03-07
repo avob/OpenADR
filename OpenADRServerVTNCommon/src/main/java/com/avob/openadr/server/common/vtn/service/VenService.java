@@ -138,5 +138,15 @@ public class VenService extends AbstractUserService<Ven> {
 	public long count() {
 		return venDao.count();
 	}
+	
+	public void cleanRegistration(Ven ven) {
+		Ven newVen = new Ven();
+		newVen.setId(ven.getId());
+		newVen.setUsername(ven.getUsername());
+		newVen.setBasicPassword(ven.getBasicPassword());
+		newVen.setDigestPassword(ven.getDigestPassword());
+		newVen.setName(ven.getName());
+		this.save(newVen);
+	}
 
 }

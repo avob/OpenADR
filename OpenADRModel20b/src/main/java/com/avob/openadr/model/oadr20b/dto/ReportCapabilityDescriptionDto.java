@@ -12,10 +12,6 @@ public class ReportCapabilityDescriptionDto {
 
 	private String reportRequestId;
 
-	private String reportRequestGranularity;
-
-	private String reportRequestBackDuration;
-
 	private ReportEnumeratedType reportType;
 
 	private ReadingTypeEnumeratedType readingType;
@@ -128,21 +124,5 @@ public class ReportCapabilityDescriptionDto {
 
 	public void setReportRequestId(String reportRequestId) {
 		this.reportRequestId = reportRequestId;
-	}
-
-	public String getReportRequestGranularity() {
-		return reportRequestGranularity;
-	}
-
-	public void setReportRequestGranularity(String reportRequestGranularity) {
-		this.reportRequestGranularity = reportRequestGranularity;
-	}
-
-	public String getReportRequestBackDuration() {
-		return reportRequestBackDuration;
-	}
-
-	public void setReportRequestBackDuration(String reportRequestBackDuration) {
-		this.reportRequestBackDuration = reportRequestBackDuration;
 	}
 }

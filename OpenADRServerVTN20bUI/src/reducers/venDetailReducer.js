@@ -49,10 +49,6 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
     case types.LOAD_VEN_GROUP_ERROR:
       return state;
 
-
-
-
-
     case types.ADD_VEN_MARKET_CONTEXT:
       return state;
 
@@ -98,9 +94,37 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
 
 
 
+      // REGISTRATION PARTY ACTION
+    case types.REQUEST_REREGISTRATION_VEN:
+      return state;
+
+    case types.REQUEST_REREGISTRATION_VEN_SUCCESS:
+      return state;
+
+    case types.REQUEST_REREGISTRATION_VEN_ERROR:
+      return state;
+
+    case types.REQUEST_CANCEL_REGISTRATION_VEN:
+      return state;
+
+    case types.REQUEST_CANCEL_REGISTRATION_VEN_SUCCESS:
+      return state;
+
+    case types.REQUEST_CANCEL_REGISTRATION_VEN_ERROR:
+      return state;
+
+    case types.REQUEST_CLEAN_REGISTRATION_VEN:
+      return state;
+
+    case types.REQUEST_CLEAN_REGISTRATION_VEN_SUCCESS:
+      return state;
+
+    case types.REQUEST_CLEAN_REGISTRATION_VEN_ERROR:
+      return state;
 
 
-      // MARKET CONTEXT
+
+    // MARKET CONTEXT
     case types.LOAD_MARKET_CONTEXT:
       return state;
 
@@ -124,6 +148,31 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
       return newState;
 
     case types.LOAD_GROUP_ERROR:
+      return state;
+
+    // REPORTS
+    case types.LOAD_VEN_AVAILABLE_REPORT:
+      return state;
+
+    case types.LOAD_VEN_AVAILABLE_REPORT_SUCCESS:
+      newState = objectAssign( {}, state, {
+        availableReport: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_VEN_AVAILABLE_REPORT_ERROR:
+      return state;
+
+    case types.LOAD_VEN_REQUESTED_REPORT:
+      return state;
+
+    case types.LOAD_VEN_REQUESTED_REPORT_SUCCESS:
+      newState = objectAssign( {}, state, {
+        requestedReport: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_VEN_REQUESTED_REPORT_ERROR:
       return state;
 
     default:

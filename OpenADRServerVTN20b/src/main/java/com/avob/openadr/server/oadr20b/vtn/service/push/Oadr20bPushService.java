@@ -38,7 +38,9 @@ import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
+import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiRegisterPartyService;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
@@ -51,6 +53,9 @@ public class Oadr20bPushService {
 
 	@Resource
 	private VtnConfig vtnConfig;
+
+	@Resource
+	private VenService venService;
 
 	@Resource
 	private Oadr20bVTNEiEventService oadr20bVTNEiEventService;
@@ -164,6 +169,7 @@ public class Oadr20bPushService {
 				OadrCancelPartyRegistrationType val = (OadrCancelPartyRegistrationType) payload;
 				OadrCanceledPartyRegistrationType oadrCancelPartyRegistrationType = requestClient
 						.oadrCancelPartyRegistrationType(venPushUrl, val);
+
 				String eiResponseCode = oadrCancelPartyRegistrationType.getEiResponse().getResponseCode();
 				if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
 					LOGGER.error("OadrCancelPartyRegistrationType - Application Layer Error[" + eiResponseCode + "]");
@@ -171,7 +177,12 @@ public class Oadr20bPushService {
 				}
 
 				// remove ven registration
-				oadr20bVTNEiRegisterPartyService.oadrCancelPartyRegistrationType(val, xmlSignatureRequired);
+//				oadr20bVTNEiRegisterPartyService.oadrCancelPartyRegistrationType(val, xmlSignatureRequired);
+				Ven findOneByUsername = venService.findOneByUsername(oadrCancelPartyRegistrationType.getVenID());
+
+				if (findOneByUsername != null) {
+					venService.cleanRegistration(findOneByUsername);
+				}
 
 			} else if (payload instanceof OadrRequestReregistrationType) {
 				OadrRequestReregistrationType val = (OadrRequestReregistrationType) payload;

@@ -308,3 +308,178 @@ export const removeVenGroup = (username, groupId) => {
     } )
   }
 }
+
+export const registerPartyRequestReregistration = (username) => {
+  return (dispatch, getState) => {
+    dispatch( {
+      type: types.REQUEST_REREGISTRATION_VEN,
+      swagger: function ( api ) {
+        api.apis[ 'oadr-20b-ven-controller' ].registerPartyRequestReregistrationUsingPOST( {
+          venID: username,
+        }, {
+          responseContentType: 'application/json'
+        } )
+          .then( data => {
+            dispatch( {
+              type: types.REQUEST_REREGISTRATION_VEN_SUCCESS,
+            } );
+          } )
+          .catch( err => {
+            console.log( err )
+            dispatch( {
+              type: types.REQUEST_REREGISTRATION_VEN_ERROR,
+              payload: err
+            } );
+          } )
+      }
+    } )
+  }
+}
+
+export const registerPartyCancelPartyRegistration = (username) => {
+  return (dispatch, getState) => {
+    dispatch( {
+      type: types.REQUEST_CANCEL_REGISTRATION_VEN,
+      swagger: function ( api ) {
+        api.apis[ 'oadr-20b-ven-controller' ].registerPartyCancelPartyRegistrationUsingPOST( {
+          venID: username,
+        }, {
+          responseContentType: 'application/json'
+        } )
+          .then( data => {
+            dispatch( {
+              type: types.REQUEST_CANCEL_REGISTRATION_VEN_SUCCESS,
+            } );
+          } )
+          .catch( err => {
+            console.log( err )
+            dispatch( {
+              type: types.REQUEST_CANCEL_REGISTRATION_VEN_ERROR,
+              payload: err
+            } );
+          } )
+      }
+    } )
+  }
+}
+
+export const cleanRegistration = (username) => {
+  return (dispatch, getState) => {
+    dispatch( {
+      type: types.REQUEST_CLEAN_REGISTRATION_VEN,
+      swagger: function ( api ) {
+        api.apis[ 'ven-controller' ].cleanRegistrationUsingPOST( {
+          venID: username,
+        }, {
+          responseContentType: 'application/json'
+        } )
+          .then( data => {
+            dispatch( {
+              type: types.REQUEST_CLEAN_REGISTRATION_VEN_SUCCESS,
+            } );
+          } )
+          .catch( err => {
+            console.log( err )
+            dispatch( {
+              type: types.REQUEST_CLEAN_REGISTRATION_VEN_ERROR,
+              payload: err
+            } );
+          } )
+      }
+    } )
+  }
+}
+
+export const loadVenAvailableReport = (username) => {
+  return (dispatch, getState) => {
+    dispatch( {
+      type: types.LOAD_VEN_AVAILABLE_REPORT,
+      swagger: function ( api ) {
+        api.apis[ 'oadr-20b-ven-controller' ].viewOtherReportCapabilityUsingGET( {
+          venID: username,
+        }, {
+          responseContentType: 'application/json'
+        } )
+          .then( data => {
+            var report = JSON.parse( data.data );
+            dispatch( {
+              type: types.LOAD_VEN_AVAILABLE_REPORT_SUCCESS,
+              payload: report
+            } );
+          } )
+          .catch( err => {
+            console.log( err )
+            dispatch( {
+              type: types.LOAD_VEN_AVAILABLE_REPORT_ERROR,
+              payload: err
+            } );
+          } )
+      }
+    } )
+  }
+}
+
+export const loadVenAvailableReportDescription = (username, reportSpecifierId) => {
+  return (dispatch, getState) => {
+    dispatch( {
+      type: types.LOAD_VEN_AVAILABLE_REPORT_DESCRIPTION,
+      swagger: function ( api ) {
+        api.apis[ 'oadr-20b-ven-controller' ].viewOtherReportCapabilityDescriptionUsingGET( {
+          venID: username,
+          reportSpecifierId: reportSpecifierId
+        }, {
+          responseContentType: 'application/json'
+        } )
+          .then( data => {
+            var report = JSON.parse( data.data );
+            dispatch( {
+              type: types.LOAD_VEN_AVAILABLE_REPORT_DESCRIPTION_SUCCESS,
+              payload: report
+            } );
+          } )
+          .catch( err => {
+            console.log( err )
+            dispatch( {
+              type: types.LOAD_VEN_AVAILABLE_REPORT_DESCRIPTION_ERROR,
+              payload: err
+            } );
+          } )
+      }
+    } )
+  }
+}
+
+
+export const loadVenRequestedReport = (username, reportSpecifierId) => {
+  return (dispatch, getState) => {
+    dispatch( {
+      type: types.LOAD_VEN_REQUESTED_REPORT,
+      swagger: function ( api ) {
+        api.apis[ 'oadr-20b-ven-controller' ].viewReportRequestUsingGET( {
+          venID: username,
+          reportSpecifierId: reportSpecifierId
+        }, {
+          responseContentType: 'application/json'
+        } )
+          .then( data => {
+            var report = JSON.parse( data.data );
+            dispatch( {
+              type: types.LOAD_VEN_REQUESTED_REPORT_SUCCESS,
+              payload: report
+            } );
+          } )
+          .catch( err => {
+            console.log( err )
+            dispatch( {
+              type: types.LOAD_VEN_REQUESTED_REPORT_ERROR,
+              payload: err
+            } );
+          } )
+      }
+    } )
+  }
+}
+
+
+
+

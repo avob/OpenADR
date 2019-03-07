@@ -31,12 +31,6 @@ public class ReportCapabilityDescription {
 
 	private String rid;
 
-	private String reportRequestId;
-
-	private String reportRequestGranularity;
-
-	private String reportRequestBackDuration;
-
 	@Enumerated(EnumType.STRING)
 	private ReportEnumeratedType reportType;
 
@@ -99,14 +93,6 @@ public class ReportCapabilityDescription {
 		this.payload = payload;
 	}
 
-	public String getReportRequestId() {
-		return reportRequestId;
-	}
-
-	public void setReportRequestId(String payloadReportRequestId) {
-		this.reportRequestId = payloadReportRequestId;
-	}
-
 	public String getOadrMaxPeriod() {
 		return oadrMaxPeriod;
 	}
@@ -154,21 +140,4 @@ public class ReportCapabilityDescription {
 	public void setSiScaleCode(SiScaleCodeType siScaleCode) {
 		this.siScaleCode = siScaleCode;
 	}
-
-	public String getReportRequestGranularity() {
-		return reportRequestGranularity;
-	}
-
-	public void setReportRequestGranularity(String reportRequestGranularity) {
-		this.reportRequestGranularity = reportRequestGranularity;
-	}
-
-	public String getReportRequestBackDuration() {
-		return reportRequestBackDuration;
-	}
-
-	public void setReportRequestBackDuration(String reportRequestBackDuration) {
-		this.reportRequestBackDuration = reportRequestBackDuration;
-	}
-
 }
