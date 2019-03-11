@@ -1,20 +1,13 @@
 import React from 'react';
 
 import Typography from '@material-ui/core/Typography';
-import PropTypes from 'prop-types';
 
-import Paper from '@material-ui/core/Paper';
-import InputBase from '@material-ui/core/InputBase';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
-import DirectionsIcon from '@material-ui/icons/Directions';
 
-import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 
-import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 
 import ExtensionIcon from '@material-ui/icons/Extension';
@@ -127,7 +120,6 @@ export class VenList extends React.Component {
   }
 
   handleEditVen = (username) => {
-    var that = this;
     return function ( event ) {
       event.preventDefault();
       history.push( '/ven/detail/' + username )

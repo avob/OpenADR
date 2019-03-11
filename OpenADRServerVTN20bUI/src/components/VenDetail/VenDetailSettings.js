@@ -214,40 +214,39 @@ export class VenDetailSettings extends React.Component {
       </Typography>
       <VenDetailHeader classes={classes} ven={ven} actions={
         <Grid container spacing={ 24 }>
-        <Grid item xs={ 4 }>
-          <Button key="btn_create"
-                  style={ { marginTop: 15 } }
-                  variant="outlined"
-                  color="primary"
-                  fullWidth={true}
-                  size="small"
-                  onClick={this.handleReRegistrationClick}>
-            <CloudDownloadIcon style={ { marginRight: 15 } }/> RE-REGISTRATION
-          </Button>
-        </Grid>
-        <Grid item xs={ 4 }>
-          <Button key="btn_create"
-                  style={ { marginTop: 15 } }
-                  variant="outlined"
-                  color="secondary"
-                  fullWidth={true}
-                  size="small"
-                  onClick={this.handleCancelRegistrationClick}>
-            <CloudDownloadIcon style={ { marginRight: 15 } }/> CANCEL REGISTRATION
-          </Button>
-        </Grid>
-        <Grid item xs={ 4 }>
-          <Button key="btn_create"
-                  style={ { marginTop: 15 } }
-                  variant="outlined"
-                  color="secondary"
-                  fullWidth={true}
-                  size="small"
-                  onClick={this.handleCleanRegistrationClick}>
-            <RemoveIcon style={ { marginRight: 15 } }/> CLEAN REGISTRATION
-          </Button>
-        </Grid>
-      
+          <Grid item xs={ 4 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="primary"
+                    fullWidth={true}
+                    size="small"
+                    onClick={this.handleReRegistrationClick}>
+              <CloudDownloadIcon style={ { marginRight: 15 } }/> RE-REGISTRATION
+            </Button>
+          </Grid>
+          <Grid item xs={ 4 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="secondary"
+                    fullWidth={true}
+                    size="small"
+                    onClick={this.handleCancelRegistrationClick}>
+              <CloudDownloadIcon style={ { marginRight: 15 } }/> CANCEL REGISTRATION
+            </Button>
+          </Grid>
+          <Grid item xs={ 4 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="secondary"
+                    fullWidth={true}
+                    size="small"
+                    onClick={this.handleCleanRegistrationClick}>
+              <RemoveIcon style={ { marginRight: 15 } }/> CLEAN REGISTRATION
+            </Button>
+          </Grid>
       </Grid>
       }/>
 

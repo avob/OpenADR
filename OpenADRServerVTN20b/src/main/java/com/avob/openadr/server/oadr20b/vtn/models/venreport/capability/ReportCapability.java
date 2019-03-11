@@ -38,6 +38,12 @@ public abstract class ReportCapability {
 
 	private String duration;
 
+	private Long createDatetime;
+
+	public ReportCapability() {
+		createDatetime = System.currentTimeMillis();
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -76,6 +82,14 @@ public abstract class ReportCapability {
 
 	public void setReportRequestId(String reportRequestId) {
 		this.reportRequestId = reportRequestId;
+	}
+
+	public Long getCreateDatetime() {
+		return createDatetime;
+	}
+
+	public void setCreateDatetime(Long createDatetime) {
+		this.createDatetime = createDatetime;
 	}
 
 }

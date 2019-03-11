@@ -129,12 +129,19 @@ public class Oadr20bVenController {
 
 	@RequestMapping(value = "/{venID}/report/available", method = RequestMethod.GET)
 	@ResponseBody
-	public List<ReportCapabilityDto> viewOtherReportCapability(@PathVariable("venID") String venID)
+	public List<ReportCapabilityDto> viewOtherReportCapability(@PathVariable("venID") String venID,
+			@RequestParam(value = "reportSpecifierId", required = false) String reportSpecifierId)
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 
 		Ven ven = checkVen(venID);
-		List<OtherReportCapability> findBySource = otherReportCapabilityService.findBySource(ven);
-
+		List<OtherReportCapability> findBySource = null;
+		if(reportSpecifierId != null) {
+			OtherReportCapability findByReportSpecifierId = otherReportCapabilityService.findByReportSpecifierId(reportSpecifierId);
+			findBySource = Arrays.asList(findByReportSpecifierId);
+		}
+		else {
+			findBySource = otherReportCapabilityService.findBySource(ven);
+		}
 		return oadr20bDtoMapper.mapList(findBySource, ReportCapabilityDto.class);
 	}
 
@@ -174,8 +181,8 @@ public class Oadr20bVenController {
 	public void subscribeOtherReportCapabilityDescriptionRid(@PathVariable("venID") String venID,
 			@RequestParam(value = "reportSpecifierId", required = true) String reportSpecifierId,
 			@RequestParam(value = "rid", required = true) String rid,
-			@RequestParam(value = "granularity", required = false) String granularity,
-			@RequestParam(value = "reportBackDuration", required = false) String reportBackDuration)
+			@RequestParam(value = "granularity", required = true) String granularity,
+			@RequestParam(value = "reportBackDuration", required = true) String reportBackDuration)
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 		Ven ven = checkVen(venID);
 		OtherReportCapability reportCapability = checkOtherReportCapability(reportSpecifierId);
@@ -189,8 +196,8 @@ public class Oadr20bVenController {
 	@ResponseBody
 	public void subscribeAllOtherReportCapabilityDescriptionRid(@PathVariable("venID") String venID,
 			@RequestParam(value = "reportSpecifierId", required = true) String reportSpecifierId,
-			@RequestParam(value = "granularity", required = false) String granularity,
-			@RequestParam(value = "reportBackDuration", required = false) String reportBackDuration)
+			@RequestParam(value = "granularity", required = true) String granularity,
+			@RequestParam(value = "reportBackDuration", required = true) String reportBackDuration)
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 		Ven ven = checkVen(venID);
 

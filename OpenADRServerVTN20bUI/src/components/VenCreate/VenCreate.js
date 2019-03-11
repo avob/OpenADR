@@ -249,11 +249,6 @@ export class VenCreate extends React.Component {
             </div>
             ) : (
             <div>
-              <Typography component="div" className={ classes.instructions }>
-                <Paper elevation={ 1 } style={ { padding: '20px 0px' } }>
-                  { getStepContent( activeStep ) }
-                </Paper>
-              </Typography>
               <div>
                 <Button disabled={ activeStep === 0 }
                         onClick={ this.handleBack }
@@ -267,6 +262,12 @@ export class VenCreate extends React.Component {
                   { activeStep === steps.length - 1 ? 'Finish' : 'Next' }
                 </Button>
               </div>
+              <Typography component="div" className={ classes.instructions }>
+                <Paper elevation={ 1 } style={ { padding: '20px 0px' } }>
+                  { getStepContent( activeStep ) }
+                </Paper>
+              </Typography>
+              
             </div>
             ) }
       </div>

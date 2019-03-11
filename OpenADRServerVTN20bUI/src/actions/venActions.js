@@ -1,7 +1,7 @@
 import * as types from '../constants/actionTypes';
 import { history } from '../store/configureStore';
 
-var swaggerAction = (actionType, getAction, getPayload) => {
+var swaggerAction = (actionType, getAction, getPayload, getNext) => {
   return (dispatch, getState) => {
     dispatch( {
       type: actionType,
@@ -19,6 +19,9 @@ var swaggerAction = (actionType, getAction, getPayload) => {
               }
             }
             dispatch(msg);
+            if(getNext) {
+              getNext(dispatch, getState);
+            }
           } )
           .catch( err => {
             dispatch( {
@@ -44,12 +47,12 @@ var saveData = ( function () {
   document.body.appendChild( a );
   a.style = 'display: none';
   return function ( data, fileName ) {
-
-    var url = window.URL.createObjectURL( data );
-    a.href = url;
-    a.download = fileName;
-    a.click();
-    window.URL.revokeObjectURL( url );
+     var url = window.URL.createObjectURL( data );
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      window.URL.revokeObjectURL( url );
+    
   };
 }());
 
@@ -82,7 +85,7 @@ export const createVen = (ven) => {
       var params = { dto: ven };
       return api.apis[ 'ven-controller' ].createVenUsingPOST(params, multipartResponseContentType);
     },
-    (data) => { console.log(data);  history.push("/ven/"); }
+    (data) => { saveData( data.data, ven.commonName + '-credentials.tar' ); history.push("/ven/") }
   );
 }
 
@@ -92,360 +95,214 @@ export const deleteVen = (venId) => {
       var params = { venID: venId };
       return  api.apis[ 'ven-controller' ].deleteVenByUsernameUsingDELETE(params, jsonResponseContentType);
     },
-    (data) => { history.push("/ven/");  }
+    () => { history.push("/ven/");  },
+    (dispatch, getState) => { loadVen()(dispatch, getState) }
   );
 }
 
-export const loadVenGroup = (username) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.LOAD_VEN_GROUP,
-      swagger: function ( api ) {
-        api.apis[ 'ven-controller' ].listVenGroupUsingGET( {
-          venID: username
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-            var group = JSON.parse( data.data );
-            dispatch( {
-              type: types.LOAD_VEN_GROUP_SUCCESS,
-              payload: group
-            } );
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.LOAD_VEN_GROUP_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
+export const loadVenGroup = (venId) => {
+  return swaggerAction(types.LOAD_VEN_GROUP, 
+    (api) => {
+      var params = { venID: venId };
+      return  api.apis[ 'ven-controller' ].listVenGroupUsingGET(params, jsonResponseContentType);
+    },
+    parseJsonData
+  );
 }
 
-export const loadVenMarketContext = (username) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.LOAD_VEN_MARKET_CONTEXT,
-      swagger: function ( api ) {
-        api.apis[ 'ven-controller' ].listVenMarketContextUsingGET( {
-          venID: username
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-            var marketContext = JSON.parse( data.data );
-            dispatch( {
-              type: types.LOAD_VEN_MARKET_CONTEXT_SUCCESS,
-              payload: marketContext
-            } );
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.LOAD_VEN_MARKET_CONTEXT_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
+export const loadVenMarketContext = (venId) => {
+  return swaggerAction(types.LOAD_VEN_MARKET_CONTEXT, 
+    (api) => {
+      var params = { venID: venId };
+      return  api.apis[ 'ven-controller' ].listVenMarketContextUsingGET(params, jsonResponseContentType);
+    },
+    parseJsonData
+  );
 }
 
-export const addVenMarketContext = (username, marketContextId) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.ADD_VEN_MARKET_CONTEXT,
-      swagger: function ( api ) {
-        api.apis[ 'ven-controller' ].addMarketContextToVenUsingPOST( {
-          venID: username,
-          marketContextId: marketContextId
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-            var marketContext = JSON.parse( data.data );
-            loadVenMarketContext( username )( dispatch, getState )
-            dispatch( {
-              type: types.ADD_VEN_MARKET_CONTEXT_SUCCESS,
-              payload: marketContext
-            } );
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.ADD_VEN_MARKET_CONTEXT_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
+export const addVenMarketContext = (venId, marketContextId) => {
+  return swaggerAction(types.ADD_VEN_MARKET_CONTEXT, 
+    (api) => {
+      var params = { venID: venId, marketContextId: marketContextId };
+      return  api.apis[ 'ven-controller' ].addMarketContextToVenUsingPOST(params, jsonResponseContentType);
+    },
+    parseJsonData,
+    (dispatch, getState) => { loadVenMarketContext( venId )( dispatch, getState ) }
+  );
 }
 
-export const addVenGroup = (username, groupId) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.ADD_VEN_GROUP,
-      swagger: function ( api ) {
-        api.apis[ 'ven-controller' ].addGroupToVenUsingPOST( {
-          venID: username,
-          groupId: groupId
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-            var marketContext = JSON.parse( data.data );
-            loadVenGroup( username )( dispatch, getState )
-            dispatch( {
-              type: types.ADD_VEN_GROUP_SUCCESS,
-              payload: marketContext
-            } );
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.ADD_VEN_GROUP_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
+export const addVenGroup = (venId, groupId) => {
+  return swaggerAction(types.ADD_VEN_GROUP, 
+    (api) => {
+      var params = { venID: venId, groupId: groupId };
+      return  api.apis[ 'ven-controller' ].addGroupToVenUsingPOST(params, jsonResponseContentType);
+    },
+    parseJsonData,
+    (dispatch, getState) => { loadVenGroup( venId )( dispatch, getState ) }
+  );
 }
 
-
-
-export const removeVenMarketContext = (username, marketContextId) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.REMOVE_VEN_MARKET_CONTEXT,
-      swagger: function ( api ) {
-        api.apis[ 'ven-controller' ].deleteVenMarketContextUsingPOST( {
-          venID: username,
-          marketContextId: marketContextId
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-            loadVenMarketContext( username )( dispatch, getState )
-            dispatch( {
-              type: types.REMOVE_VEN_MARKET_CONTEXT_SUCCESS,
-            } );
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.REMOVE_VEN_MARKET_CONTEXT_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
+export const removeVenMarketContext = (venId, marketContextId) => {
+  return swaggerAction(types.REMOVE_VEN_MARKET_CONTEXT, 
+    (api) => {
+      var params = { venID: venId, marketContextId: marketContextId };
+      return  api.apis[ 'ven-controller' ].deleteVenMarketContextUsingPOST(params, jsonResponseContentType);
+    },
+    parseJsonData,
+    (dispatch, getState) => { loadVenMarketContext( venId )( dispatch, getState ) }
+  );
 }
 
-export const removeVenGroup = (username, groupId) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.REMOVE_VEN_GROUP,
-      swagger: function ( api ) {
-        api.apis[ 'ven-controller' ].deleteVenGroupUsingPOST( {
-          venID: username,
-          groupId: groupId
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-            loadVenGroup( username )( dispatch, getState )
-            dispatch( {
-              type: types.REMOVE_VEN_GROUP_SUCCESS,
-            } );
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.REMOVE_VEN_GROUP_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
+export const removeVenGroup = (venId, groupId) => {
+  return swaggerAction(types.REMOVE_VEN_GROUP, 
+    (api) => {
+      var params = { venID: venId, groupId: groupId };
+      return  api.apis[ 'ven-controller' ].deleteVenGroupUsingPOST(params, jsonResponseContentType);
+    },
+    parseJsonData,
+    (dispatch, getState) => { loadVenGroup( venId )( dispatch, getState ) }
+  );
 }
 
-export const registerPartyRequestReregistration = (username) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.REQUEST_REREGISTRATION_VEN,
-      swagger: function ( api ) {
-        api.apis[ 'oadr-20b-ven-controller' ].registerPartyRequestReregistrationUsingPOST( {
-          venID: username,
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-            dispatch( {
-              type: types.REQUEST_REREGISTRATION_VEN_SUCCESS,
-            } );
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.REQUEST_REREGISTRATION_VEN_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
+export const registerPartyRequestReregistration = (venId) => {
+  return swaggerAction(types.REQUEST_REREGISTRATION_VEN, 
+    (api) => {
+      var params = { venID: venId };
+      return  api.apis[ 'oadr-20b-ven-controller' ].registerPartyRequestReregistrationUsingPOST(params, jsonResponseContentType);
+    },
+  );
 }
 
-export const registerPartyCancelPartyRegistration = (username) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.REQUEST_CANCEL_REGISTRATION_VEN,
-      swagger: function ( api ) {
-        api.apis[ 'oadr-20b-ven-controller' ].registerPartyCancelPartyRegistrationUsingPOST( {
-          venID: username,
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-            dispatch( {
-              type: types.REQUEST_CANCEL_REGISTRATION_VEN_SUCCESS,
-            } );
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.REQUEST_CANCEL_REGISTRATION_VEN_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
+export const registerPartyCancelPartyRegistration = (venId) => {
+  return swaggerAction(types.REQUEST_CANCEL_REGISTRATION_VEN, 
+    (api) => {
+      var params = { venID: venId };
+      return  api.apis[ 'oadr-20b-ven-controller' ].registerPartyCancelPartyRegistrationUsingPOST(params, jsonResponseContentType);
+    },
+  );
 }
 
-export const cleanRegistration = (username) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.REQUEST_CLEAN_REGISTRATION_VEN,
-      swagger: function ( api ) {
-        api.apis[ 'ven-controller' ].cleanRegistrationUsingPOST( {
-          venID: username,
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-            dispatch( {
-              type: types.REQUEST_CLEAN_REGISTRATION_VEN_SUCCESS,
-            } );
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.REQUEST_CLEAN_REGISTRATION_VEN_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
+export const cleanRegistration = (venId) => {
+  return swaggerAction(types.REQUEST_CLEAN_REGISTRATION_VEN, 
+    (api) => {
+      var params = { venID: venId };
+      return  api.apis[ 'ven-controller' ].cleanRegistrationUsingPOST(params, jsonResponseContentType);
+    },
+  );
 }
 
-export const loadVenAvailableReport = (username) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.LOAD_VEN_AVAILABLE_REPORT,
-      swagger: function ( api ) {
-        api.apis[ 'oadr-20b-ven-controller' ].viewOtherReportCapabilityUsingGET( {
-          venID: username,
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-            var report = JSON.parse( data.data );
-            dispatch( {
-              type: types.LOAD_VEN_AVAILABLE_REPORT_SUCCESS,
-              payload: report
-            } );
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.LOAD_VEN_AVAILABLE_REPORT_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
+export const loadVenAvailableReport = (venId, reportSpecifierId) => {
+  return swaggerAction(types.LOAD_VEN_AVAILABLE_REPORT, 
+    (api) => {
+      var params = { venID: venId, reportSpecifierId:reportSpecifierId };
+      return  api.apis[ 'oadr-20b-ven-controller' ].viewOtherReportCapabilityUsingGET(params, jsonResponseContentType);
+    },
+    parseJsonData
+  );
 }
 
-export const loadVenAvailableReportDescription = (username, reportSpecifierId) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.LOAD_VEN_AVAILABLE_REPORT_DESCRIPTION,
-      swagger: function ( api ) {
-        api.apis[ 'oadr-20b-ven-controller' ].viewOtherReportCapabilityDescriptionUsingGET( {
-          venID: username,
-          reportSpecifierId: reportSpecifierId
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-            var report = JSON.parse( data.data );
-            dispatch( {
-              type: types.LOAD_VEN_AVAILABLE_REPORT_DESCRIPTION_SUCCESS,
-              payload: report
-            } );
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.LOAD_VEN_AVAILABLE_REPORT_DESCRIPTION_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
+export const loadVenAvailableReportDescription = (venId, reportSpecifierId) => {
+  return swaggerAction(types.LOAD_VEN_AVAILABLE_REPORT_DESCRIPTION, 
+    (api) => {
+      var params = { venID: venId, reportSpecifierId: reportSpecifierId };
+      return  api.apis[ 'oadr-20b-ven-controller' ].viewOtherReportCapabilityDescriptionUsingGET(params, jsonResponseContentType);
+    },
+    parseJsonData
+  );
+}
+
+export const loadVenRequestedReport = (venId, reportSpecifierId) => {
+  return swaggerAction(types.LOAD_VEN_REQUESTED_REPORT, 
+    (api) => {
+      var params = { venID: venId, reportSpecifierId: reportSpecifierId };
+      return  api.apis[ 'oadr-20b-ven-controller' ].viewReportRequestUsingGET(params, jsonResponseContentType);
+    },
+    parseJsonData
+  );
+}
+
+export const requestRegisterReport  = (venId) => {
+  return swaggerAction(types.REQUEST_VEN_REGISTER_REPORT, 
+    (api) => {
+      var params = { venID: venId };
+      return  api.apis[ 'oadr-20b-ven-controller' ].requestRegisterReportUsingPOST(params, jsonResponseContentType);
+    },
+  );
+}
+
+export const sendRegisterReport  = (venId) => {
+  return swaggerAction(types.SEND_VTN_REGISTER_REPORT, 
+    (api) => {
+      var params = { venID: venId };
+      return  api.apis[ 'oadr-20b-ven-controller' ].sendRegisterReportUsingPOST(params, jsonResponseContentType);
+    },
+  );
+}
+
+export const createRequestedReport  = (venId, reportSpecifierId, start, end, rid) => {
+  if(rid == null) {
+    return swaggerAction(types.CREATE_REQUESTED_REPORT, 
+      (api) => {
+        var params = { venID: venId, reportSpecifierId: reportSpecifierId, start: start, end: end };
+        return  api.apis[ 'oadr-20b-ven-controller' ].requestAllOtherReportCapabilityDescriptionRidUsingPOST(params, jsonResponseContentType);
+      },
+      () => { history.push("/ven/detail/"+venId+"/reports");  },
+    );
+  }
+  else {
+    return swaggerAction(types.CREATE_REQUESTED_REPORT, 
+      (api) => {
+        var params = { venID: venId, reportSpecifierId: reportSpecifierId, start: start, end: end, rid:rid.join(",") };
+        return  api.apis[ 'oadr-20b-ven-controller' ].requestOtherReportCapabilityDescriptionRidUsingPOST(params, jsonResponseContentType);
+      },
+      () => { history.push("/ven/detail/"+venId+"/reports");  },
+    );
   }
 }
 
 
-export const loadVenRequestedReport = (username, reportSpecifierId) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.LOAD_VEN_REQUESTED_REPORT,
-      swagger: function ( api ) {
-        api.apis[ 'oadr-20b-ven-controller' ].viewReportRequestUsingGET( {
-          venID: username,
-          reportSpecifierId: reportSpecifierId
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-            var report = JSON.parse( data.data );
-            dispatch( {
-              type: types.LOAD_VEN_REQUESTED_REPORT_SUCCESS,
-              payload: report
-            } );
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.LOAD_VEN_REQUESTED_REPORT_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
+export const createRequestedReportSubscription  = (venId, reportSpecifierId, granularity, reportBackDuration, rid) => {
+
+   if(rid == null) {
+    return swaggerAction(types.CREATE_REQUESTED_REPORT, 
+      (api) => {
+        var params = { venID: venId
+          , reportSpecifierId: reportSpecifierId
+          , granularity: granularity
+          , reportBackDuration: reportBackDuration
+        };
+        return  api.apis[ 'oadr-20b-ven-controller' ].subscribeAllOtherReportCapabilityDescriptionRidUsingPOST(params, jsonResponseContentType);
+      },
+      () => { history.push("/ven/detail/"+venId+"/reports");  },
+    );
+  }
+  else {
+    return swaggerAction(types.CREATE_REQUESTED_REPORT, 
+      (api) => {
+        var params = { venID: venId
+          , reportSpecifierId: reportSpecifierId
+          , granularity: granularity
+          , reportBackDuration: reportBackDuration
+          , rid:rid.join(",") 
+        };
+        return  api.apis[ 'oadr-20b-ven-controller' ].subscribeOtherReportCapabilityDescriptionRidUsingPOST(params, jsonResponseContentType);
+      },
+      () => { history.push("/ven/detail/"+venId+"/reports");  },
+    );
   }
 }
+
+export const cancelRequestReportSubscription  = (venId, reportRequestId) => {
+  return swaggerAction(types.CANCEL_REQUESTED_REPORT, 
+    (api) => {
+      var params = { venID: venId, reportRequestId:reportRequestId };
+      return  api.apis[ 'oadr-20b-ven-controller' ].cancelSubscriptionReportRequestUsingPOST(params, jsonResponseContentType);
+    },
+    null,
+    (dispatch, getState) => { loadVenRequestedReport( venId )( dispatch, getState ) }
+  );
+}
+
 
 
 

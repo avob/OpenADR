@@ -52,9 +52,52 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 
+import { history } from '../../store/configureStore';
+
+
+//
+// Takes an ical duration in a outputs it as a total # of seconds
+//
+function iCalDurationInSeconds(durStr) {
+  var exp = new RegExp(/^P/);
+  let totalSec = 0;
+  let valStr;
+  if (durStr.match(exp)) {
+    // Days
+    exp = new RegExp(/(\d+)D/);
+    valStr = durStr.match(exp);
+    if (valStr) totalSec += parseInt(valStr[1]) * 60 * 60 * 24;
+    // Hours
+    exp = new RegExp(/(\d+)H/);
+    valStr = durStr.match(exp);
+    if (valStr) totalSec += parseInt(valStr[1]) * 60 * 60;
+    // Minutes
+    exp = new RegExp(/(\d+)M/);
+    valStr = durStr.match(exp);
+    if (valStr) totalSec += parseInt(valStr[1]) * 60;
+    // Seconds
+    exp = new RegExp(/(\d+)S/);
+    valStr = durStr.match(exp);
+    if (valStr) totalSec += parseInt(valStr[1]);
+  }
+  return totalSec;
+}
+
 
 var VenAvailableReportTable = (props) => {
   const {classes, availableReport, ven} = props
+
+  var getActionLabel = (report) => {
+    switch(report.reportName) {
+      case "METADATA_HISTORY_USAGE":
+        return "Request";
+      case "METADATA_TELEMETRY_USAGE":
+        return "Subscribe";
+      default:
+        return "Request";
+
+    }
+  }
   return (
     <Paper className={classes.root}>
       <Table className={classes.table}>
@@ -64,15 +107,24 @@ var VenAvailableReportTable = (props) => {
             <TableCell align="right">Created<br/>Date/Time</TableCell>
             <TableCell align="right">Duration</TableCell>
             <TableCell align="right">Report Name</TableCell>
+            <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {availableReport.map(row => (
             <TableRow key={row.id}>
               <TableCell align="right">{row.reportSpecifierId}</TableCell>
-              <TableCell align="right"></TableCell>
-              <TableCell align="right">{row.duration}</TableCell>
+              <TableCell align="right">{row.createDatetime}</TableCell>
+              <TableCell align="right">{(row.duration) ? row.duration : "Realtime"}</TableCell>
               <TableCell align="right">{row.reportName}</TableCell>
+              <TableCell align="right">
+                <Button size="small" color="primary" onClick={function(reportSpecifierId) {
+                  return () => {props.handleViewReportDetail(reportSpecifierId);}
+                }(row.reportSpecifierId)  }> View </Button> 
+                | <Button size="small" color="primary" onClick={function(reportSpecifierId) {
+                  return () => {props.handleCreateRequestClick(reportSpecifierId);}
+                }(row.reportSpecifierId)  }>{ getActionLabel(row)}</Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -82,31 +134,48 @@ var VenAvailableReportTable = (props) => {
 }
 
 var VenRequestedReportTable = (props) => {
-  const {classes, requestedReport, ven} = props
+  const {classes, requestedReport, ven, handleDeleteRequestClick} = props
   console.log(requestedReport)
+  var getActionLabel = (request) => {
+    if(request.end != null || request.start != null)  {
+      return "DELETE"
+    } else if(iCalDurationInSeconds(request.granularity) == 0 || iCalDurationInSeconds(request.reportBackDuration) == 0 )  {
+      return "DELETE"
+    } else if(iCalDurationInSeconds(request.granularity) != 0 && iCalDurationInSeconds(request.reportBackDuration) != 0 )  {
+      return "UNSUBSCRIBE"
+    }
+  }
   return (
     <Paper className={classes.root}>
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
+            <TableCell align="right">report request ID</TableCell>
             <TableCell align="right">Specifier ID</TableCell>
+            <TableCell align="right">rID</TableCell>
             <TableCell align="right">Created<br/>Date/Time</TableCell>
-            <TableCell align="right">Duration</TableCell>
-            <TableCell align="right">Report Name</TableCell>
+            <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {requestedReport.map(row => (
-            <TableRow key={row.id}>
-              <TableCell component="th" scope="row">
-                {row.name}
-              </TableCell>
-              <TableCell align="right">{row.reportSpecifierId}</TableCell>
-              <TableCell align="right"></TableCell>
-              <TableCell align="right">{row.duration}</TableCell>
-              <TableCell align="right">{row.reportName}</TableCell>
-            </TableRow>
-          ))}
+          {requestedReport.map(row => {
+            return (
+              <TableRow key={row.id}>
+                <TableCell align="right">{row.reportRequestId}</TableCell>
+                <TableCell align="right">{row.reportSpecifierId}</TableCell>
+                <TableCell align="right">{row.rid}</TableCell>
+                <TableCell align="right">{row.createDatetime}</TableCell>
+                <TableCell align="right">
+                  <Button size="small" color="primary" onClick={function(reportRequestId) {
+                    return () => {}
+                  }(row.reportRequestId)  }> View </Button> 
+                  | <Button size="small" color="secondary" onClick={function(reportRequestId) {
+                    return () => {handleDeleteRequestClick(reportRequestId)}
+                  }(row.reportRequestId)  }> { getActionLabel(row)} </Button>
+                </TableCell>
+              </TableRow>
+            )
+          })}
         </TableBody>
       </Table>
     </Paper>
@@ -120,13 +189,28 @@ export class VenDetailReport extends React.Component {
     this.state = {}
   }
 
+  handleRequestRegisterReportClick = () => {
+    this.props.requestRegisterReport( this.props.ven.username);
+  }
+
+  handleSendRegisterReportClick = () => {
+    this.props.sendRegisterReport( this.props.ven.username);
+  }
+
+  handleCreateRequestClick = (reportSpecifierId) => {
+    history.push("/ven/detail/"+this.props.ven.username+"/reports/"+reportSpecifierId+"/create")
+  }
+
+  handleDeleteRequestClick = (reportRequestId) => {
+    this.props.cancelRequestReportSubscription(this.props.ven.username, reportRequestId)
+  }
+
+  handleViewReportDetail = (reportSpecifierId) => {
+    history.push("/ven/detail/"+this.props.ven.username+"/reports/"+reportSpecifierId);
+  }
 
   render() {
-    const {classes, ven, availableReport, requestedReport} = this.props;
-    console.log(this.props)
-    console.log(ven, availableReport, requestedReport)
-
-
+    const {classes, ven, availableReport, requestedReport, cancelRequestReportSubscription} = this.props;
 
     var SuccessSnackbar = (props) => {
       return (
@@ -169,42 +253,31 @@ export class VenDetailReport extends React.Component {
                   component="h2">
         Status
       </Typography>
-      <VenDetailHeader classes={classes} ven={ven} actions={
-        <div>
-        <Grid container spacing={ 24 }>
-          <Grid item xs={ 4 }>
+      <VenDetailHeader classes={classes} ven={ven} actions={[
+         <Grid  key="report_action_first_row" container spacing={ 24 }>
+          <Grid item xs={ 3 }>
             <Button key="btn_create"
                     style={ { marginTop: 15 } }
                     variant="outlined"
                     color="primary"
                     fullWidth={true}
-                    size="small">
-              <AddIcon style={ { marginRight: 15 } }/> CREATE REQUEST
-            </Button>
-          </Grid>
-          <Grid item xs={ 4 }>
-            <Button key="btn_create"
-                    style={ { marginTop: 15 } }
-                    variant="outlined"
-                    color="primary"
-                    fullWidth={true}
-                    size="small">
+                    size="small"
+                    onClick={this.handleRequestRegisterReportClick}>
               <CloudDownloadIcon style={ { marginRight: 15 } }/> REQUIRE REPORTS
             </Button>
           </Grid>
-          <Grid item xs={ 4 }>
+          <Grid item xs={ 3 }>
             <Button key="btn_create"
                     style={ { marginTop: 15 } }
                     variant="outlined"
                     color="primary"
                     fullWidth={true}
-                    size="small">
+                    size="small"
+                    onClick={this.handleSendRegisterReportClick}>
               <CloudDownloadIcon style={ { marginRight: 15 } }/> SEND REQUESTS
             </Button>
           </Grid>
-        </Grid>
-        <Grid container spacing={ 24 }>
-        <Grid item xs={ 4 }>
+           <Grid item xs={ 3 }>
           <Button key="btn_create"
                   style={ { marginTop: 15 } }
                   variant="outlined"
@@ -214,7 +287,7 @@ export class VenDetailReport extends React.Component {
             <RemoveIcon style={ { marginRight: 15 } }/> CLEAN REQUESTS
           </Button>
         </Grid>
-        <Grid item xs={ 4 }>
+        <Grid item xs={ 3 }>
           <Button key="btn_create"
                   style={ { marginTop: 15 } }
                   variant="outlined"
@@ -225,7 +298,7 @@ export class VenDetailReport extends React.Component {
           </Button>
         </Grid>
         </Grid>
-      </div>
+      ]
       }/>
       <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
       <Typography gutterBottom
@@ -233,7 +306,10 @@ export class VenDetailReport extends React.Component {
                   component="h2">
         Reports
       </Typography>
-      <VenAvailableReportTable ven={ven} availableReport={availableReport} classes={classes}/>
+      <VenAvailableReportTable ven={ven} 
+        availableReport={availableReport} classes={classes} 
+        handleViewReportDetail={this.handleViewReportDetail}
+        handleCreateRequestClick={this.handleCreateRequestClick}/>
 
 
       <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
@@ -242,7 +318,8 @@ export class VenDetailReport extends React.Component {
                   component="h2">
         Requests
       </Typography>
-      <VenRequestedReportTable ven={ven} requestedReport={requestedReport} classes={classes}/>
+      <VenRequestedReportTable ven={ven} requestedReport={requestedReport}
+         handleDeleteRequestClick={this.handleDeleteRequestClick} classes={classes}/>
 
      
     </div>

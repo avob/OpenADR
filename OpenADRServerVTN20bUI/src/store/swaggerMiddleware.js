@@ -2,12 +2,17 @@ import Swagger from 'swagger-client';
 
 var swaggerClient = null;
 
+var responseInterceptor=  (res) => {
+    // console.log(res);
+  }
+
+
 var loadClient = function ( url ) {
   return new Promise( (resolve, reject) => {
     if ( swaggerClient != null ) {
       resolve( swaggerClient );
     } else {
-      return Swagger( url ).then( client => {
+      return Swagger( {url:url, responseInterceptor: responseInterceptor} ).then( client => {
         swaggerClient = client; resolve( client )
       } )
     }

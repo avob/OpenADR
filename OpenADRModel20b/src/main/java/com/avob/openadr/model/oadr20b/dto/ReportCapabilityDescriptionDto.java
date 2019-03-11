@@ -10,8 +10,6 @@ public class ReportCapabilityDescriptionDto {
 
 	private String rid;
 
-	private String reportRequestId;
-
 	private ReportEnumeratedType reportType;
 
 	private ReadingTypeEnumeratedType readingType;
@@ -118,11 +116,4 @@ public class ReportCapabilityDescriptionDto {
 		this.siScaleCode = siScaleCode;
 	}
 
-	public String getReportRequestId() {
-		return reportRequestId;
-	}
-
-	public void setReportRequestId(String reportRequestId) {
-		this.reportRequestId = reportRequestId;
-	}
 }

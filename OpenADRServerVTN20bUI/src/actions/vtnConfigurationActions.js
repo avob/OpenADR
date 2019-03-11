@@ -1,7 +1,7 @@
 import * as types from '../constants/actionTypes';
 
 export const loadVtnConfiguration = () => {
-  return (dispatch, getState) => {
+  return (dispatch) => {
     dispatch( {
       type: types.LOAD_VTN_CONFIGURATION,
       swagger: function ( api ) {
@@ -27,7 +27,7 @@ export const loadVtnConfiguration = () => {
 }
 
 export const loadMarketContext = () => {
-  return (dispatch, getState) => {
+  return (dispatch) => {
     dispatch( {
       type: types.LOAD_MARKET_CONTEXT,
       swagger: function ( api ) {
@@ -122,7 +122,7 @@ export const deleteMarketContext = (marketContextId) => {
         }, {
           responseContentType: 'application/json'
         } )
-          .then( data => {
+          .then( () => {
             dispatch( {
               type: types.DELETE_MARKET_CONTEXT_SUCCESS
             } );
@@ -141,7 +141,7 @@ export const deleteMarketContext = (marketContextId) => {
 // GROUPS
 
 export const loadGroup = () => {
-  return (dispatch, getState) => {
+  return (dispatch) => {
     dispatch( {
       type: types.LOAD_GROUP,
       swagger: function ( api ) {
@@ -236,7 +236,7 @@ export const deleteGroup = (groupId) => {
         }, {
           responseContentType: 'application/json'
         } )
-          .then( data => {
+          .then( () => {
             dispatch( {
               type: types.DELETE_GROUP_SUCCESS
             } );

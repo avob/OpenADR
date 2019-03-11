@@ -1,5 +1,5 @@
 /* eslint-disable import/no-named-as-default */
-import { NavLink, Route, Switch } from 'react-router-dom';
+import {  Route, Switch } from 'react-router-dom';
 
 import AboutPage from './AboutPage';
 import HomePage from './HomePage';
@@ -9,6 +9,11 @@ import VenPage from './containers/VenPage'
 import AccountPage from './containers/AccountPage'
 import EventPage from './containers/EventPage'
 import VenDetailPage from './containers/VenDetailPage'
+import VenDetailCreateReportPage from './containers/VenDetailCreateReportPage'
+import VenDetailReportPage from './containers/VenDetailReportPage'
+
+
+
 import VenCreatePage from './containers/VenCreatePage'
 
 import PropTypes from 'prop-types';
@@ -136,9 +141,7 @@ class App extends React.Component {
 
   render() {
     const {classes} = this.props;
-    const activeStyle = {
-      color: 'blue'
-    };
+
     return (
     <div className={ classes.root }>
       <CssBaseline />
@@ -187,17 +190,32 @@ class App extends React.Component {
       <main className={ classes.content }>
         <div className={ classes.appBarSpacer } />
         <Switch>
+
           <Route exact
                  path="/"
                  component={ HomePage } />
+
           <Route path="/about" component={ AboutPage } />
+
           <Route path="/vtn_configuration" component={ VtnConfigurationPage } />
+          
+          <Route path="/ven/detail/:username/reports/:reportSpecifierId/create" component={ VenDetailCreateReportPage } />
+
+          <Route path="/ven/detail/:username/reports/:reportSpecifierId" component={ VenDetailReportPage } />
+
+          <Route path="/ven/detail/:username/:panel(settings|reports|optschedules)" component={ VenDetailPage } />
           <Route path="/ven/detail/:username" component={ VenDetailPage } />
+          
           <Route path="/ven/create" component={ VenCreatePage } />
+
           <Route path="/ven" component={ VenPage } />
+
           <Route path="/account" component={ AccountPage } />
+
           <Route path="/event" component={ EventPage } />
+
           <Route component={ NotFoundPage } />
+
         </Switch>
       </main>
     </div>
@@ -206,7 +224,8 @@ class App extends React.Component {
 }
 
 App.propTypes = {
-  children: PropTypes.element
+  children: PropTypes.element,
+  classes: PropTypes.element
 };
 
 export default hot( module )( withStyles( styles )( App ) );

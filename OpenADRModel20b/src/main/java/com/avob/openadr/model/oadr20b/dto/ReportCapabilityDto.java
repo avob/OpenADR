@@ -13,6 +13,8 @@ public class ReportCapabilityDto {
 	private ReportNameEnumeratedType reportName;
 
 	private String duration;
+	
+	private Long createDatetime;
 
 	public long getId() {
 		return id;
@@ -52,5 +54,13 @@ public class ReportCapabilityDto {
 
 	public void setReportRequestId(String reportRequestId) {
 		this.reportRequestId = reportRequestId;
+	}
+
+	public Long getCreateDatetime() {
+		return createDatetime;
+	}
+
+	public void setCreateDatetime(Long createDatetime) {
+		this.createDatetime = createDatetime;
 	}
 }

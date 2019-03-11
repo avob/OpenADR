@@ -17,6 +17,9 @@ import VenDetailReport from '../VenDetail/VenDetailReport'
 
 import green from '@material-ui/core/colors/green';
 
+import { history } from '../../store/configureStore';
+
+
 
 
 function TabContainer( props ) {
@@ -77,14 +80,31 @@ const styles = theme => ({
 });
 
 export class VenDetailPage extends React.Component {
-  state = {
-    value: 0,
-  };
+  
+  constructor() {
+    super();
+    this.state = {
+      value: 0,
+    };
+    
+  }
 
   handleChange = (event, value) => {
     this.setState( {
       value
     } );
+    switch(value) {
+      case 0:
+        history.push("/ven/detail/"+this.props.match.params.username+"/settings")
+        break;
+      case 1:
+        history.push("/ven/detail/"+this.props.match.params.username+"/reports")
+        break;
+      case 2:
+        history.push("/ven/detail/"+this.props.match.params.username+"/optschedules")
+        break;
+    }
+    
   };
 
 
@@ -96,6 +116,20 @@ export class VenDetailPage extends React.Component {
     this.props.venActions.loadVenMarketContext( this.props.match.params.username );
     this.props.venActions.loadVenAvailableReport( this.props.match.params.username );
     this.props.venActions.loadVenRequestedReport( this.props.match.params.username );
+    switch(this.props.match.params.panel){
+      case "settings":
+        this.setState({value:0});
+        break;
+      case "reports":
+        this.setState({value:1});
+        break;
+      case "optschedules":
+        this.setState({value:2});
+        break;
+      default:
+        this.setState({value:0});
+        break;
+    }
   }
 
   render() {
@@ -137,6 +171,11 @@ export class VenDetailPage extends React.Component {
                                             marketContext={ ven_detail.marketContext }
                                             availableReport={ven_detail.availableReport}
                                             requestedReport={ven_detail.requestedReport}
+                                            requestRegisterReport={this.props.venActions.requestRegisterReport}
+                                            sendRegisterReport={this.props.venActions.sendRegisterReport}
+                                            cancelRequestReportSubscription={this.props.venActions.cancelRequestReportSubscription}
+
+                                            
                                              />
                                           
         

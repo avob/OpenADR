@@ -14,6 +14,12 @@ export default {
     availableReport:[],
     requestedReport:[]
   },
+  ven_detail_create_report: {
+    availableReportDescription:[]
+  },
+  ven_detail_report: {
+    availableReportDescription:[]
+  },
   ven_create: {
     parameters: {}
   },

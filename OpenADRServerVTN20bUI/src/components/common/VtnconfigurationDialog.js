@@ -11,11 +11,8 @@ import Dialog from '@material-ui/core/Dialog';
 
 import ExtensionIcon from '@material-ui/icons/Extension';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-;
 
 export function MarketContextSelectDialog( props ) {
-  const {close} = props;
   return (
   <Dialog open={ props.open } onClose={ () => {
                                         props.close()
@@ -46,7 +43,6 @@ export function MarketContextSelectDialog( props ) {
 }
 
 export function GroupSelectDialog( props ) {
-  const {close} = props;
   return (
   <Dialog open={ props.open } onClose={ () => {
                                         props.close()

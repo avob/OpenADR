@@ -899,17 +899,7 @@ public class Oadr20bVTNEiReportService {
 	public void subscribe(Ven ven, OtherReportCapability reportCapability, List<String> rids, String reportBackDuration,
 			String granularity, Long start, Long end) throws Oadr20bMarshalException {
 
-		String reportRequestId = null;
-
-		if (reportCapability.getReportRequestId() == null || "0".equals(reportCapability.getReportRequestId())) {
-			reportRequestId = UUID.randomUUID().toString();
-			if (reportBackDuration == null || granularity == null) {
-				throw new IllegalArgumentException(
-						"Must provide reportBackDuration and granularity because report as not already been subscribed");
-			}
-		} else {
-			reportRequestId = reportCapability.getReportRequestId();
-		}
+		String reportRequestId = UUID.randomUUID().toString();
 
 		List<OtherReportCapabilityDescription> descriptions = otherReportCapabilityDescriptionService
 				.findByOtherReportCapability(reportCapability);
