@@ -1,25 +1,28 @@
 import * as types from '../constants/actionTypes';
 import { history } from '../store/configureStore';
 
-
-export const loadVen = () => {
+var swaggerAction = (actionType, getAction, getPayload) => {
   return (dispatch, getState) => {
     dispatch( {
-      type: types.LOAD_VEN,
+      type: actionType,
       swagger: function ( api ) {
-        api.apis[ 'ven-controller' ].listVenUsingGET( {
-          responseContentType: 'application/json'
-        } )
+          getAction(api)
           .then( data => {
-            var ven = JSON.parse( data.data );
-            dispatch( {
-              type: types.LOAD_VEN_SUCCESS,
-              payload: ven
-            } );
+           
+            var msg = {
+              type: actionType + "_SUCCESS"
+            }
+            if(getPayload) {
+              var payload = getPayload(data);
+              if(payload) {
+                msg.payload = payload;
+              }
+            }
+            dispatch(msg);
           } )
           .catch( err => {
             dispatch( {
-              type: types.LOAD_VEN_ERROR,
+              type: actionType + "_ERROR",
               payload: err
             } );
           } )
@@ -28,32 +31,12 @@ export const loadVen = () => {
   }
 }
 
-export const loadVenDetail = (username) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.LOAD_VEN_DETAIL,
-      swagger: function ( api ) {
-        api.apis[ 'ven-controller' ].findVenByUsernameUsingGET( {
-          venID: username
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-            var ven = JSON.parse( data.data );
-            dispatch( {
-              type: types.LOAD_VEN_DETAIL_SUCCESS,
-              payload: ven
-            } );
-          } )
-          .catch( err => {
-            dispatch( {
-              type: types.LOAD_VEN_DETAIL_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
+var jsonResponseContentType = {
+      responseContentType: 'application/json'
+}
+
+var multipartResponseContentType = {
+      responseContentType: 'multipart/form-data'
 }
 
 var saveData = ( function () {
@@ -70,63 +53,47 @@ var saveData = ( function () {
   };
 }());
 
+var parseJsonData = (data) => {
+  return JSON.parse( data.data );
+}
+
+export const loadVen = () => {
+  return swaggerAction(types.LOAD_VEN, 
+    (api) => {
+      return api.apis[ 'ven-controller' ].listVenUsingGET(jsonResponseContentType);
+    }, 
+    parseJsonData
+  );
+}
+
+export const loadVenDetail = (username) => {
+  return swaggerAction(types.LOAD_VEN_DETAIL, 
+    (api) => {
+      var params = { venID: username };
+      return api.apis[ 'ven-controller' ].findVenByUsernameUsingGET(params, jsonResponseContentType);
+    },
+    parseJsonData
+  );
+}
+
 export const createVen = (ven) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.CREATE_VEN,
-      swagger: function ( api ) {
-        api.apis[ 'ven-controller' ].createVenUsingPOST( {
-          dto: ven
-        }, {
-          responseContentType: 'multipart/form-data'
-        } )
-          .then( data => {
-            saveData( data.data, ven.commonName + '-credentials.tar' )
-            dispatch( {
-              type: types.CREATE_VEN_SUCCESS,
-              payload: ven
-            } );
-            history.push( '/ven' )
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.CREATE_VEN_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
+  return swaggerAction(types.CREATE_VEN, 
+    (api) => {
+      var params = { dto: ven };
+      return api.apis[ 'ven-controller' ].createVenUsingPOST(params, multipartResponseContentType);
+    },
+    (data) => { console.log(data);  history.push("/ven/"); }
+  );
 }
 
 export const deleteVen = (venId) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: types.DELETE_VEN,
-      swagger: function ( api ) {
-        api.apis[ 'ven-controller' ].deleteVenByUsernameUsingDELETE( {
-          venID: venId
-        }, {
-          responseContentType: 'application/json'
-        } )
-          .then( data => {
-
-            dispatch( {
-              type: types.DELETE_VEN_SUCCESS,
-            } );
-            loadVen()( dispatch, getState )
-          } )
-          .catch( err => {
-            console.log( err )
-            dispatch( {
-              type: types.DELETE_VEN_ERROR,
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
+  return swaggerAction(types.DELETE_VEN, 
+    (api) => {
+      var params = { venID: venId };
+      return  api.apis[ 'ven-controller' ].deleteVenByUsernameUsingDELETE(params, jsonResponseContentType);
+    },
+    (data) => { history.push("/ven/");  }
+  );
 }
 
 export const loadVenGroup = (username) => {

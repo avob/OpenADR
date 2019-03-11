@@ -16,7 +16,7 @@ export default function vtnConfigurationReducer( state = initialState.vtnConfigu
     case types.LOAD_VTN_CONFIGURATION:
       return state;
 
-
+    
     case types.LOAD_VTN_CONFIGURATION_SUCCESS:
       newState = objectAssign( {}, state, {
         parameters: action.payload
@@ -26,7 +26,7 @@ export default function vtnConfigurationReducer( state = initialState.vtnConfigu
     case types.LOAD_VTN_CONFIGURATION_ERROR:
       return state;
 
-      // MARKET CONTEXT
+  // MARKET CONTEXT
     case types.LOAD_MARKET_CONTEXT:
       return state;
 

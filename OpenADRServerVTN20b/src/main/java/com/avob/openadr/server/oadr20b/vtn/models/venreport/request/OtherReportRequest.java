@@ -26,6 +26,8 @@ public class OtherReportRequest extends ReportRequest {
 	@JoinColumn(name = "ven_id")
 	private Ven source;
 
+	private Long createDatetime;
+	
 	private Long lastUpdateDatetime;
 
 	@Lob
@@ -43,6 +45,7 @@ public class OtherReportRequest extends ReportRequest {
 		this.setReportRequestId(reportRequestId);
 		this.setGranularity(granularity);
 		this.setReportBackDuration(reportBackDuration);
+		createDatetime = System.currentTimeMillis();
 	}
 
 	public OtherReportCapability getOtherReportCapability() {
@@ -84,6 +87,14 @@ public class OtherReportRequest extends ReportRequest {
 
 	public void setLastUpdateValue(String lastUpdateValue) {
 		this.lastUpdateValue = lastUpdateValue;
+	}
+
+	public Long getCreateDatetime() {
+		return createDatetime;
+	}
+
+	public void setCreateDatetime(Long createDatetime) {
+		this.createDatetime = createDatetime;
 	}
 
 }

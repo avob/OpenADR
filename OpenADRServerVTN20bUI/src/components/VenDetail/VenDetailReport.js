@@ -33,6 +33,7 @@ import ChipInput from 'material-ui-chip-input'
 
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
 import SearchIcon from '@material-ui/icons/Search';
 
 
@@ -59,7 +60,6 @@ var VenAvailableReportTable = (props) => {
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
-            <TableCell>Available Report</TableCell>
             <TableCell align="right">Specifier ID</TableCell>
             <TableCell align="right">Created<br/>Date/Time</TableCell>
             <TableCell align="right">Duration</TableCell>
@@ -68,6 +68,35 @@ var VenAvailableReportTable = (props) => {
         </TableHead>
         <TableBody>
           {availableReport.map(row => (
+            <TableRow key={row.id}>
+              <TableCell align="right">{row.reportSpecifierId}</TableCell>
+              <TableCell align="right"></TableCell>
+              <TableCell align="right">{row.duration}</TableCell>
+              <TableCell align="right">{row.reportName}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Paper>
+  );
+}
+
+var VenRequestedReportTable = (props) => {
+  const {classes, requestedReport, ven} = props
+  console.log(requestedReport)
+  return (
+    <Paper className={classes.root}>
+      <Table className={classes.table}>
+        <TableHead>
+          <TableRow>
+            <TableCell align="right">Specifier ID</TableCell>
+            <TableCell align="right">Created<br/>Date/Time</TableCell>
+            <TableCell align="right">Duration</TableCell>
+            <TableCell align="right">Report Name</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {requestedReport.map(row => (
             <TableRow key={row.id}>
               <TableCell component="th" scope="row">
                 {row.name}
@@ -141,15 +170,48 @@ export class VenDetailReport extends React.Component {
         Status
       </Typography>
       <VenDetailHeader classes={classes} ven={ven} actions={
+        <div>
+        <Grid container spacing={ 24 }>
+          <Grid item xs={ 4 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="primary"
+                    fullWidth={true}
+                    size="small">
+              <AddIcon style={ { marginRight: 15 } }/> CREATE REQUEST
+            </Button>
+          </Grid>
+          <Grid item xs={ 4 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="primary"
+                    fullWidth={true}
+                    size="small">
+              <CloudDownloadIcon style={ { marginRight: 15 } }/> REQUIRE REPORTS
+            </Button>
+          </Grid>
+          <Grid item xs={ 4 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="primary"
+                    fullWidth={true}
+                    size="small">
+              <CloudDownloadIcon style={ { marginRight: 15 } }/> SEND REQUESTS
+            </Button>
+          </Grid>
+        </Grid>
         <Grid container spacing={ 24 }>
         <Grid item xs={ 4 }>
           <Button key="btn_create"
                   style={ { marginTop: 15 } }
                   variant="outlined"
-                  color="primary"
+                  color="secondary"
                   fullWidth={true}
                   size="small">
-            <CloudDownloadIcon style={ { marginRight: 15 } }/> RE-REGISTRATION
+            <RemoveIcon style={ { marginRight: 15 } }/> CLEAN REQUESTS
           </Button>
         </Grid>
         <Grid item xs={ 4 }>
@@ -159,21 +221,11 @@ export class VenDetailReport extends React.Component {
                   color="secondary"
                   fullWidth={true}
                   size="small">
-            <CloudDownloadIcon style={ { marginRight: 15 } }/> CANCEL REGISTRATION
+            <RemoveIcon style={ { marginRight: 15 } }/> CLEAN REPORTS
           </Button>
         </Grid>
-        <Grid item xs={ 4 }>
-          <Button key="btn_create"
-                  style={ { marginTop: 15 } }
-                  variant="outlined"
-                  color="secondary"
-                  fullWidth={true}
-                  size="small">
-            <CloudDownloadIcon style={ { marginRight: 15 } }/> CLEAN REGISTRATION
-          </Button>
         </Grid>
-      
-      </Grid>
+      </div>
       }/>
       <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
       <Typography gutterBottom
@@ -181,14 +233,17 @@ export class VenDetailReport extends React.Component {
                   component="h2">
         Reports
       </Typography>
-
       <VenAvailableReportTable ven={ven} availableReport={availableReport} classes={classes}/>
+
+
       <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
       <Typography gutterBottom
                   variant="title"
                   component="h2">
         Requests
       </Typography>
+      <VenRequestedReportTable ven={ven} requestedReport={requestedReport} classes={classes}/>
+
      
     </div>
     );

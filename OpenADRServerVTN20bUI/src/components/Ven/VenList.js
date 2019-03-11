@@ -145,7 +145,6 @@ export class VenList extends React.Component {
 
     for (var i in ven) {
       var v = ven[ i ];
-      console.log( v );
       view.push(
 
         <VtnConfigurationVenCard key={ 'ven_card_' + v.username }

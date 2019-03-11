@@ -24,6 +24,8 @@ public class ReportRequestDto {
 
 	private boolean acked = false;
 
+	private Long createDatetime;
+	
 	private Long lastUpdateDatetime;
 
 	private String lastUpdateValue;
@@ -122,6 +124,14 @@ public class ReportRequestDto {
 
 	public void setLastUpdateValue(String lastUpdateValue) {
 		this.lastUpdateValue = lastUpdateValue;
+	}
+
+	public Long getCreateDatetime() {
+		return createDatetime;
+	}
+
+	public void setCreateDatetime(Long createDatetime) {
+		this.createDatetime = createDatetime;
 	}
 
 }

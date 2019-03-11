@@ -33,6 +33,7 @@ import ChipInput from 'material-ui-chip-input'
 
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
 import SearchIcon from '@material-ui/icons/Search';
 
 
@@ -243,7 +244,7 @@ export class VenDetailSettings extends React.Component {
                   fullWidth={true}
                   size="small"
                   onClick={this.handleCleanRegistrationClick}>
-            <CloudDownloadIcon style={ { marginRight: 15 } }/> CLEAN REGISTRATION
+            <RemoveIcon style={ { marginRight: 15 } }/> CLEAN REGISTRATION
           </Button>
         </Grid>
       

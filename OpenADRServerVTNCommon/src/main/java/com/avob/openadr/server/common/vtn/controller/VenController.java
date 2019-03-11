@@ -92,10 +92,12 @@ public class VenController {
 				InputStreamResource resource = new InputStreamResource(
 						new FileInputStream(generateCertificateIfRequired.get()));
 				body = ResponseEntity.ok().header("Content-Disposition", "attachment; filename=\"archive.tar\"")
+						.header("X-VenID", prepare.getUsername())
 						.contentLength(generateCertificateIfRequired.get().length())
 						.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
 			} else {
-				body = ResponseEntity.status(HttpStatus.CREATED_201).body(null);
+				body = ResponseEntity.status(HttpStatus.CREATED_201).header("x-venID", prepare.getUsername())
+						.body(null);
 			}
 
 		} catch (GenerateX509VenException e) {

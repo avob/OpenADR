@@ -14,11 +14,11 @@ export default function venCreateReducer( state = initialState.ven_create, actio
 
   switch (action.type) {
 
-    // PARAMETERS
+  	// PARAMETERS
     case types.LOAD_VTN_CONFIGURATION:
       return state;
 
-
+    
     case types.LOAD_VTN_CONFIGURATION_SUCCESS:
       newState = objectAssign( {}, state, {
         parameters: action.payload
@@ -28,8 +28,8 @@ export default function venCreateReducer( state = initialState.ven_create, actio
     case types.LOAD_VTN_CONFIGURATION_ERROR:
       return state;
 
-      // VEN
-    case types.CREATE_VEN:
+     // VEN
+     case types.CREATE_VEN:
       return state;
 
     case types.CREATE_VEN_SUCCESS:
@@ -43,12 +43,12 @@ export default function venCreateReducer( state = initialState.ven_create, actio
       return state;
 
     case types.DELETE_VEN_SUCCESS:
-
+      
       return state;
 
     case types.DELETE_VEN_ERROR:
       return state;
-
+      
     default:
       return state;
   }

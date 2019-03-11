@@ -17,6 +17,9 @@ var loadClient = function ( url ) {
 export default function swaggerMiddleware( opts ) {
   return store => next => action => {
     console.log( action.type )
+    if(action.type.indexOf("_ERROR") > -1){
+      console.log(action.payload)
+    }
     if ( !action.swagger ) {
       return next( action );
     }
