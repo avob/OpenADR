@@ -8,9 +8,14 @@ import VtnConfigurationPage from './containers/VtnConfigurationPage';
 import VenPage from './containers/VenPage'
 import AccountPage from './containers/AccountPage'
 import EventPage from './containers/EventPage'
+import EventDetailPage from './containers/EventDetailPage'
+import EventCreatePage from './containers/EventCreatePage'
 import VenDetailPage from './containers/VenDetailPage'
 import VenDetailCreateReportPage from './containers/VenDetailCreateReportPage'
 import VenDetailReportPage from './containers/VenDetailReportPage'
+import VenDetailReportRequestPage from './containers/VenDetailReportRequestPage'
+
+
 
 
 
@@ -199,8 +204,9 @@ class App extends React.Component {
 
           <Route path="/vtn_configuration" component={ VtnConfigurationPage } />
           
-          <Route path="/ven/detail/:username/reports/:reportSpecifierId/create" component={ VenDetailCreateReportPage } />
 
+          <Route path="/ven/detail/:username/reports/:reportSpecifierId/requests/:reportRequestId" component={ VenDetailReportRequestPage } />
+          <Route path="/ven/detail/:username/reports/:reportSpecifierId/create" component={ VenDetailCreateReportPage } />
           <Route path="/ven/detail/:username/reports/:reportSpecifierId" component={ VenDetailReportPage } />
 
           <Route path="/ven/detail/:username/:panel(settings|reports|optschedules)" component={ VenDetailPage } />
@@ -212,6 +218,8 @@ class App extends React.Component {
 
           <Route path="/account" component={ AccountPage } />
 
+          <Route path="/event/detail/:eventId" component={ EventDetailPage } />
+          <Route path="/event/create" component={ EventCreatePage } />
           <Route path="/event" component={ EventPage } />
 
           <Route component={ NotFoundPage } />
@@ -224,8 +232,7 @@ class App extends React.Component {
 }
 
 App.propTypes = {
-  children: PropTypes.element,
-  classes: PropTypes.element
+  children: PropTypes.element
 };
 
 export default hot( module )( withStyles( styles )( App ) );

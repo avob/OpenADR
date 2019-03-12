@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
@@ -177,7 +178,6 @@ public class Oadr20bVTNEiReportService {
 			throws Oadr20bRegisterReportApplicationLayerException, Oadr20bXMLSignatureException,
 			Oadr20bMarshalException {
 
-		// String payloadReportRequestID = payload.getReportRequestID();
 		String requestID = payload.getRequestID();
 		String venID = payload.getVenID();
 		Ven ven = venService.findOneByUsername(venID);
@@ -208,14 +208,13 @@ public class Oadr20bVTNEiReportService {
 		for (OadrReportType oadrReportType : payload.getOadrReport()) {
 
 			boolean created = false;
+			XMLGregorianCalendar createdDateTime = oadrReportType.getCreatedDateTime();
+			String reportId = oadrReportType.getEiReportID();
 			String reportName = oadrReportType.getReportName();
-			// TODO bzanni : reportRequestID = 0 if not yet requested
 			String reportRequestID = oadrReportType.getReportRequestID();
 			String reportSpecifierID = oadrReportType.getReportSpecifierID();
 			DurationPropType duration = oadrReportType.getDuration();
-
-			// OtherReportCapability otherReportCapability = otherReportCapabilityService
-			// .findByReportSpecifierId(reportSpecifierID);
+			Dtstart dtstart = oadrReportType.getDtstart();
 
 			OtherReportCapability otherReportCapability = currentVenCapabilityMap.get(reportSpecifierID);
 			if (otherReportCapability == null) {
@@ -223,6 +222,7 @@ public class Oadr20bVTNEiReportService {
 				created = true;
 			}
 
+			otherReportCapability.setReportId(reportId);
 			otherReportCapability.setReportName(ReportNameEnumeratedType.fromValue(reportName));
 			otherReportCapability.setReportSpecifierId(reportSpecifierID);
 			otherReportCapability.setReportRequestId(reportRequestID);
@@ -230,22 +230,23 @@ public class Oadr20bVTNEiReportService {
 			if (duration != null) {
 				otherReportCapability.setDuration(duration.getDuration());
 			}
+			if (dtstart != null) {
+				otherReportCapability.setStart(Oadr20bFactory.xmlCalendarToTimestamp(dtstart.getDateTime()));
+			}
+			if (createdDateTime != null) {
+				otherReportCapability.setCreatedDatetime(Oadr20bFactory.xmlCalendarToTimestamp(createdDateTime));
+			}
 			capabilities.add(otherReportCapability);
 			List<OtherReportCapabilityDescription> capabilityDescription = new ArrayList<OtherReportCapabilityDescription>();
 			for (OadrReportDescriptionType oadrReportDescriptionType : oadrReportType.getOadrReportDescription()) {
-
 				String rid = oadrReportDescriptionType.getRID();
-
 				OtherReportCapabilityDescription description = null;
 				if (!created) {
-
 					currentVenCapabilityDescriptionMap.get(otherReportCapability.getReportSpecifierId() + rid);
 				}
-
 				if (description == null) {
 					description = new OtherReportCapabilityDescription(otherReportCapability);
 				}
-
 				String reportType = oadrReportDescriptionType.getReportType();
 				String readingType = oadrReportDescriptionType.getReadingType();
 				OadrSamplingRateType oadrSamplingRate = oadrReportDescriptionType.getOadrSamplingRate();
@@ -940,11 +941,7 @@ public class Oadr20bVTNEiReportService {
 
 				otherReportRequests.add(otherReportRequest);
 
-				
-
 			}
-
-	
 
 		}
 
@@ -1027,7 +1024,6 @@ public class Oadr20bVTNEiReportService {
 					otherReportRequests.add(otherReportRequest);
 				}
 
-
 			}
 
 		}
@@ -1055,7 +1051,6 @@ public class Oadr20bVTNEiReportService {
 
 		otherReportCapabilityService.save(findByPayloadReportRequestId2);
 
-	
 		List<OtherReportRequest> findByReportRequestId = otherReportRequestService
 				.findByReportRequestId(reportRequestID);
 		otherReportRequestService.delete(findByReportRequestId);

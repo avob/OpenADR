@@ -6,15 +6,19 @@ public class ReportCapabilityDto {
 
 	private long id;
 
+	private String reportId;
+
 	private String reportSpecifierId;
 
 	private String reportRequestId;
 
 	private ReportNameEnumeratedType reportName;
 
+	private Long start;
+
 	private String duration;
-	
-	private Long createDatetime;
+
+	private Long createdDatetime;
 
 	public long getId() {
 		return id;
@@ -56,11 +60,27 @@ public class ReportCapabilityDto {
 		this.reportRequestId = reportRequestId;
 	}
 
-	public Long getCreateDatetime() {
-		return createDatetime;
+	public Long getCreatedDatetime() {
+		return createdDatetime;
 	}
 
-	public void setCreateDatetime(Long createDatetime) {
-		this.createDatetime = createDatetime;
+	public void setCreatedDatetime(Long createDatetime) {
+		this.createdDatetime = createDatetime;
+	}
+
+	public String getReportId() {
+		return reportId;
+	}
+
+	public void setReportId(String reportId) {
+		this.reportId = reportId;
+	}
+
+	public Long getStart() {
+		return start;
+	}
+
+	public void setStart(Long start) {
+		this.start = start;
 	}
 }

@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.Lob;
 
 import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 
@@ -40,6 +41,17 @@ public abstract class ReportRequest {
 	private ReadingTypeEnumeratedType readingType;
 
 	private boolean acked = false;
+
+	private Long createdDatetime;
+
+	private Long lastUpdateDatetime;
+
+	@Lob
+	private String lastUpdateValue;
+
+	protected ReportRequest() {
+		setCreatedDatetime(System.currentTimeMillis());
+	}
 
 	public String getReportRequestId() {
 		return reportRequestId;
@@ -103,6 +115,30 @@ public abstract class ReportRequest {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Long getCreatedDatetime() {
+		return createdDatetime;
+	}
+
+	public void setCreatedDatetime(Long createdDatetime) {
+		this.createdDatetime = createdDatetime;
+	}
+
+	public Long getLastUpdateDatetime() {
+		return lastUpdateDatetime;
+	}
+
+	public void setLastUpdateDatetime(Long lastUpdateDatetime) {
+		this.lastUpdateDatetime = lastUpdateDatetime;
+	}
+
+	public String getLastUpdateValue() {
+		return lastUpdateValue;
+	}
+
+	public void setLastUpdateValue(String lastUpdateValue) {
+		this.lastUpdateValue = lastUpdateValue;
 	}
 
 }

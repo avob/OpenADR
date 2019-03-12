@@ -148,7 +148,7 @@ export const removeVenMarketContext = (venId, marketContextId) => {
       var params = { venID: venId, marketContextId: marketContextId };
       return  api.apis[ 'ven-controller' ].deleteVenMarketContextUsingPOST(params, jsonResponseContentType);
     },
-    parseJsonData,
+    null,
     (dispatch, getState) => { loadVenMarketContext( venId )( dispatch, getState ) }
   );
 }
@@ -159,7 +159,7 @@ export const removeVenGroup = (venId, groupId) => {
       var params = { venID: venId, groupId: groupId };
       return  api.apis[ 'ven-controller' ].deleteVenGroupUsingPOST(params, jsonResponseContentType);
     },
-    parseJsonData,
+    null,
     (dispatch, getState) => { loadVenGroup( venId )( dispatch, getState ) }
   );
 }
@@ -211,10 +211,10 @@ export const loadVenAvailableReportDescription = (venId, reportSpecifierId) => {
   );
 }
 
-export const loadVenRequestedReport = (venId, reportSpecifierId) => {
+export const loadVenRequestedReport = (venId, reportRequestId) => {
   return swaggerAction(types.LOAD_VEN_REQUESTED_REPORT, 
     (api) => {
-      var params = { venID: venId, reportSpecifierId: reportSpecifierId };
+      var params = { venID: venId, reportRequestId: reportRequestId };
       return  api.apis[ 'oadr-20b-ven-controller' ].viewReportRequestUsingGET(params, jsonResponseContentType);
     },
     parseJsonData

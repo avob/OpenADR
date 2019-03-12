@@ -17,14 +17,18 @@ public interface OtherReportRequestDao extends ReportRequestDao<OtherReportReque
 	public OtherReportRequest findBySourceAndOtherReportCapabilityDescriptionAndReportRequestId(Ven ven,
 			OtherReportCapabilityDescription otherReportCapabilityDescription, String reportRequestId);
 
-	public List<OtherReportRequest> findOneBySourceAndOtherReportCapability_ReportSpecifierId(Ven ven,
+	public List<OtherReportRequest> findBySourceAndOtherReportCapability_ReportSpecifierId(Ven ven,
 			String reportSpecifierId);
-
+	
 	public List<OtherReportRequest> findBySource(Ven ven);
 
 	@Query("select req from OtherReportRequest req left join req.otherReportCapability cap where req.source = :ven and cap.reportSpecifierId like :reportSpecifierId%")
 	public List<OtherReportRequest> findBySourceAndOtherReportCapability_ReportSpecifierIdStartingWith(
 			@Param("ven") Ven ven, @Param("reportSpecifierId") String reportSpecifierId);
+	
+	@Query("select req from OtherReportRequest req where req.source = :ven and req.reportRequestId = :reportRequestId")
+	public List<OtherReportRequest> findBySourceAndOtherReportCapability_ReportRequestId(
+			@Param("ven") Ven ven, @Param("reportRequestId") String reportRequestId);
 
 	@Transactional
 	public void deleteByOtherReportCapabilityDescriptionIn(Collection<OtherReportCapabilityDescription> descriptions);

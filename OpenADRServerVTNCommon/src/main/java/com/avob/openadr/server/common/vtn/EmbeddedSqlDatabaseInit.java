@@ -8,8 +8,11 @@ import org.springframework.context.annotation.Profile;
 
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
+import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
+import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
+import com.avob.openadr.server.common.vtn.service.VenGroupService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.google.common.collect.Sets;
@@ -22,6 +25,9 @@ public class EmbeddedSqlDatabaseInit {
 	private VenMarketContextService venMarketContextService;
 
 	@Resource
+	private VenGroupService venGroupService;
+
+	@Resource
 	private VenService venService;
 
 	@PostConstruct
@@ -32,6 +38,15 @@ public class EmbeddedSqlDatabaseInit {
 		VenMarketContext marketContext = venMarketContextService
 				.prepare(new VenMarketContextDto(marketContextName, marketContextDescription, marketcontextColor));
 		venMarketContextService.save(marketContext);
+
+		String groupName = "OadrCACert";
+		VenGroup oadrCaCert = venGroupService.prepare(new VenGroupDto(groupName));
+		venGroupService.save(oadrCaCert);
+
+		groupName = "CustomCACert";
+		VenGroup customCaCert = venGroupService.prepare(new VenGroupDto(groupName));
+		venGroupService.save(customCaCert);
+
 		// rsa test ven
 		VenCreateDto dto = new VenCreateDto();
 		dto.setUsername("2E:55:12:81:B9:EE:9C:46:72:1D");
@@ -40,6 +55,7 @@ public class EmbeddedSqlDatabaseInit {
 		dto.setOadrProfil("20b");
 		Ven prepare = venService.prepare(dto);
 		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
+		prepare.setVenGroup(Sets.newHashSet(oadrCaCert));
 		venService.save(prepare);
 
 		// ecc test ven
@@ -50,6 +66,7 @@ public class EmbeddedSqlDatabaseInit {
 		dto.setOadrProfil("20b");
 		prepare = venService.prepare(dto);
 		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
+		prepare.setVenGroup(Sets.newHashSet(oadrCaCert));
 		venService.save(prepare);
 
 		// ven1.oadr.com
@@ -60,6 +77,18 @@ public class EmbeddedSqlDatabaseInit {
 		dto.setOadrProfil("20b");
 		prepare = venService.prepare(dto);
 		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
+		prepare.setVenGroup(Sets.newHashSet(customCaCert));
+		venService.save(prepare);
+
+		// ven2.oadr.com
+		dto = new VenCreateDto();
+		dto.setUsername("4E:6C:5F:94:70:CD:A8:5A:28:B7");
+		dto.setAuthenticationType("x509");
+		dto.setCommonName("ven1.oadr.com");
+		dto.setOadrProfil("20b");
+		prepare = venService.prepare(dto);
+		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
+		prepare.setVenGroup(Sets.newHashSet(customCaCert));
 		venService.save(prepare);
 
 	}

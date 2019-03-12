@@ -6,13 +6,12 @@ import classNames from 'classnames';
 import { withStyles, MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 import { VtnConfigurationVenCard, VtnConfigurationMarketContextCard, VtnConfigurationGroupCard } from '../common/VtnConfigurationCard'
+import { VenAvailableReportHeader, VenAvailableReportParamsHeader } from '../common/VenAvailableReportHeader'
+
+
+
 import { MarketContextSelectDialog, GroupSelectDialog } from '../common/VtnconfigurationDialog'
 
-import Input from '@material-ui/core/Input';
-import InputBase from '@material-ui/core/InputBase';
-import InputLabel from '@material-ui/core/InputLabel';
-import TextField from '@material-ui/core/TextField';
-import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
 
 
@@ -59,7 +58,10 @@ import Toolbar from '@material-ui/core/Toolbar';
 
 import { lighten } from '@material-ui/core/styles/colorManipulator';
 
-import Fab from '@material-ui/core/Fab';
+
+import {minutesToICalDuration, iCalDurationInSeconds} from '../../utils/time'
+import {isActionReport, isHistoryReport, isTelemetryReport} from '../../utils/venReport'
+
 
 
 const toolbarStyles = theme => ({
@@ -133,8 +135,105 @@ class VenAvailableReportDescriptionTable extends React.Component {
   constructor( props ) {
     super( props );
     this.state = {}
-    this.state.selected = [];
   }
+
+  
+  
+
+  render() {
+    const {classes, availableReportDescription, availableReport} = this.props
+    return (
+      <div>
+        <Paper className={classes.root}>
+          <VenAvailableReportDescriptionTableToolbar handeCreateRequestClick={this.props.handeCreateRequestClick} 
+          availableReport={availableReport} numSelected={this.props.selected.length} />
+          <Table className={classes.table}>
+            <TableHead>
+              <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                     color="primary"
+                    indeterminate={this.props.selected.length > 0 && this.props.selected.length < availableReportDescription.length}
+                    checked={this.props.selected.length === availableReportDescription.length}
+                    onChange={this.props.handleSelectAllClick}
+                  />
+                </TableCell>
+                <TableCell align="right">rID</TableCell>
+                <TableCell align="right">ReportType</TableCell>
+                <TableCell align="right">ReadingType</TableCell>
+                <TableCell align="right">OadrMinPeriod</TableCell>
+                <TableCell align="right">OadrMaxPeriod</TableCell>
+                <TableCell align="right">OadrOnchange</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {availableReportDescription.map(row => {
+                const isSelected = this.props.isSelected(row.rid);
+                return (
+                  <TableRow key={row.id}
+                    hover
+                        onClick={event => this.props.handleClick(event, row.rid)}
+                        role="checkbox"
+                        aria-checked={isSelected}
+                        tabIndex={-1}
+                        selected={isSelected}>
+                    <TableCell padding="checkbox">
+                       <Checkbox checked={isSelected}  color="primary"/>
+                    </TableCell>
+                    <TableCell align="right">{row.rid}</TableCell>
+                    <TableCell align="right">{row.reportType}</TableCell>
+                    <TableCell align="right">{row.readingType}</TableCell>
+                    <TableCell align="right">{row.oadrMinPeriod}</TableCell>
+                    <TableCell align="right">{row.oadrMaxPeriod}</TableCell>
+                    <TableCell align="right">{(row.oadrOnChange) ? "True" : "False"}</TableCell>
+                </TableRow>
+              )
+              })}
+            </TableBody>
+          </Table>
+        </Paper>
+      </div>
+    );
+  }
+  
+}
+
+
+
+
+export class VenDetailCreateReport extends React.Component {
+  constructor( props ) {
+    super( props );
+    this.state = {
+      start:null,
+      duration:null,
+      granularity: null,
+      reportBackDuration:null,
+      selected: [],
+      hasError:false
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps.availableReport)
+    var newState = {}
+    if(nextProps.availableReport.start != null) {
+      newState.start = nextProps.availableReport.start;
+    }
+    if(nextProps.availableReport.duration != null) {
+      console.log(nextProps.availableReport.duration, iCalDurationInSeconds(nextProps.availableReport.duration))
+      newState.duration = iCalDurationInSeconds(nextProps.availableReport.duration) / 60;
+    }
+    this.setState(newState);
+
+  }
+
+
+  onStartChange = start => { this.setState({start}) }
+  onDurationChange = duration => this.setState({duration})
+  onGranularityChange = granularity => {this.setState({granularity})}
+  onReportBackDurationChange = reportBackDuration => this.setState({reportBackDuration})
+
 
   handleSelectAllClick = (event) => {
     if (event.target.checked) {
@@ -143,6 +242,52 @@ class VenAvailableReportDescriptionTable extends React.Component {
     }
     this.setState({ selected: [] });
   };
+
+  isSelected = rid => this.state.selected.indexOf(rid) !== -1;
+
+  handeCreateRequestClick = () => {
+    var start = this.state.start;
+    var end = null;
+    if(start != null) {
+      end = new Date();
+      end.setTime(start + this.state.duration * 60 * 1000);
+      end = end.getTime();
+    }
+    
+    var granularity = null;
+    var reportBackDuration = null;
+    if(this.state.granularity) {
+     granularity =  minutesToICalDuration(this.state.granularity);
+    }
+    if(this.state.reportBackDuration) {
+     reportBackDuration =  minutesToICalDuration(this.state.reportBackDuration);
+    }
+
+    var rid = null;
+    if(this.state.selected.length < this.props.availableReportDescription.length) {
+      rid = this.state.selected;
+    }
+
+    if(isHistoryReport(this.props.availableReport) && start != null && end != null){
+
+      this.props.createRequestedReport(this.props.venId, this.props.reportSpecifierId
+          , start, end, rid);
+    }
+    else if(isTelemetryReport(this.props.availableReport) && granularity != null 
+      && reportBackDuration != null){
+      this.props.createRequestedReportSubscription(this.props.venId, this.props.reportSpecifierId
+          , granularity, reportBackDuration, rid);
+    }
+    else if(isActionReport(this.props.availableReport)) {
+      this.props.createRequestedReport(this.props.venId, this.props.reportSpecifierId
+          , null, null, rid);
+      
+    }
+    else {
+      this.setState({hasError: true});
+    }
+    
+  }
 
   handleClick = (event, rid) => {
     const { selected } = this.state;
@@ -164,119 +309,45 @@ class VenAvailableReportDescriptionTable extends React.Component {
 
     this.setState({ selected: newSelected });
   }
+  
  
-  handleChangePage = (event, page) => {
-    this.setState({ page });
-  };
-
-  handleChangeRowsPerPage = event => {
-    this.setState({ rowsPerPage: event.target.value });
-  };
-
-  isSelected = rid => this.state.selected.indexOf(rid) !== -1;
-
-  handeCreateRequestClick = () => {
-    var start = null;
-    var end = null;
-    var granularity = null;
-    var reportBackDuration = null;
-    var rid = null;
-    if(this.state.selected.length < this.props.availableReportDescription.length) {
-      rid = this.state.selected;
-    }
-    if(this.props.availableReport.reportName == "METADATA_HISTORY_USAGE"){
-
-      this.props.createRequestedReport(this.props.venId, this.props.reportSpecifierId
-          , start, end, rid);
-    }
-    else if(this.props.availableReport.reportName == "METADATA_TELEMETRY_USAGE"){
-      this.props.createRequestedReportSubscription(this.props.venId, this.props.reportSpecifierId
-          , granularity, reportBackDuration, rid);
-    }
-    
-  }
-
-  render() {
-    const {classes, availableReportDescription, availableReport} = this.props
-    return (
-      <Paper className={classes.root}>
-        <VenAvailableReportDescriptionTableToolbar handeCreateRequestClick={this.handeCreateRequestClick} availableReport={availableReport} numSelected={this.state.selected.length} />
-        <Table className={classes.table}>
-          <TableHead>
-            <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                   color="primary"
-                  indeterminate={this.state.selected.length > 0 && this.state.selected.length < availableReportDescription.length}
-                  checked={this.state.selected.length === availableReportDescription.length}
-                  onChange={this.handleSelectAllClick}
-                />
-              </TableCell>
-              <TableCell align="right">rID</TableCell>
-              <TableCell align="right">ReportType</TableCell>
-              <TableCell align="right">ReadingType</TableCell>
-              <TableCell align="right">OadrMinPeriod</TableCell>
-              <TableCell align="right">OadrMaxPeriod</TableCell>
-              <TableCell align="right">OadrOnchange</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {availableReportDescription.map(row => {
-              const isSelected = this.isSelected(row.rid);
-              return (
-                <TableRow key={row.id}
-                  hover
-                      onClick={event => this.handleClick(event, row.rid)}
-                      role="checkbox"
-                      aria-checked={isSelected}
-                      tabIndex={-1}
-                      selected={isSelected}>
-                  <TableCell padding="checkbox">
-                     <Checkbox checked={isSelected}  color="primary"/>
-                  </TableCell>
-                  <TableCell align="right">{row.rid}</TableCell>
-                  <TableCell align="right">{row.reportType}</TableCell>
-                  <TableCell align="right">{row.readingType}</TableCell>
-                  <TableCell align="right">{row.oadrMinPeriod}</TableCell>
-                  <TableCell align="right">{row.oadrMaxPeriod}</TableCell>
-                  <TableCell align="right">{(row.oadrOnChange) ? "True" : "False"}</TableCell>
-              </TableRow>
-            )
-            })}
-          </TableBody>
-        </Table>
-      </Paper>
-    );
-  }
-  
-}
-
-
-
-
-export class VenDetailCreateReport extends React.Component {
-  constructor( props ) {
-    super( props );
-    this.state = {}
-  }
-
-  
-
   render() {
     const {classes, availableReportDescription, availableReport
       , venId, reportSpecifierId
       , createRequestedReport, createRequestedReportSubscription} = this.props;
 
-    console.log(availableReportDescription, availableReport, this.props)
-
 
     return (
     <div className={ classes.root } >
+      <VenAvailableReportHeader availableReport={availableReport} classes={classes}/>
+      <Divider style={ { marginBottom: '30px', marginTop: '20px' } } /> 
+
+      {(!isActionReport(this.props.availableReport)) ? (
+        <div>
+          <VenAvailableReportParamsHeader availableReport={availableReport} classes={classes}
+            start={this.state.start}
+            duration={this.state.duration}
+            granularity={this.state.granularity}
+            reportBackDuration={this.state.reportBackDuration}
+            onStartChange={this.onStartChange}
+            onDurationChange={this.onDurationChange}
+            onGranularityChange={this.onGranularityChange}
+            onReportBackDurationChange={this.onReportBackDurationChange}
+            hasError={this.state.hasError}
+
+            />
+          <Divider style={ { marginBottom: '30px', marginTop: '20px' } } /> 
+        </div>
+        ) : null}
+      
+    
       <VenAvailableReportDescriptionTable availableReport={availableReport} 
           availableReportDescription={availableReportDescription} 
+          handleSelectAllClick={this.handleSelectAllClick}
+          handleClick={this.handleClick}
+          isSelected={this.isSelected}
           handeCreateRequestClick={this.handeCreateRequestClick}
-          createRequestedReport={createRequestedReport}
-          createRequestedReportSubscription={createRequestedReportSubscription}
+          selected={this.state.selected}
           venId={venId}
           reportSpecifierId={reportSpecifierId}
           classes={classes}/>

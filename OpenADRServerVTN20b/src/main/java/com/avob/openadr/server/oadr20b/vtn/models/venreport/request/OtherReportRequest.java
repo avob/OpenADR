@@ -2,7 +2,6 @@ package com.avob.openadr.server.oadr20b.vtn.models.venreport.request;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -26,26 +25,20 @@ public class OtherReportRequest extends ReportRequest {
 	@JoinColumn(name = "ven_id")
 	private Ven source;
 
-	private Long createDatetime;
-	
-	private Long lastUpdateDatetime;
-
-	@Lob
-	private String lastUpdateValue;
-
 	public OtherReportRequest() {
 	}
 
 	public OtherReportRequest(Ven ven, OtherReportCapability otherReportCapability,
 			OtherReportCapabilityDescription otherReportCapabilityDescription, String reportRequestId,
 			String granularity, String reportBackDuration) {
+		super();
 		this.setSource(ven);
 		this.setOtherReportCapability(otherReportCapability);
 		this.setOtherReportCapabilityDescription(otherReportCapabilityDescription);
 		this.setReportRequestId(reportRequestId);
 		this.setGranularity(granularity);
 		this.setReportBackDuration(reportBackDuration);
-		createDatetime = System.currentTimeMillis();
+
 	}
 
 	public OtherReportCapability getOtherReportCapability() {
@@ -71,30 +64,6 @@ public class OtherReportRequest extends ReportRequest {
 
 	private void setSource(Ven source) {
 		this.source = source;
-	}
-
-	public Long getLastUpdateDatetime() {
-		return lastUpdateDatetime;
-	}
-
-	public void setLastUpdateDatetime(Long lastUpdateDatetime) {
-		this.lastUpdateDatetime = lastUpdateDatetime;
-	}
-
-	public String getLastUpdateValue() {
-		return lastUpdateValue;
-	}
-
-	public void setLastUpdateValue(String lastUpdateValue) {
-		this.lastUpdateValue = lastUpdateValue;
-	}
-
-	public Long getCreateDatetime() {
-		return createDatetime;
-	}
-
-	public void setCreateDatetime(Long createDatetime) {
-		this.createDatetime = createDatetime;
 	}
 
 }

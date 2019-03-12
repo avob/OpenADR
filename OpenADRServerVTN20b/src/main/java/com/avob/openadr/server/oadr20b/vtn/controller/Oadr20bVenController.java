@@ -135,11 +135,11 @@ public class Oadr20bVenController {
 
 		Ven ven = checkVen(venID);
 		List<OtherReportCapability> findBySource = null;
-		if(reportSpecifierId != null) {
-			OtherReportCapability findByReportSpecifierId = otherReportCapabilityService.findByReportSpecifierId(reportSpecifierId);
+		if (reportSpecifierId != null) {
+			OtherReportCapability findByReportSpecifierId = otherReportCapabilityService
+					.findByReportSpecifierId(reportSpecifierId);
 			findBySource = Arrays.asList(findByReportSpecifierId);
-		}
-		else {
+		} else {
 			findBySource = otherReportCapabilityService.findBySource(ven);
 		}
 		return oadr20bDtoMapper.mapList(findBySource, ReportCapabilityDto.class);
@@ -255,15 +255,18 @@ public class Oadr20bVenController {
 	@RequestMapping(value = "/{venID}/report/requested", method = RequestMethod.GET)
 	@ResponseBody
 	public List<ReportRequestDto> viewReportRequest(@PathVariable("venID") String venID,
-			@RequestParam(value = "reportSpecifierId", required = false) String reportSpecifierId)
+			@RequestParam(value = "reportSpecifierId", required = false) String reportSpecifierId,
+			@RequestParam(value = "reportRequestId", required = false) String reportRequestId)
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 
 		Ven ven = checkVen(venID);
 		List<OtherReportRequest> findBySource = null;
-		if (reportSpecifierId == null) {
+		if (reportSpecifierId == null && reportRequestId == null) {
 			findBySource = otherReportRequestService.findBySource(ven);
-		} else {
+		} else if (reportSpecifierId != null) {
 			findBySource = otherReportRequestService.findBySourceAndReportSpecifierId(ven, reportSpecifierId);
+		} else if (reportRequestId != null) {
+			findBySource = otherReportRequestService.findBySourceAndReportRequestId(ven, reportRequestId);
 		}
 
 		return oadr20bDtoMapper.mapList(findBySource, ReportRequestDto.class);

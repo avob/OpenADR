@@ -4,10 +4,12 @@ import ven from './venReducer';
 import ven_detail from './venDetailReducer';
 import ven_detail_create_report from './venDetailCreateReportReducer';
 import ven_detail_report from './venDetailReportReducer';
-
+import ven_detail_report_request from './venDetailReportRequestReducer'
 import ven_create from './venCreateReducer';
 import account from './accountReducer';
-import event from './eventReducer';
+import event from './eventReducer'
+import event_detail from './eventDetailReducer'
+import event_create from './eventCreateReducer';
 
 
 
@@ -18,9 +20,12 @@ const rootReducer = combineReducers( {
   ven_detail,
   ven_detail_report,
   ven_detail_create_report,
+  ven_detail_report_request,
   ven_create,
   account,
-  event
+  event,
+  event_detail,
+  event_create
 } );
 
 export default rootReducer;

@@ -6,41 +6,12 @@ import classNames from 'classnames';
 import { withStyles, MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 import { VtnConfigurationVenCard, VtnConfigurationMarketContextCard, VtnConfigurationGroupCard } from '../common/VtnConfigurationCard'
-import { MarketContextSelectDialog, GroupSelectDialog } from '../common/VtnconfigurationDialog'
-
-import Input from '@material-ui/core/Input';
-import InputBase from '@material-ui/core/InputBase';
-import InputLabel from '@material-ui/core/InputLabel';
-import TextField from '@material-ui/core/TextField';
-import FormControl from '@material-ui/core/FormControl';
-import Grid from '@material-ui/core/Grid';
+import { VenAvailableReportHeader } from '../common/VenAvailableReportHeader'
 
 
 import Typography from '@material-ui/core/Typography';
 
 import Divider from '@material-ui/core/Divider';
-
-
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
-
-import IconButton from '@material-ui/core/IconButton';
-
-import StarBorderIcon from '@material-ui/icons/StarBorder';
-
-import ChipInput from 'material-ui-chip-input'
-
-import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
-import RemoveIcon from '@material-ui/icons/Remove';
-import SearchIcon from '@material-ui/icons/Search';
-
-
-import SnackbarContent from '@material-ui/core/SnackbarContent';
-import DoneIcon from '@material-ui/icons/Done';
-import CloseIcon from '@material-ui/icons/Close';
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 
 
 import Table from '@material-ui/core/Table';
@@ -50,13 +21,27 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
+import Toolbar from '@material-ui/core/Toolbar';
+
+
 
 var VenAvailableReportDescriptionTable = (props) => {
   const {classes, availableReportDescription} = props
-  console.log(availableReportDescription)
 
   return (
     <Paper className={classes.root}>
+      <Toolbar
+      className={classes.root}
+    >
+      <div className={classes.title}>
+         <Typography variant="h6" id="tableTitle">
+             Report Descriptions
+          </Typography>
+      </div>
+      <div className={classes.spacer} />
+      <div className={classes.actions}>
+      </div>
+    </Toolbar>
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
@@ -102,11 +87,8 @@ export class VenDetailReport extends React.Component {
 
     return (
     <div className={ classes.root } >
-      <Typography gutterBottom
-                  variant="title"
-                  component="h2">
-        Report Descriptions
-      </Typography>
+      <VenAvailableReportHeader availableReport={availableReport} classes={classes}/>
+      <Divider style={ { marginBottom: '30px', marginTop: '20px' } } /> 
       <VenAvailableReportDescriptionTable availableReportDescription={availableReportDescription} classes={classes}/>
   
     </div>

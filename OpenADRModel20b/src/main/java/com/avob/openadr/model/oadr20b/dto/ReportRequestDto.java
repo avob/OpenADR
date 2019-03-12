@@ -24,7 +24,7 @@ public class ReportRequestDto {
 
 	private boolean acked = false;
 
-	private Long createDatetime;
+	private Long createdDatetime;
 	
 	private Long lastUpdateDatetime;
 
@@ -126,12 +126,12 @@ public class ReportRequestDto {
 		this.lastUpdateValue = lastUpdateValue;
 	}
 
-	public Long getCreateDatetime() {
-		return createDatetime;
+	public Long getCreatedDatetime() {
+		return createdDatetime;
 	}
 
-	public void setCreateDatetime(Long createDatetime) {
-		this.createDatetime = createDatetime;
+	public void setCreatedDatetime(Long createDatetime) {
+		this.createdDatetime = createDatetime;
 	}
 
 }

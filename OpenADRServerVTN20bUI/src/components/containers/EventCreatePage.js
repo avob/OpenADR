@@ -11,8 +11,7 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 
-import EventList from '../Event/EventList'
-import EventCalendar from '../Event/EventCalendar'
+import EventCreate from '../EventCreate/EventCreate'
 
 
 function TabContainer( props ) {
@@ -59,7 +58,7 @@ const styles = theme => ({
   },
 });
 
-export class EventPage extends React.Component {
+export class EventCreatePage extends React.Component {
 
 
   state = {
@@ -85,17 +84,11 @@ export class EventPage extends React.Component {
             indicatorColor="primary"
             textColor="primary"
             centered>
-        <Tab label="Events" />
-        <Tab label="Calendar" />
+        <Tab label="Event Create" />
       </Tabs>
       <Divider variant="middle" />
-
       { value === 0 && <TabContainer>
-                          <EventList classes={classes} />
-                       </TabContainer> }
-                       
-      { value === 1 && <TabContainer>
-                          <EventCalendar classes={classes} />
+                          <EventCreate classes={classes} />
                        </TabContainer> }
 
     </div>
@@ -104,13 +97,13 @@ export class EventPage extends React.Component {
   }
 }
 
-EventPage.propTypes = {
+EventCreatePage.propTypes = {
   actions: PropTypes.object.isRequired
 };
 
 function mapStateToProps( state ) {
   return {
-    event: state.event
+    event_create: state.event_create
   };
 }
 
@@ -123,4 +116,4 @@ function mapDispatchToProps( dispatch ) {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)( withStyles( styles )( EventPage ) );
+)( withStyles( styles )( EventCreatePage ) );

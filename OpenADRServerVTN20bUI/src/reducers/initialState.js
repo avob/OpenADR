@@ -15,15 +15,23 @@ export default {
     requestedReport:[]
   },
   ven_detail_create_report: {
-    availableReportDescription:[]
+    availableReportDescription:[],
+    availableReport: {}
   },
   ven_detail_report: {
-    availableReportDescription:[]
+    availableReportDescription:[],
+    availableReport:{}
+  },
+  ven_detail_report_request: {
+    requestedReport: [],
+    availableReport: {}
   },
   ven_create: {
     parameters: {}
   },
   account: [],
-  event: []
+  event: [],
+  event_detail: {},
+  event_create: {},
 
 };

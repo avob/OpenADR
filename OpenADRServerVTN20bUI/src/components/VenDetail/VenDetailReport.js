@@ -54,34 +54,10 @@ import Paper from '@material-ui/core/Paper';
 
 import { history } from '../../store/configureStore';
 
+import {iCalDurationInSeconds, formatTimestamp} from '../../utils/time'
+import {isActionReport, isHistoryReport, isTelemetryReport} from '../../utils/venReport'
 
-//
-// Takes an ical duration in a outputs it as a total # of seconds
-//
-function iCalDurationInSeconds(durStr) {
-  var exp = new RegExp(/^P/);
-  let totalSec = 0;
-  let valStr;
-  if (durStr.match(exp)) {
-    // Days
-    exp = new RegExp(/(\d+)D/);
-    valStr = durStr.match(exp);
-    if (valStr) totalSec += parseInt(valStr[1]) * 60 * 60 * 24;
-    // Hours
-    exp = new RegExp(/(\d+)H/);
-    valStr = durStr.match(exp);
-    if (valStr) totalSec += parseInt(valStr[1]) * 60 * 60;
-    // Minutes
-    exp = new RegExp(/(\d+)M/);
-    valStr = durStr.match(exp);
-    if (valStr) totalSec += parseInt(valStr[1]) * 60;
-    // Seconds
-    exp = new RegExp(/(\d+)S/);
-    valStr = durStr.match(exp);
-    if (valStr) totalSec += parseInt(valStr[1]);
-  }
-  return totalSec;
-}
+
 
 
 var VenAvailableReportTable = (props) => {
@@ -98,30 +74,55 @@ var VenAvailableReportTable = (props) => {
 
     }
   }
+
+  var getReportBehavior = (report) => {
+    var behavior = "Unknown";
+    if(isActionReport(report)) {
+      behavior = "Action"
+    }
+    else if(isHistoryReport(report)) {
+      behavior = "History"
+    }
+    else if(isTelemetryReport(report)) {
+      behavior = "Telemetry"
+    }
+    return behavior
+  }
+
+  var getFormatedCreatedDatetime = (report) => {
+    var format = formatTimestamp(report.createdDatetime);
+    return (
+      <span>{format.date}<br/>{format.time} {format.tz}</span>
+    );
+  }
+
+  var onClick = reportSpecifierId => event => props.handleViewReportDetail(reportSpecifierId)
   return (
     <Paper className={classes.root}>
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
+            <TableCell align="right">Report Behavior</TableCell>
             <TableCell align="right">Specifier ID</TableCell>
             <TableCell align="right">Created<br/>Date/Time</TableCell>
-            <TableCell align="right">Duration</TableCell>
+            
             <TableCell align="right">Report Name</TableCell>
             <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {availableReport.map(row => (
-            <TableRow key={row.id}>
-              <TableCell align="right">{row.reportSpecifierId}</TableCell>
-              <TableCell align="right">{row.createDatetime}</TableCell>
-              <TableCell align="right">{(row.duration) ? row.duration : "Realtime"}</TableCell>
-              <TableCell align="right">{row.reportName}</TableCell>
+            <TableRow key={row.id}
+              hover
+          
+               >
+               <TableCell scope="row" onClick={onClick(row.reportSpecifierId)} align="right">{getReportBehavior(row)}</TableCell>
+              <TableCell scope="row" onClick={onClick(row.reportSpecifierId)} align="right">{row.reportSpecifierId}</TableCell>
+              <TableCell scope="row" onClick={onClick(row.reportSpecifierId)} align="right">{getFormatedCreatedDatetime(row)}</TableCell>
+              
+              <TableCell scope="row" onClick={onClick(row.reportSpecifierId)} align="right">{row.reportName}</TableCell>
               <TableCell align="right">
-                <Button size="small" color="primary" onClick={function(reportSpecifierId) {
-                  return () => {props.handleViewReportDetail(reportSpecifierId);}
-                }(row.reportSpecifierId)  }> View </Button> 
-                | <Button size="small" color="primary" onClick={function(reportSpecifierId) {
+               <Button size="small" color="primary" onClick={function(reportSpecifierId) {
                   return () => {props.handleCreateRequestClick(reportSpecifierId);}
                 }(row.reportSpecifierId)  }>{ getActionLabel(row)}</Button>
               </TableCell>
@@ -145,6 +146,42 @@ var VenRequestedReportTable = (props) => {
       return "UNSUBSCRIBE"
     }
   }
+
+  var getFormatedCreatedDatetime = (report) => {
+    var format = formatTimestamp(report.createdDatetime);
+    return (
+      <span>{format.date}<br/>{format.time} {format.tz}</span>
+    );
+  }
+
+  var groupByReportRequestId = {};
+
+  for(var i in requestedReport) {
+    var reportRequestId = requestedReport[i].reportRequestId;
+    var group = groupByReportRequestId[reportRequestId];
+    if(group == null) {
+      group = {}
+      group.reportRequestId = requestedReport[i].reportRequestId;
+      group.reportSpecifierId = requestedReport[i].reportSpecifierId;
+      group.createdDatetime = requestedReport[i].createdDatetime;
+      group.start = requestedReport[i].createdDatetime;
+      group.duration = requestedReport[i].duration;
+      group.granularity = requestedReport[i].granularity;
+      group.reportBackDuration = requestedReport[i].reportBackDuration;
+      group.request = [];
+    }
+    group.request.push(requestedReport[i]);
+
+     groupByReportRequestId[reportRequestId] = group;
+
+  }
+
+
+  var req = Object.values(groupByReportRequestId)
+
+  var onClick = (reportSpecifierId, reportRequestId) => event => props.handleViewReportRequestDetail(reportSpecifierId, reportRequestId)
+
+
   return (
     <Paper className={classes.root}>
       <Table className={classes.table}>
@@ -152,24 +189,21 @@ var VenRequestedReportTable = (props) => {
           <TableRow>
             <TableCell align="right">report request ID</TableCell>
             <TableCell align="right">Specifier ID</TableCell>
-            <TableCell align="right">rID</TableCell>
+            <TableCell align="right"># rIDs</TableCell>
             <TableCell align="right">Created<br/>Date/Time</TableCell>
             <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {requestedReport.map(row => {
+          {req.map(row => {
             return (
-              <TableRow key={row.id}>
-                <TableCell align="right">{row.reportRequestId}</TableCell>
-                <TableCell align="right">{row.reportSpecifierId}</TableCell>
-                <TableCell align="right">{row.rid}</TableCell>
-                <TableCell align="right">{row.createDatetime}</TableCell>
+              <TableRow key={row.reportRequestId} hover>
+                <TableCell scope="row" onClick={onClick(row.reportSpecifierId, row.reportRequestId)} align="right">{row.reportRequestId}</TableCell>
+                <TableCell scope="row" onClick={onClick(row.reportSpecifierId, row.reportRequestId)} align="right">{row.reportSpecifierId}</TableCell>
+                <TableCell scope="row" onClick={onClick(row.reportSpecifierId, row.reportRequestId)} align="right">{row.request.length}</TableCell>
+                <TableCell scope="row" onClick={onClick(row.reportSpecifierId, row.reportRequestId)} align="right">{getFormatedCreatedDatetime(row)}</TableCell>
                 <TableCell align="right">
-                  <Button size="small" color="primary" onClick={function(reportRequestId) {
-                    return () => {}
-                  }(row.reportRequestId)  }> View </Button> 
-                  | <Button size="small" color="secondary" onClick={function(reportRequestId) {
+                  <Button size="small" color="secondary" onClick={function(reportRequestId) {
                     return () => {handleDeleteRequestClick(reportRequestId)}
                   }(row.reportRequestId)  }> { getActionLabel(row)} </Button>
                 </TableCell>
@@ -207,6 +241,10 @@ export class VenDetailReport extends React.Component {
 
   handleViewReportDetail = (reportSpecifierId) => {
     history.push("/ven/detail/"+this.props.ven.username+"/reports/"+reportSpecifierId);
+  }
+
+  handleViewReportRequestDetail = (reportSpecifierId, reportRequestId) => {
+    history.push("/ven/detail/"+this.props.ven.username+"/reports/"+reportSpecifierId+"/requests/"+reportRequestId);
   }
 
   render() {
@@ -319,7 +357,8 @@ export class VenDetailReport extends React.Component {
         Requests
       </Typography>
       <VenRequestedReportTable ven={ven} requestedReport={requestedReport}
-         handleDeleteRequestClick={this.handleDeleteRequestClick} classes={classes}/>
+         handleDeleteRequestClick={this.handleDeleteRequestClick} 
+         handleViewReportRequestDetail={this.handleViewReportRequestDetail} classes={classes}/>
 
      
     </div>

@@ -33,16 +33,16 @@ public abstract class ReportCapability {
 
 	private String reportRequestId;
 
+	private String reportId;
+
 	@Enumerated(EnumType.STRING)
 	private ReportNameEnumeratedType reportName;
 
+	private Long createdDatetime;
+
 	private String duration;
 
-	private Long createDatetime;
-
-	public ReportCapability() {
-		createDatetime = System.currentTimeMillis();
-	}
+	private Long start;
 
 	public Long getId() {
 		return id;
@@ -84,12 +84,28 @@ public abstract class ReportCapability {
 		this.reportRequestId = reportRequestId;
 	}
 
-	public Long getCreateDatetime() {
-		return createDatetime;
+	public Long getCreatedDatetime() {
+		return createdDatetime;
 	}
 
-	public void setCreateDatetime(Long createDatetime) {
-		this.createDatetime = createDatetime;
+	public void setCreatedDatetime(Long createDatetime) {
+		this.createdDatetime = createDatetime;
+	}
+
+	public String getReportId() {
+		return reportId;
+	}
+
+	public void setReportId(String reportId) {
+		this.reportId = reportId;
+	}
+
+	public Long getStart() {
+		return start;
+	}
+
+	public void setStart(Long start) {
+		this.start = start;
 	}
 
 }

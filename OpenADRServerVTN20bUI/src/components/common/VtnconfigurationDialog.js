@@ -27,7 +27,7 @@ export function MarketContextSelectDialog( props ) {
                       onClick={ () => {
                                   props.close( context )
                                 } }
-                      key={ context }>
+                      key={ context.name }>
               <ListItemAvatar>
                 <Avatar style={ { backgroundColor: context.color } }>
                   <ExtensionIcon />
@@ -57,7 +57,7 @@ export function GroupSelectDialog( props ) {
                       onClick={ () => {
                                   props.close( g )
                                 } }
-                      key={ g }>
+                      key={ g.name }>
               <ListItemAvatar>
                 <Avatar style={ { backgroundColor: '#bbb' } }>
                   <GroupWorkIcon />

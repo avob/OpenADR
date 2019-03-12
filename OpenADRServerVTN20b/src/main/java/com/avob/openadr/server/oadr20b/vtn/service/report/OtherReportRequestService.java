@@ -39,7 +39,11 @@ public class OtherReportRequestService extends GenericService<OtherReportRequest
 	}
 
 	public List<OtherReportRequest> findBySourceAndReportSpecifierId(Ven ven, String reportSpecifierId) {
-		return otherReportRequestDao.findOneBySourceAndOtherReportCapability_ReportSpecifierId(ven, reportSpecifierId);
+		return otherReportRequestDao.findBySourceAndOtherReportCapability_ReportSpecifierId(ven, reportSpecifierId);
+	}
+
+	public List<OtherReportRequest> findBySourceAndReportRequestId(Ven ven, String reportRequestId) {
+		return otherReportRequestDao.findBySourceAndOtherReportCapability_ReportRequestId(ven, reportRequestId);
 	}
 
 	public List<OtherReportRequest> findBySourceAndReportSpecifierIdStartingWith(Ven ven, String reportSpecifierId) {
