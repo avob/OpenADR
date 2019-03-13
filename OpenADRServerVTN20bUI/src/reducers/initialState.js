@@ -4,7 +4,11 @@ export default {
     marketContext: [],
     group: []
   },
-  ven: [],
+  ven: {
+    marketContext: [],
+    group: [],
+    ven: []
+  },
   ven_detail: {
     ven: {},
     marketContext: [],
@@ -30,7 +34,10 @@ export default {
     parameters: {}
   },
   account: [],
-  event: [],
+  event: {
+    marketContext: [],
+    event: [],
+  },
   event_detail: {},
   event_create: {},
 

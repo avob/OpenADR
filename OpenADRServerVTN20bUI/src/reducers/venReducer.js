@@ -25,6 +25,41 @@ export default function venReducer( state = initialState.ven, action ) {
     case types.LOAD_VEN_ERROR:
       return state;
 
+    case types.LOAD_VEN_MARKET_CONTEXT_SUCCESS:
+      newState = objectAssign( {}, state, {
+        marketContext: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_VEN_MARKET_CONTEXT_ERROR:
+      return state;
+      
+      // MARKET CONTEXT
+    case types.LOAD_MARKET_CONTEXT:
+      return state;
+
+    case types.LOAD_MARKET_CONTEXT_SUCCESS:
+      newState = objectAssign( {}, state, {
+        marketContext: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_MARKET_CONTEXT_ERROR:
+      return state;
+
+     // GROUPS
+    case types.LOAD_GROUP:
+      return state;
+
+    case types.LOAD_GROUP_SUCCESS:
+      newState = objectAssign( {}, state, {
+        group: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_GROUP_ERROR:
+      return state;
+
     default:
       return state;
   }

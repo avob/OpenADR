@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import * as actions from '../../actions/venActions';
+import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions';
+import * as venActions from '../../actions/venActions';
 import VenList from '../Ven/VenList'
 import { withStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
@@ -57,7 +58,9 @@ const styles = theme => ({
 export class VenPage extends React.Component {
 
   componentDidMount() {
-    this.props.actions.loadVen();
+    this.props.vtnConfigurationActions.loadMarketContext();
+    this.props.vtnConfigurationActions.loadGroup();
+    this.props.venActions.loadVen();
   }
 
   render() {
@@ -74,7 +77,9 @@ export class VenPage extends React.Component {
       <Typography component="div" style={ { padding: 8 * 3 } }>
         <VenList classes={ classes }
                  ven={ ven.ven }
-                 deleteVen={ this.props.actions.deleteVen } />
+                 marketContext={ ven.marketContext }
+                 group={ ven.group }
+                 deleteVen={ this.props.venActions.deleteVen } />
       </Typography>
     </div>
 
@@ -83,7 +88,7 @@ export class VenPage extends React.Component {
 }
 
 VenPage.propTypes = {
-  actions: PropTypes.object.isRequired
+  venActions: PropTypes.object.isRequired
 };
 
 function mapStateToProps( state ) {
@@ -94,7 +99,8 @@ function mapStateToProps( state ) {
 
 function mapDispatchToProps( dispatch ) {
   return {
-    actions: bindActionCreators( actions, dispatch )
+    venActions: bindActionCreators( venActions, dispatch ),
+    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch )
   };
 }
 

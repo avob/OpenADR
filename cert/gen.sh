@@ -57,13 +57,16 @@ openssl x509 -req -days 365 -in $VTN_NAME-rsa.csr -CA $CA_NAME.crt -CAkey $CA_NA
 # VTN ECC 256-bit
 ###################################
 # Creating a Key and CSR for the Server
-# create $VTN_NAME-ecc.key / $VTN_NAME-ecc.csr
-openssl ecparam -out $VTN_NAME-ecc.key -name prime256v1 -genkey 
-openssl req -new -key $VTN_NAME-ecc.key -out $VTN_NAME-ecc.csr -subj "/C=FR/ST=Paris/L=Paris/O=Avob/OU=Avob/CN=$VTN_NAME"
+# create $VTN_NAME.key / $VTN_NAME.csr
+openssl req -new -x509 -nodes -newkey ec:<(openssl ecparam -name secp384r1) -keyout $VTN_NAME.key -subj "/C=FR/ST=Paris/L=Paris/O=Avob/OU=Avob/CN=$VTN_NAME"
+openssl req -new -key $VTN_NAME.key -out $VTN_NAME.csr -sha256 -subj "/C=FR/ST=Paris/L=Paris/O=Avob/OU=Avob/CN=$VTN_NAME"
 
 # Signing Server Certificate with previously created CA.
-# $VTN_NAME-ecc = $VTN_NAME-ecc.csr + $CA_NAME.crt + $CA_NAME.key
-openssl x509 -req -days 365 -in $VTN_NAME-ecc.csr -CA $CA_NAME.crt -CAkey $CA_NAME.key -set_serial 03 -out $VTN_NAME-ecc.crt
+# $VTN_NAME.crt = $VTN_NAME.csr + $CA_NAME.crt + $CA_NAME.key
+openssl x509 -req -days 365 -in $VTN_NAME.csr -CA $CA_NAME.crt -CAkey $CA_NAME.key -set_serial 03 -out $VTN_NAME.crt
+
+# Compute VEN fingerprint
+openssl x509 -in $VTN_NAME.crt -fingerprint -sha256 -noout | cut -d'=' -f2 | cat | tail -c 30 > $VTN_NAME.fingerprint
 
 ###################################
 # VEN1 RSA
@@ -80,12 +83,12 @@ openssl x509 -req -days 365 -in $VEN1_NAME.csr -CA $CA_NAME.crt -CAkey $CA_NAME.
 openssl x509 -in $VEN1_NAME.crt -fingerprint -sha256 -noout | cut -d'=' -f2 | cat | tail -c 30 > $VEN1_NAME.fingerprint
 
 ###################################
-# VEN2 ECC
+# VEN2 ECC 256-bit
 ###################################
 # Creating a Key and CSR for the Server
 # create $VEN2_NAME.key / $VEN2_NAME.csr
-openssl ecparam -out $VEN2_NAME.key -name prime256v1 -genkey 
-openssl req -new -key $VEN2_NAME.key -out $VEN2_NAME.csr -subj "/C=FR/ST=Paris/L=Paris/O=Avob/OU=Avob/CN=$VEN2_NAME"
+openssl req -new -x509 -nodes -newkey ec:<(openssl ecparam -name secp384r1) -keyout $VEN2_NAME.key -subj "/C=FR/ST=Paris/L=Paris/O=Avob/OU=Avob/CN=$VEN2_NAME"
+openssl req -new -key $VEN2_NAME.key -out $VEN2_NAME.csr -sha256 -subj "/C=FR/ST=Paris/L=Paris/O=Avob/OU=Avob/CN=$VEN2_NAME"
 
 # Signing Server Certificate with previously created CA.
 # $VEN2_NAME.crt = $VEN2_NAME.csr + $CA_NAME.crt + $CA_NAME.key
@@ -93,4 +96,5 @@ openssl x509 -req -days 365 -in $VEN2_NAME.csr -CA $CA_NAME.crt -CAkey $CA_NAME.
 
 # Compute VEN fingerprint
 openssl x509 -in $VEN2_NAME.crt -fingerprint -sha256 -noout | cut -d'=' -f2 | cat | tail -c 30 > $VEN2_NAME.fingerprint
+
 

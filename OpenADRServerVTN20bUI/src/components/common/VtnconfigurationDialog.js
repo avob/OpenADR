@@ -11,6 +11,8 @@ import Dialog from '@material-ui/core/Dialog';
 
 import ExtensionIcon from '@material-ui/icons/Extension';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
+import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
+
 
 export function MarketContextSelectDialog( props ) {
   return (
@@ -66,6 +68,44 @@ export function GroupSelectDialog( props ) {
               <ListItemText primary={ g.name } />
             </ListItem>
           ) ) }
+      </List>
+    </div>
+  </Dialog>
+  );
+}
+
+export function VenStatusSelectDialog( props ) {
+  var items = [{
+    name: "online",
+    color: "green"
+  },{
+    name: "offline",
+    color: "#bbb"
+  }]
+  return (
+  <Dialog open={ props.open } onClose={ () => {
+                                        props.close()
+                                      } }>
+    <DialogTitle>
+      { props.title }
+    </DialogTitle>
+    <div>
+      <List>
+        { items.map( g => (
+            <ListItem button
+                      onClick={ () => {
+                                  props.close( g )
+                                } }
+                      key={ g.name }>
+              <ListItemAvatar>
+                <Avatar style={ { backgroundColor: g.color } }>
+                  <SettingsInputComponentIcon />
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText primary={ g.name } />
+            </ListItem>
+          ) ) }
+        
       </List>
     </div>
   </Dialog>

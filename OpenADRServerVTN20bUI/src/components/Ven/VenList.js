@@ -13,6 +13,7 @@ import Select from '@material-ui/core/Select';
 import ExtensionIcon from '@material-ui/icons/Extension';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import ExpandMore from '@material-ui/icons/ExpandMore';
+import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
 
 
 
@@ -28,7 +29,7 @@ import GridListTile from '@material-ui/core/GridListTile';
 
 import { VtnConfigurationVenCard } from '../common/VtnConfigurationCard'
 
-import { MarketContextSelectDialog, GroupSelectDialog } from '../common/VtnconfigurationDialog'
+import { MarketContextSelectDialog, GroupSelectDialog, VenStatusSelectDialog } from '../common/VtnconfigurationDialog'
 
 import { history } from '../../store/configureStore';
 
@@ -47,12 +48,19 @@ var GroupChip = (props) => {
   );
 }
 
+var VenStatusChip = (props) => {
+  return (
+  <span style={ { display: 'flex', alignItems: 'center', marginLeft: '-7px', } }><SettingsInputComponentIcon color="disabled" style={ { marginRight: '5px' } }/> { props.name }</span>
+  );
+}
+
 export class VenList extends React.Component {
   constructor( props ) {
     super( props );
     this.state = {}
     this.state.marketContextSelectDialogOpen = false;
     this.state.groupSelectDialogOpen = false;
+    this.state.venStatusSelectDialogOpen = false;
     this.state.filterMarketContext = [];
     this.state.filterGroup = [];
     this.state.filter = []
@@ -84,6 +92,22 @@ export class VenList extends React.Component {
   handleGroupSelectClose = (group) => {
     var params = {
       groupSelectDialogOpen: false
+    }
+    if ( group != null ) {
+      this.handleAddChip( <GroupChip name={ group.name } /> );
+    }
+    this.setState( params )
+  }
+
+  handleVenStatusSelectOpen = () => {
+    this.setState( {
+      venStatusSelectDialogOpen: true
+    } )
+  }
+
+  handleVenStatusSelectClose = (group) => {
+    var params = {
+      venStatusSelectDialogOpen: false
     }
     if ( group != null ) {
       this.handleAddChip( <GroupChip name={ group.name } /> );
@@ -131,7 +155,7 @@ export class VenList extends React.Component {
   }
 
   render() {
-    const {classes, ven} = this.props;
+    const {classes, ven, marketContext, group} = this.props;
 
     var view = [];
 
@@ -148,11 +172,6 @@ export class VenList extends React.Component {
     }
     return (
     <div>
-      <Typography gutterBottom
-                  variant="title"
-                  component="h2">
-        Search
-      </Typography>
       <Grid container spacing={ 8 }>
         <Grid container
               item
@@ -168,26 +187,41 @@ export class VenList extends React.Component {
           </Grid>
           <Grid item xs={ 3 }>
             <div style={ { marginTop: 15 } }>
+
               <IconButton className={ classes.iconButton }
                           aria-label="market_context"
                           onClick={ this.handleMarketContextSelectOpen }>
                 <ExtensionIcon />
                 <ExpandMore />
               </IconButton>
-              <MarketContextSelectDialog marketContext={ [ { name: 'http://oadr.avob.com', color: '#0000ff' } ] }
+              <MarketContextSelectDialog marketContext={ marketContext}
                                          open={ this.state.marketContextSelectDialogOpen }
                                          close={ this.handleMarketContextSelectClose }
                                          title="Filter by Market Context" />
+
+
               <IconButton className={ classes.iconButton }
                           aria-label="group"
                           onClick={ this.handleGroupSelectOpen }>
                 <GroupWorkIcon />
                 <ExpandMore />
               </IconButton>
-              <GroupSelectDialog group={ [ { name: 'mouaiccool' } ] }
+              <GroupSelectDialog group={ group }
                                  open={ this.state.groupSelectDialogOpen }
                                  close={ this.handleGroupSelectClose }
                                  title="Filter by Group" />
+
+              <IconButton className={ classes.iconButton }
+                          aria-label="group"
+                          onClick={ this.handleVenStatusSelectOpen }>
+                <SettingsInputComponentIcon />
+                <ExpandMore />
+              </IconButton>
+              <VenStatusSelectDialog open={ this.state.venStatusSelectDialogOpen }
+                                 close={ this.handleVenStatusSelectClose }
+                                 title="Filter by Ven Status" />
+
+
               <IconButton className={ classes.iconButton } aria-label="Search">
                 <SearchIcon />
               </IconButton>

@@ -1,4 +1,4 @@
-package com.avob.openadr.server.common.vtn;
+package com.avob.openadr.server.oadr20b.vtn;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -82,9 +82,9 @@ public class EmbeddedSqlDatabaseInit {
 
 		// ven2.oadr.com
 		dto = new VenCreateDto();
-		dto.setUsername("4E:6C:5F:94:70:CD:A8:5A:28:B7");
+		dto.setUsername("5A:82:D3:9C:3C:98:41:BC:A5:4C");
 		dto.setAuthenticationType("x509");
-		dto.setCommonName("ven1.oadr.com");
+		dto.setCommonName("ven2.oadr.com");
 		dto.setOadrProfil("20b");
 		prepare = venService.prepare(dto);
 		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
