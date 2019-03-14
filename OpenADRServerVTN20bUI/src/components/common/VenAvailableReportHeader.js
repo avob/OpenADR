@@ -6,6 +6,8 @@ import Grid from '@material-ui/core/Grid';
 
 import {timestampToISO, isoToTimestamp} from '../../utils/time'
 import {isActionReport, isHistoryReport, isTelemetryReport} from '../../utils/venReport'
+import {DateAndTimePicker, DurationPicker } from './TimePicker'
+
 
 
 
@@ -25,58 +27,7 @@ var VenReportTextField = (props) => {
   );
 }
 
-var DateAndTimePicker = (props) => {
-  const { classes } = props;
-  var val = "";
-  if(props.value != null) {
-    val = timestampToISO(props.value);
-  }
 
-  return (
-    <form className={classes.container} noValidate>
-      <TextField required
-        label={props.field}
-        type="datetime-local"
-        defaultValue={props.default}
-        className={classes.textField}
-        fullWidth={true}
-        value={val}
-        onChange={(e) => {
-          props.onChange(isoToTimestamp(e.target.value));
-        }}
-        InputLabelProps={{
-          shrink: true,
-        }}
-      />
-    </form>
-  );
-}
-
-var DurationPicker = (props) => {
-  const { classes } = props;
-   var val = "";
-  if(props.value != null) {
-    val = props.value;
-  }
-
-  return (
-    <form className={classes.container} noValidate>
-      <TextField required error={props.error}
-        label={props.field}
-        type="number"
-        className={classes.textField}
-        fullWidth={true}
-        value={val}
-        onChange={(e) => {
-          props.onChange(e.target.value);
-        }}
-        InputLabelProps={{
-          shrink: true,
-        }}
-      />
-    </form>
-  );
-}
 
 export function VenAvailableReportHeader (props) {
   const { classes, availableReport} = props;

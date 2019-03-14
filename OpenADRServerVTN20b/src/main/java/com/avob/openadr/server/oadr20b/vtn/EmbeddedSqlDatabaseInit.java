@@ -6,12 +6,17 @@ import javax.annotation.Resource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
+import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenGroupService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenService;
@@ -30,12 +35,22 @@ public class EmbeddedSqlDatabaseInit {
 	@Resource
 	private VenService venService;
 
+	@Resource
+	private DemandResponseEventService demandeResponseEventService;
+
 	@PostConstruct
 	public void init() {
 		String marketContextName = "http://oadr.avob.com";
 		String marketContextDescription = "Avob Test Market Context";
 		String marketcontextColor = "#90CAF9";
 		VenMarketContext marketContext = venMarketContextService
+				.prepare(new VenMarketContextDto(marketContextName, marketContextDescription, marketcontextColor));
+		venMarketContextService.save(marketContext);
+
+		marketContextName = "http://MarketContext1";
+		marketContextDescription = "Test Market Context 1";
+		marketcontextColor = "#ff8080";
+		marketContext = venMarketContextService
 				.prepare(new VenMarketContextDto(marketContextName, marketContextDescription, marketcontextColor));
 		venMarketContextService.save(marketContext);
 
@@ -90,6 +105,33 @@ public class EmbeddedSqlDatabaseInit {
 		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
 		prepare.setVenGroup(Sets.newHashSet(customCaCert));
 		venService.save(prepare);
+				
+		DemandResponseEvent event = new DemandResponseEvent();
+        String eventId = "eventId";
+        Long createdTimestamp = System.currentTimeMillis();
+        String duration = "PT1H";
+        String notificationDuration = "P1D";
+        Long lastUpdateTimestamp = 0L;
+        int modification = 0;
+        Long start = System.currentTimeMillis();
+        Long startNotification = System.currentTimeMillis();
+        DemandResponseEventStateEnum state = DemandResponseEventStateEnum.ACTIVE;
+        DemandResponseEventSimpleValueEnum value = DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH;
+
+        event.setEventId(eventId);
+        event.setValue(value);
+        event.setState(state);
+        event.setStart(start);
+        event.setNotificationDuration(notificationDuration);
+        event.setStartNotification(startNotification);
+        event.setModificationNumber(modification);
+        event.setMarketContext(marketContext);
+        event.setLastUpdateTimestamp(lastUpdateTimestamp);
+        event.setDuration(duration);
+        event.setCreatedTimestamp(createdTimestamp);
+        event.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+        
+        demandeResponseEventService.create(event);
 
 	}
 }

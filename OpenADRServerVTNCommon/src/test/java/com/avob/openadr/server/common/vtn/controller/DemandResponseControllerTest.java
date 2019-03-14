@@ -54,7 +54,7 @@ import com.google.common.collect.Sets;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { ApplicationTest.class })
 @WebAppConfiguration
-public class EosDemandResponseControllerTest {
+public class DemandResponseControllerTest {
 
     private static final String DEMAND_RESPONSE_EVENT_URL = "/DemandResponseEvent/";
 
@@ -161,7 +161,7 @@ public class EosDemandResponseControllerTest {
         ServletContext servletContext = wac.getServletContext();
         Assert.assertNotNull(servletContext);
         Assert.assertTrue(servletContext instanceof MockServletContext);
-        Assert.assertNotNull(wac.getBean("eosDemandResponseController"));
+        Assert.assertNotNull(wac.getBean("demandResponseController"));
     }
 
     @Test
@@ -177,12 +177,12 @@ public class EosDemandResponseControllerTest {
         assertEquals(2, readValue.size());
 
         for (DemandResponseEventDto dto : readValue) {
-            assertEquals(EosDemandResponseControllerTest.modification, dto.getModificationNumber());
+            assertEquals(DemandResponseControllerTest.modification, dto.getModificationNumber());
             assertNotNull(dto.getCreatedTimestamp());
-            assertEquals(EosDemandResponseControllerTest.duration, dto.getDuration());
-            assertEquals(EosDemandResponseControllerTest.marketContextName, dto.getMarketContext());
-            assertEquals(EosDemandResponseControllerTest.start, dto.getStart());
-            assertEquals(EosDemandResponseControllerTest.value, dto.getValue());
+            assertEquals(DemandResponseControllerTest.duration, dto.getDuration());
+            assertEquals(DemandResponseControllerTest.marketContextName, dto.getMarketContext());
+            assertEquals(DemandResponseControllerTest.start, dto.getStart());
+            assertEquals(DemandResponseControllerTest.value, dto.getValue());
             assertTrue("ven2".equals(dto.getComaSeparatedTargetedVenUsername())
                     || "ven1,ven2".equals(dto.getComaSeparatedTargetedVenUsername()));
             assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getState())
@@ -192,7 +192,7 @@ public class EosDemandResponseControllerTest {
         // find by ven username
         andReturn = this.mockMvc
                 .perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-                        .param("ven", EosDemandResponseControllerTest.ven1).with(adminSession))
+                        .param("ven", DemandResponseControllerTest.ven1).with(adminSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
         readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -200,19 +200,19 @@ public class EosDemandResponseControllerTest {
         assertEquals(1, readValue.size());
 
         for (DemandResponseEventDto dto : readValue) {
-            assertEquals(EosDemandResponseControllerTest.modification, dto.getModificationNumber());
+            assertEquals(DemandResponseControllerTest.modification, dto.getModificationNumber());
             assertNotNull(dto.getCreatedTimestamp());
-            assertEquals(EosDemandResponseControllerTest.duration, dto.getDuration());
-            assertEquals(EosDemandResponseControllerTest.marketContextName, dto.getMarketContext());
-            assertEquals(EosDemandResponseControllerTest.start, dto.getStart());
-            assertEquals(EosDemandResponseControllerTest.value, dto.getValue());
+            assertEquals(DemandResponseControllerTest.duration, dto.getDuration());
+            assertEquals(DemandResponseControllerTest.marketContextName, dto.getMarketContext());
+            assertEquals(DemandResponseControllerTest.start, dto.getStart());
+            assertEquals(DemandResponseControllerTest.value, dto.getValue());
             assertTrue("ven1,ven2".equals(dto.getComaSeparatedTargetedVenUsername()));
             assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getState()));
         }
 
         andReturn = this.mockMvc
                 .perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-                        .param("ven", EosDemandResponseControllerTest.ven2).with(adminSession))
+                        .param("ven", DemandResponseControllerTest.ven2).with(adminSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
         readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -220,12 +220,12 @@ public class EosDemandResponseControllerTest {
         assertEquals(2, readValue.size());
 
         for (DemandResponseEventDto dto : readValue) {
-            assertEquals(EosDemandResponseControllerTest.modification, dto.getModificationNumber());
+            assertEquals(DemandResponseControllerTest.modification, dto.getModificationNumber());
             assertNotNull(dto.getCreatedTimestamp());
-            assertEquals(EosDemandResponseControllerTest.duration, dto.getDuration());
-            assertEquals(EosDemandResponseControllerTest.marketContextName, dto.getMarketContext());
-            assertEquals(EosDemandResponseControllerTest.start, dto.getStart());
-            assertEquals(EosDemandResponseControllerTest.value, dto.getValue());
+            assertEquals(DemandResponseControllerTest.duration, dto.getDuration());
+            assertEquals(DemandResponseControllerTest.marketContextName, dto.getMarketContext());
+            assertEquals(DemandResponseControllerTest.start, dto.getStart());
+            assertEquals(DemandResponseControllerTest.value, dto.getValue());
             assertTrue("ven2".equals(dto.getComaSeparatedTargetedVenUsername())
                     || "ven1,ven2".equals(dto.getComaSeparatedTargetedVenUsername()));
             assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getState())
@@ -243,12 +243,12 @@ public class EosDemandResponseControllerTest {
         assertEquals(1, readValue.size());
 
         for (DemandResponseEventDto dto : readValue) {
-            assertEquals(EosDemandResponseControllerTest.modification, dto.getModificationNumber());
+            assertEquals(DemandResponseControllerTest.modification, dto.getModificationNumber());
             assertNotNull(dto.getCreatedTimestamp());
-            assertEquals(EosDemandResponseControllerTest.duration, dto.getDuration());
-            assertEquals(EosDemandResponseControllerTest.marketContextName, dto.getMarketContext());
-            assertEquals(EosDemandResponseControllerTest.start, dto.getStart());
-            assertEquals(EosDemandResponseControllerTest.value, dto.getValue());
+            assertEquals(DemandResponseControllerTest.duration, dto.getDuration());
+            assertEquals(DemandResponseControllerTest.marketContextName, dto.getMarketContext());
+            assertEquals(DemandResponseControllerTest.start, dto.getStart());
+            assertEquals(DemandResponseControllerTest.value, dto.getValue());
             assertTrue("ven1,ven2".equals(dto.getComaSeparatedTargetedVenUsername()));
             assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getState()));
         }
@@ -256,7 +256,7 @@ public class EosDemandResponseControllerTest {
         // find by ven and state
         andReturn = this.mockMvc
                 .perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-                        .param("ven", EosDemandResponseControllerTest.ven2)
+                        .param("ven", DemandResponseControllerTest.ven2)
                         .param("state", DemandResponseEventStateEnum.CANCELED.toString()).with(adminSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
@@ -265,19 +265,19 @@ public class EosDemandResponseControllerTest {
         assertEquals(1, readValue.size());
 
         for (DemandResponseEventDto dto : readValue) {
-            assertEquals(EosDemandResponseControllerTest.modification, dto.getModificationNumber());
+            assertEquals(DemandResponseControllerTest.modification, dto.getModificationNumber());
             assertNotNull(dto.getCreatedTimestamp());
-            assertEquals(EosDemandResponseControllerTest.duration, dto.getDuration());
-            assertEquals(EosDemandResponseControllerTest.marketContextName, dto.getMarketContext());
-            assertEquals(EosDemandResponseControllerTest.start, dto.getStart());
-            assertEquals(EosDemandResponseControllerTest.value, dto.getValue());
+            assertEquals(DemandResponseControllerTest.duration, dto.getDuration());
+            assertEquals(DemandResponseControllerTest.marketContextName, dto.getMarketContext());
+            assertEquals(DemandResponseControllerTest.start, dto.getStart());
+            assertEquals(DemandResponseControllerTest.value, dto.getValue());
             assertTrue("ven2".equals(dto.getComaSeparatedTargetedVenUsername()));
             assertTrue(DemandResponseEventStateEnum.CANCELED.equals(dto.getState()));
         }
 
         // find non existing ven
         andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-                .param("ven", EosDemandResponseControllerTest.ven2).param("ven", "idonotexists").with(adminSession))
+                .param("ven", DemandResponseControllerTest.ven2).param("ven", "idonotexists").with(adminSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
         readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -286,7 +286,7 @@ public class EosDemandResponseControllerTest {
 
         // find non existing state
         andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-                .param("ven", EosDemandResponseControllerTest.ven2).param("state", "idonotexists").with(adminSession))
+                .param("ven", DemandResponseControllerTest.ven2).param("state", "idonotexists").with(adminSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400)).andReturn();
 
     }
@@ -297,7 +297,7 @@ public class EosDemandResponseControllerTest {
         // perform check
         MvcResult andReturn = this.mockMvc
                 .perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-                        .param("ven", EosDemandResponseControllerTest.ven1).with(adminSession))
+                        .param("ven", DemandResponseControllerTest.ven1).with(adminSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
         List<DemandResponseEventDto> readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -305,12 +305,12 @@ public class EosDemandResponseControllerTest {
         assertEquals(1, readValue.size());
 
         for (DemandResponseEventDto dto : readValue) {
-            assertEquals(EosDemandResponseControllerTest.modification, dto.getModificationNumber());
+            assertEquals(DemandResponseControllerTest.modification, dto.getModificationNumber());
             assertNotNull(dto.getCreatedTimestamp());
-            assertEquals(EosDemandResponseControllerTest.duration, dto.getDuration());
-            assertEquals(EosDemandResponseControllerTest.marketContextName, dto.getMarketContext());
-            assertEquals(EosDemandResponseControllerTest.start, dto.getStart());
-            assertEquals(EosDemandResponseControllerTest.value, dto.getValue());
+            assertEquals(DemandResponseControllerTest.duration, dto.getDuration());
+            assertEquals(DemandResponseControllerTest.marketContextName, dto.getMarketContext());
+            assertEquals(DemandResponseControllerTest.start, dto.getStart());
+            assertEquals(DemandResponseControllerTest.value, dto.getValue());
             assertTrue("ven1,ven2".equals(dto.getComaSeparatedTargetedVenUsername()));
             assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getState()));
         }
@@ -331,19 +331,19 @@ public class EosDemandResponseControllerTest {
         assertNotNull(res);
         assertNotNull(res.getId());
         Long toDeleteId = res.getId();
-        assertEquals(EosDemandResponseControllerTest.modification, res.getModificationNumber());
+        assertEquals(DemandResponseControllerTest.modification, res.getModificationNumber());
         assertNotNull(res.getCreatedTimestamp());
-        assertEquals(EosDemandResponseControllerTest.duration, res.getDuration());
-        assertEquals(EosDemandResponseControllerTest.marketContextName, res.getMarketContext());
-        assertEquals(EosDemandResponseControllerTest.start, res.getStart());
-        assertEquals(EosDemandResponseControllerTest.value, res.getValue());
+        assertEquals(DemandResponseControllerTest.duration, res.getDuration());
+        assertEquals(DemandResponseControllerTest.marketContextName, res.getMarketContext());
+        assertEquals(DemandResponseControllerTest.start, res.getStart());
+        assertEquals(DemandResponseControllerTest.value, res.getValue());
         assertTrue("ven1,ven2".equals(res.getComaSeparatedTargetedVenUsername()));
         assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(res.getState()));
 
         // perform check
         andReturn = this.mockMvc
                 .perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-                        .param("ven", EosDemandResponseControllerTest.ven1).with(adminSession))
+                        .param("ven", DemandResponseControllerTest.ven1).with(adminSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
         readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -351,12 +351,12 @@ public class EosDemandResponseControllerTest {
         assertEquals(2, readValue.size());
 
         for (DemandResponseEventDto dto : readValue) {
-            assertEquals(EosDemandResponseControllerTest.modification, dto.getModificationNumber());
+            assertEquals(DemandResponseControllerTest.modification, dto.getModificationNumber());
             assertNotNull(dto.getCreatedTimestamp());
-            assertEquals(EosDemandResponseControllerTest.duration, dto.getDuration());
-            assertEquals(EosDemandResponseControllerTest.marketContextName, dto.getMarketContext());
-            assertEquals(EosDemandResponseControllerTest.start, dto.getStart());
-            assertEquals(EosDemandResponseControllerTest.value, dto.getValue());
+            assertEquals(DemandResponseControllerTest.duration, dto.getDuration());
+            assertEquals(DemandResponseControllerTest.marketContextName, dto.getMarketContext());
+            assertEquals(DemandResponseControllerTest.start, dto.getStart());
+            assertEquals(DemandResponseControllerTest.value, dto.getValue());
             assertTrue("ven1,ven2".equals(dto.getComaSeparatedTargetedVenUsername()));
             assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getState()));
         }
@@ -455,12 +455,12 @@ public class EosDemandResponseControllerTest {
         DemandResponseEventDto dto = convertMvcResultToDemandResponseDto(andReturn);
         assertNotNull(dto);
 
-        assertEquals(EosDemandResponseControllerTest.modification, dto.getModificationNumber());
+        assertEquals(DemandResponseControllerTest.modification, dto.getModificationNumber());
         assertNotNull(dto.getCreatedTimestamp());
-        assertEquals(EosDemandResponseControllerTest.duration, dto.getDuration());
-        assertEquals(EosDemandResponseControllerTest.marketContextName, dto.getMarketContext());
-        assertEquals(EosDemandResponseControllerTest.start, dto.getStart());
-        assertEquals(EosDemandResponseControllerTest.value, dto.getValue());
+        assertEquals(DemandResponseControllerTest.duration, dto.getDuration());
+        assertEquals(DemandResponseControllerTest.marketContextName, dto.getMarketContext());
+        assertEquals(DemandResponseControllerTest.start, dto.getStart());
+        assertEquals(DemandResponseControllerTest.value, dto.getValue());
         assertTrue("ven1,ven2".equals(dto.getComaSeparatedTargetedVenUsername()));
         assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getState()));
 
@@ -683,17 +683,17 @@ public class EosDemandResponseControllerTest {
     public void securityTest() throws Exception {
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-                        .param("ven", EosDemandResponseControllerTest.ven1).with(adminSession))
+                        .param("ven", DemandResponseControllerTest.ven1).with(adminSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-                        .param("ven", EosDemandResponseControllerTest.ven1).with(userSession))
+                        .param("ven", DemandResponseControllerTest.ven1).with(userSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
         this.mockMvc
                 .perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-                        .param("ven", EosDemandResponseControllerTest.ven1).with(venSession))
+                        .param("ven", DemandResponseControllerTest.ven1).with(venSession))
                 .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
     }
 

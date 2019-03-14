@@ -2,7 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from '../../actions/vtnConfigurationActions';
+
+import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions';
+import * as eventActions from '../../actions/eventActions';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -72,10 +74,13 @@ export class EventDetailPage extends React.Component {
     } );
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.props.eventActions.loadEventDetail(this.props.match.params.id);
+
+  }
 
   render() {
-    const {classes} = this.props;
+    const {classes, event} = this.props;
     const {value} = this.state;
 
     return (
@@ -86,11 +91,10 @@ export class EventDetailPage extends React.Component {
             textColor="primary"
             centered>
         <Tab label="Event Detail" />
-        <Tab label="Calendar" />
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
-                <EventDetail classes={classes} />
+                <EventDetail classes={classes} event={event}/>
                      
                        </TabContainer> }
 
@@ -102,7 +106,7 @@ export class EventDetailPage extends React.Component {
 }
 
 EventDetailPage.propTypes = {
-  actions: PropTypes.object.isRequired
+  eventActions: PropTypes.object.isRequired
 };
 
 function mapStateToProps( state ) {
@@ -113,7 +117,7 @@ function mapStateToProps( state ) {
 
 function mapDispatchToProps( dispatch ) {
   return {
-    actions: bindActionCreators( actions, dispatch )
+    eventActions: bindActionCreators( eventActions, dispatch )
   };
 }
 

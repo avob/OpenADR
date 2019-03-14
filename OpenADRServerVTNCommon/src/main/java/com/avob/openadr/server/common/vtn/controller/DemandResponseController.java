@@ -32,9 +32,9 @@ import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 
 @RestController
 @RequestMapping("/DemandResponseEvent")
-public class EosDemandResponseController {
+public class DemandResponseController {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(EosDemandResponseController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DemandResponseController.class);
 
 	@Resource
 	private DtoMapper dtoMapper;

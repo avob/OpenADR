@@ -12,6 +12,19 @@ export default function eventCreateReducer( state = initialState.event_create, a
 
   switch (action.type) {
 
+  	 // MARKET CONTEXT
+    case types.LOAD_MARKET_CONTEXT:
+      return state;
+
+    case types.LOAD_MARKET_CONTEXT_SUCCESS:
+      newState = objectAssign( {}, state, {
+        marketContext: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_MARKET_CONTEXT_ERROR:
+      return state;
+
     default:
       return state;
   }

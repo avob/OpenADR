@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 
-import { withStyles, MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 
 import { VtnConfigurationVenCard, VtnConfigurationMarketContextCard, VtnConfigurationGroupCard } from '../common/VtnConfigurationCard'
 import { MarketContextSelectDialog, GroupSelectDialog } from '../common/VtnconfigurationDialog'
@@ -48,15 +48,6 @@ import VenDetailHeader from './VenDetailHeader'
 
 
 
-
-const theme = createMuiTheme( {
-  palette: {
-    primary: green,
-  },
-  typography: {
-    useNextVariants: true
-  },
-} );
 
 
 var VenTextField = (props) => {

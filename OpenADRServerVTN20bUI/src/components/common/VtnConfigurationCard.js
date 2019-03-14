@@ -18,6 +18,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import ExtensionIcon from '@material-ui/icons/Extension';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
 
 
@@ -131,6 +132,20 @@ export function VtnConfigurationVenCard( props ) {
                         edit={ props.handleEditVen }
                         cardType={ "VEN" }
                         icon={ <SettingsInputComponentIcon style={ { height: 30, width: 30} } /> }
+                        actions={ [ <Button key="action_group_vens" size="small" color="primary"> Detail </Button> ] } />
+  );
+}
+
+export function VtnConfigurationEventCard( props ) {
+  return (
+  <VtnConfigurationCard classes={ props.classes }
+                        color={ "#bbb"}
+                        name={ props.event.eventId }
+                        description={ props.event.marketContext }
+                        close={ props.handleDeleteEvent }
+                        edit={ props.handleEditEvent }
+                        cardType={ "EVENT" }
+                        icon={ <CalendarTodayIcon style={ { height: 30, width: 30} } /> }
                         actions={ [ <Button key="action_group_vens" size="small" color="primary"> Detail </Button> ] } />
   );
 }

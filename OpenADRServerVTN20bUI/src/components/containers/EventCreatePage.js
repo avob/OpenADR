@@ -2,7 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as actions from '../../actions/vtnConfigurationActions';
+
+import * as eventActions from '../../actions/eventActions';
+import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions';
+
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -42,7 +45,7 @@ const styles = theme => ({
   },
   formControl: {
     margin: theme.spacing.unit,
-    minWidth: 500,
+    display:'flex'
   },
   card: {
     maxWidth: 350,
@@ -71,10 +74,12 @@ export class EventCreatePage extends React.Component {
     } );
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.props.vtnConfigurationActions.loadMarketContext();
+  }
 
   render() {
-    const {classes} = this.props;
+    const {classes, event_create} = this.props;
     const {value} = this.state;
 
     return (
@@ -88,7 +93,7 @@ export class EventCreatePage extends React.Component {
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
-                          <EventCreate classes={classes} />
+                          <EventCreate classes={classes} marketContext={event_create.marketContext} createEvent={this.props.eventActions.createEvent}/>
                        </TabContainer> }
 
     </div>
@@ -98,7 +103,8 @@ export class EventCreatePage extends React.Component {
 }
 
 EventCreatePage.propTypes = {
-  actions: PropTypes.object.isRequired
+  eventActions: PropTypes.object.isRequired,
+  vtnConfigurationActions: PropTypes.object.isRequired
 };
 
 function mapStateToProps( state ) {
@@ -109,7 +115,8 @@ function mapStateToProps( state ) {
 
 function mapDispatchToProps( dispatch ) {
   return {
-    actions: bindActionCreators( actions, dispatch )
+    eventActions: bindActionCreators( eventActions, dispatch ),
+    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch )
   };
 }
 

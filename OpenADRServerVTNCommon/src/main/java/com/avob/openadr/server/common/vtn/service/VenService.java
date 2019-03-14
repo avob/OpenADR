@@ -140,13 +140,9 @@ public class VenService extends AbstractUserService<Ven> {
 	}
 	
 	public void cleanRegistration(Ven ven) {
-		Ven newVen = new Ven();
-		newVen.setId(ven.getId());
-		newVen.setUsername(ven.getUsername());
-		newVen.setBasicPassword(ven.getBasicPassword());
-		newVen.setDigestPassword(ven.getDigestPassword());
-		newVen.setName(ven.getName());
-		this.save(newVen);
+		ven.setRegistrationId(null);
+		ven.setXmlSignature(false);
+		this.save(ven);
 	}
 
 }

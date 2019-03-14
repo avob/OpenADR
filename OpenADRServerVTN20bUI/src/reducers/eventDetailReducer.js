@@ -12,6 +12,19 @@ export default function eventDetailReducer( state = initialState.event_detail, a
 
   switch (action.type) {
 
+  	// EVENT
+    case types.LOAD_EVENT_DETAIL:
+      return state;
+
+    case types.LOAD_EVENT_DETAIL_SUCCESS:
+      newState = objectAssign( {}, state, {
+        event: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_EVENT_DETAIL_ERROR:
+      return state;
+
     default:
       return state;
   }

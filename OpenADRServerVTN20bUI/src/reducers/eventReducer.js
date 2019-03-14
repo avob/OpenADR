@@ -12,6 +12,19 @@ export default function eventReducer( state = initialState.event, action ) {
 
   switch (action.type) {
 
+    // EVENT
+    case types.LOAD_EVENT:
+      return state;
+
+    case types.LOAD_EVENT_SUCCESS:
+      newState = objectAssign( {}, state, {
+        event: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_EVENT_ERROR:
+      return state;
+
   	// MARKET CONTEXT
     case types.LOAD_MARKET_CONTEXT:
       return state;

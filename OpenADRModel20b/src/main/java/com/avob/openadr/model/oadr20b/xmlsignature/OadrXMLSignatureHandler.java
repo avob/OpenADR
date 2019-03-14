@@ -13,7 +13,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -44,7 +43,6 @@ import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
-import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -395,107 +393,7 @@ public class OadrXMLSignatureHandler {
 
 	}
 
-	private static class X509KeySelector extends KeySelector {
-		public KeySelectorResult select(KeyInfo keyInfo, KeySelector.Purpose purpose, AlgorithmMethod method,
-				XMLCryptoContext context) throws KeySelectorException {
-			Iterator ki = keyInfo.getContent().iterator();
-			while (ki.hasNext()) {
-				XMLStructure info = (XMLStructure) ki.next();
-				if (!(info instanceof X509Data))
-					continue;
-				X509Data x509Data = (X509Data) info;
-				Iterator xi = x509Data.getContent().iterator();
-				while (xi.hasNext()) {
-					Object o = xi.next();
-					if (!(o instanceof X509Certificate))
-						continue;
-					final PublicKey key = ((X509Certificate) o).getPublicKey();
-					// Make sure the algorithm is compatible
-					// with the method.
-					if (algEquals(method.getAlgorithm(), key.getAlgorithm())) {
-						return new KeySelectorResult() {
-							public Key getKey() {
-								return key;
-							}
-						};
-					}
-				}
-			}
-			throw new KeySelectorException("No key found!");
-		}
+	
 
-	}
-
-	private static class KeyValueKeySelector extends KeySelector {
-
-		private class SimpleKeySelectorResult implements KeySelectorResult {
-			private PublicKey pk;
-
-			SimpleKeySelectorResult(PublicKey pk) {
-				this.pk = pk;
-			}
-
-			public Key getKey() {
-				return pk;
-			}
-		}
-
-		public KeySelectorResult select(KeyInfo keyInfo, KeySelector.Purpose purpose, AlgorithmMethod method,
-				XMLCryptoContext context) throws KeySelectorException {
-
-			if (keyInfo == null) {
-				throw new KeySelectorException("Null KeyInfo object!");
-			}
-			SignatureMethod sm = (SignatureMethod) method;
-			List list = keyInfo.getContent();
-
-			for (int i = 0; i < list.size(); i++) {
-				XMLStructure xmlStructure = (XMLStructure) list.get(i);
-				if (xmlStructure instanceof KeyValue) {
-					PublicKey pk = null;
-					try {
-						pk = ((KeyValue) xmlStructure).getPublicKey();
-					} catch (KeyException ke) {
-						throw new KeySelectorException(ke);
-					}
-					// make sure algorithm is compatible with method
-					if (algEquals(sm.getAlgorithm(), pk.getAlgorithm())) {
-						return new SimpleKeySelectorResult(pk);
-					}
-				}
-			}
-			throw new KeySelectorException("No KeyValue element found!");
-		}
-
-		static boolean algEquals(String algURI, String algName) {
-			if (algName.equalsIgnoreCase("DSA")
-					&& algURI.equalsIgnoreCase("http://www.w3.org/2009/xmldsig11#dsa-sha256")) {
-				return true;
-			} else if (algName.equalsIgnoreCase("RSA")
-					&& algURI.equalsIgnoreCase("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256")) {
-				return true;
-			} else if (algName.equalsIgnoreCase("RSA")
-					&& algURI.equalsIgnoreCase("http://www.w3.org/2000/09/xmldsig#rsa-sha1")) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-	}
-
-	static boolean algEquals(String algURI, String algName) {
-		if (algName.equalsIgnoreCase("DSA") && algURI.equalsIgnoreCase("http://www.w3.org/2009/xmldsig11#dsa-sha256")) {
-			return true;
-		} else if (algName.equalsIgnoreCase("RSA")
-				&& algURI.equalsIgnoreCase("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256")) {
-			return true;
-		} else if (algName.equalsIgnoreCase("RSA")
-				&& algURI.equalsIgnoreCase("http://www.w3.org/2000/09/xmldsig#rsa-sha1")) {
-			return true;
-		} else {
-			return false;
-		}
-	}
 
 }

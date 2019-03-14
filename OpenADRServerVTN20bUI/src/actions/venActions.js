@@ -1,64 +1,8 @@
 import * as types from '../constants/actionTypes';
 import { history } from '../store/configureStore';
 
-var swaggerAction = (actionType, getAction, getPayload, getNext) => {
-  return (dispatch, getState) => {
-    dispatch( {
-      type: actionType,
-      swagger: function ( api ) {
-          getAction(api)
-          .then( data => {
-           
-            var msg = {
-              type: actionType + "_SUCCESS"
-            }
-            if(getPayload) {
-              var payload = getPayload(data);
-              if(payload) {
-                msg.payload = payload;
-              }
-            }
-            dispatch(msg);
-            if(getNext) {
-              getNext(dispatch, getState);
-            }
-          } )
-          .catch( err => {
-            dispatch( {
-              type: actionType + "_ERROR",
-              payload: err
-            } );
-          } )
-      }
-    } )
-  }
-}
+import { swaggerAction, jsonResponseContentType, multipartResponseContentType, saveData, parseJsonData } from './apiUtils';
 
-var jsonResponseContentType = {
-      responseContentType: 'application/json'
-}
-
-var multipartResponseContentType = {
-      responseContentType: 'multipart/form-data'
-}
-
-var saveData = ( function () {
-  var a = document.createElement( 'a' );
-  document.body.appendChild( a );
-  a.style = 'display: none';
-  return function ( data, fileName ) {
-     var url = window.URL.createObjectURL( data );
-      a.href = url;
-      a.download = fileName;
-      a.click();
-      window.URL.revokeObjectURL( url );
-    
-  };
-}());
-
-var parseJsonData = (data) => {
-  return JSON.parse( data.data );
-}
 
 export const loadVen = () => {
   return swaggerAction(types.LOAD_VEN, 

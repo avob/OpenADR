@@ -2,7 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+
 import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions';
+import * as eventActions from '../../actions/eventActions';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -74,6 +76,7 @@ export class EventPage extends React.Component {
 
   componentDidMount() {
     this.props.vtnConfigurationActions.loadMarketContext();
+    this.props.eventActions.loadEvent();
   }
 
   render() {
@@ -110,7 +113,8 @@ export class EventPage extends React.Component {
 }
 
 EventPage.propTypes = {
-  vtnConfigurationActions: PropTypes.object.isRequired
+  vtnConfigurationActions: PropTypes.object.isRequired,
+  eventActions: PropTypes.object.isRequired,
 };
 
 function mapStateToProps( state ) {
@@ -121,7 +125,10 @@ function mapStateToProps( state ) {
 
 function mapDispatchToProps( dispatch ) {
   return {
-    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch )
+    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch ),
+    eventActions: bindActionCreators( eventActions, dispatch )
+
+
   };
 }
 

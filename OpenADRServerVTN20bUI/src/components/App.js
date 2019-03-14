@@ -218,7 +218,7 @@ class App extends React.Component {
 
           <Route path="/account" component={ AccountPage } />
 
-          <Route path="/event/detail/:eventId" component={ EventDetailPage } />
+          <Route path="/event/detail/:id" component={ EventDetailPage } />
           <Route path="/event/create" component={ EventCreatePage } />
           <Route path="/event" component={ EventPage } />
 

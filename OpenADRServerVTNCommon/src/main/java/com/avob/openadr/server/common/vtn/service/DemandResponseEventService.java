@@ -141,15 +141,26 @@ public class DemandResponseEventService {
 		Duration notificationDuration = datatypeFactory.newDuration(event.getNotificationDuration());
 		long notificationDurationInMillis = notificationDuration.getTimeInMillis(dateStart);
 		event.setStartNotification(dateStart.getTime() - notificationDurationInMillis);
+		List<Ven> findByUsernameIn = null;
+		String comaSeparatedTargetedVenUsername = event.getComaSeparatedTargetedVenUsername();
+		if (comaSeparatedTargetedVenUsername != null) {
+			List<String> targetedVenUsername = Arrays.asList(comaSeparatedTargetedVenUsername.split(","));
 
-		List<String> targetedVenUsername = Arrays.asList(event.getComaSeparatedTargetedVenUsername().split(","));
+			findByUsernameIn = venDao.findByUsernameInAndVenMarketContextsContains(targetedVenUsername,
+					event.getMarketContext());
+		} else {
+			findByUsernameIn = venDao.findByVenMarketContextsName(event.getMarketContext().getName());
+		}
 
-		List<Ven> findByUsernameIn = venDao.findByUsernameInAndVenMarketContextsContains(targetedVenUsername,
-				event.getMarketContext());
 		List<VenDemandResponseEvent> list = new ArrayList<VenDemandResponseEvent>();
 		for (Ven ven : findByUsernameIn) {
 			if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
-				demandResponseEventPublisher.publish20a(ven);
+//				if (ven.getOadrProfil().equals("20b")) {
+//					demandResponseEventPublisher.publish20b(ven);
+//				} else {
+//					demandResponseEventPublisher.publish20a(ven);
+//				}
+
 			}
 			list.add(new VenDemandResponseEvent(event, ven));
 		}
