@@ -76,6 +76,7 @@ export class EventCreatePage extends React.Component {
 
   componentDidMount() {
     this.props.vtnConfigurationActions.loadMarketContext();
+    this.props.vtnConfigurationActions.loadGroup();
   }
 
   render() {
@@ -93,7 +94,8 @@ export class EventCreatePage extends React.Component {
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
-                          <EventCreate classes={classes} marketContext={event_create.marketContext} createEvent={this.props.eventActions.createEvent}/>
+                          <EventCreate classes={classes} marketContext={event_create.marketContext} group={event_create.group} 
+                          createEvent={this.props.eventActions.createEvent}/>
                        </TabContainer> }
 
     </div>

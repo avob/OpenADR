@@ -17,7 +17,6 @@ export var DateAndTimePicker = (props) => {
   }
 
   return (
-    <form className={classes.container} noValidate>
       <TextField required error={props.error}
         label={props.field}
         type="datetime-local"
@@ -33,7 +32,6 @@ export var DateAndTimePicker = (props) => {
           shrink: true,
         }}
       />
-    </form>
   );
 }
 
@@ -45,7 +43,6 @@ export var DurationPicker = (props) => {
   }
 
   return (
-    <form className={classes.container} noValidate>
       <TextField required error={props.error}
         label={props.field}
         type="number"
@@ -59,7 +56,6 @@ export var DurationPicker = (props) => {
           shrink: true,
         }}
       />
-    </form>
   );
 }
 
@@ -118,7 +114,7 @@ export var TimezonePicker = (props) => {
 
 
   return (
-       <FormControl className={ classes.formControl }>
+       <FormControl style={{marginLeft:8}}>
           <FormLabel style={ labelStyle } component="label">
             {props.label}
           </FormLabel>

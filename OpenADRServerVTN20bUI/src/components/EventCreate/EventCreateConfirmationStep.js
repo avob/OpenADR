@@ -29,22 +29,136 @@ export class EventCreateConfirmationStep extends React.Component {
 
 
   render() {
-    const {classes, hasError} = this.props;
+    const {classes, descriptor, eventSignal, eventTarget} = this.props;
 
     return (
     <Grid container
           spacing={ 8 }
           justify="center">
       <Grid container spacing={ 24 }>
+          <Grid item xs={ 2 } />
+          <Grid item xs={ 4 }>
+            <TextField label="Market Context"
+                       value={ descriptor.marketContext }
+                       className={ classes.textField }
+                       margin="dense"
+                       variant="outlined"
+                       InputProps={ { readOnly: true } }
+                       fullWidth={ true } />
+          </Grid>
+          <Grid item xs={ 1 }>
+            <TextField label="Priority"
+                       value={ descriptor.priority }
+                       className={ classes.textField }
+                       margin="dense"
+                       variant="outlined"
+                       InputProps={ { readOnly: true } }
+                       fullWidth={ true } />
+          </Grid>
+          <Grid item xs={ 1 }>
+            <TextField label="Response required"
+                       value={ descriptor.responseRequired }
+                       className={ classes.textField }
+                       margin="dense"
+                       variant="outlined"
+                       InputProps={ { readOnly: true } }
+                       fullWidth={ true } />
+          </Grid>
+          <Grid item xs={ 2 }>
+            <TextField label="Scope"
+                       value={ (descriptor.testEvent ) ? "Test Event": "Production Event"}
+                       className={ classes.textField }
+                       margin="dense"
+                       variant="outlined"
+                       InputProps={ { readOnly: true } }
+                       fullWidth={ true } />
+          </Grid>
+          <Grid item xs={ 2 } />
+        </Grid>
+
+        <Grid container
+            style={ { marginTop: 20, marginBottom:10 } }
+            spacing={ 24 }>
         <Grid item xs={ 2 } />
-        <Grid item xs={ 4 }>
-        </Grid> 
-        <Grid item xs={ 4 }>
-         
+        <Grid item xs={ 8 }>
+          <Divider />
         </Grid>
         <Grid item xs={ 2 } />
       </Grid>
 
+      <Grid container spacing={ 24 }>
+          <Grid item xs={ 2 } />
+          <Grid item xs={ 2 }>
+            <TextField label="Signal Name"
+                       value={ eventSignal.signalName }
+                       className={ classes.textField }
+                       margin="dense"
+                       variant="outlined"
+                       InputProps={ { readOnly: true } }
+                       fullWidth={ true } />
+          </Grid>
+          <Grid item xs={ 2 }>
+            <TextField label="Signal Type"
+                       value={ eventSignal.signalType }
+                       className={ classes.textField }
+                       margin="dense"
+                       variant="outlined"
+                       InputProps={ { readOnly: true } }
+                       fullWidth={ true } />
+          </Grid>
+          <Grid item xs={ 2 }>
+            <TextField label="Unit"
+                       value={ eventSignal.unitType }
+                       className={ classes.textField }
+                       margin="dense"
+                       variant="outlined"
+                       InputProps={ { readOnly: true } }
+                       fullWidth={ true } />
+          </Grid>
+          <Grid item xs={ 1 }>
+            <TextField label="Current Value"
+                       value={ eventSignal.currentValue }
+                       className={ classes.textField }
+                       margin="dense"
+                       variant="outlined"
+                       InputProps={ { readOnly: true } }
+                       fullWidth={ true } />
+          </Grid>
+          <Grid item xs={ 1 }>
+            <TextField label="Nb Intervals"
+                       value={ eventSignal.signalInterval.length}
+                       className={ classes.textField }
+                       margin="dense"
+                       variant="outlined"
+                       InputProps={ { readOnly: true } }
+                       fullWidth={ true } />
+          </Grid>
+          <Grid item xs={ 2 } />
+        </Grid>
+
+         <Grid container
+            style={ { marginTop: 20, marginBottom:10 } }
+            spacing={ 24 }>
+        <Grid item xs={ 2 } />
+        <Grid item xs={ 8 }>
+          <Divider />
+        </Grid>
+        <Grid item xs={ 2 } />
+      </Grid>
+      <Grid container spacing={ 24 }>
+          <Grid item xs={ 2 } />
+          <Grid item xs={ 2 }>
+            <TextField label="Nb Targeted devices"
+                       value={ 12 }
+                       className={ classes.textField }
+                       margin="dense"
+                       variant="outlined"
+                       InputProps={ { readOnly: true } }
+                       fullWidth={ true } />
+          </Grid>
+          
+          <Grid item xs={ 2 } />
+        </Grid>
     </Grid>
     );
   }

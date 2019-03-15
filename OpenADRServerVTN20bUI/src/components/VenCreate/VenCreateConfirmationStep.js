@@ -110,21 +110,11 @@ export class VenCreateConfirmationStep extends React.Component {
             justify="center">
         <Grid container spacing={ 24 }>
           <Grid item xs={ 2 } />
-          <Grid item xs={ 2 }>
-            <Typography gutterBottom
-                        variant="title"
-                        component="h2">
-              VEN Settings
-            </Typography>
-          </Grid>
-        </Grid>
-        <Grid container spacing={ 24 }>
-          <Grid item xs={ 2 } />
           <Grid item xs={ 1 }>
             <TextField label="Profile"
                        value={ ven.venOadrProfile }
                        className={ classes.textField }
-                       margin="normal"
+                       margin="dense"
                        variant="outlined"
                        InputProps={ { readOnly: true } }
                        fullWidth={ true } />
@@ -133,7 +123,7 @@ export class VenCreateConfirmationStep extends React.Component {
             <TextField label="Authentication"
                        value={ ven.authenticationType }
                        className={ classes.textField }
-                       margin="normal"
+                       margin="dense"
                        variant="outlined"
                        InputProps={ { readOnly: true } }
                        fullWidth={ true } />
@@ -142,7 +132,7 @@ export class VenCreateConfirmationStep extends React.Component {
             <TextField label="Common Name"
                        value={ ven.venCommonName }
                        className={ classes.textField }
-                       margin="normal"
+                       margin="dense"
                        variant="outlined"
                        InputProps={ { readOnly: true } }
                        fullWidth={ true } />
@@ -151,7 +141,7 @@ export class VenCreateConfirmationStep extends React.Component {
             <TextField label="VenID"
                        value={ venId }
                        className={ classes.textField }
-                       margin="normal"
+                       margin="dense"
                        variant="outlined"
                        InputProps={ { readOnly: true } }
                        fullWidth={ true } />

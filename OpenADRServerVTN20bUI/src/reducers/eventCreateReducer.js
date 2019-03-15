@@ -25,6 +25,19 @@ export default function eventCreateReducer( state = initialState.event_create, a
     case types.LOAD_MARKET_CONTEXT_ERROR:
       return state;
 
+      // GROUPS
+    case types.LOAD_GROUP:
+      return state;
+
+    case types.LOAD_GROUP_SUCCESS:
+      newState = objectAssign( {}, state, {
+        group: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_GROUP_ERROR:
+      return state;
+
     default:
       return state;
   }

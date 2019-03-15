@@ -74,6 +74,44 @@ export function GroupSelectDialog( props ) {
   );
 }
 
+export function TargetSelectDialog( props ) {
+  return (
+  <Dialog open={ props.open } onClose={ () => {
+                                        props.close()
+                                      } }>
+    <DialogTitle>
+      { props.title }
+    </DialogTitle>
+    <div>
+      <List>
+        <ListItem button
+                  onClick={ () => {
+                              props.close( "group" )
+                            } } >
+          <ListItemAvatar>
+            <Avatar style={ { backgroundColor: '#bbb' } }>
+              <GroupWorkIcon /> 
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Group" />
+        </ListItem>
+        <ListItem button
+                  onClick={ () => {
+                              props.close( "ven" )
+                            } } >
+          <ListItemAvatar>
+            <Avatar style={ { backgroundColor: '#bbb' } }>
+              <SettingsInputComponentIcon /> 
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Ven" />
+        </ListItem>
+      </List>
+    </div>
+  </Dialog>
+  );
+}
+
 export function VenStatusSelectDialog( props ) {
   var items = [{
     name: "online",

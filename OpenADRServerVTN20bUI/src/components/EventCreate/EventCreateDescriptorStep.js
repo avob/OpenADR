@@ -7,6 +7,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
+
 import TextField from '@material-ui/core/TextField';
 
 import ExtensionIcon from '@material-ui/icons/Extension';
@@ -28,7 +29,6 @@ import Checkbox from '@material-ui/core/Checkbox';
 
 
 
-import {TimezonePicker, DateAndTimePicker, DurationPicker} from '../common/TimePicker'
 
 import { MarketContextSelectDialog } from '../common/VtnconfigurationDialog'
 
@@ -48,7 +48,7 @@ const labelStyle = {
   marginTop: "-8px"
 }
 
-export class EventCreateStandardDetailsStep extends React.Component {
+export class EventCreateDescriptorStep extends React.Component {
 
   constructor( props ) {
     super( props );
@@ -58,25 +58,7 @@ export class EventCreateStandardDetailsStep extends React.Component {
   
   }
 
-  handleTimezoneChange = (timezone) => {
-    let details = this.props.standardDetails;
-    details.timezone = timezone;
-    this.props.onChange(details);
-  }
-
-  handleStartChange = (start) => {
-    console.log(start)
-    let details = this.props.standardDetails;
-    details.start = start;
-    this.props.onChange(details);
-  }
-
-
-  handleDurationChange = (duration) => {
-    let details = this.props.standardDetails;
-    details.duration = duration;
-    this.props.onChange(details);
-  }
+ 
 
   handleMarketContextSelectOpen = () => {
     this.setState({marketContextSelectDialogOpen: true})
@@ -84,7 +66,7 @@ export class EventCreateStandardDetailsStep extends React.Component {
 
   handleMarketContextSelectClose = (context) => {
     if(context != null) {
-      let details = this.props.standardDetails;
+      let details = this.props.descriptor;
       details.marketContext = context.name;
       this.props.onChange(details);
     }
@@ -92,72 +74,49 @@ export class EventCreateStandardDetailsStep extends React.Component {
   }
 
   handlePriorityChange = (e) => {
-    let details = this.props.standardDetails;
+    let details = this.props.descriptor;
     details.priority = e.target.value;
     this.props.onChange(details);
   }
 
   handleResponseRequiredChange = (e) => {
-    let details = this.props.standardDetails;
+    let details = this.props.descriptor;
     details.responseRequired = e.target.value;
     this.props.onChange(details);
   }
 
   handleTestEventChange = (e) => {
-    let details = this.props.standardDetails;
+    let details = this.props.descriptor;
     details.testEvent = e.target.checked;
     this.props.onChange(details);
   }
 
   handleVtnCommentChange = (e) => {
-    let details = this.props.standardDetails;
+    let details = this.props.descriptor;
     details.vtnComment = e.target.value;
     this.props.onChange(details);
   }
 
   render() {
-    const {classes, hasError, standardDetails, marketContext} = this.props;
+    const {classes, hasError, descriptor, marketContext} = this.props;
 
 
     return (
     <Grid container
           spacing={ 8 }
           justify="center">
-      <Grid container spacing={ 24 }>
-        <Grid item xs={ 2 } />
-        <Grid item xs={ 3 }>
-          <TimezonePicker label="Timezone"  classes={classes} value={standardDetails.timezone} onChange={this.handleTimezoneChange}/>
-        </Grid> 
-        <Grid item xs={ 3 }>
-           <DateAndTimePicker classes={ classes } field="Start Date" error={hasError && standardDetails.start == null}
-             value={standardDetails.start} onChange={this.handleStartChange} />
-        </Grid>
-        <Grid item xs={ 2 }>
-           <DurationPicker classes={ classes } field="Duration (minutes)"  error={hasError && standardDetails.duration == ""}
-               value={standardDetails.duration} onChange={this.handleDurationChange}/>
-        </Grid>
-        <Grid item xs={ 2 } />
-      </Grid>
+      
 
 
-      <Grid container
-            style={ { marginTop: 20 } }
-            spacing={ 24 }>
-        <Grid item xs={ 2 } />
-        <Grid item xs={ 8 }>
-          <Divider />
-        </Grid>
-        <Grid item xs={ 2 } />
-      </Grid>
-
-       <Grid container spacing={ 24 } style={ { marginTop: 20 } } >
+     
+       <Grid container spacing={ 24 } >
         <Grid item xs={ 2 } />
        
        
        <Grid item xs={ 3 }>
      
-              <TextField required label="Market Context" error={hasError && standardDetails.marketContext == null}
-                 value={ (standardDetails.marketContext) ? standardDetails.marketContext : "" }
+              <TextField required label="Market Context" error={hasError && descriptor.marketContext == null}
+                 value={ (descriptor.marketContext) ? descriptor.marketContext : "" }
                  className={classes.textField}
                  fullWidth={true}
                  onClick={this.handleMarketContextSelectOpen}
@@ -174,7 +133,7 @@ export class EventCreateStandardDetailsStep extends React.Component {
      
               <TextField required label="Priority"
                 type="number"
-                value={ standardDetails.priority }
+                value={ descriptor.priority }
                 onChange={this.handlePriorityChange}
                 className={classes.textField}
                 fullWidth={true}/>
@@ -187,7 +146,7 @@ export class EventCreateStandardDetailsStep extends React.Component {
                 <FormLabel style={ labelStyle } component="label">
                   Response Required
                 </FormLabel>
-                <Select value={ standardDetails.responseRequired}
+                <Select value={ descriptor.responseRequired}
                               style={ { marginTop: 0 } }
 
                                onChange={this.handleResponseRequiredChange}
@@ -208,7 +167,7 @@ export class EventCreateStandardDetailsStep extends React.Component {
            <FormControlLabel
           control={
             <Checkbox
-              checked={standardDetails.testEvent}
+              checked={descriptor.testEvent}
               onChange={this.handleTestEventChange}
               value="testEvent"
               color="primary"
@@ -231,13 +190,13 @@ export class EventCreateStandardDetailsStep extends React.Component {
         <Grid item xs={ 2 } />
       </Grid>
 
-      <Grid container spacing={ 24 } style={ { marginTop: 20 } }>
+      <Grid container spacing={ 24 } style={ { marginTop: 20, marginBottom:10 } }>
         <Grid item xs={ 2 } />
         <Grid item xs={ 8 }>
             <TextField  label="VTN Comment"
                 multiline
           rowsMax="4"
-                value={ standardDetails.vtnComment }
+                value={ descriptor.vtnComment }
                 onChange={this.handleVtnCommentChange}
                 className={classes.textField}
                 fullWidth={true}/>
@@ -251,4 +210,4 @@ export class EventCreateStandardDetailsStep extends React.Component {
   }
 }
 
-export default EventCreateStandardDetailsStep;
+export default EventCreateDescriptorStep;
