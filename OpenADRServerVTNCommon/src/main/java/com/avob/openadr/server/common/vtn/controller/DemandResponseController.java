@@ -12,6 +12,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,10 +24,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDtoValidator;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDtoValidator;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 
@@ -58,11 +58,10 @@ public class DemandResponseController {
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	@ResponseBody
-	public DemandResponseEventDto create(@Valid @RequestBody DemandResponseEventDto event,
-			HttpServletResponse response) {
-		DemandResponseEvent map = dtoMapper.map(event, DemandResponseEvent.class);
+	public DemandResponseEventDto create(@Valid @RequestBody DemandResponseEventDto event, HttpServletResponse response,
+			BindingResult result) {
 
-		DemandResponseEvent save = demandResponseEventService.create(map);
+		DemandResponseEvent save = demandResponseEventService.create(event);
 
 		response.setStatus(HttpStatus.CREATED_201);
 
@@ -97,7 +96,8 @@ public class DemandResponseController {
 
 	@RequestMapping(value = "/{id}/cancel", method = RequestMethod.POST)
 	@ResponseBody
-	public DemandResponseEventDto cancel(@PathVariable(value = "id") Long id, HttpServletResponse response) {
+	public DemandResponseEventDto cancel(@PathVariable(value = "id") Long id, HttpServletResponse response)
+			throws Exception {
 		DemandResponseEvent event = demandResponseEventService.cancel(id);
 		if (event == null) {
 			response.setStatus(HttpStatus.NOT_FOUND_404);
@@ -108,57 +108,9 @@ public class DemandResponseController {
 
 	@RequestMapping(value = "/{id}/active", method = RequestMethod.POST)
 	@ResponseBody
-	public DemandResponseEventDto active(@PathVariable(value = "id") Long id, HttpServletResponse response) {
+	public DemandResponseEventDto active(@PathVariable(value = "id") Long id, HttpServletResponse response)
+			throws Exception {
 		DemandResponseEvent event = demandResponseEventService.active(id);
-		if (event == null) {
-			response.setStatus(HttpStatus.NOT_FOUND_404);
-			return null;
-		}
-		return dtoMapper.map(event, DemandResponseEventDto.class);
-	}
-
-	@RequestMapping(value = "/{id}/normal", method = RequestMethod.POST)
-	@ResponseBody
-	public DemandResponseEventDto updateValueNormal(@PathVariable(value = "id") Long id, HttpServletResponse response) {
-		DemandResponseEvent event = demandResponseEventService.updateValue(id,
-				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_NORMAL);
-		if (event == null) {
-			response.setStatus(HttpStatus.NOT_FOUND_404);
-			return null;
-		}
-		return dtoMapper.map(event, DemandResponseEventDto.class);
-	}
-
-	@RequestMapping(value = "/{id}/moderate", method = RequestMethod.POST)
-	@ResponseBody
-	public DemandResponseEventDto updateModerate(@PathVariable(value = "id") Long id, HttpServletResponse response) {
-		DemandResponseEvent event = demandResponseEventService.updateValue(id,
-				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE);
-		if (event == null) {
-			response.setStatus(HttpStatus.NOT_FOUND_404);
-			return null;
-		}
-		return dtoMapper.map(event, DemandResponseEventDto.class);
-	}
-
-	@RequestMapping(value = "/{id}/high", method = RequestMethod.POST)
-	@ResponseBody
-	public DemandResponseEventDto updateValueHigh(@PathVariable(value = "id") Long id, HttpServletResponse response) {
-		DemandResponseEvent event = demandResponseEventService.updateValue(id,
-				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH);
-		if (event == null) {
-			response.setStatus(HttpStatus.NOT_FOUND_404);
-			return null;
-		}
-		return dtoMapper.map(event, DemandResponseEventDto.class);
-	}
-
-	@RequestMapping(value = "/{id}/special", method = RequestMethod.POST)
-	@ResponseBody
-	public DemandResponseEventDto updateValueSpecial(@PathVariable(value = "id") Long id,
-			HttpServletResponse response) {
-		DemandResponseEvent event = demandResponseEventService.updateValue(id,
-				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_SPECIAL);
 		if (event == null) {
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return null;

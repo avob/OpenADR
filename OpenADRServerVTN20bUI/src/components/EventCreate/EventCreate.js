@@ -155,12 +155,12 @@ export class EventCreate extends React.Component {
         signalType: this.state.eventSignal.signalType,
         unitType: this.state.eventSignal.unitType,
         currentValue: this.state.eventSignal.currentValue,
-        interval: this.state.eventSignal.signalInterval
+        intervals: this.state.eventSignal.signalInterval
       }],
 
       targets: this.state.eventTarget
     }
-    console.log(dto)
+    console.log(JSON.stringify(dto))
     // this.props.createEvent( dto );
   }
 

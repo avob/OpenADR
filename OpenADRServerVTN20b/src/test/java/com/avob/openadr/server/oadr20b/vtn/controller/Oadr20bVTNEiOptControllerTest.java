@@ -8,7 +8,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBElement;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
@@ -23,30 +22,23 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.avob.openadr.model.oadr20b.Oadr20bFactory;
-import com.avob.openadr.model.oadr20b.builders.Oadr20bEiBuilders;
-import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiOptBuilders;
 import com.avob.openadr.model.oadr20b.dto.VenOptDto;
-import com.avob.openadr.model.oadr20b.ei.EiActivePeriodType;
-import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
-import com.avob.openadr.model.oadr20b.ei.EiEventType;
-import com.avob.openadr.model.oadr20b.ei.EiTargetType;
-import com.avob.openadr.model.oadr20b.ei.EventDescriptorType;
-import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.OptReasonEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
-import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedOptType;
-import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.xcal.VavailabilityType;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.converter.OptConverter;
@@ -54,7 +46,6 @@ import com.avob.openadr.server.oadr20b.vtn.service.VenOptService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockMvc;
-import com.google.common.collect.Lists;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VTN20bSecurityApplicationTest.class })
@@ -331,9 +322,23 @@ public class Oadr20bVTNEiOptControllerTest {
 		assertEquals(1, findScheduledOpt.size());
 
 		// create a dr event
-		EiTargetType target = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addVenId(OadrDataBaseSetup.VEN).build();
-		oadrMockMvc.postOadrEventAndExpect(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				createPayload("eventId1", target, OadrDataBaseSetup.MARKET_CONTEXT_NAME), HttpStatus.CREATED_201);
+		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
+		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
+		signal.setSignalName("SIMPLE");
+		signal.setSignalType("level");
+
+		DemandResponseEventDto dto = new DemandResponseEventDto();
+		dto.setEventId("eventActive");
+		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
+		dto.setCreatedTimestamp(System.currentTimeMillis());
+		dto.getActivePeriod().setDuration("PT1H");
+		dto.getActivePeriod().setNotificationDuration("P1D");
+		dto.getSignals().add(signal);
+		// ensure event status is "active"
+		dto.getActivePeriod().setStart(System.currentTimeMillis() - 10);
+		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
+		dto.setState(DemandResponseEventStateEnum.ACTIVE);
+		demandResponseEventService.create(dto);
 
 		List<DemandResponseEvent> find = demandResponseEventService.find(OadrDataBaseSetup.VEN,
 				DemandResponseEventStateEnum.ACTIVE);
@@ -409,41 +414,6 @@ public class Oadr20bVTNEiOptControllerTest {
 
 		demandResponseEventService.delete(eventId);
 
-	}
-
-	private JAXBElement<EiEventType> createPayload(String eventId, EiTargetType target, String marketContextName) {
-		long timestampStart = System.currentTimeMillis();
-		String eventXmlDuration = "PT1H";
-		String toleranceXmlDuration = "PT5M";
-		String notificationXmlDuration = "P1D";
-		EiActivePeriodType period = Oadr20bEiEventBuilders.newOadr20bEiActivePeriodTypeBuilder(timestampStart,
-				eventXmlDuration, toleranceXmlDuration, notificationXmlDuration).build();
-
-		long start = System.currentTimeMillis();
-		float currentValue = 3f;
-		String xmlDuration = "PT1H";
-		String signalId = "0";
-		String signalName = "simple";
-		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
-		String intervalId = "0";
-		EiEventSignalType eiEventSignal = Oadr20bEiEventBuilders
-				.newOadr20bEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue)
-				.addInterval(Oadr20bEiBuilders.newOadr20bSignalIntervalTypeBuilder(intervalId, start, xmlDuration,
-						Lists.newArrayList(currentValue)).build())
-				.build();
-
-		long datetime = System.currentTimeMillis();
-		Long priority = 0L;
-		EventStatusEnumeratedType status = EventStatusEnumeratedType.ACTIVE;
-		String comment = "";
-		EventDescriptorType descriptor = Oadr20bEiEventBuilders
-				.newOadr20bEventDescriptorTypeBuilder(datetime, eventId, 0L, marketContextName, status)
-				.withPriority(priority).withVtnComment(comment).build();
-
-		OadrEvent event = Oadr20bEiEventBuilders.newOadr20bDistributeEventOadrEventBuilder().withActivePeriod(period)
-				.withEiTarget(target).withEventDescriptor(descriptor).addEiEventSignal(eiEventSignal).build();
-
-		return Oadr20bFactory.createEiEvent(event.getEiEvent());
 	}
 
 }

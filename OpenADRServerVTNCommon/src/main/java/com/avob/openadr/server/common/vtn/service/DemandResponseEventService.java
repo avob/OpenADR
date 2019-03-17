@@ -1,7 +1,6 @@
 package com.avob.openadr.server.common.vtn.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -25,13 +24,16 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDao;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignal;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalDao;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenDao;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDao;
-import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
+import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 import com.avob.openadr.server.common.vtn.service.push.DemandResponseEventPublisher;
 import com.google.common.collect.Lists;
 
@@ -57,7 +59,13 @@ public class DemandResponseEventService {
 	private DemandResponseEventPublisher demandResponseEventPublisher;
 
 	@Resource
+	private DemandResponseEventSignalDao demandResponseEventSignalDao;
+
+	@Resource
 	private Executor executor;
+
+	@Resource
+	private DtoMapper dtoMapper;
 
 	private static DatatypeFactory datatypeFactory;
 	static {
@@ -122,34 +130,40 @@ public class DemandResponseEventService {
 	 * @return
 	 */
 	@Transactional
-	public DemandResponseEvent create(DemandResponseEvent event) {
-
+	public DemandResponseEvent create(DemandResponseEventDto dto) {
+		DemandResponseEvent event = dtoMapper.map(dto, DemandResponseEvent.class);
 		event.setCreatedTimestamp(System.currentTimeMillis());
 		event.setModificationNumber(0);
 
 		event.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 
 		Date dateStart = new Date();
-		dateStart.setTime(event.getStart());
+		dateStart.setTime(event.getActivePeriod().getStart());
 
 		// compute end from start and duration
-		Duration duration = datatypeFactory.newDuration(event.getDuration());
+		Duration duration = datatypeFactory.newDuration(event.getActivePeriod().getDuration());
 		long durationInMillis = duration.getTimeInMillis(dateStart);
-		event.setEnd(dateStart.getTime() + durationInMillis);
+		event.getActivePeriod().setEnd(dateStart.getTime() + durationInMillis);
 
 		// compute startNotification from start and notificationDuration
-		Duration notificationDuration = datatypeFactory.newDuration(event.getNotificationDuration());
+		Duration notificationDuration = datatypeFactory.newDuration(event.getActivePeriod().getNotificationDuration());
 		long notificationDurationInMillis = notificationDuration.getTimeInMillis(dateStart);
-		event.setStartNotification(dateStart.getTime() - notificationDurationInMillis);
+		event.getActivePeriod().setStartNotification(dateStart.getTime() - notificationDurationInMillis);
 		List<Ven> findByUsernameIn = null;
-		String comaSeparatedTargetedVenUsername = event.getComaSeparatedTargetedVenUsername();
-		if (comaSeparatedTargetedVenUsername != null) {
-			List<String> targetedVenUsername = Arrays.asList(comaSeparatedTargetedVenUsername.split(","));
 
+		if (dto.getTargets() != null) {
+			List<String> targetedVenUsername = new ArrayList<>();
+
+			List<DemandResponseEventTargetDto> targets = dto.getTargets();
+			for (DemandResponseEventTargetDto target : targets) {
+				if ("ven".equals(target.getTargetType())) {
+					targetedVenUsername.add(target.getTargetId());
+				}
+			}
 			findByUsernameIn = venDao.findByUsernameInAndVenMarketContextsContains(targetedVenUsername,
-					event.getMarketContext());
+					event.getDescriptor().getMarketContext());
 		} else {
-			findByUsernameIn = venDao.findByVenMarketContextsName(event.getMarketContext().getName());
+			findByUsernameIn = venDao.findByVenMarketContextsName(event.getDescriptor().getMarketContext().getName());
 		}
 
 		List<VenDemandResponseEvent> list = new ArrayList<VenDemandResponseEvent>();
@@ -165,7 +179,12 @@ public class DemandResponseEventService {
 			list.add(new VenDemandResponseEvent(event, ven));
 		}
 		venDemandResponseEventDao.saveAll(list);
-		return demandResponseEventDao.save(event);
+		DemandResponseEvent save = demandResponseEventDao.save(event);
+		event.getSignals().forEach(sig -> {
+			sig.setEvent(save);
+		});
+		demandResponseEventSignalDao.saveAll(event.getSignals());
+		return save;
 	}
 
 	/**
@@ -205,70 +224,16 @@ public class DemandResponseEventService {
 
 	}
 
-	private DemandResponseEvent createOrUpdate(DemandResponseEvent event, String eventId, long modificationNumber,
-			Long start, String durationXml, String notificationDurationXml, List<String> targetedVenUsername,
-			VenMarketContext marketContext, DemandResponseEventStateEnum state, String payload,
-			DemandResponseEventOadrProfileEnum profile) {
-		event.setEventId(eventId);
-		event.setCreatedTimestamp(System.currentTimeMillis());
-		event.setModificationNumber(modificationNumber);
-		event.setComaSeparatedTargetedVenUsername(String.join(",", targetedVenUsername));
-		event.setStart(start);
-		event.setMarketContext(marketContext);
-		event.setDuration(durationXml);
-		event.setNotificationDuration(notificationDurationXml);
-		event.setState(state);
-		event.setEvent(payload);
-		Date dateStart = new Date();
-		dateStart.setTime(start);
-		event.setOadrProfile(profile);
-		// compute end from start and duration
-		Duration duration = datatypeFactory.newDuration(durationXml);
-		long durationInMillis = duration.getTimeInMillis(dateStart);
-		event.setEnd(dateStart.getTime() + durationInMillis);
-
-		// compute startNotification from start and notificationDuration
-		Duration notificationDuration = datatypeFactory.newDuration(notificationDurationXml);
-		long notificationDurationInMillis = notificationDuration.getTimeInMillis(dateStart);
-		event.setStartNotification(dateStart.getTime() - notificationDurationInMillis);
-
-		List<Ven> findByUsernameIn = venDao.findByUsernameInAndVenMarketContextsContains(targetedVenUsername,
-				marketContext);
-		List<VenDemandResponseEvent> list = new ArrayList<VenDemandResponseEvent>();
-
-		for (Ven ven : findByUsernameIn) {
-			list.add(new VenDemandResponseEvent(event, ven));
-		}
-
-		DemandResponseEvent save = this.persist(event, list);
-		this.publish(findByUsernameIn, profile);
-
-		return save;
-
-	}
-
-	public DemandResponseEvent update(DemandResponseEvent event, String eventId, long modificationNumber, Long start,
-			String durationXml, String notificationDurationXml, List<String> targetedVenUsername,
-			VenMarketContext marketContext, DemandResponseEventStateEnum state, String payload,
-			DemandResponseEventOadrProfileEnum profile) {
-		venDemandResponseEventDao.deleteByEventId(event.getId());
-		return createOrUpdate(event, eventId, modificationNumber, start, durationXml, notificationDurationXml,
-				targetedVenUsername, marketContext, state, payload, profile);
-	}
-
-	public DemandResponseEvent create(String eventId, Long start, String durationXml, String notificationDurationXml,
-			List<String> targetedVenUsername, VenMarketContext marketContext, DemandResponseEventStateEnum state,
-			String payload, DemandResponseEventOadrProfileEnum profile) {
-		return createOrUpdate(new DemandResponseEvent(), eventId, 0L, start, durationXml, notificationDurationXml,
-				targetedVenUsername, marketContext, state, payload, profile);
-	}
-
 	public Optional<DemandResponseEvent> findById(Long id) {
 		return demandResponseEventDao.findById(id);
 	}
 
 	public DemandResponseEvent findByEventId(String eventId) {
 		return demandResponseEventDao.findOneByEventId(eventId);
+	}
+
+	public List<DemandResponseEventSignal> getSignals(DemandResponseEvent event) {
+		return demandResponseEventSignalDao.findByEvent(event);
 	}
 
 	public boolean delete(Long id) {
@@ -309,15 +274,15 @@ public class DemandResponseEventService {
 		return updateState(id, DemandResponseEventStateEnum.ACTIVE);
 	}
 
-	public DemandResponseEvent updateValue(Long id, DemandResponseEventSimpleValueEnum value) {
+	public DemandResponseEvent updateValue(Long id, Float value) {
 		Optional<DemandResponseEvent> op = demandResponseEventDao.findById(id);
 		if (!op.isPresent()) {
 			return null;
 		}
 		DemandResponseEvent event = op.get();
 
-		if (!value.equals(event.getValue())) {
-			event.setValue(value);
+		if (!value.equals(event.getSignals().toArray(new DemandResponseEventSignal[0])[0].getCurrentValue())) {
+			event.getSignals().toArray(new DemandResponseEventSignal[0])[0].setCurrentValue(value);
 			event.setModificationNumber(event.getModificationNumber() + 1);
 			event.setLastUpdateTimestamp(System.currentTimeMillis());
 			return demandResponseEventDao.save(event);

@@ -8,6 +8,7 @@ import java.security.cert.CertificateException;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.annotation.Resource;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.Source;
@@ -17,7 +18,6 @@ import javax.xml.validation.SchemaFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -37,6 +37,7 @@ import com.avob.openadr.model.oadr20a.Oadr20aSecurity;
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VTNEmbeddedServletContainerCustomizer;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.google.common.collect.Maps;
 
 @Configuration
@@ -48,41 +49,20 @@ public class VTN20aApplication {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(VTN20aApplication.class);
 
-	@Value("${oadr.server.context_path:#{null}}")
-	private String contextPath;
-
-	@Value("${oadr.server.port:#{8443}}")
-	private int port;
-
-	@Value("${oadr.security.ven.trustcertificate.oadrRsaRootCertificate}")
-	private String oadrRsaRootCertificate;
-
-	@Value("${oadr.security.ven.trustcertificate.oadrRsaIntermediateCertificate}")
-	private String oadrRsaIntermediateCertificate;
-
-	@Value("${oadr.security.ven.trustcertificate.oadrEccRootCertificate}")
-	private String oadrEccRootCertificate;
-
-	@Value("${oadr.security.ven.trustcertificate.oadrEccIntermediateCertificate}")
-	private String oadrEccIntermediateCertificate;
-
-	@Value("${oadr.security.vtn.rsaPrivateKeyPath}")
-	private String rsaPrivateKeyPath;
-
-	@Value("${oadr.security.vtn.rsaCertificatePath}")
-	private String rsaCertificatePath;
+	@Resource
+	private VtnConfig vtnConfig;
 
 	@Bean
 	public WebServerFactoryCustomizer<JettyServletWebServerFactory> servletContainerCustomizer() {
 		Map<String, String> trustedCertificates = Maps.newHashMap();
-		trustedCertificates.put("oadrRsaRootCertificate", oadrRsaRootCertificate);
-		trustedCertificates.put("oadrRsaIntermediateCertificate", oadrRsaIntermediateCertificate);
-		trustedCertificates.put("oadrEccRootCertificate", oadrEccRootCertificate);
-		trustedCertificates.put("oadrEccIntermediateCertificate", oadrEccIntermediateCertificate);
+		int i = 0;
+		for (String path : vtnConfig.getTrustCertificates()) {
+			trustedCertificates.put("cert_" + (i++), path);
+		}
 		try {
 			String password = UUID.randomUUID().toString();
-			return new VTNEmbeddedServletContainerCustomizer(port, contextPath,
-					OadrHttpSecurity.createKeyStore(rsaPrivateKeyPath, rsaCertificatePath, password), password,
+			return new VTNEmbeddedServletContainerCustomizer(vtnConfig.getPort(), vtnConfig.getContextPath(),
+					OadrHttpSecurity.createKeyStore(vtnConfig.getKey(), vtnConfig.getCert(), password), password,
 					OadrHttpSecurity.createTrustStore(trustedCertificates), Oadr20aSecurity.getProtocols(),
 					Oadr20aSecurity.getCiphers());
 		} catch (KeyStoreException e) {

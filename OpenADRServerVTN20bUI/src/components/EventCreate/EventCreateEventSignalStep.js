@@ -373,7 +373,7 @@ export class EventCreateEventSignalStep extends React.Component {
     stateChanged = true;
   }
 
-  if(nextProps.eventSignal.signalinterval.length > 0) {
+  if(nextProps.eventSignal.signalInterval.length > 0) {
     newState.needIntervalCreate = true;
     stateChanged = true;
   }

@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
@@ -43,9 +45,11 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationExc
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.security.exception.OadrSecurityException;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
@@ -58,6 +62,7 @@ import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bPushService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
 import com.google.common.collect.Sets;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -66,29 +71,26 @@ import com.google.common.collect.Sets;
 @ActiveProfiles("test")
 public class Oadr20bVTNSecurityTest {
 
-	@Value("${oadr.security.vtn.trustcertificate.oadrRsaRootCertificate}")
+	@Value("${oadr.security.vtn.trustcertificate}")
 	private String oadrRsaRootCertificate;
 
-	@Value("${oadr.security.vtn.trustcertificate.oadrRsaIntermediateCertificate}")
-	private String oadrRsaIntermediateCertificate;
-
-	@Value("${oadr.security.vtn.trustcertificate.oadrEccRootCertificate}")
-	private String oadrEccRootCertificate;
-
-	@Value("${oadr.security.vtn.trustcertificate.oadrEccIntermediateCertificate}")
-	private String oadrEccIntermediateCertificate;
-
-	@Value("${oadr.security.ven.rsaPrivateKeyPath}")
+	@Value("${oadr.security.ven.key}")
 	private String rsaPrivateKeyPemFilePath;
 
-	@Value("${oadr.security.ven.rsaCertificatePath}")
+	@Value("${oadr.security.ven.cert}")
 	private String rsaClientCertPemFilePath;
 
-	@Value("${oadr.security.ven.eccPrivateKeyPath}")
+	@Value("${oadr.security.ven.fingerprint}")
+	private String rsaClientFingerprintFilePath;
+
+	@Value("${oadr.security.ven.ecc.key}")
 	private String eccPrivateKeyPemFilePath;
 
-	@Value("${oadr.security.ven.eccCertificatePath}")
+	@Value("${oadr.security.ven.ecc.cert}")
 	private String eccClientCertPemFilePath;
+
+	@Value("${oadr.security.ven.ecc.fingerprint}")
+	private String eccClientFingerprintFilePath;
 
 	@Value("${oadr.server.port}")
 	private String port;
@@ -141,13 +143,15 @@ public class Oadr20bVTNSecurityTest {
 	@Test
 	public void testX509() throws Oadr20bException, OadrSecurityException, JAXBException, UnrecoverableKeyException,
 			NoSuchAlgorithmException, KeyStoreException, URISyntaxException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
+			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, IOException {
 
-		String[] allCerts = { oadrRsaRootCertificate, oadrRsaIntermediateCertificate };
+		String[] allCerts = { oadrRsaRootCertificate };
 
 		// using rsa oadr20a certificate fingerprint as Ven username grant
 		// access
-
+		byte[] encoded = Files.readAllBytes(Paths.get(rsaClientFingerprintFilePath));
+		String fingerprint = new String(encoded, Charsets.UTF_8);
+		fingerprint = fingerprint.trim();
 		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
 				.withTrustedCertificate(Arrays.asList(allCerts))
 				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers())
@@ -155,7 +159,7 @@ public class Oadr20bVTNSecurityTest {
 
 		OadrHttpVenClient20b x509HttpClient = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
 
-		String username = "2E:55:12:81:B9:EE:9C:46:72:1D";
+		String username = fingerprint;
 		Ven ven = venService.prepare(username);
 		ven.setRegistrationId(username);
 		venService.save(ven);
@@ -164,7 +168,9 @@ public class Oadr20bVTNSecurityTest {
 
 		// using ecc oadr20a certificate fingerprint as Ven username grant
 		// access
-
+		encoded = Files.readAllBytes(Paths.get(eccClientFingerprintFilePath));
+		fingerprint = new String(encoded, Charsets.UTF_8);
+		fingerprint = fingerprint.trim();
 		builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
 				.withTrustedCertificate(Arrays.asList(allCerts))
 				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers())
@@ -172,7 +178,7 @@ public class Oadr20bVTNSecurityTest {
 
 		x509HttpClient = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
 
-		username = "15:97:7B:DE:1C:1F:C6:D2:64:84";
+		username = fingerprint;
 		ven = venService.prepare(username);
 		ven.setRegistrationId(username);
 		venService.save(ven);
@@ -184,7 +190,7 @@ public class Oadr20bVTNSecurityTest {
 	public void testDigest() throws Oadr20bException, OadrSecurityException, JAXBException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		String[] allCerts = { oadrRsaRootCertificate, oadrRsaIntermediateCertificate };
+		String[] allCerts = { oadrRsaRootCertificate };
 
 		String username = "securityVen1";
 		String password = "securityVen1";
@@ -211,7 +217,7 @@ public class Oadr20bVTNSecurityTest {
 			IOException, URISyntaxException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
 			Oadr20bXMLSignatureValidationException {
 
-		String[] allCerts = { oadrRsaRootCertificate, oadrRsaIntermediateCertificate };
+		String[] allCerts = { oadrRsaRootCertificate };
 
 		String venUsername = "securityVen1";
 		String venPassword = "securityVen1";
@@ -255,16 +261,20 @@ public class Oadr20bVTNSecurityTest {
 				.withHeader(HttpHeaders.CONTENT_TYPE, "application/json").build();
 
 		ObjectMapper mapper = new ObjectMapper();
+		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
+		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
+		signal.setSignalName("SIMPLE");
+		signal.setSignalType("level");
 		DemandResponseEventDto dto = new DemandResponseEventDto();
 		dto.setEventId("eventId");
-		dto.setComaSeparatedTargetedVenUsername(String.join(",", venUsername, venUsername2));
-		dto.setDuration("PT1H");
-		dto.setNotificationDuration("P1D");
-		dto.setToleranceDuration("PT5M");
-		dto.setStart(System.currentTimeMillis());
+		dto.getTargets().add(new DemandResponseEventTargetDto("ven", ven.getUsername()));
+		dto.getActivePeriod().setDuration("PT1H");
+		dto.getActivePeriod().setNotificationDuration("P1D");
+		dto.getActivePeriod().setToleranceDuration("PT5M");
+		dto.getActivePeriod().setStart(System.currentTimeMillis());
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
-		dto.setValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH);
-		dto.setMarketContext(MARKET_CONTEXT_NAME);
+		dto.getSignals().add(signal);
+		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
 
 		String payload = mapper.writeValueAsString(dto);
 		HttpPost post = new HttpPost(demandResponseEnpointUrl);

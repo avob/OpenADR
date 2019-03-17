@@ -9,8 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
@@ -64,13 +62,13 @@ public class OadrHttpClient20bTest {
 		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
 		String xmlDuration = "PT1H";
 		float currentValue = 0;
-		List<Float> values = Arrays.asList(currentValue);
 		String intervalId = "intervalId";
 
 		EiEventSignalType eiEventSignalType = Oadr20bEiEventBuilders
 				.newOadr20bEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue)
 				.addInterval(Oadr20bEiBuilders
-						.newOadr20bSignalIntervalTypeBuilder(intervalId, timestampStart, xmlDuration, values).build())
+						.newOadr20bSignalIntervalTypeBuilder(intervalId, timestampStart, xmlDuration, currentValue)
+						.build())
 				.build();
 
 		String venId = "ven1";

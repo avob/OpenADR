@@ -44,10 +44,12 @@ import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.ResponseRequiredType;
 import com.avob.openadr.model.oadr20b.pyld.EiRequestEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
@@ -170,29 +172,37 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		VenMarketContext marketContext = venMarketContextService.findOneByName(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 
-		DemandResponseEvent eventActive = new DemandResponseEvent();
-		eventActive.setEventId("eventActive");
-		eventActive.setMarketContext(marketContext);
-		eventActive.setCreatedTimestamp(System.currentTimeMillis());
-		eventActive.setDuration("PT1H");
-		eventActive.setNotificationDuration("P1D");
-		eventActive.setValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH);
-		// ensure event status is "active"
-		eventActive.setStart(System.currentTimeMillis() - 10);
-		eventActive.setComaSeparatedTargetedVenUsername(OadrDataBaseSetup.VEN);
-		eventActive = demandResponseEventService.create(eventActive);
+		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
+		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
+		signal.setSignalName("SIMPLE");
+		signal.setSignalType("level");
 
-		DemandResponseEvent eventCanceled = new DemandResponseEvent();
-		eventCanceled.setEventId("eventCanceled");
-		eventCanceled.setMarketContext(marketContext);
-		eventCanceled.setCreatedTimestamp(System.currentTimeMillis());
-		eventCanceled.setDuration("PT1H");
-		eventCanceled.setNotificationDuration("P1D");
-		eventCanceled.setValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE);
-		eventCanceled.setStart(System.currentTimeMillis() - 10);
-		eventCanceled.setComaSeparatedTargetedVenUsername(OadrDataBaseSetup.VEN);
-		eventCanceled.setState(DemandResponseEventStateEnum.CANCELED);
-		eventCanceled = demandResponseEventService.create(eventCanceled);
+		DemandResponseEventDto dto = new DemandResponseEventDto();
+		dto.setEventId("eventActive");
+		dto.getDescriptor().setMarketContext(marketContext.getName());
+		dto.setCreatedTimestamp(System.currentTimeMillis());
+		dto.getActivePeriod().setDuration("PT1H");
+		dto.getActivePeriod().setNotificationDuration("P1D");
+		dto.getSignals().add(signal);
+		// ensure event status is "active"
+		dto.getActivePeriod().setStart(System.currentTimeMillis() - 10);
+		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
+		dto.setState(DemandResponseEventStateEnum.ACTIVE);
+		DemandResponseEvent eventActive = demandResponseEventService.create(dto);
+
+		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
+
+		dto = new DemandResponseEventDto();
+		dto.setEventId("eventCanceled");
+		dto.getDescriptor().setMarketContext(marketContext.getName());
+		dto.setCreatedTimestamp(System.currentTimeMillis());
+		dto.getActivePeriod().setDuration("PT1H");
+		dto.getActivePeriod().setNotificationDuration("P1D");
+		dto.getSignals().add(signal);
+		dto.getActivePeriod().setStart(System.currentTimeMillis() - 10);
+		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
+		dto.setState(DemandResponseEventStateEnum.CANCELED);
+		DemandResponseEvent eventCanceled = demandResponseEventService.create(dto);
 
 		String requestId = "0";
 		long replyLimit = 2L;
@@ -238,7 +248,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		assertEquals(new Double(2), new Double(eiEventSignalTypeActive.getCurrentValue().getPayloadFloat().getValue()));
 
 		// ensure correct signal name/type (rule 7)
-		assertEquals("simple", eiEventSignalTypeActive.getSignalName());
+		assertEquals("SIMPLE", eiEventSignalTypeActive.getSignalName());
 		assertEquals(SignalTypeEnumeratedType.LEVEL, eiEventSignalTypeActive.getSignalType());
 
 		// ensure "canceled" drevent is translated into OadrEvent
@@ -254,13 +264,8 @@ public class Oadr20bVTNEiEventControllerTest {
 		assertEquals(1, eiEventCanceled.getEiEventSignals().getEiEventSignal().size());
 		EiEventSignalType eiEventSignalTypeCanceled = eiEventCanceled.getEiEventSignals().getEiEventSignal().get(0);
 
-		// ensure currentValue is set to "0" (normal) when event status is
-		// not "active" (rule 14)
-		assertEquals(new Double(0),
-				new Double(eiEventSignalTypeCanceled.getCurrentValue().getPayloadFloat().getValue()));
-
 		// ensure correct signal name/type (rule 7)
-		assertEquals("simple", eiEventSignalTypeCanceled.getSignalName());
+		assertEquals("SIMPLE", eiEventSignalTypeCanceled.getSignalName());
 		assertEquals(SignalTypeEnumeratedType.LEVEL, eiEventSignalTypeCanceled.getSignalType());
 
 		demandResponseEventService.delete(eventCanceled.getId());
@@ -333,16 +338,22 @@ public class Oadr20bVTNEiEventControllerTest {
 		// create and send DR Event to DemandResponseEvent API
 		DemandResponseEventDto dto = new DemandResponseEventDto();
 		dto.setEventId("eventIdScenario1");
-		dto.setComaSeparatedTargetedVenUsername(OadrDataBaseSetup.VEN);
-		dto.setDuration("PT1H");
-		dto.setToleranceDuration("PT5M");
-		dto.setNotificationDuration("P1D");
-		dto.setRampUpDuration("PT1M");
-		dto.setRecoveryDuration("PT1M");
-		dto.setStart(System.currentTimeMillis());
+		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
+
+		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
+		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
+		signal.setSignalName("SIMPLE");
+		signal.setSignalType("level");
+
+		dto.getActivePeriod().setDuration("PT1H");
+		dto.getActivePeriod().setToleranceDuration("PT5M");
+		dto.getActivePeriod().setNotificationDuration("P1D");
+		dto.getActivePeriod().setRampUpDuration("PT1M");
+		dto.getActivePeriod().setRecoveryDuration("PT1M");
+		dto.getActivePeriod().setStart(System.currentTimeMillis());
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
-		dto.setValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH);
-		dto.setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
+		dto.getSignals().add(signal);
+		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 
 		MvcResult andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
@@ -495,19 +506,25 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		List<DemandResponseEventDto> created = new ArrayList<DemandResponseEventDto>();
 
+		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
+		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
+		signal.setSignalName("SIMPLE");
+		signal.setSignalType("level");
+
 		// create 'none' and send DR Event to DemandResponseEvent API
 		DemandResponseEventDto dto = new DemandResponseEventDto();
 		dto.setEventId("eventIdScenario2");
-		dto.setComaSeparatedTargetedVenUsername(OadrDataBaseSetup.VEN);
-		dto.setDuration("PT1H");
-		dto.setNotificationDuration("P1D");
-		dto.setToleranceDuration("PT5M");
+		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
+		dto.getActivePeriod().setDuration("PT1H");
+		dto.getActivePeriod().setNotificationDuration("P1D");
+		dto.getActivePeriod().setToleranceDuration("PT5M");
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DATE, 5);
-		dto.setStart(cal.getTimeInMillis());
+		dto.getActivePeriod().setStart(cal.getTimeInMillis());
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
-		dto.setValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH);
-		dto.setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
+		dto.getSignals().add(signal);
+
+		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 
 		MvcResult andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
@@ -534,17 +551,18 @@ public class Oadr20bVTNEiEventControllerTest {
 		// create 'far' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventDto();
 		dto.setEventId("eventIdScenario4");
-		dto.setComaSeparatedTargetedVenUsername(OadrDataBaseSetup.VEN);
-		dto.setDuration("PT1H");
-		dto.setToleranceDuration("PT5M");
-		dto.setNotificationDuration("P1D");
+		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
+		dto.getActivePeriod().setDuration("PT1H");
+		dto.getActivePeriod().setToleranceDuration("PT5M");
+		dto.getActivePeriod().setNotificationDuration("P1D");
 		cal = Calendar.getInstance();
 		cal.add(Calendar.DATE, 1);
 		cal.add(Calendar.HOUR, -2);
-		dto.setStart(cal.getTimeInMillis());
+		dto.getActivePeriod().setStart(cal.getTimeInMillis());
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
-		dto.setValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH);
-		dto.setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
+		dto.getSignals().add(signal);
+
+		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
@@ -571,17 +589,17 @@ public class Oadr20bVTNEiEventControllerTest {
 		// create 'near' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventDto();
 		dto.setEventId("eventIdScenario6");
-		dto.setComaSeparatedTargetedVenUsername(OadrDataBaseSetup.VEN);
-		dto.setDuration("PT1H");
-		dto.setToleranceDuration("PT5M");
-		dto.setNotificationDuration("P1D");
-		dto.setRampUpDuration("PT6H");
+		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
+		dto.getActivePeriod().setDuration("PT1H");
+		dto.getActivePeriod().setToleranceDuration("PT5M");
+		dto.getActivePeriod().setNotificationDuration("P1D");
+		dto.getActivePeriod().setRampUpDuration("PT6H");
 		cal = Calendar.getInstance();
 		cal.add(Calendar.HOUR, 6);
-		dto.setStart(cal.getTimeInMillis());
+		dto.getActivePeriod().setStart(cal.getTimeInMillis());
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
-		dto.setValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH);
-		dto.setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
+		dto.getSignals().add(signal);
+		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
@@ -608,15 +626,15 @@ public class Oadr20bVTNEiEventControllerTest {
 		// create 'active' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventDto();
 		dto.setEventId("eventIdScenario8");
-		dto.setComaSeparatedTargetedVenUsername(OadrDataBaseSetup.VEN);
-		dto.setDuration("PT1H");
-		dto.setToleranceDuration("PT5M");
-		dto.setNotificationDuration("P1D");
+		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
+		dto.getActivePeriod().setDuration("PT1H");
+		dto.getActivePeriod().setToleranceDuration("PT5M");
+		dto.getActivePeriod().setNotificationDuration("P1D");
 		cal = Calendar.getInstance();
-		dto.setStart(cal.getTimeInMillis());
+		dto.getActivePeriod().setStart(cal.getTimeInMillis());
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
-		dto.setValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH);
-		dto.setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
+		dto.getSignals().add(signal);
+		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
@@ -643,16 +661,16 @@ public class Oadr20bVTNEiEventControllerTest {
 		// create 'completed' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventDto();
 		dto.setEventId("eventIdScenario10");
-		dto.setComaSeparatedTargetedVenUsername(OadrDataBaseSetup.VEN);
-		dto.setDuration("PT1H");
-		dto.setToleranceDuration("PT5M");
-		dto.setNotificationDuration("P1D");
+		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
+		dto.getActivePeriod().setDuration("PT1H");
+		dto.getActivePeriod().setToleranceDuration("PT5M");
+		dto.getActivePeriod().setNotificationDuration("P1D");
 		cal = Calendar.getInstance();
 		cal.add(Calendar.HOUR, -6);
-		dto.setStart(cal.getTimeInMillis());
+		dto.getActivePeriod().setStart(cal.getTimeInMillis());
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
-		dto.setValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH);
-		dto.setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
+		dto.getSignals().add(signal);
+		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")

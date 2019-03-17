@@ -1,7 +1,5 @@
 package com.avob.openadr.model.oadr20b.builders;
 
-import java.util.List;
-
 import javax.xml.bind.JAXBElement;
 
 import com.avob.openadr.model.oadr20b.avob.PayloadAvobVenServiceRequestType;
@@ -19,8 +17,8 @@ public class Oadr20bEiBuilders {
 	}
 
 	public static Oadr20bSignalIntervalTypeBuilder newOadr20bSignalIntervalTypeBuilder(String intervalId, long dtstart,
-			String xmlDuration, List<Float> values) {
-		return new Oadr20bSignalIntervalTypeBuilder(intervalId, dtstart, xmlDuration, values);
+			String xmlDuration, Float value) {
+		return new Oadr20bSignalIntervalTypeBuilder(intervalId, dtstart, xmlDuration, value);
 	}
 
 	public static Oadr20bReportIntervalTypeBuilder newOadr20bReportIntervalTypeBuilder(String intervalId, long start,

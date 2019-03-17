@@ -67,7 +67,6 @@ public class OadrEventServiceTest {
 				eventXmlDuration, toleranceXmlDuration, notificationXmlDuration).build();
 
 		float currentValue = 3f;
-		List<Float> values = Arrays.asList(currentValue);
 		String xmlDuration = "";
 		String signalId = "";
 		String signalName = "";
@@ -76,7 +75,8 @@ public class OadrEventServiceTest {
 		EiEventSignalType eiEventSignal = Oadr20bEiEventBuilders
 				.newOadr20bEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue)
 				.addInterval(Oadr20bEiBuilders
-						.newOadr20bSignalIntervalTypeBuilder(intervalId, timestampStart, xmlDuration, values).build())
+						.newOadr20bSignalIntervalTypeBuilder(intervalId, timestampStart, xmlDuration, currentValue)
+						.build())
 				.build();
 
 		EiTargetType target = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addGroupId("groupId")

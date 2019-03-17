@@ -8,21 +8,21 @@ package com.avob.openadr.server.common.vtn.models.demandresponseevent;
  */
 public enum DemandResponseEventSimpleValueEnum {
 
-    SIMPLE_SIGNAL_PAYLOAD_NORMAL(0), SIMPLE_SIGNAL_PAYLOAD_MODERATE(1), SIMPLE_SIGNAL_PAYLOAD_HIGH(
-            2), SIMPLE_SIGNAL_PAYLOAD_SPECIAL(3);
+	SIMPLE_SIGNAL_PAYLOAD_NORMAL(0F), SIMPLE_SIGNAL_PAYLOAD_MODERATE(1F), SIMPLE_SIGNAL_PAYLOAD_HIGH(2F),
+	SIMPLE_SIGNAL_PAYLOAD_SPECIAL(3F);
 
-    private Integer value;
+	private Float value;
 
-    private DemandResponseEventSimpleValueEnum(Integer value) {
-        this.setValue(value);
-    }
+	private DemandResponseEventSimpleValueEnum(Float value) {
+		this.setValue(value);
+	}
 
-    public Integer getValue() {
-        return value;
-    }
+	public Float getValue() {
+		return value;
+	}
 
-    private void setValue(Integer value) {
-        this.value = value;
-    }
+	private void setValue(Float value) {
+		this.value = value;
+	}
 
 }

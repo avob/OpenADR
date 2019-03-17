@@ -2,7 +2,6 @@ package com.avob.openadr.server.oadr20a.vtn.service.push;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -11,7 +10,6 @@ import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +21,7 @@ import com.avob.openadr.model.oadr20a.exception.Oadr20aHttpLayerException;
 import com.avob.openadr.model.oadr20a.exception.Oadr20aInitializationException;
 import com.avob.openadr.model.oadr20a.oadr.OadrDistributeEvent;
 import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.oadr20a.vtn.service.Oadr20aVTNEiEventService;
@@ -34,20 +33,8 @@ public class Oadr20aPushService {
 
 	private static final String HTTP_SCHEME = "http";
 
-	@Value("${oadr.security.vtn.trustcertificate.oadrRsaRootCertificate}")
-	private String oadrRsaRootCertificate;
-
-	@Value("${oadr.security.vtn.trustcertificate.oadrEccRootCertificate}")
-	private String oadrEccRootCertificate;
-
-	@Value("${oadr.security.vtn.rsaPrivateKeyPath}")
-	private String rsaPrivateKeyPemFilePath;
-
-	@Value("${oadr.security.vtn.rsaCertificatePath}")
-	private String rsaClientCertPemFilePath;
-
-	@Value("${oadr.supportUnsecuredHttpPush:#{false}}")
-	private boolean supportUnsecuredHttpPush;
+	@Resource
+	private VtnConfig vtnConfig;
 
 	@Resource
 	private Oadr20aVTNEiEventService oadr20aVTNEiEventService;
@@ -59,14 +46,13 @@ public class Oadr20aPushService {
 
 	@PostConstruct
 	public void init() {
-		String[] trustedCertificateFilePath = { oadrEccRootCertificate, oadrRsaRootCertificate };
 
 		OadrHttpClientBuilder builder;
 		try {
-			builder = new OadrHttpClientBuilder().withTrustedCertificate(Arrays.asList(trustedCertificateFilePath))
-					.withX509Authentication(rsaPrivateKeyPemFilePath, rsaClientCertPemFilePath);
+			builder = new OadrHttpClientBuilder().withTrustedCertificate(vtnConfig.getTrustCertificates())
+					.withX509Authentication(vtnConfig.getKey(), vtnConfig.getCert());
 
-			if (supportUnsecuredHttpPush) {
+			if (vtnConfig.getSupportUnsecuredHttpPush()) {
 				builder.enableHttp(true);
 			}
 
@@ -85,7 +71,7 @@ public class Oadr20aPushService {
 		try {
 			URI uri = new URI(venPushUrl);
 
-			if (HTTP_SCHEME.equals(uri.getScheme()) && !supportUnsecuredHttpPush) {
+			if (HTTP_SCHEME.equals(uri.getScheme()) && !vtnConfig.getSupportUnsecuredHttpPush()) {
 				LOGGER.warn("Unsecured HTTP call unsupported");
 				return;
 			}

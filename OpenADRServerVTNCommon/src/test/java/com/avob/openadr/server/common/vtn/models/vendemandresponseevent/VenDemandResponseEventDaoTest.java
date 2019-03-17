@@ -17,7 +17,6 @@ import com.avob.openadr.server.common.vtn.ApplicationTest;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDao;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
@@ -30,109 +29,107 @@ import com.avob.openadr.server.common.vtn.service.VenService;
 @WebAppConfiguration
 public class VenDemandResponseEventDaoTest {
 
-    @Resource
-    private VenMarketContextService venMarketContextService;
+	@Resource
+	private VenMarketContextService venMarketContextService;
 
-    @Resource
-    private VenService venService;
+	@Resource
+	private VenService venService;
 
-    @Resource
-    private DemandResponseEventDao demandResponseEventDao;
+	@Resource
+	private DemandResponseEventDao demandResponseEventDao;
 
-    @Resource
-    private VenDemandResponseEventDao venDemandResponseEventDao;
+	@Resource
+	private VenDemandResponseEventDao venDemandResponseEventDao;
 
-    @Test
-    public void test() {
+	@Test
+	public void test() {
 
-        String marketContextName = "http://oadr.avob.com";
-        VenMarketContext prepare = venMarketContextService.prepare(new VenMarketContextDto(marketContextName));
-        venMarketContextService.save(prepare);
+		String marketContextName = "http://oadr.avob.com";
+		VenMarketContext prepare = venMarketContextService.prepare(new VenMarketContextDto(marketContextName));
+		venMarketContextService.save(prepare);
 
-        String name = "name";
+		String name = "name";
 
-        String oadrProfil = "20a";
-        String transport = "http";
+		String oadrProfil = "20a";
+		String transport = "http";
 
-        String username = "username";
-        String password = "myuberplaintextpassword";
+		String username = "username";
+		String password = "myuberplaintextpassword";
 
-        Ven ven = venService.prepare(username, password);
+		Ven ven = venService.prepare(username, password);
 
-        ven.setOadrName(name);
-        ven.setOadrProfil(oadrProfil);
-        ven.setTransport(transport);
+		ven.setOadrName(name);
+		ven.setOadrProfil(oadrProfil);
+		ven.setTransport(transport);
 
-        Ven savedVen = venService.save(ven);
+		Ven savedVen = venService.save(ven);
 
-        DemandResponseEvent event = new DemandResponseEvent();
-        String eventId = "eventId";
-        Long createdTimestamp = 0L;
-        String duration = "PT1H";
-        String notificationDuration = "P1D";
-        Long lastUpdateTimestamp = 0L;
-        int modification = 0;
-        Long start = 0L;
-        Long startNotification = 0L;
-        DemandResponseEventStateEnum state = DemandResponseEventStateEnum.ACTIVE;
-        DemandResponseEventSimpleValueEnum value = DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH;
+		DemandResponseEvent event = new DemandResponseEvent();
+		String eventId = "eventId";
+		Long createdTimestamp = 0L;
+		String duration = "PT1H";
+		String notificationDuration = "P1D";
+		Long lastUpdateTimestamp = 0L;
+		int modification = 0;
+		Long start = 0L;
+		Long startNotification = 0L;
+		DemandResponseEventStateEnum state = DemandResponseEventStateEnum.ACTIVE;
 
-        event.setEventId(eventId);
-        event.setValue(value);
-        event.setState(state);
-        event.setStart(start);
-        event.setNotificationDuration(notificationDuration);
-        event.setStartNotification(startNotification);
-        event.setModificationNumber(modification);
-        event.setMarketContext(prepare);
-        event.setLastUpdateTimestamp(lastUpdateTimestamp);
-        event.setDuration(duration);
-        event.setCreatedTimestamp(createdTimestamp);
-        event.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		event.setEventId(eventId);
+		event.setState(state);
+		event.getActivePeriod().setStart(start);
+		event.getActivePeriod().setNotificationDuration(notificationDuration);
+		event.getActivePeriod().setStartNotification(startNotification);
+		event.setModificationNumber(modification);
+		event.getDescriptor().setMarketContext(prepare);
+		event.setLastUpdateTimestamp(lastUpdateTimestamp);
+		event.getActivePeriod().setDuration(duration);
+		event.setCreatedTimestamp(createdTimestamp);
+		event.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 
-        DemandResponseEvent savedDemandResponseEvent = demandResponseEventDao.save(event);
+		DemandResponseEvent savedDemandResponseEvent = demandResponseEventDao.save(event);
 
-        VenDemandResponseEvent venDemandResponseEvent = new VenDemandResponseEvent();
-        venDemandResponseEvent.setEvent(savedDemandResponseEvent);
-        venDemandResponseEvent.setVen(savedVen);
-        venDemandResponseEvent.setLastSentModificationNumber(-1);
+		VenDemandResponseEvent venDemandResponseEvent = new VenDemandResponseEvent();
+		venDemandResponseEvent.setEvent(savedDemandResponseEvent);
+		venDemandResponseEvent.setVen(savedVen);
+		venDemandResponseEvent.setLastSentModificationNumber(-1);
 
-        VenDemandResponseEvent savedVenDemandResponseEvent = venDemandResponseEventDao.save(venDemandResponseEvent);
+		VenDemandResponseEvent savedVenDemandResponseEvent = venDemandResponseEventDao.save(venDemandResponseEvent);
 
-        assertNotNull(savedVenDemandResponseEvent);
-        assertNotNull(savedVenDemandResponseEvent.getId());
-        assertEquals(venDemandResponseEvent.getEvent().getId(), savedVenDemandResponseEvent.getEvent().getId());
-        assertEquals(venDemandResponseEvent.getVen().getId(), savedVenDemandResponseEvent.getVen().getId());
-        assertEquals(venDemandResponseEvent.getLastSentModificationNumber(),
-                savedVenDemandResponseEvent.getLastSentModificationNumber());
+		assertNotNull(savedVenDemandResponseEvent);
+		assertNotNull(savedVenDemandResponseEvent.getId());
+		assertEquals(venDemandResponseEvent.getEvent().getId(), savedVenDemandResponseEvent.getEvent().getId());
+		assertEquals(venDemandResponseEvent.getVen().getId(), savedVenDemandResponseEvent.getVen().getId());
+		assertEquals(venDemandResponseEvent.getLastSentModificationNumber(),
+				savedVenDemandResponseEvent.getLastSentModificationNumber());
 
-        venDemandResponseEvent = new VenDemandResponseEvent();
-        venDemandResponseEvent.setEvent(savedDemandResponseEvent);
-        venDemandResponseEvent.setVen(savedVen);
-        venDemandResponseEvent.setLastSentModificationNumber(0);
+		venDemandResponseEvent = new VenDemandResponseEvent();
+		venDemandResponseEvent.setEvent(savedDemandResponseEvent);
+		venDemandResponseEvent.setVen(savedVen);
+		venDemandResponseEvent.setLastSentModificationNumber(0);
 
-        VenDemandResponseEvent savedVenDemandResponseEvent2 = venDemandResponseEventDao.save(venDemandResponseEvent);
+		VenDemandResponseEvent savedVenDemandResponseEvent2 = venDemandResponseEventDao.save(venDemandResponseEvent);
 
-        Iterable<VenDemandResponseEvent> findAll = venDemandResponseEventDao.findAll();
-        Iterator<VenDemandResponseEvent> iterator = findAll.iterator();
-        long count = 0;
-        while (iterator.hasNext()) {
-            count++;
-            VenDemandResponseEvent next = iterator.next();
-            assertEquals(venDemandResponseEvent.getEvent().getId(), next.getEvent().getId());
-            assertEquals(venDemandResponseEvent.getVen().getId(), next.getVen().getId());
-        }
-        assertEquals(2, count);
+		Iterable<VenDemandResponseEvent> findAll = venDemandResponseEventDao.findAll();
+		Iterator<VenDemandResponseEvent> iterator = findAll.iterator();
+		long count = 0;
+		while (iterator.hasNext()) {
+			count++;
+			VenDemandResponseEvent next = iterator.next();
+			assertEquals(venDemandResponseEvent.getEvent().getId(), next.getEvent().getId());
+			assertEquals(venDemandResponseEvent.getVen().getId(), next.getVen().getId());
+		}
+		assertEquals(2, count);
 
-        count = venDemandResponseEventDao.count();
-        assertEquals(2, count);
+		count = venDemandResponseEventDao.count();
+		assertEquals(2, count);
 
-        venDemandResponseEventDao.delete(savedVenDemandResponseEvent);
-        venDemandResponseEventDao.delete(savedVenDemandResponseEvent2);
-        venService.delete(savedVen);
-        demandResponseEventDao.delete(savedDemandResponseEvent);
-        venMarketContextService.delete(prepare);
+		venDemandResponseEventDao.delete(savedVenDemandResponseEvent);
+		venDemandResponseEventDao.delete(savedVenDemandResponseEvent2);
+		venService.delete(savedVen);
+		demandResponseEventDao.delete(savedDemandResponseEvent);
+		venMarketContextService.delete(prepare);
 
-    }
+	}
 
 }

@@ -1,25 +1,13 @@
 package com.avob.openadr.server.oadr20b.ven.service;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.annotation.Resource;
 
 import org.junit.After;
 
-import com.avob.openadr.model.oadr20b.builders.Oadr20bEiBuilders;
-import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
-import com.avob.openadr.model.oadr20b.ei.EiActivePeriodType;
-import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
-import com.avob.openadr.model.oadr20b.ei.EiTargetType;
-import com.avob.openadr.model.oadr20b.ei.EventDescriptorType;
-import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
-import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
-import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
 
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration(classes = { VEN20bApplicationTest.class })
@@ -36,44 +24,6 @@ public class Oadr20bVENEiEventServiceTest {
 	@After
 	public void clear() {
 		oadr20bVENEiEventService.clearOadrEvents();
-	}
-
-	private OadrEvent createOadrEvent(String eventId, long modificationNumber) {
-		long timestampStart = 0L;
-		String eventXmlDuration = "PT1H";
-		String toleranceXmlDuration = "PT5M";
-		String notificationXmlDuration = "P1D";
-		EiActivePeriodType period = Oadr20bEiEventBuilders.newOadr20bEiActivePeriodTypeBuilder(timestampStart,
-				eventXmlDuration, toleranceXmlDuration, notificationXmlDuration).build();
-
-		float currentValue = 3f;
-		List<Float> values = Arrays.asList(currentValue);
-		String xmlDuration = "";
-		String signalId = "";
-		String signalName = "";
-		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
-		String intervalId = "";
-		EiEventSignalType eiEventSignal = Oadr20bEiEventBuilders
-				.newOadr20bEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue)
-				.addInterval(Oadr20bEiBuilders
-						.newOadr20bSignalIntervalTypeBuilder(intervalId, timestampStart, xmlDuration, values).build())
-				.build();
-
-		EiTargetType target = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addGroupId("groupId")
-				.addPartyId("partyId").addResourceId("resourceId").addVenId("venId").build();
-
-		long datetime = System.currentTimeMillis();
-		String marketContextValue = "";
-
-		Long priority = 0L;
-		EventStatusEnumeratedType status = EventStatusEnumeratedType.ACTIVE;
-		String comment = "";
-		EventDescriptorType descriptor = Oadr20bEiEventBuilders
-				.newOadr20bEventDescriptorTypeBuilder(datetime, eventId, modificationNumber, marketContextValue, status)
-				.withPriority(priority).withVtnComment(comment).build();
-
-		return Oadr20bEiEventBuilders.newOadr20bDistributeEventOadrEventBuilder().withActivePeriod(period)
-				.withEiTarget(target).withEventDescriptor(descriptor).addEiEventSignal(eiEventSignal).build();
 	}
 
 //	@Test

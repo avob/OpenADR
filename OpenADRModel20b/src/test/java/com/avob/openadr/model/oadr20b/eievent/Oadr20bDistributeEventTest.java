@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -52,8 +50,7 @@ public class Oadr20bDistributeEventTest {
 				eventXmlDuration, toleranceXmlDuration, notificationXmlDuration).build();
 
 		float currentValue = 3f;
-		List<Float> l = new ArrayList<Float>();
-		l.add(currentValue);
+
 		String xmlDuration = "";
 		String signalId = "";
 		String signalName = "";
@@ -62,8 +59,8 @@ public class Oadr20bDistributeEventTest {
 		long start = 12L;
 		EiEventSignalType eiEventSignal = Oadr20bEiEventBuilders
 				.newOadr20bEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue)
-				.addInterval(Oadr20bEiBuilders.newOadr20bSignalIntervalTypeBuilder(intervalId, start, xmlDuration, l)
-						.build())
+				.addInterval(Oadr20bEiBuilders
+						.newOadr20bSignalIntervalTypeBuilder(intervalId, start, xmlDuration, currentValue).build())
 				.build();
 
 		String[] list = { "a", "b", "c" };

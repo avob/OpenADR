@@ -6,8 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -25,7 +23,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Base64;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -288,7 +285,7 @@ public class OadrHttpSecurity {
 				csr.getSubject(),
 				// Public key of the certificate authority
 				csr.getSubjectPublicKeyInfo());
-	
+
 		ContentSigner sigGen = new BcRSAContentSignerBuilder(sigAlgId, digAlgId)
 				.build(PrivateKeyFactory.createKey(caKeyPair.getPrivate().getEncoded()));
 

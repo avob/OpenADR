@@ -48,7 +48,7 @@ public class VtnConfig {
 	@Value("${" + SUPPORT_PUSH_CONF + ":#{null}}")
 	private Boolean supportPush;
 
-	@Value("${" + SUPPORT_UNSECURED_PHTTP_PUSH_CONF + ":#{null}}")
+	@Value("${" + SUPPORT_UNSECURED_PHTTP_PUSH_CONF + ":#{false}}")
 	private Boolean supportUnsecuredHttpPush;
 
 	@Value("${" + PULL_FREQUENCY_SECONDS_CONF + ":#{null}}")

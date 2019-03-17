@@ -228,7 +228,6 @@ public class Oadr20bFactory {
 	public static String millisecondToXmlDuration(Long millisecond) {
 		Duration newDuration = datatypeFactory.newDuration(millisecond);
 
-		
 		StringBuilder builder = new StringBuilder();
 		builder.append("P");
 		if (newDuration.getYears() > 0) {
@@ -243,7 +242,7 @@ public class Oadr20bFactory {
 			builder.append(newDuration.getDays());
 			builder.append("D");
 		}
-		if(newDuration.getHours() > 0 || newDuration.getMinutes() > 0){
+		if (newDuration.getHours() > 0 || newDuration.getMinutes() > 0) {
 			builder.append("T");
 			if (newDuration.getHours() > 0) {
 				builder.append(newDuration.getHours());
@@ -254,7 +253,7 @@ public class Oadr20bFactory {
 				builder.append("M");
 			}
 		}
-		
+
 		return builder.toString();
 	}
 
@@ -310,7 +309,7 @@ public class Oadr20bFactory {
 		createOadrDistributeEventType.setRequestID(requestId);
 		return createOadrDistributeEventType;
 	}
-	
+
 	public static OadrPayload createOadrPayload(String id, Object value) {
 		OadrSignedObject createOadrSignedObject = factory.createOadrSignedObject();
 		createOadrSignedObject.setId(id);
@@ -1038,13 +1037,13 @@ public class Oadr20bFactory {
 	}
 
 	public static IntervalType createSignalIntervalType(String intervalId, long start, String xmlDuration,
-			List<Float> values) {
+			Float value) {
 		IntervalType createIntervalType = eiFactory.createIntervalType();
 		createIntervalType.setUid(Oadr20bFactory.createUidType(intervalId));
 		createIntervalType.setDuration(Oadr20bFactory.createDurationPropType(xmlDuration));
 		createIntervalType.setDtstart(Oadr20bFactory.createDtstart(start));
-		values.forEach(value -> createIntervalType.getStreamPayloadBase()
-				.add(Oadr20bFactory.createSignalPayload(Oadr20bFactory.createSignalPayloadType(value))));
+		createIntervalType.getStreamPayloadBase()
+				.add(Oadr20bFactory.createSignalPayload(Oadr20bFactory.createSignalPayloadType(value)));
 		return createIntervalType;
 	}
 

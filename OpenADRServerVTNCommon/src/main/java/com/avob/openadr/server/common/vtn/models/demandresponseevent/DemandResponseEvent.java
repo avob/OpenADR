@@ -1,6 +1,7 @@
 package com.avob.openadr.server.common.vtn.models.demandresponseevent;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -11,14 +12,11 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
-import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 
 /**
  * An entity of DemandResponseEvent
@@ -45,56 +43,10 @@ public class DemandResponseEvent {
 	@Enumerated(EnumType.STRING)
 	private DemandResponseEventOadrProfileEnum oadrProfile;
 
-	@Column(name = "startEvent")
-	@NotNull
-	private Long start;
-
-	@Column(name = "endEvent")
-	private Long end;
-
-	@NotNull
-	private Long startNotification;
-
-	/**
-	 * Event active state duration as xml duration
-	 */
-	@NotNull
-	private String duration;
-
-	/**
-	 * Event notification duration as xml duration
-	 */
-	@NotNull
-	private String notificationDuration;
-
-	/**
-	 * Event tolerance as xml duration
-	 */
-	private String toleranceDuration;
-
-	/**
-	 * Event ramp up duration as xml duration
-	 */
-	private String rampUpDuration;
-
-	/**
-	 * Event recovery duration as xml duration
-	 */
-	private String recoveryDuration;
-
 	@NotNull
 	private Long createdTimestamp = System.currentTimeMillis();
 
 	private Long lastUpdateTimestamp;
-
-	@ManyToOne
-	@NotNull
-	private VenMarketContext marketContext;
-
-	private String comaSeparatedTargetedVenUsername;
-
-	@Enumerated(EnumType.STRING)
-	private DemandResponseEventSimpleValueEnum value;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -105,14 +57,12 @@ public class DemandResponseEvent {
 
 	private long modificationNumber = 0;
 
-	private long priority = 0;
+	private DemandResponseEventDescriptor descriptor;
 
-	private boolean testEvent = false;
+	private DemandResponseEventActivePeriod activePeriod;
 
-	private String vtnComment;
-
-	@Lob
-	private String event;
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "event", cascade = CascadeType.ALL)
+	private Set<DemandResponseEventSignal> signals;
 
 	public Long getId() {
 		return id;
@@ -128,38 +78,6 @@ public class DemandResponseEvent {
 
 	public void setState(DemandResponseEventStateEnum state) {
 		this.state = state;
-	}
-
-	public DemandResponseEventSimpleValueEnum getValue() {
-		return value;
-	}
-
-	public void setValue(DemandResponseEventSimpleValueEnum value) {
-		this.value = value;
-	}
-
-	public Long getStart() {
-		return start;
-	}
-
-	public void setStart(Long start) {
-		this.start = start;
-	}
-
-	public String getDuration() {
-		return duration;
-	}
-
-	public void setDuration(String duration) {
-		this.duration = duration;
-	}
-
-	public VenMarketContext getMarketContext() {
-		return marketContext;
-	}
-
-	public void setMarketContext(VenMarketContext marketContext) {
-		this.marketContext = marketContext;
 	}
 
 	public Long getCreatedTimestamp() {
@@ -186,94 +104,6 @@ public class DemandResponseEvent {
 		this.modificationNumber = modificationNumber;
 	}
 
-	public String getComaSeparatedTargetedVenUsername() {
-		return comaSeparatedTargetedVenUsername;
-	}
-
-	public void setComaSeparatedTargetedVenUsername(String comaSeparatedTargetedVenUsername) {
-		this.comaSeparatedTargetedVenUsername = comaSeparatedTargetedVenUsername;
-	}
-
-	public long getPriority() {
-		return priority;
-	}
-
-	public void setPriority(long priority) {
-		this.priority = priority;
-	}
-
-	public String getToleranceDuration() {
-		return toleranceDuration;
-	}
-
-	public void setToleranceDuration(String toleranceDuration) {
-		this.toleranceDuration = toleranceDuration;
-	}
-
-	public String getRampUpDuration() {
-		return rampUpDuration;
-	}
-
-	public void setRampUpDuration(String rampUpDuration) {
-		this.rampUpDuration = rampUpDuration;
-	}
-
-	public String getRecoveryDuration() {
-		return recoveryDuration;
-	}
-
-	public void setRecoveryDuration(String recoveryDuration) {
-		this.recoveryDuration = recoveryDuration;
-	}
-
-	public Long getEnd() {
-		return end;
-	}
-
-	public void setEnd(Long end) {
-		this.end = end;
-	}
-
-	public boolean isTestEvent() {
-		return testEvent;
-	}
-
-	public void setTestEvent(boolean testEvent) {
-		this.testEvent = testEvent;
-	}
-
-	public String getNotificationDuration() {
-		return notificationDuration;
-	}
-
-	public void setNotificationDuration(String notificationDuration) {
-		this.notificationDuration = notificationDuration;
-	}
-
-	public Long getStartNotification() {
-		return startNotification;
-	}
-
-	public void setStartNotification(Long startNotification) {
-		this.startNotification = startNotification;
-	}
-
-	public String getVtnComment() {
-		return vtnComment;
-	}
-
-	public void setVtnComment(String vtnComment) {
-		this.vtnComment = vtnComment;
-	}
-
-	public String getEvent() {
-		return event;
-	}
-
-	public void setEvent(String event) {
-		this.event = event;
-	}
-
 	public DemandResponseEventOadrProfileEnum getOadrProfile() {
 		return oadrProfile;
 	}
@@ -288,6 +118,36 @@ public class DemandResponseEvent {
 
 	public void setEventId(String eventId) {
 		this.eventId = eventId;
+	}
+
+	public DemandResponseEventDescriptor getDescriptor() {
+		if (descriptor == null) {
+			descriptor = new DemandResponseEventDescriptor();
+		}
+		return descriptor;
+	}
+
+	public void setDescriptor(DemandResponseEventDescriptor descriptor) {
+		this.descriptor = descriptor;
+	}
+
+	public DemandResponseEventActivePeriod getActivePeriod() {
+		if (activePeriod == null) {
+			activePeriod = new DemandResponseEventActivePeriod();
+		}
+		return activePeriod;
+	}
+
+	public void setActivePeriod(DemandResponseEventActivePeriod activePeriod) {
+		this.activePeriod = activePeriod;
+	}
+
+	public Set<DemandResponseEventSignal> getSignals() {
+		return signals;
+	}
+
+	public void setSignals(Set<DemandResponseEventSignal> signals) {
+		this.signals = signals;
 	}
 
 }
