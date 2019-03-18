@@ -142,7 +142,7 @@ export class VenDetailPage extends React.Component {
             indicatorColor="primary"
             textColor="primary"
             centered>
-        <Tab label="VEN Settings" />
+        <Tab label="Settings" />
         <Tab label="Reports" />
         <Tab label="OptSchedules" />
       </Tabs>

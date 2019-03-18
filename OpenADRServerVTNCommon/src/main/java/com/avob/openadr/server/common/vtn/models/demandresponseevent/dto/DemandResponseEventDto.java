@@ -3,6 +3,7 @@ package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 
 //{
@@ -42,6 +43,8 @@ public class DemandResponseEventDto {
 
 	private String eventId;
 
+	private String eventName;
+
 	private DemandResponseEventDescriptorDto descriptor = new DemandResponseEventDescriptorDto();
 
 	private DemandResponseEventActivePeriodDto activePeriod = new DemandResponseEventActivePeriodDto();
@@ -57,6 +60,8 @@ public class DemandResponseEventDto {
 	private Long modificationNumber;
 
 	private DemandResponseEventStateEnum state;
+	
+	private DemandResponseEventOadrProfileEnum oadrProfile;
 
 	public Long getCreatedTimestamp() {
 		return createdTimestamp;
@@ -139,5 +144,21 @@ public class DemandResponseEventDto {
 
 	public void setState(DemandResponseEventStateEnum state) {
 		this.state = state;
+	}
+
+	public String getEventName() {
+		return eventName;
+	}
+
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
+	}
+
+	public DemandResponseEventOadrProfileEnum getOadrProfile() {
+		return oadrProfile;
+	}
+
+	public void setOadrProfile(DemandResponseEventOadrProfileEnum oadrProfile) {
+		this.oadrProfile = oadrProfile;
 	}
 }

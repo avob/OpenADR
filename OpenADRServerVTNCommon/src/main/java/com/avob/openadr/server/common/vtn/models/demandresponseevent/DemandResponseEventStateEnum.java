@@ -8,5 +8,5 @@ package com.avob.openadr.server.common.vtn.models.demandresponseevent;
  *
  */
 public enum DemandResponseEventStateEnum {
-    ACTIVE, CANCELED;
+	ACTIVE, CANCELED, UNPUBLISHED;
 }

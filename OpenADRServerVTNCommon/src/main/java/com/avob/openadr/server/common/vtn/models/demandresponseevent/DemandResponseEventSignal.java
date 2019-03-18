@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -25,7 +26,7 @@ public class DemandResponseEventSignal {
 	private String signalType;
 	private String unitType;
 
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	private List<DemandResponseEventSignalInterval> intervals;
 	private Float currentValue;
 

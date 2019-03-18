@@ -182,12 +182,14 @@ public class Oadr20bVTNEiEventService {
 		}
 
 		int responseCode = HttpStatus.OK_200;
-		for (EventResponse response : eiCreatedEvent.getEventResponses().getEventResponse()) {
-			try {
-				processEventResponseFromOadrCreatedEvent(ven, response);
-			} catch (Oadr20bCreatedEventApplicationLayerException e) {
-				LOGGER.warn(e.getMessage(), e);
-				responseCode = HttpStatus.NOT_ACCEPTABLE_406;
+		if (eiCreatedEvent.getEventResponses() != null) {
+			for (EventResponse response : eiCreatedEvent.getEventResponses().getEventResponse()) {
+				try {
+					processEventResponseFromOadrCreatedEvent(ven, response);
+				} catch (Oadr20bCreatedEventApplicationLayerException e) {
+					LOGGER.warn(e.getMessage(), e);
+					responseCode = HttpStatus.NOT_ACCEPTABLE_406;
+				}
 			}
 		}
 
@@ -251,16 +253,21 @@ public class Oadr20bVTNEiEventService {
 
 		// vtn request id
 		Long andIncrease = venRequestCountService.getAndIncrease(venId);
-		EiResponseType eiResponse = Oadr20bResponseBuilders
-				.newOadr20bEiResponseBuilder(eiResponseRequestId, HttpStatus.OK_200).build();
+//		EiResponseType eiResponse = Oadr20bResponseBuilders
+//				.newOadr20bEiResponseBuilder(eiResponseRequestId, HttpStatus.OK_200).build();
 		Oadr20bDistributeEventBuilder builder = Oadr20bEiEventBuilders
-				.newOadr20bDistributeEventBuilder(vtnConfig.getVtnId(), Long.toString(andIncrease))
-				.withEiResponse(eiResponse);
+				.newOadr20bDistributeEventBuilder(vtnConfig.getVtnId(), Long.toString(andIncrease));
+//				.withEiResponse(eiResponse);
 
 		for (DemandResponseEvent drEvent : events) {
 			EventDescriptorType createEventDescriptor = createEventDescriptor(drEvent);
 
-			boolean needResponse = !demandResponseEventService.hasResponded(venId, drEvent);
+			boolean needResponse = true;
+//			if (drEvent.getDescriptor().getResponseRequired().equals("always")) {
+//				needResponse = true;
+//			} else {
+//				needResponse = !demandResponseEventService.hasResponded(venId, drEvent);
+//			}
 
 			builder.addOadrEvent(Oadr20bEiEventBuilders.newOadr20bDistributeEventOadrEventBuilder()
 					.withEventDescriptor(createEventDescriptor).withActivePeriod(createActivePeriod(drEvent))
@@ -330,7 +337,8 @@ public class Oadr20bVTNEiEventService {
 		// signal name: MUST be 'simple' for 20a spec
 		String xmlDuration = drEvent.getActivePeriod().getDuration();
 
-		for (DemandResponseEventSignal demandResponseEventSignal : drEvent.getSignals()) {
+		List<DemandResponseEventSignal> signals = demandResponseEventService.getSignals(drEvent);
+		for (DemandResponseEventSignal demandResponseEventSignal : signals) {
 
 			Float currentValue = 0F;
 			if (demandResponseEventSignal.getCurrentValue() != null) {
@@ -342,7 +350,6 @@ public class Oadr20bVTNEiEventService {
 							SignalTypeEnumeratedType.fromValue(demandResponseEventSignal.getSignalType()),
 							currentValue);
 
-//			.addInterval(interval)
 			if (demandResponseEventSignal.getIntervals() != null
 					&& !demandResponseEventSignal.getIntervals().isEmpty()) {
 				int intervalId = 0;
@@ -354,6 +361,11 @@ public class Oadr20bVTNEiEventService {
 					intervalId++;
 					newOadr20bEiEventSignalTypeBuilder.addInterval(interval);
 				}
+			} else {
+				int intervalId = 0;
+				IntervalType interval = Oadr20bEiBuilders
+						.newOadr20bSignalIntervalTypeBuilder("" + intervalId, start, xmlDuration, currentValue).build();
+				newOadr20bEiEventSignalTypeBuilder.addInterval(interval);
 			}
 
 			signalId++;

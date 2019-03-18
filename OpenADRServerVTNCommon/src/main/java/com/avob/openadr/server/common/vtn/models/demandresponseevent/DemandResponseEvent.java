@@ -5,6 +5,7 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -15,6 +16,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 
@@ -38,6 +42,8 @@ public class DemandResponseEvent {
 	@NotNull
 	@Column(unique = true)
 	private String eventId;
+
+	private String eventName;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -63,6 +69,10 @@ public class DemandResponseEvent {
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "event", cascade = CascadeType.ALL)
 	private Set<DemandResponseEventSignal> signals;
+
+	@ElementCollection
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private List<DemandResponseEventTarget> targets;
 
 	public Long getId() {
 		return id;
@@ -148,6 +158,22 @@ public class DemandResponseEvent {
 
 	public void setSignals(Set<DemandResponseEventSignal> signals) {
 		this.signals = signals;
+	}
+
+	public List<DemandResponseEventTarget> getTargets() {
+		return targets;
+	}
+
+	public void setTargets(List<DemandResponseEventTarget> targets) {
+		this.targets = targets;
+	}
+
+	public String getEventName() {
+		return eventName;
+	}
+
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
 	}
 
 }

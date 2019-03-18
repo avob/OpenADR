@@ -1,6 +1,7 @@
 package com.avob.openadr.server.common.vtn.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignal;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalDao;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTarget;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
@@ -135,7 +137,7 @@ public class DemandResponseEventService {
 		event.setCreatedTimestamp(System.currentTimeMillis());
 		event.setModificationNumber(0);
 
-		event.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+//		event.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 
 		Date dateStart = new Date();
 		dateStart.setTime(event.getActivePeriod().getStart());
@@ -169,12 +171,9 @@ public class DemandResponseEventService {
 		List<VenDemandResponseEvent> list = new ArrayList<VenDemandResponseEvent>();
 		for (Ven ven : findByUsernameIn) {
 			if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
-//				if (ven.getOadrProfil().equals("20b")) {
-//					demandResponseEventPublisher.publish20b(ven);
-//				} else {
-//					demandResponseEventPublisher.publish20a(ven);
-//				}
-
+				if (DemandResponseEventStateEnum.ACTIVE.equals(dto.getState())) {
+					pushAsync(Arrays.asList(ven), dto.getOadrProfile());
+				}
 			}
 			list.add(new VenDemandResponseEvent(event, ven));
 		}
@@ -185,6 +184,35 @@ public class DemandResponseEventService {
 		});
 		demandResponseEventSignalDao.saveAll(event.getSignals());
 		return save;
+	}
+
+	public void publishEvent(DemandResponseEvent event) {
+		if (!DemandResponseEventStateEnum.ACTIVE.equals(event.getState())) {
+			// only ACTIVE event shoudl be published
+			return;
+		}
+		List<Ven> findByUsernameIn = null;
+		if (event.getTargets() != null) {
+			List<String> targetedVenUsername = new ArrayList<>();
+
+			List<DemandResponseEventTarget> targets = event.getTargets();
+			for (DemandResponseEventTarget target : targets) {
+				if ("ven".equals(target.getTargetType())) {
+					targetedVenUsername.add(target.getTargetId());
+				}
+			}
+			findByUsernameIn = venDao.findByUsernameInAndVenMarketContextsContains(targetedVenUsername,
+					event.getDescriptor().getMarketContext());
+		} else {
+			findByUsernameIn = venDao.findByVenMarketContextsName(event.getDescriptor().getMarketContext().getName());
+		}
+		for (Ven ven : findByUsernameIn) {
+			if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
+
+				pushAsync(Arrays.asList(ven), event.getOadrProfile());
+
+			}
+		}
 	}
 
 	/**
@@ -199,7 +227,7 @@ public class DemandResponseEventService {
 		return demandResponseEventDao.save(event);
 	}
 
-	private void publish(List<Ven> vens, DemandResponseEventOadrProfileEnum profile) {
+	private void pushAsync(List<Ven> vens, DemandResponseEventOadrProfileEnum profile) {
 		Runnable run = new Runnable() {
 
 			@Override
@@ -250,12 +278,8 @@ public class DemandResponseEventService {
 		demandResponseEventDao.deleteAll(entities);
 	}
 
-	private DemandResponseEvent updateState(Long id, DemandResponseEventStateEnum state) {
-		Optional<DemandResponseEvent> op = demandResponseEventDao.findById(id);
-		if (!op.isPresent()) {
-			return null;
-		}
-		DemandResponseEvent event = op.get();
+	private DemandResponseEvent updateState(DemandResponseEvent event, DemandResponseEventStateEnum state) {
+
 		if (!event.getState().equals(state)) {
 			event.setState(state);
 			event.setModificationNumber(event.getModificationNumber() + 1);
@@ -267,11 +291,34 @@ public class DemandResponseEventService {
 	}
 
 	public DemandResponseEvent cancel(Long id) {
-		return updateState(id, DemandResponseEventStateEnum.CANCELED);
+		Optional<DemandResponseEvent> op = demandResponseEventDao.findById(id);
+		if (!op.isPresent()) {
+			return null;
+		}
+		DemandResponseEvent event = op.get();
+		return updateState(event, DemandResponseEventStateEnum.CANCELED);
 	}
 
 	public DemandResponseEvent active(Long id) {
-		return updateState(id, DemandResponseEventStateEnum.ACTIVE);
+		Optional<DemandResponseEvent> op = demandResponseEventDao.findById(id);
+		if (!op.isPresent()) {
+			return null;
+		}
+		DemandResponseEvent event = op.get();
+		this.publishEvent(event);
+		if(DemandResponseEventStateEnum.ACTIVE.equals(event.getState())) {
+			return event;
+		}
+		return updateState(event, DemandResponseEventStateEnum.ACTIVE);
+	}
+
+	public DemandResponseEvent unpublish(Long id) {
+		Optional<DemandResponseEvent> op = demandResponseEventDao.findById(id);
+		if (!op.isPresent()) {
+			return null;
+		}
+		DemandResponseEvent event = op.get();
+		return updateState(event, DemandResponseEventStateEnum.UNPUBLISHED);
 	}
 
 	public DemandResponseEvent updateValue(Long id, Float value) {

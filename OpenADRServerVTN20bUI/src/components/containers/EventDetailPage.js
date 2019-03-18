@@ -13,7 +13,11 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 
-import EventDetail from '../EventDetail/EventDetail'
+import EventDetailDescriptor from '../EventDetail/EventDetailDescriptor'
+import EventDetailSignal from '../EventDetail/EventDetailSignal'
+import EventDetailTarget from '../EventDetail/EventDetailTarget'
+
+import green from '@material-ui/core/colors/green';
 
 
 
@@ -59,6 +63,9 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
   },
+  success: {
+    backgroundColor: green[600],
+  }
 });
 
 export class EventDetailPage extends React.Component {
@@ -80,9 +87,9 @@ export class EventDetailPage extends React.Component {
   }
 
   render() {
-    const {classes, event} = this.props;
+    const {classes, event_detail} = this.props;
     const {value} = this.state;
-
+    console.log(event_detail);
     return (
      <div className={ classes.root }>
       <Tabs value={ this.state.value }
@@ -90,11 +97,23 @@ export class EventDetailPage extends React.Component {
             indicatorColor="primary"
             textColor="primary"
             centered>
-        <Tab label="Event Detail" />
+        <Tab label="Descriptor" />
+        <Tab label="Signals" />
+        <Tab label="Targets" />
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
-                <EventDetail classes={classes} event={event}/>
+                <EventDetailDescriptor classes={classes} event={event_detail.event}
+                  activeEvent={this.props.eventActions.activeEvent}
+                  cancelEvent={this.props.eventActions.cancelEvent}/>
+                     
+                       </TabContainer> }
+      { value === 1 && <TabContainer>
+                <EventDetailSignal classes={classes} event={event_detail.event}/>
+                     
+                       </TabContainer> }
+      { value === 2 && <TabContainer>
+                <EventDetailTarget classes={classes} event={event_detail.event}/>
                      
                        </TabContainer> }
 

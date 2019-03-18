@@ -7,8 +7,7 @@
 # - client ven2 ecc
 # use openssl_client / curl to test ssl handshake between components:
 # openssl s_client -key ven1.oadr.com.key -cert ven1.oadr.com.crt -CAfile oadr.com.crt -connect vtn.oadr.com:8181
-# curl --key admin.oadr.com.key --cert admin.oadr.com.crt --cacert oadr.com.crt  \
-#	-d '{"username": "35:C2:79:32:5B:62:65:A7:AA:D3}' -H "Content-Type: application/json" -X POST https://localhost:8181/testvtn/Ven/ 
+# curl --key admin.oadr.com.key --cert admin.oadr.com.crt --cacert oadr.com.crt -H "Content-Type: application/json" -X GET https://localhost:8181/testvtn/Ven/ 
 ###################################################
 COUNTRY="FR"
 STATE="Paris"
@@ -40,21 +39,19 @@ write_openssl_config_file()
 	organizationName           = $ORGANIZATION
 	commonName                 = $2
 	[ req_ext ]
-	subjectAltName = @alt_names
-	[alt_names]
-	DNS.1   = localhost
+	subjectAltName =DNS:$2,DNS:localhost
 	EOM
 }
 # gen_rsa_certificate "key/csr/crt files name" "certificate CN" "in ca key/crt name" "serial" "days"
 gen_rsa_key_csr()
 {
 	OPENSSL_CONFIG_FILENAME="openssl.conf"
-	write_openssl_config_file $OPENSSL_CONFIG_FILENAME $1 2048
+	write_openssl_config_file $OPENSSL_CONFIG_FILENAME $2 2048
 
 	openssl req -out $1.csr -newkey rsa:2048 -nodes -keyout $1.key \
-		-subj "/C=$COUNTRY/ST=$STATE/L=$LOCALITY/O=$ORGANIZATION/OU=$ORGANIZATION/CN=$2" -config $OPENSSL_CONFIG_FILENAME
+		-subj "/C=$COUNTRY/ST=$STATE/L=$LOCALITY/O=$ORGANIZATION/OU=$ORGANIZATION/CN=$2" -reqexts req_ext -config $OPENSSL_CONFIG_FILENAME
 
-	openssl x509 -req -days $5 -in $1.csr -CA $3.crt -CAkey $3.key -set_serial $4 -out $1.crt \
+	openssl x509 -req -days $5 -in $1.csr -CA $3.crt -CAkey $3.key -CAcreateserial -out $1.crt \
 		-extensions req_ext -extfile $OPENSSL_CONFIG_FILENAME
 
 	rm $OPENSSL_CONFIG_FILENAME
@@ -63,12 +60,12 @@ gen_rsa_key_csr()
 gen_ecc_key_csr()
 {
 	OPENSSL_CONFIG_FILENAME="openssl.conf"
-	write_openssl_config_file $OPENSSL_CONFIG_FILENAME $1 384
+	write_openssl_config_file $OPENSSL_CONFIG_FILENAME $2 384
 
 	openssl req -out $1.csr -newkey ec:<(openssl ecparam -name secp384r1) -nodes -keyout $1.key \
-		-subj "/C=$COUNTRY/ST=$STATE/L=$LOCALITY/O=$ORGANIZATION/OU=$ORGANIZATION/CN=$2" -config $OPENSSL_CONFIG_FILENAME
+		-subj "/C=$COUNTRY/ST=$STATE/L=$LOCALITY/O=$ORGANIZATION/OU=$ORGANIZATION/CN=$2" -reqexts req_ext -config $OPENSSL_CONFIG_FILENAME
 
-	openssl x509 -req -days $5 -in $1.csr -CA $3.crt -CAkey $3.key -set_serial $4 -out $1.crt \
+	openssl x509 -req -days $5 -in $1.csr -CA $3.crt -CAkey $3.key -CAcreateserial -out $1.crt \
 		-extensions req_ext -extfile $OPENSSL_CONFIG_FILENAME
 
 	rm $OPENSSL_CONFIG_FILENAME
@@ -118,6 +115,7 @@ gen_oadr20a_fingerprint $VTN_NAME-ecc
 ###################################
 gen_rsa_key_csr $CLIENT_NAME $CLIENT_NAME $CA_NAME 03 365
 gen_pkcs12 $CLIENT_NAME
+gen_oadr20b_fingerprint $CLIENT_NAME
 
 ###################################
 # VEN1
@@ -132,8 +130,3 @@ gen_oadr20a_fingerprint $VEN1_NAME
 gen_ecc_key_csr $VEN2_NAME $VEN2_NAME $CA_NAME 05 365
 gen_oadr20b_fingerprint $VEN2_NAME
 gen_oadr20a_fingerprint $VEN2_NAME
-
-
-
-
-

@@ -15,10 +15,8 @@ import org.dozer.DozerBeanMapper;
 import org.dozer.loader.api.BeanMappingBuilder;
 import org.springframework.stereotype.Service;
 
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDescriptor;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDescriptorDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
 import com.google.common.collect.Lists;
 
 @Service
@@ -59,8 +57,6 @@ public class DtoMapper {
 				mapping(DemandResponseEventDescriptor.class, DemandResponseEventDescriptorDto.class).fields(
 						"marketContext", "marketContext", customConverter(MarketContextMapper.class),
 						customConverterId(MARKET_CONTEXT_CONVERTER_ID));
-				
-				
 
 			}
 		};

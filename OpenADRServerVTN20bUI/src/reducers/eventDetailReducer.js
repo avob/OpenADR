@@ -25,6 +25,25 @@ export default function eventDetailReducer( state = initialState.event_detail, a
     case types.LOAD_EVENT_DETAIL_ERROR:
       return state;
 
+
+    case types.EVENT_ACTIVE:
+      return state;
+
+    case types.EVENT_ACTIVE_SUCCESS:
+      return state;
+
+    case types.EVENT_ACTIVE_ERROR:
+      return state;
+
+    case types.EVENT_CANCEL:
+      return state;
+
+    case types.EVENT_CANCEL_SUCCESS:
+      return state;
+
+    case types.EVENT_CANCEL_ERROR:
+      return state;
+
     default:
       return state;
   }

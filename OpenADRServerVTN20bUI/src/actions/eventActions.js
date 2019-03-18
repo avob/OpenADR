@@ -16,7 +16,7 @@ export const createEvent = (dto) => {
 	var params = { event: dto }
   return swaggerAction(types.CREATE_EVENT, 
     (api) => {
-      return api.apis[ 'demand-response-controller' ].listUsingGET(params, jsonResponseContentType);
+      return api.apis[ 'demand-response-controller' ].createUsingPOST(params, jsonResponseContentType);
     }, 
     parseJsonData
   );
@@ -31,3 +31,24 @@ export const loadEventDetail = (id) => {
     parseJsonData
   );
 }
+
+export const activeEvent = (id) => {
+  var params = { id: id };
+  return swaggerAction(types.ACTIVE_EVENT, 
+    (api) => {
+      return api.apis[ 'demand-response-controller' ].activeUsingPOST(params, jsonResponseContentType);
+    }, 
+    parseJsonData
+  );
+}
+
+export const cancelEvent = (id) => {
+  var params = { id: id };
+  return swaggerAction(types.CANCEL_EVENT, 
+    (api) => {
+      return api.apis[ 'demand-response-controller' ].cancelUsingPOST(params, jsonResponseContentType);
+    }, 
+    parseJsonData
+  );
+}
+

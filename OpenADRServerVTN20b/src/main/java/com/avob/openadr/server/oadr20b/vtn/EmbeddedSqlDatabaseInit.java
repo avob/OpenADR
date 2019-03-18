@@ -63,42 +63,20 @@ public class EmbeddedSqlDatabaseInit {
 		VenGroup customCaCert = venGroupService.prepare(new VenGroupDto(groupName));
 		venGroupService.save(customCaCert);
 
-		// rsa test ven
-		VenCreateDto dto = new VenCreateDto();
-		dto.setUsername("2E:55:12:81:B9:EE:9C:46:72:1D");
-		dto.setAuthenticationType("x509");
-		dto.setCommonName("test-rsa.oadr.com");
-		dto.setOadrProfil("20b");
-		Ven prepare = venService.prepare(dto);
-		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
-		prepare.setVenGroup(Sets.newHashSet(oadrCaCert));
-		venService.save(prepare);
-
-		// ecc test ven
-		dto = new VenCreateDto();
-		String ven1Username = "15:97:7B:DE:1C:1F:C6:D2:64:84";
-		dto.setUsername(ven1Username);
-		dto.setAuthenticationType("x509");
-		dto.setCommonName("test-ecc.oadr.com");
-		dto.setOadrProfil("20b");
-		prepare = venService.prepare(dto);
-		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
-		prepare.setVenGroup(Sets.newHashSet(oadrCaCert));
-		venService.save(prepare);
-
 		// ven1.oadr.com
-		dto = new VenCreateDto();
-		dto.setUsername("05:8F:6B:7B:47:AF:EB:47:2A:7B");
+		VenCreateDto dto = new VenCreateDto();
+		String ven1Username = "4A:D1:2E:95:49:43:80:0B:8D:E9";
+		dto.setUsername(ven1Username);
 		dto.setAuthenticationType("x509");
 		dto.setCommonName("ven1.oadr.com");
 		dto.setOadrProfil("20b");
-		prepare = venService.prepare(dto);
+		Ven prepare = venService.prepare(dto);
 		prepare.setVenMarketContexts(Sets.newHashSet(marketContext));
 		prepare.setVenGroup(Sets.newHashSet(customCaCert));
 		venService.save(prepare);
 
 		// ven2.oadr.com
-		String ven2Username = "5A:82:D3:9C:3C:98:41:BC:A5:4C";
+		String ven2Username = "B1:71:26:57:3C:53:0C:D9:23:47";
 		dto = new VenCreateDto();
 		dto.setUsername(ven2Username);
 		dto.setAuthenticationType("x509");

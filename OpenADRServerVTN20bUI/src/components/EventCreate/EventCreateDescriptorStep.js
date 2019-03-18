@@ -97,6 +97,18 @@ export class EventCreateDescriptorStep extends React.Component {
     this.props.onChange(details);
   }
 
+  handleEventIdChange = (e) => {
+    let details = this.props.descriptor;
+    details.eventId = e.target.value;
+    this.props.onChange(details);
+  }
+
+  handleEventNameChange = (e) => {
+    let details = this.props.descriptor;
+    details.eventName = e.target.value;
+    this.props.onChange(details);
+  }
+
   render() {
     const {classes, hasError, descriptor, marketContext} = this.props;
 
@@ -107,9 +119,39 @@ export class EventCreateDescriptorStep extends React.Component {
           justify="center">
       
 
+        <Grid container spacing={ 24 } >
+        <Grid item xs={ 2 } />
+        <Grid item xs={ 4 }>
+            <TextField  label="Event ID" required
+                error={hasError && descriptor.eventId == ""}
+                value={ descriptor.eventId }
+                onChange={this.handleEventIdChange}
+                className={classes.textField}
+                fullWidth={true}/>
+        </Grid>
+        <Grid item xs={ 4 }>
+            <TextField  label="Event Name" required
+                error={hasError && descriptor.eventName == ""}
+                value={ descriptor.eventName }
+                onChange={this.handleEventNameChange}
+                className={classes.textField}
+                fullWidth={true}/>
+        </Grid>
+        <Grid item xs={ 2 } />
 
+      </Grid>
+
+       <Grid container
+            style={ { marginTop: 20 } }
+            spacing={ 24 }>
+        <Grid item xs={ 2 } />
+        <Grid item xs={ 8 }>
+          <Divider />
+        </Grid>
+        <Grid item xs={ 2 } />
+      </Grid>
      
-       <Grid container spacing={ 24 } >
+       <Grid container spacing={ 24 } style={ { marginTop: 20 } }>
         <Grid item xs={ 2 } />
        
        

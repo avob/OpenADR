@@ -157,7 +157,10 @@ public class OadrHttpClient20b {
 						throw new Oadr20bApplicationLayerException("Signed payload expected in response");
 					}
 				} else {
-					return jaxbContext.unmarshal(EntityUtils.toString(response.getEntity(), "UTF-8"), responseKlass,
+					String resp = EntityUtils.toString(response.getEntity(), "UTF-8");
+					System.out.println(marshal);
+					System.out.println(resp);
+					return jaxbContext.unmarshal(resp, responseKlass,
 							validateXmlPayload);
 				}
 			}

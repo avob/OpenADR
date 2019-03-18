@@ -11,9 +11,9 @@ import { VtnConfigurationEventCard } from '../common/VtnConfigurationCard'
 
 import Typography from '@material-ui/core/Typography';
 
+import EventDetailHeader from './EventDetailHeader'
 
-
-export class EventDetail extends React.Component {
+export class EventDetailSignal extends React.Component {
   constructor( props ) {
     super( props );
     this.state = {}
@@ -26,11 +26,7 @@ export class EventDetail extends React.Component {
 
     return (
     <div className={ classes.root } >
-      <Typography gutterBottom
-                  variant="title"
-                  component="h2">
-        Event Detail
-      </Typography>
+      <EventDetailHeader classes={classes} event={event}/>
    
 
     </div>
@@ -38,4 +34,4 @@ export class EventDetail extends React.Component {
   }
 }
 
-export default EventDetail;
+export default EventDetailSignal;

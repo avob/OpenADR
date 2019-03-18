@@ -22,6 +22,9 @@ import EventCreateEventSignalStep from './EventCreateEventSignalStep'
 import EventCreateEventTarget from './EventCreateEventTarget'
 import EventCreateConfirmationStep from './EventCreateConfirmationStep'
 
+import {minutesToICalDuration} from '../../utils/time'
+
+
 
 
 
@@ -36,6 +39,8 @@ export class EventCreate extends React.Component {
     this.state = {
       activeStep: 0,
       descriptor: {
+        // eventId: "",
+        // eventName: "",
         // timezone: "UTC",
         // priority:0,
         // responseRequired:"always",
@@ -45,6 +50,8 @@ export class EventCreate extends React.Component {
         // vtnComment: "",
         // marketContext: null
         
+         eventId: "mouaiccool",
+        eventName: "mouaiccool",
         priority:0,
         responseRequired:"always",
         testEvent: false,
@@ -52,7 +59,7 @@ export class EventCreate extends React.Component {
 
 
         vtnComment: "",
-        marketContext: "mouaiccool"
+        marketContext: "http://MarketContext1"
       },
       eventSignal: {
         // signalName: "",
@@ -76,7 +83,7 @@ export class EventCreate extends React.Component {
         recoveryDuration: 120,
       },
       // eventTarget: []
-      eventTarget: [{targetType:"group", targetId:"Group1"}]
+      eventTarget: [{targetType:"ven", targetId:"4A:D1:2E:95:49:43:80:0B:8D:E9"}]
     };
   }
 
@@ -111,29 +118,25 @@ export class EventCreate extends React.Component {
  
 
   handleCreateEvent = () => {
-    // var dto = {
-    //   "comaSeparatedTargetedVenUsername": "string",
-    //   "createdTimestamp": 0,
-    //   "duration": "string",
-    //   "event": "string",
-    //   "eventId": "string",
-    //   "id": 0,
-    //   "lastUpdateTimestamp": 0,
-    //   "marketContext": "string",
-    //   "modificationNumber": 0,
-    //   "notificationDuration": "string",
-    //   "priority": 0,
-    //   "rampUpDuration": "string",
-    //   "recoveryDuration": "string",
-    //   "start": 0,
-    //   "state": "ACTIVE",
-    //   "testEvent": true,
-    //   "toleranceDuration": "string",
-    //   "value": "SIMPLE_SIGNAL_PAYLOAD_NORMAL"
-    // }
+    var addXMLDurationIfNotNull = (src, field, value) => {
+      if(value != null){
+        src[field] = minutesToICalDuration(value);
+      }
+    }
+    var activePeriod = {
+      start: this.state.eventSignal.start,
+      duration: minutesToICalDuration(this.state.eventSignal.duration)
+    }
+    addXMLDurationIfNotNull(activePeriod, "rampUpDuration", this.state.eventSignal.rampUpDuration);
+    addXMLDurationIfNotNull(activePeriod, "recoveryDuration", this.state.eventSignal.recoveryDuration);
+    addXMLDurationIfNotNull(activePeriod, "toleranceDuration", this.state.eventSignal.toleranceDuration);
+    addXMLDurationIfNotNull(activePeriod, "notificationDuration", this.state.eventSignal.notificationDuration);
     var dto = {
      
-      
+      eventId:this.state.descriptor.eventId,
+      eventName: this.state.descriptor.eventName,
+      state: "ACTIVE",
+      oadrProfile: "OADR20B",
       descriptor: {
         marketContext: this.state.descriptor.marketContext,
         priority: this.state.descriptor.priority,
@@ -141,14 +144,7 @@ export class EventCreate extends React.Component {
         testEvent: this.state.descriptor.testEvent
       },
 
-      activePeriod: {
-        start: this.state.eventSignal.start,
-        duration: this.state.eventSignal.duration,
-        rampUpDuration: this.state.eventSignal.rampUpDuration,
-        recoveryDuration: this.state.eventSignal.recoveryDuration,
-        toleranceDuration: this.state.eventSignal.toleranceDuration,
-        notificationDuration: this.state.eventSignal.notificationDuration
-      },
+      activePeriod: activePeriod,
 
       signals: [{
         signalName: this.state.eventSignal.signalName,
@@ -161,7 +157,7 @@ export class EventCreate extends React.Component {
       targets: this.state.eventTarget
     }
     console.log(JSON.stringify(dto))
-    // this.props.createEvent( dto );
+    this.props.createEvent( dto );
   }
 
   handleDescriptorChange = (descriptor) => {
@@ -213,8 +209,11 @@ export class EventCreate extends React.Component {
     function getSetValidation( step ) {
       switch (step) {
         case 0:
+        console.log(descriptor)
           return descriptor.priority != null
-            && descriptor.marketContext != null;
+            && descriptor.marketContext != null
+            && descriptor.eventId != ""
+            && descriptor.eventName != "";
 
         case 1:
           return eventSignal.start != null 
