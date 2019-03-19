@@ -51,7 +51,9 @@ import com.avob.openadr.model.oadr20a.oadr.OadrResponse;
 import com.avob.openadr.model.oadr20a.oadr.ResponseRequiredType;
 import com.avob.openadr.model.oadr20a.pyld.EiRequestEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
@@ -255,6 +257,8 @@ public class Oadr20aVTNEiEventControllerTest {
 		eventActive.getActivePeriod().setStart(System.currentTimeMillis() - 10);
 		eventActive.getTargets().add(new DemandResponseEventTargetDto("ven", VEN));
 		eventActive.setState(DemandResponseEventStateEnum.ACTIVE);
+		eventActive.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+		eventActive.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 		DemandResponseEvent eventActivePO = demandResponseEventService.create(eventActive);
 
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
@@ -269,6 +273,8 @@ public class Oadr20aVTNEiEventControllerTest {
 		eventCanceled.getActivePeriod().setStart(System.currentTimeMillis() - 10);
 		eventCanceled.getTargets().add(new DemandResponseEventTargetDto("ven", VEN));
 		eventCanceled.setState(DemandResponseEventStateEnum.CANCELED);
+		eventCanceled.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+		eventCanceled.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 		DemandResponseEvent eventCanceledPO = demandResponseEventService.create(eventCanceled);
 
 		String requestId = "0";
@@ -461,6 +467,8 @@ public class Oadr20aVTNEiEventControllerTest {
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
+		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
@@ -687,6 +695,8 @@ public class Oadr20aVTNEiEventControllerTest {
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
+		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
@@ -722,6 +732,8 @@ public class Oadr20aVTNEiEventControllerTest {
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
+		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
@@ -757,6 +769,8 @@ public class Oadr20aVTNEiEventControllerTest {
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
+		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
@@ -790,6 +804,8 @@ public class Oadr20aVTNEiEventControllerTest {
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
+		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
@@ -824,6 +840,8 @@ public class Oadr20aVTNEiEventControllerTest {
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
+		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)

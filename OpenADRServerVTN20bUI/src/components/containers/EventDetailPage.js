@@ -18,6 +18,7 @@ import EventDetailSignal from '../EventDetail/EventDetailSignal'
 import EventDetailTarget from '../EventDetail/EventDetailTarget'
 
 import green from '@material-ui/core/colors/green';
+import red from '@material-ui/core/colors/red';
 
 
 
@@ -65,6 +66,9 @@ const styles = theme => ({
   },
   success: {
     backgroundColor: green[600],
+  },
+  error: {
+    backgroundColor: red[600],
   }
 });
 

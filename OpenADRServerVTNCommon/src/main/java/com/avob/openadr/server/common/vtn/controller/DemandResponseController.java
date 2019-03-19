@@ -60,6 +60,12 @@ public class DemandResponseController {
 	@ResponseBody
 	public DemandResponseEventDto create(@Valid @RequestBody DemandResponseEventDto event, HttpServletResponse response,
 			BindingResult result) {
+		
+		DemandResponseEvent findByEventId = demandResponseEventService.findByEventId(event.getEventId());
+		if(findByEventId != null) {
+			response.setStatus(HttpStatus.BAD_REQUEST_400);
+			return null;
+		}
 
 		DemandResponseEvent save = demandResponseEventService.create(event);
 

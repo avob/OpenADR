@@ -259,7 +259,7 @@ export class VenCreate extends React.Component {
                         color="primary"
                         onClick={ handleValidatedNext( activeStep ) }
                         className={ classes.button }>
-                  { activeStep === steps.length - 1 ? 'Finish' : 'Next' }
+                  { activeStep === steps.length - 1 ? 'Create Ven' : 'Next' }
                 </Button>
               </div>
               <Typography component="div" className={ classes.instructions }>

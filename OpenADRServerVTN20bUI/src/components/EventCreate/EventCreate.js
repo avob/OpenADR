@@ -49,15 +49,13 @@ export class EventCreate extends React.Component {
        
         // vtnComment: "",
         // marketContext: null
+        oadrProfile: "OADR20B",
         
-         eventId: "mouaiccool",
+        eventId: "mouaiccool",
         eventName: "mouaiccool",
         priority:0,
-        responseRequired:"always",
+        responseRequired:"ALWAYS",
         testEvent: false,
-        vtnComment: "",
-
-
         vtnComment: "",
         marketContext: "http://MarketContext1"
       },
@@ -117,7 +115,7 @@ export class EventCreate extends React.Component {
 
  
 
-  handleCreateEvent = () => {
+  handleCreateEvent = (needPublish) => {
     var addXMLDurationIfNotNull = (src, field, value) => {
       if(value != null){
         src[field] = minutesToICalDuration(value);
@@ -131,11 +129,14 @@ export class EventCreate extends React.Component {
     addXMLDurationIfNotNull(activePeriod, "recoveryDuration", this.state.eventSignal.recoveryDuration);
     addXMLDurationIfNotNull(activePeriod, "toleranceDuration", this.state.eventSignal.toleranceDuration);
     addXMLDurationIfNotNull(activePeriod, "notificationDuration", this.state.eventSignal.notificationDuration);
+
+    var state = (needPublish != null && needPublish) ? "ACTIVE" : "UNPUBLISHED";
+    console.log(needPublish, state)
     var dto = {
      
       eventId:this.state.descriptor.eventId,
       eventName: this.state.descriptor.eventName,
-      state: "ACTIVE",
+      state: state,
       oadrProfile: "OADR20B",
       descriptor: {
         marketContext: this.state.descriptor.marketContext,
@@ -282,10 +283,16 @@ export class EventCreate extends React.Component {
                 </Button>
                 <Button variant="contained"
                         color="primary"
-                        onClick={ handleValidatedNext( activeStep ) }
+                        onClick={ handleValidatedNext( activeStep )}
                         className={ classes.button }>
-                  { activeStep === steps.length - 1 ? 'Finish' : 'Next' }
+                  { activeStep === steps.length - 1 ? 'Create Event' : 'Next' }
                 </Button>
+                { activeStep === steps.length - 1 ? <Button variant="contained"
+                        color="secondary"
+                        onClick={ () => { that.handleCreateEvent(true) } }
+                        className={ classes.button }>
+                    Create And Publish Event
+                </Button> : null }
               </div>
               <Typography component="div" className={ classes.instructions }>
                 <Paper elevation={ 1 } style={ { padding: '20px 0px' } }>

@@ -30,6 +30,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.web.servlet.MvcResult;
 
 import com.avob.openadr.client.http.OadrHttpClient;
 import com.avob.openadr.client.http.OadrHttpClientBuilder;
@@ -45,6 +46,8 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationExc
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
@@ -275,7 +278,8 @@ public class Oadr20bVTNSecurityTest {
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
-
+		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		String payload = mapper.writeValueAsString(dto);
 		HttpPost post = new HttpPost(demandResponseEnpointUrl);
 		StringEntity stringEntity = new StringEntity(payload);

@@ -35,6 +35,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.avob.openadr.server.common.vtn.ApplicationTest;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
@@ -137,6 +139,7 @@ public class DemandResponseControllerTest {
 
 		DemandResponseEventDto dto = new DemandResponseEventDto();
 		dto.setEventId(event1Id);
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getActivePeriod().setStart(start);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
@@ -152,6 +155,7 @@ public class DemandResponseControllerTest {
 
 		dto = new DemandResponseEventDto();
 		dto.setEventId(event2Id);
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.setState(DemandResponseEventStateEnum.CANCELED);
 		dto.getActivePeriod().setStart(start);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
@@ -332,9 +336,12 @@ public class DemandResponseControllerTest {
 		DemandResponseEventDto toCreate = new DemandResponseEventDto();
 		toCreate.setEventId(event1Id + "_copy");
 		toCreate.getSignals().add(signal);
+		toCreate.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
+		
 		toCreate.setState(DemandResponseEventStateEnum.ACTIVE);
 		toCreate.getActivePeriod().setStart(start);
 		toCreate.getDescriptor().setMarketContext(marketContext.getName());
+		toCreate.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		toCreate.getActivePeriod().setDuration(duration);
 		toCreate.getActivePeriod().setToleranceDuration(toleranceDuration);
 		toCreate.getActivePeriod().setNotificationDuration(notificationDuration);

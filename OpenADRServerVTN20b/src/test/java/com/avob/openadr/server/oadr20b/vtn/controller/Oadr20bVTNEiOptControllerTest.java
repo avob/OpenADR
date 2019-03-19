@@ -34,6 +34,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreatedOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.xcal.VavailabilityType;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
@@ -329,6 +330,7 @@ public class Oadr20bVTNEiOptControllerTest {
 
 		DemandResponseEventDto dto = new DemandResponseEventDto();
 		dto.setEventId("eventActive");
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 		dto.setCreatedTimestamp(System.currentTimeMillis());
 		dto.getActivePeriod().setDuration("PT1H");

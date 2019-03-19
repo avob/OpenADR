@@ -25,6 +25,15 @@ export default function eventReducer( state = initialState.event, action ) {
     case types.LOAD_EVENT_ERROR:
       return state;
 
+    case types.DELETE_EVENT:
+      return state;
+
+    case types.DELETE_EVENT_SUCCESS:
+      return state;
+
+    case types.DELETE_EVENT_ERROR:
+      return state;
+
   	// MARKET CONTEXT
     case types.LOAD_MARKET_CONTEXT:
       return state;

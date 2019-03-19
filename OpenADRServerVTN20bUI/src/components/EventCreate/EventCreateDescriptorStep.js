@@ -109,6 +109,12 @@ export class EventCreateDescriptorStep extends React.Component {
     this.props.onChange(details);
   }
 
+  handleOadrProfileChange = (e) => {
+     let details = this.props.descriptor;
+    details.oadrProfile = e.target.value;
+    this.props.onChange(details);
+  }
+
   render() {
     const {classes, hasError, descriptor, marketContext} = this.props;
 
@@ -121,7 +127,7 @@ export class EventCreateDescriptorStep extends React.Component {
 
         <Grid container spacing={ 24 } >
         <Grid item xs={ 2 } />
-        <Grid item xs={ 4 }>
+        <Grid item xs={ 3 }>
             <TextField  label="Event ID" required
                 error={hasError && descriptor.eventId == ""}
                 value={ descriptor.eventId }
@@ -129,13 +135,35 @@ export class EventCreateDescriptorStep extends React.Component {
                 className={classes.textField}
                 fullWidth={true}/>
         </Grid>
-        <Grid item xs={ 4 }>
+        <Grid item xs={ 3 }>
             <TextField  label="Event Name" required
                 error={hasError && descriptor.eventName == ""}
                 value={ descriptor.eventName }
                 onChange={this.handleEventNameChange}
                 className={classes.textField}
                 fullWidth={true}/>
+        </Grid>
+        <Grid item xs={2} >
+           <FormControl className={ classes.formControl }>
+                <FormLabel style={ labelStyle } component="label">
+                  OadrProfile
+                </FormLabel>
+                <Select value={ descriptor.oadrProfile}
+                              style={ { marginTop: 0 } }
+
+                               onChange={this.handleOadrProfileChange}
+                   
+                              inputProps={ { name: 'response_required_select', id: 'response_required_select', } }
+                              >
+                      <MenuItem key="menu_item_oadr_profile_20a" value="OADR20A">
+                       2.0a
+                       </MenuItem> 
+
+                       <MenuItem key="menu_item_oadr_profile_20a" value="OADR20B">
+                       2.0b
+                       </MenuItem> 
+                </Select>
+              </FormControl>
         </Grid>
         <Grid item xs={ 2 } />
 
@@ -195,11 +223,11 @@ export class EventCreateDescriptorStep extends React.Component {
                    
                               inputProps={ { name: 'response_required_select', id: 'response_required_select', } }
                               >
-                      <MenuItem key="response_required_item_always" value="always">
+                      <MenuItem key="response_required_item_always" value="ALWAYS">
                        Always
                        </MenuItem> 
 
-                       <MenuItem key="response_required_item_never" value="never">
+                       <MenuItem key="response_required_item_never" value="NEVER">
                        Never
                        </MenuItem> 
                 </Select>

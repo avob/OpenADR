@@ -1,6 +1,8 @@
 package com.avob.openadr.server.common.vtn.models.demandresponseevent;
 
 import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
@@ -19,7 +21,9 @@ public class DemandResponseEventDescriptor {
 
 	private String vtnComment;
 
-	private String responseRequired;
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private DemandResponseEventResponseRequiredEnum responseRequired;
 
 	public VenMarketContext getMarketContext() {
 		return marketContext;
@@ -53,11 +57,11 @@ public class DemandResponseEventDescriptor {
 		this.vtnComment = vtnComment;
 	}
 
-	public String getResponseRequired() {
+	public DemandResponseEventResponseRequiredEnum getResponseRequired() {
 		return responseRequired;
 	}
 
-	public void setResponseRequired(String responseRequired) {
+	public void setResponseRequired(DemandResponseEventResponseRequiredEnum responseRequired) {
 		this.responseRequired = responseRequired;
 	}
 

@@ -137,9 +137,26 @@ export function VtnConfigurationVenCard( props ) {
 }
 
 export function VtnConfigurationEventCard( props ) {
+  var color;
+  switch(props.event.state) {
+    case "ACTIVE":
+      color = "green";
+      break;
+    case "UNPUBLISHED":
+      color = "#bbb";
+      break;
+    case "CANCELED":
+      color = "red";
+      break;
+    default:
+      color = "#bbb";
+      break;
+
+  }
+
   return (
   <VtnConfigurationCard classes={ props.classes }
-                        color={ "#bbb"}
+                        color={ color }
                         name={ props.event.eventId }
                         description={ props.event.marketContext }
                         close={ props.handleDeleteEvent }

@@ -18,7 +18,19 @@ export const createEvent = (dto) => {
     (api) => {
       return api.apis[ 'demand-response-controller' ].createUsingPOST(params, jsonResponseContentType);
     }, 
-    parseJsonData
+    (data) => {  history.push("/event/") }
+
+  );
+}
+
+export const deleteEvent = (id) => {
+  return swaggerAction(types.DELETE_EVENT, 
+    (api) => {
+      var params = { id: id };
+      return  api.apis[ 'demand-response-controller' ].deleteUsingDELETE(params, jsonResponseContentType);
+    },
+    () => { history.push("/event/");  },
+    (dispatch, getState) => { loadEvent()(dispatch, getState) }
   );
 }
 

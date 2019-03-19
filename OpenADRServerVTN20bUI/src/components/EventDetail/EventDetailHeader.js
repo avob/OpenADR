@@ -67,6 +67,21 @@ export class EventDetailHeader extends React.Component {
       );
     }
 
+    var ErrorSnackbar = (props) => {
+      return (
+      <SnackbarContent className={ classes.error }
+                       style={ { maxWidth: 'none', paddingTop:0, paddingBottom:0 } }
+                       message={ <Grid container direction="row" alignItems="center">
+                            <Grid item>
+                              <DoneIcon style={ { width: 20, height: 20, marginRight: 20, color:"#fff" } }/>
+                            </Grid>
+                            <Grid item >
+                               { props.message }
+                            </Grid>
+                          </Grid>} />
+      );
+    }
+
     var DefaultSnackbar = (props) => {
       return (
       <SnackbarContent className={ classes.success }
@@ -100,7 +115,7 @@ export class EventDetailHeader extends React.Component {
                              </Typography> } />
 
     } else {
-      statePanel = <DefaultSnackbar  message={ <Typography component="span" >
+      statePanel = <ErrorSnackbar  message={ <Typography component="span" style={ { color:"#fff" } }>
                                <strong>CANCELED</strong>
                              </Typography> } />
     }

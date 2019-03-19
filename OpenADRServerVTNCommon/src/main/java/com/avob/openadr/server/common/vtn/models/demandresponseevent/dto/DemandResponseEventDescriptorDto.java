@@ -1,5 +1,7 @@
 package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto;
 
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
+
 public class DemandResponseEventDescriptorDto {
 
 	private Long priority;
@@ -8,7 +10,7 @@ public class DemandResponseEventDescriptorDto {
 
 	private Boolean testEvent;
 
-	private String responseRequired;
+	private DemandResponseEventResponseRequiredEnum responseRequired;
 
 	private String vtnComment;
 
@@ -36,11 +38,11 @@ public class DemandResponseEventDescriptorDto {
 		this.testEvent = testEvent;
 	}
 
-	public String getResponseRequired() {
+	public DemandResponseEventResponseRequiredEnum getResponseRequired() {
 		return responseRequired;
 	}
 
-	public void setResponseRequired(String responseRequired) {
+	public void setResponseRequired(DemandResponseEventResponseRequiredEnum responseRequired) {
 		this.responseRequired = responseRequired;
 	}
 

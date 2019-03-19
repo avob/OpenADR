@@ -63,100 +63,22 @@ var VenTextField = (props) => {
   );
 }
 
-var MarketContextGridList = (props) => {
-  return (
-  <div className={ props.classes.root }>
-    <GridList className={ props.classes.gridList }
-              cols={ 3 }
-              spacing={ 0 }
-              cellHeight="auto">
-      { props.marketContext.map( context => (
-          <GridListTile key={ context.id } className={ props.classes.tile }>
-            <VtnConfigurationMarketContextCard classes={ props.classes }
-                                               context={ context }
-                                               handleRemoveVenMarketContext={ props.handleRemoveVenMarketContext( context ) } />
-          </GridListTile>
-        ) ) }
-    </GridList>
-  </div>
-  );
-}
 
-var GroupGridList = (props) => {
-
-  return (
-  <div className={ props.classes.root }>
-    <GridList className={ props.classes.gridList }
-              cols={ 3 }
-              spacing={ 0 }
-              cellHeight="auto">
-      { props.group.map( g => (
-          <GridListTile key={ g.id } className={ props.classes.tile }>
-            <VtnConfigurationGroupCard classes={ props.classes }
-                                       group={ g }
-                                       handleRemoveVenGroup={ props.handleRemoveVenGroup( g ) } />
-          </GridListTile>
-        ) ) }
-    </GridList>
-  </div>
-  );
-}
 
 
 export class VenDetailSettings extends React.Component {
   constructor( props ) {
     super( props );
     this.state = {}
-    this.state.marketContextSelectDialogOpen = false;
-    this.state.groupSelectDialogOpen = false;
+   
+    
 
 
   }
 
-  handleMarketContextSelectOpen = () => {
-    this.setState( {
-      marketContextSelectDialogOpen: true
-    } );
-  }
 
-  handleMarketContextSelectClose = (context) => {
-    if ( context ) {
-      this.props.addVenMarketContext( this.props.ven.username, context.id )
-    }
-    this.setState( {
-      marketContextSelectDialogOpen: false
-    } );
-  }
 
-  handleGroupSelectOpen = () => {
-    this.setState( {
-      groupSelectDialogOpen: true
-    } );
-  }
-
-  handleGroupSelectClose = (group) => {
-    console.log( group )
-    if ( group ) {
-      this.props.addVenGroup( this.props.ven.username, group.id )
-    }
-    this.setState( {
-      groupSelectDialogOpen: false
-    } );
-  }
-
-  handleRemoveVenMarketContext = (context) => {
-    return () => {
-      console.log( context )
-      this.props.removeVenMarketContext( this.props.ven.username, context.id )
-    }
-  }
-
-  handleRemoveVenGroup = (group) => {
-    return () => {
-      console.log( group )
-      this.props.removeVenGroup( this.props.ven.username, group.id )
-    }
-  }
+  
 
   handleReRegistrationClick = () => {
     this.props.registerPartyRequestReregistration( this.props.ven.username);
@@ -172,37 +94,12 @@ export class VenDetailSettings extends React.Component {
 
 
   render() {
-    const {classes, ven, marketContext, group, venMarketContext, venGroup} = this.props;
+    const {classes, ven} = this.props;
 
-    var notSubscribedMarketContext = [];
-    var venMarketContextId = [];
-    for (var i in venMarketContext) {
-      venMarketContextId.push( venMarketContext[ i ].id );
-    }
-    for (var i in marketContext) {
-      if ( venMarketContextId.indexOf( marketContext[ i ].id ) == -1 ) {
-        notSubscribedMarketContext.push( marketContext[ i ] )
-      }
-    }
-
-    var notAddedGroup = [];
-    var venGroupId = [];
-    for (var i in venGroup) {
-      venGroupId.push( venGroup[ i ].id );
-    }
-    for (var i in group) {
-      if ( venGroupId.indexOf( group[ i ].id ) == -1 ) {
-        notAddedGroup.push( group[ i ] )
-      }
-    }
+    
 
     return (
     <div className={ classes.root } >
-      <Typography gutterBottom
-                  variant="title"
-                  component="h2">
-        Status
-      </Typography>
       <VenDetailHeader classes={classes} ven={ven} actions={
         <Grid container spacing={ 24 }>
           <Grid item xs={ 4 }>
@@ -241,12 +138,7 @@ export class VenDetailSettings extends React.Component {
       </Grid>
       }/>
 
-      <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
-      <Typography gutterBottom
-                  variant="title"
-                  component="h2">
-        Settings
-      </Typography>
+      <Divider style={ { marginTop: '20px' } } />
       <Grid>
         <Grid container spacing={ 24 }>
           <Grid item xs={ 3 }>
@@ -286,94 +178,8 @@ export class VenDetailSettings extends React.Component {
           </Grid>
         </Grid>
       </Grid>
-      { /* MarketContext Row */ }
-      <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
-      <Typography gutterBottom
-                  variant="title"
-                  component="h2">
-        Market Context
-      </Typography>
-      <Grid container spacing={ 24 }>
-        <Grid item xs={ 6 }>
-          <ChipInput label="Filters"
-                     placeholder="Filters"
-                     value={ this.state.filter }
-                     onAdd={ this.handleAddChip }
-                     onDelete={ this.handleDeleteChip }
-                     fullWidth={ true } />
-        </Grid>
-        <Grid item xs={ 1 }>
-          <IconButton className={ classes.iconButton } aria-label="Search">
-            <SearchIcon />
-          </IconButton>
-        </Grid>
-        <Grid item xs={ 3 }>
-          <Button key="btn_create"
-                  style={ { marginTop: 15 } }
-                  variant="outlined"
-                  color="primary"
-                  size="small"
-                  className={ classes.button }
-                  onClick={ this.handleMarketContextSelectOpen }>
-            <AddIcon />Subscribe to a Market Context
-          </Button>
-          <MarketContextSelectDialog marketContext={ notSubscribedMarketContext }
-                                     open={ this.state.marketContextSelectDialogOpen }
-                                     close={ this.handleMarketContextSelectClose }
-                                     title="Add VEN to Market Context" />
-        </Grid>
-      </Grid>
-      <Grid container spacing={ 24 }>
-        <Grid item xs={ 12 }>
-          <MarketContextGridList classes={ classes }
-                                 marketContext={ venMarketContext }
-                                 handleRemoveVenMarketContext={ this.handleRemoveVenMarketContext } />
-        </Grid>
-      </Grid>
-      { /* Group Row */ }
-      <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
-      <Typography gutterBottom
-                  variant="title"
-                  component="h2">
-        Group
-      </Typography>
-      <Grid container spacing={ 24 }>
-        <Grid item xs={ 6 }>
-          <ChipInput label="Filters"
-                     placeholder="Filters"
-                     value={ this.state.filter }
-                     onAdd={ this.handleAddChip }
-                     onDelete={ this.handleDeleteChip }
-                     fullWidth={ true } />
-        </Grid>
-        <Grid item xs={ 1 }>
-          <IconButton className={ classes.iconButton } aria-label="Search">
-            <SearchIcon />
-          </IconButton>
-        </Grid>
-        <Grid item xs={ 3 }>
-          <Button key="btn_create"
-                  style={ { marginTop: 15 } }
-                  variant="outlined"
-                  color="primary"
-                  size="small"
-                  className={ classes.button }
-                  onClick={ this.handleGroupSelectOpen }>
-            <AddIcon />Add to a Group
-          </Button>
-          <GroupSelectDialog group={ notAddedGroup }
-                             open={ this.state.groupSelectDialogOpen }
-                             close={ this.handleGroupSelectClose }
-                             title="Add VEN to group:" />
-        </Grid>
-      </Grid>
-      <Grid container spacing={ 24 }>
-        <Grid item xs={ 12 }>
-          <GroupGridList classes={ classes }
-                         group={ venGroup }
-                         handleRemoveVenGroup={ this.handleRemoveVenGroup } />
-        </Grid>
-      </Grid>
+      
+      
     </div>
     );
   }

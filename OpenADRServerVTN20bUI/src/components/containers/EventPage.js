@@ -99,7 +99,9 @@ export class EventPage extends React.Component {
                           <EventList classes={classes} 
                           marketContext={ event.marketContext }
                           event={event.event}
+                          deleteEvent={ this.props.eventActions.deleteEvent}
                            />
+                          
                        </TabContainer> }
                        
       { value === 1 && <TabContainer>

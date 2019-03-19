@@ -94,12 +94,12 @@ export class EventList extends React.Component {
     } )
   }
 
-  handleEditEvent = (id) => {
+  handleEditEvent = (id) => () => {
     history.push( '/event/detail/'+ id);
   }
 
-  handleDeleteEvent = () => {
-    
+  handleDeleteEvent = (id) => () => {
+    this.props.deleteEvent(id)
   }
 
   onStartChange = (start) =>  {
@@ -122,12 +122,12 @@ export class EventList extends React.Component {
     for (var i in event) {
       var v = event[ i ];
       view.push(
-        <VtnConfigurationEventCard key={ 'event_card_' + event.id }
+        <VtnConfigurationEventCard key={ 'event_card_' + v.id }
                                  classes={ classes }
                                  event={ v } 
 
-                                  handleEditEvent = {() => {this.handleEditEvent(v.id)}}
-                                  handleDeleteEvent = {this.handleDeleteEvent} />
+                                  handleEditEvent = {this.handleEditEvent(v.id)}
+                                  handleDeleteEvent = {this.handleDeleteEvent(v.id)} />
       );
     }
     return (

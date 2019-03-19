@@ -6,6 +6,8 @@ import javax.annotation.Resource;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
@@ -106,6 +108,8 @@ public class EmbeddedSqlDatabaseInit {
 		eventDto.getActivePeriod().setNotificationDuration(notificationDuration);
 
 		eventDto.getDescriptor().setMarketContext(marketContext.getName());
+		eventDto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
+		eventDto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		eventDto.getActivePeriod().setDuration(duration);
 		eventDto.getActivePeriod().setNotificationDuration(notificationDuration);
 		eventDto.setCreatedTimestamp(createdTimestamp);

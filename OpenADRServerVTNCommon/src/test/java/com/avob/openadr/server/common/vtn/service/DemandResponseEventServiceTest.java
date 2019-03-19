@@ -22,6 +22,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.avob.openadr.server.common.vtn.ApplicationTest;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
@@ -104,6 +105,7 @@ public class DemandResponseEventServiceTest {
 		DemandResponseEventDto dto = new DemandResponseEventDto();
 		dto.setEventId(event1Id);
 		dto.setState(state);
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getActivePeriod().setStart(start);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
 		dto.getActivePeriod().setDuration(duration);
@@ -118,6 +120,7 @@ public class DemandResponseEventServiceTest {
 		dto = new DemandResponseEventDto();
 		dto.setEventId(event2Id);
 		dto.setState(DemandResponseEventStateEnum.CANCELED);
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getActivePeriod().setStart(start);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
 		dto.getActivePeriod().setDuration(duration);
@@ -133,6 +136,7 @@ public class DemandResponseEventServiceTest {
 
 		dto = new DemandResponseEventDto();
 		dto.setEventId(event3Id);
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.setState(state);
 		dto.getActivePeriod().setStart(start);
 		dto.getDescriptor().setMarketContext(marketContext.getName());

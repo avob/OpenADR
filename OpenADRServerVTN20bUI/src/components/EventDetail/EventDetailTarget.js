@@ -12,6 +12,8 @@ import { VtnConfigurationEventCard } from '../common/VtnConfigurationCard'
 import Typography from '@material-ui/core/Typography';
 
 import EventDetailHeader from './EventDetailHeader'
+import Divider from '@material-ui/core/Divider';
+
 
 export class EventDetailTarget extends React.Component {
   constructor( props ) {
@@ -27,7 +29,7 @@ export class EventDetailTarget extends React.Component {
     return (
     <div className={ classes.root } >
       <EventDetailHeader classes={classes} event={event}/>
-   
+       <Divider style={ { marginTop: '20px' } } />
 
     </div>
     );

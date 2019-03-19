@@ -14,6 +14,11 @@ import Divider from '@material-ui/core/Divider';
 
 import VenDetailSettings from '../VenDetail/VenDetailSettings'
 import VenDetailReport from '../VenDetail/VenDetailReport'
+import VenDetailOptSchedule from '../VenDetail/VenDetailOptSchedule'
+import VenDetailEnrollment from '../VenDetail/VenDetailEnrollment'
+import VenDetailGroup from '../VenDetail/VenDetailGroup'
+
+
 
 import green from '@material-ui/core/colors/green';
 
@@ -103,6 +108,12 @@ export class VenDetailPage extends React.Component {
       case 2:
         history.push("/ven/detail/"+this.props.match.params.username+"/optschedules")
         break;
+      case 3:
+        history.push("/ven/detail/"+this.props.match.params.username+"/enrollments")
+        break;
+      case 4:
+        history.push("/ven/detail/"+this.props.match.params.username+"/groups")
+        break;
     }
     
   };
@@ -126,6 +137,12 @@ export class VenDetailPage extends React.Component {
       case "optschedules":
         this.setState({value:2});
         break;
+      case "enrollments":
+        this.setState({value:3});
+        break;
+      case "groups":
+        this.setState({value:4});
+        break;
       default:
         this.setState({value:0});
         break;
@@ -145,22 +162,21 @@ export class VenDetailPage extends React.Component {
         <Tab label="Settings" />
         <Tab label="Reports" />
         <Tab label="OptSchedules" />
+        <Tab label="Enrollments" />
+        <Tab label="Groups" />
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
                          <VenDetailSettings classes={ classes }
                                             ven={ ven_detail.ven }
-                                            marketContext={ ven_detail.marketContext }
+
                                             group={ ven_detail.group }
-                                            venMarketContext={ ven_detail.venMarketContext }
                                             venGroup={ ven_detail.venGroup }
-                                            addVenMarketContext={ this.props.venActions.addVenMarketContext }
-                                            removeVenMarketContext={ this.props.venActions.removeVenMarketContext }
-                                            addVenGroup={ this.props.venActions.addVenGroup }
-                                            removeVenGroup={ this.props.venActions.removeVenGroup }
+                                            
                                             registerPartyRequestReregistration={this.props.venActions.registerPartyRequestReregistration}
                                             registerPartyCancelPartyRegistration={this.props.venActions.registerPartyCancelPartyRegistration}
                                             cleanRegistration={this.props.venActions.cleanRegistration}
+
                                              />
                                             
                                             
@@ -171,6 +187,7 @@ export class VenDetailPage extends React.Component {
                                             marketContext={ ven_detail.marketContext }
                                             availableReport={ven_detail.availableReport}
                                             requestedReport={ven_detail.requestedReport}
+
                                             requestRegisterReport={this.props.venActions.requestRegisterReport}
                                             sendRegisterReport={this.props.venActions.sendRegisterReport}
                                             cancelRequestReportSubscription={this.props.venActions.cancelRequestReportSubscription}
@@ -181,6 +198,40 @@ export class VenDetailPage extends React.Component {
         
                        </TabContainer> }
       { value === 2 && <TabContainer>
+                      <VenDetailOptSchedule classes={ classes }
+                                            ven={ ven_detail.ven }                                            
+                                             />
+
+
+        
+                       </TabContainer> }
+      { value === 3 && <TabContainer>
+                      <VenDetailEnrollment classes={ classes }
+                                            ven={ ven_detail.ven }
+                                            marketContext={ ven_detail.marketContext }
+                                            venMarketContext={ ven_detail.venMarketContext }  
+
+                                             addVenMarketContext={ this.props.venActions.addVenMarketContext }
+                                            removeVenMarketContext={ this.props.venActions.removeVenMarketContext }                                    
+                                             />
+
+
+        
+                       </TabContainer> }
+      { value === 4 && <TabContainer>
+                      <VenDetailGroup classes={ classes }
+                                            ven={ ven_detail.ven }
+                                            
+
+                                            group={ ven_detail.group }
+                                            venGroup={ ven_detail.venGroup }
+
+                                            addVenGroup={ this.props.venActions.addVenGroup }
+                                            removeVenGroup={ this.props.venActions.removeVenGroup }                                  
+                                             />
+
+
+        
                        </TabContainer> }
     </div>
 

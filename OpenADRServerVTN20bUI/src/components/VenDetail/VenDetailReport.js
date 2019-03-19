@@ -250,47 +250,8 @@ export class VenDetailReport extends React.Component {
   render() {
     const {classes, ven, availableReport, requestedReport, cancelRequestReportSubscription} = this.props;
 
-    var SuccessSnackbar = (props) => {
-      return (
-      <SnackbarContent className={ classes.success }
-                       style={ { maxWidth: 'none', paddingTop:0, paddingBottom:0 } }
-                       message={ <Grid container direction="row" alignItems="center">
-                            <Grid item>
-                              <DoneIcon style={ { width: 20, height: 20, marginRight: 20, color:"#fff" } }/>
-                            </Grid>
-                            <Grid item style={{}}>
-                               { props.message }
-                            </Grid>
-                          </Grid>} />
-      );
-    }
-
-    var DefaultSnackbar = (props) => {
-      return (
-      <SnackbarContent className={ classes.success }
-                       style={ { maxWidth: 'none', paddingTop:0, paddingBottom:0, backgroundColor:"#fafafa" } }
-                       message={ 
-                          <Grid container direction="row" alignItems="center">
-                            <Grid item>
-                              <CloseIcon style={ { width: 20, height: 20, marginRight: 20, color:"#000" } }/>
-                            </Grid>
-                            <Grid item>
-                               { props.message }
-                            </Grid>
-                          </Grid>
-                     } />
-      );
-    }
-
-
-
     return (
     <div className={ classes.root } >
-      <Typography gutterBottom
-                  variant="title"
-                  component="h2">
-        Status
-      </Typography>
       <VenDetailHeader classes={classes} ven={ven} actions={[
          <Grid  key="report_action_first_row" container spacing={ 24 }>
           <Grid item xs={ 3 }>
@@ -339,11 +300,6 @@ export class VenDetailReport extends React.Component {
       ]
       }/>
       <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
-      <Typography gutterBottom
-                  variant="title"
-                  component="h2">
-        Reports
-      </Typography>
       <VenAvailableReportTable ven={ven} 
         availableReport={availableReport} classes={classes} 
         handleViewReportDetail={this.handleViewReportDetail}

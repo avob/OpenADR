@@ -41,6 +41,8 @@ import com.avob.openadr.model.oadr20a.exception.Oadr20aHttpLayerException;
 import com.avob.openadr.model.oadr20a.oadr.OadrDistributeEvent;
 import com.avob.openadr.model.oadr20a.oadr.OadrRequestEvent;
 import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
@@ -254,6 +256,8 @@ public class Oadr20aVTNSecurityTest {
 		dto.setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
+		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 
 		String payload = mapper.writeValueAsString(dto);
 		HttpPost post = new HttpPost(demandResponseEnpointUrl);
