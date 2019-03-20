@@ -59,26 +59,13 @@ public class VenPoll {
 	public Ven getVen() {
 		return ven;
 	}
-
-	public void setVen(Ven ven) {
-		this.ven = ven;
-	}
-
 	
 	public String getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
 	public Long getCreatedTimestamp() {
 		return createdTimestamp;
-	}
-
-	public void setCreatedTimestamp(Long createdTimestamp) {
-		this.createdTimestamp = createdTimestamp;
 	}
 
 }

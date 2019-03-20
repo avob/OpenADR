@@ -1,4 +1,4 @@
-package com.avob.openadr.server.oadr20b.vtn.controller;
+package com.avob.openadr.server.oadr20b.vtn.controller.ei;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

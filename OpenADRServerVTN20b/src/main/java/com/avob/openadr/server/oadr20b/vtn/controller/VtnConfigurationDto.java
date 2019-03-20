@@ -9,84 +9,52 @@ public class VtnConfigurationDto {
 
 	private Long pullFrequencySeconds;
 
-	private Integer port;
+	private int port;
 
 	private String contextPath;
 
 	private String host;
 
 	private String oadrVersion = "OpenADR 20b";
-	
+
 	private boolean supportCertificateGeneration = false;
-	
+
 	private boolean xsdValidation = false;
-	
+
 	private Long xmlSignatureReplayProtectSecond;
-	
+
 	private boolean saveVenDate = false;
 
 	public String getVtnId() {
 		return vtnId;
 	}
 
-	public void setVtnId(String vtnId) {
-		this.vtnId = vtnId;
-	}
-
 	public Boolean getSupportPush() {
 		return supportPush;
-	}
-
-	public void setSupportPush(Boolean supportPush) {
-		this.supportPush = supportPush;
 	}
 
 	public Boolean getSupportUnsecuredHttpPush() {
 		return supportUnsecuredHttpPush;
 	}
 
-	public void setSupportUnsecuredHttpPush(Boolean supportUnsecuredHttpPush) {
-		this.supportUnsecuredHttpPush = supportUnsecuredHttpPush;
-	}
-
 	public Long getPullFrequencySeconds() {
 		return pullFrequencySeconds;
 	}
 
-	public void setPullFrequencySeconds(Long pullFrequencySeconds) {
-		this.pullFrequencySeconds = pullFrequencySeconds;
-	}
-
-	public Integer getPort() {
+	public int getPort() {
 		return port;
-	}
-
-	public void setPort(Integer port) {
-		this.port = port;
 	}
 
 	public String getContextPath() {
 		return contextPath;
 	}
 
-	public void setContextPath(String contextPath) {
-		this.contextPath = contextPath;
-	}
-
 	public String getHost() {
 		return host;
 	}
 
-	public void setHost(String host) {
-		this.host = host;
-	}
-
 	public String getOadrVersion() {
 		return oadrVersion;
-	}
-
-	public void setOadrVersion(String oadrVersion) {
-		this.oadrVersion = oadrVersion;
 	}
 
 	public boolean isSupportCertificateGeneration() {
@@ -115,6 +83,38 @@ public class VtnConfigurationDto {
 
 	public boolean isSaveVenDate() {
 		return saveVenDate;
+	}
+
+	public void setVtnId(String oadr20bFingerprint) {
+		vtnId = oadr20bFingerprint;
+	}
+
+	public void setSupportPush(Boolean supportPush) {
+		this.supportPush = supportPush;
+	}
+
+	public void setSupportUnsecuredHttpPush(Boolean supportUnsecuredHttpPush) {
+		this.supportUnsecuredHttpPush = supportUnsecuredHttpPush;
+	}
+
+	public void setPullFrequencySeconds(Long pullFrequencySeconds) {
+		this.pullFrequencySeconds = pullFrequencySeconds;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public void setContextPath(String contextPath) {
+		this.contextPath = contextPath;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public void setOadrVersion(String oadrVersion) {
+		this.oadrVersion = oadrVersion;
 	}
 
 	public void setSaveVenDate(boolean saveVenDate) {

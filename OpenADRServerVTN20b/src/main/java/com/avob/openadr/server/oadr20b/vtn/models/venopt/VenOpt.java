@@ -84,8 +84,8 @@ public class VenOpt {
 		this.marketContext = marketContext;
 		this.venResource = resource;
 		this.optId = optId;
-		this.setStart(start);
-		this.setEnd(end);
+		this.start = start;
+		this.end = end;
 		this.opt = venOpt;
 	}
 
@@ -94,7 +94,7 @@ public class VenOpt {
 		this.ven = ven;
 		this.marketContext = marketContext;
 		this.venResource = resource;
-		this.setEvent(event);
+		this.event = event;
 		this.opt = venOpt;
 	}
 
@@ -102,72 +102,36 @@ public class VenOpt {
 		return id;
 	}
 
-	public void setId(long id) {
-		this.id = id;
-	}
-
 	public Ven getVen() {
 		return ven;
-	}
-
-	public void setVen(Ven ven) {
-		this.ven = ven;
 	}
 
 	public DemandResponseEventOptEnum getOpt() {
 		return opt;
 	}
 
-	public void setOpt(DemandResponseEventOptEnum venOpt) {
-		this.opt = venOpt;
-	}
-
 	public Long getStart() {
 		return start;
-	}
-
-	public void setStart(Long start) {
-		this.start = start;
 	}
 
 	public Long getEnd() {
 		return end;
 	}
 
-	public void setEnd(Long end) {
-		this.end = end;
-	}
-
 	public String getOptId() {
 		return optId;
-	}
-
-	public void setOptId(String optId) {
-		this.optId = optId;
 	}
 
 	public VenMarketContext getMarketContext() {
 		return marketContext;
 	}
 
-	public void setMarketContext(VenMarketContext marketContext) {
-		this.marketContext = marketContext;
-	}
-
 	public VenResource getVenResource() {
 		return venResource;
 	}
 
-	public void setVenResource(VenResource venResource) {
-		this.venResource = venResource;
-	}
-
 	public DemandResponseEvent getEvent() {
 		return event;
-	}
-
-	public void setEvent(DemandResponseEvent event) {
-		this.event = event;
 	}
 
 }
