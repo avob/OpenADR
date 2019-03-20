@@ -75,17 +75,17 @@ public class VenDemandResponseEventDaoTest {
 		Long startNotification = 0L;
 		DemandResponseEventStateEnum state = DemandResponseEventStateEnum.ACTIVE;
 
-		event.setEventId(eventId);
-		event.setState(state);
+		event.getDescriptor().setEventId(eventId);
+		event.getDescriptor().setState(state);
 		event.getActivePeriod().setStart(start);
 		event.getActivePeriod().setNotificationDuration(notificationDuration);
 		event.getActivePeriod().setStartNotification(startNotification);
-		event.setModificationNumber(modification);
+		event.getDescriptor().setModificationNumber(modification);
 		event.getDescriptor().setMarketContext(prepare);
 		event.setLastUpdateTimestamp(lastUpdateTimestamp);
 		event.getActivePeriod().setDuration(duration);
 		event.setCreatedTimestamp(createdTimestamp);
-		event.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		event.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 
 		DemandResponseEvent savedDemandResponseEvent = demandResponseEventDao.save(event);
 

@@ -140,7 +140,7 @@ public class Oadr20aVTNEiEventService {
 
 		DemandResponseEvent findById = op.get();
 
-		if (findById.getModificationNumber() != modificationNumber) {
+		if (findById.getDescriptor().getModificationNumber() != modificationNumber) {
 
 			String description = "eiCreatedEvent:mismatch modification number for event with id: " + eventID;
 			throw new Oadr20aCreatedEventApplicationLayerException(description,
@@ -403,11 +403,11 @@ public class Oadr20aVTNEiEventService {
 		Long startNotification = drEvent.getActivePeriod().getStartNotification();
 		String rampUpDuration = drEvent.getActivePeriod().getRampUpDuration();
 		VenMarketContext marketContext = drEvent.getDescriptor().getMarketContext();
-		DemandResponseEventStateEnum state = drEvent.getState();
+		DemandResponseEventStateEnum state = drEvent.getDescriptor().getState();
 
 		long priority = drEvent.getDescriptor().getPriority();
 		boolean testEvent = drEvent.getDescriptor().isTestEvent();
-		long modificationNumber = drEvent.getModificationNumber();
+		long modificationNumber = drEvent.getDescriptor().getModificationNumber();
 		String vtnComment = drEvent.getDescriptor().getVtnComment();
 
 		// event status

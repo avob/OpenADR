@@ -1,6 +1,8 @@
-package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto;
+package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded;
 
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 
 public class DemandResponseEventDescriptorDto {
 
@@ -13,6 +15,14 @@ public class DemandResponseEventDescriptorDto {
 	private DemandResponseEventResponseRequiredEnum responseRequired;
 
 	private String vtnComment;
+
+	private DemandResponseEventStateEnum state;
+
+	private DemandResponseEventOadrProfileEnum oadrProfile;
+
+	private String eventId;
+
+	private Long modificationNumber;
 
 	public Long getPriority() {
 		return priority;
@@ -52,6 +62,38 @@ public class DemandResponseEventDescriptorDto {
 
 	public void setVtnComment(String vtnComment) {
 		this.vtnComment = vtnComment;
+	}
+
+	public Long getModificationNumber() {
+		return modificationNumber;
+	}
+
+	public void setModificationNumber(Long modificationNumber) {
+		this.modificationNumber = modificationNumber;
+	}
+
+	public String getEventId() {
+		return eventId;
+	}
+
+	public void setEventId(String eventId) {
+		this.eventId = eventId;
+	}
+
+	public DemandResponseEventStateEnum getState() {
+		return state;
+	}
+
+	public void setState(DemandResponseEventStateEnum state) {
+		this.state = state;
+	}
+
+	public DemandResponseEventOadrProfileEnum getOadrProfile() {
+		return oadrProfile;
+	}
+
+	public void setOadrProfile(DemandResponseEventOadrProfileEnum oadrProfile) {
+		this.oadrProfile = oadrProfile;
 	}
 
 }

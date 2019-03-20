@@ -4,11 +4,8 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -40,28 +37,14 @@ public class DemandResponseEvent {
 	private Long id;
 
 	@NotNull
-	@Column(unique = true)
-	private String eventId;
-
-	private String eventName;
-
-	@NotNull
-	@Enumerated(EnumType.STRING)
-	private DemandResponseEventOadrProfileEnum oadrProfile;
-
-	@NotNull
 	private Long createdTimestamp = System.currentTimeMillis();
 
 	private Long lastUpdateTimestamp;
 
-	@NotNull
-	@Enumerated(EnumType.STRING)
-	private DemandResponseEventStateEnum state = DemandResponseEventStateEnum.ACTIVE;
+	private boolean published = false;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "event", cascade = CascadeType.REMOVE)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "event")
 	private List<VenDemandResponseEvent> venDemandResponseEvent;
-
-	private long modificationNumber = 0;
 
 	private DemandResponseEventDescriptor descriptor;
 
@@ -82,14 +65,6 @@ public class DemandResponseEvent {
 		this.id = id;
 	}
 
-	public DemandResponseEventStateEnum getState() {
-		return state;
-	}
-
-	public void setState(DemandResponseEventStateEnum state) {
-		this.state = state;
-	}
-
 	public Long getCreatedTimestamp() {
 		return createdTimestamp;
 	}
@@ -104,30 +79,6 @@ public class DemandResponseEvent {
 
 	public void setLastUpdateTimestamp(Long lastUpdateTimestamp) {
 		this.lastUpdateTimestamp = lastUpdateTimestamp;
-	}
-
-	public long getModificationNumber() {
-		return modificationNumber;
-	}
-
-	public void setModificationNumber(long modificationNumber) {
-		this.modificationNumber = modificationNumber;
-	}
-
-	public DemandResponseEventOadrProfileEnum getOadrProfile() {
-		return oadrProfile;
-	}
-
-	public void setOadrProfile(DemandResponseEventOadrProfileEnum oadrProfile) {
-		this.oadrProfile = oadrProfile;
-	}
-
-	public String getEventId() {
-		return eventId;
-	}
-
-	public void setEventId(String eventId) {
-		this.eventId = eventId;
 	}
 
 	public DemandResponseEventDescriptor getDescriptor() {
@@ -168,12 +119,12 @@ public class DemandResponseEvent {
 		this.targets = targets;
 	}
 
-	public String getEventName() {
-		return eventName;
+	public boolean isPublished() {
+		return published;
 	}
 
-	public void setEventName(String eventName) {
-		this.eventName = eventName;
+	public void setPublished(boolean published) {
+		this.published = published;
 	}
 
 }

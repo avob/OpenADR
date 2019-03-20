@@ -1,5 +1,6 @@
 package com.avob.openadr.server.common.vtn.models.demandresponseevent;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -14,6 +15,20 @@ public class DemandResponseEventDescriptor {
 	@ManyToOne
 	@NotNull
 	private VenMarketContext marketContext;
+
+	@NotNull
+	@Column(unique = true)
+	private String eventId;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private DemandResponseEventOadrProfileEnum oadrProfile;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private DemandResponseEventStateEnum state = DemandResponseEventStateEnum.ACTIVE;
+
+	private long modificationNumber = 0;
 
 	private long priority = 0;
 
@@ -63,6 +78,38 @@ public class DemandResponseEventDescriptor {
 
 	public void setResponseRequired(DemandResponseEventResponseRequiredEnum responseRequired) {
 		this.responseRequired = responseRequired;
+	}
+
+	public DemandResponseEventOadrProfileEnum getOadrProfile() {
+		return oadrProfile;
+	}
+
+	public void setOadrProfile(DemandResponseEventOadrProfileEnum oadrProfile) {
+		this.oadrProfile = oadrProfile;
+	}
+
+	public String getEventId() {
+		return eventId;
+	}
+
+	public void setEventId(String eventId) {
+		this.eventId = eventId;
+	}
+
+	public long getModificationNumber() {
+		return modificationNumber;
+	}
+
+	public void setModificationNumber(long modificationNumber) {
+		this.modificationNumber = modificationNumber;
+	}
+
+	public DemandResponseEventStateEnum getState() {
+		return state;
+	}
+
+	public void setState(DemandResponseEventStateEnum state) {
+		this.state = state;
 	}
 
 }

@@ -146,7 +146,7 @@ public class Oadr20bVTNEiOptService {
 
 			DemandResponseEvent event = op.get();
 
-			if (modificationNumber != event.getModificationNumber()) {
+			if (modificationNumber != event.getDescriptor().getModificationNumber()) {
 				throw new Oadr20bCreateOptApplicationLayerException(
 						"Modification number do not match known event modification number",
 						Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,

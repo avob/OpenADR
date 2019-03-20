@@ -37,9 +37,9 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventSignalDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventTargetDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.converter.OptConverter;
@@ -328,18 +328,18 @@ public class Oadr20bVTNEiOptControllerTest {
 		signal.setSignalName("SIMPLE");
 		signal.setSignalType("level");
 
-		DemandResponseEventDto dto = new DemandResponseEventDto();
-		dto.setEventId("eventActive");
-		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
+		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
+		dto.getDescriptor().setEventId("eventActive");
+		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
-		dto.setCreatedTimestamp(System.currentTimeMillis());
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		dto.getSignals().add(signal);
 		// ensure event status is "active"
 		dto.getActivePeriod().setStart(System.currentTimeMillis() - 10);
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
-		dto.setState(DemandResponseEventStateEnum.ACTIVE);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
+		dto.setPublished(true);
 		demandResponseEventService.create(dto);
 
 		List<DemandResponseEvent> find = demandResponseEventService.find(OadrDataBaseSetup.VEN,
@@ -348,7 +348,7 @@ public class Oadr20bVTNEiOptControllerTest {
 		assertEquals(1, find.size());
 
 		Long eventId = find.get(0).getId();
-		Long modificationNumber = find.get(0).getModificationNumber();
+		Long modificationNumber = find.get(0).getDescriptor().getModificationNumber();
 
 		// test no opt for this ven and this event
 		DemandResponseEvent findById = demandResponseEventService.findById(eventId).get();

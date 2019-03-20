@@ -39,6 +39,7 @@ import SnackbarContent from '@material-ui/core/SnackbarContent';
 import DoneIcon from '@material-ui/icons/Done';
 import CloseIcon from '@material-ui/icons/Close';
 import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
+import amber from '@material-ui/core/colors/amber';
 
 
 export class EventDetailHeader extends React.Component {
@@ -82,14 +83,14 @@ export class EventDetailHeader extends React.Component {
       );
     }
 
-    var DefaultSnackbar = (props) => {
+    var WarningSnackbar = (props) => {
       return (
       <SnackbarContent className={ classes.success }
-                       style={ { maxWidth: 'none', paddingTop:0, paddingBottom:0, backgroundColor:"#fafafa" } }
+                       style={ { maxWidth: 'none', paddingTop:0, paddingBottom:0, backgroundColor:amber[700] } }
                        message={ 
                           <Grid container direction="row" alignItems="center">
                             <Grid item>
-                              <CloseIcon style={ { width: 20, height: 20, marginRight: 20, color:"#000" } }/>
+                              <CloseIcon style={ { width: 20, height: 20, marginRight: 20, color:"#fff" } }/>
                             </Grid>
                             <Grid item>
                                { props.message }
@@ -103,22 +104,28 @@ export class EventDetailHeader extends React.Component {
     var statePanel = null;
     var actionPanel = null;
 
-    if ( event.state == "ACTIVE" ) {
+    if(event.published){
+      if ( event.descriptor.state == "ACTIVE") {
       
-      statePanel = <SuccessSnackbar  message={ <Typography component="span" style={ { color:"#fff" } }>
-                               <strong>ACTIVE</strong>
-                             </Typography> } />
+        statePanel = <SuccessSnackbar  message={ <Typography component="span" style={ { color:"#fff" } }>
+                                 <strong>ACTIVE</strong>
+                               </Typography> } />
 
-    } else if ( event.state == "UNPUBLISHED" ) {
-      statePanel = <DefaultSnackbar  message={ <Typography component="span" >
-                               <strong>UNPUBLISHED</strong>
-                             </Typography> } />
+      } else if ( event.descriptor.state == "CANCELED" ) {
+        statePanel = <ErrorSnackbar  message={ <Typography component="span" style={ { color:"#fff" } }>
+                                 <strong>CANCELED</strong>
+                               </Typography> } />
 
-    } else {
-      statePanel = <ErrorSnackbar  message={ <Typography component="span" style={ { color:"#fff" } }>
-                               <strong>CANCELED</strong>
-                             </Typography> } />
+      } 
+
     }
+    else {
+      statePanel = <WarningSnackbar  message={ <Typography component="span" style={ { color:"#fff" } }>
+         <strong>{event.descriptor.state}</strong>
+       </Typography> } />
+    }
+
+
 
     actionPanel = this.props.actions;
 
@@ -143,7 +150,7 @@ export class EventDetailHeader extends React.Component {
                               align="center"
                               variant="headline"
                               component="h3">
-                   { event.eventId  }
+                   { event.descriptor.eventId  }
                     
                   </Typography>
                 </Grid>

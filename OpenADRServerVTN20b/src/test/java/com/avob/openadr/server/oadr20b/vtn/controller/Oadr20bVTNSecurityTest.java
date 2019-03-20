@@ -30,7 +30,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.web.servlet.MvcResult;
 
 import com.avob.openadr.client.http.OadrHttpClient;
 import com.avob.openadr.client.http.OadrHttpClientBuilder;
@@ -50,9 +49,10 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventSignalDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventTargetDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
@@ -268,18 +268,19 @@ public class Oadr20bVTNSecurityTest {
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
 		signal.setSignalName("SIMPLE");
 		signal.setSignalType("level");
-		DemandResponseEventDto dto = new DemandResponseEventDto();
-		dto.setEventId("eventId");
+		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
+		dto.getDescriptor().setEventId("eventId");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", ven.getUsername()));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setStart(System.currentTimeMillis());
-		dto.setState(DemandResponseEventStateEnum.ACTIVE);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
+		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
+		dto.setPublished(true);
 		String payload = mapper.writeValueAsString(dto);
 		HttpPost post = new HttpPost(demandResponseEnpointUrl);
 		StringEntity stringEntity = new StringEntity(payload);
@@ -288,15 +289,16 @@ public class Oadr20bVTNSecurityTest {
 		HttpResponse execute = userBasicHttpClient.execute(post, "");
 		assertEquals(HttpStatus.CREATED_201, execute.getStatusLine().getStatusCode());
 
-		dto = mapper.readValue(execute.getEntity().getContent(), DemandResponseEventDto.class);
-		assertNotNull(dto.getId());
+		DemandResponseEventReadDto readdto = mapper.readValue(execute.getEntity().getContent(),
+				DemandResponseEventReadDto.class);
+		assertNotNull(readdto.getId());
 
 		OadrRequestEventType event = Oadr20bEiEventBuilders.newOadrRequestEventBuilder(ven.getUsername(), "0").build();
 		OadrDistributeEventType OadrRequestEventType = venBasicHttpClient.oadrRequestEvent(event);
 		assertEquals(String.valueOf(HttpStatus.OK_200), OadrRequestEventType.getEiResponse().getResponseCode());
 		assertEquals(1, OadrRequestEventType.getOadrEvent().size());
 
-		demandResponseEventService.delete(dto.getId());
+		demandResponseEventService.delete(readdto.getId());
 
 		venService.delete(ven);
 		venService.delete(ven2);

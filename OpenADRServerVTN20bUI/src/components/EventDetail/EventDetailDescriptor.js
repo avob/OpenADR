@@ -54,8 +54,12 @@ export class EventDetailDescriptor extends React.Component {
 
   }
 
+  handlePublishEventClick = () => {
+    this.props.publishEvent(this.props.event.id);
+  }
+
   handleActiveEventClick = () => {
-    this.props.activeEvent(this.props.event.id)
+    this.props.activeEvent(this.props.event.id);
   }
  
   handleCancelEventClick = () => {
@@ -69,23 +73,24 @@ export class EventDetailDescriptor extends React.Component {
     var createdDatetime = formatTimestamp(event.createdTimestamp);
     var lastUpdateDatetime = formatTimestamp(event.lastUpdateTimestamp);
 
-    
+
     return (
     <div className={ classes.root } >
-      <EventDetailHeader classes={classes} event={event} actions={[
-         <Grid  key="report_action_first_row" container spacing={ 24 }>
-          <Grid item xs={ 3 }>
+      <EventDetailHeader classes={classes} event={event} actions={<Grid container spacing={ 24 }>
+
+        {(!event.published) ? <Grid item xs={ 4 }>
             <Button key="btn_create"
                     style={ { marginTop: 15 } }
                     variant="outlined"
                     color="primary"
                     fullWidth={true}
                     size="small"
-                    onClick={this.handleActiveEventClick}>
-              <CloudDownloadIcon style={ { marginRight: 15 } }/> ACTIVE AND PUBLISH
+                    onClick={this.handlePublishEventClick}>
+              <CloudDownloadIcon style={ { marginRight: 15 } }/> PUBLISH
             </Button>
-          </Grid>
-          <Grid item xs={ 3 }>
+          </Grid> : null}
+
+        {(event.published && event.descriptor.state == "ACTIVE") ? <Grid item xs={ 4 }>
             <Button key="btn_create"
                     style={ { marginTop: 15 } }
                     variant="outlined"
@@ -95,28 +100,39 @@ export class EventDetailDescriptor extends React.Component {
                     onClick={this.handleCancelEventClick}>
               <CloudDownloadIcon style={ { marginRight: 15 } }/> CANCEL
             </Button>
-          </Grid>
-         
-        </Grid>
-      ]
-      }/>
+          </Grid> : null}
+
+        {(event.published && event.descriptor.state == "CANCELED") ? <Grid item xs={ 4 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="primary"
+                    fullWidth={true}
+                    size="small"
+                    onClick={this.handleActiveEventClick}>
+              <CloudDownloadIcon style={ { marginRight: 15 } }/> ACTIVE
+            </Button>
+          </Grid> : null}
+          
+      
+      </Grid>}/>
        <Divider style={ { marginTop: '20px' } } />
        <Grid>
         <Grid container spacing={ 24 }>
           <Grid item xs={ 3 }>
-            <EventTextField className={ classes.textField } field="Event ID" value={ event.eventId } />
+            <EventTextField className={ classes.textField } field="Event ID" value={ event.descriptor.eventId } />
           </Grid>
           <Grid item xs={ 3 }>
-            <EventTextField className={ classes.textField } field="Event Name" value={ event.eventName } />
+            <EventTextField className={ classes.textField } field="Modification Number" value={ event.descriptor.modificationNumber } />
           </Grid>
           <Grid item xs={ 3 }>
-            <EventTextField className={ classes.textField } field="Oadr Profile" value={ event.oadrProfile } />
+            <EventTextField className={ classes.textField } field="Oadr Profile" value={ event.descriptor.oadrProfile } />
           </Grid>
           <Grid item xs={ 1 }>
             <EventTextField className={ classes.textField } field="Priority" value={ event.descriptor.priority } />
           </Grid>
            <Grid item xs={ 2 }>
-            <EventTextField className={ classes.textField } field="State" value={ event.state } />
+            <EventTextField className={ classes.textField } field="State" value={ event.descriptor.state } />
           </Grid>
 
         </Grid>

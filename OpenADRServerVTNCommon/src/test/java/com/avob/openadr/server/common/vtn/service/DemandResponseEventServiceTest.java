@@ -26,9 +26,9 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventSignalDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventTargetDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDao;
@@ -91,7 +91,6 @@ public class DemandResponseEventServiceTest {
 		ven3 = venService.save(ven3);
 		vens.add(ven3);
 
-		Long createdTimestamp = 0L;
 		String duration = "PT1H";
 		String notificationDuration = "P1D";
 
@@ -102,49 +101,49 @@ public class DemandResponseEventServiceTest {
 		signal.setSignalName("SIMPLE");
 		signal.setSignalType("level");
 
-		DemandResponseEventDto dto = new DemandResponseEventDto();
-		dto.setEventId(event1Id);
-		dto.setState(state);
-		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
+		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
+		dto.getDescriptor().setEventId(event1Id);
+		dto.getDescriptor().setState(state);
+		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getActivePeriod().setStart(start);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
 		dto.getActivePeriod().setDuration(duration);
 		dto.getActivePeriod().setNotificationDuration(notificationDuration);
-		dto.setCreatedTimestamp(createdTimestamp);
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", "ven1"));
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", "ven2"));
 		dto.getSignals().add(signal);
+		dto.setPublished(true);
 		event1 = demandResponseEventService.create(dto);
 		events.add(event1);
 
-		dto = new DemandResponseEventDto();
-		dto.setEventId(event2Id);
-		dto.setState(DemandResponseEventStateEnum.CANCELED);
-		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
+		dto = new DemandResponseEventCreateDto();
+		dto.getDescriptor().setEventId(event2Id);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getActivePeriod().setStart(start);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
 		dto.getActivePeriod().setDuration(duration);
 		dto.getActivePeriod().setNotificationDuration(notificationDuration);
-		dto.setCreatedTimestamp(createdTimestamp);
 		dto.getActivePeriod().setRampUpDuration("PT1H");
 		dto.getActivePeriod().setRecoveryDuration("PT1H");
 		dto.getDescriptor().setVtnComment("comment");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", "ven2"));
 		dto.getSignals().add(signal);
+		dto.setPublished(true);
 		event2 = demandResponseEventService.create(dto);
 		events.add(event2);
 
-		dto = new DemandResponseEventDto();
-		dto.setEventId(event3Id);
-		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
-		dto.setState(state);
+		dto = new DemandResponseEventCreateDto();
+		dto.getDescriptor().setEventId(event3Id);
+		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
+		dto.getDescriptor().setState(state);
 		dto.getActivePeriod().setStart(start);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
 		dto.getActivePeriod().setDuration(duration);
 		dto.getActivePeriod().setNotificationDuration(notificationDuration);
-		dto.setCreatedTimestamp(createdTimestamp);
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", "ven3"));
 		dto.getSignals().add(signal);
+		dto.setPublished(true);
 		event3 = demandResponseEventService.create(dto);
 		events.add(event3);
 	}
@@ -235,6 +234,24 @@ public class DemandResponseEventServiceTest {
 	}
 
 	@Test
+	public void updateTest() {
+		long count = venDemandResponseEventDao.count();
+		assertEquals(4L, count);
+
+		Iterable<VenDemandResponseEvent> findAll = venDemandResponseEventDao.findAll();
+
+		Iterator<VenDemandResponseEvent> iterator = findAll.iterator();
+
+		while (iterator.hasNext()) {
+			VenDemandResponseEvent next = iterator.next();
+			assertEquals(-1, next.getLastSentModificationNumber());
+			assertNull(next.getVenOpt());
+			assertTrue(next.getVen().getUsername() == "ven1" || next.getVen().getUsername() == "ven2"
+					|| next.getVen().getUsername() == "ven3");
+		}
+	}
+
+	@Test
 	public void deleteTest() {
 		long count = venDemandResponseEventDao.count();
 		assertEquals(4L, count);
@@ -250,161 +267,14 @@ public class DemandResponseEventServiceTest {
 		assertEquals(0L, count);
 	}
 
-	/**
-	 * test cancel update state / modification / last update timestamp
-	 * 
-	 * test cancel indempotent if event already canceled
-	 */
-	@Test
-	public void cancelTest() {
-		// null should raise an exception
-		boolean exception = false;
-		try {
-			demandResponseEventService.cancel(null);
-		} catch (Exception e) {
-			exception = true;
-		}
-		assertTrue(exception);
-
-		// non-existent id should return null
-		DemandResponseEvent updateValue = demandResponseEventService.cancel(999L);
-		assertNull(updateValue);
-
-		// event should have some properties
-		DemandResponseEvent findById = demandResponseEventService.findById(event1.getId()).get();
-
-		assertEquals(DemandResponseEventStateEnum.ACTIVE, findById.getState());
-		assertEquals(0, findById.getModificationNumber());
-		assertNull(findById.getLastUpdateTimestamp());
-
-		// cancel should update those properties
-		demandResponseEventService.cancel(event1.getId());
-
-		findById = demandResponseEventService.findById(event1.getId()).get();
-
-		assertEquals(DemandResponseEventStateEnum.CANCELED, findById.getState());
-		assertEquals(1, findById.getModificationNumber());
-		assertNotNull(findById.getLastUpdateTimestamp());
-
-		// cancel should be indempotent on already activated event
-		demandResponseEventService.cancel(event1.getId());
-
-		DemandResponseEvent findById2 = demandResponseEventService.findById(event1.getId()).get();
-
-		assertEquals(DemandResponseEventStateEnum.CANCELED, findById2.getState());
-		assertEquals(findById.getModificationNumber(), findById2.getModificationNumber());
-		assertEquals(findById.getLastUpdateTimestamp(), findById2.getLastUpdateTimestamp());
-
-	}
-
-	/**
-	 * test active update state / modification / last update timestamp
-	 * 
-	 * test active indempotent if event already canceled
-	 */
-	@Test
-	public void activeTest() {
-		// null should raise an exception
-		boolean exception = false;
-		try {
-			demandResponseEventService.active(null);
-		} catch (Exception e) {
-			exception = true;
-		}
-		assertTrue(exception);
-
-		// non-existent id should return null
-		DemandResponseEvent updateValue = demandResponseEventService.active(999L);
-		assertNull(updateValue);
-
-		// event should have some properties
-		DemandResponseEvent findById = demandResponseEventService.findById(event2.getId()).get();
-
-		assertEquals(DemandResponseEventStateEnum.CANCELED, findById.getState());
-		assertEquals(0, findById.getModificationNumber());
-		assertNull(findById.getLastUpdateTimestamp());
-
-		// active should update those properties
-		demandResponseEventService.active(event2.getId());
-
-		findById = demandResponseEventService.findById(event2.getId()).get();
-
-		assertEquals(DemandResponseEventStateEnum.ACTIVE, findById.getState());
-		assertEquals(1, findById.getModificationNumber());
-		assertNotNull(findById.getLastUpdateTimestamp());
-
-		// active should be indempotent on already activated event
-		demandResponseEventService.active(event2.getId());
-
-		DemandResponseEvent findById2 = demandResponseEventService.findById(event2.getId()).get();
-
-		assertEquals(DemandResponseEventStateEnum.ACTIVE, findById2.getState());
-		assertEquals(findById.getModificationNumber(), findById2.getModificationNumber());
-		assertEquals(findById.getLastUpdateTimestamp(), findById2.getLastUpdateTimestamp());
-	}
-
-	/**
-	 * test updateValue update value / modification / last update timestamp
-	 * 
-	 * test updateValue indempotent if event value is already set
-	 */
-	@Test
-	public void updateValueTest() {
-		// null should raise an exception
-		boolean exception = false;
-		try {
-			demandResponseEventService.updateValue(null,
-					DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_NORMAL.getValue());
-		} catch (Exception e) {
-			exception = true;
-		}
-		assertTrue(exception);
-
-		// non-existent id should return null
-		DemandResponseEvent updateValue = demandResponseEventService.updateValue(999L,
-				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_NORMAL.getValue());
-		assertNull(updateValue);
-
-		// event have some properties
-		DemandResponseEvent findById = demandResponseEventService.findById(event1.getId()).get();
-
-		assertEquals(0, findById.getModificationNumber());
-		assertNull(findById.getLastUpdateTimestamp());
-
-		assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
-				demandResponseEventService.getSignals(findById).get(0).getCurrentValue());
-
-		// updateValue should update those properties
-		demandResponseEventService.updateValue(event1.getId(),
-				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_NORMAL.getValue());
-
-		findById = demandResponseEventService.findById(event1.getId()).get();
-
-		assertEquals(1, findById.getModificationNumber());
-		assertNotNull(findById.getLastUpdateTimestamp());
-		assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_NORMAL.getValue(),
-				demandResponseEventService.getSignals(findById).get(0).getCurrentValue());
-
-		// updateValue should be indempotent on event alread set with this value
-		demandResponseEventService.updateValue(event1.getId(),
-				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_NORMAL.getValue());
-
-		DemandResponseEvent findById2 = demandResponseEventService.findById(event1.getId()).get();
-
-		assertEquals(findById.getModificationNumber(), findById2.getModificationNumber());
-		assertEquals(findById.getLastUpdateTimestamp(), findById2.getLastUpdateTimestamp());
-		assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_NORMAL.getValue(),
-				demandResponseEventService.getSignals(findById).get(0).getCurrentValue());
-	}
-
 	@Test
 	public void getUpdateVenOptTest() {
 
 		DemandResponseEventOptEnum venOpt = demandResponseEventService.getVenOpt(event1.getId(), ven1.getUsername());
 		assertNull(venOpt);
 		assertFalse(demandResponseEventService.hasResponded(ven1.getUsername(), event1));
-		demandResponseEventService.updateVenOpt(event1.getId(), event1.getModificationNumber(), ven1.getUsername(),
-				DemandResponseEventOptEnum.OPT_IN);
+		demandResponseEventService.updateVenOpt(event1.getId(), event1.getDescriptor().getModificationNumber(),
+				ven1.getUsername(), DemandResponseEventOptEnum.OPT_IN);
 		assertTrue(demandResponseEventService.hasResponded(ven1.getUsername(), event1));
 		venOpt = demandResponseEventService.getVenOpt(event1.getId(), ven1.getUsername());
 		assertNotNull(venOpt);
@@ -412,8 +282,8 @@ public class DemandResponseEventServiceTest {
 		venOpt = demandResponseEventService.getVenOpt(event1.getId(), ven2.getUsername());
 		assertNull(venOpt);
 
-		demandResponseEventService.updateVenOpt(event1.getId(), event1.getModificationNumber(), ven2.getUsername(),
-				DemandResponseEventOptEnum.OPT_OUT);
+		demandResponseEventService.updateVenOpt(event1.getId(), event1.getDescriptor().getModificationNumber(),
+				ven2.getUsername(), DemandResponseEventOptEnum.OPT_OUT);
 		venOpt = demandResponseEventService.getVenOpt(event1.getId(), ven2.getUsername());
 		assertNotNull(venOpt);
 		assertEquals(DemandResponseEventOptEnum.OPT_OUT, venOpt);

@@ -14,6 +14,7 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 
 import EventDetailDescriptor from '../EventDetail/EventDetailDescriptor'
+import EventDetailActivePeriod from '../EventDetail/EventDetailActivePeriod'
 import EventDetailSignal from '../EventDetail/EventDetailSignal'
 import EventDetailTarget from '../EventDetail/EventDetailTarget'
 
@@ -50,7 +51,7 @@ const styles = theme => ({
   },
   formControl: {
     margin: theme.spacing.unit,
-    minWidth: 500,
+    display:'flex'
   },
   card: {
     maxWidth: 350,
@@ -102,6 +103,7 @@ export class EventDetailPage extends React.Component {
             textColor="primary"
             centered>
         <Tab label="Descriptor" />
+        <Tab label="Active Period" />
         <Tab label="Signals" />
         <Tab label="Targets" />
       </Tabs>
@@ -109,15 +111,24 @@ export class EventDetailPage extends React.Component {
       { value === 0 && <TabContainer>
                 <EventDetailDescriptor classes={classes} event={event_detail.event}
                   activeEvent={this.props.eventActions.activeEvent}
-                  cancelEvent={this.props.eventActions.cancelEvent}/>
+                  cancelEvent={this.props.eventActions.cancelEvent}
+                  publishEvent={this.props.eventActions.publishEvent}/>
                      
-                       </TabContainer> }
+                       </TabContainer> }     
       { value === 1 && <TabContainer>
-                <EventDetailSignal classes={classes} event={event_detail.event}/>
+                <EventDetailActivePeriod classes={classes} event={event_detail.event}/>
                      
                        </TabContainer> }
       { value === 2 && <TabContainer>
-                <EventDetailTarget classes={classes} event={event_detail.event}/>
+                <EventDetailSignal classes={classes} event={event_detail.event}
+                  paramId={this.props.match.params.id}
+                  updateEvent={this.props.eventActions.updateEvent}/>
+                      
+                       </TabContainer> }
+      { value === 3 && <TabContainer>
+                <EventDetailTarget classes={classes} event={event_detail.event}
+
+                  updateEvent={this.props.eventActions.updateEvent}/>
                      
                        </TabContainer> }
 

@@ -25,8 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDtoValidator;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.validator.DemandResponseEventCreateDtoValidator;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.validator.DemandResponseEventUpdateDtoValidator;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 
@@ -42,30 +45,37 @@ public class DemandResponseController {
 	@Autowired
 	private DemandResponseEventService demandResponseEventService;
 
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) throws DatatypeConfigurationException {
-		binder.setValidator(new DemandResponseEventDtoValidator());
+	@Resource
+	private DemandResponseEventCreateDtoValidator demandResponseEventCreateDtoValidator;
+
+	@Resource
+	private DemandResponseEventUpdateDtoValidator demandResponseEventUpdateDtoValidator;
+
+	@InitBinder("demandResponseEventCreateDto")
+	protected void initBinderCreate(WebDataBinder binder) throws DatatypeConfigurationException {
+		binder.setValidator(demandResponseEventCreateDtoValidator);
+
+	}
+
+	@InitBinder("demandResponseEventUpdateDto")
+	protected void initBinderUpdate(WebDataBinder binder) throws DatatypeConfigurationException {
+		binder.addValidators(demandResponseEventUpdateDtoValidator);
+
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	@ResponseBody
-	public List<DemandResponseEventDto> list(@RequestParam(value = "ven", required = false) String ven,
+	public List<DemandResponseEventReadDto> list(@RequestParam(value = "ven", required = false) String ven,
 			@RequestParam(value = "state", required = false) DemandResponseEventStateEnum state) {
 
 		List<DemandResponseEvent> find = demandResponseEventService.find(ven, state);
-		return dtoMapper.mapList(find, DemandResponseEventDto.class);
+		return dtoMapper.mapList(find, DemandResponseEventReadDto.class);
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	@ResponseBody
-	public DemandResponseEventDto create(@Valid @RequestBody DemandResponseEventDto event, HttpServletResponse response,
-			BindingResult result) {
-		
-		DemandResponseEvent findByEventId = demandResponseEventService.findByEventId(event.getEventId());
-		if(findByEventId != null) {
-			response.setStatus(HttpStatus.BAD_REQUEST_400);
-			return null;
-		}
+	public DemandResponseEventReadDto create(@Valid @RequestBody DemandResponseEventCreateDto event,
+			HttpServletResponse response, BindingResult result) {
 
 		DemandResponseEvent save = demandResponseEventService.create(event);
 
@@ -73,13 +83,91 @@ public class DemandResponseController {
 
 		LOGGER.info("create DR event: " + save.toString());
 
-		return dtoMapper.map(save, DemandResponseEventDto.class);
+		return dtoMapper.map(save, DemandResponseEventReadDto.class);
+
+	}
+
+	@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+	@ResponseBody
+	public DemandResponseEventReadDto update(@PathVariable(value = "id") Long id,
+			@Valid @RequestBody DemandResponseEventUpdateDto event, HttpServletResponse response,
+			BindingResult result) {
+		Optional<DemandResponseEvent> op = demandResponseEventService.findById(id);
+		if (!op.isPresent()) {
+			response.setStatus(HttpStatus.NOT_FOUND_404);
+			return null;
+		}
+		DemandResponseEvent eventOld = op.get();
+		DemandResponseEvent save = demandResponseEventService.update(eventOld, event);
+
+		response.setStatus(HttpStatus.OK_200);
+
+		LOGGER.info("update DR event: " + save.toString());
+
+		return dtoMapper.map(save, DemandResponseEventReadDto.class);
+
+	}
+
+	@RequestMapping(value = "/{id}/publish", method = RequestMethod.POST)
+	@ResponseBody
+	public DemandResponseEventReadDto publish(@PathVariable(value = "id") Long id, HttpServletResponse response) {
+		Optional<DemandResponseEvent> op = demandResponseEventService.findById(id);
+		if (!op.isPresent()) {
+			response.setStatus(HttpStatus.NOT_FOUND_404);
+			return null;
+		}
+		DemandResponseEvent event = op.get();
+		event = demandResponseEventService.publish(event);
+
+		response.setStatus(HttpStatus.OK_200);
+
+		LOGGER.info("active DR event: " + event.toString());
+
+		return dtoMapper.map(event, DemandResponseEventReadDto.class);
+
+	}
+	
+	@RequestMapping(value = "/{id}/active", method = RequestMethod.POST)
+	@ResponseBody
+	public DemandResponseEventReadDto active(@PathVariable(value = "id") Long id, HttpServletResponse response) {
+		Optional<DemandResponseEvent> op = demandResponseEventService.findById(id);
+		if (!op.isPresent()) {
+			response.setStatus(HttpStatus.NOT_FOUND_404);
+			return null;
+		}
+		DemandResponseEvent event = op.get();
+		event = demandResponseEventService.active(event);
+
+		response.setStatus(HttpStatus.OK_200);
+
+		LOGGER.info("active DR event: " + event.toString());
+
+		return dtoMapper.map(event, DemandResponseEventReadDto.class);
+
+	}
+
+	@RequestMapping(value = "/{id}/cancel", method = RequestMethod.POST)
+	@ResponseBody
+	public DemandResponseEventReadDto cancel(@PathVariable(value = "id") Long id, HttpServletResponse response) {
+		Optional<DemandResponseEvent> op = demandResponseEventService.findById(id);
+		if (!op.isPresent()) {
+			response.setStatus(HttpStatus.NOT_FOUND_404);
+			return null;
+		}
+		DemandResponseEvent event = op.get();
+		event = demandResponseEventService.cancel(event);
+
+		response.setStatus(HttpStatus.OK_200);
+
+		LOGGER.info("cancel DR event: " + event.toString());
+
+		return dtoMapper.map(event, DemandResponseEventReadDto.class);
 
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	@ResponseBody
-	public DemandResponseEventDto read(@PathVariable(value = "id") Long id, HttpServletResponse response) {
+	public DemandResponseEventReadDto read(@PathVariable(value = "id") Long id, HttpServletResponse response) {
 		Optional<DemandResponseEvent> op = demandResponseEventService.findById(id);
 		if (!op.isPresent()) {
 			response.setStatus(HttpStatus.NOT_FOUND_404);
@@ -87,7 +175,7 @@ public class DemandResponseController {
 		}
 		DemandResponseEvent event = op.get();
 		LOGGER.info("read DR event: " + event.toString());
-		return dtoMapper.map(event, DemandResponseEventDto.class);
+		return dtoMapper.map(event, DemandResponseEventReadDto.class);
 
 	}
 
@@ -98,30 +186,6 @@ public class DemandResponseController {
 		if (!delete) {
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 		}
-	}
-
-	@RequestMapping(value = "/{id}/cancel", method = RequestMethod.POST)
-	@ResponseBody
-	public DemandResponseEventDto cancel(@PathVariable(value = "id") Long id, HttpServletResponse response)
-			throws Exception {
-		DemandResponseEvent event = demandResponseEventService.cancel(id);
-		if (event == null) {
-			response.setStatus(HttpStatus.NOT_FOUND_404);
-			return null;
-		}
-		return dtoMapper.map(event, DemandResponseEventDto.class);
-	}
-
-	@RequestMapping(value = "/{id}/active", method = RequestMethod.POST)
-	@ResponseBody
-	public DemandResponseEventDto active(@PathVariable(value = "id") Long id, HttpServletResponse response)
-			throws Exception {
-		DemandResponseEvent event = demandResponseEventService.active(id);
-		if (event == null) {
-			response.setStatus(HttpStatus.NOT_FOUND_404);
-			return null;
-		}
-		return dtoMapper.map(event, DemandResponseEventDto.class);
 	}
 
 }

@@ -1,107 +1,15 @@
 package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventActivePeriodDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventDescriptorDto;
 
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+public class DemandResponseEventDto extends DemandResponseEventContentDto {
 
-//{
-//  "currentValue": 97.5
-//	"descriptor": {
-//		"marketContext": "mouaiccool",
-//		"priority": 0,
-//		"responseRequired": "always",
-//		"testEvent": false
-//	},
-//	"activePeriod": {
-//		"start": 0,
-//		"duration": 120,
-//		"rampUpDuration": 120,
-//		"recoveryDuration": 120,
-//		"toleranceDuration": 120,
-//		"notificationDuration": 120
-//	},
-//	"signals": [{
-//		"signalName": "ENERGY_PRICE",
-//		"signalType": "price",
-//		"unitType": "euro_per_kwh",
-//		"intervals": [{
-//			"duration": "120",
-//			"value": "120"
-//		}]
-//	}],
-//	"targets": [{
-//		"targetType": "group",
-//		"targetId": "Group1"
-//	}]
-//}
-
-public class DemandResponseEventDto {
-
-	private Long id;
-
-	private String eventId;
-
-	private String eventName;
+	private boolean published = false;
 
 	private DemandResponseEventDescriptorDto descriptor = new DemandResponseEventDescriptorDto();
 
 	private DemandResponseEventActivePeriodDto activePeriod = new DemandResponseEventActivePeriodDto();
-
-	private List<DemandResponseEventSignalDto> signals = new ArrayList<>();
-
-	private List<DemandResponseEventTargetDto> targets = new ArrayList<>();
-
-	private Long createdTimestamp;
-
-	private Long lastUpdateTimestamp;
-
-	private Long modificationNumber;
-
-	private DemandResponseEventStateEnum state;
-	
-	private DemandResponseEventOadrProfileEnum oadrProfile;
-
-	public Long getCreatedTimestamp() {
-		return createdTimestamp;
-	}
-
-	public void setCreatedTimestamp(Long createdTimestamp) {
-		this.createdTimestamp = createdTimestamp;
-	}
-
-	public Long getLastUpdateTimestamp() {
-		return lastUpdateTimestamp;
-	}
-
-	public void setLastUpdateTimestamp(Long lastUpdateTimestamp) {
-		this.lastUpdateTimestamp = lastUpdateTimestamp;
-	}
-
-	public Long getModificationNumber() {
-		return modificationNumber;
-	}
-
-	public void setModificationNumber(Long modificationNumber) {
-		this.modificationNumber = modificationNumber;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getEventId() {
-		return eventId;
-	}
-
-	public void setEventId(String eventId) {
-		this.eventId = eventId;
-	}
 
 	public DemandResponseEventDescriptorDto getDescriptor() {
 		return descriptor;
@@ -119,46 +27,11 @@ public class DemandResponseEventDto {
 		this.activePeriod = activePeriod;
 	}
 
-	public List<DemandResponseEventSignalDto> getSignals() {
-		if (signals == null) {
-			return new ArrayList<>();
-		}
-		return signals;
+	public boolean isPublished() {
+		return published;
 	}
 
-	public void setSignals(List<DemandResponseEventSignalDto> signals) {
-		this.signals = signals;
-	}
-
-	public List<DemandResponseEventTargetDto> getTargets() {
-		return targets;
-	}
-
-	public void setTargets(List<DemandResponseEventTargetDto> targets) {
-		this.targets = targets;
-	}
-
-	public DemandResponseEventStateEnum getState() {
-		return state;
-	}
-
-	public void setState(DemandResponseEventStateEnum state) {
-		this.state = state;
-	}
-
-	public String getEventName() {
-		return eventName;
-	}
-
-	public void setEventName(String eventName) {
-		this.eventName = eventName;
-	}
-
-	public DemandResponseEventOadrProfileEnum getOadrProfile() {
-		return oadrProfile;
-	}
-
-	public void setOadrProfile(DemandResponseEventOadrProfileEnum oadrProfile) {
-		this.oadrProfile = oadrProfile;
+	public void setPublished(boolean published) {
+		this.published = published;
 	}
 }

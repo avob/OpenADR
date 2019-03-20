@@ -24,7 +24,7 @@ public interface DemandResponseEventDao extends PagingAndSortingRepository<Deman
 	 * @param state
 	 * @return
 	 */
-	@Query(value = "select e from DemandResponseEvent e join e.venDemandResponseEvent vd where vd.ven.username = :venUsername and e.state = :state")
+	@Query(value = "select e from DemandResponseEvent e join e.venDemandResponseEvent vd where vd.ven.username = :venUsername and e.descriptor.state = :state")
 	public List<DemandResponseEvent> findByVenUsernameAndState(@Param("venUsername") String venUsername,
 			@Param("state") DemandResponseEventStateEnum state);
 
@@ -36,7 +36,7 @@ public interface DemandResponseEventDao extends PagingAndSortingRepository<Deman
 	 * @param pageable
 	 * @return
 	 */
-	@Query(value = "select e from DemandResponseEvent e join e.venDemandResponseEvent vd where vd.ven.username = :venUsername and e.state = :state")
+	@Query(value = "select e from DemandResponseEvent e join e.venDemandResponseEvent vd where vd.ven.username = :venUsername and e.descriptor.state = :state")
 	public List<DemandResponseEvent> findByVenUsernameAndState(@Param("venUsername") String venUsername,
 			@Param("state") DemandResponseEventStateEnum state, Pageable pageable);
 
@@ -59,14 +59,8 @@ public interface DemandResponseEventDao extends PagingAndSortingRepository<Deman
 	@Query(value = "select e from DemandResponseEvent e join e.venDemandResponseEvent vd where vd.ven.username = :venUsername")
 	public List<DemandResponseEvent> findByVenUsername(@Param("venUsername") String venUsername, Pageable pageable);
 
-	/**
-	 * list of demand response with specific state
-	 * 
-	 * @param state
-	 * @return
-	 */
-	public List<DemandResponseEvent> findByState(DemandResponseEventStateEnum state);
-
+	
+	public List<DemandResponseEvent> findByDescriptorState(DemandResponseEventStateEnum state);
 	/**
 	 * paginated list of demand response with specific state
 	 * 
@@ -74,23 +68,25 @@ public interface DemandResponseEventDao extends PagingAndSortingRepository<Deman
 	 * @param pageable
 	 * @return
 	 */
-	public List<DemandResponseEvent> findByState(DemandResponseEventStateEnum state, Pageable pageable);
+	public List<DemandResponseEvent> findByDescriptorState(DemandResponseEventStateEnum state, Pageable pageable);
 
-	@Query(value = "select e from DemandResponseEvent e join e.venDemandResponseEvent vd where vd.ven = :ven and :now >= e.activePeriod.startNotification and (e.activePeriod.end is null or :now < e.activePeriod.end)")
+	@Query(value = "select e from DemandResponseEvent e join e.venDemandResponseEvent vd where vd.ven = :ven and :now >= e.activePeriod.startNotification and (e.activePeriod.end is null or :now < e.activePeriod.end) and e.published is true")
 	public List<DemandResponseEvent> findToSentEventByVen(@Param("ven") Ven ven, @Param("now") long now);
 
-	@Query(value = "select e from DemandResponseEvent e join e.venDemandResponseEvent vd where vd.ven = :ven and :now >= e.activePeriod.startNotification and (e.activePeriod.end is null or :now < e.activePeriod.end)")
+	@Query(value = "select e from DemandResponseEvent e join e.venDemandResponseEvent vd where vd.ven = :ven and :now >= e.activePeriod.startNotification and (e.activePeriod.end is null or :now < e.activePeriod.end) and e.published is true")
 	public List<DemandResponseEvent> findToSentEventByVen(@Param("ven") Ven ven, @Param("now") long now,
 			Pageable pageable);
 
-	@Query(value = "select e from DemandResponseEvent e join e.venDemandResponseEvent vd where vd.ven.username = :venUsername and :now >= e.activePeriod.startNotification and (e.activePeriod.end is null or :now < e.activePeriod.end)")
+	@Query(value = "select e from DemandResponseEvent e join e.venDemandResponseEvent vd where vd.ven.username = :venUsername and :now >= e.activePeriod.startNotification and (e.activePeriod.end is null or :now < e.activePeriod.end) and e.published is true")
 	public List<DemandResponseEvent> findToSentEventByVenUsername(@Param("venUsername") String venUsername,
 			@Param("now") long now);
 
-	@Query(value = "select e from DemandResponseEvent e join e.venDemandResponseEvent vd where vd.ven.username = :venUsername and :now >= e.activePeriod.startNotification and (e.activePeriod.end is null or :now < e.activePeriod.end)")
+	@Query(value = "select e from DemandResponseEvent e join e.venDemandResponseEvent vd where vd.ven.username = :venUsername and :now >= e.activePeriod.startNotification and (e.activePeriod.end is null or :now < e.activePeriod.end) and e.published is true")
 	public List<DemandResponseEvent> findToSentEventByVenUsername(@Param("venUsername") String venUsername,
 			@Param("now") long now, Pageable pageable);
 
-	public DemandResponseEvent findOneByEventId(String eventId);
+	public DemandResponseEvent findOneByDescriptorEventId(String eventId);
+
+	public void deleteByIdIn(Iterable<Long> entities);
 
 }

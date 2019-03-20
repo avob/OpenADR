@@ -16,7 +16,7 @@ import org.dozer.loader.api.BeanMappingBuilder;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDescriptor;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDescriptorDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventDescriptorDto;
 import com.google.common.collect.Lists;
 
 @Service

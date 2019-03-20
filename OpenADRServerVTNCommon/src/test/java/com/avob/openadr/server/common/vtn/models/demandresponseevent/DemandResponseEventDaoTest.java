@@ -60,45 +60,45 @@ public class DemandResponseEventDaoTest {
 		DemandResponseEventStateEnum state = DemandResponseEventStateEnum.ACTIVE;
 		String eventId = "eventId";
 
-		event.setEventId(eventId);
-		event.setState(state);
+		event.getDescriptor().setEventId(eventId);
+		event.getDescriptor().setState(state);
 		event.getActivePeriod().setStart(start);
 		event.getActivePeriod().setStartNotification(startNotification);
-		event.setModificationNumber(modification);
+		event.getDescriptor().setModificationNumber(modification);
 		event.getDescriptor().setMarketContext(prepare);
 		event.setLastUpdateTimestamp(lastUpdateTimestamp);
 		event.getActivePeriod().setDuration(duration);
 		event.getActivePeriod().setNotificationDuration(notificationDuration);
 		event.setCreatedTimestamp(createdTimestamp);
-		event.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		event.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 
 		// test create
 		DemandResponseEvent saved = demandResponseEventDao.save(event);
 
 		assertNotNull(saved);
 		assertNotNull(saved.getId());
-		assertEquals(event.getEventId(), saved.getEventId());
+		assertEquals(event.getDescriptor().getEventId(), saved.getDescriptor().getEventId());
 		assertEquals(event.getCreatedTimestamp(), saved.getCreatedTimestamp());
 		assertEquals(event.getActivePeriod().getDuration(), saved.getActivePeriod().getDuration());
 		assertEquals(event.getLastUpdateTimestamp(), saved.getLastUpdateTimestamp());
 		assertEquals(event.getDescriptor().getMarketContext(), saved.getDescriptor().getMarketContext());
-		assertEquals(event.getModificationNumber(), saved.getModificationNumber());
+		assertEquals(event.getDescriptor().getModificationNumber(), saved.getDescriptor().getModificationNumber());
 		assertEquals(event.getActivePeriod().getStart(), saved.getActivePeriod().getStart());
-		assertEquals(event.getState(), saved.getState());
+		assertEquals(event.getDescriptor().getState(), saved.getDescriptor().getState());
 
 		// test find by id
 		DemandResponseEvent findOne = demandResponseEventDao.findById(saved.getId()).get();
 
 		assertEquals(saved.getId(), findOne.getId());
-		assertEquals(saved.getEventId(), findOne.getEventId());
+		assertEquals(saved.getDescriptor().getEventId(), findOne.getDescriptor().getEventId());
 		assertEquals(saved.getCreatedTimestamp(), findOne.getCreatedTimestamp());
 		assertEquals(saved.getActivePeriod().getDuration(), findOne.getActivePeriod().getDuration());
 		assertEquals(saved.getLastUpdateTimestamp(), findOne.getLastUpdateTimestamp());
 		assertEquals(saved.getDescriptor().getMarketContext().getName(),
 				findOne.getDescriptor().getMarketContext().getName());
-		assertEquals(saved.getModificationNumber(), findOne.getModificationNumber());
+		assertEquals(saved.getDescriptor().getModificationNumber(), findOne.getDescriptor().getModificationNumber());
 		assertEquals(saved.getActivePeriod().getStart(), findOne.getActivePeriod().getStart());
-		assertEquals(saved.getState(), findOne.getState());
+		assertEquals(saved.getDescriptor().getState(), findOne.getDescriptor().getState());
 
 		// test update
 		String updatedDuration = "PT2H";
@@ -123,9 +123,10 @@ public class DemandResponseEventDaoTest {
 					next.getDescriptor().getMarketContext().getId());
 			assertEquals(findAnotherOne.getDescriptor().getMarketContext().getName(),
 					next.getDescriptor().getMarketContext().getName());
-			assertEquals(findAnotherOne.getModificationNumber(), next.getModificationNumber());
+			assertEquals(findAnotherOne.getDescriptor().getModificationNumber(),
+					next.getDescriptor().getModificationNumber());
 			assertEquals(findAnotherOne.getActivePeriod().getStart(), next.getActivePeriod().getStart());
-			assertEquals(findAnotherOne.getState(), next.getState());
+			assertEquals(findAnotherOne.getDescriptor().getState(), next.getDescriptor().getState());
 		}
 		assertEquals(1, count);
 
@@ -186,69 +187,69 @@ public class DemandResponseEventDaoTest {
 		String eventId = "eventId";
 
 		DemandResponseEvent event = new DemandResponseEvent();
-		event.setEventId(eventId + "1");
-		event.setState(state);
+		event.getDescriptor().setEventId(eventId + "1");
+		event.getDescriptor().setState(state);
 		event.getActivePeriod().setStart(start);
 		event.getActivePeriod().setStartNotification(startNotification);
 		event.getActivePeriod().setEnd(end);
-		event.setModificationNumber(modification);
+		event.getDescriptor().setModificationNumber(modification);
 		event.getDescriptor().setMarketContext(prepare);
 		event.setLastUpdateTimestamp(lastUpdateTimestamp);
 		event.getActivePeriod().setDuration(duration);
 		event.getActivePeriod().setNotificationDuration(notificationDuration);
 		event.setCreatedTimestamp(createdTimestamp);
-		event.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
-
+		event.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		event.setPublished(true);
 		DemandResponseEvent savedDemandResponseEvent = demandResponseEventDao.save(event);
 
 		DemandResponseEvent event2 = new DemandResponseEvent();
-		event2.setEventId(eventId + "2");
-		event2.setState(state);
+		event2.getDescriptor().setEventId(eventId + "2");
+		event2.getDescriptor().setState(state);
 		event2.getActivePeriod().setStart(start);
 		event2.getActivePeriod().setStartNotification(startNotification);
 		// end is modified in order to exclude him from search
 		event2.getActivePeriod().setEnd(start);
-		event2.setModificationNumber(modification);
+		event2.getDescriptor().setModificationNumber(modification);
 		event2.getDescriptor().setMarketContext(prepare);
 		event2.setLastUpdateTimestamp(lastUpdateTimestamp);
 		event2.getActivePeriod().setDuration(duration);
 		event2.getActivePeriod().setNotificationDuration(notificationDuration);
 		event2.setCreatedTimestamp(createdTimestamp);
-		event2.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
-
+		event2.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		event2.setPublished(true);
 		DemandResponseEvent savedDemandResponseEvent2 = demandResponseEventDao.save(event2);
 
 		DemandResponseEvent event3 = new DemandResponseEvent();
-		event3.setEventId(eventId + "3");
-		event3.setState(state);
+		event3.getDescriptor().setEventId(eventId + "3");
+		event3.getDescriptor().setState(state);
 		event3.getActivePeriod().setStart(start);
 		event3.getActivePeriod().setStartNotification(startNotification);
 		event3.getActivePeriod().setEnd(end);
-		event3.setModificationNumber(modification);
+		event3.getDescriptor().setModificationNumber(modification);
 		event3.getDescriptor().setMarketContext(prepare);
 		event3.setLastUpdateTimestamp(lastUpdateTimestamp);
 		event3.getActivePeriod().setDuration(duration);
 		event3.getActivePeriod().setNotificationDuration(notificationDuration);
 		event3.setCreatedTimestamp(createdTimestamp);
-		event3.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
-
+		event3.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		event3.setPublished(true);
 		DemandResponseEvent savedDemandResponseEvent3 = demandResponseEventDao.save(event3);
 
 		DemandResponseEvent event4 = new DemandResponseEvent();
-		event4.setEventId(eventId + "4");
-		event4.setState(state);
+		event4.getDescriptor().setEventId(eventId + "4");
+		event4.getDescriptor().setState(state);
 		event4.getActivePeriod().setStart(start);
 		event4.getActivePeriod().setStartNotification(startNotification);
 		// end is set to be null to signify event do not have a end
 		event4.getActivePeriod().setEnd(null);
-		event4.setModificationNumber(modification);
+		event4.getDescriptor().setModificationNumber(modification);
 		event4.getDescriptor().setMarketContext(prepare);
 		event4.setLastUpdateTimestamp(lastUpdateTimestamp);
 		event4.getActivePeriod().setDuration(duration);
 		event4.getActivePeriod().setNotificationDuration(notificationDuration);
 		event4.setCreatedTimestamp(createdTimestamp);
-		event4.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
-
+		event4.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		event4.setPublished(true);
 		DemandResponseEvent savedDemandResponseEvent4 = demandResponseEventDao.save(event4);
 
 		// event 1 should be grabbed

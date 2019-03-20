@@ -31,5 +31,9 @@ public interface VenDemandResponseEventDao extends CrudRepository<VenDemandRespo
     @Modifying
     @Query("delete from VenDemandResponseEvent event where event.ven.id = :venId")
     public void deleteByVenId(@Param("venId") Long venId);
+    
+    @Modifying
+    @Query("delete from VenDemandResponseEvent event where event.id = :id and event.ven in :vens")
+    public void deleteByEventIdAndVenIn(@Param("id") Long id, @Param("vens") List<Ven> vens);
 
 }

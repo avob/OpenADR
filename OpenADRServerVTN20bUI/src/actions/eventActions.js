@@ -23,6 +23,16 @@ export const createEvent = (dto) => {
   );
 }
 
+export const updateEvent = (id, dto) => {
+  var params = { id:id, event: dto }
+  return swaggerAction(types.UPDATE_EVENT, 
+    (api) => {
+      return api.apis[ 'demand-response-controller' ].updateUsingPUT(params, jsonResponseContentType);
+    }, 
+    parseJsonData,
+  );
+}
+
 export const deleteEvent = (id) => {
   return swaggerAction(types.DELETE_EVENT, 
     (api) => {
@@ -44,13 +54,25 @@ export const loadEventDetail = (id) => {
   );
 }
 
+export const publishEvent = (id) => {
+  var params = { id: id };
+  return swaggerAction(types.PUBLISH_EVENT, 
+    (api) => {
+      return api.apis[ 'demand-response-controller' ].publishUsingPOST(params, jsonResponseContentType);
+    }, 
+    null,
+    (dispatch, getState) => { loadEventDetail(id)(dispatch, getState) }
+  );
+}
+
 export const activeEvent = (id) => {
   var params = { id: id };
   return swaggerAction(types.ACTIVE_EVENT, 
     (api) => {
       return api.apis[ 'demand-response-controller' ].activeUsingPOST(params, jsonResponseContentType);
     }, 
-    parseJsonData
+    null,
+    (dispatch, getState) => { loadEventDetail(id)(dispatch, getState) }
   );
 }
 
@@ -60,7 +82,8 @@ export const cancelEvent = (id) => {
     (api) => {
       return api.apis[ 'demand-response-controller' ].cancelUsingPOST(params, jsonResponseContentType);
     }, 
-    parseJsonData
+    null,
+    (dispatch, getState) => { loadEventDetail(id)(dispatch, getState) }
   );
 }
 

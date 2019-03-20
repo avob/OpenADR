@@ -56,9 +56,10 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventSignalDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventTargetDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
@@ -246,35 +247,35 @@ public class Oadr20aVTNEiEventControllerTest {
 		signal.setSignalName("SIMPLE");
 		signal.setSignalType("level");
 
-		DemandResponseEventDto eventActive = new DemandResponseEventDto();
-		eventActive.setEventId("eventActive");
+		DemandResponseEventCreateDto eventActive = new DemandResponseEventCreateDto();
+		eventActive.getDescriptor().setEventId("eventActive");
 		eventActive.getDescriptor().setMarketContext(marketContext.getName());
-		eventActive.setCreatedTimestamp(System.currentTimeMillis());
 		eventActive.getActivePeriod().setDuration("PT1H");
 		eventActive.getActivePeriod().setNotificationDuration("P1D");
 		eventActive.getSignals().add(signal);
 		// ensure event status is "active"
 		eventActive.getActivePeriod().setStart(System.currentTimeMillis() - 10);
 		eventActive.getTargets().add(new DemandResponseEventTargetDto("ven", VEN));
-		eventActive.setState(DemandResponseEventStateEnum.ACTIVE);
+		eventActive.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		eventActive.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-		eventActive.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		eventActive.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		eventActive.setPublished(true);
 		DemandResponseEvent eventActivePO = demandResponseEventService.create(eventActive);
 
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
-		DemandResponseEventDto eventCanceled = new DemandResponseEventDto();
-		eventCanceled.setEventId("eventCanceled");
+		DemandResponseEventCreateDto eventCanceled = new DemandResponseEventCreateDto();
+		eventCanceled.getDescriptor().setEventId("eventCanceled");
 		eventCanceled.getDescriptor().setMarketContext(marketContext.getName());
-		eventCanceled.setCreatedTimestamp(System.currentTimeMillis());
 		eventCanceled.getActivePeriod().setDuration("PT1H");
 		eventCanceled.getActivePeriod().setNotificationDuration("P1D");
 		eventCanceled.getSignals().add(signal);
 
 		eventCanceled.getActivePeriod().setStart(System.currentTimeMillis() - 10);
 		eventCanceled.getTargets().add(new DemandResponseEventTargetDto("ven", VEN));
-		eventCanceled.setState(DemandResponseEventStateEnum.CANCELED);
+		eventCanceled.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
 		eventCanceled.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-		eventCanceled.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		eventCanceled.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		eventCanceled.setPublished(true);
 		DemandResponseEvent eventCanceledPO = demandResponseEventService.create(eventCanceled);
 
 		String requestId = "0";
@@ -347,7 +348,6 @@ public class Oadr20aVTNEiEventControllerTest {
 		assertNotNull(eiEventCanceled.getEiEventSignals());
 		assertEquals(1, eiEventCanceled.getEiEventSignals().getEiEventSignal().size());
 		EiEventSignalType eiEventSignalTypeCanceled = eiEventCanceled.getEiEventSignals().getEiEventSignal().get(0);
-
 
 		// ensure correct signal name/type (rule 7)
 		assertEquals("SIMPLE", eiEventSignalTypeCanceled.getSignalName());
@@ -457,31 +457,31 @@ public class Oadr20aVTNEiEventControllerTest {
 		signal.setSignalName("SIMPLE");
 		signal.setSignalType("level");
 
-		DemandResponseEventDto dto = new DemandResponseEventDto();
-		dto.setEventId("eventId");
+		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
+		dto.getDescriptor().setEventId("eventId");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		dto.getActivePeriod().setStart(System.currentTimeMillis());
-		dto.setState(DemandResponseEventStateEnum.ACTIVE);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
-
+		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		dto.setPublished(true);
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
 						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		MockHttpServletResponse mockHttpServletResponse = andReturn.getResponse();
 
-		DemandResponseEventDto readValue = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventDto.class);
+		DemandResponseEventReadDto readValue = mapper.readValue(mockHttpServletResponse.getContentAsString(),
+				DemandResponseEventReadDto.class);
 		assertNotNull(readValue);
 		assertNotNull(readValue.getId());
 		assertNotNull(readValue.getCreatedTimestamp());
-		assertNull(readValue.getLastUpdateTimestamp());
+		assertNotNull(readValue.getLastUpdateTimestamp());
 
 		Long eventId = readValue.getId();
 
@@ -511,26 +511,6 @@ public class Oadr20aVTNEiEventControllerTest {
 		assertNull(venOpt);
 
 		// create and send OadrCreatedEvent to EiEvent API
-		// OadrCreatedEvent oadrCreatedEvent = new OadrCreatedEvent();
-		// EiCreatedEvent eiCreatedEvent = new EiCreatedEvent();
-		// eiCreatedEvent.setVenID(venId);
-		// EventResponses eventResponses = new EventResponses();
-		// EventResponse eventResponse = new EventResponse();
-		// eventResponse.setOptType(OptTypeType.OPT_IN);
-		// eventResponse.setResponseCode("200");
-		// eventResponse.setRequestID("");
-		// QualifiedEventIDType qualifiedEventID = new QualifiedEventIDType();
-		// qualifiedEventID.setEventID(eventId.toString());
-		// qualifiedEventID.setModificationNumber(modificationNumber);
-		// eventResponse.setQualifiedEventID(qualifiedEventID);
-		// eventResponses.getEventResponse().add(eventResponse);
-		// eiCreatedEvent.setEventResponses(eventResponses);
-		// EiResponse eiResponse = new EiResponse();
-		// eiResponse.setRequestID("");
-		// eiResponse.setResponseCode("200");
-		// eiCreatedEvent.setEiResponse(eiResponse);
-		// oadrCreatedEvent.setEiCreatedEvent(eiCreatedEvent);
-
 		OadrCreatedEvent oadrCreatedEvent = Oadr20aBuilders.newCreatedEventBuilder(venId, "", 200)
 				.addEventResponse(Oadr20aBuilders.newOadr20aCreatedEventEventResponseBuilder(eventId.toString(),
 						modificationNumber, "", 200, OptTypeType.OPT_IN).build())
@@ -557,7 +537,7 @@ public class Oadr20aVTNEiEventControllerTest {
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
 
-		readValue = mapper.readValue(mockHttpServletResponse.getContentAsString(), DemandResponseEventDto.class);
+		readValue = mapper.readValue(mockHttpServletResponse.getContentAsString(), DemandResponseEventReadDto.class);
 
 		// check DR event is sent
 		andReturn = this.mockMvc
@@ -662,7 +642,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		VenMarketContext marketContext = venMarketContextService.prepare(new VenMarketContextDto(MARKET_CONTEXT_NAME));
 		venMarketContextService.save(marketContext);
 
-		List<DemandResponseEventDto> created = new ArrayList<DemandResponseEventDto>();
+		List<DemandResponseEventReadDto> created = new ArrayList<DemandResponseEventReadDto>();
 		String venId = "ven1";
 
 		Ven ven = venService.prepare(venId);
@@ -683,8 +663,8 @@ public class Oadr20aVTNEiEventControllerTest {
 		signal.setSignalName("SIMPLE");
 		signal.setSignalType("level");
 
-		DemandResponseEventDto dto = new DemandResponseEventDto();
-		dto.setEventId("eventId");
+		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
+		dto.getDescriptor().setEventId("eventId");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -692,35 +672,36 @@ public class Oadr20aVTNEiEventControllerTest {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DATE, 5);
 		dto.getActivePeriod().setStart(cal.getTimeInMillis());
-		dto.setState(DemandResponseEventStateEnum.ACTIVE);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
-
+		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		dto.setPublished(true);
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
 						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		MockHttpServletResponse mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventDto event1 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventDto.class);
+		DemandResponseEventReadDto event1 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
+				DemandResponseEventReadDto.class);
 		created.add(event1);
 
-		dto.setEventId("eventId2");
-		dto.setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setEventId("eventId2");
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.setPublished(true);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
 						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventDto event2 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventDto.class);
+		DemandResponseEventReadDto event2 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
+				DemandResponseEventReadDto.class);
 		created.add(event2);
 
 		// create 'far' and send DR Event to DemandResponseEvent API
-		dto = new DemandResponseEventDto();
-		dto.setEventId("eventId3");
+		dto = new DemandResponseEventCreateDto();
+		dto.getDescriptor().setEventId("eventId3");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
@@ -729,35 +710,36 @@ public class Oadr20aVTNEiEventControllerTest {
 		cal.add(Calendar.DATE, 1);
 		cal.add(Calendar.HOUR, -2);
 		dto.getActivePeriod().setStart(cal.getTimeInMillis());
-		dto.setState(DemandResponseEventStateEnum.ACTIVE);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
-
+		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		dto.setPublished(true);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
 						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventDto event3 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventDto.class);
+		DemandResponseEventReadDto event3 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
+				DemandResponseEventReadDto.class);
 		created.add(event3);
 
-		dto.setEventId("eventId4");
-		dto.setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setEventId("eventId4");
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.setPublished(true);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
 						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventDto event4 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventDto.class);
+		DemandResponseEventReadDto event4 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
+				DemandResponseEventReadDto.class);
 		created.add(event4);
 
 		// create 'near' and send DR Event to DemandResponseEvent API
-		dto = new DemandResponseEventDto();
-		dto.setEventId("eventId5");
+		dto = new DemandResponseEventCreateDto();
+		dto.getDescriptor().setEventId("eventId5");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
@@ -766,70 +748,72 @@ public class Oadr20aVTNEiEventControllerTest {
 		cal = Calendar.getInstance();
 		cal.add(Calendar.HOUR, 6);
 		dto.getActivePeriod().setStart(cal.getTimeInMillis());
-		dto.setState(DemandResponseEventStateEnum.ACTIVE);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
-
+		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		dto.setPublished(true);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
 						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventDto event5 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventDto.class);
+		DemandResponseEventReadDto event5 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
+				DemandResponseEventReadDto.class);
 		created.add(event5);
 
-		dto.setEventId("eventId6");
-		dto.setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setEventId("eventId6");
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.setPublished(true);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
 						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventDto event6 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventDto.class);
+		DemandResponseEventReadDto event6 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
+				DemandResponseEventReadDto.class);
 		created.add(event6);
 
 		// create 'active' and send DR Event to DemandResponseEvent API
-		dto = new DemandResponseEventDto();
-		dto.setEventId("eventId7");
+		dto = new DemandResponseEventCreateDto();
+		dto.getDescriptor().setEventId("eventId7");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		cal = Calendar.getInstance();
 		dto.getActivePeriod().setStart(cal.getTimeInMillis());
-		dto.setState(DemandResponseEventStateEnum.ACTIVE);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
-
+		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		dto.setPublished(true);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
 						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventDto event7 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventDto.class);
+		DemandResponseEventReadDto event7 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
+				DemandResponseEventReadDto.class);
 		created.add(event7);
 
-		dto.setEventId("eventId8");
-		dto.setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setEventId("eventId8");
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.setPublished(true);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
 						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventDto event8 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventDto.class);
+		DemandResponseEventReadDto event8 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
+				DemandResponseEventReadDto.class);
 		created.add(event8);
 
 		// create 'completed' and send DR Event to DemandResponseEvent API
-		dto = new DemandResponseEventDto();
-		dto.setEventId("eventId9");
+		dto = new DemandResponseEventCreateDto();
+		dto.getDescriptor().setEventId("eventId9");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
@@ -837,31 +821,58 @@ public class Oadr20aVTNEiEventControllerTest {
 		cal = Calendar.getInstance();
 		cal.add(Calendar.HOUR, -6);
 		dto.getActivePeriod().setStart(cal.getTimeInMillis());
-		dto.setState(DemandResponseEventStateEnum.ACTIVE);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
-
+		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		dto.setPublished(true);
+		
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
 						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventDto event9 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventDto.class);
+		DemandResponseEventReadDto event9 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
+				DemandResponseEventReadDto.class);
 		created.add(event9);
 
-		dto.setEventId("eventId10");
-		dto.setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setEventId("eventId10");
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.setPublished(true);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
 						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventDto event10 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventDto.class);
+		DemandResponseEventReadDto event10 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
+				DemandResponseEventReadDto.class);
 		created.add(event10);
+		
+		// create unpublished event not to be found by ven
+		dto = new DemandResponseEventCreateDto();
+		dto.getDescriptor().setEventId("eventId11");
+		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
+		dto.getActivePeriod().setDuration("PT1H");
+		dto.getActivePeriod().setToleranceDuration("PT5M");
+		dto.getActivePeriod().setNotificationDuration("P1D");
+		cal = Calendar.getInstance();
+		cal.add(Calendar.HOUR, -6);
+		dto.getActivePeriod().setStart(cal.getTimeInMillis());
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
+		dto.getSignals().add(signal);
+		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
+		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		dto.setPublished(false);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
+						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
+		mockHttpServletResponse = andReturn.getResponse();
+		DemandResponseEventReadDto event11 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
+				DemandResponseEventReadDto.class);
+		created.add(event11);
 
 		// create and send OadrRequestEvent to EiEvent API
 		OadrRequestEvent oadrRequestEvent = new OadrRequestEvent();
@@ -881,7 +892,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		assertNotNull(unmarshal);
 
 		List<DemandResponseEvent> find = demandResponseEventService.find(venId, null);
-		assertEquals(10, find.size());
+		assertEquals(11, find.size());
 		assertEquals(6, unmarshal.getOadrEvent().size());
 		List<OadrEvent> oadrEvent = unmarshal.getOadrEvent();
 		int countFar = 0;
@@ -925,7 +936,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		assertEquals(3, countCancelled);
 
 		// clean bdd
-		for (DemandResponseEventDto e : created) {
+		for (DemandResponseEventReadDto e : created) {
 			demandResponseEventService.delete(e.getId());
 		}
 		venService.delete(ven);

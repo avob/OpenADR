@@ -45,9 +45,10 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventSignalDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventTargetDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
@@ -245,20 +246,21 @@ public class Oadr20aVTNSecurityTest {
 		signal.setSignalName("SIMPLE");
 		signal.setSignalType("level");
 
-		DemandResponseEventDto dto = new DemandResponseEventDto();
+		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venUsername));
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venUsername2));
-		dto.setEventId("eventId");
+		dto.getDescriptor().setEventId("eventId");
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setStart(System.currentTimeMillis());
-		dto.setState(DemandResponseEventStateEnum.ACTIVE);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-		dto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
-
+		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		dto.setPublished(true);
+		
 		String payload = mapper.writeValueAsString(dto);
 		HttpPost post = new HttpPost(demandResponseEnpointUrl);
 		StringEntity stringEntity = new StringEntity(payload);
@@ -267,15 +269,16 @@ public class Oadr20aVTNSecurityTest {
 		HttpResponse execute = userBasicHttpClient.execute(post, "");
 		assertEquals(HttpStatus.CREATED_201, execute.getStatusLine().getStatusCode());
 
-		dto = mapper.readValue(execute.getEntity().getContent(), DemandResponseEventDto.class);
-		assertNotNull(dto.getId());
+		DemandResponseEventReadDto readdto = mapper.readValue(execute.getEntity().getContent(),
+				DemandResponseEventReadDto.class);
+		assertNotNull(readdto.getId());
 
 		OadrRequestEvent event = Oadr20aBuilders.newOadrRequestEventBuilder(ven.getUsername(), "0").build();
 		OadrDistributeEvent oadrRequestEvent = venBasicHttpClient.oadrRequestEvent(event);
 		assertEquals(String.valueOf(HttpStatus.OK_200), oadrRequestEvent.getEiResponse().getResponseCode());
 		assertEquals(1, oadrRequestEvent.getOadrEvent().size());
 
-		demandResponseEventService.delete(dto.getId());
+		demandResponseEventService.delete(readdto.getId());
 
 		venService.delete(ven);
 		venService.delete(ven2);

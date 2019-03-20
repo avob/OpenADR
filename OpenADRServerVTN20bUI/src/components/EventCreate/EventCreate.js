@@ -18,6 +18,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
 
 import EventCreateDescriptorStep from './EventCreateDescriptorStep'
+import EventCreateActivePeriodStep from './EventCreateActivePeriodStep'
 import EventCreateEventSignalStep from './EventCreateEventSignalStep'
 import EventCreateEventTarget from './EventCreateEventTarget'
 import EventCreateConfirmationStep from './EventCreateConfirmationStep'
@@ -29,7 +30,7 @@ import {minutesToICalDuration} from '../../utils/time'
 
 
 function getSteps() {
-  return [ 'Descriptor', 'Event Signal', 'Event Targets', 'Confirmation' ];
+  return [ 'Descriptor', 'Active Period', 'Signal', 'Targets', 'Confirmation' ];
 }
 
 
@@ -50,36 +51,38 @@ export class EventCreate extends React.Component {
         // vtnComment: "",
         // marketContext: null
         oadrProfile: "OADR20B",
-        
         eventId: "mouaiccool",
-        eventName: "mouaiccool",
         priority:0,
         responseRequired:"ALWAYS",
         testEvent: false,
         vtnComment: "",
         marketContext: "http://MarketContext1"
       },
-      eventSignal: {
-        // signalName: "",
-        // signalType: "",
-        // unitType: "",
-         // start: null,
+      activePeriod: {
+        // start: null,
         // duration: "",
-        // signalInterval: [],
-        // currentValue: "",
-         timezone: "UTC",
+        timezone: "UTC",
         start: 0,
         duration: 120,
-        signalInterval: [],
-        currentValue: "97.5",
-        signalName: "ENERGY_PRICE",
-        signalType: "price",
-        unitType: "euro_per_kwh",
         notificationDuration: 120,
         rampUpDuration: 120,
         toleranceDuration: 120,
         recoveryDuration: 120,
       },
+      eventSignal: [{
+        // signalName: "",
+        // signalType: "",
+        // unitType: "",
+        // signalInterval: [],
+        // currentValue: "",
+     
+        intervals: [],
+        currentValue: "97.5",
+        signalName: "ENERGY_PRICE",
+        signalType: "price",
+        unitType: "euro_per_kwh",
+        
+      }],
       // eventTarget: []
       eventTarget: [{targetType:"ven", targetId:"4A:D1:2E:95:49:43:80:0B:8D:E9"}]
     };
@@ -122,38 +125,31 @@ export class EventCreate extends React.Component {
       }
     }
     var activePeriod = {
-      start: this.state.eventSignal.start,
-      duration: minutesToICalDuration(this.state.eventSignal.duration)
+      start: this.state.activePeriod.start,
+      duration: minutesToICalDuration(this.state.activePeriod.duration)
     }
-    addXMLDurationIfNotNull(activePeriod, "rampUpDuration", this.state.eventSignal.rampUpDuration);
-    addXMLDurationIfNotNull(activePeriod, "recoveryDuration", this.state.eventSignal.recoveryDuration);
-    addXMLDurationIfNotNull(activePeriod, "toleranceDuration", this.state.eventSignal.toleranceDuration);
-    addXMLDurationIfNotNull(activePeriod, "notificationDuration", this.state.eventSignal.notificationDuration);
+    addXMLDurationIfNotNull(activePeriod, "rampUpDuration", this.state.activePeriod.rampUpDuration);
+    addXMLDurationIfNotNull(activePeriod, "recoveryDuration", this.state.activePeriod.recoveryDuration);
+    addXMLDurationIfNotNull(activePeriod, "toleranceDuration", this.state.activePeriod.toleranceDuration);
+    addXMLDurationIfNotNull(activePeriod, "notificationDuration", this.state.activePeriod.notificationDuration);
 
-    var state = (needPublish != null && needPublish) ? "ACTIVE" : "UNPUBLISHED";
-    console.log(needPublish, state)
     var dto = {
      
-      eventId:this.state.descriptor.eventId,
-      eventName: this.state.descriptor.eventName,
-      state: state,
-      oadrProfile: "OADR20B",
+      
+      published: needPublish,
       descriptor: {
         marketContext: this.state.descriptor.marketContext,
         priority: this.state.descriptor.priority,
         responseRequired: this.state.descriptor.responseRequired,
-        testEvent: this.state.descriptor.testEvent
+        testEvent: this.state.descriptor.testEvent,
+        eventId:this.state.descriptor.eventId,
+        state: "ACTIVE" ,
+        oadrProfile: this.state.descriptor.oadrProfile,
       },
 
       activePeriod: activePeriod,
 
-      signals: [{
-        signalName: this.state.eventSignal.signalName,
-        signalType: this.state.eventSignal.signalType,
-        unitType: this.state.eventSignal.unitType,
-        currentValue: this.state.eventSignal.currentValue,
-        intervals: this.state.eventSignal.signalInterval
-      }],
+      signals: this.state.eventSignal,
 
       targets: this.state.eventTarget
     }
@@ -163,6 +159,10 @@ export class EventCreate extends React.Component {
 
   handleDescriptorChange = (descriptor) => {
     this.setState(descriptor);
+  }
+
+  handleActivePeriodChange = (activePeriod) => {
+    this.setState(activePeriod);
   }
 
   handleEventSignalChange = (eventSignal) => {
@@ -182,7 +182,7 @@ export class EventCreate extends React.Component {
   render() {
     const {classes, marketContext, group} = this.props;
     const steps = getSteps();
-    const {activeStep, descriptor, eventSignal, eventTarget, hasError} = this.state;
+    const {activeStep, descriptor, activePeriod, eventSignal, eventTarget, hasError} = this.state;
     var that = this;
 
 
@@ -192,12 +192,15 @@ export class EventCreate extends React.Component {
           return <EventCreateDescriptorStep classes={classes} marketContext={marketContext} 
             descriptor={descriptor} onChange={this.handleDescriptorChange} hasError={hasError}/>
         case 1:
+          return <EventCreateActivePeriodStep classes={classes} marketContext={marketContext} 
+            activePeriod={activePeriod} onChange={this.handleActivePeriodChange} hasError={hasError}/>
+        case 2:
           return <EventCreateEventSignalStep classes={classes} onChange={this.handleEventSignalChange}
             eventSignal={eventSignal} hasError={hasError}/>
-        case 2:
+        case 3:
           return <EventCreateEventTarget classes={classes} group={group} eventTarget={eventTarget} 
             onChange={this.handleEventTargetChange}/>
-        case 3:
+        case 4:
           return <EventCreateConfirmationStep classes={classes} group={group} marketContext={marketContext} 
             descriptor={descriptor} eventTarget={eventTarget} eventSignal={eventSignal} createEvent={this.createEvent}/>
         default:
@@ -210,20 +213,33 @@ export class EventCreate extends React.Component {
     function getSetValidation( step ) {
       switch (step) {
         case 0:
-        console.log(descriptor)
           return descriptor.priority != null
             && descriptor.marketContext != null
             && descriptor.eventId != ""
             && descriptor.eventName != "";
 
         case 1:
-          return eventSignal.start != null 
-            && eventSignal.duration != ""
-            && (eventSignal.currentValue != "" || eventSignal.signalInterval.length > 0 )
-            
+          return activePeriod.start != null 
+            && activePeriod.duration != "";
+
         case 2:
-          return eventTarget.length > 0;
+          var valid = false;
+
+          for(var i in eventSignal){
+            console.log(eventSignal[i])
+            if( eventSignal[i].signalName == "" 
+              || eventSignal[i].signalType == "" 
+              || (eventSignal[i].currentValue == "" 
+              && eventSignal[i].signalInterval.length == 0 )){
+              return false;
+            }
+          }
+          return true;
+          
+            
         case 3:
+          return eventTarget.length > 0;
+        case 4:
           return true;
         default:
           return false

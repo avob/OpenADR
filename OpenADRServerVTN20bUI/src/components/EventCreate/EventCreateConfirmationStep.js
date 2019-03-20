@@ -86,55 +86,61 @@ export class EventCreateConfirmationStep extends React.Component {
         <Grid item xs={ 2 } />
       </Grid>
 
-      <Grid container spacing={ 24 }>
-          <Grid item xs={ 2 } />
-          <Grid item xs={ 2 }>
-            <TextField label="Signal Name"
-                       value={ eventSignal.signalName }
-                       className={ classes.textField }
-                       margin="dense"
-                       variant="outlined"
-                       InputProps={ { readOnly: true } }
-                       fullWidth={ true } />
-          </Grid>
-          <Grid item xs={ 2 }>
-            <TextField label="Signal Type"
-                       value={ eventSignal.signalType }
-                       className={ classes.textField }
-                       margin="dense"
-                       variant="outlined"
-                       InputProps={ { readOnly: true } }
-                       fullWidth={ true } />
-          </Grid>
-          <Grid item xs={ 2 }>
-            <TextField label="Unit"
-                       value={ eventSignal.unitType }
-                       className={ classes.textField }
-                       margin="dense"
-                       variant="outlined"
-                       InputProps={ { readOnly: true } }
-                       fullWidth={ true } />
-          </Grid>
-          <Grid item xs={ 1 }>
-            <TextField label="Current Value"
-                       value={ eventSignal.currentValue }
-                       className={ classes.textField }
-                       margin="dense"
-                       variant="outlined"
-                       InputProps={ { readOnly: true } }
-                       fullWidth={ true } />
-          </Grid>
-          <Grid item xs={ 1 }>
-            <TextField label="Nb Intervals"
-                       value={ eventSignal.signalInterval.length}
-                       className={ classes.textField }
-                       margin="dense"
-                       variant="outlined"
-                       InputProps={ { readOnly: true } }
-                       fullWidth={ true } />
-          </Grid>
-          <Grid item xs={ 2 } />
-        </Grid>
+      {eventSignal.map((signal, index) => {
+          return (
+             <Grid container spacing={ 24 }  key={"signal_confirmation_panel_"+index}>
+                <Grid item xs={ 2 } />
+                <Grid item xs={ 2 }>
+                  <TextField label="Signal Name"
+                             value={ signal.signalName }
+                             className={ classes.textField }
+                             margin="dense"
+                             variant="outlined"
+                             InputProps={ { readOnly: true } }
+                             fullWidth={ true } />
+                </Grid>
+                <Grid item xs={ 2 }>
+                  <TextField label="Signal Type"
+                             value={ signal.signalType }
+                             className={ classes.textField }
+                             margin="dense"
+                             variant="outlined"
+                             InputProps={ { readOnly: true } }
+                             fullWidth={ true } />
+                </Grid>
+                <Grid item xs={ 2 }>
+                  <TextField label="Unit"
+                             value={ signal.unitType }
+                             className={ classes.textField }
+                             margin="dense"
+                             variant="outlined"
+                             InputProps={ { readOnly: true } }
+                             fullWidth={ true } />
+                </Grid>
+                <Grid item xs={ 1 }>
+                  <TextField label="Current Value"
+                             value={ signal.currentValue }
+                             className={ classes.textField }
+                             margin="dense"
+                             variant="outlined"
+                             InputProps={ { readOnly: true } }
+                             fullWidth={ true } />
+                </Grid>
+                <Grid item xs={ 1 }>
+                  <TextField label="Nb Intervals"
+                             value={ signal.intervals.length}
+                             className={ classes.textField }
+                             margin="dense"
+                             variant="outlined"
+                             InputProps={ { readOnly: true } }
+                             fullWidth={ true } />
+                </Grid>
+                <Grid item xs={ 2 } />
+              </Grid>
+              )
+        })}
+
+     
 
          <Grid container
             style={ { marginTop: 20, marginBottom:10 } }

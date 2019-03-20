@@ -10,9 +10,9 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventSignalDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventTargetDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
@@ -90,7 +90,6 @@ public class EmbeddedSqlDatabaseInit {
 		venService.save(prepare);
 
 		String eventId = "eventId";
-		Long createdTimestamp = System.currentTimeMillis();
 		String duration = "PT1H";
 		String notificationDuration = "P1D";
 		Long start = System.currentTimeMillis();
@@ -101,18 +100,17 @@ public class EmbeddedSqlDatabaseInit {
 		signal.setSignalName("SIMPLE");
 		signal.setSignalType("level");
 
-		DemandResponseEventDto eventDto = new DemandResponseEventDto();
-		eventDto.setEventId(eventId);
-		eventDto.setState(state);
+		DemandResponseEventCreateDto eventDto = new DemandResponseEventCreateDto();
+		eventDto.getDescriptor().setEventId(eventId);
+		eventDto.getDescriptor().setState(state);
 		eventDto.getActivePeriod().setStart(start);
 		eventDto.getActivePeriod().setNotificationDuration(notificationDuration);
 
 		eventDto.getDescriptor().setMarketContext(marketContext.getName());
-		eventDto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
+		eventDto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		eventDto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		eventDto.getActivePeriod().setDuration(duration);
 		eventDto.getActivePeriod().setNotificationDuration(notificationDuration);
-		eventDto.setCreatedTimestamp(createdTimestamp);
 		eventDto.getTargets().add(new DemandResponseEventTargetDto("ven", ven1Username));
 		eventDto.getTargets().add(new DemandResponseEventTargetDto("ven", ven2Username));
 		eventDto.getSignals().add(signal);

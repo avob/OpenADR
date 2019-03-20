@@ -27,6 +27,9 @@ import Divider from '@material-ui/core/Divider';
 
 import Grid from '@material-ui/core/Grid';
 
+import amber from '@material-ui/core/colors/amber';
+
+
 
 var VtnConfigurationCard = (props) => {
   return (
@@ -138,12 +141,9 @@ export function VtnConfigurationVenCard( props ) {
 
 export function VtnConfigurationEventCard( props ) {
   var color;
-  switch(props.event.state) {
+  switch(props.event.descriptor.state) {
     case "ACTIVE":
       color = "green";
-      break;
-    case "UNPUBLISHED":
-      color = "#bbb";
       break;
     case "CANCELED":
       color = "red";
@@ -151,14 +151,17 @@ export function VtnConfigurationEventCard( props ) {
     default:
       color = "#bbb";
       break;
+  }
 
+  if(!props.event.published) {
+    color = amber[700];
   }
 
   return (
   <VtnConfigurationCard classes={ props.classes }
                         color={ color }
-                        name={ props.event.eventId }
-                        description={ props.event.marketContext }
+                        name={ props.event.descriptor.eventId }
+                        description={ props.event.descriptor.marketContext }
                         close={ props.handleDeleteEvent }
                         edit={ props.handleEditEvent }
                         cardType={ "EVENT" }

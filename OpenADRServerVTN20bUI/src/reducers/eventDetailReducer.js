@@ -25,23 +25,44 @@ export default function eventDetailReducer( state = initialState.event_detail, a
     case types.LOAD_EVENT_DETAIL_ERROR:
       return state;
 
-
-    case types.EVENT_ACTIVE:
+    case types.UPDATE_EVENT:
       return state;
 
-    case types.EVENT_ACTIVE_SUCCESS:
+    case types.UPDATE_EVENT_SUCCESS:
+      newState = objectAssign( {}, state, {
+        event: action.payload
+      } );
+      return newState;
+
+    case types.UPDATE_EVENT_ERROR:
       return state;
 
-    case types.EVENT_ACTIVE_ERROR:
+    case types.PUBLISH_EVENT:
       return state;
 
-    case types.EVENT_CANCEL:
+    case types.PUBLISH_EVENT_SUCCESS:
       return state;
 
-    case types.EVENT_CANCEL_SUCCESS:
+    case types.PUBLISH_EVENT_ERROR:
       return state;
 
-    case types.EVENT_CANCEL_ERROR:
+
+    case types.ACTIVE_EVENT:
+      return state;
+
+    case types.ACTIVE_EVENT_SUCCESS:
+      return state;
+
+    case types.ACTIVE_EVENT_ERROR:
+      return state;
+
+    case types.CANCEL_EVENT:
+      return state;
+
+    case types.CANCEL_EVENT_SUCCESS:
+      return state;
+
+    case types.CANCEL_EVENT_ERROR:
       return state;
 
     default:

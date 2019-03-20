@@ -3,7 +3,7 @@ package com.avob.openadr.server.common.vtn.models.demandresponseevent;
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class DemandResponseEventTarget {
+public class DemandResponseEventTarget implements DemandResponseEventTargetInterface {
 
 	private String targetType;
 

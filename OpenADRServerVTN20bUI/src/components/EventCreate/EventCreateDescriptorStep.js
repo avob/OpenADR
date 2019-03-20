@@ -103,12 +103,6 @@ export class EventCreateDescriptorStep extends React.Component {
     this.props.onChange(details);
   }
 
-  handleEventNameChange = (e) => {
-    let details = this.props.descriptor;
-    details.eventName = e.target.value;
-    this.props.onChange(details);
-  }
-
   handleOadrProfileChange = (e) => {
      let details = this.props.descriptor;
     details.oadrProfile = e.target.value;
@@ -127,19 +121,11 @@ export class EventCreateDescriptorStep extends React.Component {
 
         <Grid container spacing={ 24 } >
         <Grid item xs={ 2 } />
-        <Grid item xs={ 3 }>
+        <Grid item xs={ 4 }>
             <TextField  label="Event ID" required
                 error={hasError && descriptor.eventId == ""}
                 value={ descriptor.eventId }
                 onChange={this.handleEventIdChange}
-                className={classes.textField}
-                fullWidth={true}/>
-        </Grid>
-        <Grid item xs={ 3 }>
-            <TextField  label="Event Name" required
-                error={hasError && descriptor.eventName == ""}
-                value={ descriptor.eventName }
-                onChange={this.handleEventNameChange}
                 className={classes.textField}
                 fullWidth={true}/>
         </Grid>
@@ -165,6 +151,17 @@ export class EventCreateDescriptorStep extends React.Component {
                 </Select>
               </FormControl>
         </Grid>
+        <Grid item xs={ 2 }>
+     
+              <TextField required label="Priority"
+                type="number"
+                value={ descriptor.priority }
+                onChange={this.handlePriorityChange}
+                className={classes.textField}
+                fullWidth={true}/>
+  
+                                         
+        </Grid> 
         <Grid item xs={ 2 } />
 
       </Grid>
@@ -183,7 +180,7 @@ export class EventCreateDescriptorStep extends React.Component {
         <Grid item xs={ 2 } />
        
        
-       <Grid item xs={ 3 }>
+       <Grid item xs={ 4 }>
      
               <TextField required label="Market Context" error={hasError && descriptor.marketContext == null}
                  value={ (descriptor.marketContext) ? descriptor.marketContext : "" }
@@ -199,17 +196,7 @@ export class EventCreateDescriptorStep extends React.Component {
   
                                          
         </Grid> 
-        <Grid item xs={ 1 }>
-     
-              <TextField required label="Priority"
-                type="number"
-                value={ descriptor.priority }
-                onChange={this.handlePriorityChange}
-                className={classes.textField}
-                fullWidth={true}/>
-  
-                                         
-        </Grid> 
+        
 
         <Grid item xs={2} >
              <FormControl className={ classes.formControl }>

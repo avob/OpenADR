@@ -1,4 +1,4 @@
-package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto;
+package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded;
 
 public class DemandResponseEventActivePeriodDto {
 

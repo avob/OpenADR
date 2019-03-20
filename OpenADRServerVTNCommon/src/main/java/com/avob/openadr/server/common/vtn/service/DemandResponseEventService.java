@@ -29,8 +29,10 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalDao;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTarget;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventTargetDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetInterface;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenDao;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
@@ -110,10 +112,10 @@ public class DemandResponseEventService {
 			events = demandResponseEventDao.findByVenUsername(venUsername, limit);
 
 		} else if (venUsername == null && state != null && limit == null) {
-			events = demandResponseEventDao.findByState(state);
+			events = demandResponseEventDao.findByDescriptorState(state);
 
 		} else if (venUsername == null && state != null && limit != null) {
-			events = demandResponseEventDao.findByState(state, limit);
+			events = demandResponseEventDao.findByDescriptorState(state, limit);
 
 		} else if (venUsername != null && state != null && limit == null) {
 			events = demandResponseEventDao.findByVenUsernameAndState(venUsername, state);
@@ -125,19 +127,44 @@ public class DemandResponseEventService {
 		return Lists.newArrayList(events);
 	}
 
+	private List<Ven> findVenForTarget(DemandResponseEvent event,
+			List<? extends DemandResponseEventTargetInterface> targets) {
+		List<Ven> ven = null;
+
+		if (targets != null) {
+			List<String> targetedVenUsername = new ArrayList<>();
+
+			for (DemandResponseEventTargetInterface target : targets) {
+				if ("ven".equals(target.getTargetType())) {
+					targetedVenUsername.add(target.getTargetId());
+				}
+			}
+			ven = venDao.findByUsernameInAndVenMarketContextsContains(targetedVenUsername,
+					event.getDescriptor().getMarketContext());
+		} else {
+			ven = venDao.findByVenMarketContextsName(event.getDescriptor().getMarketContext().getName());
+		}
+		return ven;
+	}
+
 	/**
 	 * create a DR Event
 	 * 
 	 * @param event
 	 * @return
 	 */
-	@Transactional
-	public DemandResponseEvent create(DemandResponseEventDto dto) {
+	@Transactional(readOnly = false)
+	public DemandResponseEvent create(DemandResponseEventCreateDto dto) {
 		DemandResponseEvent event = dtoMapper.map(dto, DemandResponseEvent.class);
 		event.setCreatedTimestamp(System.currentTimeMillis());
-		event.setModificationNumber(0);
-
-//		event.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
+		event.setLastUpdateTimestamp(System.currentTimeMillis());
+		if(dto.isPublished()) {
+			event.getDescriptor().setModificationNumber(0);
+		}
+		else {
+			event.getDescriptor().setModificationNumber(-1);
+		}
+		
 
 		Date dateStart = new Date();
 		dateStart.setTime(event.getActivePeriod().getStart());
@@ -151,80 +178,156 @@ public class DemandResponseEventService {
 		Duration notificationDuration = datatypeFactory.newDuration(event.getActivePeriod().getNotificationDuration());
 		long notificationDurationInMillis = notificationDuration.getTimeInMillis(dateStart);
 		event.getActivePeriod().setStartNotification(dateStart.getTime() - notificationDurationInMillis);
-		List<Ven> findByUsernameIn = null;
 
-		if (dto.getTargets() != null) {
-			List<String> targetedVenUsername = new ArrayList<>();
+		// save event
+		DemandResponseEvent save = demandResponseEventDao.save(event);
 
-			List<DemandResponseEventTargetDto> targets = dto.getTargets();
-			for (DemandResponseEventTargetDto target : targets) {
-				if ("ven".equals(target.getTargetType())) {
-					targetedVenUsername.add(target.getTargetId());
-				}
-			}
-			findByUsernameIn = venDao.findByUsernameInAndVenMarketContextsContains(targetedVenUsername,
-					event.getDescriptor().getMarketContext());
-		} else {
-			findByUsernameIn = venDao.findByVenMarketContextsName(event.getDescriptor().getMarketContext().getName());
-		}
-
+		// link targets
+		List<Ven> findByUsernameIn = findVenForTarget(event, dto.getTargets());
 		List<VenDemandResponseEvent> list = new ArrayList<VenDemandResponseEvent>();
 		for (Ven ven : findByUsernameIn) {
 			if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
-				if (DemandResponseEventStateEnum.ACTIVE.equals(dto.getState())) {
-					pushAsync(Arrays.asList(ven), dto.getOadrProfile());
+				if (event.isPublished()) {
+					pushAsync(Arrays.asList(ven), dto.getDescriptor().getOadrProfile());
 				}
 			}
 			list.add(new VenDemandResponseEvent(event, ven));
 		}
 		venDemandResponseEventDao.saveAll(list);
-		DemandResponseEvent save = demandResponseEventDao.save(event);
+
+		// link signals
 		event.getSignals().forEach(sig -> {
 			sig.setEvent(save);
 		});
 		demandResponseEventSignalDao.saveAll(event.getSignals());
+
 		return save;
 	}
 
-	public void publishEvent(DemandResponseEvent event) {
-		if (!DemandResponseEventStateEnum.ACTIVE.equals(event.getState())) {
-			// only ACTIVE event shoudl be published
-			return;
-		}
-		List<Ven> findByUsernameIn = null;
-		if (event.getTargets() != null) {
-			List<String> targetedVenUsername = new ArrayList<>();
+	@Transactional(readOnly = false)
+	public DemandResponseEvent update(DemandResponseEvent event, DemandResponseEventUpdateDto dto) {
 
-			List<DemandResponseEventTarget> targets = event.getTargets();
-			for (DemandResponseEventTarget target : targets) {
-				if ("ven".equals(target.getTargetType())) {
-					targetedVenUsername.add(target.getTargetId());
+		List<DemandResponseEventTargetDto> toAdd = new ArrayList<>();
+		List<DemandResponseEventTargetDto> unchanged = new ArrayList<>();
+
+		for (DemandResponseEventTargetDto updateTarget : dto.getTargets()) {
+			boolean found = false;
+			for (DemandResponseEventTarget target : event.getTargets()) {
+				if (target.getTargetType().equals(updateTarget.getTargetType())
+						&& target.getTargetId().equals(updateTarget.getTargetId())) {
+					found = true;
+					unchanged.add(updateTarget);
 				}
 			}
-			findByUsernameIn = venDao.findByUsernameInAndVenMarketContextsContains(targetedVenUsername,
-					event.getDescriptor().getMarketContext());
-		} else {
-			findByUsernameIn = venDao.findByVenMarketContextsName(event.getDescriptor().getMarketContext().getName());
+			if (!found) {
+				toAdd.add(updateTarget);
+			}
+
 		}
-		for (Ven ven : findByUsernameIn) {
+
+		List<DemandResponseEventTarget> toRemove = new ArrayList<>();
+		if (dto.getTargets().size() < unchanged.size() + toAdd.size()) {
+			for (DemandResponseEventTarget target : event.getTargets()) {
+				boolean found = false;
+				for (DemandResponseEventTargetDto updateTarget : dto.getTargets()) {
+					if (target.getTargetType().equals(updateTarget.getTargetType())
+							&& target.getTargetId().equals(updateTarget.getTargetId())) {
+						found = true;
+					}
+				}
+
+				if (!found) {
+					toRemove.add(target);
+				}
+			}
+		}
+
+		// update modification number if event is published
+		if (dto.isPublished()) {
+			event.getDescriptor().setModificationNumber(event.getDescriptor().getModificationNumber() + 1);
+		}
+
+		DemandResponseEvent partialUpdate = dtoMapper.map(dto, DemandResponseEvent.class);
+		// link signals
+		demandResponseEventSignalDao.deleteAll(event.getSignals());
+		partialUpdate.getSignals().forEach(sig -> {
+			sig.setEvent(event);
+		});
+		demandResponseEventSignalDao.saveAll(partialUpdate.getSignals());
+		// update event
+		event.setSignals(partialUpdate.getSignals());
+		event.setTargets(partialUpdate.getTargets());
+		event.setLastUpdateTimestamp(System.currentTimeMillis());
+		DemandResponseEvent save = demandResponseEventDao.save(event);
+
+		// link added targets
+		if (toAdd.size() > 0) {
+			List<Ven> vens = findVenForTarget(event, toAdd);
+			List<VenDemandResponseEvent> list = new ArrayList<VenDemandResponseEvent>();
+			for (Ven ven : vens) {
+				if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
+					if (dto.isPublished()) {
+						pushAsync(Arrays.asList(ven), event.getDescriptor().getOadrProfile());
+					}
+				}
+				list.add(new VenDemandResponseEvent(event, ven));
+			}
+			venDemandResponseEventDao.saveAll(list);
+		}
+
+		// unlink removed target
+		if (toRemove.size() > 0) {
+			List<Ven> vens = findVenForTarget(event, toRemove);
+			venDemandResponseEventDao.deleteByEventIdAndVenIn(event.getId(), vens);
+		}
+
+		return save;
+	}
+
+	public void distributeEventToPushVen(DemandResponseEvent event) {
+		List<Ven> vens = findVenForTarget(event, event.getTargets());
+		for (Ven ven : vens) {
 			if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
-
-				pushAsync(Arrays.asList(ven), event.getOadrProfile());
-
+				pushAsync(Arrays.asList(ven), event.getDescriptor().getOadrProfile());
 			}
 		}
 	}
 
-	/**
-	 * create a DR Event
-	 * 
-	 * @param event
-	 * @return
-	 */
 	@Transactional(readOnly = false)
-	private DemandResponseEvent persist(DemandResponseEvent event, List<VenDemandResponseEvent> list) {
-		venDemandResponseEventDao.saveAll(list);
-		return demandResponseEventDao.save(event);
+	public DemandResponseEvent publish(DemandResponseEvent event) {
+		if (!event.isPublished()) {
+			event.getDescriptor().setModificationNumber(event.getDescriptor().getModificationNumber() + 1);
+			event.setPublished(true);
+			demandResponseEventDao.save(event);
+		}
+
+		distributeEventToPushVen(event);
+		return event;
+	}
+
+	@Transactional(readOnly = false)
+	public DemandResponseEvent active(DemandResponseEvent event) {
+		if (!event.getDescriptor().getState().equals(DemandResponseEventStateEnum.ACTIVE)) {
+			event.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
+			event.getDescriptor().setModificationNumber(event.getDescriptor().getModificationNumber() + 1);
+			event.setPublished(true);
+			distributeEventToPushVen(event);
+			demandResponseEventDao.save(event);
+
+		}
+		return event;
+	}
+
+	@Transactional(readOnly = false)
+	public DemandResponseEvent cancel(DemandResponseEvent event) {
+		if (!event.getDescriptor().getState().equals(DemandResponseEventStateEnum.CANCELED)) {
+			event.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+			event.getDescriptor().setModificationNumber(event.getDescriptor().getModificationNumber() + 1);
+			event.setPublished(true);
+			distributeEventToPushVen(event);
+			demandResponseEventDao.save(event);
+		}
+		return event;
 	}
 
 	private void pushAsync(List<Ven> vens, DemandResponseEventOadrProfileEnum profile) {
@@ -257,7 +360,7 @@ public class DemandResponseEventService {
 	}
 
 	public DemandResponseEvent findByEventId(String eventId) {
-		return demandResponseEventDao.findOneByEventId(eventId);
+		return demandResponseEventDao.findOneByDescriptorEventId(eventId);
 	}
 
 	public List<DemandResponseEventSignal> getSignals(DemandResponseEvent event) {
@@ -278,64 +381,17 @@ public class DemandResponseEventService {
 		demandResponseEventDao.deleteAll(entities);
 	}
 
-	private DemandResponseEvent updateState(DemandResponseEvent event, DemandResponseEventStateEnum state) {
+	public void deleteById(Iterable<Long> entities) {
+		for (Long id : entities) {
+			venDemandResponseEventDao.deleteByEventId(id);
 
-		if (!event.getState().equals(state)) {
-			event.setState(state);
-			event.setModificationNumber(event.getModificationNumber() + 1);
-			event.setLastUpdateTimestamp(System.currentTimeMillis());
-			return demandResponseEventDao.save(event);
 		}
 
-		return event;
+		demandResponseEventDao.deleteByIdIn(entities);
 	}
 
-	public DemandResponseEvent cancel(Long id) {
-		Optional<DemandResponseEvent> op = demandResponseEventDao.findById(id);
-		if (!op.isPresent()) {
-			return null;
-		}
-		DemandResponseEvent event = op.get();
-		return updateState(event, DemandResponseEventStateEnum.CANCELED);
-	}
-
-	public DemandResponseEvent active(Long id) {
-		Optional<DemandResponseEvent> op = demandResponseEventDao.findById(id);
-		if (!op.isPresent()) {
-			return null;
-		}
-		DemandResponseEvent event = op.get();
-		this.publishEvent(event);
-		if(DemandResponseEventStateEnum.ACTIVE.equals(event.getState())) {
-			return event;
-		}
-		return updateState(event, DemandResponseEventStateEnum.ACTIVE);
-	}
-
-	public DemandResponseEvent unpublish(Long id) {
-		Optional<DemandResponseEvent> op = demandResponseEventDao.findById(id);
-		if (!op.isPresent()) {
-			return null;
-		}
-		DemandResponseEvent event = op.get();
-		return updateState(event, DemandResponseEventStateEnum.UNPUBLISHED);
-	}
-
-	public DemandResponseEvent updateValue(Long id, Float value) {
-		Optional<DemandResponseEvent> op = demandResponseEventDao.findById(id);
-		if (!op.isPresent()) {
-			return null;
-		}
-		DemandResponseEvent event = op.get();
-
-		if (!value.equals(event.getSignals().toArray(new DemandResponseEventSignal[0])[0].getCurrentValue())) {
-			event.getSignals().toArray(new DemandResponseEventSignal[0])[0].setCurrentValue(value);
-			event.setModificationNumber(event.getModificationNumber() + 1);
-			event.setLastUpdateTimestamp(System.currentTimeMillis());
-			return demandResponseEventDao.save(event);
-		}
-
-		return event;
+	public boolean exists(Long id) {
+		return demandResponseEventDao.existsById(id);
 	}
 
 	public List<DemandResponseEvent> findToSentEventByVen(Ven ven) {

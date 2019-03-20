@@ -1,13 +1,16 @@
-package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto;
+package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded;
 
-public class DemandResponseEventTargetDto {
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetInterface;
+
+public class DemandResponseEventTargetDto implements DemandResponseEventTargetInterface {
 
 	private String targetType;
 
 	private String targetId;
-	
-	public DemandResponseEventTargetDto() {}
-	
+
+	public DemandResponseEventTargetDto() {
+	}
+
 	public DemandResponseEventTargetDto(String targetType, String targetId) {
 		this.targetId = targetId;
 		this.targetType = targetType;
