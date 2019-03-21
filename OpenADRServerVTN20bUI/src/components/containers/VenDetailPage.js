@@ -127,6 +127,7 @@ export class VenDetailPage extends React.Component {
     this.props.venActions.loadVenMarketContext( this.props.match.params.username );
     this.props.venActions.loadVenAvailableReport( this.props.match.params.username );
     this.props.venActions.loadVenRequestedReport( this.props.match.params.username );
+    this.props.venActions.loadVenOpt( this.props.match.params.username );
     switch(this.props.match.params.panel){
       case "settings":
         this.setState({value:0});
@@ -199,7 +200,8 @@ export class VenDetailPage extends React.Component {
                        </TabContainer> }
       { value === 2 && <TabContainer>
                       <VenDetailOptSchedule classes={ classes }
-                                            ven={ ven_detail.ven }                                            
+                                            ven={ ven_detail.ven }
+                                            venOpt={ven_detail.venOpt}                                            
                                              />
 
 
@@ -211,7 +213,7 @@ export class VenDetailPage extends React.Component {
                                             marketContext={ ven_detail.marketContext }
                                             venMarketContext={ ven_detail.venMarketContext }  
 
-                                             addVenMarketContext={ this.props.venActions.addVenMarketContext }
+                                            addVenMarketContext={ this.props.venActions.addVenMarketContext }
                                             removeVenMarketContext={ this.props.venActions.removeVenMarketContext }                                    
                                              />
 

@@ -45,6 +45,7 @@ import com.avob.openadr.model.oadr20b.pyld.EiCreatedEvent;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignal;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalInterval;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
@@ -263,11 +264,10 @@ public class Oadr20bVTNEiEventService {
 			EventDescriptorType createEventDescriptor = createEventDescriptor(drEvent);
 
 			boolean needResponse = false;
-			if (drEvent.getDescriptor().getResponseRequired() != null
-					&& drEvent.getDescriptor().getResponseRequired().equals("always")) {
+			if (drEvent.getDescriptor().getResponseRequired().equals(DemandResponseEventResponseRequiredEnum.ALWAYS)) {
 				needResponse = true;
-			} else {
-				needResponse = !demandResponseEventService.hasResponded(venId, drEvent);
+			} else if (drEvent.getDescriptor().getResponseRequired().equals(DemandResponseEventResponseRequiredEnum.NEVER)){
+				needResponse = false;
 			}
 
 			builder.addOadrEvent(Oadr20bEiEventBuilders.newOadr20bDistributeEventOadrEventBuilder()

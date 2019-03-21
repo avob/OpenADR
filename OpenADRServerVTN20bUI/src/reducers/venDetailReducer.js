@@ -92,6 +92,17 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
     case types.REMOVE_VEN_GROUP_ERROR:
       return state;
 
+    case types.LOAD_VEN_GROUP:
+      return state;
+
+    case types.LOAD_VEN_GROUP_SUCCESS:
+      newState = objectAssign( {}, state, {
+        venOpt: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_VEN_GROUP_ERROR:
+
 
 
       // REGISTRATION PARTY ACTION

@@ -248,6 +248,14 @@ export const cancelRequestReportSubscription  = (venId, reportRequestId) => {
 }
 
 
-
+export const loadVenOpt = (venId) => {
+  return swaggerAction(types.LOAD_VEN_OPT, 
+    (api) => {
+      var params = { venID: venId };
+      return  api.apis[ 'oadr-20b-ven-controller' ].venOptUsingGET(params, jsonResponseContentType);
+    },
+    parseJsonData
+  );
+}
 
 

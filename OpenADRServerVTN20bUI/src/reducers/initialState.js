@@ -16,7 +16,8 @@ export default {
     venMarketContext: [],
     venGroup: [],
     availableReport:[],
-    requestedReport:[]
+    requestedReport:[],
+    venOpt:[]
   },
   ven_detail_create_report: {
     availableReportDescription:[],
