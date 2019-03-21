@@ -258,6 +258,7 @@ public class DemandResponseEventService {
 		event.setSignals(partialUpdate.getSignals());
 		event.setTargets(partialUpdate.getTargets());
 		event.setLastUpdateTimestamp(System.currentTimeMillis());
+		event.setPublished(partialUpdate.isPublished());
 		DemandResponseEvent save = demandResponseEventDao.save(event);
 
 		// link added targets
@@ -279,6 +280,10 @@ public class DemandResponseEventService {
 		if (toRemove.size() > 0) {
 			List<Ven> vens = findVenForTarget(event, toRemove);
 			venDemandResponseEventDao.deleteByEventIdAndVenIn(event.getId(), vens);
+		}
+		
+		if (dto.isPublished()) {
+			this.distributeEventToPushVen(event);
 		}
 
 		return save;

@@ -3,18 +3,10 @@ import React from 'react';
 
 import Grid from '@material-ui/core/Grid';
 
-
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import Select from '@material-ui/core/Select';
-
 import Divider from '@material-ui/core/Divider';
 
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
-
-import Checkbox from '@material-ui/core/Checkbox';
 
 import {EventSignalPanel} from '../common/EventSignalPanel'
 
@@ -60,29 +52,37 @@ export class EventCreateEventSignalStep extends React.Component {
       <div>
 
         
-      {eventSignal.map((signal, index) => {
-          return (
-            <div key={"signal_panel_"+index}>
-            {(index !=0) ? <Grid container
-                  style={ { marginTop: 20, marginBottom: 20 } }
-                  spacing={ 24 }>
-              <Grid item xs={ 2 } />
-              <Grid item xs={ 8 }>
-                <Divider />
-              </Grid>
-              <Grid item xs={ 2 } />
-            </Grid> : null}
+      
+        <Grid container
+              style={ { marginTop: 20 } }
+              spacing={ 24 }>
+          <Grid item xs={ 2 } />
+          <Grid item xs={ 8 }>
+            {eventSignal.map((signal, index) => {
+              return (
+                <div key={"signal_panel_"+index}>
+                {(index !=0) ? <Grid container
+                      style={ { marginTop: 20, marginBottom: 20 } }
+                      spacing={ 24 }>
+                  <Grid item xs={ 2 } />
+                  <Grid item xs={ 8 }>
+                    <Divider />
+                  </Grid>
+                  <Grid item xs={ 2 } />
+                </Grid> : null}
 
-            <EventSignalPanel 
-              classes={classes} eventSignal={signal} hasError={hasError} 
-                onChange={that.handleEventSignalChange(index)}
-                onRemove={that.handleRemoveEventSignalChange(index)}
-                canBeRemoved={eventSignal.length >0}/>
-                
-            </div>
-        )
-        })}
-
+                <EventSignalPanel 
+                  classes={classes} eventSignal={signal} hasError={hasError} 
+                    onChange={that.handleEventSignalChange(index)}
+                    onRemove={that.handleRemoveEventSignalChange(index)}
+                    canBeRemoved={eventSignal.length >0}/>
+                    
+                </div>
+            )
+            })}
+          </Grid>
+          <Grid item xs={ 2 } />
+        </Grid>
 
         <Grid container
               style={ { marginTop: 20 } }

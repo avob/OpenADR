@@ -37,6 +37,7 @@ function getSteps() {
 export class EventCreate extends React.Component {
   constructor( props ) {
     super( props );
+    var now = new Date()
     this.state = {
       activeStep: 0,
       descriptor: {
@@ -62,7 +63,7 @@ export class EventCreate extends React.Component {
         // start: null,
         // duration: "",
         timezone: "UTC",
-        start: 0,
+        start: now.getTime(),
         duration: 120,
         notificationDuration: 120,
         rampUpDuration: 120,

@@ -1,19 +1,14 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
 
-
-import { withStyles} from '@material-ui/core/styles';
-
-import { VtnConfigurationEventCard } from '../common/VtnConfigurationCard'
-
-
-
-import Typography from '@material-ui/core/Typography';
 
 import EventDetailHeader from './EventDetailHeader'
 import Divider from '@material-ui/core/Divider';
 
+import {EventTargetPanel} from '../common/EventTargetPanel'
+
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 
 export class EventDetailTarget extends React.Component {
   constructor( props ) {
@@ -24,12 +19,52 @@ export class EventDetailTarget extends React.Component {
   }
 
   render() {
-   const {classes, event} = this.props;
-
+   const {classes, event, copyTargets, group, editMode} = this.props;
     return (
     <div className={ classes.root } >
-      <EventDetailHeader classes={classes} event={event}/>
-       <Divider style={ { marginTop: '20px' } } />
+      <EventDetailHeader classes={classes} event={event} actions={<Grid container spacing={ 24 }>
+
+        {(!event.published) ? <Grid item xs={ 4 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="primary"
+                    fullWidth={true}
+                    size="small"
+                    onClick={this.handlePublishEventClick}>
+              <CloudDownloadIcon style={ { marginRight: 15 } }/> PUBLISH
+            </Button>
+          </Grid> : null}
+          
+
+        {(editMode) ? <Grid item xs={ 4 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="primary"
+                    fullWidth={true}
+                    size="small"
+                    onClick={() => {this.props.updateEvent(false)}}>
+              <CloudDownloadIcon style={ { marginRight: 15 } }/> UPDATE
+            </Button>
+          </Grid> : null}
+
+        {(editMode) ? <Grid item xs={ 4 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="secondary"
+                    fullWidth={true}
+                    size="small"
+                    onClick={() => {this.props.updateEvent(true)}}>
+              <CloudDownloadIcon style={ { marginRight: 15 } }/> UPDATE AND PUBLISH
+            </Button>
+          </Grid> : null}
+      
+      </Grid>}/>
+       <Divider style={ { marginTop: '20px', marginBottom:20 } } />
+
+       <EventTargetPanel classes={classes} eventTarget={copyTargets} group={group} onChange={this.props.updateCopyTargets}/>
 
     </div>
     );

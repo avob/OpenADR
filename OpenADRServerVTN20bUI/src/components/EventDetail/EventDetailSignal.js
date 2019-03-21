@@ -45,74 +45,70 @@ var EventTextField = (props) => {
 export class EventDetailSignal extends React.Component {
   constructor( props ) {
     super( props );
-    this.state = {}
-    this.state.editMode = false;
-    this.state.signals = this.props.event.signals.splice(0);
-
-
   }
-
-componentWillReceiveProps(nextProps) {
-  this.setState({signals: this.props.event.signals, editMode: false});
-}
 
   handleAddSignalClick = () => {
-    var signals = this.state.signals;
-    if(!this.state.editMode) {
-      signals = this.props.event.signals;
-    }
-    signals.push({
-        signalName: "",
-        signalType: "",
-        unitType: "",
-        intervals: [],
-        currentValue: "",
-      });
-    this.setState({signals: signals, editMode: true});
+    this.props.addCopySignals();
   }
 
-  handleEventSignalChange = (index) => (signal) => {
-    var signals = this.state.signals;
-    signals[index] = signal;
-    this.setState({signals: signals, editMode: true});
+  handleEventSignalChange = (index) => (newSignal) => {
+    this.props.updateCopySignals(index, newSignal);
   }
 
   handleRemoveEventSignalChange = (index) => () => {
-    var signals = this.state.signals.splice(0);
-    signals.splice(index, 1)
-    this.setState({signals: signals, editMode: true});
+    this.props.removeCopySignals(index);
   }
 
-  handleUpdateEvent = () => {
-    var updateEvent = {};
-    updateEvent.signals = this.state.signals;
-    updateEvent.targets = this.props.event.targets;
-    this.setState({editMode:false})
-    // this.props.updateEvent(this.props.paramId, updateEvent);
-    
+  handlePublishEventClick = () => {
+    this.props.publishEvent(this.props.event.id);
   }
+
 
   render() {
-    const {classes, event} = this.props;
+    const {classes, event, copySignals, editMode} = this.props;
     var that = this;
     var hasError = false;
+    console.log(event);
 
-
-    var signals = this.state.signals;
 
     return (
     <div className={ classes.root } >
       <EventDetailHeader classes={classes} event={event} actions={<Grid container spacing={ 24 }>
 
-        {(this.state.editMode) ? <Grid item xs={ 4 }>
+        {(!event.published) ? <Grid item xs={ 4 }>
             <Button key="btn_create"
                     style={ { marginTop: 15 } }
                     variant="outlined"
                     color="primary"
                     fullWidth={true}
                     size="small"
-                    onClick={this.handleUpdateEvent}>
+                    onClick={this.handlePublishEventClick}>
+              <CloudDownloadIcon style={ { marginRight: 15 } }/> PUBLISH
+            </Button>
+          </Grid> : null}
+          
+
+        {(editMode) ? <Grid item xs={ 4 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="primary"
+                    fullWidth={true}
+                    size="small"
+                    onClick={() => {this.props.updateEvent(false)}}>
               <CloudDownloadIcon style={ { marginRight: 15 } }/> UPDATE
+            </Button>
+          </Grid> : null}
+
+        {(editMode) ? <Grid item xs={ 4 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="secondary"
+                    fullWidth={true}
+                    size="small"
+                    onClick={() => {this.props.updateEvent(true)}}>
+              <CloudDownloadIcon style={ { marginRight: 15 } }/> UPDATE AND PUBLISH
             </Button>
           </Grid> : null}
       
@@ -121,7 +117,7 @@ componentWillReceiveProps(nextProps) {
 
 
        <Divider style={ { marginTop: '20px', marginBottom:20 } } />
-       {signals.map((signal, index) => {
+       {copySignals.map((signal, index) => {
           return (
             <div key={"signal_panel_"+index}>
             {(index !=0) ? <Grid container
@@ -136,7 +132,7 @@ componentWillReceiveProps(nextProps) {
               classes={classes} eventSignal={signal} hasError={hasError} 
                 onChange={that.handleEventSignalChange(index)}
                 onRemove={that.handleRemoveEventSignalChange(index)}
-                canBeRemoved={signals.length >0}/>
+                canBeRemoved={copySignals.length >0}/>
                 
             </div>
         )

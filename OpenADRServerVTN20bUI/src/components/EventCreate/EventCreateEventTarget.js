@@ -35,123 +35,15 @@ import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponen
 import { GroupSelectDialog, TargetSelectDialog } from '../common/VtnconfigurationDialog'
 
 
-
-var EventTargetTable = (props) => {
-  const {classes} = props;
-  return (
-    <Paper className={classes.root}>
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell align="right">Target Type</TableCell>
-            <TableCell align="right">Target ID</TableCell>
-            <TableCell align="right">Targeted Devices</TableCell>
-            <TableCell align="right"></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {props.eventTarget.map( (row, index) => (
-            <TableRow key={index}>
-              <TableCell scope="row" align="right">{row.targetType}</TableCell>
-              <TableCell scope="row" align="right">{row.targetId}</TableCell>
-              <TableCell scope="row" align="right"></TableCell>
-              <TableCell scope="row" align="right">
-                  <Button size="small" color="secondary" onClick={props.handleRemoveTargetAtIndex(index)}> REMOVE </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </Paper>
-  );
-}
+import {EventTargetPanel} from '../common/EventTargetPanel'
 
 
-const labelStyle = {
-
-  boxSizing: 'border-box',
-  color: 'rgba(0, 0, 0, 0.54)',
-  fontSize: '1rem',
-  fontWeight: 400,
-  left: '0px',
-  lineHeight: 1,
-  transition: 'color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms',
-  transform: 'translate(0, 1.5px) scale(0.75)',
-  transformOrigin: 'top left',
-  top: 0,
-  left: 0,
-  marginTop: "-8px"
-
-}
 
 export class EventCreateEventTarget extends React.Component {
 
   constructor( props ) {
     super( props )
-    this.state = {
-      createTargetType: "",
-      createTargetId: "",
-      targetSelectDialog: false,
-      groupSelectDialog: false
-    }
-  }
-
-  handleCreateTarget = () => {
-    let target = this.props.eventTarget;
-    target.push({
-      targetType: this.state.createTargetType,
-      targetId: this.state.createTargetId
-    });
-    this.props.onChange(target);
-    this.setState({
-      createTargetType: "",
-      createTargetId: "",
-    });
-  }
-
-  handleCancelTarget = () => {
-    this.setState({
-      createTargetType: "",
-      createTargetId: "",
-    });
-  }
-
-  handleRemoveTargetAtIndex = (index) => () => {
-    let target = this.props.eventTarget;
-    target.splice(index,1);
-    this.props.onChange(target);
-  }
-
-  handleTargetTypeChange = (e) => {
-    this.setState({createTargetType: e.target.value});
-  }
-
-  handleTargetIdChange = (e) => {
-    this.setState({createTargetId: e.target.value});
-  }
-
-  handleTargetSelectDialogClose = (targetType) => {
-    var newState = {targetSelectDialog: false}
-    if(targetType != null){
-      newState.createTargetType = targetType;
-    }
-    this.setState(newState);
-  }
-
-  handleTargetSelectDialogOpen = () => {
-    this.setState({targetSelectDialog: true});
-  }
-
-  handleGroupSelectClose = (group) => {
-    var newState = {groupSelectDialog: false}
-    if(group != null){
-      newState.createTargetId = group.name;
-    }
-    this.setState(newState);
-  }
-
-  handleGroupSelectOpen = () => {
-    this.setState({groupSelectDialog: true});
+   
   }
 
 
@@ -165,85 +57,14 @@ export class EventCreateEventTarget extends React.Component {
       
       <Grid container spacing={ 24 }>
         <Grid item xs={ 2 } />
-          <Grid item xs={ 2 }>
-           <TextField label="Select Target Type" error={hasError && descriptor.marketContext == null}
-                 value={ this.state.createTargetType }
-                 placeholder="Ven, Group ..."
-                 className={classes.textField}
-                 fullWidth={true}
-                 onClick={this.handleTargetSelectDialogOpen}
-                 InputProps={ { readOnly: true, } } InputLabelProps={{ shrink: true }}/>
-
-              <TargetSelectDialog open={ this.state.targetSelectDialog }
-                                  close={ this.handleTargetSelectDialogClose }
-                                  title="Select Target Type" />
-
-
-            
+          <Grid item xs={ 8 }>
+            <EventTargetPanel classes={classes} eventTarget={eventTarget} group={group} onChange={this.props.onChange}/>
           </Grid>
 
-          { (this.state.createTargetType == "group") ? <Grid item xs={ 4 }>
-            <TextField required label="Group" 
-                 value={this.state.createTargetId}
-                 className={classes.textField}
-                 fullWidth={true}
-                 onClick={this.handleGroupSelectOpen}
-                 InputProps={{ readOnly: true }} />
-
-              <GroupSelectDialog group={ group}
-                                         open={ this.state.groupSelectDialog }
-                                         close={ this.handleGroupSelectClose }
-                                         title="Select Market Context" />
-          </Grid> : null}
-
-          { (this.state.createTargetType == "ven") ? <Grid item xs={ 4 }>
-            <TextField label="Select Target"
-                       placeholder="MyGroup, MyVen ..."
-                       value={ this.state.createTargetId }
-                       className={ classes.textField }
-                       onChange={ this.handleTargetIdChange }
-                       InputLabelProps={{ shrink: true }}
-                       fullWidth={ true } />
-          </Grid> : null}
-
-          { (this.state.createTargetType != "" && this.state.createTargetId != "") ? <Grid item xs={ 1 }>
-            <Button key="btn_create"
-                            variant="outlined"
-                            color="primary"
-                            size="small"
-                            className={ classes.button }
-                            style={ { marginTop: 13 } }
-                            onClick={ this.handleCreateTarget }>
-                      <AddIcon />Create
-                    </Button>
-          </Grid> : null}
-
-          { (this.state.createTargetType != "") ? <Grid item xs={ 1 }>
-            <Button key="btn_create"
-                            variant="outlined"
-                            color="secondary"
-                            size="small"
-                            className={ classes.button }
-                            style={ { marginTop: 13 } }
-                            onClick={ this.handleCancelTarget }>
-                      <AddIcon />Cancel
-                    </Button>
-          </Grid> : null}
-         
-          
-          
           
         <Grid item xs={ 2 } />
       </Grid>
-      <Grid container spacing={ 24 }
-         style={ { marginTop: 20, marginBottom:10 } }>
-        <Grid item xs={ 2 } />
-        <Grid item xs={ 8 }>
-          <EventTargetTable classes={classes} eventTarget={eventTarget} 
-          handleRemoveTargetAtIndex={this.handleRemoveTargetAtIndex}/>
-        </Grid> 
-        <Grid item xs={ 2 } />
-      </Grid>
+     
       
     </Grid>
     );

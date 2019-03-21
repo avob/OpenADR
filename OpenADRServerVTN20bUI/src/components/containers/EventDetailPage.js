@@ -75,10 +75,15 @@ const styles = theme => ({
 
 export class EventDetailPage extends React.Component {
 
-
-  state = {
-    value: 0,
-  };
+  constructor() {
+    super()
+    this.state = {
+      value: 0,
+      copySignals: [],
+      copyTargets: [],
+      editMode: false
+    };
+  }
 
   handleChange = (event, value) => {
     this.setState( {
@@ -87,14 +92,60 @@ export class EventDetailPage extends React.Component {
   };
 
   componentDidMount() {
+    this.props.vtnConfigurationActions.loadMarketContext();
+    this.props.vtnConfigurationActions.loadGroup();
     this.props.eventActions.loadEventDetail(this.props.match.params.id);
+    if(this.props.event_detail.event.signals) {
+      this.setState({copySignals: this.props.event_detail.event.signals});
+    }
+    if(this.props.event_detail.event.targets) {
+      this.setState({copyTargets: this.props.event_detail.event.targets});
+    }
+    
 
+  }
+
+  updateCopySignals = (index, newSignal) => {
+    var copySignals = this.state.copySignals;
+    copySignals[index] = newSignal;
+    this.setState({copySignals: copySignals, editMode: true});
+  }
+
+  removeCopySignals = (index) => {
+    var copySignals = this.state.copySignals;
+    copySignals.splice(index, 1)
+    this.setState({copySignals: copySignals, editMode: true});
+  }
+
+  updateCopyTargets = (newTargets) => {
+    this.setState({copyTargets: newTargets, editMode: true});
+  }
+
+   addCopySignals = (index) => {
+    var copySignals = this.state.copySignals;
+    copySignals.push({
+        signalName: "",
+        signalType: "",
+        unitType: "",
+        intervals: [],
+        currentValue: "",
+      });
+    this.setState({copySignals: copySignals, editMode: true});
+  }
+
+  updateEvent = (published) => {
+    var dto = {
+      published:published,
+      signals: this.state.copySignals,
+      targets: this.state.copyTargets
+    }
+    this.props.eventActions.updateEvent(this.props.match.params.id, dto)
+    this.setState({editMode: false});
   }
 
   render() {
     const {classes, event_detail} = this.props;
     const {value} = this.state;
-    console.log(event_detail);
     return (
      <div className={ classes.root }>
       <Tabs value={ this.state.value }
@@ -109,7 +160,7 @@ export class EventDetailPage extends React.Component {
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
-                <EventDetailDescriptor classes={classes} event={event_detail.event}
+                <EventDetailDescriptor classes={classes} event={event_detail.event} 
                   activeEvent={this.props.eventActions.activeEvent}
                   cancelEvent={this.props.eventActions.cancelEvent}
                   publishEvent={this.props.eventActions.publishEvent}/>
@@ -120,15 +171,29 @@ export class EventDetailPage extends React.Component {
                      
                        </TabContainer> }
       { value === 2 && <TabContainer>
-                <EventDetailSignal classes={classes} event={event_detail.event}
-                  paramId={this.props.match.params.id}
-                  updateEvent={this.props.eventActions.updateEvent}/>
-                      
+                <EventDetailSignal classes={classes} event={event_detail.event} 
+                  updateEvent={this.updateEvent}
+                   
+                  
+                  editMode={this.state.editMode}
+                  copySignals={this.state.copySignals}
+                  updateCopySignals={this.updateCopySignals}
+                 
+                  removeCopySignals={this.removeCopySignals}
+                  addCopySignals={this.addCopySignals}
+                  publishEvent={this.props.eventActions.publishEvent}
+                  />
+                  
                        </TabContainer> }
       { value === 3 && <TabContainer>
                 <EventDetailTarget classes={classes} event={event_detail.event}
 
-                  updateEvent={this.props.eventActions.updateEvent}/>
+                  updateEvent={this.updateEvent}
+                  group={event_detail.group}
+                  editMode={this.state.editMode}
+                  copyTargets={this.state.copyTargets}
+                  updateCopyTargets={this.updateCopyTargets}
+                  />
                      
                        </TabContainer> }
 
@@ -151,7 +216,8 @@ function mapStateToProps( state ) {
 
 function mapDispatchToProps( dispatch ) {
   return {
-    eventActions: bindActionCreators( eventActions, dispatch )
+    eventActions: bindActionCreators( eventActions, dispatch ),
+    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch )
   };
 }
 
