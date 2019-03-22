@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDao;
@@ -158,13 +159,11 @@ public class DemandResponseEventService {
 		DemandResponseEvent event = dtoMapper.map(dto, DemandResponseEvent.class);
 		event.setCreatedTimestamp(System.currentTimeMillis());
 		event.setLastUpdateTimestamp(System.currentTimeMillis());
-		if(dto.isPublished()) {
+		if (dto.isPublished()) {
 			event.getDescriptor().setModificationNumber(0);
-		}
-		else {
+		} else {
 			event.getDescriptor().setModificationNumber(-1);
 		}
-		
 
 		Date dateStart = new Date();
 		dateStart.setTime(event.getActivePeriod().getStart());
@@ -281,7 +280,7 @@ public class DemandResponseEventService {
 			List<Ven> vens = findVenForTarget(event, toRemove);
 			venDemandResponseEventDao.deleteByEventIdAndVenIn(event.getId(), vens);
 		}
-		
+
 		if (dto.isPublished()) {
 			this.distributeEventToPushVen(event);
 		}
@@ -437,6 +436,7 @@ public class DemandResponseEventService {
 		if (findOneByEventIdAndVenId != null) {
 			findOneByEventIdAndVenId.setVenOpt(venOpt);
 			findOneByEventIdAndVenId.setLastSentModificationNumber(modificationNumber);
+			findOneByEventIdAndVenId.setLastUpdateDatetime(System.currentTimeMillis());
 			venDemandResponseEventDao.save(findOneByEventIdAndVenId);
 		}
 	}
@@ -473,6 +473,16 @@ public class DemandResponseEventService {
 		} else {
 			return demandResponseEventDao.findToSentEventByVenUsername(username, currentTimeMillis);
 		}
+	}
+
+	public List<VenDemandResponseEvent> getVenDemandResponseEvent(Long demandResponseEventId)
+			throws OadrElementNotFoundException {
+		Optional<DemandResponseEvent> findById = demandResponseEventDao.findById(demandResponseEventId);
+		if (!findById.isPresent()) {
+			throw new OadrElementNotFoundException("Event not found");
+		}
+		DemandResponseEvent event = findById.get();
+		return venDemandResponseEventDao.findByEvent(event);
 	}
 
 }

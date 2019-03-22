@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
@@ -30,6 +31,8 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandR
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.validator.DemandResponseEventCreateDtoValidator;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.validator.DemandResponseEventUpdateDtoValidator;
+import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDto;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 
@@ -126,7 +129,7 @@ public class DemandResponseController {
 		return dtoMapper.map(event, DemandResponseEventReadDto.class);
 
 	}
-	
+
 	@RequestMapping(value = "/{id}/active", method = RequestMethod.POST)
 	@ResponseBody
 	public DemandResponseEventReadDto active(@PathVariable(value = "id") Long id, HttpServletResponse response) {
@@ -186,6 +189,24 @@ public class DemandResponseController {
 		if (!delete) {
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 		}
+	}
+
+	@RequestMapping(value = "/{id}/venResponse", method = RequestMethod.GET)
+	@ResponseBody
+	public List<VenDemandResponseEventDto> readVenDemandResponseEvent(@PathVariable(value = "id") Long id,
+			HttpServletResponse response) {
+
+		try {
+			List<VenDemandResponseEvent> venDemandResponseEvent = demandResponseEventService
+					.getVenDemandResponseEvent(id);
+
+			return dtoMapper.mapList(venDemandResponseEvent, VenDemandResponseEventDto.class);
+
+		} catch (OadrElementNotFoundException e) {
+			response.setStatus(HttpStatus.NOT_FOUND_404);
+			return null;
+		}
+
 	}
 
 }

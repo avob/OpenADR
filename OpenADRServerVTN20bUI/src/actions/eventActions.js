@@ -87,3 +87,13 @@ export const cancelEvent = (id) => {
   );
 }
 
+export const loadEventVenResponse = (id) => {
+  var params = { id: id };
+  return swaggerAction(types.LOAD_EVENT_VEN_RESPONSE, 
+    (api) => {
+      return api.apis[ 'demand-response-controller' ].readVenDemandResponseEventUsingGET(params, jsonResponseContentType);
+    }, 
+    parseJsonData
+  );
+}
+

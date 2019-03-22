@@ -13,6 +13,9 @@ import ExtensionIcon from '@material-ui/icons/Extension';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
 
+import Button from '@material-ui/core/Button';
+import DialogActions from '@material-ui/core/DialogActions';
+
 
 export function MarketContextSelectDialog( props ) {
   return (
@@ -146,6 +149,47 @@ export function VenStatusSelectDialog( props ) {
         
       </List>
     </div>
+  </Dialog>
+  );
+}
+
+  // title:e.descriptor.eventId,
+  //       start: start,
+  //       end: end,
+  //       allday:false,
+  //       state: e.descriptor.state,
+  //       published: e.published,
+  //       marketContext:e.descriptor.marketContext
+
+export function EventCalendarDialog( props ) {
+  if(!props.event) return null;
+  return (
+  <Dialog open={ props.open } onClose={ () => {
+                                        props.close()
+                                      } }>
+    <DialogTitle>
+      { props.event.title }
+    </DialogTitle>
+    <div>
+      <List>
+        <ListItem >
+          <ListItemAvatar>
+            <Avatar>
+              <SettingsInputComponentIcon />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary={ props.event.marketContext } />
+        </ListItem>
+      </List>
+    </div>
+      <DialogActions>
+        <Button onClick={props.close} color="primary">
+          close
+        </Button>
+        <Button onClick={props.handleEventDetailClick} color="primary" autoFocus>
+          Event Detail
+        </Button>
+      </DialogActions>
   </Dialog>
   );
 }

@@ -1,4 +1,4 @@
-package com.avob.openadr.model.oadr20b.dto;
+package com.avob.openadr.server.oadr20b.vtn.models.venreport.data;
 
 public class ReportDataDto {
 

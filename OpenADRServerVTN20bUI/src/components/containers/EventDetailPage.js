@@ -17,10 +17,12 @@ import EventDetailDescriptor from '../EventDetail/EventDetailDescriptor'
 import EventDetailActivePeriod from '../EventDetail/EventDetailActivePeriod'
 import EventDetailSignal from '../EventDetail/EventDetailSignal'
 import EventDetailTarget from '../EventDetail/EventDetailTarget'
+import EventDetailVenResponse from '../EventDetail/EventDetailVenResponse'
 
 import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
 
+import { history } from '../../store/configureStore';
 
 
 function TabContainer( props ) {
@@ -89,17 +91,55 @@ export class EventDetailPage extends React.Component {
     this.setState( {
       value
     } );
+    switch(value) {
+      case 0:
+        history.push("/event/detail/"+this.props.match.params.id+"/descriptor")
+        break;
+      case 1:
+        history.push("/event/detail/"+this.props.match.params.id+"/activeperiod")
+        break;
+      case 2:
+        history.push("/event/detail/"+this.props.match.params.id+"/signal")
+        break;
+      case 3:
+        history.push("/event/detail/"+this.props.match.params.id+"/target")
+        break;
+      case 4:
+        history.push("/event/detail/"+this.props.match.params.id+"/venresponse")
+        break;
+    }
+
   };
 
   componentDidMount() {
     this.props.vtnConfigurationActions.loadMarketContext();
     this.props.vtnConfigurationActions.loadGroup();
     this.props.eventActions.loadEventDetail(this.props.match.params.id);
+    this.props.eventActions.loadEventVenResponse(this.props.match.params.id);
+
     if(this.props.event_detail.event.signals) {
       this.setState({copySignals: this.props.event_detail.event.signals});
     }
     if(this.props.event_detail.event.targets) {
       this.setState({copyTargets: this.props.event_detail.event.targets});
+    }
+
+    switch(this.props.match.params.panel){
+      case "descriptor":
+        this.setState({value:0});
+        break;
+      case "activeperiod":
+        this.setState({value:1});
+        break;
+      case "signal":
+        this.setState({value:2});
+        break;
+      case "target":
+        this.setState({value:3});
+        break;
+      case "venresponse":
+        this.setState({value:4});
+        break;
     }
     
 
@@ -146,6 +186,7 @@ export class EventDetailPage extends React.Component {
   render() {
     const {classes, event_detail} = this.props;
     const {value} = this.state;
+    if(!event_detail.event.activePeriod ) return null;
     return (
      <div className={ classes.root }>
       <Tabs value={ this.state.value }
@@ -157,6 +198,7 @@ export class EventDetailPage extends React.Component {
         <Tab label="Active Period" />
         <Tab label="Signals" />
         <Tab label="Targets" />
+        <Tab label="Ven Responses" />
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
@@ -196,6 +238,13 @@ export class EventDetailPage extends React.Component {
                   />
                      
                        </TabContainer> }
+
+      { value === 4 && <TabContainer>
+                <EventDetailVenResponse classes={classes} event={event_detail.event} venResponse={event_detail.venResponse}
+                refreshVenResponse={() => {this.props.eventActions.loadEventVenResponse(this.props.match.params.id)}}/>
+                     
+                       </TabContainer> }
+                
 
 
     </div>

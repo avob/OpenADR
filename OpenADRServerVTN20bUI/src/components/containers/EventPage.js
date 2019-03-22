@@ -16,6 +16,9 @@ import Divider from '@material-ui/core/Divider';
 import EventList from '../Event/EventList'
 import EventCalendar from '../Event/EventCalendar'
 
+import { history } from '../../store/configureStore';
+
+
 
 function TabContainer( props ) {
   return (
@@ -72,11 +75,27 @@ export class EventPage extends React.Component {
     this.setState( {
       value
     } );
+    switch(value) {
+      case 0:
+        history.push("/event/list")
+        break;
+      case 1:
+        history.push("/event/calendar")
+        break;
+    }
   };
 
   componentDidMount() {
     this.props.vtnConfigurationActions.loadMarketContext();
     this.props.eventActions.loadEvent();
+    switch(this.props.match.params.panel){
+      case "list":
+        this.setState({value:0});
+        break;
+      case "calendar":
+        this.setState({value:1});
+        break;
+    }
   }
 
   render() {
@@ -105,7 +124,9 @@ export class EventPage extends React.Component {
                        </TabContainer> }
                        
       { value === 1 && <TabContainer>
-                          <EventCalendar classes={classes} />
+                          <EventCalendar classes={classes} 
+                          marketContext={ event.marketContext }
+                          event={event.event}/>
                        </TabContainer> }
 
     </div>

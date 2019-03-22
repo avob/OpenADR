@@ -134,4 +134,40 @@ public class VenOpt {
 		return event;
 	}
 
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setVen(Ven ven) {
+		this.ven = ven;
+	}
+
+	public void setMarketContext(VenMarketContext marketContext) {
+		this.marketContext = marketContext;
+	}
+
+	public void setVenResource(VenResource venResource) {
+		this.venResource = venResource;
+	}
+
+	public void setEvent(DemandResponseEvent event) {
+		this.event = event;
+	}
+
+	public void setOptId(String optId) {
+		this.optId = optId;
+	}
+
+	public void setStart(Long start) {
+		this.start = start;
+	}
+
+	public void setEnd(Long end) {
+		this.end = end;
+	}
+
+	public void setOpt(DemandResponseEventOptEnum opt) {
+		this.opt = opt;
+	}
+
 }

@@ -23,7 +23,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiOptBuilders;
-import com.avob.openadr.model.oadr20b.dto.VenOptDto;
 import com.avob.openadr.model.oadr20b.ei.OptReasonEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
@@ -43,6 +42,7 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedde
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.converter.OptConverter;
+import com.avob.openadr.server.oadr20b.vtn.models.venopt.VenOptDto;
 import com.avob.openadr.server.oadr20b.vtn.service.VenOptService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
@@ -135,8 +135,8 @@ public class Oadr20bVTNEiOptControllerTest {
 
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenID());
-		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContextName());
+		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenId());
+		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContext());
 
 		// test opt configured on OadrDataBaseSetup.MARKET_CONTEXT_NAME: between
 		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
@@ -145,8 +145,8 @@ public class Oadr20bVTNEiOptControllerTest {
 
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenID());
-		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContextName());
+		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenId());
+		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContext());
 
 		// test opt configured on OadrDataBaseSetup.MARKET_CONTEXT_NAME: after
 		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
@@ -154,8 +154,8 @@ public class Oadr20bVTNEiOptControllerTest {
 				createParams(createdDatetime - 1000, null, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenID());
-		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContextName());
+		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenId());
+		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContext());
 
 		// test opt configured: after
 		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
@@ -163,8 +163,8 @@ public class Oadr20bVTNEiOptControllerTest {
 				createParams(createdDatetime - 1000, null, null));
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenID());
-		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContextName());
+		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenId());
+		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContext());
 
 		// test opt configured on OadrDataBaseSetup.MARKET_CONTEXT_NAME: before
 		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
@@ -173,8 +173,8 @@ public class Oadr20bVTNEiOptControllerTest {
 
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenID());
-		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContextName());
+		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenId());
+		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContext());
 
 		// test opt configured: before
 		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
@@ -183,8 +183,8 @@ public class Oadr20bVTNEiOptControllerTest {
 
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenID());
-		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContextName());
+		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenId());
+		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContext());
 
 		// test opt configured on OadrDataBaseSetup.MARKET_CONTEXT_NAME
 		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
@@ -193,8 +193,8 @@ public class Oadr20bVTNEiOptControllerTest {
 
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenID());
-		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContextName());
+		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenId());
+		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContext());
 
 		// test opt configured on OadrDataBaseSetup.MARKET_CONTEXT_NAME: outside
 		// opt window frame

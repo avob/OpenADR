@@ -42,7 +42,8 @@ export default {
   event_detail: {
     event: {},
     marketContext: [],
-    group: []
+    group: [],
+    venResponse:[]
   },
   event_create: {
     marketContext: [],

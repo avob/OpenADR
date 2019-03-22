@@ -183,6 +183,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setEventId("eventActive");
 		dto.getDescriptor().setMarketContext(marketContext.getName());
+		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		dto.getSignals().add(signal);
@@ -200,6 +201,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getDescriptor().setEventId("eventCanceled");
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
+		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		dto.getSignals().add(signal);

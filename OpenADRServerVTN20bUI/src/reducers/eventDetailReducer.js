@@ -65,6 +65,18 @@ export default function eventDetailReducer( state = initialState.event_detail, a
     case types.CANCEL_EVENT_ERROR:
       return state;
 
+    case types.LOAD_EVENT_VEN_RESPONSE:
+      return state;
+
+    case types.LOAD_EVENT_VEN_RESPONSE_SUCCESS:
+      newState = objectAssign( {}, state, {
+        venResponse: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_EVENT_VEN_RESPONSE_ERROR:
+      return state;
+
      // MARKET CONTEXT
     case types.LOAD_MARKET_CONTEXT:
       return state;

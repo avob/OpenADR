@@ -17,15 +17,29 @@ import org.springframework.stereotype.Service;
 
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDescriptor;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventDescriptorDto;
+import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDto;
 import com.google.common.collect.Lists;
 
 @Service
 
 public class DtoMapper {
 	protected static final String MARKET_CONTEXT_CONVERTER_ID = "marketContextConverter";
+	protected static final String VEN_CONVERTER_ID = "venConverter";
+	protected static final String DEMAND_RESPONSE_CONVERTER_ID = "demandResponseEventConverter";
+	protected static final String VEN_RESOURCE_CONVERTER_ID = "venResourceConverter";
 
 	@Resource
 	protected MarketContextMapper marketContextConverter;
+
+	@Resource
+	private VenMapper venConverter;
+
+	@Resource
+	private DemandResponseEventMapper demandResponseEventConverter;
+
+	@Resource
+	private VenResourceMapper venResourceMapper;
 
 	protected DozerBeanMapper mapper;
 
@@ -34,8 +48,12 @@ public class DtoMapper {
 		mapper = new DozerBeanMapper();
 		Map<String, CustomConverter> customConvertersWithId = new HashMap<String, CustomConverter>();
 		customConvertersWithId.put(MARKET_CONTEXT_CONVERTER_ID, marketContextConverter);
+		customConvertersWithId.put(VEN_CONVERTER_ID, venConverter);
+		customConvertersWithId.put(DEMAND_RESPONSE_CONVERTER_ID, demandResponseEventConverter);
+		customConvertersWithId.put(VEN_RESOURCE_CONVERTER_ID, venResourceMapper);
 		mapper.setCustomConvertersWithId(customConvertersWithId);
 		mapper.addMapping(demandResponseEventMappingConfiguration());
+		mapper.addMapping(venDemandResponseEventMappingConfiguration());
 	}
 
 	public <T> T map(Object src, Class<T> klass) {
@@ -57,6 +75,19 @@ public class DtoMapper {
 				mapping(DemandResponseEventDescriptor.class, DemandResponseEventDescriptorDto.class).fields(
 						"marketContext", "marketContext", customConverter(MarketContextMapper.class),
 						customConverterId(MARKET_CONTEXT_CONVERTER_ID));
+
+			}
+		};
+	}
+
+	private BeanMappingBuilder venDemandResponseEventMappingConfiguration() {
+		return new BeanMappingBuilder() {
+			@Override
+			protected void configure() {
+				mapping(VenDemandResponseEvent.class, VenDemandResponseEventDto.class)
+						.fields("ven", "venId", customConverter(VenMapper.class), customConverterId(VEN_CONVERTER_ID))
+						.fields("event", "eventId", customConverter(DemandResponseEventMapper.class),
+								customConverterId(DEMAND_RESPONSE_CONVERTER_ID));
 
 			}
 		};

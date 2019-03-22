@@ -14,6 +14,9 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 
+import { history } from '../../store/configureStore';
+
+
 function TabContainer( props ) {
   return (
   <Typography component="div" style={ { padding: 8 * 3 } }>
@@ -67,6 +70,17 @@ export class VtnConfigurationPage extends React.Component {
     this.setState( {
       value
     } );
+    switch(value) {
+      case 0:
+        history.push("/vtn_configuration/marketcontext")
+        break;
+      case 1:
+        history.push("/vtn_configuration/group")
+        break;
+      case 2:
+        history.push("/vtn_configuration/parameter")
+        break;
+    }
   };
 
 
@@ -74,6 +88,17 @@ export class VtnConfigurationPage extends React.Component {
     this.props.actions.loadVtnConfiguration();
     this.props.actions.loadMarketContext();
     this.props.actions.loadGroup();
+    switch(this.props.match.params.panel){
+      case "marketcontext":
+        this.setState({value:0});
+        break;
+      case "group":
+        this.setState({value:1});
+        break;
+      case "parameter":
+        this.setState({value:2});
+        break;
+    }
   }
 
   render() {

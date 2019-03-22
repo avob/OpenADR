@@ -1,4 +1,4 @@
-package com.avob.openadr.server.oadr20b.vtn.exception;
+package com.avob.openadr.server.common.vtn.exception;
 
 public class OadrElementNotFoundException extends Exception {
 

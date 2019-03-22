@@ -1,11 +1,8 @@
 import React from 'react';
 
-
 import Typography from '@material-ui/core/Typography';
 
-import VenDetailHeader from './VenDetailHeader'
 import Divider from '@material-ui/core/Divider';
-
 import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 
@@ -24,12 +21,8 @@ import ChipInput from 'material-ui-chip-input'
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
 
 import { VtnConfigurationEventCard } from '../common/VtnConfigurationCard'
 
@@ -37,66 +30,32 @@ import { MarketContextSelectDialog } from '../common/VtnconfigurationDialog'
 
 import { history } from '../../store/configureStore';
 
-import {DateAndTimePicker, DurationPicker } from '../common/TimePicker'
+import { DateAndTimePicker, DurationPicker } from '../common/TimePicker'
 
 import { MarketContextChip } from '../common/FilterChip'
-
-import {formatTimestamp} from '../../utils/time'
 
 const deltaStartDays = 7
 const deltaEndDays = 7
 
-
-var VenOptTable = (props) => {
-  const {classes} = props;
-  return (
-    <Paper className={classes.root}>
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell align="right">Opt ID</TableCell>
-            <TableCell align="right">MarketContext</TableCell>
-            <TableCell align="right">Start</TableCell>
-            <TableCell align="right">End</TableCell>
-            <TableCell align="right">Opt</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {props.venOpt.map( (row, index) => {
-            var startDatetime = formatTimestamp(row.start);
-            var endDatetime = formatTimestamp(row.end);
-            return (
-
-            <TableRow key={index}>
-              <TableCell scope="row" align="right">{row.optId}</TableCell>
-              <TableCell scope="row" align="right">{row.marketContext}</TableCell>
-              <TableCell scope="row" align="right">{startDatetime.date + " " +startDatetime.time + " " + startDatetime.tz}</TableCell>
-              <TableCell scope="row" align="right">{endDatetime.date + " " +endDatetime.time + " " + endDatetime.tz}</TableCell>
-              <TableCell scope="row" align="right">{row.opt}</TableCell>
-            </TableRow>
-          )
-          })}
-        </TableBody>
-      </Table>
-    </Paper>
-  );
-}
-
-export class VenDetailOptSchedule extends React.Component {
+export class EventHeader extends React.Component {
   constructor( props ) {
     super( props );
     this.state = {}
     this.state.marketContextSelectDialogOpen = false;
+
     var now = new Date();
     var today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
 
     this.state.start = today.getTime() - deltaStartDays * 24 * 60 * 60 * 1000;
     this.state.end = today.getTime() + deltaEndDays * 24 * 60 * 60 * 1000;
-
     this.state.filter = [];
+
 
   }
 
+  handleCreateEventClick = () => {
+    history.push( '/event/create' );
+  }
 
   handleMarketContextSelectOpen = () => {
     this.setState( {
@@ -131,6 +90,7 @@ export class VenDetailOptSchedule extends React.Component {
   }
 
 
+
   onStartChange = (start) =>  {
     this.setState({start})
   }
@@ -140,18 +100,11 @@ export class VenDetailOptSchedule extends React.Component {
     this.setState({end})
   }
 
+
   render() {
-    const {classes, ven, venOpt, marketContext} = this.props;
-    console.log(venOpt)
+    const {classes, marketContext, event} = this.props;
 
     return (
-    <div className={ classes.root } >
-      <VenDetailHeader classes={classes} ven={ven} actions={[
- 
-      ]
-      }/>
-      <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
-
       <Grid container spacing={ 8 }>
         <Grid container
               item
@@ -193,15 +146,21 @@ export class VenDetailOptSchedule extends React.Component {
               </IconButton>
             </div>
           </Grid>
+          <Grid item xs={ 2 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    className={ classes.button }
+                    onClick={ this.handleCreateEventClick }>
+              <AddIcon />Create a new Event
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
-      <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
-      <VenOptTable classes={classes} venOpt={venOpt}/>
-
-
-    </div>
+      </Grid>     
     );
   }
 }
 
-export default VenDetailOptSchedule;
+export default EventHeader;

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.avob.openadr.server.oadr20b.vtn.exception.OadrElementNotFoundException;
+import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
 
 @ControllerAdvice
 public class Oadr20bVenControllerExceptionHandler {

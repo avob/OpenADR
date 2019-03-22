@@ -21,11 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
-import com.avob.openadr.model.oadr20b.dto.ReportCapabilityDescriptionDto;
-import com.avob.openadr.model.oadr20b.dto.ReportCapabilityDto;
-import com.avob.openadr.model.oadr20b.dto.ReportDataDto;
-import com.avob.openadr.model.oadr20b.dto.ReportRequestDto;
-import com.avob.openadr.model.oadr20b.dto.VenOptDto;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
@@ -35,17 +30,22 @@ import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
+import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venresource.VenResource;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenResourceService;
 import com.avob.openadr.server.common.vtn.service.VenService;
-import com.avob.openadr.server.oadr20b.vtn.exception.OadrElementNotFoundException;
+import com.avob.openadr.server.oadr20b.vtn.models.venopt.VenOptDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDescriptionDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportData;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.ReportDataDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequest;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.ReportRequestDto;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenOptService;
@@ -370,9 +370,19 @@ public class Oadr20bVenController {
 
 		Long startTimestamp = (start != null) ? start.toEpochMilli() : null;
 		Long endTimestamp = (end != null) ? end.toEpochMilli() : null;
-		return oadr20bDtoMapper.mapList(
+		List<VenOptDto> mapList = oadr20bDtoMapper.mapList(
 				venOptService.findScheduledOpt(ven.getUsername(), marketContextName, startTimestamp, endTimestamp),
 				VenOptDto.class);
+
+		return mapList;
+	}
+
+	@RequestMapping(value = "/{venID}/opt", method = RequestMethod.POST)
+	@ResponseBody
+	public VenOptDto createVenOpt(@PathVariable("venID") String venID)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+		return null;
 	}
 
 	@RequestMapping(value = "/{venID}/opt/resource/{resourceName}", method = RequestMethod.GET)

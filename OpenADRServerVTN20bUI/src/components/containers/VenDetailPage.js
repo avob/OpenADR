@@ -115,7 +115,6 @@ export class VenDetailPage extends React.Component {
         history.push("/ven/detail/"+this.props.match.params.username+"/groups")
         break;
     }
-    
   };
 
 
@@ -201,7 +200,8 @@ export class VenDetailPage extends React.Component {
       { value === 2 && <TabContainer>
                       <VenDetailOptSchedule classes={ classes }
                                             ven={ ven_detail.ven }
-                                            venOpt={ven_detail.venOpt}                                            
+                                            venOpt={ven_detail.venOpt}
+                                            marketContext={ ven_detail.marketContext }                                     
                                              />
 
 

@@ -15,9 +15,6 @@ import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
 
-
-
-
 import ChipInput from 'material-ui-chip-input'
 
 
@@ -33,26 +30,7 @@ import { MarketContextSelectDialog, GroupSelectDialog, VenStatusSelectDialog } f
 
 import { history } from '../../store/configureStore';
 
-
-
-
-var MarketContextChip = (props) => {
-  return (
-  <span style={ { display: 'flex', alignItems: 'center', marginLeft: '-7px', } }><ExtensionIcon color="disabled" style={ { marginRight: '5px' } }/> { props.name }</span>
-  );
-}
-
-var GroupChip = (props) => {
-  return (
-  <span style={ { display: 'flex', alignItems: 'center', marginLeft: '-7px', } }><GroupWorkIcon color="disabled" style={ { marginRight: '5px' } }/> { props.name }</span>
-  );
-}
-
-var VenStatusChip = (props) => {
-  return (
-  <span style={ { display: 'flex', alignItems: 'center', marginLeft: '-7px', } }><SettingsInputComponentIcon color="disabled" style={ { marginRight: '5px' } }/> { props.name }</span>
-  );
-}
+import { MarketContextChip, GroupChip, VenStatusChip } from '../common/FilterChip'
 
 export class VenList extends React.Component {
   constructor( props ) {

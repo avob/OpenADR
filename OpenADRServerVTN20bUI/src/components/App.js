@@ -19,6 +19,7 @@ import VenDetailReportRequestPage from './containers/VenDetailReportRequestPage'
 
 
 
+
 import VenCreatePage from './containers/VenCreatePage'
 
 import PropTypes from 'prop-types';
@@ -202,11 +203,13 @@ class App extends React.Component {
 
           <Route path="/about" component={ AboutPage } />
 
+          <Route path="/vtn_configuration/:panel(marketcontext|group|parameter)" component={ VtnConfigurationPage } />
           <Route path="/vtn_configuration" component={ VtnConfigurationPage } />
           
 
           <Route path="/ven/detail/:username/reports/:reportSpecifierId/requests/:reportRequestId" component={ VenDetailReportRequestPage } />
           <Route path="/ven/detail/:username/reports/:reportSpecifierId/create" component={ VenDetailCreateReportPage } />
+
           <Route path="/ven/detail/:username/reports/:reportSpecifierId" component={ VenDetailReportPage } />
 
           <Route path="/ven/detail/:username/:panel(settings|reports|optschedules)" component={ VenDetailPage } />
@@ -218,8 +221,11 @@ class App extends React.Component {
 
           <Route path="/account" component={ AccountPage } />
 
+          <Route path="/event/detail/:id/:panel(descriptor|activeperiod|signal|target|venresponse)" component={ EventDetailPage } />
           <Route path="/event/detail/:id" component={ EventDetailPage } />
+
           <Route path="/event/create" component={ EventCreatePage } />
+          <Route path="/event/:panel(list|calendar)" component={ EventPage } />
           <Route path="/event" component={ EventPage } />
 
           <Route component={ NotFoundPage } />

@@ -15,15 +15,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.avob.openadr.model.oadr20b.dto.ReportCapabilityDescriptionDto;
-import com.avob.openadr.model.oadr20b.dto.ReportCapabilityDto;
-import com.avob.openadr.model.oadr20b.dto.ReportRequestDto;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDescriptionDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapabilityDescription;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.ReportRequestDto;
 import com.avob.openadr.server.oadr20b.vtn.service.dtomapper.Oadr20bDtoMapper;
 import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportCapabilityDescriptionService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportCapabilityService;
