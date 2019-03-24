@@ -37,11 +37,11 @@ import { MarketContextSelectDialog } from '../common/VtnconfigurationDialog'
 
 import { history } from '../../store/configureStore';
 
-import {DateAndTimePicker, DurationPicker } from '../common/TimePicker'
-
-import { MarketContextChip } from '../common/FilterChip'
+import {DatePicker, DurationPicker } from '../common/TimePicker'
 
 import {formatTimestamp} from '../../utils/time'
+
+import FilterPanel from '../common/FilterPanel' 
 
 const deltaStartDays = 7
 const deltaEndDays = 7
@@ -86,7 +86,6 @@ export class VenDetailOptSchedule extends React.Component {
   constructor( props ) {
     super( props );
     this.state = {}
-    this.state.marketContextSelectDialogOpen = false;
     var now = new Date();
     var today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
 
@@ -104,32 +103,6 @@ export class VenDetailOptSchedule extends React.Component {
     } )
   }
 
-  handleMarketContextSelectClose = (context) => {
-    var params = {
-      marketContextSelectDialogOpen: false
-    }
-    if ( context != null ) {
-      this.handleAddChip( <MarketContextChip name={ context.name } /> );
-    }
-    this.setState( params )
-  }
-
-  handleAddChip = (chip) => {
-    var filter = this.state.filter;
-    filter.push( chip );
-    this.setState( {
-      filter
-    } )
-  }
-
-  handleDeleteChip = (chip, index) => {
-    var filter = this.state.filter;
-    filter.splice( index, 1 );
-    this.setState( {
-      filter
-    } )
-  }
-
 
   onStartChange = (start) =>  {
     this.setState({start})
@@ -139,6 +112,8 @@ export class VenDetailOptSchedule extends React.Component {
   onEndChange = (end) =>  {
     this.setState({end})
   }
+
+  onFilterChange = (filter) => {this.setState({filter})}
 
   render() {
     const {classes, ven, venOpt, marketContext} = this.props;
@@ -152,49 +127,25 @@ export class VenDetailOptSchedule extends React.Component {
       }/>
       <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
 
-      <Grid container spacing={ 8 }>
-        <Grid container
-              item
-              xs={ 12 }
-              spacing={ 24 }>
+      <Grid container>
+        <Grid container >
 
-          <Grid item xs={ 2 }>
-            <DateAndTimePicker classes={ classes } field="Start" 
+          <Grid item xs={ 3 }>
+            <DatePicker classes={ classes } field="Start" 
             value={this.state.start} onChange={this.onStartChange} />
-          </Grid>
-          <Grid item xs={ 2 }>
-            <DateAndTimePicker classes={ classes } field="End" 
+             <DatePicker classes={ classes } field="End" 
             value={this.state.end} onChange={this.onEndChange} />
           </Grid>
-          <Grid item xs={ 4 }>
-            <ChipInput label="Filters"
-                      style={{marginTop:"-3px"}}
-                       placeholder="Filters"
-                       value={ this.state.filter }
-                       onAdd={ this.handleAddChip }
-                       onDelete={ this.handleDeleteChip }
-                       fullWidth={ true } />
-          </Grid>
-          <Grid item xs={ 2 }>
-            <div style={ { marginTop: 15 } }>
-              <IconButton className={ classes.iconButton }
-                          aria-label="market_context"
-                          onClick={ this.handleMarketContextSelectOpen }>
-                <ExtensionIcon />
-                <ExpandMore />
-              </IconButton>
-              <MarketContextSelectDialog marketContext={ marketContext}
-                                         open={ this.state.marketContextSelectDialogOpen }
-                                         close={ this.handleMarketContextSelectClose }
-                                         title="Filter by Market Context" />
-       
-              <IconButton className={ classes.iconButton } aria-label="Search">
-                <SearchIcon />
-              </IconButton>
-            </div>
+          <Grid item xs={ 9 }>
+            <FilterPanel classes={classes} hasFilter={{marketContext:true}} 
+                marketContext={marketContext}
+                filter={this.state.filter}
+                onFilterChange={this.onFilterChange}
+            />
           </Grid>
         </Grid>
       </Grid>
+      
       <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
       <VenOptTable classes={classes} venOpt={venOpt}/>
 
@@ -203,5 +154,7 @@ export class VenDetailOptSchedule extends React.Component {
     );
   }
 }
+
+
 
 export default VenDetailOptSchedule;

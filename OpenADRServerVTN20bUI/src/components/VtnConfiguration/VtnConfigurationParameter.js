@@ -95,11 +95,6 @@ const VtnConfigurationParameter = (props) => {
 
   return (
   <div>
-    <Typography gutterBottom
-                variant="title"
-                component="h2">
-      Parameters
-    </Typography>
     <FormControl className={ classes.formControl }>
       { getTextField( 'Identifiant VTN', 'vtnId' ) }
     </FormControl>
@@ -107,18 +102,8 @@ const VtnConfigurationParameter = (props) => {
       { getTextField( 'Default Pull Frequency (seconds)', 'pullFrequencySeconds' ) }
     </FormControl>
     <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
-    <Typography gutterBottom
-                variant="title"
-                component="h2">
-      Endpoints
-    </Typography>
     { getUrlTextField() }
     <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
-    <Typography gutterBottom
-                variant="title"
-                component="h2">
-      Features
-    </Typography>
     <FormControl className={ classes.formControl }>
       { getFeatureField( 'HTTPS Push feature', 'supportPush' ) }
     </FormControl>

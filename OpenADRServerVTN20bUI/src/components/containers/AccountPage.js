@@ -41,6 +41,9 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
   },
+  iconButton: {
+    marginTop: 10
+  },
 });
 
 export class AccountPage extends React.Component {

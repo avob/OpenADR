@@ -96,11 +96,6 @@ export class EventCalendar extends React.Component {
       <div className={ classes.root }>
         <EventHeader classes={classes}  marketContext={marketContext} event={event}/>
         <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
-        <Typography gutterBottom
-                    variant="title"
-                    component="h2">
-          Existing Events
-        </Typography>
         <BigCalendar style={{height:600}}
           localizer={localizer}
           events={calendarEvent}

@@ -12,10 +12,6 @@ import { MarketContextSelectDialog } from '../common/VtnconfigurationDialog'
 
 import { history } from '../../store/configureStore';
 
-import { DateAndTimePicker, DurationPicker } from '../common/TimePicker'
-
-import { MarketContextChip } from '../common/FilterChip'
-
 import EventHeader from './EventHeader'
 
 export class EventList extends React.Component {
@@ -55,11 +51,6 @@ export class EventList extends React.Component {
       <div className={ classes.root }>
         <EventHeader classes={classes}  marketContext={marketContext} event={event}/>
         <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
-        <Typography gutterBottom
-                    variant="title"
-                    component="h2">
-          Existing Events
-        </Typography>
         <GridList style={ { justifyContent: 'space-around', } }>
           { view }
         </GridList>

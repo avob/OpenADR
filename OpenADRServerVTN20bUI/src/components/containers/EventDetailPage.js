@@ -72,7 +72,10 @@ const styles = theme => ({
   },
   error: {
     backgroundColor: red[600],
-  }
+  },
+  iconButton: {
+    marginTop: 10
+  },
 });
 
 export class EventDetailPage extends React.Component {

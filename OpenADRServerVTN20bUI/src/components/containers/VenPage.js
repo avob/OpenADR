@@ -45,13 +45,8 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
   },
-
-  input: {
-    marginLeft: 8,
-    flex: 1,
-  },
   iconButton: {
-    padding: 10,
+    marginTop: 10
   },
 });
 

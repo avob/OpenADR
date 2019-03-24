@@ -59,6 +59,9 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
   },
+  iconButton: {
+    marginTop: 10
+  },
 });
 
 export class VtnConfigurationPage extends React.Component {

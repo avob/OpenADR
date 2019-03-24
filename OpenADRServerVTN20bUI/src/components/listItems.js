@@ -7,6 +7,7 @@ import AssignmentIcon from '@material-ui/icons/Assignment';
 
 import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
 import SettingsIcon from '@material-ui/icons/Settings';
+import ShowChartIcon from '@material-ui/icons/ShowChart';
 
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
@@ -47,6 +48,14 @@ export const mainListItems = (
       <AccountBoxIcon />
     </ListItemIcon>
     <ListItemText primary="Accounts" />
+  </ListItem>
+  <ListItem button
+            component={ NavLink }
+            to="/data">
+    <ListItemIcon>
+      <ShowChartIcon />
+    </ListItemIcon>
+    <ListItemText primary="Data" />
   </ListItem>
 </div>
 );

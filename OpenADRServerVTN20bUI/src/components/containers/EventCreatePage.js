@@ -59,7 +59,9 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
   },
-  
+  iconButton: {
+    marginTop: 10
+  },
 });
 
 export class EventCreatePage extends React.Component {

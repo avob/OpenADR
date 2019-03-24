@@ -153,14 +153,6 @@ export function VenStatusSelectDialog( props ) {
   );
 }
 
-  // title:e.descriptor.eventId,
-  //       start: start,
-  //       end: end,
-  //       allday:false,
-  //       state: e.descriptor.state,
-  //       published: e.published,
-  //       marketContext:e.descriptor.marketContext
-
 export function EventCalendarDialog( props ) {
   if(!props.event) return null;
   return (

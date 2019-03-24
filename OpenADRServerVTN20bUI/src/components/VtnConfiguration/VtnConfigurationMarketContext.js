@@ -141,10 +141,8 @@ export class VtnConfigurationMarketContext extends React.Component {
       flexDirection: 'row',
     };
     var saveBtnView = null;
-    var formLabelText = null;
     var marginTop = 13;
     if ( !this.state.editMode ) {
-      formLabelText = 'Create New Market Context';
       saveBtnView = <Button key="btn_create"
                             variant="outlined"
                             color="primary"
@@ -155,7 +153,6 @@ export class VtnConfigurationMarketContext extends React.Component {
                       <AddIcon />Create
                     </Button>
     } else {
-      formLabelText = 'Edit Market Context';
       saveBtnView = [ <Button key="btn_save"
                               variant="outlined"
                               color="primary"
@@ -180,11 +177,6 @@ export class VtnConfigurationMarketContext extends React.Component {
 
     return (
     <div>
-      <Typography gutterBottom
-                  variant="title"
-                  component="h2">
-        { formLabelText }
-      </Typography>
       <form style={ flexContainer }>
         <Grid container spacing={ 8 }>
           <Grid container
@@ -223,11 +215,6 @@ export class VtnConfigurationMarketContext extends React.Component {
       </form>
       <div>
         <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
-        <Typography gutterBottom
-                    variant="title"
-                    component="h2">
-          Existing Market Contexts
-        </Typography>
         <GridList style={ { justifyContent: 'space-around', } }>
           { view }
         </GridList>

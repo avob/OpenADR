@@ -74,8 +74,9 @@ const styles = theme => ({
   },
   message: {
     display: 'flex',
-
-
+  },
+  iconButton: {
+    marginTop: 10
   },
 });
 

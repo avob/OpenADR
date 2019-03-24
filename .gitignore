@@ -59,3 +59,5 @@
 
 devops/vtn20b_postgres/provisioning/playbook.retry
 devops/vtn20b_postgres/provisioning/roles/*
+
+*/package-lock.json

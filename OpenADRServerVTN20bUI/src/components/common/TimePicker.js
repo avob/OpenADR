@@ -6,32 +6,97 @@ import FormLabel from '@material-ui/core/FormLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 
-import {timestampToISO, isoToTimestamp} from '../../utils/time'
+import {timestampToISO, isoToTimestamp, formatTimestamp} from '../../utils/time'
 import timezone from './timezone'
 
-export var DateAndTimePicker = (props) => {
+export var DatePicker = (props) => {
   const { classes } = props;
-  var val = "";
+  var valDate = null;
+  var now = new Date();
   if(props.value != null) {
-    val = timestampToISO(props.value);
+    var f  = formatTimestamp(props.value); 
+    valDate = f.date ;
   }
+  else {
+    var f  = formatTimestamp(now.getTime()); 
+    valDate = f.date ;
+  }
+
+  var onDateChange = (e) => {
+    var d  = new Date();
+    d.setTime(isoToTimestamp(e.target.value + "T00:00"));
+    props.onChange(isoToTimestamp(e.target.value + "T"+valTime));
+  }
+
 
   return (
       <TextField required error={props.error}
-        label={props.field}
-        type="datetime-local"
-        defaultValue={props.default}
-        className={classes.textField}
-        fullWidth={true}
-        margin="dense"
-        value={val}
-        onChange={(e) => {
-          props.onChange(isoToTimestamp(e.target.value));
-        }}
-        InputLabelProps={{
-          shrink: true,
-        }}
-      />
+          label={props.field}
+          type="date"
+          className={classes.textField}
+          value={valDate}
+          onChange={onDateChange}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          InputProps={{style:{marginTop:24}}}
+        />
+  );
+}
+
+export var DateAndTimePicker = (props) => {
+  const { classes } = props;
+  var valDate = null;
+  var valTime = null;
+  var now = new Date();
+  if(props.value != null) {
+    var f  = formatTimestamp(props.value); 
+    valDate = f.date ;
+    valTime = f.time    
+  }
+  else {
+    var f  = formatTimestamp(now.getTime()); 
+    valDate = f.date ;
+    valTime = "00:00"  
+  }
+
+  var onDateChange = (e) => {
+    var d  = new Date();
+    d.setTime(isoToTimestamp(e.target.value + "T"+valTime));
+    props.onChange(isoToTimestamp(e.target.value + "T"+valTime));
+  }
+
+  var onTimeChange = (e) => {
+    console.log(e.target.value)
+    props.onChange(isoToTimestamp(valDate + "T"+e.target.value));
+  }
+
+  return (
+      <span>
+        <TextField required error={props.error}
+          label={props.field}
+          type="date"
+          className={classes.textField}
+          value={valDate}
+          onChange={onDateChange}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+        <TextField required error={props.error}
+          label={props.field}
+          type="time"
+          className={classes.textField}
+          value={valTime}
+          onChange={ onTimeChange}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          inputProps={{
+            step: 60, // 5 min
+          }}
+        />
+      </span>
   );
 }
 

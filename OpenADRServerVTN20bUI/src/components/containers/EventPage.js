@@ -62,6 +62,9 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
   },
+  iconButton: {
+    marginTop: 10
+  },
 });
 
 export class EventPage extends React.Component {
