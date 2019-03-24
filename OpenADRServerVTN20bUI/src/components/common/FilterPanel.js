@@ -70,7 +70,7 @@ export class FilterPanel extends React.Component {
 
   addFilterFromInput = (f) => {
     this.addFilter({
-    	type: "input",
+    	type: "VEN_ID",
     	value: f
     });
   }
@@ -98,7 +98,7 @@ export class FilterPanel extends React.Component {
       marketContextSelectDialogOpen: false
     }
     if ( context != null ) {
-    	this.addFilter({type: "marketContext", value: context.name});
+    	this.addFilter({type: "MARKET_CONTEXT", value: context.name});
     }
     this.setState( params )
   }
@@ -114,7 +114,7 @@ export class FilterPanel extends React.Component {
       groupSelectDialogOpen: false
     }
     if ( group != null ) {
-    	this.addFilter({type: "group", value: group.name});
+    	this.addFilter({type: "GROUP", value: group.name});
     }
     this.setState( params )
   }
@@ -130,7 +130,7 @@ export class FilterPanel extends React.Component {
       venStatusSelectDialogOpen: false
     }
     if ( status != null ) {
-      this.addFilter({type: "venStatus", value: status.name});
+      this.addFilter({type: "IS_REGISTERED", value: status.name == "online"});
     }
     this.setState( params )
   }
@@ -146,16 +146,16 @@ export class FilterPanel extends React.Component {
     	var chip = null;
     	var filter = this.props.filter[i];
     	switch(filter.type){
-    		case "marketContext":
+    		case "MARKET_CONTEXT":
     			chip = <MarketContextChip name={ filter.value } />
     			break; 
-    		case "group":
+    		case "GROUP":
     			chip = <GroupChip name={ filter.value } />
     			break; 
-    		case "venStatus":
+    		case "IS_REGISTERED":
     			chip = <VenStatusChip name={ filter.value } />
     			break; 
-    		case "input":
+    		case "VEN_ID":
     			chip = filter.value
     			break; 
 

@@ -23,9 +23,7 @@ export var DatePicker = (props) => {
   }
 
   var onDateChange = (e) => {
-    var d  = new Date();
-    d.setTime(isoToTimestamp(e.target.value + "T00:00"));
-    props.onChange(isoToTimestamp(e.target.value + "T"+valTime));
+    props.onChange(isoToTimestamp(e.target.value + "T00:00"));
   }
 
 

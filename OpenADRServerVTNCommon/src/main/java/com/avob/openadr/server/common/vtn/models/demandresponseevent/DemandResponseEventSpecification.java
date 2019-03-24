@@ -44,6 +44,17 @@ public class DemandResponseEventSpecification {
 			return cb.equal(joinList.get("ven").get("username"), username);
 		};
 	}
+	
+	static public Specification<DemandResponseEvent> hasActivePeriodStartAfter(Long timestamp) {
+		return (event, cq, cb) -> cb.ge(event.get("activePeriod").get("start"), timestamp);
+	}
+	
+	static public Specification<DemandResponseEvent> hasActivePeriodEndNullOrBefore(Long timestamp) {
+		return (event, cq, cb) -> {
+			return cb.or(cb.isNull(event.get("activePeriod").get("end")),
+					cb.lt(event.get("activePeriod").get("end"), timestamp));
+		};
+	}
 
 	static public Specification<DemandResponseEvent> hasActivePeriodStartBefore(Long timestamp) {
 		return (event, cq, cb) -> cb.le(event.get("activePeriod").get("start"), timestamp);

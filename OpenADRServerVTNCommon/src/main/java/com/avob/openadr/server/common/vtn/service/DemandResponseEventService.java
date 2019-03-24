@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +51,8 @@ import com.google.common.collect.Lists;
 public class DemandResponseEventService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DemandResponseEventService.class);
+
+	private static final Integer DEFAULT_SEARCH_SIZE = 20;
 
 	@Value("${oadr.supportPush:#{false}}")
 	private Boolean supportPush;
@@ -475,8 +478,22 @@ public class DemandResponseEventService {
 		return venDemandResponseEventDao.findByEvent(event);
 	}
 
-	public List<DemandResponseEvent> search(List<DemandResponseEventFilter> filters) {
-		return demandResponseEventDao.findAll(DemandResponseEventSpecification.search(filters));
+	public Page<DemandResponseEvent> search(List<DemandResponseEventFilter> filters, Long start, Long end) {
+		return search(filters, start, end, null, null);
+	}
+
+	public Page<DemandResponseEvent> search(List<DemandResponseEventFilter> filters, Long start, Long end, Integer page,
+			Integer size) {
+		if (page == null) {
+			page = 0;
+		}
+		if (size == null) {
+			size = DEFAULT_SEARCH_SIZE;
+		}
+		Specification<DemandResponseEvent> spec = Specification.where(DemandResponseEventSpecification.search(filters))
+				.and(DemandResponseEventSpecification.hasActivePeriodStartAfter(start))
+				.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrBefore(end));
+		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size));
 	}
 
 }

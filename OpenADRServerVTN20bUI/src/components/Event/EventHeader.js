@@ -22,20 +22,10 @@ import { DatePicker } from '../common/TimePicker'
 
 import FilterPanel from '../common/FilterPanel' 
 
-const deltaStartDays = 7
-const deltaEndDays = 7
 
 export class EventHeader extends React.Component {
   constructor( props ) {
     super( props );
-    this.state = {}
-
-    var now = new Date();
-    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-
-    this.state.start = today.getTime() - deltaStartDays * 24 * 60 * 60 * 1000;
-    this.state.end = today.getTime() + deltaEndDays * 24 * 60 * 60 * 1000;
-    this.state.filter = [];
 
 
   }
@@ -44,39 +34,24 @@ export class EventHeader extends React.Component {
     history.push( '/event/create' );
   }
 
-
-  onStartChange = (start) =>  {
-    this.setState({start})
-  }
-
-
-  onEndChange = (end) =>  {
-    this.setState({end})
-  }
-
-  onFilterChange = (filter) => {this.setState({filter})}
-
-
   render() {
     const {classes, marketContext, event} = this.props;
-
     return (
       <div>
         <Grid container spacing={ 8 }>
-          <Grid container
-                xs={ 12 }>
+          <Grid container>
 
             <Grid item xs={ 3 }>
               <DatePicker classes={ classes } field="Start" 
-              value={this.state.start} onChange={this.onStartChange} />
+              value={this.props.start} onChange={this.props.onStartChange} />
               <DatePicker classes={ classes } field="End" 
-              value={this.state.end} onChange={this.onEndChange} />
+              value={this.props.end} onChange={this.props.onEndChange} />
             </Grid>
             <Grid item xs={ 8 }>
               <FilterPanel classes={classes} hasFilter={{marketContext:true}} 
                 marketContext={marketContext}
-                filter={this.state.filter}
-                onFilterChange={this.onFilterChange}/>
+                filter={this.props.filters}
+                onFilterChange={this.props.onFilterChange}/>
             </Grid>
             <Grid item xs={ 1 }>
              <Button key="btn_create"
@@ -99,3 +74,4 @@ export class EventHeader extends React.Component {
 }
 
 export default EventHeader;
+

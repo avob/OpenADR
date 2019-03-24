@@ -31,6 +31,7 @@ import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenUpdateDto;
+import com.avob.openadr.server.common.vtn.models.ven.filter.VenFilter;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
@@ -69,6 +70,13 @@ public class VenController {
 	@ResponseBody
 	public List<VenDto> listVen() {
 		return dtoMapper.mapList(venService.findAll(), VenDto.class);
+	}
+
+	@RequestMapping(value = "/search", method = RequestMethod.POST)
+	@ResponseBody
+	public List<VenDto> search(@RequestBody List<VenFilter> filters, @RequestParam("page") int page,
+			@RequestParam("size") int size) {
+		return dtoMapper.mapList(venService.search(filters, page, size), VenDto.class);
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)

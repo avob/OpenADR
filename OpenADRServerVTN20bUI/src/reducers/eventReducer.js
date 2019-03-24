@@ -25,6 +25,18 @@ export default function eventReducer( state = initialState.event, action ) {
     case types.LOAD_EVENT_ERROR:
       return state;
 
+    case types.SEARCH_EVENT:
+      return state;
+
+    case types.SEARCH_EVENT_SUCCESS:
+      newState = objectAssign( {}, state, {
+        event: action.payload
+      } );
+      return newState;
+
+    case types.SEARCH_EVENT_ERROR:
+      return state;
+  
     case types.DELETE_EVENT:
       return state;
 

@@ -12,6 +12,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -76,11 +77,13 @@ public class DemandResponseController {
 		return dtoMapper.mapList(find, DemandResponseEventReadDto.class);
 	}
 
-	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	@RequestMapping(value = "/search", method = RequestMethod.POST)
 	@ResponseBody
-	public List<DemandResponseEventReadDto> search(@RequestBody List<DemandResponseEventFilter> filters) {
+	public List<DemandResponseEventReadDto> search(@RequestBody List<DemandResponseEventFilter> filters,
+			@RequestParam("start") Long start, @RequestParam("end") Long end, @RequestParam("page") int page,
+			@RequestParam("size") int size) {
 
-		List<DemandResponseEvent> find = demandResponseEventService.search(filters);
+		Page<DemandResponseEvent> find = demandResponseEventService.search(filters, start, end, page, size);
 		return dtoMapper.mapList(find, DemandResponseEventReadDto.class);
 	}
 

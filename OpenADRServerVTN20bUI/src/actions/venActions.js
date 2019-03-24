@@ -13,6 +13,16 @@ export const loadVen = () => {
   );
 }
 
+export const searchVen = (filters, page, size) => {
+  var params = {filters, page, size};
+  return swaggerAction(types.SEARCH_VEN, 
+    (api) => {
+      return api.apis[ 'ven-controller' ].searchUsingPOST(params, jsonResponseContentType);
+    }, 
+    parseJsonData
+  );
+}
+
 export const loadVenDetail = (username) => {
   return swaggerAction(types.LOAD_VEN_DETAIL, 
     (api) => {

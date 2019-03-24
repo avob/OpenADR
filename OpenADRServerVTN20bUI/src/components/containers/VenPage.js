@@ -52,10 +52,30 @@ const styles = theme => ({
 
 export class VenPage extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {};
+    this.state.filters = [];
+    this.state.pagination = {
+      page: 0
+      , size: 20
+    }
+  }
+
   componentDidMount() {
     this.props.vtnConfigurationActions.loadMarketContext();
     this.props.vtnConfigurationActions.loadGroup();
-    this.props.venActions.loadVen();
+    this.props.venActions.searchVen(this.state.filters, this.state.page, this.state.size);
+
+  }
+
+  onFilterChange = (filters) => {
+    this.setState({filters});
+    this.props.venActions.searchVen(filters, this.state.page, this.state.size);
+  }
+
+  onPaginationChange = (pagination) => {
+    this.setState({pagination});
   }
 
   render() {
@@ -74,7 +94,11 @@ export class VenPage extends React.Component {
                  ven={ ven.ven }
                  marketContext={ ven.marketContext }
                  group={ ven.group }
-                 deleteVen={ this.props.venActions.deleteVen } />
+                 deleteVen={ this.props.venActions.deleteVen } 
+                 filters={this.state.filters}
+                 pagination={this.state.pagination}
+                 onFilterChange={this.onFilterChange}
+                 onPaginationChange={this.onPaginationChange}/>
       </Typography>
     </div>
 

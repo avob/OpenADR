@@ -12,6 +12,16 @@ export const loadEvent = (start, end) => {
   );
 }
 
+export const searchEvent = (filters, start, end, page, size) => {
+  var params = {filters, start, end, page, size};
+  return swaggerAction(types.SEARCH_EVENT, 
+    (api) => {
+      return api.apis[ 'demand-response-controller' ].searchUsingPOST(params, jsonResponseContentType);
+    }, 
+    parseJsonData
+  );
+}
+
 export const createEvent = (dto) => {
 	var params = { event: dto }
   return swaggerAction(types.CREATE_EVENT, 

@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.data.domain.Page;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -193,7 +194,7 @@ public class VenServiceTest {
 		String marketContextName = "http://oadr.avob.com";
 		marketContext = venMarketContextService.prepare(new VenMarketContextDto(marketContextName));
 		venMarketContextService.save(marketContext);
-		
+
 		String groupName = "group1";
 		VenGroup group = venGroupService.prepare(new VenGroupDto(groupName));
 		venGroupService.save(group);
@@ -272,84 +273,84 @@ public class VenServiceTest {
 		events.add(event3);
 
 		List<VenFilter> filters = new ArrayList<>();
-		List<Ven> search = venService.search(filters);
-		assertEquals(3, search.size());
+		Page<Ven> search = venService.search(filters);
+		assertEquals(3, search.getTotalElements());
 
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.EVENT, event1Id));
 		search = venService.search(filters);
-		assertEquals(2, search.size());
+		assertEquals(2, search.getTotalElements());
 
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.EVENT, event2Id));
 		search = venService.search(filters);
-		assertEquals(1, search.size());
+		assertEquals(1, search.getTotalElements());
 
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.EVENT, event3Id));
 		search = venService.search(filters);
-		assertEquals(1, search.size());
+		assertEquals(1, search.getTotalElements());
 
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.EVENT, event1Id));
 		filters.add(getFilter(VenFilterType.EVENT, event2Id));
 		search = venService.search(filters);
-		assertEquals(2, search.size());
+		assertEquals(2, search.getTotalElements());
 
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.EVENT, event1Id));
 		filters.add(getFilter(VenFilterType.EVENT, event2Id));
 		filters.add(getFilter(VenFilterType.EVENT, event3Id));
 		search = venService.search(filters);
-		assertEquals(3, search.size());
+		assertEquals(3, search.getTotalElements());
 
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.IS_REGISTERED, Boolean.TRUE.toString()));
 		search = venService.search(filters);
-		assertEquals(0, search.size());
+		assertEquals(0, search.getTotalElements());
 
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.IS_REGISTERED, Boolean.FALSE.toString()));
 		search = venService.search(filters);
-		assertEquals(3, search.size());
-		
+		assertEquals(3, search.getTotalElements());
+
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.GROUP, groupName));
 		search = venService.search(filters);
-		assertEquals(2, search.size());
-		
+		assertEquals(2, search.getTotalElements());
+
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.GROUP, groupName));
 		filters.add(getFilter(VenFilterType.EVENT, event1Id));
 		search = venService.search(filters);
-		assertEquals(1, search.size());
-		
+		assertEquals(1, search.getTotalElements());
+
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.MARKET_CONTEXT, marketContextName));
 		filters.add(getFilter(VenFilterType.EVENT, event1Id));
 		search = venService.search(filters);
-		assertEquals(2, search.size());
-		
+		assertEquals(2, search.getTotalElements());
+
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.MARKET_CONTEXT, marketContextName));
 		filters.add(getFilter(VenFilterType.EVENT, event1Id));
-		filters.add(getFilter(VenFilterType.VEN_ID,"ven1"));
+		filters.add(getFilter(VenFilterType.VEN_ID, "ven1"));
 		search = venService.search(filters);
-		assertEquals(1, search.size());
-		
+		assertEquals(1, search.getTotalElements());
+
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.MARKET_CONTEXT, marketContextName));
 		filters.add(getFilter(VenFilterType.EVENT, event1Id));
-		filters.add(getFilter(VenFilterType.VEN_ID,"ven"));
+		filters.add(getFilter(VenFilterType.VEN_ID, "ven"));
 		search = venService.search(filters);
-		assertEquals(2, search.size());
-		
+		assertEquals(2, search.getTotalElements());
+
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.MARKET_CONTEXT, marketContextName));
 		filters.add(getFilter(VenFilterType.EVENT, event1Id));
-		filters.add(getFilter(VenFilterType.VEN_ID,"mouaiccool"));
+		filters.add(getFilter(VenFilterType.VEN_ID, "mouaiccool"));
 		search = venService.search(filters);
-		assertEquals(0, search.size());
+		assertEquals(0, search.getTotalElements());
 
 		demandResponseEventService.delete(events);
 		venService.delete(vens);

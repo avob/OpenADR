@@ -67,12 +67,27 @@ const styles = theme => ({
   },
 });
 
+const deltaStartDays = 7
+const deltaEndDays = 7
+
+
 export class EventPage extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.state= {};
+    this.state.value = 0;
+    this.state.filters = [];
+    this.state.pagination = {
+      page: 0
+      , size: 20
+    }
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
 
-  state = {
-    value: 0,
-  };
+    this.state.start = today.getTime() - deltaStartDays * 24 * 60 * 60 * 1000;
+    this.state.end = today.getTime() + deltaEndDays * 24 * 60 * 60 * 1000;
+  }
 
   handleChange = (event, value) => {
     this.setState( {
@@ -90,7 +105,7 @@ export class EventPage extends React.Component {
 
   componentDidMount() {
     this.props.vtnConfigurationActions.loadMarketContext();
-    this.props.eventActions.loadEvent();
+    this.refreshEvent();
     switch(this.props.match.params.panel){
       case "list":
         this.setState({value:0});
@@ -99,6 +114,34 @@ export class EventPage extends React.Component {
         this.setState({value:1});
         break;
     }
+  }
+
+  refreshEvent = () => {
+    this.props.eventActions.searchEvent(this.state.filters, this.state.start, this.state.end
+      , this.state.pagination.page, this.state.pagination.size);
+  }
+
+  onFilterChange = (filters) => {
+    this.setState({filters});
+    this.refreshEvent();
+  }
+
+  onPaginationChange = (pagination) => {
+    this.setState({pagination});
+    this.refreshEvent();
+  }
+
+  onStartChange = (start) =>  {
+    this.setState({start})
+    this.props.eventActions.searchEvent(this.state.filters, start, this.state.end
+      , this.state.pagination.page, this.state.pagination.size);
+  }
+
+
+  onEndChange = (end) =>  {
+    this.setState({end})
+    this.props.eventActions.searchEvent(this.state.filters, this.state.start, end
+      , this.state.pagination.page, this.state.pagination.size);
   }
 
   render() {
@@ -122,14 +165,33 @@ export class EventPage extends React.Component {
                           marketContext={ event.marketContext }
                           event={event.event}
                           deleteEvent={ this.props.eventActions.deleteEvent}
+                          filters={this.state.filters}
+                          pagination={this.state.pagination}
+                          onFilterChange={this.onFilterChange}
+                          onPaginationChange={this.onPaginationChange}
+                          start={this.state.start}
+                          end={this.state.end}
+                          onStartChange={this.onStartChange}
+                          onEndChange={this.onEndChange}
                            />
+                          
                           
                        </TabContainer> }
                        
       { value === 1 && <TabContainer>
                           <EventCalendar classes={classes} 
                           marketContext={ event.marketContext }
-                          event={event.event}/>
+                          event={event.event}
+                          deleteEvent={ this.props.eventActions.deleteEvent}
+                          filters={this.state.filters}
+                          pagination={this.state.pagination}
+                          onFilterChange={this.onFilterChange}
+                          onPaginationChange={this.onPaginationChange}
+                          start={this.state.start}
+                          end={this.state.end}
+                          onStartChange={this.onStartChange}
+                          onEndChange={this.onEndChange}
+                 />
                        </TabContainer> }
 
     </div>

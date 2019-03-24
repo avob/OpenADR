@@ -25,6 +25,21 @@ export default function venReducer( state = initialState.ven, action ) {
     case types.LOAD_VEN_ERROR:
       return state;
 
+    case types.SEARCH_VEN:
+      return state;
+
+    case types.SEARCH_VEN_SUCCESS:
+    console.log(action.payload)
+      newState = objectAssign( {}, state, {
+        ven: action.payload
+      } );
+      return newState;
+
+    case types.SEARCH_VEN_ERROR:
+      return state;
+
+      
+
     case types.LOAD_VEN_MARKET_CONTEXT_SUCCESS:
       newState = objectAssign( {}, state, {
         marketContext: action.payload

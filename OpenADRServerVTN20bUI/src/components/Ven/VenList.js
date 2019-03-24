@@ -21,8 +21,6 @@ export class VenList extends React.Component {
   constructor( props ) {
     super( props );
     this.state = {}
-    this.state.filter = [];
-
   }
 
   handleDeleteVen = (username) => {
@@ -45,8 +43,6 @@ export class VenList extends React.Component {
   handleCreateVENClick = () => {
     history.push( '/ven/create' )
   }
-
-  onFilterChange = (filter) => {this.setState({filter})}
 
   render() {
     const {classes, ven, marketContext, group} = this.props;
@@ -73,8 +69,8 @@ export class VenList extends React.Component {
               <FilterPanel classes={classes} hasFilter={{group:true, marketContext:true, venStatus:true}} 
                 group={group}
                 marketContext={marketContext}
-                filter={this.state.filter}
-                onFilterChange={this.onFilterChange}/>
+                filter={this.props.filters}
+                onFilterChange={this.props.onFilterChange}/>
             </Grid>
             <Grid item xs={ 1 }>
              <Button key="btn_create"

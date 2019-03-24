@@ -10,6 +10,8 @@ import javax.transaction.Transactional;
 import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
@@ -24,6 +26,8 @@ import com.avob.openadr.server.common.vtn.models.venresource.VenResourceDao;
 
 @Service
 public class VenService extends AbstractUserService<Ven> {
+
+	private static final Integer DEFAULT_SEARCH_SIZE = 20;
 
 	@Resource
 	private VenDao venDao;
@@ -147,8 +151,18 @@ public class VenService extends AbstractUserService<Ven> {
 		this.save(ven);
 	}
 
-	public List<Ven> search(List<VenFilter> filters) {
-		return venDao.findAll(VenSpecification.search(filters));
+	public Page<Ven> search(List<VenFilter> filters) {
+		return search(filters, null, null);
+	}
+
+	public Page<Ven> search(List<VenFilter> filters, Integer page, Integer size) {
+		if (page == null) {
+			page = 0;
+		}
+		if (size == null) {
+			size = DEFAULT_SEARCH_SIZE;
+		}
+		return venDao.findAll(VenSpecification.search(filters), PageRequest.of(page, size));
 	}
 
 }
