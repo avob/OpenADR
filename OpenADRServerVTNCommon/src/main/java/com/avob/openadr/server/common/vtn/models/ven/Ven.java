@@ -1,5 +1,6 @@
 package com.avob.openadr.server.common.vtn.models.ven;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -13,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
+import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venresource.VenResource;
@@ -91,10 +93,13 @@ public class Ven extends AbstractUser {
 	@OneToMany(mappedBy = "ven", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<VenResource> venResources;
 
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "ven")
+	private List<VenDemandResponseEvent> venDemandResponseEvent;
+
 	private Long lastUpdateDatetime;
-	
+
 	private String commonName;
-	
+
 	private String authenticationType;
 
 	public Ven() {
@@ -146,8 +151,7 @@ public class Ven extends AbstractUser {
 	}
 
 	/**
-	 * @param pushUrl
-	 *            the pushUrl to set
+	 * @param pushUrl the pushUrl to set
 	 */
 	public void setPushUrl(String pushUrl) {
 		this.pushUrl = pushUrl;
@@ -256,6 +260,14 @@ public class Ven extends AbstractUser {
 
 	public void setAuthenticationType(String authenticationType) {
 		this.authenticationType = authenticationType;
+	}
+
+	public List<VenDemandResponseEvent> getVenDemandResponseEvent() {
+		return venDemandResponseEvent;
+	}
+
+	public void setVenDemandResponseEvent(List<VenDemandResponseEvent> venDemandResponseEvent) {
+		this.venDemandResponseEvent = venDemandResponseEvent;
 	}
 
 }

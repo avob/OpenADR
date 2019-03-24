@@ -16,6 +16,8 @@ import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenDao;
+import com.avob.openadr.server.common.vtn.models.ven.VenSpecification;
+import com.avob.openadr.server.common.vtn.models.ven.filter.VenFilter;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDao;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venresource.VenResourceDao;
@@ -138,11 +140,15 @@ public class VenService extends AbstractUserService<Ven> {
 	public long count() {
 		return venDao.count();
 	}
-	
+
 	public void cleanRegistration(Ven ven) {
 		ven.setRegistrationId(null);
 		ven.setXmlSignature(false);
 		this.save(ven);
+	}
+
+	public List<Ven> search(List<VenFilter> filters) {
+		return venDao.findAll(VenSpecification.search(filters));
 	}
 
 }

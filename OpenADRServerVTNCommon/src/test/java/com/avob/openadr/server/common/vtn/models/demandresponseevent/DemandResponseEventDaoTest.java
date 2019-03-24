@@ -276,8 +276,10 @@ public class DemandResponseEventDaoTest {
 		venDemandResponseEvent.setVen(savedVen);
 		VenDemandResponseEvent savedVenDemandResponseEvent4 = venDemandResponseEventDao.save(venDemandResponseEvent);
 
-		List<DemandResponseEvent> findToSentEventByVen = demandResponseEventDao.findToSentEventByVen(savedVen,
-				System.currentTimeMillis());
+		List<DemandResponseEvent> findToSentEventByVen =
+
+				demandResponseEventDao
+						.findAll(DemandResponseEventSpecification.toSentByVenUsername(savedVen.getUsername()));
 		assertNotNull(findToSentEventByVen);
 		assertEquals(2, findToSentEventByVen.size());
 		for (DemandResponseEvent e : findToSentEventByVen) {
@@ -287,7 +289,10 @@ public class DemandResponseEventDaoTest {
 
 		// test dao request with pagerequest
 		Pageable limit = PageRequest.of(0, 1);
-		findToSentEventByVen = demandResponseEventDao.findToSentEventByVen(savedVen, System.currentTimeMillis(), limit);
+
+		findToSentEventByVen = demandResponseEventDao
+				.findAll(DemandResponseEventSpecification.toSentByVenUsername(savedVen.getUsername()), limit)
+				.getContent();
 		assertNotNull(findToSentEventByVen);
 		assertEquals(1, findToSentEventByVen.size());
 		for (DemandResponseEvent e : findToSentEventByVen) {

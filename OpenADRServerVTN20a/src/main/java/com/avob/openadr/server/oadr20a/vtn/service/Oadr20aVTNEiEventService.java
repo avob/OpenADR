@@ -227,7 +227,7 @@ public class Oadr20aVTNEiEventService {
 							.withEiResponse(venNotFoundResponse(venRequestID, venID)).build());
 		}
 
-		List<DemandResponseEvent> findByVenId = demandResponseEventService.findToSentEventByVen(ven, replyLimit);
+		List<DemandResponseEvent> findByVenId = demandResponseEventService.findToSentEventByVenUsername(ven.getUsername(), replyLimit);
 
 		// oadr events
 		if (findByVenId == null || findByVenId.isEmpty()) {

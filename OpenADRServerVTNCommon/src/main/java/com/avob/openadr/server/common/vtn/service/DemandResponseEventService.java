@@ -15,6 +15,7 @@ import javax.xml.datatype.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,12 +29,14 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignal;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalDao;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSpecification;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTarget;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetInterface;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenDao;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
@@ -102,27 +105,28 @@ public class DemandResponseEventService {
 
 		if (venUsername == null && state == null && limit == null) {
 			events = demandResponseEventDao.findAll();
-
 		} else if (venUsername == null && state == null && limit != null) {
 			events = demandResponseEventDao.findAll(limit);
 
 		} else if (venUsername != null && state == null && limit == null) {
-			events = demandResponseEventDao.findByVenUsername(venUsername);
+			events = demandResponseEventDao.findAll(DemandResponseEventSpecification.hasVenUsername(venUsername));
 
 		} else if (venUsername != null && state == null && limit != null) {
-			events = demandResponseEventDao.findByVenUsername(venUsername, limit);
-
+			events = demandResponseEventDao.findAll(DemandResponseEventSpecification.hasVenUsername(venUsername),
+					limit);
 		} else if (venUsername == null && state != null && limit == null) {
-			events = demandResponseEventDao.findByDescriptorState(state);
+			events = demandResponseEventDao.findAll(DemandResponseEventSpecification.hasDescriptorState(state));
 
 		} else if (venUsername == null && state != null && limit != null) {
-			events = demandResponseEventDao.findByDescriptorState(state, limit);
+			events = demandResponseEventDao.findAll(DemandResponseEventSpecification.hasDescriptorState(state), limit);
 
 		} else if (venUsername != null && state != null && limit == null) {
-			events = demandResponseEventDao.findByVenUsernameAndState(venUsername, state);
+			events = demandResponseEventDao.findAll(DemandResponseEventSpecification.hasDescriptorState(state)
+					.and(DemandResponseEventSpecification.hasVenUsername(venUsername)));
 
 		} else if (venUsername != null && state != null && limit != null) {
-			events = demandResponseEventDao.findByVenUsernameAndState(venUsername, state, limit);
+			events = demandResponseEventDao.findAll(DemandResponseEventSpecification.hasDescriptorState(state)
+					.and(DemandResponseEventSpecification.hasVenUsername(venUsername)), limit);
 		}
 
 		return Lists.newArrayList(events);
@@ -398,23 +402,6 @@ public class DemandResponseEventService {
 		return demandResponseEventDao.existsById(id);
 	}
 
-	public List<DemandResponseEvent> findToSentEventByVen(Ven ven) {
-		return this.findToSentEventByVen(ven, null);
-	}
-
-	public List<DemandResponseEvent> findToSentEventByVen(Ven ven, Long size) {
-		long currentTimeMillis = System.currentTimeMillis();
-
-		if (size != null && size > 0) {
-			Pageable limit = null;
-			int i = (int) (long) size;
-			limit = PageRequest.of(0, i);
-			return demandResponseEventDao.findToSentEventByVen(ven, currentTimeMillis, limit);
-		} else {
-			return demandResponseEventDao.findToSentEventByVen(ven, currentTimeMillis);
-		}
-	}
-
 	public boolean hasResponded(String venId, DemandResponseEvent event) {
 		VenDemandResponseEvent findOneByEventAndVen = venDemandResponseEventDao.findOneByEventAndVenId(event, venId);
 		return findOneByEventAndVen.getVenOpt() != null;
@@ -464,14 +451,17 @@ public class DemandResponseEventService {
 	}
 
 	public List<DemandResponseEvent> findToSentEventByVenUsername(String username, Long size) {
-		long currentTimeMillis = System.currentTimeMillis() - 60 * 1000;
 		if (size != null && size > 0) {
 			Pageable limit = null;
 			int i = (int) (long) size;
 			limit = PageRequest.of(0, i);
-			return demandResponseEventDao.findToSentEventByVenUsername(username, currentTimeMillis, limit);
+
+			Page<DemandResponseEvent> findAll = demandResponseEventDao
+					.findAll(DemandResponseEventSpecification.toSentByVenUsername(username), limit);
+			return findAll.getContent();
+
 		} else {
-			return demandResponseEventDao.findToSentEventByVenUsername(username, currentTimeMillis);
+			return demandResponseEventDao.findAll(DemandResponseEventSpecification.toSentByVenUsername(username));
 		}
 	}
 
@@ -483,6 +473,10 @@ public class DemandResponseEventService {
 		}
 		DemandResponseEvent event = findById.get();
 		return venDemandResponseEventDao.findByEvent(event);
+	}
+
+	public List<DemandResponseEvent> search(List<DemandResponseEventFilter> filters) {
+		return demandResponseEventDao.findAll(DemandResponseEventSpecification.search(filters));
 	}
 
 }

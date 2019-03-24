@@ -223,7 +223,8 @@ public class Oadr20bVTNEiEventService {
 							.withEiResponse(xmlSignatureRequiredButAbsent).build());
 		}
 
-		List<DemandResponseEvent> findByVenId = demandResponseEventService.findToSentEventByVen(ven, replyLimit);
+		List<DemandResponseEvent> findByVenId = demandResponseEventService
+				.findToSentEventByVenUsername(ven.getUsername(), replyLimit);
 
 		// oadr events
 		OadrDistributeEventType response = null;
@@ -266,7 +267,8 @@ public class Oadr20bVTNEiEventService {
 			boolean needResponse = false;
 			if (drEvent.getDescriptor().getResponseRequired().equals(DemandResponseEventResponseRequiredEnum.ALWAYS)) {
 				needResponse = true;
-			} else if (drEvent.getDescriptor().getResponseRequired().equals(DemandResponseEventResponseRequiredEnum.NEVER)){
+			} else if (drEvent.getDescriptor().getResponseRequired()
+					.equals(DemandResponseEventResponseRequiredEnum.NEVER)) {
 				needResponse = false;
 			}
 

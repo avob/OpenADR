@@ -29,6 +29,8 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilterType;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDao;
@@ -202,17 +204,59 @@ public class DemandResponseEventServiceTest {
 
 	@Test
 	public void findtoSentEvent() {
-		List<DemandResponseEvent> findToSentEvent = demandResponseEventService.findToSentEventByVen(ven1);
-		assertEquals(1, findToSentEvent.size());
-
-		findToSentEvent = demandResponseEventService.findToSentEventByVen(ven1, 1L);
-		assertEquals(1, findToSentEvent.size());
-
-		findToSentEvent = demandResponseEventService.findToSentEventByVenUsername(ven1.getUsername());
+		List<DemandResponseEvent> findToSentEvent = demandResponseEventService
+				.findToSentEventByVenUsername(ven1.getUsername());
 		assertEquals(1, findToSentEvent.size());
 
 		findToSentEvent = demandResponseEventService.findToSentEventByVenUsername(ven1.getUsername(), 1L);
 		assertEquals(1, findToSentEvent.size());
+	}
+
+	private DemandResponseEventFilter getFilter(DemandResponseEventFilterType type, String value) {
+		DemandResponseEventFilter demandResponseEventFilter = new DemandResponseEventFilter();
+		demandResponseEventFilter.setType(type);
+		demandResponseEventFilter.setValue(value);
+		return demandResponseEventFilter;
+	}
+
+	@Test
+	public void searchTest() {
+		List<DemandResponseEventFilter> filters = new ArrayList<>();
+		List<DemandResponseEvent> findToSentEvent = demandResponseEventService.search(filters);
+		assertEquals(3, findToSentEvent.size());
+
+		filters = new ArrayList<>();
+		filters.add(getFilter(DemandResponseEventFilterType.VEN, "ven2"));
+		findToSentEvent = demandResponseEventService.search(filters);
+		assertEquals(2, findToSentEvent.size());
+		
+		filters = new ArrayList<>();
+		filters.add(getFilter(DemandResponseEventFilterType.VEN, "ven2"));
+		filters.add(getFilter(DemandResponseEventFilterType.STATE, DemandResponseEventStateEnum.ACTIVE.name()));
+		findToSentEvent = demandResponseEventService.search(filters);
+		assertEquals(1, findToSentEvent.size());
+		
+		filters = new ArrayList<>();
+		filters.add(getFilter(DemandResponseEventFilterType.VEN, "ven2"));
+		filters.add(getFilter(DemandResponseEventFilterType.STATE, DemandResponseEventStateEnum.CANCELED.name()));
+		findToSentEvent = demandResponseEventService.search(filters);
+		assertEquals(1, findToSentEvent.size());
+		
+		filters = new ArrayList<>();
+		filters.add(getFilter(DemandResponseEventFilterType.STATE, DemandResponseEventStateEnum.ACTIVE.name()));
+		findToSentEvent = demandResponseEventService.search(filters);
+		assertEquals(2, findToSentEvent.size());
+		
+		filters = new ArrayList<>();
+		filters.add(getFilter(DemandResponseEventFilterType.EVENT_ID, event1Id));
+		findToSentEvent = demandResponseEventService.search(filters);
+		assertEquals(1, findToSentEvent.size());
+		
+		filters = new ArrayList<>();
+		filters.add(getFilter(DemandResponseEventFilterType.MARKET_CONTEXT, marketContext.getName()));
+		findToSentEvent = demandResponseEventService.search(filters);
+		assertEquals(3, findToSentEvent.size());
+
 	}
 
 	@Test

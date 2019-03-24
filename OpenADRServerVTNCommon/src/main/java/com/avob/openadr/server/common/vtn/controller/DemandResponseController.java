@@ -31,6 +31,7 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandR
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.validator.DemandResponseEventCreateDtoValidator;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.validator.DemandResponseEventUpdateDtoValidator;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDto;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
@@ -72,6 +73,14 @@ public class DemandResponseController {
 			@RequestParam(value = "state", required = false) DemandResponseEventStateEnum state) {
 
 		List<DemandResponseEvent> find = demandResponseEventService.find(ven, state);
+		return dtoMapper.mapList(find, DemandResponseEventReadDto.class);
+	}
+
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	@ResponseBody
+	public List<DemandResponseEventReadDto> search(@RequestBody List<DemandResponseEventFilter> filters) {
+
+		List<DemandResponseEvent> find = demandResponseEventService.search(filters);
 		return dtoMapper.mapList(find, DemandResponseEventReadDto.class);
 	}
 
