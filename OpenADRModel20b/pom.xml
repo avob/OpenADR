@@ -44,7 +44,7 @@
 		</resources>
 
 		<plugins>
-		<plugin>
+			<plugin>
 				<artifactId>maven-remote-resources-plugin</artifactId>
 				<version>1.6.0</version>
 				<executions>
@@ -59,23 +59,6 @@
 						<include>**/*.xsd</include>
 					</includes>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-remote-resources-plugin</artifactId>
-				<version>1.6.0</version>
-				<configuration>
-					<resourceBundles>
-						<resourceBundle>com.avob.openadr.model:OpenADRModel20b:${project.version}</resourceBundle>
-					</resourceBundles>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>process</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
