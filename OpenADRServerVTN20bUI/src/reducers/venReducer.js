@@ -29,7 +29,6 @@ export default function venReducer( state = initialState.ven, action ) {
       return state;
 
     case types.SEARCH_VEN_SUCCESS:
-    console.log(action.payload)
       newState = objectAssign( {}, state, {
         ven: action.payload
       } );
@@ -73,6 +72,19 @@ export default function venReducer( state = initialState.ven, action ) {
       return newState;
 
     case types.LOAD_GROUP_ERROR:
+      return state;
+
+    // EVENTS
+     case types.SEARCH_EVENT:
+      return state;
+
+    case types.SEARCH_EVENT_SUCCESS:
+      newState = objectAssign( {}, state, {
+        event: action.payload
+      } );
+      return newState;
+
+    case types.SEARCH_EVENT_ERROR:
       return state;
 
     default:

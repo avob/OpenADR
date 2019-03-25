@@ -5,6 +5,7 @@ import { bindActionCreators } from 'redux';
 
 import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions';
 import * as eventActions from '../../actions/eventActions';
+import * as venActions from '../../actions/venActions';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -77,7 +78,11 @@ export class EventPage extends React.Component {
     super(props);
     this.state= {};
     this.state.value = 0;
-    this.state.filters = [];
+    this.state.filters =  [];
+    if(props.location.state && props.location.state.filters.length > 0) {
+      this.state.filters = this.state.filters.concat(props.location.state.filters)
+    }
+
     this.state.pagination = {
       page: 0
       , size: 20
@@ -144,10 +149,25 @@ export class EventPage extends React.Component {
       , this.state.pagination.page, this.state.pagination.size);
   }
 
+  onVenSuggestionsFetchRequested = (e) => {
+    var filters = this.state.filters.splice(0);
+    filters.push({type:"VEN", value:e.value});
+    this.props.venActions.searchVen(filters, 0, 5);
+  }
+
+  onVenSuggestionsClearRequested = () => {
+  }
+
+  onVenSuggestionsSelect = (ven) => {
+     var filters = this.state.filters;
+    filters.push({type:"VEN", value:ven.username});
+    this.setState({filters});
+    this.refreshEvent();
+  }
+
   render() {
     const {classes, event} = this.props;
     const {value} = this.state;
-
     return (
      <div className={ classes.root }>
       <Tabs value={ this.state.value }
@@ -164,6 +184,7 @@ export class EventPage extends React.Component {
                           <EventList classes={classes} 
                           marketContext={ event.marketContext }
                           event={event.event}
+                          
                           deleteEvent={ this.props.eventActions.deleteEvent}
                           filters={this.state.filters}
                           pagination={this.state.pagination}
@@ -173,7 +194,13 @@ export class EventPage extends React.Component {
                           end={this.state.end}
                           onStartChange={this.onStartChange}
                           onEndChange={this.onEndChange}
+                          
+                          ven={event.ven}
+                          onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
+                          onVenSuggestionsClearRequested={this.onVenSuggestionsClearRequested}
+                          onVenSuggestionsSelect={this.onVenSuggestionsSelect}
                            />
+                          
                           
                           
                        </TabContainer> }
@@ -191,6 +218,11 @@ export class EventPage extends React.Component {
                           end={this.state.end}
                           onStartChange={this.onStartChange}
                           onEndChange={this.onEndChange}
+
+                          ven={event.ven}
+                          onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
+                          onVenSuggestionsClearRequested={this.onVenSuggestionsClearRequested}
+                          onVenSuggestionsSelect={this.onVenSuggestionsSelect}
                  />
                        </TabContainer> }
 
@@ -214,7 +246,10 @@ function mapStateToProps( state ) {
 function mapDispatchToProps( dispatch ) {
   return {
     vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch ),
-    eventActions: bindActionCreators( eventActions, dispatch )
+    eventActions: bindActionCreators( eventActions, dispatch ),
+    venActions: bindActionCreators( venActions, dispatch )
+
+    
 
 
   };

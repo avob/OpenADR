@@ -32,7 +32,6 @@ import { VtnConfigurationMarketContextCard } from '../common/VtnConfigurationCar
 
 
 export class VtnConfigurationMarketContext extends React.Component {
-  // const VtnConfigurationMarketContext = (props) => {
   constructor( props ) {
     super( props );
 
@@ -185,26 +184,38 @@ export class VtnConfigurationMarketContext extends React.Component {
                 spacing={ 24 }>
             <Grid item xs={ 2 }>
               <TextField label="Name"
-                         placeholder="Name"
                          value={ this.state.name }
                          className={ classes.textField }
                          onChange={ this.handleCreateMarketContextNameChange }
-                         disabled={ this.state.editMode } />
+                         disabled={ this.state.editMode }
+                         InputLabelProps={{
+                          shrink: true,
+                        }}
+                        InputProps={{style:{marginTop:24}}} />
             </Grid>
             <Grid item xs={ 4 }>
               <TextField label="Description"
-                         placeholder="Description"
                          value={ this.state.description }
                          className={ classes.textField }
                          onChange={ this.handleCreateMarketContextDescriptionChange }
-                         fullWidth={ true } />
+                         fullWidth={ true } 
+                         InputLabelProps={{
+                            shrink: true,
+                          }}
+                          InputProps={{style:{marginTop:24}}}/>
             </Grid>
             <Grid item xs={ 2 }>
               <ColorPicker label="Color"
-                           placeholder="Color"
                            defaultValue='#000'
                            value={ this.state.color }
-                           TextFieldProps={ { className: classes.textField, fullWidth: true } }
+                           TextFieldProps={ { 
+                            className: classes.textField
+                            , fullWidth: true
+                            , InputLabelProps: {
+                              shrink: true,
+                            },
+                            InputProps:{style:{marginTop:24, color: this.state.color}}
+                            } } 
                            onChange={ this.handleCreateMarketContextColorChange } />
             </Grid>
             <Grid item xs={ 4 }>

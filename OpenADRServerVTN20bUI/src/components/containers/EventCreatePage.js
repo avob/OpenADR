@@ -5,6 +5,8 @@ import { bindActionCreators } from 'redux';
 
 import * as eventActions from '../../actions/eventActions';
 import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions';
+import * as venActions from '../../actions/venActions';
+
 
 
 import { withStyles } from '@material-ui/core/styles';
@@ -82,6 +84,19 @@ export class EventCreatePage extends React.Component {
     this.props.vtnConfigurationActions.loadGroup();
   }
 
+  onVenSuggestionsFetchRequested = (e) => {
+     var filters = [];
+    filters.push({type:"VEN", value:e.value});
+    this.props.venActions.searchVen([], 0, 5);
+  }
+
+  onVenSuggestionsClearRequested = () => {
+  }
+
+  onVenSuggestionsSelect = (ven) => {
+    console.log(ven)
+  }
+
   render() {
     const {classes, event_create} = this.props;
     const {value} = this.state;
@@ -98,7 +113,12 @@ export class EventCreatePage extends React.Component {
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
                           <EventCreate classes={classes} marketContext={event_create.marketContext} group={event_create.group} 
-                          createEvent={this.props.eventActions.createEvent}/>
+                          createEvent={this.props.eventActions.createEvent}
+                          ven={event_create.ven}
+                          onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
+                          onVenSuggestionsClearRequested={this.onVenSuggestionsClearRequested}
+                          onVenSuggestionsSelect={this.onVenSuggestionsSelect}
+                          />
                        </TabContainer> }
 
     </div>
@@ -121,7 +141,10 @@ function mapStateToProps( state ) {
 function mapDispatchToProps( dispatch ) {
   return {
     eventActions: bindActionCreators( eventActions, dispatch ),
-    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch )
+    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch ),
+    venActions: bindActionCreators( venActions, dispatch )
+
+    
   };
 }
 

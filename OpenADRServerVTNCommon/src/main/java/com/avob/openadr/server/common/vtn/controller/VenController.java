@@ -74,7 +74,7 @@ public class VenController {
 
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
 	@ResponseBody
-	public List<VenDto> search(@RequestBody List<VenFilter> filters, @RequestParam("page") int page,
+	public List<VenDto> searchVen(@RequestBody List<VenFilter> filters, @RequestParam("page") int page,
 			@RequestParam("size") int size) {
 		return dtoMapper.mapList(venService.search(filters, page, size), VenDto.class);
 	}

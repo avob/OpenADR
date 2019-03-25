@@ -38,6 +38,20 @@ export default function eventCreateReducer( state = initialState.event_create, a
     case types.LOAD_GROUP_ERROR:
       return state;
 
+      // VEN
+    case types.SEARCH_VEN:
+      return state;
+
+    case types.SEARCH_VEN_SUCCESS:
+      newState = objectAssign( {}, state, {
+        ven: action.payload
+      } );
+      return newState;
+
+    case types.SEARCH_VEN_ERROR:
+      return state;
+
+
     default:
       return state;
   }

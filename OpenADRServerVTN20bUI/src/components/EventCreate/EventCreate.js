@@ -154,7 +154,6 @@ export class EventCreate extends React.Component {
 
       targets: this.state.eventTarget
     }
-    console.log(JSON.stringify(dto))
     this.props.createEvent( dto );
   }
 
@@ -181,7 +180,7 @@ export class EventCreate extends React.Component {
   
 
   render() {
-    const {classes, marketContext, group} = this.props;
+    const {classes, marketContext, group, ven} = this.props;
     const steps = getSteps();
     const {activeStep, descriptor, activePeriod, eventSignal, eventTarget, hasError} = this.state;
     var that = this;
@@ -200,7 +199,11 @@ export class EventCreate extends React.Component {
             eventSignal={eventSignal} hasError={hasError}/>
         case 3:
           return <EventCreateEventTarget classes={classes} group={group} eventTarget={eventTarget} 
-            onChange={this.handleEventTargetChange}/>
+            onChange={this.handleEventTargetChange}
+            ven={ven}
+            onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
+            onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
+            onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}/>
         case 4:
           return <EventCreateConfirmationStep classes={classes} group={group} marketContext={marketContext} 
             descriptor={descriptor} eventTarget={eventTarget} eventSignal={eventSignal} createEvent={this.createEvent}/>
@@ -227,7 +230,6 @@ export class EventCreate extends React.Component {
           var valid = false;
 
           for(var i in eventSignal){
-            console.log(eventSignal[i])
             if( eventSignal[i].signalName == "" 
               || eventSignal[i].signalType == "" 
               || (eventSignal[i].currentValue == "" 

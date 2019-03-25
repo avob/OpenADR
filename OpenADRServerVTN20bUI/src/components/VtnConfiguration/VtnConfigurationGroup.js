@@ -42,7 +42,6 @@ import { VtnConfigurationGroupCard } from '../common/VtnConfigurationCard'
 
 
 export class VtnConfigurationGroup extends React.Component {
-  // const VtnConfigurationMarketContext = (props) => {
   constructor( props ) {
     super( props );
 
@@ -186,19 +185,25 @@ export class VtnConfigurationGroup extends React.Component {
                 spacing={ 24 }>
             <Grid item xs={ 2 }>
               <TextField label="Name"
-                         placeholder="Name"
                          value={ this.state.name }
                          className={ classes.textField }
                          onChange={ this.handleGroupNameChange }
-                         disabled={ this.state.editMode } />
+                         disabled={ this.state.editMode }
+                          InputLabelProps={{
+                          shrink: true,
+                        }}
+                        InputProps={{style:{marginTop:24}}} />
             </Grid>
             <Grid item xs={ 4 }>
               <TextField label="Description"
-                         placeholder="Description"
                          value={ this.state.description }
                          className={ classes.textField }
                          onChange={ this.handleGroupDescriptionChange }
-                         fullWidth={ true } />
+                         fullWidth={ true }
+                          InputLabelProps={{
+                          shrink: true,
+                        }}
+                        InputProps={{style:{marginTop:24}}} />
             </Grid>
             <Grid item xs={ 4 }>
               { saveBtnView }

@@ -5,6 +5,8 @@ import { bindActionCreators } from 'redux';
 
 import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions';
 import * as eventActions from '../../actions/eventActions';
+import * as venActions from '../../actions/venActions';
+
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -186,9 +188,26 @@ export class EventDetailPage extends React.Component {
     this.setState({editMode: false});
   }
 
+  onVenSuggestionsFetchRequested = (e) => {
+    var filters = [];
+    filters.push({type:"VEN", value:e.value});
+    this.props.venActions.searchVen(filters, 0, 5);
+  }
+
+  onVenSuggestionsClearRequested = () => {
+  }
+
+  onVenSuggestionsSelect = (ven) => {
+     var filters = this.state.filters;
+    filters.push({type:"VEN", value:ven.username});
+    this.setState({filters});
+    this.refreshEvent();
+  }
+
   render() {
     const {classes, event_detail} = this.props;
     const {value} = this.state;
+    console.log(event_detail.ven)
     if(!event_detail.event.activePeriod ) return null;
     return (
      <div className={ classes.root }>
@@ -238,13 +257,18 @@ export class EventDetailPage extends React.Component {
                   editMode={this.state.editMode}
                   copyTargets={this.state.copyTargets}
                   updateCopyTargets={this.updateCopyTargets}
+                   ven={event_detail.ven}
+                onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
+                onVenSuggestionsClearRequested={this.onVenSuggestionsClearRequested}
+                onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}
                   />
                      
                        </TabContainer> }
 
       { value === 4 && <TabContainer>
                 <EventDetailVenResponse classes={classes} event={event_detail.event} venResponse={event_detail.venResponse}
-                refreshVenResponse={() => {this.props.eventActions.loadEventVenResponse(this.props.match.params.id)}}/>
+                refreshVenResponse={() => {this.props.eventActions.loadEventVenResponse(this.props.match.params.id)}}
+               />
                      
                        </TabContainer> }
                 
@@ -269,7 +293,10 @@ function mapStateToProps( state ) {
 function mapDispatchToProps( dispatch ) {
   return {
     eventActions: bindActionCreators( eventActions, dispatch ),
-    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch )
+    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch ),
+    venActions: bindActionCreators( venActions, dispatch ),
+
+    
   };
 }
 

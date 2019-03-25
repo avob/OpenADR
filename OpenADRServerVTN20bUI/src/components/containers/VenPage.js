@@ -5,6 +5,9 @@ import { bindActionCreators } from 'redux';
 
 import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions';
 import * as venActions from '../../actions/venActions';
+import * as eventActions from '../../actions/eventActions';
+
+
 import VenList from '../Ven/VenList'
 import { withStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
@@ -56,6 +59,9 @@ export class VenPage extends React.Component {
     super(props);
     this.state = {};
     this.state.filters = [];
+    if(props.location.state && props.location.state.filters.length > 0) {
+      this.state.filters = this.state.filters.concat(props.location.state.filters)
+    }
     this.state.pagination = {
       page: 0
       , size: 20
@@ -65,17 +71,34 @@ export class VenPage extends React.Component {
   componentDidMount() {
     this.props.vtnConfigurationActions.loadMarketContext();
     this.props.vtnConfigurationActions.loadGroup();
-    this.props.venActions.searchVen(this.state.filters, this.state.page, this.state.size);
+    this.props.venActions.searchVen(this.state.filters, this.state.pagination.page, this.state.pagination.size);
 
   }
 
   onFilterChange = (filters) => {
     this.setState({filters});
-    this.props.venActions.searchVen(filters, this.state.page, this.state.size);
+    this.props.venActions.searchVen(filters, this.state.pagination.page, this.state.pagination.size);
   }
 
   onPaginationChange = (pagination) => {
     this.setState({pagination});
+  }
+
+  onEventSuggestionsFetchRequested = (e) => {
+    console.log(e);
+    var filters = this.state.filters.splice(0);
+    this.props.eventActions.searchEvent(filters, null, null, 0, 5);
+  }
+
+  onEventSuggestionsClearRequested = () => {
+  }
+
+  onEventSuggestionsSelect = (event) => {
+    console.log(event)
+     var filters = this.state.filters;
+    filters.push({type:"EVENT", value:event.descriptor.eventId});
+    this.setState({filters});
+    this.props.eventActions.searchEvent(filters, this.state.pagination.page, this.state.pagination.size);
   }
 
   render() {
@@ -98,7 +121,13 @@ export class VenPage extends React.Component {
                  filters={this.state.filters}
                  pagination={this.state.pagination}
                  onFilterChange={this.onFilterChange}
-                 onPaginationChange={this.onPaginationChange}/>
+                 onPaginationChange={this.onPaginationChange}
+
+                 event={ven.event}
+                  onEventSuggestionsFetchRequested={this.onEventSuggestionsFetchRequested}
+                  onEventSuggestionsClearRequested={this.onEventSuggestionsClearRequested}
+                  onEventSuggestionsSelect={this.onEventSuggestionsSelect}
+                 />
       </Typography>
     </div>
 
@@ -119,7 +148,8 @@ function mapStateToProps( state ) {
 function mapDispatchToProps( dispatch ) {
   return {
     venActions: bindActionCreators( venActions, dispatch ),
-    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch )
+    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch ),
+    eventActions: bindActionCreators( eventActions, dispatch )  
   };
 }
 

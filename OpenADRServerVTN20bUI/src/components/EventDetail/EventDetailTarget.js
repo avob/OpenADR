@@ -19,7 +19,7 @@ export class EventDetailTarget extends React.Component {
   }
 
   render() {
-   const {classes, event, copyTargets, group, editMode} = this.props;
+   const {classes, event, copyTargets, group, editMode, ven} = this.props;
     return (
     <div className={ classes.root } >
       <EventDetailHeader classes={classes} event={event} actions={<Grid container spacing={ 24 }>
@@ -64,7 +64,11 @@ export class EventDetailTarget extends React.Component {
       </Grid>}/>
        <Divider style={ { marginTop: '20px', marginBottom:20 } } />
 
-       <EventTargetPanel classes={classes} eventTarget={copyTargets} group={group} onChange={this.props.updateCopyTargets}/>
+       <EventTargetPanel classes={classes} eventTarget={copyTargets} group={group} onChange={this.props.updateCopyTargets}
+        ven={ven}
+        onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
+        onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
+        onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}/>
 
     </div>
     );

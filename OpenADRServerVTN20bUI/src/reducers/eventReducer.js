@@ -59,6 +59,19 @@ export default function eventReducer( state = initialState.event, action ) {
     case types.LOAD_MARKET_CONTEXT_ERROR:
       return state;
 
+    // VEN
+    case types.SEARCH_VEN:
+      return state;
+
+    case types.SEARCH_VEN_SUCCESS:
+      newState = objectAssign( {}, state, {
+        ven: action.payload
+      } );
+      return newState;
+
+    case types.SEARCH_VEN_ERROR:
+      return state;
+
 
     default:
       return state;

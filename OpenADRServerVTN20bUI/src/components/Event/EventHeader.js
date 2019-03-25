@@ -35,7 +35,7 @@ export class EventHeader extends React.Component {
   }
 
   render() {
-    const {classes, marketContext, event} = this.props;
+    const {classes, marketContext, event, ven} = this.props;
     return (
       <div>
         <Grid container spacing={ 8 }>
@@ -48,10 +48,15 @@ export class EventHeader extends React.Component {
               value={this.props.end} onChange={this.props.onEndChange} />
             </Grid>
             <Grid item xs={ 8 }>
-              <FilterPanel classes={classes} hasFilter={{marketContext:true}} 
+              <FilterPanel classes={classes} type="EVENT" hasFilter={{marketContext:true, ven: true, eventStatus:true}} 
                 marketContext={marketContext}
                 filter={this.props.filters}
-                onFilterChange={this.props.onFilterChange}/>
+                onFilterChange={this.props.onFilterChange}
+                ven={ven}
+                onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
+                onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
+                onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}
+                />
             </Grid>
             <Grid item xs={ 1 }>
              <Button key="btn_create"

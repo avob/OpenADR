@@ -157,7 +157,7 @@ public class DemandResponseControllerTest {
 		dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setEventId(event2Id);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
-		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.getActivePeriod().setStart(start);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
 		dto.getActivePeriod().setDuration(duration);
@@ -200,7 +200,7 @@ public class DemandResponseControllerTest {
 					dto.getSignals().get(0).getCurrentValue());
 
 			assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getDescriptor().getState())
-					|| DemandResponseEventStateEnum.CANCELED.equals(dto.getDescriptor().getState()));
+					|| DemandResponseEventStateEnum.CANCELLED.equals(dto.getDescriptor().getState()));
 		}
 
 		// find by ven username
@@ -243,7 +243,7 @@ public class DemandResponseControllerTest {
 					dto.getSignals().get(0).getCurrentValue());
 
 			assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getDescriptor().getState())
-					|| DemandResponseEventStateEnum.CANCELED.equals(dto.getDescriptor().getState()));
+					|| DemandResponseEventStateEnum.CANCELLED.equals(dto.getDescriptor().getState()));
 		}
 
 		// find by state
@@ -271,7 +271,7 @@ public class DemandResponseControllerTest {
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
 						.param("ven", DemandResponseControllerTest.ven2)
-						.param("state", DemandResponseEventStateEnum.CANCELED.toString()).with(adminSession))
+						.param("state", DemandResponseEventStateEnum.CANCELLED.toString()).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
 		readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -286,7 +286,7 @@ public class DemandResponseControllerTest {
 			assertEquals(DemandResponseControllerTest.start, dto.getActivePeriod().getStart());
 			assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
 					dto.getSignals().get(0).getCurrentValue());
-			assertTrue(DemandResponseEventStateEnum.CANCELED.equals(dto.getDescriptor().getState()));
+			assertTrue(DemandResponseEventStateEnum.CANCELLED.equals(dto.getDescriptor().getState()));
 		}
 
 		// find non existing ven
@@ -761,7 +761,7 @@ public class DemandResponseControllerTest {
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
 		assertEquals(new Long(modificationNumber), dto.getDescriptor().getModificationNumber());
-		assertEquals(DemandResponseEventStateEnum.CANCELED, dto.getDescriptor().getState());
+		assertEquals(DemandResponseEventStateEnum.CANCELLED, dto.getDescriptor().getState());
 
 		// cancel an already canceled event does nothing
 		this.mockMvc
@@ -781,7 +781,7 @@ public class DemandResponseControllerTest {
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
 		assertEquals(new Long(modificationNumber), dto.getDescriptor().getModificationNumber());
-		assertEquals(DemandResponseEventStateEnum.CANCELED, dto.getDescriptor().getState());
+		assertEquals(DemandResponseEventStateEnum.CANCELLED, dto.getDescriptor().getState());
 
 		// activate
 		// expect change in modificationNumber

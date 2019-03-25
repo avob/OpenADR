@@ -17,7 +17,7 @@ export const searchVen = (filters, page, size) => {
   var params = {filters, page, size};
   return swaggerAction(types.SEARCH_VEN, 
     (api) => {
-      return api.apis[ 'ven-controller' ].searchUsingPOST(params, jsonResponseContentType);
+      return api.apis[ 'ven-controller' ].searchVenUsingPOST(params, jsonResponseContentType);
     }, 
     parseJsonData
   );

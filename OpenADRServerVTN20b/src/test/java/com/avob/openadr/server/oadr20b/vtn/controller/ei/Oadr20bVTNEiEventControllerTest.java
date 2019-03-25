@@ -207,7 +207,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getSignals().add(signal);
 		dto.getActivePeriod().setStart(System.currentTimeMillis() - 10);
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
-		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
 		DemandResponseEvent eventCanceled = demandResponseEventService.create(dto);
 
@@ -547,7 +547,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		created.add(event1);
 
 		dto.getDescriptor().setEventId("eventIdScenario3");
-		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
@@ -590,7 +590,7 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		dto.getDescriptor().setEventId("eventIdScenario5");
 		dto.setPublished(true);
-		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
 						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
@@ -631,7 +631,7 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		dto.getDescriptor().setEventId("eventIdScenario7");
 		dto.setPublished(true);
-		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
 						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
@@ -670,7 +670,7 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		dto.getDescriptor().setEventId("eventIdScenario9");
 		dto.setPublished(true);
-		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
 						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
@@ -710,7 +710,7 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		dto.getDescriptor().setEventId("eventIdScenario11");
 		dto.setPublished(true);
-		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
 						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))

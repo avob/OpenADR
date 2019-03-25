@@ -29,6 +29,9 @@ import Grid from '@material-ui/core/Grid';
 
 import amber from '@material-ui/core/colors/amber';
 
+import { history } from '../../store/configureStore';
+
+
 
 
 var VtnConfigurationCard = (props) => {
@@ -91,6 +94,12 @@ export function VtnConfigurationMarketContextCard( props ) {
   } else if ( props.handleRemoveVenMarketContext ) {
     close = props.handleRemoveVenMarketContext
   }
+  var handleEventClick = () => {
+    history.push( '/event', { filters: [{type:"MARKET_CONTEXT", value: props.context.name}] });
+  }
+  var handleVenClick = () => {
+    history.push( '/ven', { filters: [{type:"MARKET_CONTEXT", value: props.context.name}] });
+  }
   return (
   <VtnConfigurationCard classes={ props.classes }
                         color={ props.context.color }
@@ -100,7 +109,8 @@ export function VtnConfigurationMarketContextCard( props ) {
                         edit={ props.handleEditMarketContext }
                         cardType={ "Market Context" }
                         icon={ <ExtensionIcon style={ { height: 30, width: 30 } } /> }
-                        actions={ [ <Button key="action_marketcontext_events" size="small" color="primary"> Events </Button>, <Button key="action_marketcontext_vens" size="small" color="primary"> Vens </Button> ] } />
+                        actions={ [ <Button onClick={handleEventClick} key="action_marketcontext_events" size="small" color="primary"> Events </Button>
+                        , <Button onClick={handleVenClick} key="action_marketcontext_vens" size="small" color="primary"> Vens </Button> ] } />
   );
 }
 
@@ -111,6 +121,9 @@ export function VtnConfigurationGroupCard( props ) {
   } else if ( props.handleRemoveVenGroup ) {
     close = props.handleRemoveVenGroup
   }
+  var handleVenClick = () => {
+    history.push( '/ven', { filters: [{type:"GROUP", value: props.group.name}] });
+  }
   return (
   <VtnConfigurationCard classes={ props.classes }
                         color="#bbb"
@@ -120,12 +133,16 @@ export function VtnConfigurationGroupCard( props ) {
                         edit={ props.handleEditGroup }
                         cardType={ "Group" }
                         icon={ <GroupWorkIcon style={ { height: 30, width: 30 } } /> }
-                        actions={ [ <Button key="action_group_vens" size="small" color="primary"> Vens </Button> ] } />
+                        actions={ [ <Button onClick={handleVenClick}  key="action_group_vens" size="small" color="primary"> Vens </Button> ] } />
   );
 }
 
 export function VtnConfigurationVenCard( props ) {
   var color = (props.ven.registrationId != null) ? "green" : "#bbb";
+  var handleEventClick = () => {
+    history.push( '/event', { filters: [{type:"VEN", value: props.ven.username}] });
+  }
+
   return (
   <VtnConfigurationCard classes={ props.classes }
                         color={color}
@@ -135,7 +152,7 @@ export function VtnConfigurationVenCard( props ) {
                         edit={ props.handleEditVen }
                         cardType={ "VEN" }
                         icon={ <SettingsInputComponentIcon style={ { height: 30, width: 30} } /> }
-                        actions={ [ <Button key="action_group_vens" size="small" color="primary"> Detail </Button> ] } />
+                        actions={ [ <Button onClick={handleEventClick}  key="action_group_vens" size="small" color="primary"> Events </Button> ] } />
   );
 }
 
@@ -157,6 +174,10 @@ export function VtnConfigurationEventCard( props ) {
     color = amber[700];
   }
 
+  var handleVenClick = () => {
+    history.push( '/ven', { filters: [{type:"EVENT", value: props.event.descriptor.eventId}] });
+  }
+
   return (
   <VtnConfigurationCard classes={ props.classes }
                         color={ color }
@@ -166,6 +187,6 @@ export function VtnConfigurationEventCard( props ) {
                         edit={ props.handleEditEvent }
                         cardType={ "EVENT" }
                         icon={ <CalendarTodayIcon style={ { height: 30, width: 30} } /> }
-                        actions={ [ <Button key="action_group_vens" size="small" color="primary"> Detail </Button> ] } />
+                        actions={ [ <Button onClick={handleVenClick} key="action_group_vens" size="small" color="primary"> VENS </Button> ] } />
   );
 }

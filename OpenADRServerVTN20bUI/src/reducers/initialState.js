@@ -7,7 +7,8 @@ export default {
   ven: {
     marketContext: [],
     group: [],
-    ven: []
+    ven: [],
+    event: []
   },
   ven_detail: {
     ven: {},
@@ -38,16 +39,19 @@ export default {
   event: {
     marketContext: [],
     event: [],
+    ven: []
   },
   event_detail: {
     event: {},
     marketContext: [],
     group: [],
-    venResponse:[]
+    venResponse:[],
+    ven: []
   },
   event_create: {
     marketContext: [],
-    group: []
+    group: [],
+    ven: []
   },
 
 };

@@ -243,7 +243,7 @@ public class VenServiceTest {
 
 		dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setEventId(event2Id);
-		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getActivePeriod().setStart(start);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
@@ -334,21 +334,21 @@ public class VenServiceTest {
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.MARKET_CONTEXT, marketContextName));
 		filters.add(getFilter(VenFilterType.EVENT, event1Id));
-		filters.add(getFilter(VenFilterType.VEN_ID, "ven1"));
+		filters.add(getFilter(VenFilterType.VEN, "ven1"));
 		search = venService.search(filters);
 		assertEquals(1, search.getTotalElements());
 
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.MARKET_CONTEXT, marketContextName));
 		filters.add(getFilter(VenFilterType.EVENT, event1Id));
-		filters.add(getFilter(VenFilterType.VEN_ID, "ven"));
+		filters.add(getFilter(VenFilterType.VEN, "ven"));
 		search = venService.search(filters);
 		assertEquals(2, search.getTotalElements());
 
 		filters = new ArrayList<>();
 		filters.add(getFilter(VenFilterType.MARKET_CONTEXT, marketContextName));
 		filters.add(getFilter(VenFilterType.EVENT, event1Id));
-		filters.add(getFilter(VenFilterType.VEN_ID, "mouaiccool"));
+		filters.add(getFilter(VenFilterType.VEN, "mouaiccool"));
 		search = venService.search(filters);
 		assertEquals(0, search.getTotalElements());
 

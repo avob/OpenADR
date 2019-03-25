@@ -72,8 +72,8 @@ export class EventCalendar extends React.Component {
   }
 
   render() {
-    const {classes, marketContext, event, filters, pagination, onFilterChange, onPaginationChange,
-      start, end, onStartChange, onEndChange} = this.props;
+    const {classes, marketContext, event, ven, filters, pagination, onFilterChange, onPaginationChange,
+      start, end, onStartChange, onEndChange, onVenSuggestionsFetchRequested, onVenSuggestionsClearRequested, onVenSuggestionsSelect} = this.props;
 
     var calendarEvent = [];
     event.forEach(e => {
@@ -97,7 +97,11 @@ export class EventCalendar extends React.Component {
       <div className={ classes.root }>
         <EventHeader classes={classes}  marketContext={marketContext} event={event}
         filters={filters} pagination={pagination} onFilterChange={onFilterChange} onPaginationChange={onPaginationChange}
-        start={start} end={end} onStartChange={onStartChange} onEndChange={onEndChange} />
+        start={start} end={end} onStartChange={onStartChange} onEndChange={onEndChange} 
+        ven={ven}
+                onVenSuggestionsFetchRequested={onVenSuggestionsFetchRequested}
+                onVenSuggestionsClearRequested={onVenSuggestionsClearRequested}
+                onVenSuggestionsSelect={onVenSuggestionsSelect}/>
         <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
         <BigCalendar style={{height:600}}
           localizer={localizer}

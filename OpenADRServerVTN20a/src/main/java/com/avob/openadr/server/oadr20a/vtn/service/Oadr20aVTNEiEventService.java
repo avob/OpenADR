@@ -415,7 +415,7 @@ public class Oadr20aVTNEiEventService {
 		EventStatusEnumeratedType status = null;
 		if (DemandResponseEventStateEnum.ACTIVE.equals(state)) {
 			status = getOadrEventStatus(now, start, end, startNotification, rampUpDuration);
-		} else if (DemandResponseEventStateEnum.CANCELED.equals(state)) {
+		} else if (DemandResponseEventStateEnum.CANCELLED.equals(state)) {
 			status = EventStatusEnumeratedType.CANCELLED;
 		}
 

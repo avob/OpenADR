@@ -80,8 +80,10 @@ public class DemandResponseController {
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
 	@ResponseBody
 	public List<DemandResponseEventReadDto> search(@RequestBody List<DemandResponseEventFilter> filters,
-			@RequestParam("start") Long start, @RequestParam("end") Long end, @RequestParam("page") int page,
-			@RequestParam("size") int size) {
+			@RequestParam(value = "start", required = false) Long start,
+			@RequestParam(value = "end", required = false) Long end,
+			@RequestParam(value = "page", required = false) int page,
+			@RequestParam(value = "size", required = false) int size) {
 
 		Page<DemandResponseEvent> find = demandResponseEventService.search(filters, start, end, page, size);
 		return dtoMapper.mapList(find, DemandResponseEventReadDto.class);

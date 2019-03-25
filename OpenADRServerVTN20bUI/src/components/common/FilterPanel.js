@@ -32,12 +32,14 @@ import Paper from '@material-ui/core/Paper';
 import ExtensionIcon from '@material-ui/icons/Extension';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
+
 import ChipInput from 'material-ui-chip-input'
 import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 
-import { MarketContextSelectDialog, GroupSelectDialog, VenStatusSelectDialog } from './VtnconfigurationDialog'
+import { MarketContextSelectDialog, GroupSelectDialog, VenStatusSelectDialog, VenSelectDialog, EventStatusSelectDialog, EventSelectDialog } from './VtnconfigurationDialog'
 
 var MarketContextChip = (props) => {
   return (
@@ -51,9 +53,15 @@ var GroupChip = (props) => {
   );
 }
 
-var VenStatusChip = (props) => {
+var VenChip = (props) => {
   return (
   <span style={ { display: 'flex', alignItems: 'center', marginLeft: '-7px', } }><SettingsInputComponentIcon color="disabled" style={ { marginRight: '5px' } }/> { props.name }</span>
+  );
+}
+
+var EventChip = (props) => {
+  return (
+  <span style={ { display: 'flex', alignItems: 'center', marginLeft: '-7px', } }><CalendarTodayIcon color="disabled" style={ { marginRight: '5px' } }/> { props.name }</span>
   );
 }
 
@@ -65,12 +73,15 @@ export class FilterPanel extends React.Component {
     this.state.marketContextSelectDialogOpen = false;
     this.state.groupSelectDialogOpen = false;
     this.state.venStatusSelectDialogOpen = false;
+    this.state.venSelectDialogOpen = false;
+    this.state.eventStatusSelectDialogOpen = false;
+    this.state.eventSelectDialogOpen = false;
     
   }
 
   addFilterFromInput = (f) => {
     this.addFilter({
-    	type: "VEN_ID",
+    	type: this.props.type,
     	value: f
     });
   }
@@ -135,12 +146,64 @@ export class FilterPanel extends React.Component {
     this.setState( params )
   }
 
+  handleVenSelectOpen = () => {
+    this.setState( {
+      venSelectDialogOpen: true
+    } )
+  }
+
+  handleVenSelectClose = (ven) => {
+    var params = {
+      venSelectDialogOpen: false
+    }
+    if ( ven != null ) {
+      this.addFilter({type: "VEN", value: ven.username});
+    }
+    this.setState( params );
+  }
+
+  handleEventStatusSelectOpen = () => {
+    this.setState( {
+      eventStatusSelectDialogOpen: true
+    } )
+  }
+
+  handleEventStatusSelectClose = (status) => {
+    var params = {
+      eventStatusSelectDialogOpen: false
+    }
+    if ( status != null && (status.name == "ACTIVE" || status.name == "CANCELLED")) {
+      this.addFilter({type: "EVENT_STATE", value: status.name});
+    } else  if ( status != null && (status.name == "NOT_PUBLISHED" || status.name == "PUBLISHED")) {
+      this.addFilter({type: "EVENT_PUBLISHED", value: status.name});
+    }
+    this.setState( params );
+  }
+
+  handleEventSelectOpen = () => {
+    this.setState( {
+      eventSelectDialogOpen: true
+    } )
+  }
+
+  handleEventSelectClose = (event) => {
+    var params = {
+      eventSelectDialogOpen: false
+    }
+    if ( event != null ) {
+      this.addFilter({type: "EVENT", value: event.descriptor.eventId});
+    }
+    this.setState( params );
+  }
+
 
   render() {
     const {classes, action, hasFilter} = this.props;
 
     var group = (this.props.group) ? this.props.group : [];
     var marketContext = (this.props.marketContext) ? this.props.marketContext : [];
+    var ven = (this.props.ven) ? this.props.ven : [];
+    var event = (this.props.event) ? this.props.event : [];
     var filterChip = [];
     for(var i in this.props.filter) {
     	var chip = null;
@@ -153,11 +216,23 @@ export class FilterPanel extends React.Component {
     			chip = <GroupChip name={ filter.value } />
     			break; 
     		case "IS_REGISTERED":
-    			chip = <VenStatusChip name={ filter.value } />
+    			chip = <VenChip name={ filter.value } />
     			break; 
-    		case "VEN_ID":
-    			chip = filter.value
+    		case "VEN":
+    			chip = <VenChip name={ filter.value } />
     			break; 
+        case "EVENT":
+          chip = <EventChip name={ filter.value } />
+          break; 
+        case "EVENT_STATE":
+          chip = <EventChip name={ filter.value } />
+          break; 
+        case "EVENT_PUBLISHED":
+          chip = <EventChip name={ filter.value } />
+          break; 
+
+        
+
 
     		default:
     			break;
@@ -211,6 +286,42 @@ export class FilterPanel extends React.Component {
       </IconButton><VenStatusSelectDialog open={ this.state.venStatusSelectDialogOpen }
                          close={ this.handleVenStatusSelectClose }
                          title="Filter by Ven Status" /></span> : null}
+
+
+      {(hasFilter && hasFilter.ven) ? <span><IconButton className={ classes.iconButton }
+                  aria-label="ven"
+                  onClick={ this.handleVenSelectOpen }>
+        <SettingsInputComponentIcon />
+        <ExpandMore />
+      </IconButton><VenSelectDialog open={ this.state.venSelectDialogOpen }
+                        suggestions={ven}
+                        onSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
+                        onSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
+                        onSuggestionsSelect={this.handleVenSelectClose}
+                        close={ this.handleVenSelectClose }
+                        title="Filter by Ven" /></span> : null}
+
+      {(hasFilter && hasFilter.eventStatus) ? <span><IconButton className={ classes.iconButton }
+                  aria-label="eventStatus"
+                  onClick={ this.handleEventStatusSelectOpen }>
+        <CalendarTodayIcon />
+        <ExpandMore />
+      </IconButton><EventStatusSelectDialog open={ this.state.eventStatusSelectDialogOpen }
+                         close={ this.handleEventStatusSelectClose }
+                         title="Filter by Event Status" /></span> : null}
+
+      {(hasFilter && hasFilter.event) ? <span><IconButton className={ classes.iconButton }
+                  aria-label="eventStatus"
+                  onClick={ this.handleEventSelectOpen }>
+        <CalendarTodayIcon />
+        <ExpandMore />
+      </IconButton><EventSelectDialog open={ this.state.eventSelectDialogOpen }
+                            suggestions={event}
+                        onSuggestionsFetchRequested={this.props.onEventSuggestionsFetchRequested}
+                        onSuggestionsClearRequested={this.props.onEventSuggestionsClearRequested}
+                        onSuggestionsSelect={this.handleEventSelectClose}
+                         close={ this.handleEventSelectClose }
+                         title="Filter by Event Status" /></span> : null}
     </span>
     );
   }

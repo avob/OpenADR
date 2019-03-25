@@ -21,7 +21,6 @@ function VtnConfigurationTextField( props ) {
   <TextField label={ props.field }
              defaultValue={ props.value }
              className={ props.className }
-             margin="normal"
              InputProps={ { readOnly: true, } } />
 
   );
@@ -34,7 +33,6 @@ function VtnConfigurationFeatureField( props ) {
   <TextField label={ props.field }
              defaultValue={ str }
              className={ props.className }
-             margin="normal"
              InputProps={ { readOnly: true, endAdornment: ( <InputAdornment> { ico } </InputAdornment> ), } } />
 
   );

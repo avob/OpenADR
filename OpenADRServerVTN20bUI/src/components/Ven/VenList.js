@@ -45,7 +45,7 @@ export class VenList extends React.Component {
   }
 
   render() {
-    const {classes, ven, marketContext, group} = this.props;
+    const {classes, ven, marketContext, group, event} = this.props;
     var view = [];
 
     for (var i in ven) {
@@ -66,11 +66,16 @@ export class VenList extends React.Component {
                 >
 
             <Grid item xs={ 11 }>
-              <FilterPanel classes={classes} hasFilter={{group:true, marketContext:true, venStatus:true}} 
+              <FilterPanel classes={classes}  type="VEN" hasFilter={{group:true, marketContext:true, venStatus:true, event:true}} 
                 group={group}
                 marketContext={marketContext}
                 filter={this.props.filters}
-                onFilterChange={this.props.onFilterChange}/>
+                onFilterChange={this.props.onFilterChange}
+
+                event={event}
+                onEventSuggestionsFetchRequested={this.props.onEventSuggestionsFetchRequested}
+                onEventSuggestionsClearRequested={this.props.onEventSuggestionsClearRequested}
+                onEventSuggestionsSelect={this.props.onEventSuggestionsSelect}/>
             </Grid>
             <Grid item xs={ 1 }>
              <Button key="btn_create"

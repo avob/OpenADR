@@ -41,6 +41,7 @@ public class EmbeddedSqlDatabaseInit {
 	@Resource
 	private DemandResponseEventService demandeResponseEventService;
 
+	
 	@PostConstruct
 	public void init() {
 		String marketContextName = "http://oadr.avob.com";

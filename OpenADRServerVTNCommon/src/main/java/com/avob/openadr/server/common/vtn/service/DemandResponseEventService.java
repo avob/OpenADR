@@ -331,8 +331,8 @@ public class DemandResponseEventService {
 
 	@Transactional(readOnly = false)
 	public DemandResponseEvent cancel(DemandResponseEvent event) {
-		if (!event.getDescriptor().getState().equals(DemandResponseEventStateEnum.CANCELED)) {
-			event.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		if (!event.getDescriptor().getState().equals(DemandResponseEventStateEnum.CANCELLED)) {
+			event.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 			event.getDescriptor().setModificationNumber(event.getDescriptor().getModificationNumber() + 1);
 			event.setPublished(true);
 			distributeEventToPushVen(event);
@@ -490,9 +490,16 @@ public class DemandResponseEventService {
 		if (size == null) {
 			size = DEFAULT_SEARCH_SIZE;
 		}
-		Specification<DemandResponseEvent> spec = Specification.where(DemandResponseEventSpecification.search(filters))
-				.and(DemandResponseEventSpecification.hasActivePeriodStartAfter(start))
-				.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrBefore(end));
+		Specification<DemandResponseEvent> spec = Specification.where(DemandResponseEventSpecification.search(filters));
+
+		if (start != null) {
+			spec = spec.and(DemandResponseEventSpecification.hasActivePeriodStartAfter(start));
+		}
+
+		if (end != null) {
+			spec = spec.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrBefore(end));
+		}
+
 		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size));
 	}
 

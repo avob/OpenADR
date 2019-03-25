@@ -105,7 +105,7 @@ public class VenSpecification {
 					marketContextPredicates = VenSpecification.hasMarketContext(venFilter.getValue());
 				}
 				break;
-			case VEN_ID:
+			case VEN:
 
 				if (venIdPredicates != null) {
 					venIdPredicates = venIdPredicates.or(VenSpecification.hasVenIdContains(venFilter.getValue()))

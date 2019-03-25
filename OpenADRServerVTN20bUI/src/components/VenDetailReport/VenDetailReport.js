@@ -82,9 +82,6 @@ export class VenDetailReport extends React.Component {
   render() {
     const {classes, availableReportDescription, availableReport} = this.props;
 
-    console.log(availableReportDescription, availableReport)
-
-
     return (
     <div className={ classes.root } >
       <VenAvailableReportHeader availableReport={availableReport} classes={classes}/>

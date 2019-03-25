@@ -16,6 +16,10 @@ public class DemandResponseEventSpecification {
 		return (event, cq, cb) -> cb.isTrue(event.get("published"));
 	}
 
+	static public Specification<DemandResponseEvent> isPublished(Boolean published) {
+		return (event, cq, cb) -> cb.equal(event.get("published"), published);
+	}
+
 	static public Specification<DemandResponseEvent> isNotPublished() {
 		return (event, cq, cb) -> cb.equal(event.get("published"), false);
 	}
@@ -44,11 +48,11 @@ public class DemandResponseEventSpecification {
 			return cb.equal(joinList.get("ven").get("username"), username);
 		};
 	}
-	
+
 	static public Specification<DemandResponseEvent> hasActivePeriodStartAfter(Long timestamp) {
 		return (event, cq, cb) -> cb.ge(event.get("activePeriod").get("start"), timestamp);
 	}
-	
+
 	static public Specification<DemandResponseEvent> hasActivePeriodEndNullOrBefore(Long timestamp) {
 		return (event, cq, cb) -> {
 			return cb.or(cb.isNull(event.get("activePeriod").get("end")),
@@ -88,9 +92,10 @@ public class DemandResponseEventSpecification {
 		Specification<DemandResponseEvent> marketContextPredicates = null;
 		Specification<DemandResponseEvent> venPredicates = null;
 		Specification<DemandResponseEvent> statePredicates = null;
+		Specification<DemandResponseEvent> isPublishedPredicates = null;
 		for (DemandResponseEventFilter demandResponseEventFilter : filters) {
 			switch (demandResponseEventFilter.getType()) {
-			case EVENT_ID:
+			case EVENT:
 				if (eventIdPredicates != null) {
 					eventIdPredicates = eventIdPredicates.or(DemandResponseEventSpecification
 							.hasDescriptorEventIdContains(demandResponseEventFilter.getValue()));
@@ -118,7 +123,7 @@ public class DemandResponseEventSpecification {
 							.hasVenUsername(demandResponseEventFilter.getValue());
 				}
 				break;
-			case STATE:
+			case EVENT_STATE:
 				DemandResponseEventStateEnum valueOf = DemandResponseEventStateEnum
 						.valueOf(demandResponseEventFilter.getValue());
 				if (statePredicates != null) {
@@ -127,6 +132,24 @@ public class DemandResponseEventSpecification {
 					statePredicates = DemandResponseEventSpecification.hasDescriptorState(valueOf);
 				}
 				break;
+			case EVENT_PUBLISHED:
+				if ("PUBLISHED".equals(demandResponseEventFilter.getValue().toUpperCase())) {
+					if (isPublishedPredicates != null) {
+						isPublishedPredicates = isPublishedPredicates
+								.or(DemandResponseEventSpecification.isPublished(true));
+					} else {
+						isPublishedPredicates = DemandResponseEventSpecification.isPublished(true);
+					}
+				} else if ("NOT_PUBLISHED".equals(demandResponseEventFilter.getValue().toUpperCase())) {
+					if (isPublishedPredicates != null) {
+						isPublishedPredicates = isPublishedPredicates
+								.or(DemandResponseEventSpecification.isPublished(false));
+					} else {
+						isPublishedPredicates = DemandResponseEventSpecification.isPublished(false);
+					}
+				}
+
+				break;
 			default:
 				break;
 
@@ -134,7 +157,7 @@ public class DemandResponseEventSpecification {
 		}
 
 		final Specification<DemandResponseEvent> finalRes = Specification.where(eventIdPredicates)
-				.and(marketContextPredicates).and(venPredicates).and(statePredicates);
+				.and(marketContextPredicates).and(venPredicates).and(statePredicates).and(isPublishedPredicates);
 
 		return (event, cq, cb) -> {
 			if (finalRes != null) {

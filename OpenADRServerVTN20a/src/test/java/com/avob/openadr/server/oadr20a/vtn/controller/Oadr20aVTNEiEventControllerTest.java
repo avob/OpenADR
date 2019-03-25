@@ -272,7 +272,7 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		eventCanceled.getActivePeriod().setStart(System.currentTimeMillis() - 10);
 		eventCanceled.getTargets().add(new DemandResponseEventTargetDto("ven", VEN));
-		eventCanceled.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		eventCanceled.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		eventCanceled.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		eventCanceled.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 		eventCanceled.setPublished(true);
@@ -688,7 +688,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		created.add(event1);
 
 		dto.getDescriptor().setEventId("eventId2");
-		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
@@ -726,7 +726,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		created.add(event3);
 
 		dto.getDescriptor().setEventId("eventId4");
-		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
@@ -764,7 +764,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		created.add(event5);
 
 		dto.getDescriptor().setEventId("eventId6");
-		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
@@ -800,7 +800,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		created.add(event7);
 
 		dto.getDescriptor().setEventId("eventId8");
-		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
@@ -827,7 +827,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 		dto.setPublished(true);
-		
+
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
 						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
@@ -838,7 +838,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		created.add(event9);
 
 		dto.getDescriptor().setEventId("eventId10");
-		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELED);
+		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/").with(userSecuritySession)
@@ -848,7 +848,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		DemandResponseEventReadDto event10 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
 				DemandResponseEventReadDto.class);
 		created.add(event10);
-		
+
 		// create unpublished event not to be found by ven
 		dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setEventId("eventId11");

@@ -32,7 +32,10 @@ import ExtensionIcon from '@material-ui/icons/Extension';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
 
-import { GroupSelectDialog, TargetSelectDialog } from '../common/VtnconfigurationDialog'
+import { GroupSelectDialog, TargetSelectDialog } from './VtnconfigurationDialog'
+
+import {VenAutocomplete} from './Autocomplete'
+
 
 
 
@@ -153,6 +156,13 @@ export class EventTargetPanel extends React.Component {
     this.setState({groupSelectDialog: true});
   }
 
+  onVenSuggestionsSelect = (ven) => {
+    console.log(ven)
+    if(ven != null){
+      this.setState({createTargetId: ven.username});
+    }
+  } 
+
 
   render() {
     const {classes, hasError, eventTarget, group} = this.props;
@@ -163,7 +173,7 @@ export class EventTargetPanel extends React.Component {
           justify="center">
       
       <Grid container spacing={ 24 }>
-          <Grid item xs={ 4 }>
+          <Grid item xs={ 2 }>
            <TextField label="Select Target Type" error={hasError && descriptor.marketContext == null}
                  value={ this.state.createTargetType }
                  placeholder="Ven, Group ..."
@@ -180,7 +190,7 @@ export class EventTargetPanel extends React.Component {
             
           </Grid>
 
-          { (this.state.createTargetType == "group") ? <Grid item xs={ 4 }>
+          { (this.state.createTargetType == "group") ? <Grid item xs={ 6 }>
             <TextField required label="Group" 
                  value={this.state.createTargetId}
                  className={classes.textField}
@@ -194,14 +204,11 @@ export class EventTargetPanel extends React.Component {
                                          title="Select Market Context" />
           </Grid> : null}
 
-          { (this.state.createTargetType == "ven") ? <Grid item xs={ 4 }>
-            <TextField label="Select Target"
-                       placeholder="MyGroup, MyVen ..."
-                       value={ this.state.createTargetId }
-                       className={ classes.textField }
-                       onChange={ this.handleTargetIdChange }
-                       InputLabelProps={{ shrink: true }}
-                       fullWidth={ true } />
+          { (this.state.createTargetType == "ven") ? <Grid item xs={ 6 }>
+            <VenAutocomplete  suggestions={this.props.ven}
+              onSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
+              onSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
+              onSuggestionsSelect={this.onVenSuggestionsSelect}/>
           </Grid> : null}
 
           { (this.state.createTargetType != "" && this.state.createTargetId != "") ? <Grid item xs={ 2 }>

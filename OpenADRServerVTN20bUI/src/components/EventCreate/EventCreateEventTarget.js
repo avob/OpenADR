@@ -48,7 +48,7 @@ export class EventCreateEventTarget extends React.Component {
 
 
   render() {
-    const {classes, hasError, eventTarget, group} = this.props;
+    const {classes, hasError, eventTarget, group, ven} = this.props;
 
     return (
     <Grid container
@@ -58,7 +58,11 @@ export class EventCreateEventTarget extends React.Component {
       <Grid container spacing={ 24 }>
         <Grid item xs={ 2 } />
           <Grid item xs={ 8 }>
-            <EventTargetPanel classes={classes} eventTarget={eventTarget} group={group} onChange={this.props.onChange}/>
+            <EventTargetPanel classes={classes} eventTarget={eventTarget} group={group} onChange={this.props.onChange}
+            ven={ven}
+            onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
+            onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
+            onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}/>
           </Grid>
 
           
