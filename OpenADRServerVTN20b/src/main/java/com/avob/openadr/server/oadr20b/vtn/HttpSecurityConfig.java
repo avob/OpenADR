@@ -1,14 +1,18 @@
 package com.avob.openadr.server.oadr20b.vtn;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -43,6 +47,11 @@ import com.avob.openadr.server.common.vtn.security.DigestUserDetailsService;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 
+	@Value("${vtn.cors:http://vtn.oadr.com:3000,http://testlocal:3000}")
+	private String corsStr;
+
+	private List<String> cors = null;
+
 	@Resource
 	private Oadr20bX509AuthenticatedUserDetailsService oadr20bX509AuthenticatedUserDetailsService;
 
@@ -51,6 +60,15 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Resource
 	private DigestUserDetailsService digestUserDetailsService;
+
+	@PostConstruct
+	public void init() {
+		if (corsStr != null) {
+			cors = Arrays.asList(corsStr.split(","));
+		} else {
+			cors = new ArrayList<>();
+		}
+	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -104,26 +122,22 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring()
-		
-		.regexMatchers("/health");
-	}
-	
-	@Bean
-    public CorsConfigurationSource corsConfigurationSource()
-    {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(true);
-//        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "OPTIONS", "HEAD", "DELETE"));
-        configuration.setAllowedOrigins(Arrays.asList("http://vtn.oadr.com:3000", "http://testlocal:3000"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.applyPermitDefaultValues();
-        
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-	
 
+				.regexMatchers("/health");
+	}
+
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowCredentials(true);
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "OPTIONS", "HEAD", "DELETE"));
+		configuration.setAllowedOrigins(cors);
+		configuration.setAllowedHeaders(Arrays.asList("*"));
+		configuration.applyPermitDefaultValues();
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
 
 }

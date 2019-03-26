@@ -34,8 +34,11 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 - VTN port (8181) is forwarded on host machine. 
 - You need to configure your DNS to match urls with machine ip address (for example by adding "127.0.0.1 vtn.oadr.com" to your local hosts file)
 ```shell
-	# build and install
+	# build backend
 	mvn clean package install
+
+	# build frontend
+	npm --prefix OpenADRServerVTN20bUI/ run headless-build
 
 	# create and provision VM
 	cd devops/vtn20b_postgres

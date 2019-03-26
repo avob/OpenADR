@@ -1,0 +1,21 @@
+# systemd service file to start Node-RED
+
+[Unit]
+Description=Node-RED graphical event wiring tool.
+Wants=network.target
+Documentation={{    nodered_doc_url    }}
+
+[Service]
+Type=simple
+User={{             nodered_run_user   }}
+Group={{            nodered_run_group  }}
+WorkingDirectory={{ nodered_run_chdir  }}
+Nice=5
+Environment="-v NODE_OPTIONS={{ nodered_node_options }}"
+ExecStart=/usr/bin/env {{ nodered_run_start }} $NODE_OPTIONS $NODE_RED_OPTIONS
+KillSignal=SIGINT
+Restart=on-failure
+SyslogIdentifier=Node-RED
+
+[Install]
+WantedBy=multi-user.target

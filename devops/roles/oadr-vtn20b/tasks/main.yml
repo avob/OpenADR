@@ -1,0 +1,99 @@
+---
+  - name: Add the user 'oadr-vtn20b'
+    user:
+      name: oadr-vtn20b
+      groups: oadr-vtn20b
+      shell: /sbin/nologin
+      append: yes
+      comment: "oadr-vtn20b nologin User"
+      state: present
+
+  - name: Creates app lib folder
+    file:
+      path: /opt/oadr-vtn20b/lib
+      state: directory
+      owner: oadr-vtn20b
+      group: oadr-vtn20b
+
+  - name: Creates app cert folder
+    file:
+      path: /opt/oadr-vtn20b/cert
+      state: directory
+      owner: oadr-vtn20b
+      group: oadr-vtn20b
+
+  - name: Creates app log folder
+    file:
+      path: /var/log/oadr-vtn20b
+      state: directory
+      owner: oadr-vtn20b
+      group: oadr-vtn20b
+
+  - name: Creates app pid folder
+    file:
+      path: /var/run/oadr-vtn20b
+      state: directory
+      owner: oadr-vtn20b
+      group: oadr-vtn20b
+
+
+  - name: Copy cert folder
+    copy:
+      src: ../../../cert
+      dest: /opt/oadr-vtn20b
+      owner: oadr-vtn20b
+      group: oadr-vtn20b
+
+  - name: Download postgres connector jar
+    get_url:
+      url: https://jdbc.postgresql.org/download/postgresql-42.2.5.jar
+      dest: /opt/oadr-vtn20b/lib/postgresql-42.2.5.jar
+      owner: oadr-vtn20b
+      group: oadr-vtn20b
+
+  - name: Install loader.properties
+    template:
+      src: templates/loader.properties
+      dest: /opt/oadr-vtn20b/loader.properties
+      owner: oadr-vtn20b
+      group: oadr-vtn20b
+
+  - name: Install log4j2.xml
+    template:
+      src: templates/log4j2.xml
+      dest: /opt/oadr-vtn20b/log4j2.xml
+      owner: oadr-vtn20b
+      group: oadr-vtn20b
+
+  - name: Set oadr-vtn20b.conf permission
+    file: 
+      path:  /opt/oadr-vtn20b/oadr-vtn20b.conf
+      owner: vagrant
+      group: vagrant
+      state: touch
+      mode: 0400
+
+  - name: Install oadr-vtn20b.jar 
+    copy:
+      src: ../../../OpenADRServerVTN20b/target/OpenADRServerVTN20b-0.0.1-SNAPSHOT.jar
+      dest: /opt/oadr-vtn20b/oadr-vtn20b.jar
+
+  - name: Set oadr-vtn20b.jar permission 
+    file: 
+      path:  /opt/oadr-vtn20b/oadr-vtn20b.jar
+      owner: oadr-vtn20b
+      group: oadr-vtn20b
+      state: touch
+      mode: 0500
+
+  - name: Install oadr-vtn20b.service
+    template:
+      src: templates/oadr-vtn20b.service
+      dest: /usr/lib/systemd/system/oadr-vtn20b.service
+      owner: oadr-vtn20b
+      group: oadr-vtn20b
+
+  - name: Start service oadr-vtn20b, if not started
+    service:
+      name: oadr-vtn20b
+      state: started

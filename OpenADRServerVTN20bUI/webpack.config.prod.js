@@ -5,6 +5,10 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
 
+// publicPath env
+const publicPath = process.env.PUBLIC_PATH;
+console.log("PUBLIC_PATH: "+publicPath)
+
 const GLOBALS = {
   'process.env.NODE_ENV': JSON.stringify('production'),
   __DEV__: false
@@ -20,7 +24,7 @@ export default {
   mode: 'production',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    publicPath: '/',
+    publicPath: publicPath,
     filename: '[name].[contenthash].js'
   },
   plugins: [

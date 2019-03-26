@@ -11,16 +11,42 @@ oracle_java_license_version: "shared/accepted-oracle-license-v1-1"
 oracle_java_set_as_default: no
 oracle_java_state: latest
 
+# POSTGRES CONF
 postgresql_databases:
   - name: oadr-vtn20b
 
 postgresql_users:
   - name: oadr-vtn20b
     password: supersecure
-
+ 
+# OADRVTN SPRING BOOT APP CONF
 springboot_application_name: oadr-vtn20b
 springboot_src_file: ../../../OpenADRServerVTN20b/target/OpenADRServerVTN20b-0.0.1-SNAPSHOT.jar
 springboot_propertyfile_template: templates/application.properties
 springboot_configuration_template: templates/oadr-vtn20b.conf
 springboot_user: oadr-vtn20b
 springboot_group: oadr-vtn20b
+
+# APACHE CONF
+apache_global_vhost_settings: |
+  DirectoryIndex index.php index.html
+  Listen 8080
+apache_remove_default_vhost: false
+apache_listen_port_ssl: 8080
+apache_vhosts: []
+apache_vhosts_ssl:
+  - servername: "vtn.oadr.com"
+    serveralias: "localhost"
+    documentroot: "/var/www/html"
+    certificate_file: "/opt/oadr-vtn20b/cert/cert/vtn.oadr.com-rsa.crt"
+    certificate_key_file: "/opt/oadr-vtn20b/cert/cert/vtn.oadr.com-rsa.key"
+    extra_parameters: |
+      RewriteCond %{HTTP_HOST} !^www\. [NC]
+      RewriteRule ^(.*)$ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+      # Don't rewrite files or directories
+      RewriteCond %{REQUEST_FILENAME} -f [OR]
+      RewriteCond %{REQUEST_FILENAME} -d
+      RewriteRule ^ - [L]
+      # Rewrite everything else to index.html to allow html5 state links
+      RewriteRule ^ index.html [L]
+

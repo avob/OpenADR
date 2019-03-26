@@ -1,0 +1,12 @@
+--- # provisioning/group_vars/orions/vars.yml
+nodered_home:               '/home/vagrant/.node-red'
+nodered_run_user:           'vagrant'
+nodered_run_group:          'vagrant'
+nodered_run_chdir:          '/home/vagrant'
+nodered_run_start:          'node-red'
+nodered_node_options:       '--max-old-space-size=128'
+nodered_doc_url:            'http://nodered.org/docs/'
+nodered_service_unit_path:  '/lib/systemd/system/nodered.service'
+nodered_service_unit_owner: 'root'
+nodered_service_unit_group: 'root'
+nodered_service_unit_mode:  '0644'

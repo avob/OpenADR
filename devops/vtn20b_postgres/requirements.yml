@@ -3,3 +3,4 @@
 - src: geerlingguy.postgresql
 - src: https://github.com/remyma/ansible-springboot.git 
   name: remyma.ansible-springboot
+- src: geerlingguy.apache

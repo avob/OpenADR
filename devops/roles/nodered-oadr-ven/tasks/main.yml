@@ -1,0 +1,39 @@
+---
+  - name: Install node-gyp build dependencies
+    when: ( ansible_os_family  == "Debian" )
+    apt: name={{item}} state=installed
+    with_items:
+      - build-essential
+
+  - name: Git clone node-red-contrib-oadr-ven module
+    git:
+      repo: 'https://github.com/avob/node-red-contrib-oadr-ven'
+      dest: /home/vagrant/node-red-contrib-oadr-ven
+      force: yes
+
+  - name: Set oadr-vtn20b.conf permission
+    file: 
+      path: /home/vagrant/node-red-contrib-oadr-ven
+      owner: vagrant
+      group: vagrant
+      state: directory
+      mode: 0755
+      recurse: yes
+
+  - name: Install node-red-contrib-oadr-ven
+    command: chdir=/home/vagrant/node-red-contrib-oadr-ven npm install
+    become: yes
+    become_user: vagrant
+
+  - name: Add node-red-contrib-oadr-ven module to nodered
+    command: chdir=/home/vagrant/.node-red npm install ../node-red-contrib-oadr-ven
+    become: yes
+    become_user: vagrant
+
+  - name: Install oadr-vtn20b.jar 
+    copy:
+      src: files/flows_default.json
+      dest: /home/vagrant/.node-red/flows_vtn20b.json
+
+  - name: start nodered from unit
+    shell: systemctl restart nodered 

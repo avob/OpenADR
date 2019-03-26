@@ -1,0 +1,15 @@
+---
+  - name: Clean oadr-vtn20b-ui apache2 app
+    file:
+      state: absent
+      path: /var/www/html/oadr-vtn20b-ui
+
+  - name: Install oadr-vtn20b-ui apache2 app
+    copy:
+      src: ../../../OpenADRServerVTN20bUI/dist/
+      dest: /var/www/html/oadr-vtn20b-ui
+  
+  - name: Start service oadr-vtn20b, if not started
+    service:
+      name: oadr-vtn20b
+      state: started

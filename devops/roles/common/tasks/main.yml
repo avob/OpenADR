@@ -1,0 +1,16 @@
+--- # provisioning/roles/common/tasks/main.yml
+
+  - name: update apt
+    when: ( offline is not defined and ansible_os_family  == "Debian" )
+    apt:
+      upgrade: dist
+      update_cache: yes
+      cache_valid_time: 3600
+
+  - name: install base software on Debian-like
+    when: ( ansible_os_family  == "Debian" )
+    apt: name={{item}} state=installed
+    with_items:
+      - git
+      - curl
+      - zsh
