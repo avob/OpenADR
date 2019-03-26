@@ -32,13 +32,15 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 - Install [Virtualbox](https://www.virtualbox.org/)
 - use "cert" folder certificates for CA, VTN, admin client
 - VTN port (8181) is forwarded on host machine. 
+- VTN Control UI (8080) is forwarded on host machine
+- NodeRed VEN simulator (1880) is forwarded on host machine
 - You need to configure your DNS to match urls with machine ip address (for example by adding "127.0.0.1 vtn.oadr.com" to your local hosts file)
 ```shell
 	# build backend
 	mvn clean package install
 
 	# build frontend
-	npm --prefix OpenADRServerVTN20bUI/ run headless-build
+	export PUBLIC_PATH=/oadr-vtn20b-ui/; npm --prefix OpenADRServerVTN20bUI/ run headless-build
 
 	# create and provision VM
 	cd devops/vtn20b_postgres
