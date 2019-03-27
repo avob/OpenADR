@@ -68,8 +68,8 @@ const styles = theme => ({
   },
 });
 
-const deltaStartDays = 7
-const deltaEndDays = 7
+const deltaStartDays = -1
+const deltaEndDays = 14
 
 
 export class EventPage extends React.Component {
@@ -85,7 +85,7 @@ export class EventPage extends React.Component {
 
     this.state.pagination = {
       page: 0
-      , size: 20
+      , size: 100
     }
     var now = new Date();
     var today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
@@ -149,6 +149,14 @@ export class EventPage extends React.Component {
       , this.state.pagination.page, this.state.pagination.size);
   }
 
+  onPeriodChange = (start, end) =>  {
+    this.setState({start, end})
+    this.props.eventActions.searchEvent(this.state.filters, start, end
+      , this.state.pagination.page, this.state.pagination.size);
+  }
+
+  
+
   onVenSuggestionsFetchRequested = (e) => {
     var filters = this.state.filters.splice(0);
     filters.push({type:"VEN", value:e.value});
@@ -194,6 +202,7 @@ export class EventPage extends React.Component {
                           end={this.state.end}
                           onStartChange={this.onStartChange}
                           onEndChange={this.onEndChange}
+                          onPeriodChange={this.onPeriodChange}
                           
                           ven={event.ven}
                           onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
@@ -218,7 +227,7 @@ export class EventPage extends React.Component {
                           end={this.state.end}
                           onStartChange={this.onStartChange}
                           onEndChange={this.onEndChange}
-
+                          onPeriodChange={this.onPeriodChange}
                           ven={event.ven}
                           onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
                           onVenSuggestionsClearRequested={this.onVenSuggestionsClearRequested}

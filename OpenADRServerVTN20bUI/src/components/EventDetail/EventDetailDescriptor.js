@@ -102,7 +102,7 @@ export class EventDetailDescriptor extends React.Component {
             </Button>
           </Grid> : null}
 
-        {(event.published && event.descriptor.state == "CANCELED") ? <Grid item xs={ 4 }>
+        {(event.published && event.descriptor.state == "CANCELLED") ? <Grid item xs={ 4 }>
             <Button key="btn_create"
                     style={ { marginTop: 15 } }
                     variant="outlined"

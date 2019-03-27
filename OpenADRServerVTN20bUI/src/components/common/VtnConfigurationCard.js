@@ -162,7 +162,7 @@ export function VtnConfigurationEventCard( props ) {
     case "ACTIVE":
       color = "green";
       break;
-    case "CANCELED":
+    case "CANCELLED":
       color = "red";
       break;
     default:

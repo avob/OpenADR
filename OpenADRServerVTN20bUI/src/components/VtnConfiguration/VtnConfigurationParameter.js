@@ -92,7 +92,7 @@ const VtnConfigurationParameter = (props) => {
   }
 
   return (
-  <div>
+  <div className={ classes.root }>
     <FormControl className={ classes.formControl }>
       { getTextField( 'Identifiant VTN', 'vtnId' ) }
     </FormControl>

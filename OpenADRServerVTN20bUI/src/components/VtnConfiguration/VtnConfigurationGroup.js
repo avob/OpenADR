@@ -177,43 +177,75 @@ export class VtnConfigurationGroup extends React.Component {
 
     return (
     <div>
-      <form style={ flexContainer }>
+      <form className={ classes.root }>
         <Grid container spacing={ 8 }>
-          <Grid container
-                item
-                xs={ 12 }
-                spacing={ 24 }>
-            <Grid item xs={ 2 }>
+          <Grid container>
+            <Grid item xs={ 3 }>
               <TextField label="Name"
                          value={ this.state.name }
                          className={ classes.textField }
                          onChange={ this.handleGroupNameChange }
                          disabled={ this.state.editMode }
+                         style={{width:"95%"}}
                           InputLabelProps={{
                           shrink: true,
                         }}
                         InputProps={{style:{marginTop:24}}} />
             </Grid>
-            <Grid item xs={ 4 }>
+            <Grid item xs={ 7 }>
               <TextField label="Description"
                          value={ this.state.description }
                          className={ classes.textField }
                          onChange={ this.handleGroupDescriptionChange }
-                         fullWidth={ true }
+                         style={{width:"95%"}}
                           InputLabelProps={{
                           shrink: true,
                         }}
-                        InputProps={{style:{marginTop:24}}} />
+                        InputProps={{style:{marginTop:24, }}} />
             </Grid>
-            <Grid item xs={ 4 }>
-              { saveBtnView }
+            <Grid item xs={ 1 }>
+              
+
+              {(this.state.editMode) ? <Button key="vtn_cancel"
+                        variant="outlined"
+                        color="secondary"
+                        size="small"
+                        className={ classes.button }
+                        style={ { marginTop } }
+                        onClick={ this.handleCancelGroupButtonClick }>
+                  <CloseIcon />
+                </Button>: null}      
+            </Grid>
+            <Grid item xs={ 1 }>
+              {(this.state.editMode) ? <Button key="btn_save"
+                              variant="outlined"
+                              color="primary"
+                              size="small"
+                              className={ classes.button }
+                              style={ { marginTop } }
+                              fullWidth={ true } 
+                              onClick={ this.handleCreateGroupButtonClick }>
+                        <AddIcon /> Save
+                      </Button> : null}
+
+              {(!this.state.editMode) ? <Button key="btn_create"
+                            variant="outlined"
+                            color="primary"
+                            size="small"
+                            className={ classes.button }
+                            style={ { marginTop } }
+                            fullWidth={ true } 
+                            onClick={ this.handleCreateGroupButtonClick }>
+                      <AddIcon />New
+                    </Button>: null}
+
             </Grid>
           </Grid>
         </Grid>
       </form>
       <div>
         <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
-        <GridList style={ { justifyContent: 'space-around', } }>
+        <GridList style={ { justifyContent: 'left', } }>
           { view }
         </GridList>
       </div>

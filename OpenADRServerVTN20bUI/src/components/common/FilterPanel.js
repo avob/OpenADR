@@ -260,7 +260,6 @@ export class FilterPanel extends React.Component {
                   aria-label="market_context"
                   onClick={ this.handleMarketContextSelectOpen }>
         <ExtensionIcon />
-        <ExpandMore />
         
       </IconButton><MarketContextSelectDialog marketContext={ marketContext}
                                  open={ this.state.marketContextSelectDialogOpen }
@@ -271,7 +270,6 @@ export class FilterPanel extends React.Component {
                   aria-label="group"
                   onClick={ this.handleGroupSelectOpen }>
         <GroupWorkIcon />
-        <ExpandMore />
         
       </IconButton><GroupSelectDialog group={ group }
                          open={ this.state.groupSelectDialogOpen }
@@ -282,7 +280,6 @@ export class FilterPanel extends React.Component {
                   aria-label="group"
                   onClick={ this.handleVenStatusSelectOpen }>
         <SettingsInputComponentIcon />
-        <ExpandMore />
       </IconButton><VenStatusSelectDialog open={ this.state.venStatusSelectDialogOpen }
                          close={ this.handleVenStatusSelectClose }
                          title="Filter by Ven Status" /></span> : null}
@@ -292,7 +289,6 @@ export class FilterPanel extends React.Component {
                   aria-label="ven"
                   onClick={ this.handleVenSelectOpen }>
         <SettingsInputComponentIcon />
-        <ExpandMore />
       </IconButton><VenSelectDialog open={ this.state.venSelectDialogOpen }
                         suggestions={ven}
                         onSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
@@ -305,7 +301,6 @@ export class FilterPanel extends React.Component {
                   aria-label="eventStatus"
                   onClick={ this.handleEventStatusSelectOpen }>
         <CalendarTodayIcon />
-        <ExpandMore />
       </IconButton><EventStatusSelectDialog open={ this.state.eventStatusSelectDialogOpen }
                          close={ this.handleEventStatusSelectClose }
                          title="Filter by Event Status" /></span> : null}
@@ -314,7 +309,6 @@ export class FilterPanel extends React.Component {
                   aria-label="eventStatus"
                   onClick={ this.handleEventSelectOpen }>
         <CalendarTodayIcon />
-        <ExpandMore />
       </IconButton><EventSelectDialog open={ this.state.eventSelectDialogOpen }
                             suggestions={event}
                         onSuggestionsFetchRequested={this.props.onEventSuggestionsFetchRequested}

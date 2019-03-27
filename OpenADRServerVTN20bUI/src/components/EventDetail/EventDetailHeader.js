@@ -111,9 +111,9 @@ export class EventDetailHeader extends React.Component {
                                  <strong>ACTIVE</strong>
                                </Typography> } />
 
-      } else if ( event.descriptor.state == "CANCELED" ) {
+      } else if ( event.descriptor.state == "CANCELLED" ) {
         statePanel = <ErrorSnackbar  message={ <Typography component="span" style={ { color:"#fff" } }>
-                                 <strong>CANCELED</strong>
+                                 <strong>CANCELLED</strong>
                                </Typography> } />
 
       } 

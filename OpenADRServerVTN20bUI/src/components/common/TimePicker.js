@@ -34,6 +34,7 @@ export var DatePicker = (props) => {
           className={classes.textField}
           value={valDate}
           onChange={onDateChange}
+          fullWidth={props.fullWidth != null && props.fullWidth }
           InputLabelProps={{
             shrink: true,
           }}

@@ -94,7 +94,7 @@ export class VenList extends React.Component {
       
       
       <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
-      <GridList style={ { justifyContent: 'space-around', } }>
+      <GridList style={ { justifyContent: 'left', } }>
         { view }
       </GridList>
     </div>

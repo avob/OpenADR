@@ -139,64 +139,34 @@ export class VtnConfigurationMarketContext extends React.Component {
       display: 'flex',
       flexDirection: 'row',
     };
-    var saveBtnView = null;
     var marginTop = 13;
-    if ( !this.state.editMode ) {
-      saveBtnView = <Button key="btn_create"
-                            variant="outlined"
-                            color="primary"
-                            size="small"
-                            className={ classes.button }
-                            style={ { marginTop } }
-                            onClick={ this.handleCreateMarketContextButtonClick }>
-                      <AddIcon />Create
-                    </Button>
-    } else {
-      saveBtnView = [ <Button key="btn_save"
-                              variant="outlined"
-                              color="primary"
-                              size="small"
-                              className={ classes.button }
-                              style={ { marginTop } }
-                              onClick={ this.handleCreateMarketContextButtonClick }>
-                        <AddIcon />Save
-                      </Button>,
-        <Button key="vtn_cancel"
-                variant="outlined"
-                color="secondary"
-                size="small"
-                className={ classes.button }
-                style={ { marginTop } }
-                onClick={ this.handleCancelMarketContextButtonClick }>
-          <CloseIcon />Cancel
-        </Button>
-      ]
-    }
+
 
 
     return (
-    <div>
-      <form style={ flexContainer }>
+    <div className={ classes.root }>
+      <form >
         <Grid container spacing={ 8 }>
-          <Grid container
-                item
-                xs={ 12 }
-                spacing={ 24 }>
-            <Grid item xs={ 2 }>
+          <Grid container>
+                
+            <Grid item xs={ 3 }>
               <TextField label="Name"
                          value={ this.state.name }
                          className={ classes.textField }
                          onChange={ this.handleCreateMarketContextNameChange }
                          disabled={ this.state.editMode }
+                         style={{width:"95%"}}
                          InputLabelProps={{
                           shrink: true,
                         }}
+
                         InputProps={{style:{marginTop:24}}} />
             </Grid>
-            <Grid item xs={ 4 }>
+            <Grid item xs={ 5 }>
               <TextField label="Description"
                          value={ this.state.description }
                          className={ classes.textField }
+                         style={{width:"95%"}}
                          onChange={ this.handleCreateMarketContextDescriptionChange }
                          fullWidth={ true } 
                          InputLabelProps={{
@@ -210,7 +180,7 @@ export class VtnConfigurationMarketContext extends React.Component {
                            value={ this.state.color }
                            TextFieldProps={ { 
                             className: classes.textField
-                            , fullWidth: true
+                            , style:{width:"95%"}
                             , InputLabelProps: {
                               shrink: true,
                             },
@@ -218,15 +188,52 @@ export class VtnConfigurationMarketContext extends React.Component {
                             } } 
                            onChange={ this.handleCreateMarketContextColorChange } />
             </Grid>
-            <Grid item xs={ 4 }>
-              { saveBtnView }
+            <Grid item xs={ 1 }>
+              
+
+              {(this.state.editMode) ? <Button key="vtn_cancel"
+                        variant="outlined"
+                        color="secondary"
+                        size="small"
+                        className={ classes.button }
+                        style={ { marginTop } }
+                        onClick={ this.handleCancelMarketContextButtonClick }>
+                  <CloseIcon />
+                </Button>: null}      
             </Grid>
+            <Grid item xs={ 1 }>
+              {(this.state.editMode) ? <Button key="btn_save"
+                              variant="outlined"
+                              color="primary"
+                              size="small"
+                              className={ classes.button }
+                              style={ { marginTop } }
+                              fullWidth={ true } 
+                              onClick={ this.handleCreateMarketContextButtonClick }>
+                        <AddIcon /> Save
+                      </Button> : null}
+
+              {(!this.state.editMode) ? <Button key="btn_create"
+                            variant="outlined"
+                            color="primary"
+                            size="small"
+                            className={ classes.button }
+                            style={ { marginTop } }
+                            fullWidth={ true } 
+                            onClick={ this.handleCreateMarketContextButtonClick }>
+                      <AddIcon />New
+                    </Button>: null}
+
+            </Grid>
+
+
+            
           </Grid>
         </Grid>
       </form>
-      <div>
+      <div >
         <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
-        <GridList style={ { justifyContent: 'space-around', } }>
+        <GridList style={ { justifyContent: 'left', } }>
           { view }
         </GridList>
       </div>

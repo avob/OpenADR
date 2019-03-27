@@ -17,7 +17,6 @@ import { VtnConfigurationEventCard } from '../common/VtnConfigurationCard'
 
 import { history } from '../../store/configureStore';
 
-import { DatePicker } from '../common/TimePicker'
 
 
 import FilterPanel from '../common/FilterPanel' 
@@ -39,15 +38,8 @@ export class EventHeader extends React.Component {
     return (
       <div>
         <Grid container spacing={ 8 }>
-          <Grid container>
-
-            <Grid item xs={ 3 }>
-              <DatePicker classes={ classes } field="Start" 
-              value={this.props.start} onChange={this.props.onStartChange} />
-              <DatePicker classes={ classes } field="End" 
-              value={this.props.end} onChange={this.props.onEndChange} />
-            </Grid>
-            <Grid item xs={ 8 }>
+          <Grid container>            
+            <Grid item xs={ 11 }>
               <FilterPanel classes={classes} type="EVENT" hasFilter={{marketContext:true, ven: true, eventStatus:true}} 
                 marketContext={marketContext}
                 filter={this.props.filters}
