@@ -17,18 +17,29 @@
       owner: vagrant
       group: vagrant
       state: directory
-      mode: 0755
+      mode: 0777
       recurse: yes
 
   - name: Install node-red-contrib-oadr-ven
-    command: chdir=/home/vagrant/node-red-contrib-oadr-ven npm install
-    become: yes
-    become_user: vagrant
+    shell: sudo npm install
+    become: no
+    args:
+      chdir: /home/vagrant/node-red-contrib-oadr-ven 
 
   - name: Add node-red-contrib-oadr-ven module to nodered
-    command: chdir=/home/vagrant/.node-red npm install ../node-red-contrib-oadr-ven
-    become: yes
-    become_user: vagrant
+    shell: sudo npm install
+    become: no
+    args:
+      chdir: /home/vagrant/.node-red
+
+  - name: Add node-red-contrib-oadr-ven module to nodered
+    shell: sudo npm install ../node-red-contrib-oadr-ven
+    become: no
+    args:
+      chdir: /home/vagrant/.node-red
+
+
+
 
   - name: Install example flow
     copy:
