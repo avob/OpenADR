@@ -75,6 +75,22 @@ public class DemandResponseEventSpecification {
 		};
 	}
 
+	static public Specification<DemandResponseEvent> isSendable(boolean sendable) {
+		return (event, cq, cb) -> {
+			long now = System.currentTimeMillis();
+			Specification<DemandResponseEvent> and = DemandResponseEventSpecification.isPublished()
+					.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrAfter(now))
+					.and(DemandResponseEventSpecification.hasActivePeriodNotificationStartBefore(now));
+
+			if (!sendable) {
+				and = Specification.not(and);
+			}
+
+			return and.toPredicate(event, cq, cb);
+
+		};
+	}
+
 	static public Specification<DemandResponseEvent> toSentByVenUsername(String venUsername) {
 		return (event, cq, cb) -> {
 			long now = System.currentTimeMillis();
@@ -82,6 +98,7 @@ public class DemandResponseEventSpecification {
 					.and(DemandResponseEventSpecification.hasVenUsername(venUsername))
 					.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrAfter(now))
 					.and(DemandResponseEventSpecification.hasActivePeriodNotificationStartBefore(now));
+			cq.distinct(true);
 			return and.toPredicate(event, cq, cb);
 
 		};
@@ -93,6 +110,7 @@ public class DemandResponseEventSpecification {
 		Specification<DemandResponseEvent> venPredicates = null;
 		Specification<DemandResponseEvent> statePredicates = null;
 		Specification<DemandResponseEvent> isPublishedPredicates = null;
+		Specification<DemandResponseEvent> isSendablePredicates = null;
 		for (DemandResponseEventFilter demandResponseEventFilter : filters) {
 			switch (demandResponseEventFilter.getType()) {
 			case EVENT:
@@ -150,6 +168,26 @@ public class DemandResponseEventSpecification {
 				}
 
 				break;
+
+			case EVENT_SENDABLE:
+				if ("SENDABLE".equals(demandResponseEventFilter.getValue().toUpperCase())) {
+					if (isSendablePredicates != null) {
+						isSendablePredicates = isSendablePredicates
+								.or(DemandResponseEventSpecification.isSendable(true));
+					} else {
+						isSendablePredicates = DemandResponseEventSpecification.isSendable(true);
+					}
+				} else if ("NOT_SENDABLE".equals(demandResponseEventFilter.getValue().toUpperCase())) {
+					if (isSendablePredicates != null) {
+						isSendablePredicates = isPublishedPredicates
+								.or(DemandResponseEventSpecification.isSendable(false));
+					} else {
+						isSendablePredicates = DemandResponseEventSpecification.isSendable(false);
+					}
+				}
+
+				break;
+
 			default:
 				break;
 
@@ -157,10 +195,11 @@ public class DemandResponseEventSpecification {
 		}
 
 		final Specification<DemandResponseEvent> finalRes = Specification.where(eventIdPredicates)
-				.and(marketContextPredicates).and(venPredicates).and(statePredicates).and(isPublishedPredicates);
+				.and(marketContextPredicates).and(venPredicates).and(statePredicates).and(isPublishedPredicates).and(isSendablePredicates);
 
 		return (event, cq, cb) -> {
 			if (finalRes != null) {
+				cq.distinct(true);
 				return finalRes.toPredicate(event, cq, cb);
 			}
 			return null;

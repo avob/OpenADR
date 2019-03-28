@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +41,7 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedde
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenDao;
+import com.avob.openadr.server.common.vtn.models.ven.VenSpecification;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDao;
 import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
@@ -137,22 +139,37 @@ public class DemandResponseEventService {
 
 	private List<Ven> findVenForTarget(DemandResponseEvent event,
 			List<? extends DemandResponseEventTargetInterface> targets) {
-		List<Ven> ven = null;
-
+		Specification<Ven> targetedSpecification = null;
 		if (targets != null) {
-			List<String> targetedVenUsername = new ArrayList<>();
 
 			for (DemandResponseEventTargetInterface target : targets) {
 				if ("ven".equals(target.getTargetType())) {
-					targetedVenUsername.add(target.getTargetId());
+					if (targetedSpecification == null) {
+						targetedSpecification = VenSpecification.hasVenIdEquals(target.getTargetId());
+					} else {
+						targetedSpecification = targetedSpecification
+								.or(VenSpecification.hasVenIdEquals(target.getTargetId()));
+					}
+
+				} else if ("group".equals(target.getTargetType())) {
+					if (targetedSpecification == null) {
+						targetedSpecification = VenSpecification.hasGroup(target.getTargetId());
+					} else {
+						targetedSpecification = targetedSpecification
+								.or(VenSpecification.hasGroup(target.getTargetId()));
+					}
 				}
 			}
-			ven = venDao.findByUsernameInAndVenMarketContextsContains(targetedVenUsername,
-					event.getDescriptor().getMarketContext());
-		} else {
-			ven = venDao.findByVenMarketContextsName(event.getDescriptor().getMarketContext().getName());
+
 		}
-		return ven;
+		if (targetedSpecification == null) {
+			targetedSpecification = VenSpecification
+					.hasMarketContext(event.getDescriptor().getMarketContext().getName());
+		} else {
+			targetedSpecification = targetedSpecification
+					.and(VenSpecification.hasMarketContext(event.getDescriptor().getMarketContext().getName()));
+		}
+		return venDao.findAll(targetedSpecification);
 	}
 
 	/**
@@ -190,6 +207,7 @@ public class DemandResponseEventService {
 
 		// link targets
 		List<Ven> findByUsernameIn = findVenForTarget(event, dto.getTargets());
+
 		List<VenDemandResponseEvent> list = new ArrayList<VenDemandResponseEvent>();
 		for (Ven ven : findByUsernameIn) {
 			if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
@@ -322,8 +340,9 @@ public class DemandResponseEventService {
 			event.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 			event.getDescriptor().setModificationNumber(event.getDescriptor().getModificationNumber() + 1);
 			event.setPublished(true);
-			distributeEventToPushVen(event);
+
 			demandResponseEventDao.save(event);
+			distributeEventToPushVen(event);
 
 		}
 		return event;
@@ -335,8 +354,9 @@ public class DemandResponseEventService {
 			event.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 			event.getDescriptor().setModificationNumber(event.getDescriptor().getModificationNumber() + 1);
 			event.setPublished(true);
-			distributeEventToPushVen(event);
+
 			demandResponseEventDao.save(event);
+			distributeEventToPushVen(event);
 		}
 		return event;
 	}
@@ -457,14 +477,15 @@ public class DemandResponseEventService {
 		if (size != null && size > 0) {
 			Pageable limit = null;
 			int i = (int) (long) size;
-			limit = PageRequest.of(0, i);
+			limit = PageRequest.of(0, i, Sort.by(Sort.Direction.ASC, "activePeriod.start"));
 
 			Page<DemandResponseEvent> findAll = demandResponseEventDao
 					.findAll(DemandResponseEventSpecification.toSentByVenUsername(username), limit);
 			return findAll.getContent();
 
 		} else {
-			return demandResponseEventDao.findAll(DemandResponseEventSpecification.toSentByVenUsername(username));
+			return demandResponseEventDao.findAll(DemandResponseEventSpecification.toSentByVenUsername(username),
+					Sort.by(Sort.Direction.ASC, "activePeriod.start"));
 		}
 	}
 
@@ -500,7 +521,8 @@ public class DemandResponseEventService {
 			spec = spec.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrBefore(end));
 		}
 
-		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size));
+		return demandResponseEventDao.findAll(spec,
+				PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "activePeriod.start")));
 	}
 
 }

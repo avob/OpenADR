@@ -68,8 +68,6 @@ export class EventDetailSignal extends React.Component {
     const {classes, event, copySignals, editMode} = this.props;
     var that = this;
     var hasError = false;
-    console.log(event);
-
 
     return (
     <div className={ classes.root } >

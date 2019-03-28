@@ -153,6 +153,7 @@ public class EmbeddedSqlDatabaseInit {
 		signal.setCurrentValue(val.getValue());
 		signal.setSignalName("SIMPLE");
 		signal.setSignalType("level");
+		signal.setUnitType("none");
 		return signal;
 	}
 
@@ -161,6 +162,7 @@ public class EmbeddedSqlDatabaseInit {
 		signal.setCurrentValue(val);
 		signal.setSignalName(SignalNameEnumeratedType.ELECTRICITY_PRICE.value());
 		signal.setSignalType(SignalTypeEnumeratedType.PRICE.value());
+		signal.setUnitType("euro_per_kwh");
 		return signal;
 	}
 
@@ -168,7 +170,8 @@ public class EmbeddedSqlDatabaseInit {
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(val);
 		signal.setSignalName(SignalNameEnumeratedType.LOAD_CONTROL.value());
-		signal.setSignalType(SignalTypeEnumeratedType.LEVEL.value());
+		signal.setSignalType(SignalTypeEnumeratedType.X_LOAD_CONTROL_CAPACITY.value());
+		signal.setUnitType("none");
 		return signal;
 	}
 
@@ -206,7 +209,7 @@ public class EmbeddedSqlDatabaseInit {
 		String duration = "PT4H";
 		String notificationDuration = "P1D";
 
-		String everydayCron = "0 0 0 * * *";
+		String everydayCron = "0 0 4 * * *";
 		CronSequenceGenerator generator = new CronSequenceGenerator(everydayCron);
 
 		Date temp = generator.next(start);
@@ -236,7 +239,7 @@ public class EmbeddedSqlDatabaseInit {
 		String duration = "PT6H";
 		String notificationDuration = "P1D";
 
-		String everydayCron = "0 0 2 * * *";
+		String everydayCron = "0 0 6 * * *";
 		CronSequenceGenerator generator = new CronSequenceGenerator(everydayCron);
 
 		Date temp = generator.next(start);

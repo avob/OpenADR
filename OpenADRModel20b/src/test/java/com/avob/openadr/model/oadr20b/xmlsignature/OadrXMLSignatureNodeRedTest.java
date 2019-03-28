@@ -29,14 +29,12 @@ public class OadrXMLSignatureNodeRedTest {
 
 	@Test
 	public void validate() throws Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {
-		System.out.println(payload);
 		OadrPayload unmarshal = jaxbContext.unmarshal(payload, OadrPayload.class);
 		OadrXMLSignatureHandler.validate(payload, unmarshal, 0, 10);
 	}
 	
 	@Test
 	public void validate2() throws Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {
-		System.out.println(payload2);
 		OadrPayload unmarshal = jaxbContext.unmarshal(payload2, OadrPayload.class);
 		OadrXMLSignatureHandler.validate(payload2, unmarshal, 0, 10);
 	}

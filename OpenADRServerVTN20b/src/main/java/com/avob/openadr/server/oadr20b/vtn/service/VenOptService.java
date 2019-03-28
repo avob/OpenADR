@@ -35,11 +35,6 @@ public class VenOptService {
 
 	public List<VenOpt> findScheduledOpt(String venUsername, String marketContext, Long start, Long end) {
 
-		Iterable<VenOpt> findAll = venOptDao.findAll();
-		for (VenOpt opt : findAll) {
-			System.out.println(opt.getOptId() + " " + opt.getStart());
-		}
-
 		if (start == null && end == null && marketContext == null) {
 			return venOptDao.findScheduledOpt(venUsername);
 		} else if (start == null && end != null && marketContext == null) {

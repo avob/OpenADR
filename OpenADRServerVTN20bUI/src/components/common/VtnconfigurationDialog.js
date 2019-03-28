@@ -198,6 +198,14 @@ export function EventStatusSelectDialog( props ) {
     name: "NOT_PUBLISHED",
     color: amber[700],
     label: "Not Published"
+  },{
+    name: "SENDABLE",
+    color: "green",
+    label: "Sendable"
+  },{
+    name: "NOT_SENDABLE",
+    color: "#bbb",
+    label: "Not Sendable"
   }]
   return (
   <Dialog open={ props.open } onClose={ () => {

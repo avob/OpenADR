@@ -19,6 +19,9 @@ import EventCalendar from '../Event/EventCalendar'
 
 import { history } from '../../store/configureStore';
 
+import moment from 'moment'
+
+
 
 
 function TabContainer( props ) {
@@ -89,9 +92,10 @@ export class EventPage extends React.Component {
     }
     var now = new Date();
     var today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+    var date = moment(today);
 
-    this.state.start = today.getTime() - deltaStartDays * 24 * 60 * 60 * 1000;
-    this.state.end = today.getTime() + deltaEndDays * 24 * 60 * 60 * 1000;
+    this.state.start = date.startOf("week").toDate().getTime();
+    this.state.end = date.endOf("week").toDate().getTime();
   }
 
   handleChange = (event, value) => {

@@ -176,6 +176,8 @@ export class FilterPanel extends React.Component {
       this.addFilter({type: "EVENT_STATE", value: status.name});
     } else  if ( status != null && (status.name == "NOT_PUBLISHED" || status.name == "PUBLISHED")) {
       this.addFilter({type: "EVENT_PUBLISHED", value: status.name});
+    } else  if ( status != null && (status.name == "NOT_SENDABLE" || status.name == "SENDABLE")) {
+      this.addFilter({type: "EVENT_SENDABLE", value: status.name});
     }
     this.setState( params );
   }
@@ -228,6 +230,9 @@ export class FilterPanel extends React.Component {
           chip = <EventChip name={ filter.value } />
           break; 
         case "EVENT_PUBLISHED":
+          chip = <EventChip name={ filter.value } />
+          break; 
+        case "EVENT_SENDABLE":
           chip = <EventChip name={ filter.value } />
           break; 
 

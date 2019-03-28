@@ -150,6 +150,17 @@ export class EventDetailPage extends React.Component {
 
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if(this.props.event_detail.event.signals != prevProps.event_detail.event.signals) {
+      this.setState({copySignals: this.props.event_detail.event.signals});
+    }
+    if(this.props.event_detail.event.targets != prevProps.event_detail.event.targets) {
+      this.setState({copyTargets: this.props.event_detail.event.targets});
+    }
+
+    
+  }
+
   updateCopySignals = (index, newSignal) => {
     var copySignals = this.state.copySignals;
     copySignals[index] = newSignal;
@@ -207,7 +218,6 @@ export class EventDetailPage extends React.Component {
   render() {
     const {classes, event_detail} = this.props;
     const {value} = this.state;
-    console.log(event_detail.ven)
     if(!event_detail.event.activePeriod ) return null;
     return (
      <div className={ classes.root }>

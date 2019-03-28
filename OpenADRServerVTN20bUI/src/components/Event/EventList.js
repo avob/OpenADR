@@ -101,7 +101,7 @@ export class EventList extends React.Component {
     for (var i in event) {
       var v = event[ i ];
       view.push(
-        <VtnConfigurationEventCard key={ 'event_card_' + v.id }
+        <VtnConfigurationEventCard key={ 'event_card_' + v.descriptor.eventId }
                                  classes={ classes }
                                  event={ v } 
 

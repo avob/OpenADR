@@ -51,6 +51,10 @@ public class VenSpecification {
 		};
 	}
 
+	static public Specification<Ven> hasVenIdEquals(String str) {
+		return (event, cq, cb) -> cb.equal(event.get("username"), str);
+	}
+
 	static public Specification<Ven> hasVenIdContains(String str) {
 		return (event, cq, cb) -> cb.like(event.get("username"), "%" + str + "%");
 	}

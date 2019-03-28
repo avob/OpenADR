@@ -126,8 +126,7 @@ public class OadrHttpClient20b {
 				marshal = jaxbContext.marshal(payload, validateXmlPayload);
 			}
 
-			System.out.println(marshal);
-
+		
 			StringEntity stringEntity = new StringEntity(marshal);
 			post.setEntity(stringEntity);
 			HttpResponse response = client.execute(post, host, Oadr20bUrlPath.OADR_BASE_PATH + path, context);
@@ -158,8 +157,6 @@ public class OadrHttpClient20b {
 					}
 				} else {
 					String resp = EntityUtils.toString(response.getEntity(), "UTF-8");
-					System.out.println(marshal);
-					System.out.println(resp);
 					return jaxbContext.unmarshal(resp, responseKlass, validateXmlPayload);
 				}
 			}
