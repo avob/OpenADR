@@ -1,0 +1,34 @@
+---
+- hosts: all
+  gather_facts: yes
+  become: yes
+  pre_tasks:
+    - name: 'update'
+      raw: sudo apt-get update
+    - name: 'upgrade'
+      raw: sudo apt-get -y upgrade
+    - name: 'install python2'
+      raw: sudo apt-get -y install python
+
+  vars_files:
+    - vars/main.yml
+
+  tasks:
+    - name: Copy cert folder
+      copy:
+        src: ../../../cert
+        dest: /opt/oadr-vtn20b
+
+    - name: Add the inventory into /etc/hosts
+      become: true
+      blockinfile:
+        dest: /etc/hosts
+        content: "{{ lookup('template', 'templates/hosts.j2') }}"
+        state: present
+
+
+  roles:
+    - ../../roles/common
+    - ../../roles/nodejs
+    - ../../roles/nodered
+    - ../../roles/nodered-oadr-ven

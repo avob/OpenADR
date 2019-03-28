@@ -38,8 +38,8 @@ apache_vhosts_ssl:
   - servername: "vtn.oadr.com"
     serveralias: "localhost"
     documentroot: "/var/www/html"
-    certificate_file: "/opt/oadr-vtn20b/cert/cert/vtn.oadr.com-rsa.crt"
-    certificate_key_file: "/opt/oadr-vtn20b/cert/cert/vtn.oadr.com-rsa.key"
+    certificate_file: "/opt/oadr-vtn20b/cert/vtn.oadr.com-rsa.crt"
+    certificate_key_file: "/opt/oadr-vtn20b/cert/vtn.oadr.com-rsa.key"
     extra_parameters: |
       RewriteCond %{HTTP_HOST} !^www\. [NC]
       RewriteRule ^(.*)$ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]

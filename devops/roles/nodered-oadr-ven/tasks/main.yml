@@ -30,10 +30,10 @@
     become: yes
     become_user: vagrant
 
-  - name: Install oadr-vtn20b.jar 
+  - name: Install example flow
     copy:
       src: files/flows_default.json
-      dest: /home/vagrant/.node-red/flows_vtn20b.json
+      dest: /home/vagrant/.node-red/flows_{{ansible_hostname}}.json
 
   - name: start nodered from unit
     shell: systemctl restart nodered 
