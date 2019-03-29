@@ -109,12 +109,12 @@ export class VenDetailHeader extends React.Component {
     return (
       <Grid container>
         <Grid container spacing={ 24 }>
-          <Grid item xs={ 4 }>
+          <Grid item lg={ 4 } md={ 6 }>
             <VtnConfigurationVenCard key={ 'ven_card_' }
                                      classes={ classes }
                                      ven={ ven } />
           </Grid>
-          <Grid item xs={ 8 }>
+          <Grid item lg={ 4 } md={ 6 }>
 
 
             <Grid container>
@@ -122,15 +122,7 @@ export class VenDetailHeader extends React.Component {
                 <Grid item xs={ 4 }>
                   { registrationPanel }
                 </Grid>
-                <Grid item xs={ 8 }>
-                  <Typography gutterBottom
-                              align="center"
-                              variant="headline"
-                              component="h3">
-                    { (ven.oadrProfil) == '20b' ? 'Oadr 2.0b VEN' : 'Oadr 2.0a VEN' } | { name }
-                    
-                  </Typography>
-                </Grid>
+  
               </Grid>
               {actionPanel}
             

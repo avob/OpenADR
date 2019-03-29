@@ -116,6 +116,14 @@ export default function eventDetailReducer( state = initialState.event_detail, a
     case types.SEARCH_VEN_ERROR:
       return state;
 
+    case types.LOCATION_CHANGE:
+      if(action.payload.location.pathname.includes("/event/detail")){
+        return state;
+      }
+      else {
+        return initialState.event;
+      }
+
     default:
       return state;
   }

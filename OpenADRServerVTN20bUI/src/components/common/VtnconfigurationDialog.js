@@ -200,7 +200,7 @@ export function EventStatusSelectDialog( props ) {
     label: "Not Published"
   },{
     name: "SENDABLE",
-    color: "green",
+    color: "#bbb",
     label: "Sendable"
   },{
     name: "NOT_SENDABLE",

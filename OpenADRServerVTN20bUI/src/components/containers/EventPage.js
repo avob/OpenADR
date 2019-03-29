@@ -90,12 +90,10 @@ export class EventPage extends React.Component {
       page: 0
       , size: 100
     }
-    var now = new Date();
-    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-    var date = moment(today);
 
-    this.state.start = date.startOf("week").toDate().getTime();
-    this.state.end = date.endOf("week").toDate().getTime();
+    this.state.color = "status";
+    this.state.view = "week";
+    this.state.currentDate = new Date();
   }
 
   handleChange = (event, value) => {
@@ -140,27 +138,6 @@ export class EventPage extends React.Component {
     this.refreshEvent();
   }
 
-  onStartChange = (start) =>  {
-    this.setState({start})
-    this.props.eventActions.searchEvent(this.state.filters, start, this.state.end
-      , this.state.pagination.page, this.state.pagination.size);
-  }
-
-
-  onEndChange = (end) =>  {
-    this.setState({end})
-    this.props.eventActions.searchEvent(this.state.filters, this.state.start, end
-      , this.state.pagination.page, this.state.pagination.size);
-  }
-
-  onPeriodChange = (start, end) =>  {
-    this.setState({start, end})
-    this.props.eventActions.searchEvent(this.state.filters, start, end
-      , this.state.pagination.page, this.state.pagination.size);
-  }
-
-  
-
   onVenSuggestionsFetchRequested = (e) => {
     var filters = this.state.filters.splice(0);
     filters.push({type:"VEN", value:e.value});
@@ -175,6 +152,45 @@ export class EventPage extends React.Component {
     filters.push({type:"VEN", value:ven.username});
     this.setState({filters});
     this.refreshEvent();
+  }
+
+  onColorChange = (color) => {
+    this.setState({color});
+  }
+
+  onViewChange = (view) => {
+    this.setState({view});
+    var range = this.getRequestDateRange(this.state.currentDate, view)
+    console.log(view)
+    this.props.eventActions.searchEvent(this.state.filters, range.start, range.end
+      , this.state.pagination.page, this.state.pagination.size);
+  }
+
+  getRequestDateRange = (date, view) => {
+    switch(view) {
+      case "month":
+      case "week":
+      case "day":
+        var d = moment(date);
+        return {
+          start: d.startOf(view).toDate().getTime()
+          , end: d.endOf(view).toDate().getTime()
+        };
+      case "agenda":
+        var d = moment(date).startOf("day");
+        return {
+          start: d.toDate().getTime()
+          , end: d.add(2, "week").toDate().getTime()
+        };
+    }
+  }
+
+  onCurrentDateChange = (currentDate) => {
+    this.setState({currentDate});
+
+    var range = this.getRequestDateRange(currentDate, this.state.view)
+    this.props.eventActions.searchEvent(this.state.filters, range.start, range.end
+      , this.state.pagination.page, this.state.pagination.size);
   }
 
   render() {
@@ -202,20 +218,19 @@ export class EventPage extends React.Component {
                           pagination={this.state.pagination}
                           onFilterChange={this.onFilterChange}
                           onPaginationChange={this.onPaginationChange}
-                          start={this.state.start}
-                          end={this.state.end}
-                          onStartChange={this.onStartChange}
-                          onEndChange={this.onEndChange}
-                          onPeriodChange={this.onPeriodChange}
-                          
+
                           ven={event.ven}
                           onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
                           onVenSuggestionsClearRequested={this.onVenSuggestionsClearRequested}
                           onVenSuggestionsSelect={this.onVenSuggestionsSelect}
+
+                          color={this.state.color}
+                          view={this.state.view}
+                          currentDate={this.state.currentDate}
+                          onColorChange={this.onColorChange}
+                          onViewChange={this.onViewChange}
+                          onCurrentDateChange={this.onCurrentDateChange}
                            />
-                          
-                          
-                          
                        </TabContainer> }
                        
       { value === 1 && <TabContainer>
@@ -223,19 +238,23 @@ export class EventPage extends React.Component {
                           marketContext={ event.marketContext }
                           event={event.event}
                           deleteEvent={ this.props.eventActions.deleteEvent}
+
                           filters={this.state.filters}
                           pagination={this.state.pagination}
                           onFilterChange={this.onFilterChange}
                           onPaginationChange={this.onPaginationChange}
-                          start={this.state.start}
-                          end={this.state.end}
-                          onStartChange={this.onStartChange}
-                          onEndChange={this.onEndChange}
-                          onPeriodChange={this.onPeriodChange}
+
                           ven={event.ven}
                           onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
                           onVenSuggestionsClearRequested={this.onVenSuggestionsClearRequested}
                           onVenSuggestionsSelect={this.onVenSuggestionsSelect}
+
+                          color={this.state.color}
+                          view={this.state.view}
+                          currentDate={this.state.currentDate}
+                          onColorChange={this.onColorChange}
+                          onViewChange={this.onViewChange}
+                          onCurrentDateChange={this.onCurrentDateChange}
                  />
                        </TabContainer> }
 

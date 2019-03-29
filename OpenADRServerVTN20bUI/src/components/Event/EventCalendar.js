@@ -35,10 +35,6 @@ export class EventCalendar extends React.Component {
     this.state = {}
     this.state.eventCalendarDialog = false;
     this.state.selectedEvent = null;
-    this.state.color = "status";
-    this.state.view = "week";
-    this.state.currentDate = new Date();
-   
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -47,7 +43,6 @@ export class EventCalendar extends React.Component {
       var context = this.props.marketContext[i];
       marketContextColorCache[context.name] = context.color;
     }
-
   }
 
   handleEventCalendarDialogClose = () =>  {
@@ -59,7 +54,7 @@ export class EventCalendar extends React.Component {
   }
 
   getEventPropGetter = (event, start, end, isSelected) => {
-    if(this.state.color == "status") {
+    if(this.props.color == "status") {
       var colorIntensity = 700;
       if(isSelected) {
         colorIntensity = 500;
@@ -101,8 +96,8 @@ export class EventCalendar extends React.Component {
 
   render() {
     var that = this;
-    const {classes, marketContext, event, ven, filters, pagination, onFilterChange, onPaginationChange,
-      start, end, onStartChange, onEndChange, onPeriodChange, onVenSuggestionsFetchRequested, onVenSuggestionsClearRequested, onVenSuggestionsSelect} = this.props;
+    const {classes, marketContext, event, ven, filters, pagination, onFilterChange, onPaginationChange
+      , onVenSuggestionsFetchRequested, onVenSuggestionsClearRequested, onVenSuggestionsSelect} = this.props;
 
     var calendarEvent = [];
     event.forEach(e => {
@@ -122,18 +117,15 @@ export class EventCalendar extends React.Component {
       });
     });
 
-   var onColorChange = function(color){
-      that.setState({color});
-    }
 
-    EventCalendarWeekView.onColorChange = onColorChange;
-    EventCalendarWeekView.color = this.state.color;
-    EventCalendarDayView.onColorChange = onColorChange;
-    EventCalendarDayView.color = this.state.color;
-    EventCalendarMonthView.onColorChange = onColorChange;
-    EventCalendarMonthView.color = this.state.color;
-    EventCalendarAgendaView.onColorChange = onColorChange;
-    EventCalendarAgendaView.color = this.state.color;
+    EventCalendarWeekView.onColorChange = this.props.onColorChange;
+    EventCalendarWeekView.color = this.props.color;
+    EventCalendarDayView.onColorChange = this.props.onColorChange;
+    EventCalendarDayView.color = this.props.color;
+    EventCalendarMonthView.onColorChange = this.props.onColorChange;
+    EventCalendarMonthView.color = this.props.color;
+    EventCalendarAgendaView.onColorChange = this.props.onColorChange;
+    EventCalendarAgendaView.color = this.props.color;
 
     
     var getRange = (date, view) => {
@@ -149,7 +141,6 @@ export class EventCalendar extends React.Component {
       else {
         let start = moment(date).startOf(view);
         let end = moment(date).endOf(view);
-        console.log(start, end)
         return {
           start:start.toDate(),
           end:end.toDate()
@@ -165,7 +156,6 @@ export class EventCalendar extends React.Component {
       <div className={ classes.root }>
         <EventHeader classes={classes}  marketContext={marketContext} event={event}
         filters={filters} pagination={pagination} onFilterChange={onFilterChange} onPaginationChange={onPaginationChange}
-        start={start} end={end} onStartChange={onStartChange} onEndChange={onEndChange} 
         ven={ven}
                 onVenSuggestionsFetchRequested={onVenSuggestionsFetchRequested}
                 onVenSuggestionsClearRequested={onVenSuggestionsClearRequested}
@@ -174,22 +164,18 @@ export class EventCalendar extends React.Component {
         <BigCalendar style={{height:600}}
           localizer={localizer}
           events={calendarEvent}
-          defaultView={this.state.view}
-          defaultDate={this.state.currentDate}
+          defaultView={this.props.view}
+          defaultDate={this.props.currentDate}
           startAccessor="start"
           endAccessor="end"
           eventPropGetter={this.getEventPropGetter}
           onSelectEvent={this.handleSelectEvent}
           views={{ month: EventCalendarMonthView, week: EventCalendarWeekView , day: EventCalendarDayView, agenda:EventCalendarAgendaView}}
           onNavigate={(date) => {
-            var r = getRange(date, this.state.view);
-            onPeriodChange(r.start.getTime(), r.end.getTime());
-            this.setState({currentDate:date});
+            that.props.onCurrentDateChange(date);
           }}
           onView={(view) => {
-            this.setState({view})
-            var r = getRange(this.state.currentDate, view);
-            onPeriodChange(r.start.getTime(), r.end.getTime());
+            that.props.onViewChange(view)
             }
           }
         />

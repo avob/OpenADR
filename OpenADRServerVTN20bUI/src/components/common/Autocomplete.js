@@ -107,7 +107,7 @@ export class VenAutocomplete extends React.Component {
           {...autosuggestProps}
           inputProps={{
             classes,
-            label: "Mouaiccool",
+            label: "venId, commonName, oadrName",
             placeholder: '',
             value: this.state.single,
             onChange: this.handleChange('single'),

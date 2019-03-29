@@ -36,7 +36,6 @@ export class VenDetailReportRequest extends React.Component {
 
   render() {
     const {classes, requestedReport, availableReport} = this.props;
-    console.log(requestedReport);
 
     var getFormatedDatetime = (datetime) => {
     var format = formatTimestamp(datetime);

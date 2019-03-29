@@ -139,16 +139,33 @@ export class VenDetailSettings extends React.Component {
       }/>
 
       <Divider style={ { marginTop: '20px' } } />
-      <Grid>
+       <Grid>
         <Grid container spacing={ 24 }>
           <Grid item xs={ 3 }>
-            <VenTextField className={ classes.textField } field="Transport" value={ ven.transport } />
+            <VenTextField className={ classes.textField } field="VenID" value={ ven.username } />
           </Grid>
           <Grid item xs={ 3 }>
             <VenTextField className={ classes.textField } field="Authentication Method" value={ ven.authenticationType } />
           </Grid>
           <Grid item xs={ 3 }>
-            <VenTextField className={ classes.textField } field="Pull Model" value={ ven.httpPullModel } />
+            <VenTextField className={ classes.textField } field="Common Name" value={ ven.commonName } />
+          </Grid>
+          <Grid item xs={ 3 }>
+            <VenTextField className={ classes.textField } field="Xml Signature" value={ ven.oadrProfil } />
+          </Grid>
+        </Grid>
+      </Grid>
+
+      <Grid>
+        <Grid container spacing={ 24 }>
+          <Grid item xs={ 3 }>
+            <VenTextField className={ classes.textField } field="Oadr name" value={ ven.oadrName } />
+          </Grid>
+          <Grid item xs={ 3 }>
+            <VenTextField className={ classes.textField } field="Transport" value={ ven.transport } />
+          </Grid>
+          <Grid item xs={ 3 }>
+            <VenTextField className={ classes.textField } field="RegistrationID" value={ ven.registrationId } />
           </Grid>
           <Grid item xs={ 3 }>
             <VenTextField className={ classes.textField } field="Push Url" value={ ven.pushUrl } />
@@ -158,10 +175,7 @@ export class VenDetailSettings extends React.Component {
       <Grid>
         <Grid container spacing={ 24 }>
           <Grid item xs={ 3 }>
-            <VenTextField className={ classes.textField } field="RegistrationID" value={ ven.registrationId } />
-          </Grid>
-          <Grid item xs={ 3 }>
-            <VenTextField className={ classes.textField } field="VenID" value={ ven.username } />
+            <VenTextField className={ classes.textField } field="Pull Model" value={ ven.httpPullModel } />
           </Grid>
           <Grid item xs={ 3 }>
             <VenTextField className={ classes.textField } field="Report Only" value={ ven.reportOnly } />
@@ -169,17 +183,11 @@ export class VenDetailSettings extends React.Component {
           <Grid item xs={ 3 }>
             <VenTextField className={ classes.textField } field="Xml Signature" value={ ven.xmlSignature } />
           </Grid>
-        </Grid>
-      </Grid>
-      <Grid>
-        <Grid container spacing={ 24 }>
           <Grid item xs={ 3 }>
-            <VenTextField className={ classes.textField } field="Oadr name" value={ ven.oadrName } />
+
           </Grid>
         </Grid>
       </Grid>
-      
-      
     </div>
     );
   }

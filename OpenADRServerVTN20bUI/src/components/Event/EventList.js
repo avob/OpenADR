@@ -24,8 +24,6 @@ export class EventList extends React.Component {
   constructor( props ) {
     super( props );
     this.state = {};
-    this.state.view = "week";
-    this.state.currentDate = new Date();
   }
 
   handleEditEvent = (id) => () => {
@@ -37,63 +35,48 @@ export class EventList extends React.Component {
   }
 
   handleViewChange = (view) => () => {
-    this.setState({view});
-    let start = moment(this.state.currentDate).startOf(view);
-    let end = moment(start.toDate());
-    end.add(1, view)
-    this.props.onPeriodChange(start.toDate().getTime(), end.toDate().getTime());
+    this.props.onViewChange(view);
   } 
 
   getTitle = () => {
-    switch(this.state.view) {
+    switch(this.props.view) {
       case "month":
-        return moment(this.state.currentDate).format( "YYYY MMMM");
+        return moment(this.props.currentDate).format( "YYYY MMMM");
 
       case "week":
-        let start = moment(this.state.currentDate).startOf(this.state.view);
-        let end = moment(this.state.currentDate).endOf(this.state.view);
+        let start = moment(this.props.currentDate).startOf(this.props.view);
+        let end = moment(this.props.currentDate).endOf(this.props.view);
         return start.format( "MMM Do") + " - " + end.format( "MMM Do");
 
       case "day":
-        return moment(this.state.currentDate).format( "dddd MMM DD")
+        return moment(this.props.currentDate).format( "dddd MMM DD")
 
       default:
-        return moment(this.state.currentDate).format( "YYYY MMMM");
+        return moment(this.props.currentDate).format( "YYYY MMMM");
     }
   }
 
-  refreshPeriod = (date) => {
-    let start = moment(date).startOf(this.state.view);
-    let end = moment(start.toDate());
-    end.add(1, this.state.view)
-    this.props.onPeriodChange(start.toDate().getTime(), end.toDate().getTime());
-  }
-
-
 
   getNext = () => {
-    var d = moment(this.state.currentDate).add(1, this.state.view);
+    var d = moment(this.props.currentDate).add(1, this.props.view);
     var date = d.toDate();
-    this.setState({currentDate: date})
-    this.refreshPeriod(date);
+    this.props.onCurrentDateChange(date);
   }
 
   getBack = () => {
-    var d = moment(this.state.currentDate).add(-1, this.state.view);
+    var d = moment(this.props.currentDate).add(-1, this.props.view);
     var date = d.toDate();
-    this.setState({currentDate: date})
-    this.refreshPeriod(date);
+    this.props.onCurrentDateChange(date);
   }
 
   getToday = () => {
     var date = new Date();
-    this.setState({currentDate: date})
-    this.refreshPeriod(date);
+    this.props.onCurrentDateChange(date);
   }
 
   render() {
     const {classes, marketContext, event, ven, filters, pagination, onFilterChange, onPaginationChange,
-      start, end, onStartChange, onEndChange, onVenSuggestionsFetchRequested, onVenSuggestionsClearRequested, onVenSuggestionsSelect} = this.props;
+      onVenSuggestionsFetchRequested, onVenSuggestionsClearRequested, onVenSuggestionsSelect} = this.props;
 
     var view = [];
 
@@ -101,7 +84,7 @@ export class EventList extends React.Component {
     for (var i in event) {
       var v = event[ i ];
       view.push(
-        <VtnConfigurationEventCard key={ 'event_card_' + v.descriptor.eventId }
+        <VtnConfigurationEventCard key={ 'event_card_' + v.id }
                                  classes={ classes }
                                  event={ v } 
 
@@ -113,7 +96,6 @@ export class EventList extends React.Component {
       <div className={ classes.root }>
         <EventHeader classes={classes}  marketContext={marketContext} event={event}
         filters={filters} pagination={pagination} onFilterChange={onFilterChange} onPaginationChange={onPaginationChange}
-        start={start} end={end} onStartChange={onStartChange} onEndChange={onEndChange}
         ven={ven}
                 onVenSuggestionsFetchRequested={onVenSuggestionsFetchRequested}
                 onVenSuggestionsClearRequested={onVenSuggestionsClearRequested}

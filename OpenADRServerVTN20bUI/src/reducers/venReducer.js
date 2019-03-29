@@ -87,6 +87,9 @@ export default function venReducer( state = initialState.ven, action ) {
     case types.SEARCH_EVENT_ERROR:
       return state;
 
+    case types.LOCATION_CHANGE:
+      return initialState.ven;
+
     default:
       return state;
   }

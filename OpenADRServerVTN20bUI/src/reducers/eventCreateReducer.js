@@ -51,6 +51,8 @@ export default function eventCreateReducer( state = initialState.event_create, a
     case types.SEARCH_VEN_ERROR:
       return state;
 
+    case types.LOCATION_CHANGE:
+      return initialState.event_create;
 
     default:
       return state;

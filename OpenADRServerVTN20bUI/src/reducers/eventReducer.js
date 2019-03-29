@@ -72,6 +72,14 @@ export default function eventReducer( state = initialState.event, action ) {
     case types.SEARCH_VEN_ERROR:
       return state;
 
+    case types.LOCATION_CHANGE:
+      if(action.payload.location.pathname.includes("/event")){
+        return state;
+      }
+      else {
+        return initialState.event;
+      }
+      
 
     default:
       return state;

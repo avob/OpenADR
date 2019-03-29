@@ -48,6 +48,9 @@ export default function venCreateReducer( state = initialState.ven_create, actio
 
     case types.DELETE_VEN_ERROR:
       return state;
+
+    case types.LOCATION_CHANGE:
+      return initialState.ven_create;
       
     default:
       return state;

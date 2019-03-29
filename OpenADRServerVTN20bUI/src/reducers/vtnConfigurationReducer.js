@@ -88,6 +88,15 @@ export default function vtnConfigurationReducer( state = initialState.vtnConfigu
     case types.DELETE_GROUP_ERROR:
       return state;
 
+    case types.LOCATION_CHANGE:
+      if(action.payload.location.pathname.includes("/vtn_configuration")){
+        return state;
+      }
+      else {
+        return initialState.event;
+      }
+      
+
     default:
       return state;
   }

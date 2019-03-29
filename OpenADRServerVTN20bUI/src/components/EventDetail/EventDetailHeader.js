@@ -132,27 +132,18 @@ export class EventDetailHeader extends React.Component {
     return (
       <Grid container>
         <Grid container spacing={ 24 }>
-          <Grid item xs={ 4 }>
+          <Grid item lg={ 4 } md={ 6 }>
             <VtnConfigurationEventCard key={ 'ven_card_' }
                                      classes={ classes }
                                      event={ event } />
           </Grid>
-          <Grid item xs={ 8 }>
+          <Grid item lg={ 8 } md={ 6 } >
 
 
             <Grid container>
               <Grid container spacing={ 24 }>
                 <Grid item xs={ 4 }>
                   { statePanel }
-                </Grid>
-                <Grid item xs={ 8 }>
-                  <Typography gutterBottom
-                              align="center"
-                              variant="headline"
-                              component="h3">
-                   { event.descriptor.eventId  }
-                    
-                  </Typography>
                 </Grid>
               </Grid>
               {actionPanel}

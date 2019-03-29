@@ -184,6 +184,14 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
     case types.LOAD_VEN_REQUESTED_REPORT_ERROR:
       return state;
 
+    case types.LOCATION_CHANGE:
+      if(action.payload.location.pathname.includes("/ven/detail")){
+        return state;
+      }
+      else {
+        return initialState.event;
+      }
+
     default:
       return state;
   }

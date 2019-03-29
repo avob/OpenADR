@@ -51,6 +51,9 @@ export default function venDetailCreateReportReducer( state = initialState.ven_d
     case types.CREATE_REQUESTED_REPORT_ERROR:
       return state;
 
+    case types.LOCATION_CHANGE:
+      return initialState.ven_detail_create_report;
+
     default:
       return state;
   }

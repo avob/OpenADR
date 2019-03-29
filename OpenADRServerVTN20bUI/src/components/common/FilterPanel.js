@@ -282,7 +282,7 @@ export class FilterPanel extends React.Component {
                         onSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
                         onSuggestionsSelect={this.handleVenSelectClose}
                         close={ this.handleVenSelectClose }
-                        title="Filter by Ven" /></span> : null}
+                        title="Filter by Targeted Ven" /></span> : null}
 
       {(hasFilter && hasFilter.eventStatus) ? <span><IconButton className={ classes.iconButton }
                   aria-label="eventStatus"

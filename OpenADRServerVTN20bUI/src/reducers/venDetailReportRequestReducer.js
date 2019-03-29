@@ -38,6 +38,9 @@ export default function venDetailReportRequestReducer( state = initialState.ven_
     case types.LOAD_VEN_AVAILABLE_REPORT_ERROR:
       return state;
 
+    case types.LOCATION_CHANGE:
+      return initialState.ven_detail_report_request;
+
     default:
       return state;
   }

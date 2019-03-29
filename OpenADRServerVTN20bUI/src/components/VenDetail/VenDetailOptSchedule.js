@@ -117,7 +117,6 @@ export class VenDetailOptSchedule extends React.Component {
 
   render() {
     const {classes, ven, venOpt, marketContext} = this.props;
-    console.log(venOpt)
 
     return (
     <div className={ classes.root } >

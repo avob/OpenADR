@@ -12,6 +12,9 @@ export default function accountReducer( state = initialState.account, action ) {
 
   switch (action.type) {
 
+  	case types.LOCATION_CHANGE:
+      return initialState.account;
+
     default:
       return state;
   }

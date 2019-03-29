@@ -41,6 +41,9 @@ export const mainListItems = (
     </ListItemIcon>
     <ListItemText primary="VTN Config" />
   </ListItem>
+
+  {/*
+
   <ListItem button
             component={ NavLink }
             to="/account">
@@ -57,11 +60,17 @@ export const mainListItems = (
     </ListItemIcon>
     <ListItemText primary="Data" />
   </ListItem>
+
+  */}
+  
 </div>
 );
 
 export const secondaryListItems = (
 <div>
+
+  {/*
+
   <ListSubheader inset>
     Exports
   </ListSubheader>
@@ -71,5 +80,9 @@ export const secondaryListItems = (
     </ListItemIcon>
     <ListItemText primary="Export VENs" />
   </ListItem>
+
+  */}
+
+  
 </div>
 );

@@ -61,16 +61,18 @@ var VtnConfigurationCard = (props) => {
                 { props.icon }
               </Avatar>
             </Grid>
-            <Grid item xs={ 9 }>
+            <Grid item xs={ 9 } >
               <Typography gutterBottom
                           variant="title"
                           component="h2"
-                          align="right">
+                          align="right"
+                          style={{marginRight:10}}>
                 { props.name }
               </Typography>
               <Typography component="p"
                           variant="caption"
-                          align="right">
+                          align="right"
+                          style={{marginRight:10}}>
                 { props.description }
               </Typography>
             </Grid>
@@ -188,9 +190,11 @@ export function VtnConfigurationEventCard( props ) {
                         name={ props.event.descriptor.marketContext + ":" + props.event.id}
                         description={
 
-                          <span>
-                            { start.date + " " + start.time} | { props.event.activePeriod.duration }
-                          </span>
+                        <span>
+                          { start.date + " " + start.time} | { props.event.activePeriod.duration } | { props.event.activePeriod.notificationDuration }
+                           
+                          
+                        </span>
                         }
                         close={ props.handleDeleteEvent }
                         edit={ props.handleEditEvent }

@@ -136,7 +136,6 @@ var VenAvailableReportTable = (props) => {
 
 var VenRequestedReportTable = (props) => {
   const {classes, requestedReport, ven, handleDeleteRequestClick} = props
-  console.log(requestedReport)
   var getActionLabel = (request) => {
     if(request.end != null || request.start != null)  {
       return "DELETE"
