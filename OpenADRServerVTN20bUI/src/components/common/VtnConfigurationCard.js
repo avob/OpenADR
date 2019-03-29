@@ -31,6 +31,9 @@ import amber from '@material-ui/core/colors/amber';
 
 import { history } from '../../store/configureStore';
 
+import {formatTimestamp} from '../../utils/time'
+
+
 
 
 
@@ -48,24 +51,23 @@ var VtnConfigurationCard = (props) => {
     <CardActionArea onClick={ (e) => {
                                 if ( props.edit ) props.edit( e )
                               } }>
-      <CardContent style={ { minHeight: 120, maxHeight: 120 } }>
-        <Typography gutterBottom
-                    variant="title"
-                    component="h2"
-                    align="center">
-          { props.name }
-        </Typography>
+      <CardContent style={ { minHeight: 80, maxHeight: 100 } }>
+        
         <Grid container spacing={ 8 }>
           <Grid container
-                item
-                xs={ 12 }
-                spacing={ 24 }>
-            <Grid item xs={ 4 }>
+                >
+            <Grid item xs={ 3 }>
               <Avatar style={ { backgroundColor: props.color, margin: '0px 10px', height: 50, width: 50 } }>
                 { props.icon }
               </Avatar>
             </Grid>
-            <Grid item xs={ 8 }>
+            <Grid item xs={ 9 }>
+              <Typography gutterBottom
+                          variant="title"
+                          component="h2"
+                          align="right">
+                { props.name }
+              </Typography>
               <Typography component="p"
                           variant="caption"
                           align="right">
@@ -175,14 +177,21 @@ export function VtnConfigurationEventCard( props ) {
   }
 
   var handleVenClick = () => {
-    history.push( '/ven', { filters: [{type:"EVENT", value: props.event.descriptor.eventId}] });
+    history.push( '/ven', { filters: [{type:"EVENT", value: props.event.id}] });
   }
+
+  var start = formatTimestamp(props.event.activePeriod.start);
 
   return (
   <VtnConfigurationCard classes={ props.classes }
                         color={ color }
-                        name={ props.event.descriptor.eventId }
-                        description={ props.event.descriptor.marketContext }
+                        name={ props.event.descriptor.marketContext + ":" + props.event.id}
+                        description={
+
+                          <span>
+                            { start.date + " " + start.time} | { props.event.activePeriod.duration }
+                          </span>
+                        }
                         close={ props.handleDeleteEvent }
                         edit={ props.handleEditEvent }
                         cardType={ "EVENT" }
