@@ -248,7 +248,6 @@ public class Oadr20aVTNEiEventControllerTest {
 		signal.setSignalType("level");
 
 		DemandResponseEventCreateDto eventActive = new DemandResponseEventCreateDto();
-		eventActive.getDescriptor().setEventId("eventActive");
 		eventActive.getDescriptor().setMarketContext(marketContext.getName());
 		eventActive.getActivePeriod().setDuration("PT1H");
 		eventActive.getActivePeriod().setNotificationDuration("P1D");
@@ -264,7 +263,6 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
 		DemandResponseEventCreateDto eventCanceled = new DemandResponseEventCreateDto();
-		eventCanceled.getDescriptor().setEventId("eventCanceled");
 		eventCanceled.getDescriptor().setMarketContext(marketContext.getName());
 		eventCanceled.getActivePeriod().setDuration("PT1H");
 		eventCanceled.getActivePeriod().setNotificationDuration("P1D");
@@ -458,7 +456,6 @@ public class Oadr20aVTNEiEventControllerTest {
 		signal.setSignalType("level");
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId("eventId");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
@@ -664,7 +661,6 @@ public class Oadr20aVTNEiEventControllerTest {
 		signal.setSignalType("level");
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId("eventId");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -687,7 +683,6 @@ public class Oadr20aVTNEiEventControllerTest {
 				DemandResponseEventReadDto.class);
 		created.add(event1);
 
-		dto.getDescriptor().setEventId("eventId2");
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
 		andReturn = this.mockMvc
@@ -701,7 +696,6 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create 'far' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId("eventId3");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
@@ -725,7 +719,6 @@ public class Oadr20aVTNEiEventControllerTest {
 				DemandResponseEventReadDto.class);
 		created.add(event3);
 
-		dto.getDescriptor().setEventId("eventId4");
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
 		andReturn = this.mockMvc
@@ -739,7 +732,6 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create 'near' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId("eventId5");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
@@ -763,7 +755,6 @@ public class Oadr20aVTNEiEventControllerTest {
 				DemandResponseEventReadDto.class);
 		created.add(event5);
 
-		dto.getDescriptor().setEventId("eventId6");
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
 		andReturn = this.mockMvc
@@ -777,7 +768,6 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create 'active' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId("eventId7");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
@@ -799,7 +789,6 @@ public class Oadr20aVTNEiEventControllerTest {
 				DemandResponseEventReadDto.class);
 		created.add(event7);
 
-		dto.getDescriptor().setEventId("eventId8");
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
 		andReturn = this.mockMvc
@@ -813,7 +802,6 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create 'completed' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId("eventId9");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
@@ -837,7 +825,6 @@ public class Oadr20aVTNEiEventControllerTest {
 				DemandResponseEventReadDto.class);
 		created.add(event9);
 
-		dto.getDescriptor().setEventId("eventId10");
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
 		andReturn = this.mockMvc
@@ -851,7 +838,6 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create unpublished event not to be found by ven
 		dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId("eventId11");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");

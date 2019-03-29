@@ -50,10 +50,6 @@ public class VenServiceTest {
 	private DemandResponseEvent event2 = null;
 	private DemandResponseEvent event3 = null;
 
-	private String event1Id = "event1Id";
-	private String event2Id = "event2Id";
-	private String event3Id = "event3Id";
-
 	private Ven ven1;
 	private Ven ven2;
 	private Ven ven3;
@@ -227,7 +223,6 @@ public class VenServiceTest {
 		signal.setSignalType("level");
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId(event1Id);
 		dto.getDescriptor().setState(state);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getActivePeriod().setStart(start);
@@ -242,7 +237,6 @@ public class VenServiceTest {
 		events.add(event1);
 
 		dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId(event2Id);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getActivePeriod().setStart(start);
@@ -259,7 +253,6 @@ public class VenServiceTest {
 		events.add(event2);
 
 		dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId(event3Id);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setState(state);
 		dto.getActivePeriod().setStart(start);
@@ -272,11 +265,16 @@ public class VenServiceTest {
 		event3 = demandResponseEventService.create(dto);
 		events.add(event3);
 
+		String event1Id = String.valueOf(event1.getId());
+		String event2Id = String.valueOf(event2.getId());
+		String event3Id = String.valueOf(event3.getId());
+
 		List<VenFilter> filters = new ArrayList<>();
 		Page<Ven> search = venService.search(filters);
 		assertEquals(3, search.getTotalElements());
 
 		filters = new ArrayList<>();
+
 		filters.add(getFilter(VenFilterType.EVENT, event1Id));
 		search = venService.search(filters);
 		assertEquals(2, search.getTotalElements());

@@ -57,11 +57,8 @@ public class DemandResponseEventDaoTest {
 		int modification = 0;
 		Long start = 0L;
 		long startNotification = 0L;
-		DemandResponseEventStateEnum state = DemandResponseEventStateEnum.ACTIVE;
-		String eventId = "eventId";
 
-		event.getDescriptor().setEventId(eventId);
-		event.getDescriptor().setState(state);
+		event.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		event.getActivePeriod().setStart(start);
 		event.getActivePeriod().setStartNotification(startNotification);
 		event.getDescriptor().setModificationNumber(modification);
@@ -77,7 +74,6 @@ public class DemandResponseEventDaoTest {
 
 		assertNotNull(saved);
 		assertNotNull(saved.getId());
-		assertEquals(event.getDescriptor().getEventId(), saved.getDescriptor().getEventId());
 		assertEquals(event.getCreatedTimestamp(), saved.getCreatedTimestamp());
 		assertEquals(event.getActivePeriod().getDuration(), saved.getActivePeriod().getDuration());
 		assertEquals(event.getLastUpdateTimestamp(), saved.getLastUpdateTimestamp());
@@ -90,7 +86,6 @@ public class DemandResponseEventDaoTest {
 		DemandResponseEvent findOne = demandResponseEventDao.findById(saved.getId()).get();
 
 		assertEquals(saved.getId(), findOne.getId());
-		assertEquals(saved.getDescriptor().getEventId(), findOne.getDescriptor().getEventId());
 		assertEquals(saved.getCreatedTimestamp(), findOne.getCreatedTimestamp());
 		assertEquals(saved.getActivePeriod().getDuration(), findOne.getActivePeriod().getDuration());
 		assertEquals(saved.getLastUpdateTimestamp(), findOne.getLastUpdateTimestamp());
@@ -184,10 +179,8 @@ public class DemandResponseEventDaoTest {
 		Long startNotification = System.currentTimeMillis() - 10;
 		Long end = System.currentTimeMillis() + 10000;
 		DemandResponseEventStateEnum state = DemandResponseEventStateEnum.ACTIVE;
-		String eventId = "eventId";
 
 		DemandResponseEvent event = new DemandResponseEvent();
-		event.getDescriptor().setEventId(eventId + "1");
 		event.getDescriptor().setState(state);
 		event.getActivePeriod().setStart(start);
 		event.getActivePeriod().setStartNotification(startNotification);
@@ -203,7 +196,6 @@ public class DemandResponseEventDaoTest {
 		DemandResponseEvent savedDemandResponseEvent = demandResponseEventDao.save(event);
 
 		DemandResponseEvent event2 = new DemandResponseEvent();
-		event2.getDescriptor().setEventId(eventId + "2");
 		event2.getDescriptor().setState(state);
 		event2.getActivePeriod().setStart(start);
 		event2.getActivePeriod().setStartNotification(startNotification);
@@ -220,7 +212,6 @@ public class DemandResponseEventDaoTest {
 		DemandResponseEvent savedDemandResponseEvent2 = demandResponseEventDao.save(event2);
 
 		DemandResponseEvent event3 = new DemandResponseEvent();
-		event3.getDescriptor().setEventId(eventId + "3");
 		event3.getDescriptor().setState(state);
 		event3.getActivePeriod().setStart(start);
 		event3.getActivePeriod().setStartNotification(startNotification);
@@ -236,7 +227,6 @@ public class DemandResponseEventDaoTest {
 		DemandResponseEvent savedDemandResponseEvent3 = demandResponseEventDao.save(event3);
 
 		DemandResponseEvent event4 = new DemandResponseEvent();
-		event4.getDescriptor().setEventId(eventId + "4");
 		event4.getDescriptor().setState(state);
 		event4.getActivePeriod().setStart(start);
 		event4.getActivePeriod().setStartNotification(startNotification);

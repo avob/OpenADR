@@ -89,8 +89,6 @@ public class DemandResponseControllerTest {
 	private List<Ven> vens = new ArrayList<>();
 	private List<Long> events = new ArrayList<>();
 	private DemandResponseEvent event1 = null;
-	private String event1Id = "event1Id";
-	private String event2Id = "event2Id";
 	private DemandResponseEvent event2 = null;
 	private VenMarketContext marketContext = null;
 
@@ -139,7 +137,6 @@ public class DemandResponseControllerTest {
 		signal.setSignalType("level");
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId(event1Id);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getActivePeriod().setStart(start);
@@ -155,7 +152,6 @@ public class DemandResponseControllerTest {
 		events.add(event1.getId());
 
 		dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId(event2Id);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.getActivePeriod().setStart(start);
@@ -312,7 +308,6 @@ public class DemandResponseControllerTest {
 		signal.setSignalType("level");
 		// perform create (copy event1)
 		DemandResponseEventCreateDto toCreate = new DemandResponseEventCreateDto();
-		toCreate.getDescriptor().setEventId(eventId);
 		toCreate.getSignals().add(signal);
 		toCreate.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 
@@ -398,14 +393,6 @@ public class DemandResponseControllerTest {
 		toCreate = createValidEvent("testEventCreate-2");
 		toCreate.getDescriptor().setMarketContext("mouaiccool");
 		String contentStr = mapper.writeValueAsString(toCreate);
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(contentStr)
-						.header("Content-Type", "application/json").with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
-
-		// perform invalid create: eventId not unique
-		toCreate = createValidEvent("testEventCreate-1");
-		contentStr = mapper.writeValueAsString(toCreate);
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(contentStr)
 						.header("Content-Type", "application/json").with(adminSession))

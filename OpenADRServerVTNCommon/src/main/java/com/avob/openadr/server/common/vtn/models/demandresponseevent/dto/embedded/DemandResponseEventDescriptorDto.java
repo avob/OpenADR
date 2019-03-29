@@ -20,8 +20,6 @@ public class DemandResponseEventDescriptorDto {
 
 	private DemandResponseEventOadrProfileEnum oadrProfile;
 
-	private String eventId;
-
 	private Long modificationNumber;
 
 	public Long getPriority() {
@@ -70,14 +68,6 @@ public class DemandResponseEventDescriptorDto {
 
 	public void setModificationNumber(Long modificationNumber) {
 		this.modificationNumber = modificationNumber;
-	}
-
-	public String getEventId() {
-		return eventId;
-	}
-
-	public void setEventId(String eventId) {
-		this.eventId = eventId;
 	}
 
 	public DemandResponseEventStateEnum getState() {

@@ -64,10 +64,6 @@ public class DemandResponseEventServiceTest {
 	private DemandResponseEvent event2 = null;
 	private DemandResponseEvent event3 = null;
 
-	private String event1Id = "event1Id";
-	private String event2Id = "event2Id";
-	private String event3Id = "event3Id";
-
 	private Ven ven1;
 	private Ven ven2;
 	private Ven ven3;
@@ -105,7 +101,6 @@ public class DemandResponseEventServiceTest {
 		signal.setSignalType("level");
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId(event1Id);
 		dto.getDescriptor().setState(state);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getActivePeriod().setStart(start);
@@ -120,7 +115,6 @@ public class DemandResponseEventServiceTest {
 		events.add(event1);
 
 		dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId(event2Id);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getActivePeriod().setStart(start);
@@ -137,7 +131,6 @@ public class DemandResponseEventServiceTest {
 		events.add(event2);
 
 		dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId(event3Id);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setState(state);
 		dto.getActivePeriod().setStart(start);
@@ -240,7 +233,8 @@ public class DemandResponseEventServiceTest {
 
 		filters = new ArrayList<>();
 		filters.add(getFilter(DemandResponseEventFilterType.VEN, "ven2"));
-		filters.add(getFilter(DemandResponseEventFilterType.EVENT_STATE, DemandResponseEventStateEnum.CANCELLED.name()));
+		filters.add(
+				getFilter(DemandResponseEventFilterType.EVENT_STATE, DemandResponseEventStateEnum.CANCELLED.name()));
 		findToSentEvent = demandResponseEventService.search(filters, start, end);
 		assertEquals(1, findToSentEvent.getTotalElements());
 
@@ -248,11 +242,6 @@ public class DemandResponseEventServiceTest {
 		filters.add(getFilter(DemandResponseEventFilterType.EVENT_STATE, DemandResponseEventStateEnum.ACTIVE.name()));
 		findToSentEvent = demandResponseEventService.search(filters, start, end);
 		assertEquals(2, findToSentEvent.getTotalElements());
-
-		filters = new ArrayList<>();
-		filters.add(getFilter(DemandResponseEventFilterType.EVENT, event1Id));
-		findToSentEvent = demandResponseEventService.search(filters, start, end);
-		assertEquals(1, findToSentEvent.getTotalElements());
 
 		filters = new ArrayList<>();
 		filters.add(getFilter(DemandResponseEventFilterType.MARKET_CONTEXT, marketContext.getName()));

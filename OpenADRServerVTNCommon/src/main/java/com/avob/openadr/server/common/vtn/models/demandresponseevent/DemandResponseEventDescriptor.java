@@ -1,6 +1,5 @@
 package com.avob.openadr.server.common.vtn.models.demandresponseevent;
 
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -15,10 +14,6 @@ public class DemandResponseEventDescriptor {
 	@ManyToOne
 	@NotNull
 	private VenMarketContext marketContext;
-
-	@NotNull
-	@Column(unique = true)
-	private String eventId;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
@@ -86,14 +81,6 @@ public class DemandResponseEventDescriptor {
 
 	public void setOadrProfile(DemandResponseEventOadrProfileEnum oadrProfile) {
 		this.oadrProfile = oadrProfile;
-	}
-
-	public String getEventId() {
-		return eventId;
-	}
-
-	public void setEventId(String eventId) {
-		this.eventId = eventId;
 	}
 
 	public long getModificationNumber() {

@@ -329,7 +329,6 @@ public class Oadr20bVTNEiOptControllerTest {
 		signal.setSignalType("level");
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId("eventActive");
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 		dto.getActivePeriod().setDuration("PT1H");

@@ -269,7 +269,6 @@ public class Oadr20bVTNSecurityTest {
 		signal.setSignalName("SIMPLE");
 		signal.setSignalType("level");
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
-		dto.getDescriptor().setEventId("eventId");
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", ven.getUsername()));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");

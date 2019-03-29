@@ -12,8 +12,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface DemandResponseEventDao
 		extends PagingAndSortingRepository<DemandResponseEvent, Long>, JpaSpecificationExecutor<DemandResponseEvent> {
 
-	public DemandResponseEvent findOneByDescriptorEventId(String eventId);
-
 	public void deleteByIdIn(Iterable<Long> entities);
 
 }

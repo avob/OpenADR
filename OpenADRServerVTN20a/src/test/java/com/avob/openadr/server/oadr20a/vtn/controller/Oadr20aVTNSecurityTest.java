@@ -249,7 +249,6 @@ public class Oadr20aVTNSecurityTest {
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venUsername));
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venUsername2));
-		dto.getDescriptor().setEventId("eventId");
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
@@ -260,7 +259,7 @@ public class Oadr20aVTNSecurityTest {
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
 		dto.setPublished(true);
-		
+
 		String payload = mapper.writeValueAsString(dto);
 		HttpPost post = new HttpPost(demandResponseEnpointUrl);
 		StringEntity stringEntity = new StringEntity(payload);

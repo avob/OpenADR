@@ -47,7 +47,7 @@ public class VenSpecification {
 	static public Specification<Ven> hasEventId(String eventId) {
 		return (ven, cq, cb) -> {
 			ListJoin<Ven, VenDemandResponseEvent> joinList = ven.joinList("venDemandResponseEvent", JoinType.INNER);
-			return cb.equal(joinList.get("event").get("descriptor").get("eventId"), eventId);
+			return cb.equal(joinList.get("event").get("id"), eventId);
 		};
 	}
 

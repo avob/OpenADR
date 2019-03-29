@@ -50,7 +50,6 @@ public class DemandResponseEventDtoValidator {
 	}
 
 	protected void validateDescriptor(DemandResponseEventDto dto, Errors errors) {
-		failOnMissingOrEmpty(dto.getDescriptor().getEventId(), errors, "descriptor.eventId");
 		failOnMissingOrEmpty(dto.getDescriptor().getMarketContext(), errors, "descriptor.marketContext");
 		failOnMissingOrEmpty(dto.getDescriptor().getOadrProfile(), errors, "descriptor.oadrProfile");
 		failOnMissingOrEmpty(dto.getDescriptor().getResponseRequired(), errors, "descriptor.responseRequired");

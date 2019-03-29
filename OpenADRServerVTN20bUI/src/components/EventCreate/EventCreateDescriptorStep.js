@@ -97,12 +97,6 @@ export class EventCreateDescriptorStep extends React.Component {
     this.props.onChange(details);
   }
 
-  handleEventIdChange = (e) => {
-    let details = this.props.descriptor;
-    details.eventId = e.target.value;
-    this.props.onChange(details);
-  }
-
   handleOadrProfileChange = (e) => {
      let details = this.props.descriptor;
     details.oadrProfile = e.target.value;
@@ -121,14 +115,6 @@ export class EventCreateDescriptorStep extends React.Component {
 
         <Grid container spacing={ 24 } >
         <Grid item xs={ 2 } />
-        <Grid item xs={ 4 }>
-            <TextField  label="Event ID" required
-                error={hasError && descriptor.eventId == ""}
-                value={ descriptor.eventId }
-                onChange={this.handleEventIdChange}
-                className={classes.textField}
-                fullWidth={true}/>
-        </Grid>
         <Grid item xs={2} >
            <FormControl className={ classes.formControl }>
                 <FormLabel style={ labelStyle } component="label">
@@ -162,42 +148,7 @@ export class EventCreateDescriptorStep extends React.Component {
   
                                          
         </Grid> 
-        <Grid item xs={ 2 } />
-
-      </Grid>
-
-       <Grid container
-            style={ { marginTop: 20 } }
-            spacing={ 24 }>
-        <Grid item xs={ 2 } />
-        <Grid item xs={ 8 }>
-          <Divider />
-        </Grid>
-        <Grid item xs={ 2 } />
-      </Grid>
-     
-       <Grid container spacing={ 24 } style={ { marginTop: 20 } }>
-        <Grid item xs={ 2 } />
-       
-       
-       <Grid item xs={ 4 }>
-     
-              <TextField required label="Market Context" error={hasError && descriptor.marketContext == null}
-                 value={ (descriptor.marketContext) ? descriptor.marketContext : "" }
-                 className={classes.textField}
-                 fullWidth={true}
-                 onClick={this.handleMarketContextSelectOpen}
-                 InputProps={ { readOnly: true, } } />
-
-              <MarketContextSelectDialog marketContext={ marketContext}
-                                         open={ this.state.marketContextSelectDialogOpen }
-                                         close={ this.handleMarketContextSelectClose }
-                                         title="Select Market Context" />
-  
-                                         
-        </Grid> 
         
-
         <Grid item xs={2} >
              <FormControl className={ classes.formControl }>
                 <FormLabel style={ labelStyle } component="label">
@@ -233,11 +184,10 @@ export class EventCreateDescriptorStep extends React.Component {
           label="Test Event"
         />
         </Grid>
-       
         <Grid item xs={ 2 } />
       </Grid>
 
-      <Grid container
+       <Grid container
             style={ { marginTop: 20 } }
             spacing={ 24 }>
         <Grid item xs={ 2 } />
@@ -246,21 +196,43 @@ export class EventCreateDescriptorStep extends React.Component {
         </Grid>
         <Grid item xs={ 2 } />
       </Grid>
-
-      <Grid container spacing={ 24 } style={ { marginTop: 20, marginBottom:10 } }>
+     
+       <Grid container spacing={ 24 } style={ { marginTop: 20, marginBottom:10  } }>
         <Grid item xs={ 2 } />
-        <Grid item xs={ 8 }>
+       
+       
+       <Grid item xs={ 4 }>
+     
+              <TextField required label="Market Context" error={hasError && descriptor.marketContext == null}
+                 value={ (descriptor.marketContext) ? descriptor.marketContext : "" }
+                 className={classes.textField}
+                 fullWidth={true}
+                 onClick={this.handleMarketContextSelectOpen}
+                 InputProps={ { readOnly: true, } } />
+
+              <MarketContextSelectDialog marketContext={ marketContext}
+                                         open={ this.state.marketContextSelectDialogOpen }
+                                         close={ this.handleMarketContextSelectClose }
+                                         title="Select Market Context" />
+  
+                                         
+        </Grid> 
+        
+         <Grid item xs={ 4 }>
             <TextField  label="VTN Comment"
                 multiline
-          rowsMax="4"
-                value={ descriptor.vtnComment }
-                onChange={this.handleVtnCommentChange}
-                className={classes.textField}
-                fullWidth={true}/>
+            rowsMax="4"
+                  value={ descriptor.vtnComment }
+                  onChange={this.handleVtnCommentChange}
+                  className={classes.textField}
+                  fullWidth={true}/>
+          </Grid>
+          
+         
+          <Grid item xs={ 2 } />
         </Grid>
-        <Grid item xs={ 2 } />
 
-      </Grid>
+ 
 
     </Grid>
     );

@@ -65,7 +65,6 @@ public class VenDemandResponseEventDaoTest {
 		Ven savedVen = venService.save(ven);
 
 		DemandResponseEvent event = new DemandResponseEvent();
-		String eventId = "eventId";
 		Long createdTimestamp = 0L;
 		String duration = "PT1H";
 		String notificationDuration = "P1D";
@@ -75,7 +74,6 @@ public class VenDemandResponseEventDaoTest {
 		Long startNotification = 0L;
 		DemandResponseEventStateEnum state = DemandResponseEventStateEnum.ACTIVE;
 
-		event.getDescriptor().setEventId(eventId);
 		event.getDescriptor().setState(state);
 		event.getActivePeriod().setStart(start);
 		event.getActivePeriod().setNotificationDuration(notificationDuration);

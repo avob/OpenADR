@@ -32,10 +32,6 @@ public class DemandResponseEventSpecification {
 		return (event, cq, cb) -> cb.equal(event.get("descriptor").get("marketContext").get("name"), marketContextName);
 	}
 
-	static public Specification<DemandResponseEvent> hasDescriptorEventIdContains(String eventId) {
-		return (event, cq, cb) -> cb.like(event.get("descriptor").get("eventId"), "%" + eventId + "%");
-	}
-
 	static public Specification<DemandResponseEvent> hasDescriptorOadrProfile(
 			DemandResponseEventOadrProfileEnum profile) {
 		return (event, cq, cb) -> cb.equal(event.get("descriptor").get("oadrProfile"), profile);
@@ -105,7 +101,6 @@ public class DemandResponseEventSpecification {
 	}
 
 	static public Specification<DemandResponseEvent> search(List<DemandResponseEventFilter> filters) {
-		Specification<DemandResponseEvent> eventIdPredicates = null;
 		Specification<DemandResponseEvent> marketContextPredicates = null;
 		Specification<DemandResponseEvent> venPredicates = null;
 		Specification<DemandResponseEvent> statePredicates = null;
@@ -113,16 +108,7 @@ public class DemandResponseEventSpecification {
 		Specification<DemandResponseEvent> isSendablePredicates = null;
 		for (DemandResponseEventFilter demandResponseEventFilter : filters) {
 			switch (demandResponseEventFilter.getType()) {
-			case EVENT:
-				if (eventIdPredicates != null) {
-					eventIdPredicates = eventIdPredicates.or(DemandResponseEventSpecification
-							.hasDescriptorEventIdContains(demandResponseEventFilter.getValue()));
-				} else {
-					eventIdPredicates = DemandResponseEventSpecification
-							.hasDescriptorEventIdContains(demandResponseEventFilter.getValue());
-				}
 
-				break;
 			case MARKET_CONTEXT:
 				if (marketContextPredicates != null) {
 					marketContextPredicates = marketContextPredicates.or(DemandResponseEventSpecification
@@ -194,8 +180,8 @@ public class DemandResponseEventSpecification {
 			}
 		}
 
-		final Specification<DemandResponseEvent> finalRes = Specification.where(eventIdPredicates)
-				.and(marketContextPredicates).and(venPredicates).and(statePredicates).and(isPublishedPredicates).and(isSendablePredicates);
+		final Specification<DemandResponseEvent> finalRes = Specification.where(marketContextPredicates)
+				.and(venPredicates).and(statePredicates).and(isPublishedPredicates).and(isSendablePredicates);
 
 		return (event, cq, cb) -> {
 			if (finalRes != null) {

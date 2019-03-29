@@ -140,11 +140,8 @@ public class EmbeddedSqlDatabaseInit {
 	}
 
 	private DemandResponseEvent saveDemandResponseEventIfMissing(DemandResponseEventCreateDto dto) {
-		DemandResponseEvent findByEventId = demandeResponseEventService.findByEventId(dto.getDescriptor().getEventId());
-		if (findByEventId == null) {
-			findByEventId = demandeResponseEventService.create(dto);
-			LOGGER.debug("Create DREvent: " + dto.getDescriptor().getEventId());
-		}
+		DemandResponseEvent findByEventId = demandeResponseEventService.create(dto);
+		LOGGER.debug("Create DREvent: " + findByEventId.getId());
 		return findByEventId;
 	}
 
@@ -185,7 +182,6 @@ public class EmbeddedSqlDatabaseInit {
 
 	private static DemandResponseEventDescriptorDto getDescriptor(String eventId, String marketcontextName) {
 		DemandResponseEventDescriptorDto demandResponseEventDescriptorDto = new DemandResponseEventDescriptorDto();
-		demandResponseEventDescriptorDto.setEventId(eventId);
 		demandResponseEventDescriptorDto.setState(DemandResponseEventStateEnum.ACTIVE);
 		demandResponseEventDescriptorDto.setMarketContext(marketcontextName);
 		demandResponseEventDescriptorDto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
@@ -228,7 +224,7 @@ public class EmbeddedSqlDatabaseInit {
 			eventDto.getSignals().add(EmbeddedSqlDatabaseInit.getElectricityPrice(10.0F));
 			eventDto.setPublished(true);
 			saveDemandResponseEventIfMissing(eventDto);
-			
+
 			temp = generator.next(temp);
 		}
 	}
@@ -251,7 +247,7 @@ public class EmbeddedSqlDatabaseInit {
 			eventDto.setDescriptor(EmbeddedSqlDatabaseInit.getDescriptor(eventId, marketcontextName));
 			eventDto.setActivePeriod(
 					EmbeddedSqlDatabaseInit.getActivePeriod(temp.getTime(), duration, notificationDuration));
-			
+
 			eventDto.getTargets().addAll(targets);
 			eventDto.getSignals().add(
 					EmbeddedSqlDatabaseInit.getSimple(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_NORMAL));
@@ -365,7 +361,6 @@ public class EmbeddedSqlDatabaseInit {
 		prepare.setVenGroup(Sets.newHashSet(customCaCert));
 		venService.save(prepare);
 
-		String eventId = "eventId";
 		String duration = "PT1H";
 		String notificationDuration = "P1D";
 		Long start = System.currentTimeMillis();
@@ -377,7 +372,6 @@ public class EmbeddedSqlDatabaseInit {
 		signal.setSignalType("level");
 
 		DemandResponseEventCreateDto eventDto = new DemandResponseEventCreateDto();
-		eventDto.getDescriptor().setEventId(eventId);
 		eventDto.getDescriptor().setState(state);
 		eventDto.getActivePeriod().setStart(start);
 		eventDto.getActivePeriod().setNotificationDuration(notificationDuration);

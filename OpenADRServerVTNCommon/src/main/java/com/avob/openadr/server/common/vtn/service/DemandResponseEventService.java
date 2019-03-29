@@ -390,10 +390,6 @@ public class DemandResponseEventService {
 		return demandResponseEventDao.findById(id);
 	}
 
-	public DemandResponseEvent findByEventId(String eventId) {
-		return demandResponseEventDao.findOneByDescriptorEventId(eventId);
-	}
-
 	public List<DemandResponseEventSignal> getSignals(DemandResponseEvent event) {
 		return demandResponseEventSignalDao.findByEvent(event);
 	}

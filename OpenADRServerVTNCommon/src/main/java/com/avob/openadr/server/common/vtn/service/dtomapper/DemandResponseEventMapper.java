@@ -20,15 +20,15 @@ public class DemandResponseEventMapper extends DozerConverter<DemandResponseEven
 
 	@Override
 	public String convertTo(DemandResponseEvent source, String destination) {
-		if(source == null || source.getDescriptor() == null) {
+		if (source == null || source.getDescriptor() == null) {
 			return null;
 		}
-		return source.getDescriptor().getEventId();
+		return String.valueOf(source.getId());
 	}
 
 	@Override
 	public DemandResponseEvent convertFrom(String source, DemandResponseEvent destination) {
-		return demandResponseEventService.findByEventId(source);
+		return demandResponseEventService.findById(Long.valueOf(source)).get();
 	}
 
 }

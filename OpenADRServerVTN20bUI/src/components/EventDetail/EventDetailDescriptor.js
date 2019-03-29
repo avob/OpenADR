@@ -120,7 +120,7 @@ export class EventDetailDescriptor extends React.Component {
        <Grid>
         <Grid container spacing={ 24 }>
           <Grid item xs={ 3 }>
-            <EventTextField className={ classes.textField } field="Event ID" value={ event.descriptor.eventId } />
+            <EventTextField className={ classes.textField } field="Event ID" value={ event.id } />
           </Grid>
           <Grid item xs={ 3 }>
             <EventTextField className={ classes.textField } field="Modification Number" value={ event.descriptor.modificationNumber } />

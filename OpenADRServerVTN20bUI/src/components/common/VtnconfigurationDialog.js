@@ -237,30 +237,6 @@ export function EventStatusSelectDialog( props ) {
   );
 }
 
-export function EventSelectDialog( props ) {
-  return (
-  <Dialog open={ props.open } onClose={ () => {
-                                        props.close()
-                                      } }>
-    <DialogTitle>
-      { props.title }
-    </DialogTitle>
-    <div>
-      <List>
-       <ListItem  style={{marginBottom:250, width: 400}}>
-
-        <EventAutocomplete  suggestions={props.suggestions}
-        onSuggestionsFetchRequested={props.onSuggestionsFetchRequested}
-        onSuggestionsClearRequested={props.onSuggestionsClearRequested}
-        onSuggestionsSelect={props.onSuggestionsSelect}/>
-      </ListItem>
-        
-      </List>
-    </div>
-  </Dialog>
-  );
-}
-
 export function EventCalendarDialog( props ) {
   if(!props.event) return null;
   return (

@@ -93,6 +93,7 @@ public class OadrMockMvc {
 		return mockMvc.perform(requestBuilder);
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T> T postEiAndExpect(String endpoint, UserRequestPostProcessor authSession, Object payload, int status,
 			Class<T> klass) throws Oadr20bMarshalException, Exception {
 
@@ -106,8 +107,8 @@ public class OadrMockMvc {
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(endpoint).content(content).with(authSession))
 				.andExpect(MockMvcResultMatchers.status().is(status)).andReturn();
-		
-		if(String.class.equals(klass)) {
+
+		if (String.class.equals(klass)) {
 			return (T) andReturn.getResponse().getContentAsString();
 		}
 		T unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), klass);

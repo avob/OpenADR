@@ -75,7 +75,6 @@ export class FilterPanel extends React.Component {
     this.state.venStatusSelectDialogOpen = false;
     this.state.venSelectDialogOpen = false;
     this.state.eventStatusSelectDialogOpen = false;
-    this.state.eventSelectDialogOpen = false;
     
   }
 
@@ -182,23 +181,6 @@ export class FilterPanel extends React.Component {
     this.setState( params );
   }
 
-  handleEventSelectOpen = () => {
-    this.setState( {
-      eventSelectDialogOpen: true
-    } )
-  }
-
-  handleEventSelectClose = (event) => {
-    var params = {
-      eventSelectDialogOpen: false
-    }
-    if ( event != null ) {
-      this.addFilter({type: "EVENT", value: event.descriptor.eventId});
-    }
-    this.setState( params );
-  }
-
-
   render() {
     const {classes, action, hasFilter} = this.props;
 
@@ -224,7 +206,7 @@ export class FilterPanel extends React.Component {
     			chip = <VenChip name={ filter.value } />
     			break; 
         case "EVENT":
-          chip = <EventChip name={ filter.value } />
+          chip = <EventChip name={ "eventID:"+ filter.value } />
           break; 
         case "EVENT_STATE":
           chip = <EventChip name={ filter.value } />
@@ -310,17 +292,7 @@ export class FilterPanel extends React.Component {
                          close={ this.handleEventStatusSelectClose }
                          title="Filter by Event Status" /></span> : null}
 
-      {(hasFilter && hasFilter.event) ? <span><IconButton className={ classes.iconButton }
-                  aria-label="eventStatus"
-                  onClick={ this.handleEventSelectOpen }>
-        <CalendarTodayIcon />
-      </IconButton><EventSelectDialog open={ this.state.eventSelectDialogOpen }
-                            suggestions={event}
-                        onSuggestionsFetchRequested={this.props.onEventSuggestionsFetchRequested}
-                        onSuggestionsClearRequested={this.props.onEventSuggestionsClearRequested}
-                        onSuggestionsSelect={this.handleEventSelectClose}
-                         close={ this.handleEventSelectClose }
-                         title="Filter by Event Status" /></span> : null}
+
     </span>
     );
   }

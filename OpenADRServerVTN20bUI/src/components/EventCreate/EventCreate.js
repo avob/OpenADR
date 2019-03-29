@@ -41,7 +41,6 @@ export class EventCreate extends React.Component {
     this.state = {
       activeStep: 0,
       descriptor: {
-        // eventId: "",
         // eventName: "",
         // timezone: "UTC",
         // priority:0,
@@ -52,7 +51,6 @@ export class EventCreate extends React.Component {
         // vtnComment: "",
         // marketContext: null
         oadrProfile: "OADR20B",
-        eventId: "mouaiccool",
         priority:0,
         responseRequired:"ALWAYS",
         testEvent: false,
@@ -143,7 +141,6 @@ export class EventCreate extends React.Component {
         priority: this.state.descriptor.priority,
         responseRequired: this.state.descriptor.responseRequired,
         testEvent: this.state.descriptor.testEvent,
-        eventId:this.state.descriptor.eventId,
         state: "ACTIVE" ,
         oadrProfile: this.state.descriptor.oadrProfile,
       },
@@ -219,7 +216,6 @@ export class EventCreate extends React.Component {
         case 0:
           return descriptor.priority != null
             && descriptor.marketContext != null
-            && descriptor.eventId != ""
             && descriptor.eventName != "";
 
         case 1:

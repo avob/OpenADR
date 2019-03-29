@@ -111,7 +111,7 @@ export class EventCalendar extends React.Component {
       var end = new Date();
       end.setTime(e.activePeriod.start + iCalDurationInSeconds(e.activePeriod.duration) * 1000);
       calendarEvent.push({
-        title:e.descriptor.eventId,
+        title:e.descriptor.marketContext+":"+e.id,
         start: start,
         end: end,
         allday:false,
