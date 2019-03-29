@@ -252,8 +252,8 @@ export class VenDetailReport extends React.Component {
     return (
     <div className={ classes.root } >
       <VenDetailHeader classes={classes} ven={ven} actions={[
-         <Grid  key="report_action_first_row" container spacing={ 24 }>
-          <Grid item xs={ 3 }>
+         <Grid  key="report_action_first_row" container spacing={ 12 }>
+          <Grid item xs={ 6 }>
             <Button key="btn_create"
                     style={ { marginTop: 15 } }
                     variant="outlined"
@@ -264,7 +264,7 @@ export class VenDetailReport extends React.Component {
               <CloudDownloadIcon style={ { marginRight: 15 } }/> REQUIRE REPORTS
             </Button>
           </Grid>
-          <Grid item xs={ 3 }>
+          <Grid item xs={ 6 }>
             <Button key="btn_create"
                     style={ { marginTop: 15 } }
                     variant="outlined"
@@ -275,7 +275,7 @@ export class VenDetailReport extends React.Component {
               <CloudDownloadIcon style={ { marginRight: 15 } }/> SEND REQUESTS
             </Button>
           </Grid>
-           <Grid item xs={ 3 }>
+           <Grid item xs={ 6 }>
           <Button key="btn_create"
                   style={ { marginTop: 15 } }
                   variant="outlined"
@@ -285,7 +285,7 @@ export class VenDetailReport extends React.Component {
             <RemoveIcon style={ { marginRight: 15 } }/> CLEAN REQUESTS
           </Button>
         </Grid>
-        <Grid item xs={ 3 }>
+        <Grid item xs={ 6 }>
           <Button key="btn_create"
                   style={ { marginTop: 15 } }
                   variant="outlined"

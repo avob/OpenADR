@@ -101,8 +101,8 @@ export class VenDetailSettings extends React.Component {
     return (
     <div className={ classes.root } >
       <VenDetailHeader classes={classes} ven={ven} actions={
-        <Grid container spacing={ 24 }>
-          <Grid item xs={ 4 }>
+        <Grid container spacing={ 12 }>
+          <Grid item xs={ 12 }>
             <Button key="btn_create"
                     style={ { marginTop: 15 } }
                     variant="outlined"
@@ -113,7 +113,7 @@ export class VenDetailSettings extends React.Component {
               <CloudDownloadIcon style={ { marginRight: 15 } }/> RE-REGISTRATION
             </Button>
           </Grid>
-          <Grid item xs={ 4 }>
+          <Grid item xs={ 6 }>
             <Button key="btn_create"
                     style={ { marginTop: 15 } }
                     variant="outlined"
@@ -124,7 +124,7 @@ export class VenDetailSettings extends React.Component {
               <CloudDownloadIcon style={ { marginRight: 15 } }/> CANCEL REGISTRATION
             </Button>
           </Grid>
-          <Grid item xs={ 4 }>
+          <Grid item xs={ 6 }>
             <Button key="btn_create"
                     style={ { marginTop: 15 } }
                     variant="outlined"
