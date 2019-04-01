@@ -131,46 +131,48 @@ export class VenDetailGroup extends React.Component {
  
       ]
       }/>
-      <Divider style={ { marginTop: '20px' } } />
+      <Divider style={ { marginTop: '20px'} } />
       { /* Group Row */ }
-      <Grid container spacing={ 24 }>
-        <Grid item xs={ 6 }>
-          <ChipInput label="Filters"
-                     placeholder="Filters"
-                     value={ this.state.filter }
-                     onAdd={ this.handleAddChip }
-                     onDelete={ this.handleDeleteChip }
-                     fullWidth={ true } />
+      <Grid container>
+        <Grid container>
+          <Grid item xs={ 8 }>
+            <ChipInput label="Filters"
+                       placeholder="Filters"
+                       value={ this.state.filter }
+                       onAdd={ this.handleAddChip }
+                       onDelete={ this.handleDeleteChip }
+                       fullWidth={ true } />
+          </Grid>
+          <Grid item xs={ 1 }>
+            <IconButton className={ classes.iconButton } aria-label="Search">
+              <SearchIcon />
+            </IconButton>
+          </Grid>
+          <Grid item xs={ 3 }>
+            <Button key="btn_create"
+                    style={ { marginTop: 15 } }
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    fullWidth={true}
+                    className={ classes.button }
+                    onClick={ this.handleGroupSelectOpen }>
+              <AddIcon />Add to a Group
+            </Button>
+            <GroupSelectDialog group={ notAddedGroup }
+                               open={ this.state.groupSelectDialogOpen }
+                               close={ this.handleGroupSelectClose }
+                               title="Add VEN to group:" />
+          </Grid>
         </Grid>
-        <Grid item xs={ 1 }>
-          <IconButton className={ classes.iconButton } aria-label="Search">
-            <SearchIcon />
-          </IconButton>
-        </Grid>
-        <Grid item xs={ 3 }>
-          <Button key="btn_create"
-                  style={ { marginTop: 15 } }
-                  variant="outlined"
-                  color="primary"
-                  size="small"
-                  className={ classes.button }
-                  onClick={ this.handleGroupSelectOpen }>
-            <AddIcon />Add to a Group
-          </Button>
-          <GroupSelectDialog group={ notAddedGroup }
-                             open={ this.state.groupSelectDialogOpen }
-                             close={ this.handleGroupSelectClose }
-                             title="Add VEN to group:" />
+        <Grid container spacing={ 24 }>
+          <Grid item xs={ 12 }>
+            <GroupGridList classes={ classes }
+                           group={ venGroup }
+                           handleRemoveVenGroup={ this.handleRemoveVenGroup } />
+          </Grid>
         </Grid>
       </Grid>
-      <Grid container spacing={ 24 }>
-        <Grid item xs={ 12 }>
-          <GroupGridList classes={ classes }
-                         group={ venGroup }
-                         handleRemoveVenGroup={ this.handleRemoveVenGroup } />
-        </Grid>
-      </Grid>
-
 
      
     </div>

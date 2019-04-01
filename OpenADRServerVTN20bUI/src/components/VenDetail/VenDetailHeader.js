@@ -114,11 +114,11 @@ export class VenDetailHeader extends React.Component {
                                      classes={ classes }
                                      ven={ ven } />
           </Grid>
-          <Grid item lg={ 4 } md={ 6 }>
+          <Grid item lg={ 8 } md={ 6 }>
 
 
             <Grid container>
-              <Grid container spacing={ 24 }>
+              <Grid container>
                 <Grid item xs={ 4 }>
                   { registrationPanel }
                 </Grid>

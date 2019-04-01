@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.Resource;
+import javax.jms.ConnectionFactory;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.Source;
@@ -29,6 +30,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jms.config.JmsListenerContainerFactory;
+import org.springframework.jms.config.SimpleJmsListenerContainerFactory;
 import org.springframework.util.ResourceUtils;
 import org.xml.sax.SAXException;
 
@@ -104,6 +107,13 @@ public class VTN20aApplication {
 	public Oadr20aJAXBContext jaxbContextTest() throws JAXBException, SAXException {
 		return Oadr20aJAXBContext.getInstance();
 	};
+
+	@Bean
+	JmsListenerContainerFactory<?> jmsContainerFactory(ConnectionFactory connectionFactory) {
+		SimpleJmsListenerContainerFactory factory = new SimpleJmsListenerContainerFactory();
+		factory.setConnectionFactory(connectionFactory);
+		return factory;
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(VTN20aApplication.class, args);

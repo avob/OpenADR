@@ -14,8 +14,6 @@
   - name: Set oadr-vtn20b.conf permission
     file: 
       path: /home/vagrant/node-red-contrib-oadr-ven
-      owner: vagrant
-      group: vagrant
       state: directory
       mode: 0777
       recurse: yes

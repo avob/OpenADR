@@ -188,7 +188,7 @@ public class Oadr20bVTNEiEventService {
 				try {
 					processEventResponseFromOadrCreatedEvent(ven, response);
 				} catch (Oadr20bCreatedEventApplicationLayerException e) {
-					LOGGER.warn(e.getMessage(), e);
+					LOGGER.warn(e.getMessage());
 					responseCode = HttpStatus.NOT_ACCEPTABLE_406;
 				}
 			}

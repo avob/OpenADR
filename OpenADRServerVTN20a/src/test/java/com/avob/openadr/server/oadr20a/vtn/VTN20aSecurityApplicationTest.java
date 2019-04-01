@@ -1,8 +1,5 @@
 package com.avob.openadr.server.oadr20a.vtn;
 
-import javax.jms.ConnectionFactory;
-
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -24,16 +21,9 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles({ "test" })
 public class VTN20aSecurityApplicationTest {
 
-	private static final String BROKER_NAME = "mybroker.avob.com";
-
 	@Bean(destroyMethod = "shutdown")
 	public EmbeddedDatabase dataSource() {
 		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
-	}
-
-	@Bean
-	public ConnectionFactory connectionFactory() {
-		return new ActiveMQConnectionFactory("vm:(broker:(vm://" + BROKER_NAME + ")?persistent=false)?marshal=false");
 	}
 
 	public static void main(String[] args) {
