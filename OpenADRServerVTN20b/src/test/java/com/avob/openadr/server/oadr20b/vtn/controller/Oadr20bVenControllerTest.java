@@ -24,6 +24,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
+import com.avob.openadr.server.oadr20b.vtn.models.venpoll.VenPollDao;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockMvc;
 
@@ -35,6 +36,8 @@ public class Oadr20bVenControllerTest {
 
 	private static final String VEN_URL = "/Ven/";
 
+	@Resource
+	private VenPollDao venPollDao;
 	@Resource
 	private OadrMockMvc oadrMockMvc;
 

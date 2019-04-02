@@ -6,7 +6,7 @@
 		</Console>
 	</Appenders>
 	<Loggers>
-		<Logger level="info" name="com.avob" additivity="false">
+		<Logger level="debug" name="com.avob" additivity="false">
 			<AppenderRef ref="Console" />
 		</Logger>
 		<Logger level="warn" name="org.springframework" additivity="false">

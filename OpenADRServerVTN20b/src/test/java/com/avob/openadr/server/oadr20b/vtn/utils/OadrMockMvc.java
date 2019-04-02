@@ -54,6 +54,7 @@ public class OadrMockMvc {
 
 	public <T> T postEiEventAndExpect(UserRequestPostProcessor authSession, Object payload, int status, Class<T> klass)
 			throws Exception {
+
 		return this.postEiAndExpect(EIEVENT_ENDPOINT, authSession, payload, status, klass);
 	}
 
@@ -113,6 +114,7 @@ public class OadrMockMvc {
 		}
 		T unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), klass);
 		assertNotNull(unmarshal);
+		Thread.sleep(200);
 		return unmarshal;
 	}
 

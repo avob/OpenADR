@@ -1,43 +1,33 @@
 {
-	"name": "Embedded Broker",
-	"modelVersion": "7.0",
-	"authenticationproviders": [
-		{
-			"name": "hardcoded",
-			"type": "Plain",
-			"secureOnlyMechanisms": [],
-			"users": [
-				{
-					"name": "guest",
-					"password": "guest",
-					"type": "managed"
-				}
-			]
-		}
-	],
-	"ports": [
-		{
-			"name": "AMQP",
-			"port": "${qpid.amqp_port}",
-			"bindingAddress": "127.0.0.1",
-			"protocols": [
-				"AMQP_0_9_1"
-			],
-			"authenticationProvider": "hardcoded",
-			"virtualhostaliases": [
-				{
-					"name": "defaultAlias",
-					"type": "defaultAlias"
-				}
-			]
-		}
-	],
-	"virtualhostnodes": [
-		{
-			"name": "default",
-			"type": "Memory",
-			"defaultVirtualHostNode": "true",
-			"virtualHostInitialConfiguration": "{\"type\": \"Memory\"}"
-		}
-	]
+  "name": "Embedded Test Broker",
+  "modelVersion": "7.0",
+  "authenticationproviders": [
+    {
+      "name": "password",
+      "type": "External"
+     
+    }
+  ],
+  "ports": [
+    {
+      "name": "AMQP",
+      "port": "${qpid.amqp_port}",
+      "authenticationProvider": "password",
+      "transports" : [ "SSL" ],
+      "virtualhostaliases": [
+        {
+          "name": "defaultAlias",
+          "type": "defaultAlias"
+        }
+      ]
+    }
+  ],
+  "virtualhostnodes": [
+    {
+      "name": "default",
+      "defaultVirtualHostNode": "true",
+      "type": "Memory",
+      "virtualHostInitialConfiguration": "{ \"type\": \"Memory\" }"
+    }
+  ]
 }

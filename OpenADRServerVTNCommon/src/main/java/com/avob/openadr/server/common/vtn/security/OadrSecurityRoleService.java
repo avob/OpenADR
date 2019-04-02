@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.user.AbstractUserDao;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
@@ -28,64 +29,70 @@ import com.google.common.collect.Lists;
 public class OadrSecurityRoleService {
 
 	@Value("${oadr.security.admin.username:#{null}}")
-    private String adminUsername;
-	
-    @Resource
-    private AbstractUserDao abstractUserDao;
+	private String adminUsername;
 
-    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	@Resource
+	private VtnConfig vtnConfig;
 
-    public User digestUserDetail(String username) {
-        AbstractUser abstractUser = saveFindUser(username);
-        return new User(abstractUser.getUsername(), abstractUser.getDigestPassword(), Lists.newArrayList());
-    }
+	@Resource
+	private AbstractUserDao abstractUserDao;
 
-    public User grantDigestRole(String username, String password) {
-        AbstractUser abstractUser = saveFindUser(username);
-        if (!abstractUser.getDigestPassword().equals(password)) {
-            throw new BadCredentialsException("Bad credentials given for user: '" + username + "'");
-        }
-        return this.grantRole(abstractUser, abstractUser.getDigestPassword());
-    }
+	private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    public User grantBasicRole(String username, CharSequence rawPassword) {
-        AbstractUser abstractUser = saveFindUser(username);
-        if (!encoder.matches(rawPassword, abstractUser.getBasicPassword())) {
-            throw new BadCredentialsException("Bad credentials given for user: '" + username + "'");
-        }
-        return this.grantRole(abstractUser, abstractUser.getBasicPassword());
-    }
+	public User digestUserDetail(String username) {
+		AbstractUser abstractUser = saveFindUser(username);
+		return new User(abstractUser.getUsername(), abstractUser.getDigestPassword(), Lists.newArrayList());
+	}
 
-    public User grantX509Role(String username) {
-    	if(adminUsername != null && adminUsername.equals(username)) {
-    		return new User(username, "",
-                    Lists.newArrayList(new SimpleGrantedAuthority("ROLE_ADMIN")));
-    	}
-        return this.grantRole(saveFindUser(username), "");
-    }
+	public User grantDigestRole(String username, String password) {
+		AbstractUser abstractUser = saveFindUser(username);
+		if (!abstractUser.getDigestPassword().equals(password)) {
+			throw new BadCredentialsException("Bad credentials given for user: '" + username + "'");
+		}
+		return this.grantRole(abstractUser, abstractUser.getDigestPassword());
+	}
 
-    private AbstractUser saveFindUser(String username) {
-        AbstractUser abstractUser = abstractUserDao.findOneByUsername(username);
-        if (abstractUser == null) {
-            throw new UsernameNotFoundException("");
-        }
-        return abstractUser;
-    }
+	public User grantBasicRole(String username, CharSequence rawPassword) {
+		AbstractUser abstractUser = saveFindUser(username);
+		if (!encoder.matches(rawPassword, abstractUser.getBasicPassword())) {
+			throw new BadCredentialsException("Bad credentials given for user: '" + username + "'");
+		}
+		return this.grantRole(abstractUser, abstractUser.getBasicPassword());
+	}
 
-    public User grantRole(AbstractUser abstractUser, String password) {
-        if (abstractUser instanceof Ven) {
-            ArrayList<SimpleGrantedAuthority> roles = Lists.newArrayList(new SimpleGrantedAuthority("ROLE_VEN"));
-            Ven ven = (Ven) abstractUser;
-            if (ven.getRegistrationId() != null) {
-                roles.add(new SimpleGrantedAuthority("ROLE_REGISTERED"));
-            }
-            return new User(abstractUser.getUsername(), password, roles);
-        } else if (abstractUser instanceof OadrUser) {
-            return new User(abstractUser.getUsername(), password,
-                    Lists.newArrayList(new SimpleGrantedAuthority("ROLE_USER")));
-        }
+	public User grantX509Role(String username) {
+		if (adminUsername != null && adminUsername.equals(username)) {
+			return new User(username, "", Lists.newArrayList(new SimpleGrantedAuthority("ROLE_ADMIN")));
+		}
 
-        throw new UsernameNotFoundException("");
-    }
+		if (username.equals(vtnConfig.getOadr20bFingerprint())) {
+			return new User(username, "", Lists.newArrayList(new SimpleGrantedAuthority("ROLE_VTN")));
+		}
+		return this.grantRole(saveFindUser(username), "");
+	}
+
+	private AbstractUser saveFindUser(String username) {
+		AbstractUser abstractUser = abstractUserDao.findOneByUsername(username);
+		if (abstractUser == null) {
+			throw new UsernameNotFoundException("");
+		}
+		return abstractUser;
+	}
+
+	public User grantRole(AbstractUser abstractUser, String password) {
+		if (abstractUser instanceof Ven) {
+			ArrayList<SimpleGrantedAuthority> roles = Lists.newArrayList(new SimpleGrantedAuthority("ROLE_VEN"));
+			Ven ven = (Ven) abstractUser;
+			if (ven.getRegistrationId() != null) {
+				roles.add(new SimpleGrantedAuthority("ROLE_REGISTERED"));
+			}
+			return new User(abstractUser.getUsername(), password, roles);
+		} else if (abstractUser instanceof OadrUser) {
+			return new User(abstractUser.getUsername(), password,
+					Lists.newArrayList(new SimpleGrantedAuthority("ROLE_USER")));
+		}
+
+		throw new UsernameNotFoundException("");
+	}
 
 }

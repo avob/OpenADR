@@ -1,5 +1,7 @@
 package com.avob.openadr.server.oadr20b.vtn.service.push;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
@@ -11,8 +13,11 @@ import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
+import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.push.DemandResponseEventPublisher;
+import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 
 @Service
@@ -29,24 +34,40 @@ public class Oadr20bDemandResponseEventCreateListener {
 	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
+	@Resource
+	private DemandResponseEventService demandResponseEventService;
+
+	@Resource
+	private Oadr20bVTNEiEventService oadr20bVTNEiEventService;
+
 	@JmsListener(destination = DemandResponseEventPublisher.OADR20B_QUEUE)
 	public void receiveEvent(Ven ven) {
 		if (ven != null && ven.getUsername() != null) {
-			if (!ven.getHttpPullModel() && ven.getPushUrl() != null) {
+			if (ven.getHttpPullModel() != null && !ven.getHttpPullModel() && ven.getPushUrl() != null) {
 				oadr20bPushService.pushDistributeEventToVen(ven.getUsername(), ven.getPushUrl(), ven.getXmlSignature());
 				LOGGER.info("pushed event to: " + ven.getUsername() + " at:" + ven.getPushUrl());
 				return;
 			} else {
-				OadrDistributeEventType createOadrDistributeEvent = oadr20bPushService
-						.createOadrDistributeEvent(ven.getUsername());
-				String marshal;
-				try {
-					marshal = jaxbContext.marshal(Oadr20bFactory.createOadrDistributeEvent(createOadrDistributeEvent));
-					venPollService.create(ven, marshal);
-					LOGGER.info("add event to: " + ven.getUsername() + " oadrpoll queue");
-				} catch (Oadr20bMarshalException e) {
-					LOGGER.error("Cannot marshal event for oadrpoll", e);
+
+				List<DemandResponseEvent> findToSentEventByVenUsername = demandResponseEventService
+						.findToSentEventByVenUsername(ven.getUsername());
+
+				if (!findToSentEventByVenUsername.isEmpty()) {
+					OadrDistributeEventType createOadrDistributeEventPayload = oadr20bVTNEiEventService
+							.createOadrDistributeEventPayload(ven.getUsername(), findToSentEventByVenUsername);
+
+					String marshal;
+					try {
+						marshal = jaxbContext
+								.marshal(Oadr20bFactory.createOadrDistributeEvent(createOadrDistributeEventPayload));
+						venPollService.create(ven, marshal);
+						LOGGER.info("add event to: " + ven.getUsername() + " oadrpoll queue");
+						return;
+					} catch (Oadr20bMarshalException e) {
+						LOGGER.error("Cannot marshal event for oadrpoll", e);
+					}
 				}
+
 			}
 		}
 		LOGGER.warn("Received unpushable ven message: " + ven.toString());

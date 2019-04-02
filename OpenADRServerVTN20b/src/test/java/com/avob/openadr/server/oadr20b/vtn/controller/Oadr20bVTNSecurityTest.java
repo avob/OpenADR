@@ -63,6 +63,7 @@ import com.avob.openadr.server.common.vtn.service.OadrUserService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
+import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bPushService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
@@ -102,6 +103,9 @@ public class Oadr20bVTNSecurityTest {
 
 	@Resource
 	private VenService venService;
+
+	@Resource
+	private VenPollService venPollService;
 
 	@Resource
 	private VenMarketContextService venMarketContextService;
@@ -298,7 +302,10 @@ public class Oadr20bVTNSecurityTest {
 		assertEquals(1, OadrRequestEventType.getOadrEvent().size());
 
 		demandResponseEventService.delete(readdto.getId());
-
+		
+		venPollService.deleteByVenUsername(ven.getUsername());
+		venPollService.deleteByVenUsername(ven2.getUsername());
+		
 		venService.delete(ven);
 		venService.delete(ven2);
 

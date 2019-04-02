@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bPollBuilders;
 import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
 import com.avob.openadr.model.oadr20b.ei.EiEventType;
 import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
@@ -39,6 +40,7 @@ import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCod
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
+import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.ResponseRequiredType;
@@ -57,6 +59,7 @@ import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketConte
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
+import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockMvc;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -77,6 +80,9 @@ public class Oadr20bVTNEiEventControllerTest {
 
 	@Resource
 	private DemandResponseEventService demandResponseEventService;
+
+	@Resource
+	private VenPollService venPollService;
 
 	@Resource
 	private VenMarketContextService venMarketContextService;
@@ -151,6 +157,8 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		assertNotNull(unmarshal.getOadrEvent());
 		assertTrue(unmarshal.getOadrEvent().isEmpty());
+
+		assertEquals(new Long(0), venPollService.countAll());
 
 	}
 
@@ -275,6 +283,22 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		demandResponseEventService.delete(eventCanceled.getId());
 		demandResponseEventService.delete(eventActive.getId());
+		
+		Thread.sleep(200);
+
+		OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(OadrDataBaseSetup.VEN).build();
+		OadrDistributeEventType oadrDistributeEventType = oadrMockMvc.postOadrPollAndExpect(
+				OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200, OadrDistributeEventType.class);
+		assertEquals(String.valueOf(HttpStatus.OK_200), oadrDistributeEventType.getEiResponse().getResponseCode());
+
+		assertEquals(new Long(1), venPollService.countAll());
+
+		poll = Oadr20bPollBuilders.newOadr20bPollBuilder(OadrDataBaseSetup.VEN).build();
+		oadrDistributeEventType = oadrMockMvc.postOadrPollAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, poll,
+				HttpStatus.OK_200, OadrDistributeEventType.class);
+		assertEquals(String.valueOf(HttpStatus.OK_200), oadrDistributeEventType.getEiResponse().getResponseCode());
+
+		assertEquals(new Long(0), venPollService.countAll());
 
 	}
 
@@ -478,6 +502,13 @@ public class Oadr20bVTNEiEventControllerTest {
 		assertEquals(DemandResponseEventOptEnum.OPT_OUT, venOpt);
 
 		demandResponseEventService.delete(eventId);
+
+		OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(OadrDataBaseSetup.VEN).build();
+		OadrDistributeEventType oadrDistributeEventType = oadrMockMvc.postOadrPollAndExpect(
+				OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200, OadrDistributeEventType.class);
+		assertEquals(String.valueOf(HttpStatus.OK_200), oadrDistributeEventType.getEiResponse().getResponseCode());
+
+		assertEquals(new Long(0), venPollService.countAll());
 
 	}
 
@@ -791,6 +822,19 @@ public class Oadr20bVTNEiEventControllerTest {
 		// clean bdd
 		for (DemandResponseEventReadDto e : created) {
 			demandResponseEventService.delete(e.getId());
+		}
+
+		Thread.sleep(1000);
+		int nbPoll = 10;
+		for (int i = 0; i < nbPoll; i++) {
+			assertEquals(new Long(nbPoll - i), venPollService.countAll());
+
+			OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(OadrDataBaseSetup.VEN).build();
+			OadrDistributeEventType oadrDistributeEventType = oadrMockMvc.postOadrPollAndExpect(
+					OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200, OadrDistributeEventType.class);
+			assertEquals(String.valueOf(HttpStatus.OK_200), oadrDistributeEventType.getEiResponse().getResponseCode());
+
+			assertEquals(new Long(nbPoll - i - 1), venPollService.countAll());
 		}
 
 	}

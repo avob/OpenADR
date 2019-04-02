@@ -210,7 +210,8 @@ public class DemandResponseEventService {
 
 		List<VenDemandResponseEvent> list = new ArrayList<VenDemandResponseEvent>();
 		for (Ven ven : findByUsernameIn) {
-			if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
+//			if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
+			if (demandResponseEventPublisher != null) {
 				if (event.isPublished()) {
 					pushAsync(Arrays.asList(ven), dto.getDescriptor().getOadrProfile());
 				}
@@ -371,11 +372,14 @@ public class DemandResponseEventService {
 					// does
 					// make
 					// event available if not
-					if (DemandResponseEventOadrProfileEnum.OADR20B.equals(profile)
-							&& DemandResponseEventOadrProfileEnum.OADR20B.getCode().equals(ven.getOadrProfil())) {
-						demandResponseEventPublisher.publish20b(ven);
-					} else if (DemandResponseEventOadrProfileEnum.OADR20A.equals(profile)) {
+//					if (DemandResponseEventOadrProfileEnum.OADR20B.equals(profile)
+//							&& DemandResponseEventOadrProfileEnum.OADR20B.getCode().equals(ven.getOadrProfil())) {
+//						
+//					} else 
+					if (DemandResponseEventOadrProfileEnum.OADR20A.equals(profile)) {
 						demandResponseEventPublisher.publish20a(ven);
+					} else {
+						demandResponseEventPublisher.publish20b(ven);
 					}
 				}
 			}

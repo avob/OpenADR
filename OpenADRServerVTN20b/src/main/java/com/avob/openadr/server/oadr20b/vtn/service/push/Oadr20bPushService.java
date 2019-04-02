@@ -98,15 +98,18 @@ public class Oadr20bPushService {
 
 	}
 
-	public OadrDistributeEventType createOadrDistributeEvent(String venUsername) {
+	public void pushDistributeEventToVen(String venUsername, String venPushUrl, Boolean xmlSignatureRequired) {
+
 		List<DemandResponseEvent> findToSentEventByVenUsername = demandResponseEventService
 				.findToSentEventByVenUsername(venUsername);
 
-		return oadr20bVTNEiEventService.createOadrDistributeEventPayload(venUsername, findToSentEventByVenUsername);
-	}
+		if (!findToSentEventByVenUsername.isEmpty()) {
+			OadrDistributeEventType createOadrDistributeEventPayload = oadr20bVTNEiEventService
+					.createOadrDistributeEventPayload(venUsername, findToSentEventByVenUsername);
 
-	public void pushDistributeEventToVen(String venUsername, String venPushUrl, Boolean xmlSignatureRequired) {
-		this.pushMessageToVen(venPushUrl, xmlSignatureRequired, createOadrDistributeEvent(venUsername));
+			this.pushMessageToVen(venPushUrl, xmlSignatureRequired, createOadrDistributeEventPayload);
+		}
+
 	}
 
 	@Async

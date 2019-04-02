@@ -2,7 +2,6 @@ package com.avob.openadr.server.common.vtn;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -35,18 +34,16 @@ public class VTNJettyServerCustomizer implements JettyServerCustomizer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(VTNJettyServerCustomizer.class);
 
 	private int port;
-	private KeyStore keystore;
-	private KeyStore truststore;
-	private String keystorePass;
+	private KeyManagerFactory keyManagerFactory;
+	private TrustManagerFactory trustManagerFactory;
 	private String[] protocols;
 	private String[] ciphers;
 
-	public VTNJettyServerCustomizer(int port, KeyStore keystore, String keystorePass, KeyStore truststore,
-			String[] protocols, String[] ciphers) {
+	public VTNJettyServerCustomizer(int port, KeyManagerFactory keyManagerFactory,
+			TrustManagerFactory trustManagerFactory, String[] protocols, String[] ciphers) {
 		this.port = port;
-		this.keystore = keystore;
-		this.truststore = truststore;
-		this.keystorePass = keystorePass;
+		this.keyManagerFactory = keyManagerFactory;
+		this.trustManagerFactory = trustManagerFactory;
 		this.protocols = protocols;
 		this.ciphers = ciphers;
 	}
@@ -62,7 +59,7 @@ public class VTNJettyServerCustomizer implements JettyServerCustomizer {
 		return config;
 	}
 
-	private SslContextFactory getSslContextFactory()
+	public SslContextFactory getSslContextFactory()
 			throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException,
 			OadrSecurityException, UnrecoverableKeyException, KeyManagementException {
 		// SSL Context Factory
@@ -70,16 +67,6 @@ public class VTNJettyServerCustomizer implements JettyServerCustomizer {
 
 		SSLContext sslContext = SSLContext.getInstance("TLS");
 
-		// init key manager factory
-		KeyStore createKeyStore = keystore;
-		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		keyManagerFactory.init(createKeyStore, keystorePass.toCharArray());
-
-		// init trust manager factory
-		KeyStore createTrustStore = truststore;
-		TrustManagerFactory trustManagerFactory = TrustManagerFactory
-				.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-		trustManagerFactory.init(createTrustStore);
 		// init ssl context
 		String seed = UUID.randomUUID().toString();
 

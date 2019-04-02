@@ -1,13 +1,41 @@
 package com.avob.openadr.server.common.vtn;
 
+import java.io.IOException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
+import org.apache.activemq.ActiveMQSslConnectionFactory;
+import org.apache.activemq.broker.BrokerPlugin;
+import org.apache.activemq.broker.SslBrokerService;
+import org.apache.activemq.broker.SslContext;
+import org.apache.activemq.transport.TransportFactory;
+import org.apache.activemq.transport.tcp.SslTransportFactory;
+import org.apache.activemq.usage.SystemUsage;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+import org.springframework.jms.core.JmsTemplate;
+
+import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
+import com.google.common.collect.Maps;
 
 @Configuration
 public class VtnConfig {
@@ -75,14 +103,180 @@ public class VtnConfig {
 	@Value("${" + CA_CERT_CONF + ":null}")
 	private String caCert;
 
+//	@Value("${activemq.broker-url}")
+	private String brokerUrl = "tcp://localhost:61616";
+	private String sslBrokerUrl = "ssl://localhost:61617";
+	private String sslMqttBrokerUrl = "ssl://localhost:1883";
+
+	@Resource
+	private ActiveMQAuthorizationPlugin activeMQAuthorizationPlugin;
+
+	private KeyManagerFactory keyManagerFactory;
+	private TrustManagerFactory trustManagerFactory;
+	private String oadr20bFingerprint;
+
+	@Bean // (initMethod = "start", destroyMethod = "stop")
+	public SslBrokerService broker() throws Exception {
+		if(getKeyManagerFactory() != null) {
+			SslBrokerService broker = new SslBrokerService();
+//			broker.addConnector(brokerUrl);
+
+			broker.addSslConnector(sslBrokerUrl + "?transport.needClientAuth=true", getKeyManagerFactory().getKeyManagers(),
+					getTrustManagerFactory().getTrustManagers(), new SecureRandom());
+			broker.addSslConnector(sslMqttBrokerUrl
+					+ "?transport.needClientAuth=true&transport.enabledProtocols=TLSv1.2&transport.enabledCipherSuites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+					getKeyManagerFactory().getKeyManagers(), getTrustManagerFactory().getTrustManagers(),
+					new SecureRandom());
+			broker.setPersistent(false);
+			broker.setBrokerName("broker");
+			broker.setUseShutdownHook(false);
+			SystemUsage systemUsage = broker.getSystemUsage();
+			systemUsage.getStoreUsage().setLimit(1024 * 8);
+			systemUsage.getTempUsage().setLimit(1024 * 8);
+			broker.setSystemUsage(systemUsage);
+//			broker.addS
+			broker.setPlugins(new BrokerPlugin[] { activeMQAuthorizationPlugin });
+
+			// for client side
+			SslTransportFactory sslFactory = new SslTransportFactory();
+
+			String[] protocols = new String[] { "TLSv1.2", "TLSv1.1", "TLSv1" };
+
+			String[] ciphers = new String[] { "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
+					"TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384", "TLS_RSA_WITH_AES_256_CBC_SHA256",
+					"TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384", "TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384",
+					"TLS_DHE_RSA_WITH_AES_256_CBC_SHA256", "TLS_DHE_DSS_WITH_AES_256_CBC_SHA256",
+					"TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA", "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+					"TLS_RSA_WITH_AES_256_CBC_SHA", "TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA",
+					"TLS_ECDH_RSA_WITH_AES_256_CBC_SHA", "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
+					"TLS_DHE_DSS_WITH_AES_256_CBC_SHA", "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
+					"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", "TLS_RSA_WITH_AES_128_CBC_SHA256",
+					"TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256", "TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256",
+					"TLS_DHE_RSA_WITH_AES_128_CBC_SHA256", "TLS_DHE_DSS_WITH_AES_128_CBC_SHA256",
+					"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA", "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+					"TLS_RSA_WITH_AES_128_CBC_SHA", "TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA",
+					"TLS_ECDH_RSA_WITH_AES_128_CBC_SHA", "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
+					"TLS_DHE_DSS_WITH_AES_128_CBC_SHA", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+					"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+					"TLS_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384",
+					"TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384", "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384",
+					"TLS_DHE_DSS_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+					"TLS_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256",
+					"TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256", "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256",
+					"TLS_DHE_DSS_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA",
+					"TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_RSA_WITH_3DES_EDE_CBC_SHA",
+					"TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA", "TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA",
+					"SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA",
+					"TLS_EMPTY_RENEGOTIATION_INFO_SCSV" };
+			String seed = UUID.randomUUID().toString();
+			SSLContext sslContext = SSLContext.getInstance("TLS");
+			sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
+					new SecureRandom(seed.getBytes()));
+			sslContext.getSupportedSSLParameters().setNeedClientAuth(true);
+			sslContext.getSupportedSSLParameters().setProtocols(protocols);
+			sslContext.getSupportedSSLParameters().setCipherSuites(ciphers);
+
+			SslContext ctx = new SslContext();
+			ctx.setSSLContext(sslContext);
+			SslContext.setCurrentSslContext(ctx);
+
+			TransportFactory.registerTransportFactory("ssl", sslFactory);
+			TransportFactory.registerTransportFactory("mqtt+ssl", sslFactory);
+			return broker;
+		}
+		return null;
+
+	}
+
+//	@Bean
+//	public ActiveMQConnectionFactory activeMQConnectionFactory() throws Exception {
+//		ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
+//		activeMQConnectionFactory.setBrokerURL(brokerUrl);
+//		return activeMQConnectionFactory;
+//	}
+
+	@Bean
+	public ActiveMQSslConnectionFactory activeMQSslConnectionFactory() throws Exception {
+		ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory();
+		if (getKeyManagerFactory() != null) {
+			activeMQConnectionFactory.setBrokerURL(sslBrokerUrl);
+//			activeMQConnectionFactory.
+			activeMQConnectionFactory.setKeyAndTrustManagers(getKeyManagerFactory().getKeyManagers(),
+					getTrustManagerFactory().getTrustManagers(), new SecureRandom());
+		}
+
+		return activeMQConnectionFactory;
+	}
+
+//	@Bean
+//	public CachingConnectionFactory cachingConnectionFactory() throws Exception {
+//		CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(
+//				activeMQSslConnectionFactory());
+//
+//		return cachingConnectionFactory;
+//
+//	}
+
+	@Bean
+	public JmsTemplate jmsTemplate() throws Exception {
+		JmsTemplate jmsTemplate = new JmsTemplate(activeMQSslConnectionFactory());
+		return jmsTemplate;
+	}
+
+	@Bean
+	public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() throws Exception {
+		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+		factory.setConnectionFactory(activeMQSslConnectionFactory());
+		return factory;
+	}
+
 	@PostConstruct
 	public void init() {
 		if (trustCertificatesStr != null) {
 			trustCertificates = Arrays.asList(trustCertificatesStr.split(","));
-		}
-		else {
+		} else {
 			trustCertificates = new ArrayList<>();
 		}
+		Map<String, String> trustedCertificates = Maps.newHashMap();
+		int i = 0;
+		for (String path : trustCertificates) {
+			trustedCertificates.put("cert_" + (i++), path);
+		}
+
+		if (this.getCert() != null) {
+			String keystorePassword = UUID.randomUUID().toString();
+
+			KeyStore keystore;
+			try {
+				oadr20bFingerprint = OadrHttpSecurity.getOadr20bFingerprint(this.getCert());
+
+				keystore = OadrHttpSecurity.createKeyStore(this.getKey(), this.getCert(), keystorePassword);
+				KeyStore truststore = OadrHttpSecurity.createTrustStore(trustedCertificates);
+
+				// init key manager factory
+				KeyStore createKeyStore = keystore;
+				setKeyManagerFactory(KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm()));
+				getKeyManagerFactory().init(createKeyStore, keystorePassword.toCharArray());
+
+				// init trust manager factory
+				setTrustManagerFactory(TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()));
+				getTrustManagerFactory().init(truststore);
+				// init ssl context
+			} catch (KeyStoreException e) {
+				throw new OadrVTNInitializationException(e);
+			} catch (NoSuchAlgorithmException e) {
+				throw new OadrVTNInitializationException(e);
+			} catch (CertificateException e) {
+				throw new OadrVTNInitializationException(e);
+			} catch (IOException e) {
+				throw new OadrVTNInitializationException(e);
+			} catch (OadrSecurityException e) {
+				throw new OadrVTNInitializationException(e);
+			} catch (UnrecoverableKeyException e) {
+				throw new OadrVTNInitializationException(e);
+			}
+		}
+
 	}
 
 	public String getContextPath() {
@@ -204,4 +398,25 @@ public class VtnConfig {
 	public void setCaCert(String caPubKey) {
 		this.caCert = caPubKey;
 	}
+
+	public KeyManagerFactory getKeyManagerFactory() {
+		return keyManagerFactory;
+	}
+
+	public void setKeyManagerFactory(KeyManagerFactory keyManagerFactory) {
+		this.keyManagerFactory = keyManagerFactory;
+	}
+
+	public TrustManagerFactory getTrustManagerFactory() {
+		return trustManagerFactory;
+	}
+
+	public void setTrustManagerFactory(TrustManagerFactory trustManagerFactory) {
+		this.trustManagerFactory = trustManagerFactory;
+	}
+
+	public String getOadr20bFingerprint() {
+		return oadr20bFingerprint;
+	}
+
 }
