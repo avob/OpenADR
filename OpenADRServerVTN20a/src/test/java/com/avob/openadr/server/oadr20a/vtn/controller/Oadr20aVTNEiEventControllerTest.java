@@ -240,6 +240,8 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		Ven ven = venService.prepare(VEN);
 		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
+		ven.setHttpPullModel(false);
+		ven.setPushUrl("http://localhost");
 		venService.save(ven);
 		UserRequestPostProcessor venSecuritySession = SecurityMockMvcRequestPostProcessors.user(VEN).roles("VEN");
 

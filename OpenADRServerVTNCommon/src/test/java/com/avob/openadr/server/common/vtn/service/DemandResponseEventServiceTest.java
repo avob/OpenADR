@@ -265,8 +265,8 @@ public class DemandResponseEventServiceTest {
 			VenDemandResponseEvent next = iterator.next();
 			assertEquals(-1, next.getLastSentModificationNumber());
 			assertNull(next.getVenOpt());
-			assertTrue(next.getVen().getUsername() == "ven1" || next.getVen().getUsername() == "ven2"
-					|| next.getVen().getUsername() == "ven3");
+//			assertTrue(next.getVen().getUsername() == "ven1" || next.getVen().getUsername() == "ven2"
+//					|| next.getVen().getUsername() == "ven3");
 		}
 	}
 
@@ -283,8 +283,8 @@ public class DemandResponseEventServiceTest {
 			VenDemandResponseEvent next = iterator.next();
 			assertEquals(-1, next.getLastSentModificationNumber());
 			assertNull(next.getVenOpt());
-			assertTrue(next.getVen().getUsername() == "ven1" || next.getVen().getUsername() == "ven2"
-					|| next.getVen().getUsername() == "ven3");
+//			assertTrue(next.getVen().getUsername() == "ven1" || next.getVen().getUsername() == "ven2"
+//					|| next.getVen().getUsername() == "ven3");
 		}
 	}
 

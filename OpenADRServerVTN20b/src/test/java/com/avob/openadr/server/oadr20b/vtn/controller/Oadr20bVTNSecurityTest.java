@@ -17,7 +17,6 @@ import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.eclipse.jetty.http.HttpStatus;
@@ -37,12 +36,15 @@ import com.avob.openadr.client.http.oadr20b.OadrHttpClient20b;
 import com.avob.openadr.client.http.oadr20b.ven.OadrHttpVenClient20b;
 import com.avob.openadr.model.oadr20b.Oadr20bSecurity;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bPollBuilders;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
@@ -65,6 +67,8 @@ import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bPushService;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Sets;
@@ -118,6 +122,9 @@ public class Oadr20bVTNSecurityTest {
 
 	@Resource
 	private Oadr20bPushService oadr20bDemandResponseEventPushService;
+
+	@Resource
+	private OadrMockMvc oadrMockMvc;
 
 	private String eiEventEndpointUrl = null;
 
@@ -220,9 +227,7 @@ public class Oadr20bVTNSecurityTest {
 	}
 
 	@Test
-	public void testBasic() throws Oadr20bException, OadrSecurityException, JAXBException, ClientProtocolException,
-			IOException, URISyntaxException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException {
+	public void testBasic() throws Oadr20bMarshalException, Exception {
 
 		String[] allCerts = { oadrRsaRootCertificate };
 
@@ -251,7 +256,6 @@ public class Oadr20bVTNSecurityTest {
 		String venPassword2 = "securityVen2";
 		Ven ven2 = venService.prepare(venUsername2, venPassword2);
 		ven2.setVenMarketContexts(Sets.newHashSet(marketContext));
-		ven2.setPushUrl("http://localhost");
 		ven2.setRegistrationId(venUsername2);
 		venService.save(ven2);
 
@@ -311,6 +315,8 @@ public class Oadr20bVTNSecurityTest {
 		venService.delete(ven2);
 
 		venMarketContextService.delete(marketContext);
+		
+
 
 	}
 }
