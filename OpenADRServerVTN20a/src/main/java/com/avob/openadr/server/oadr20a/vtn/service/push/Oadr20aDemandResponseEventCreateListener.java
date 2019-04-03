@@ -8,6 +8,7 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
+import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.common.vtn.service.push.DemandResponseEventPublisher;
 
 @Service
@@ -18,8 +19,12 @@ public class Oadr20aDemandResponseEventCreateListener {
 	@Resource
 	private Oadr20aPushService oadr20aPushService;
 
+	@Resource
+	private VenService venService;
+
 	@JmsListener(destination = DemandResponseEventPublisher.OADR20A_QUEUE)
-	public void receiveEvent(Ven ven) {
+	public void receiveEvent(String venUsername) {
+		Ven ven = venService.findOneByUsername(venUsername);
 		LOGGER.info("sub: " + ven.getUsername() + " - " + ven.getPushUrl());
 		if (ven != null && ven.getUsername() != null && ven.getPushUrl() != null) {
 			oadr20aPushService.call(ven.getUsername(), ven.getPushUrl());

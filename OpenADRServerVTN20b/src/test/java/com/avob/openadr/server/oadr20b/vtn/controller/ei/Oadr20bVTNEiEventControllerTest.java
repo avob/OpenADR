@@ -513,6 +513,8 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		demandResponseEventService.delete(eventId);
 
+		Thread.sleep(1000);
+		
 		OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(OadrDataBaseSetup.VEN).build();
 		OadrDistributeEventType oadrDistributeEventType = oadrMockMvc.postOadrPollAndExpect(
 				OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200, OadrDistributeEventType.class);
