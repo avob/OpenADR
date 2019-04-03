@@ -15,10 +15,12 @@ LOCALITY="Paris"
 ORGANIZATION="Avob"	
 
 CA_NAME="oadr.com"
-CLIENT_NAME="admin.oadr.com"
+ADMIN_NAME="admin.oadr.com"
 VTN_NAME="vtn.oadr.com"
 VEN1_NAME="ven1.oadr.com"
 VEN2_NAME="ven2.oadr.com"
+USER_NAME="user.oadr.com"
+APP_NAME="app.oadr.com"
 
 ###################################
 # HELPERS
@@ -113,9 +115,9 @@ gen_oadr20a_fingerprint $VTN_NAME-ecc
 ###################################
 # CLIENT
 ###################################
-gen_rsa_key_csr $CLIENT_NAME $CLIENT_NAME $CA_NAME 03 365
-gen_pkcs12 $CLIENT_NAME
-gen_oadr20b_fingerprint $CLIENT_NAME
+gen_rsa_key_csr $ADMIN_NAME $ADMIN_NAME $CA_NAME 03 365
+gen_pkcs12 $ADMIN_NAME
+gen_oadr20b_fingerprint $ADMIN_NAME
 
 ###################################
 # VEN1
@@ -130,3 +132,17 @@ gen_oadr20a_fingerprint $VEN1_NAME
 gen_ecc_key_csr $VEN2_NAME $VEN2_NAME $CA_NAME 05 365
 gen_oadr20b_fingerprint $VEN2_NAME
 gen_oadr20a_fingerprint $VEN2_NAME
+
+###################################
+# USER
+###################################
+gen_rsa_key_csr $USER_NAME $USER_NAME $CA_NAME 06 365
+gen_pkcs12 $USER_NAME
+gen_oadr20b_fingerprint $USER_NAME
+
+###################################
+# APP
+###################################
+gen_rsa_key_csr $APP_NAME $APP_NAME $CA_NAME 07 365
+gen_pkcs12 $APP_NAME
+gen_oadr20b_fingerprint $APP_NAME
