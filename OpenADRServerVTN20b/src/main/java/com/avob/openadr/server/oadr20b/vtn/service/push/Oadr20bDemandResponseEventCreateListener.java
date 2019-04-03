@@ -16,6 +16,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
+import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.common.vtn.service.push.DemandResponseEventPublisher;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
@@ -25,6 +26,8 @@ public class Oadr20bDemandResponseEventCreateListener {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bDemandResponseEventCreateListener.class);
 
+	@Resource
+	private VenService venService;
 	@Resource
 	private Oadr20bPushService oadr20bPushService;
 
@@ -41,7 +44,8 @@ public class Oadr20bDemandResponseEventCreateListener {
 	private Oadr20bVTNEiEventService oadr20bVTNEiEventService;
 
 	@JmsListener(destination = DemandResponseEventPublisher.OADR20B_QUEUE)
-	public void receiveEvent(Ven ven) {
+	public void receiveEvent(String venUsername) {
+		Ven ven = venService.findOneByUsername(venUsername);
 		if (ven != null && ven.getUsername() != null) {
 			if (ven.getHttpPullModel() != null && !ven.getHttpPullModel() && ven.getPushUrl() != null) {
 				oadr20bPushService.pushDistributeEventToVen(ven.getUsername(), ven.getPushUrl(), ven.getXmlSignature());

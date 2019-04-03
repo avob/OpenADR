@@ -363,31 +363,39 @@ public class DemandResponseEventService {
 	}
 
 	private void pushAsync(List<Ven> vens, DemandResponseEventOadrProfileEnum profile) {
-		Runnable run = new Runnable() {
+//		Runnable run = new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				for (Ven ven : vens) {
+//					// the receiver check if ven is a push ven and how it
+//					// does
+//					// make
+//					// event available if not
+////					if (DemandResponseEventOadrProfileEnum.OADR20B.equals(profile)
+////							&& DemandResponseEventOadrProfileEnum.OADR20B.getCode().equals(ven.getOadrProfil())) {
+////						
+////					} else 
+//					if (DemandResponseEventOadrProfileEnum.OADR20A.equals(profile)) {
+//						demandResponseEventPublisher.publish20a(ven);
+//					} else {
+//						demandResponseEventPublisher.publish20b(ven);
+//					}
+//				}
+//			}
+//
+//		};
+//
+//		executor.execute(run);
+		
+		for (Ven ven : vens) {
 
-			@Override
-			public void run() {
-				for (Ven ven : vens) {
-					// the receiver check if ven is a push ven and how it
-					// does
-					// make
-					// event available if not
-//					if (DemandResponseEventOadrProfileEnum.OADR20B.equals(profile)
-//							&& DemandResponseEventOadrProfileEnum.OADR20B.getCode().equals(ven.getOadrProfil())) {
-//						
-//					} else 
-					if (DemandResponseEventOadrProfileEnum.OADR20A.equals(profile)) {
-						demandResponseEventPublisher.publish20a(ven);
-					} else {
-						demandResponseEventPublisher.publish20b(ven);
-					}
-				}
+			if (DemandResponseEventOadrProfileEnum.OADR20A.equals(profile)) {
+				demandResponseEventPublisher.publish20a(ven);
+			} else {
+				demandResponseEventPublisher.publish20b(ven);
 			}
-
-		};
-
-		executor.execute(run);
-
+		}
 	}
 
 	public Optional<DemandResponseEvent> findById(Long id) {

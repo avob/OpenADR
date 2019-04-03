@@ -1,4 +1,4 @@
-package com.avob.openadr.server.common.vtn;
+package com.avob.openadr.server.common.vtn.broker.activemq;
 
 import java.security.Principal;
 import java.security.cert.X509Certificate;
@@ -7,11 +7,7 @@ import java.util.Set;
 import org.apache.activemq.broker.Broker;
 import org.apache.activemq.broker.BrokerFilter;
 import org.apache.activemq.broker.ConnectionContext;
-import org.apache.activemq.broker.region.Subscription;
 import org.apache.activemq.command.ConnectionInfo;
-import org.apache.activemq.command.ConsumerInfo;
-import org.apache.activemq.command.ProducerInfo;
-import org.apache.activemq.command.SessionInfo;
 import org.apache.activemq.security.SecurityContext;
 import org.apache.http.auth.BasicUserPrincipal;
 import org.slf4j.Logger;
@@ -41,7 +37,11 @@ public class ActiveMQAuthorizationBroker extends BrokerFilter {
 	public void addConnection(ConnectionContext context, ConnectionInfo info) throws Exception {
 
 		SecurityContext securityContext = context.getSecurityContext();
-		if (securityContext == null) {
+		if (context.getConnection().getConnector().getBrokerInfo().getBrokerURL().startsWith("tcp://localhost")) {
+			super.addConnection(context, info);
+			return;
+		} else if (!context.getConnection().getConnector().getBrokerInfo().getBrokerURL().startsWith("tcp://localhost")
+				&& securityContext == null) {
 
 			Object transportContext = info.getTransportContext();
 
@@ -76,7 +76,7 @@ public class ActiveMQAuthorizationBroker extends BrokerFilter {
 			}
 
 		}
-
+		throw new SecurityException("Unable to authenticate transport");
 	}
 
 	public OadrSecurityRoleService getOadrSecurityRoleService() {

@@ -1,19 +1,13 @@
 package com.avob.openadr.server.common.vtn.models.ven;
 
-import java.io.Serializable;
+import com.avob.openadr.server.common.vtn.models.user.AbstractUserCreateDto;
 
-public class VenCreateDto implements Serializable {
+public class VenCreateDto extends AbstractUserCreateDto {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 3250807214482052191L;
-
-	private String id;
-
-	private String username;
-
-	private String password;
 
 	private String oadrName;
 
@@ -35,15 +29,7 @@ public class VenCreateDto implements Serializable {
 	}
 
 	public VenCreateDto(String username) {
-		this.username = username;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
+		this.setUsername(username);
 	}
 
 	public String getOadrName() {
@@ -76,28 +62,6 @@ public class VenCreateDto implements Serializable {
 
 	public void setPushUrl(String pushUrl) {
 		this.pushUrl = pushUrl;
-	}
-
-	/**
-	 * @return the password
-	 */
-	public String getPassword() {
-		return password;
-	}
-
-	/**
-	 * @param password the password to set
-	 */
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public String getAuthenticationType() {

@@ -40,6 +40,10 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedde
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventDescriptorDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
+import com.avob.openadr.server.common.vtn.models.user.OadrApp;
+import com.avob.openadr.server.common.vtn.models.user.OadrAppCreateDto;
+import com.avob.openadr.server.common.vtn.models.user.OadrUser;
+import com.avob.openadr.server.common.vtn.models.user.OadrUserCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
@@ -47,12 +51,14 @@ import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
+import com.avob.openadr.server.common.vtn.service.OadrAppService;
+import com.avob.openadr.server.common.vtn.service.OadrUserService;
 import com.avob.openadr.server.common.vtn.service.VenGroupService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.google.common.collect.Sets;
 
-@Profile({ "test-functional", "fake-data" })
+@Profile({ "fake-data" })
 @Component
 public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -60,8 +66,10 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 
 	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-	protected static final CharSequence VEN_FILE_PREFIX = "ven";
-	protected static final CharSequence ADMIN_FILE_PREFIX = "admin";
+	protected static final String VEN_FILE_PREFIX = "ven";
+	protected static final String ADMIN_FILE_PREFIX = "admin";
+	protected static final String USER_FILE_PREFIX = "user";
+	protected static final String APP_FILE_PREFIX = "app";
 
 	@Value("${vtn.custom-cert-folder}")
 	private String customCertFolder;
@@ -78,12 +86,18 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 	@Resource
 	private DemandResponseEventService demandeResponseEventService;
 
-	private List<String> getVenFilename() {
+	@Resource
+	private OadrUserService oadrUserService;
+
+	@Resource
+	private OadrAppService oadrAppService;
+
+	private List<String> getFilename(String type) {
 		File file = new File(customCertFolder);
 		String[] directories = file.list(new FilenameFilter() {
 			@Override
 			public boolean accept(File current, String name) {
-				return name.contains(VEN_FILE_PREFIX) && name.endsWith(".key");
+				return name.contains(type) && name.endsWith(".key");
 			}
 		});
 		if (directories == null) {
@@ -92,8 +106,24 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 		return Arrays.asList(directories);
 	}
 
-	private String getFingerprintForVen(String filename) {
-		Path path = Paths.get(customCertFolder + "/" + filename);
+	private List<String> getAdminFilename() {
+		return getFilename(ADMIN_FILE_PREFIX);
+	}
+
+	private List<String> getUserFilename() {
+		return getFilename(USER_FILE_PREFIX);
+	}
+
+	private List<String> getAppFilename() {
+		return getFilename(APP_FILE_PREFIX);
+	}
+
+	private List<String> getVenFilename() {
+		return getFilename(VEN_FILE_PREFIX);
+	}
+
+	private String getFingerprint(String filename) {
+		Path path = Paths.get(customCertFolder + "/" + filename + ".fingerprint");
 		try (BufferedReader reader = Files.newBufferedReader(path, Charset.forName("UTF-8"))) {
 
 			String currentLine = reader.readLine();
@@ -136,6 +166,24 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 			prepare.setVenGroup(linkedGroup);
 			findOneByName = venService.save(prepare);
 			LOGGER.debug("Create VEN: " + findOneByName.getUsername());
+		}
+		return findOneByName;
+	}
+
+	private OadrUser saveUserIfMissing(OadrUserCreateDto dto) {
+		OadrUser findOneByName = oadrUserService.findByUsername(dto.getUsername());
+		if (findOneByName == null) {
+			OadrUser prepare = oadrUserService.create(dto);
+			LOGGER.debug("Create User: " + prepare.getUsername());
+		}
+		return findOneByName;
+	}
+
+	private OadrApp saveAppIfMissing(OadrAppCreateDto dto) {
+		OadrApp findOneByName = oadrAppService.findByUsername(dto.getUsername());
+		if (findOneByName == null) {
+			OadrApp prepare = oadrAppService.create(dto);
+			LOGGER.debug("Create App: " + prepare.getUsername());
 		}
 		return findOneByName;
 	}
@@ -263,12 +311,14 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent arg0) {
 
+		// create fake market contexts
 		VenMarketContext oadrMarketContext = saveMarketContextIfMissing(
 				new VenMarketContextDto("http://oadr.avob.com", "Avob Test Market Context", "#90CAF9"));
 
 		VenMarketContext marketContext = saveMarketContextIfMissing(
 				new VenMarketContextDto("http://MarketContext1", "Test Market Context 1", "#ff8080"));
 
+		// create fake groups
 		VenGroup customCaCert = saveGroupIfMissing(new VenGroupDto("CustomCACert"));
 		VenGroup group1 = saveGroupIfMissing(new VenGroupDto("Group1"));
 
@@ -276,6 +326,7 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 		List<DemandResponseEventTargetDto> groupTargets = new ArrayList<>();
 		groupTargets.add(getGroupTarget(group1));
 
+		// load fake ven from ./cert
 		List<String> venFilename = getVenFilename();
 		int i = 0;
 		if (!venFilename.isEmpty()) {
@@ -283,7 +334,7 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 			for (String filename : venFilename) {
 				String[] split = filename.split("\\.");
 				String commonName = filename.replace("." + split[split.length - 1], "");
-				String fingerprintForVen = getFingerprintForVen(commonName + ".fingerprint");
+				String fingerprintForVen = getFingerprint(commonName);
 				VenCreateDto dto = new VenCreateDto();
 				String ven1Username = fingerprintForVen;
 
@@ -309,8 +360,48 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 			c.add(Calendar.DATE, 14);
 			Date end = c.getTime();
 
+			// gen fake DR events links to loaded ven
 			genDailyElectricityPriceSignals("daily_electricity_price", marketContext.getName(), venTargets, start, end);
 			genLoadControlSignals("daily_load_control", oadrMarketContext.getName(), groupTargets, start, end);
+		}
+
+		// load fake user from ./cert
+		List<String> filenames = getAdminFilename();
+		if (!filenames.isEmpty()) {
+			for (String filename : filenames) {
+				String[] split = filename.split("\\.");
+				String commonName = filename.replace("." + split[split.length - 1], "");
+				String fingerprint = getFingerprint(commonName);
+				OadrUserCreateDto dto = new OadrUserCreateDto();
+				dto.setUsername(fingerprint);
+				List<String> roles = Arrays.asList("ROLE_ADMIN");
+				dto.setRoles(roles);
+				saveUserIfMissing(dto);
+			}
+		}
+		filenames = getUserFilename();
+		if (!filenames.isEmpty()) {
+			for (String filename : filenames) {
+				String[] split = filename.split("\\.");
+				String commonName = filename.replace("." + split[split.length - 1], "");
+				String fingerprint = getFingerprint(commonName);
+				OadrUserCreateDto dto = new OadrUserCreateDto();
+				dto.setUsername(fingerprint);
+				saveUserIfMissing(dto);
+			}
+		}
+
+		// load fake app from ./cert
+		filenames = getAppFilename();
+		if (!filenames.isEmpty()) {
+			for (String filename : filenames) {
+				String[] split = filename.split("\\.");
+				String commonName = filename.replace("." + split[split.length - 1], "");
+				String fingerprint = getFingerprint(commonName);
+				OadrAppCreateDto dto = new OadrAppCreateDto();
+				dto.setUsername(fingerprint);
+				saveAppIfMissing(dto);
+			}
 		}
 
 	}

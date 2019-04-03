@@ -259,6 +259,7 @@ public class Oadr20bVTNSecurityTest {
 		String userPassword = "securityUser1";
 
 		OadrUser user = oadrUserService.prepare(userUsername, userPassword);
+		user.setRoles(Arrays.asList("ROLE_ADMIN"));
 		oadrUserService.save(user);
 
 		OadrHttpClient userBasicHttpClient = new OadrHttpClientBuilder()
@@ -302,10 +303,10 @@ public class Oadr20bVTNSecurityTest {
 		assertEquals(1, OadrRequestEventType.getOadrEvent().size());
 
 		demandResponseEventService.delete(readdto.getId());
-		
+
 		venPollService.deleteByVenUsername(ven.getUsername());
 		venPollService.deleteByVenUsername(ven2.getUsername());
-		
+
 		venService.delete(ven);
 		venService.delete(ven2);
 

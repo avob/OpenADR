@@ -1,4 +1,4 @@
-package com.avob.openadr.server.common.vtn;
+package com.avob.openadr.server.common.vtn.broker.activemq;
 
 import javax.annotation.Resource;
 

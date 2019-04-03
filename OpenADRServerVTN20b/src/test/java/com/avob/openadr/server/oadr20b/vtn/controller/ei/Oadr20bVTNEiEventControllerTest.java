@@ -384,9 +384,16 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		dto.setPublished(true);
-		MvcResult andReturn = this.oadrMockMvc
+		
+		this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
 						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
+						.header("Content-Type", "application/json"))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		
+		MvcResult andReturn = this.oadrMockMvc
+				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		MockHttpServletResponse mockHttpServletResponse = andReturn.getResponse();
@@ -441,7 +448,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		// update DR event
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/" + eventId.toString() + "/cancel")
-						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).header("Content-Type", "application/json"))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
 
@@ -563,9 +570,16 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		dto.setPublished(true);
+		
+		this.oadrMockMvc
+		.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
+				.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
+				.header("Content-Type", "application/json"))
+		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		
 		MvcResult andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		MockHttpServletResponse mockHttpServletResponse = andReturn.getResponse();
@@ -577,7 +591,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.setPublished(true);
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
@@ -605,7 +619,7 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
@@ -617,7 +631,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
@@ -644,7 +658,7 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
@@ -656,7 +670,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
@@ -681,7 +695,7 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
@@ -693,7 +707,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
@@ -719,7 +733,7 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
@@ -731,7 +745,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
@@ -757,7 +771,7 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		andReturn = this.oadrMockMvc
 				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 		mockHttpServletResponse = andReturn.getResponse();
@@ -824,8 +838,7 @@ public class Oadr20bVTNEiEventControllerTest {
 			demandResponseEventService.delete(e.getId());
 		}
 
-		Thread.sleep(1000);
-		int nbPoll = 10;
+		int nbPoll = 8;
 		for (int i = 0; i < nbPoll; i++) {
 			assertEquals(new Long(nbPoll - i), venPollService.countAll());
 

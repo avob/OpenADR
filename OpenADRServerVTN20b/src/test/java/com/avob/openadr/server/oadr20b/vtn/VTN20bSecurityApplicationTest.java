@@ -17,17 +17,11 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 public class VTN20bSecurityApplicationTest {
 
-	private static final String BROKER_NAME = "mybroker.avob.com";
 
 	@Bean(destroyMethod = "shutdown")
 	public EmbeddedDatabase dataSource() {
 		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
 	}
-
-//	@Bean
-//	public ConnectionFactory connectionFactory() {
-//		return new ActiveMQConnectionFactory("vm:(broker:(vm://" + BROKER_NAME + ")?persistent=false)?marshal=false");
-//	}
 
 	public static void main(String[] args) {
 

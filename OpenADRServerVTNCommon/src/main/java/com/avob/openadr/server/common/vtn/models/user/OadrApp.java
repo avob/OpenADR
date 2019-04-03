@@ -11,29 +11,17 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
-@Table(name = "oadr_user")
-public class OadrUser extends AbstractUser implements Serializable {
+@Table(name = "oadr_app")
+public class OadrApp extends AbstractUser implements Serializable {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -5248787555143594631L;
-	private String email;
+	private static final long serialVersionUID = 2869155520774908886L;
 
 	@ElementCollection
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<String> roles;
-
-	public OadrUser() {
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
 
 	public List<String> getRoles() {
 		return roles;

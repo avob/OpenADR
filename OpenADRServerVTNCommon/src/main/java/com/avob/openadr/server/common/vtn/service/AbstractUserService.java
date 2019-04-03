@@ -23,8 +23,10 @@ public abstract class AbstractUserService<T extends AbstractUser> {
 
 	protected T prepare(T instance, String username, String password) {
 		instance.setUsername(username);
-		instance.setBasicPassword(this.encodeBasic(password));
-		instance.setDigestPassword(this.encodeDigest(username, password));
+		if (password != null) {
+			instance.setBasicPassword(this.encodeBasic(password));
+			instance.setDigestPassword(this.encodeDigest(username, password));
+		}
 		return instance;
 	}
 

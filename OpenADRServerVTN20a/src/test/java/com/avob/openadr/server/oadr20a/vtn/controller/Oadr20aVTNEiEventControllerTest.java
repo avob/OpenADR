@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -445,9 +446,10 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		String username = "user1";
 		OadrUser user = userService.prepare(username);
+		user.setRoles(Arrays.asList("ROLE_ADMIN"));
 		userService.save(user);
 		UserRequestPostProcessor userSecuritySession = SecurityMockMvcRequestPostProcessors.user(username)
-				.roles("USER");
+				.roles("ADMIN");
 
 		// create and send DR Event to DemandResponseEvent API
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
@@ -650,9 +652,10 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		String username = "user1";
 		OadrUser user = userService.prepare(username);
+		user.setRoles(Arrays.asList("ROLE_ADMIN"));
 		userService.save(user);
 		UserRequestPostProcessor userSecuritySession = SecurityMockMvcRequestPostProcessors.user(username)
-				.roles("USER");
+				.roles("ADMIN");
 
 		// create 'none' and send DR Event to DemandResponseEvent API
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();

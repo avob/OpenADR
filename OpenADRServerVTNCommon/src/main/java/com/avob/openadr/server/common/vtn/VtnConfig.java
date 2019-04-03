@@ -16,24 +16,25 @@ import java.util.UUID;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.apache.activemq.ActiveMQSslConnectionFactory;
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerPlugin;
 import org.apache.activemq.broker.SslBrokerService;
-import org.apache.activemq.broker.SslContext;
-import org.apache.activemq.transport.TransportFactory;
-import org.apache.activemq.transport.tcp.SslTransportFactory;
 import org.apache.activemq.usage.SystemUsage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.core.JmsTemplate;
 
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.common.vtn.broker.activemq.ActiveMQAuthorizationPlugin;
 import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
 import com.google.common.collect.Maps;
 
@@ -105,8 +106,8 @@ public class VtnConfig {
 
 //	@Value("${activemq.broker-url}")
 	private String brokerUrl = "tcp://localhost:61616";
-	private String sslBrokerUrl = "ssl://localhost:61617";
-	private String sslMqttBrokerUrl = "ssl://localhost:1883";
+//	private String sslBrokerUrlClient = "ssl://vtn.oadr.com:61617";
+	private String sslBrokerUrl = "ssl://0.0.0.0:61617";
 
 	@Resource
 	private ActiveMQAuthorizationPlugin activeMQAuthorizationPlugin;
@@ -117,117 +118,68 @@ public class VtnConfig {
 
 	@Bean // (initMethod = "start", destroyMethod = "stop")
 	public SslBrokerService broker() throws Exception {
-		if(getKeyManagerFactory() != null) {
-			SslBrokerService broker = new SslBrokerService();
-//			broker.addConnector(brokerUrl);
+		if (getKeyManagerFactory() != null) {
 
-			broker.addSslConnector(sslBrokerUrl + "?transport.needClientAuth=true", getKeyManagerFactory().getKeyManagers(),
-					getTrustManagerFactory().getTrustManagers(), new SecureRandom());
-			broker.addSslConnector(sslMqttBrokerUrl
-					+ "?transport.needClientAuth=true&transport.enabledProtocols=TLSv1.2&transport.enabledCipherSuites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+			SslBrokerService broker = new SslBrokerService();
+			broker.addConnector(brokerUrl);
+
+			broker.addSslConnector(sslBrokerUrl + "?transport.needClientAuth=true",
 					getKeyManagerFactory().getKeyManagers(), getTrustManagerFactory().getTrustManagers(),
 					new SecureRandom());
+
 			broker.setPersistent(false);
 			broker.setBrokerName("broker");
 			broker.setUseShutdownHook(false);
+
 			SystemUsage systemUsage = broker.getSystemUsage();
 			systemUsage.getStoreUsage().setLimit(1024 * 8);
 			systemUsage.getTempUsage().setLimit(1024 * 8);
 			broker.setSystemUsage(systemUsage);
-//			broker.addS
 			broker.setPlugins(new BrokerPlugin[] { activeMQAuthorizationPlugin });
 
-			// for client side
-			SslTransportFactory sslFactory = new SslTransportFactory();
-
-			String[] protocols = new String[] { "TLSv1.2", "TLSv1.1", "TLSv1" };
-
-			String[] ciphers = new String[] { "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
-					"TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384", "TLS_RSA_WITH_AES_256_CBC_SHA256",
-					"TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384", "TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384",
-					"TLS_DHE_RSA_WITH_AES_256_CBC_SHA256", "TLS_DHE_DSS_WITH_AES_256_CBC_SHA256",
-					"TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA", "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
-					"TLS_RSA_WITH_AES_256_CBC_SHA", "TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA",
-					"TLS_ECDH_RSA_WITH_AES_256_CBC_SHA", "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
-					"TLS_DHE_DSS_WITH_AES_256_CBC_SHA", "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
-					"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", "TLS_RSA_WITH_AES_128_CBC_SHA256",
-					"TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256", "TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256",
-					"TLS_DHE_RSA_WITH_AES_128_CBC_SHA256", "TLS_DHE_DSS_WITH_AES_128_CBC_SHA256",
-					"TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA", "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
-					"TLS_RSA_WITH_AES_128_CBC_SHA", "TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA",
-					"TLS_ECDH_RSA_WITH_AES_128_CBC_SHA", "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
-					"TLS_DHE_DSS_WITH_AES_128_CBC_SHA", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-					"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-					"TLS_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384",
-					"TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384", "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384",
-					"TLS_DHE_DSS_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-					"TLS_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256",
-					"TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256", "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256",
-					"TLS_DHE_DSS_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA",
-					"TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_RSA_WITH_3DES_EDE_CBC_SHA",
-					"TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA", "TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA",
-					"SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA", "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA",
-					"TLS_EMPTY_RENEGOTIATION_INFO_SCSV" };
-			String seed = UUID.randomUUID().toString();
-			SSLContext sslContext = SSLContext.getInstance("TLS");
-			sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
-					new SecureRandom(seed.getBytes()));
-			sslContext.getSupportedSSLParameters().setNeedClientAuth(true);
-			sslContext.getSupportedSSLParameters().setProtocols(protocols);
-			sslContext.getSupportedSSLParameters().setCipherSuites(ciphers);
-
-			SslContext ctx = new SslContext();
-			ctx.setSSLContext(sslContext);
-			SslContext.setCurrentSslContext(ctx);
-
-			TransportFactory.registerTransportFactory("ssl", sslFactory);
-			TransportFactory.registerTransportFactory("mqtt+ssl", sslFactory);
 			return broker;
 		}
 		return null;
 
 	}
 
-//	@Bean
-//	public ActiveMQConnectionFactory activeMQConnectionFactory() throws Exception {
-//		ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
-//		activeMQConnectionFactory.setBrokerURL(brokerUrl);
-//		return activeMQConnectionFactory;
-//	}
-
 	@Bean
-	public ActiveMQSslConnectionFactory activeMQSslConnectionFactory() throws Exception {
-		ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory();
-		if (getKeyManagerFactory() != null) {
-			activeMQConnectionFactory.setBrokerURL(sslBrokerUrl);
-//			activeMQConnectionFactory.
-			activeMQConnectionFactory.setKeyAndTrustManagers(getKeyManagerFactory().getKeyManagers(),
-					getTrustManagerFactory().getTrustManagers(), new SecureRandom());
-		}
-
+	public ActiveMQConnectionFactory activeMQConnectionFactory() throws Exception {
+		ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
+		activeMQConnectionFactory.setBrokerURL(brokerUrl);
 		return activeMQConnectionFactory;
 	}
 
 //	@Bean
-//	public CachingConnectionFactory cachingConnectionFactory() throws Exception {
-//		CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(
-//				activeMQSslConnectionFactory());
+//	public ActiveMQSslConnectionFactory activeMQSslConnectionFactory() throws Exception {
+//		ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory();
+//		if (getKeyManagerFactory() != null) {
+//			activeMQConnectionFactory.setBrokerURL(sslBrokerUrlClient);
+////			activeMQConnectionFactory.
+//			activeMQConnectionFactory.setKeyAndTrustManagers(getKeyManagerFactory().getKeyManagers(),
+//					getTrustManagerFactory().getTrustManagers(), new SecureRandom());
+//		}
 //
-//		return cachingConnectionFactory;
-//
+//		return activeMQConnectionFactory;
 //	}
 
 	@Bean
 	public JmsTemplate jmsTemplate() throws Exception {
-		JmsTemplate jmsTemplate = new JmsTemplate(activeMQSslConnectionFactory());
+		JmsTemplate jmsTemplate = new JmsTemplate(activeMQConnectionFactory());
 		return jmsTemplate;
 	}
 
 	@Bean
 	public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() throws Exception {
 		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-		factory.setConnectionFactory(activeMQSslConnectionFactory());
+		factory.setConnectionFactory(activeMQConnectionFactory());
 		return factory;
+	}
+
+	@Profile({ "test-functional" })
+	@Bean(destroyMethod = "shutdown")
+	public EmbeddedDatabase dataSource() {
+		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
 	}
 
 	@PostConstruct

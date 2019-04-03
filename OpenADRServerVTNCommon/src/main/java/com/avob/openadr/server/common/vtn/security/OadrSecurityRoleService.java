@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.user.AbstractUserDao;
+import com.avob.openadr.server.common.vtn.models.user.OadrApp;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.google.common.collect.Lists;
@@ -61,9 +62,9 @@ public class OadrSecurityRoleService {
 	}
 
 	public User grantX509Role(String username) {
-		if (adminUsername != null && adminUsername.equals(username)) {
-			return new User(username, "", Lists.newArrayList(new SimpleGrantedAuthority("ROLE_ADMIN")));
-		}
+//		if (adminUsername != null && adminUsername.equals(username)) {
+//			return new User(username, "", Lists.newArrayList(new SimpleGrantedAuthority("ROLE_ADMIN")));
+//		}
 
 		if (username.equals(vtnConfig.getOadr20bFingerprint())) {
 			return new User(username, "", Lists.newArrayList(new SimpleGrantedAuthority("ROLE_VTN")));
@@ -88,8 +89,19 @@ public class OadrSecurityRoleService {
 			}
 			return new User(abstractUser.getUsername(), password, roles);
 		} else if (abstractUser instanceof OadrUser) {
-			return new User(abstractUser.getUsername(), password,
-					Lists.newArrayList(new SimpleGrantedAuthority("ROLE_USER")));
+			OadrUser user = (OadrUser) abstractUser;
+			ArrayList<SimpleGrantedAuthority> roles = Lists.newArrayList(new SimpleGrantedAuthority("ROLE_USER"));
+			user.getRoles().forEach(role -> {
+				roles.add(new SimpleGrantedAuthority(role));
+			});
+			return new User(abstractUser.getUsername(), password, roles);
+		} else if (abstractUser instanceof OadrApp) {
+			OadrApp app = (OadrApp) abstractUser;
+			ArrayList<SimpleGrantedAuthority> roles = Lists.newArrayList(new SimpleGrantedAuthority("ROLE_APP"));
+			app.getRoles().forEach(role -> {
+				roles.add(new SimpleGrantedAuthority(role));
+			});
+			return new User(abstractUser.getUsername(), password, roles);
 		}
 
 		throw new UsernameNotFoundException("");

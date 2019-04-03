@@ -232,6 +232,7 @@ public class Oadr20aVTNSecurityTest {
 		String userPassword = "bof";
 
 		OadrUser user = oadrUserService.prepare(userUsername, userPassword);
+		user.setRoles(Arrays.asList("ROLE_ADMIN"));
 		oadrUserService.save(user);
 
 		OadrHttpClient userBasicHttpClient = new OadrHttpClientBuilder()
