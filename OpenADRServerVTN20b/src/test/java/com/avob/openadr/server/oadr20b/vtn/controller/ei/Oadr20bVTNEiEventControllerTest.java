@@ -284,7 +284,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		demandResponseEventService.delete(eventCanceled.getId());
 		demandResponseEventService.delete(eventActive.getId());
 		
-		Thread.sleep(500);
+		Thread.sleep(1000);
 
 		OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(OadrDataBaseSetup.VEN).build();
 		OadrDistributeEventType oadrDistributeEventType = oadrMockMvc.postOadrPollAndExpect(
@@ -842,7 +842,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		}
 
 		int nbPoll = 8;
-		Thread.sleep(500);
+		Thread.sleep(1000);
 		for (int i = 0; i < nbPoll; i++) {
 			assertEquals(new Long(nbPoll - i), venPollService.countAll());
 

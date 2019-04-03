@@ -11,8 +11,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.jms.annotation.EnableJms;
 import org.springframework.test.context.ActiveProfiles;
 
+@EnableJms
 @Configuration
 @EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class })
 @ComponentScan(basePackages = { "com.avob.openadr.server.oadr20a.vtn" })
