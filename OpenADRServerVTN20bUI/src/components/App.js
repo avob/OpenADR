@@ -1,6 +1,7 @@
 /* eslint-disable import/no-named-as-default */
-import {  Route, Switch } from 'react-router-dom';
+import {  Route, Switch, Redirect } from 'react-router-dom';
 
+import LoginPage from './LoginPage';
 import AboutPage from './AboutPage';
 import HomePage from './HomePage';
 import NotFoundPage from './NotFoundPage';
@@ -16,15 +17,17 @@ import VenDetailReportPage from './containers/VenDetailReportPage'
 import VenDetailReportRequestPage from './containers/VenDetailReportRequestPage'
 
 
-
-
-
-
 import VenCreatePage from './containers/VenCreatePage'
 
 import PropTypes from 'prop-types';
 import React from 'react';
 import { hot } from 'react-hot-loader';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
+
 
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -38,9 +41,14 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Badge from '@material-ui/core/Badge';
 import MenuIcon from '@material-ui/icons/Menu';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import NotificationsIcon from '@material-ui/icons/Notifications';
+import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import { mainListItems, secondaryListItems } from './listItems';
+
+import { config } from '../store/configureStore';
+
 
 
 const drawerWidth = 240;
@@ -122,6 +130,38 @@ const styles = theme => ({
   },
 });
 
+const fakeAuth = {
+  isAuthenticated: config,
+  authenticate(cb) {
+    this.isAuthenticated = true;
+    setTimeout(cb, 100); // fake async
+  },
+  signout(cb) {
+    this.isAuthenticated = false;
+    setTimeout(cb, 100);
+  }
+};
+
+function PrivateRoute({ component: Component, ...rest }) {
+  return (
+    <Route
+      {...rest}
+      render={props =>
+        config.isConnected ? (
+          <Component {...props} />
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: props.location }
+            }}
+          />
+        )
+      }
+    />
+  );
+}
+
 // This is a class-based component because the current
 // version of hot reloading won't hot reload a stateless
 // component at the top-level.
@@ -130,6 +170,8 @@ class App extends React.Component {
 
   state = {
     open: true,
+    anchorEl: null,
+    mobileMoreAnchorEl: null,
   };
 
   handleDrawerOpen = () => {
@@ -144,9 +186,33 @@ class App extends React.Component {
     } );
   };
 
+  handleProfileMenuOpen = event => {
+    this.setState({ anchorEl: event.currentTarget });
+  };
+
+  handleMenuClose = () => {
+    this.setState({ anchorEl: null });
+    this.handleMobileMenuClose();
+  };
+
 
   render() {
     const {classes} = this.props;
+    const { anchorEl, mobileMoreAnchorEl } = this.state;
+    const isMenuOpen = Boolean(anchorEl);
+
+    const renderMenu = (
+      <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        open={isMenuOpen}
+        onClose={this.handleMenuClose}
+      >
+        <MenuItem onClick={this.handleMenuClose}>Profile</MenuItem>
+        <MenuItem onClick={this.handleMenuClose}>My account</MenuItem>
+      </Menu>
+    );
 
     return (
     <div className={ classes.root }>
@@ -167,15 +233,26 @@ class App extends React.Component {
                       color="inherit"
                       noWrap
                       className={ classes.title }>
-            Dashboard
+            VTN Control
           </Typography>
+        {/* 
           <IconButton color="inherit">
             <Badge badgeContent={ 4 } color="secondary">
-              <NotificationsIcon />
+             {(config.isConnected) ? config.user.username: ""} <AccountBoxIcon />
             </Badge>
           </IconButton>
+          */}
+          <IconButton
+                aria-owns={isMenuOpen ? 'material-appbar' : undefined}
+                aria-haspopup="true"
+                onClick={this.handleProfileMenuOpen}
+                color="inherit"
+              >
+                <AccountCircleIcon />
+              </IconButton>
         </Toolbar>
       </AppBar>
+      {renderMenu}
       <Drawer variant="permanent"
               classes={ { paper: classNames( classes.drawerPaper, !this.state.open && classes.drawerPaperClose ), } }
               open={ this.state.open }>
@@ -195,42 +272,42 @@ class App extends React.Component {
       </Drawer>
       <main className={ classes.content }>
         <div className={ classes.appBarSpacer } />
+
         <Switch>
 
           <Route exact
                  path="/"
                  component={ HomePage } />
 
+
+                 
+          <Route path="/login" component={ LoginPage } />
           <Route path="/about" component={ AboutPage } />
 
-          <Route path="/vtn_configuration/:panel(marketcontext|group|parameter)" component={ VtnConfigurationPage } />
-          <Route path="/vtn_configuration" component={ VtnConfigurationPage } />
+          <PrivateRoute path="/account" component={ AccountPage } />
+
+          <PrivateRoute path="/vtn_configuration/:panel(marketcontext|group|parameter)" component={ VtnConfigurationPage } />
+          <PrivateRoute path="/vtn_configuration" component={ VtnConfigurationPage } />
           
+          <PrivateRoute path="/ven/detail/:username/reports/:reportSpecifierId/requests/:reportRequestId" component={ VenDetailReportRequestPage } />
+          <PrivateRoute path="/ven/detail/:username/reports/:reportSpecifierId/create" component={ VenDetailCreateReportPage } />
+          <PrivateRoute path="/ven/detail/:username/reports/:reportSpecifierId" component={ VenDetailReportPage } />
+          <PrivateRoute path="/ven/detail/:username/:panel(settings|reports|optschedules)" component={ VenDetailPage } />
+          <PrivateRoute path="/ven/detail/:username" component={ VenDetailPage } />
+          <PrivateRoute path="/ven/create" component={ VenCreatePage } />
+          <PrivateRoute path="/ven" component={ VenPage } />
 
-          <Route path="/ven/detail/:username/reports/:reportSpecifierId/requests/:reportRequestId" component={ VenDetailReportRequestPage } />
-          <Route path="/ven/detail/:username/reports/:reportSpecifierId/create" component={ VenDetailCreateReportPage } />
-
-          <Route path="/ven/detail/:username/reports/:reportSpecifierId" component={ VenDetailReportPage } />
-
-          <Route path="/ven/detail/:username/:panel(settings|reports|optschedules)" component={ VenDetailPage } />
-          <Route path="/ven/detail/:username" component={ VenDetailPage } />
-          
-          <Route path="/ven/create" component={ VenCreatePage } />
-
-          <Route path="/ven" component={ VenPage } />
-
-          <Route path="/account" component={ AccountPage } />
-
-          <Route path="/event/detail/:id/:panel(descriptor|activeperiod|signal|target|venresponse)" component={ EventDetailPage } />
-          <Route path="/event/detail/:id" component={ EventDetailPage } />
-
-          <Route path="/event/create" component={ EventCreatePage } />
-          <Route path="/event/:panel(list|calendar)" component={ EventPage } />
-          <Route path="/event" component={ EventPage } />
+          <PrivateRoute path="/event/detail/:id/:panel(descriptor|activeperiod|signal|target|venresponse)" component={ EventDetailPage } />
+          <PrivateRoute path="/event/detail/:id" component={ EventDetailPage } />
+          <PrivateRoute path="/event/create" component={ EventCreatePage } />
+          <PrivateRoute path="/event/:panel(list|calendar)" component={ EventPage } />
+          <PrivateRoute path="/event" component={ EventPage } />
 
           <Route component={ NotFoundPage } />
 
         </Switch>
+        
+        
       </main>
     </div>
     );
@@ -241,4 +318,8 @@ App.propTypes = {
   children: PropTypes.element
 };
 
-export default hot( module )( withStyles( styles )( App ) );
+export default hot( module )( withStyles( styles )( App ));
+
+
+
+

@@ -3,9 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import * as accountActions from '../../actions/accountActions';
+import * as accountActions from '../actions/accountActions';
 
-import * as venActions from '../../actions/venActions';
 
 import { withStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
@@ -15,9 +14,8 @@ import Divider from '@material-ui/core/Divider';
 
 import amber from '@material-ui/core/colors/amber';
 
+import { history } from '../store/configureStore';
 
-import AccountUser from '../Account/AccountUser'
-import AccountApp from '../Account/AccountApp'
 
 
 
@@ -83,7 +81,7 @@ const styles = theme => ({
   },
 });
 
-export class AccountPage extends React.Component {
+export class LoginPage extends React.Component {
   state = {
     value: 0,
   };
@@ -96,8 +94,19 @@ export class AccountPage extends React.Component {
 
 
   componentDidMount() {
-    this.props.accountActions.loadAccountUser();
-    this.props.accountActions.loadAccountApp();
+    this.props.accountActions.loadLoginUser();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log()
+    if(nextProps.user.isConnected){
+      if(this.props.history.location.state.from) {
+        history.push( this.props.history.location.state.from.pathname)
+      }
+      else {
+        history.push( '/ven' )
+      }
+    }
   }
 
   render() {
@@ -110,29 +119,26 @@ export class AccountPage extends React.Component {
             indicatorColor="primary"
             textColor="primary"
             centered>
-        <Tab label="Users" />
-        <Tab label="Apps" />
+        <Tab label="Login" />
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
-                        <AccountUser classes={classes} user={account.user}/>
+
                        </TabContainer> }
-      { value === 1 && <TabContainer>
-                          <AccountApp classes={classes} app={account.app}/>
-                       </TabContainer> }
+
     </div>
 
     );
   }
 }
 
-AccountPage.propTypes = {
+LoginPage.propTypes = {
   accountActions: PropTypes.object.isRequired
 };
 
 function mapStateToProps( state ) {
   return {
-    account: state.account
+    user: state.user
   };
 }
 
@@ -145,4 +151,4 @@ function mapDispatchToProps( dispatch ) {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)( withStyles( styles )( AccountPage ) );
+)( withStyles( styles )( LoginPage ) );

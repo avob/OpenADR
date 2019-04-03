@@ -12,6 +12,30 @@ export default function accountReducer( state = initialState.account, action ) {
 
   switch (action.type) {
 
+  	case types.LOAD_ACCOUNT_USER:
+      return state;
+
+    case types.LOAD_ACCOUNT_USER_SUCCESS:
+      newState = objectAssign( {}, state, {
+        user: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_ACCOUNT_USER_ERROR:
+      return state;
+
+     case types.LOAD_ACCOUNT_APP:
+      return state;
+
+    case types.LOAD_ACCOUNT_APP_SUCCESS:
+      newState = objectAssign( {}, state, {
+        app: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_ACCOUNT_APP_ERROR:
+      return state;
+
   	case types.LOCATION_CHANGE:
       return initialState.account;
 

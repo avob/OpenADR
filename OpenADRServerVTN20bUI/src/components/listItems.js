@@ -42,7 +42,7 @@ export const mainListItems = (
     <ListItemText primary="VTN Config" />
   </ListItem>
 
-  {/*
+  
 
   <ListItem button
             component={ NavLink }
@@ -52,6 +52,8 @@ export const mainListItems = (
     </ListItemIcon>
     <ListItemText primary="Accounts" />
   </ListItem>
+
+  {/*
   <ListItem button
             component={ NavLink }
             to="/data">

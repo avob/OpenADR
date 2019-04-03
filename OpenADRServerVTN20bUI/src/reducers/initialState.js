@@ -35,7 +35,10 @@ export default {
   ven_create: {
     parameters: {}
   },
-  account: [],
+  account: {
+    user:[],
+    app: []
+  },
   event: {
     marketContext: [],
     event: [],
@@ -53,5 +56,9 @@ export default {
     group: [],
     ven: []
   },
+  user: {
+    isConnectionPending: true,
+    isConnected: false
+  }
 
 };

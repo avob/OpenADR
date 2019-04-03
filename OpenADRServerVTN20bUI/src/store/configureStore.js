@@ -12,28 +12,19 @@ import rootReducer from '../reducers';
 export const history = createHistory();
 const connectRouterHistory = connectRouter( history );
 
-var config = {
-  vtnSwaggerUrl: 'https://vtn.oadr.com:8181/testvtn/v2/api-docs'
+export var config = {
+  vtnSwaggerUrl: 'https://vtn.oadr.com:8181/testvtn/v2/api-docs',
+  isConnectionPending: true,
+  isConnected: false
 };
 
 function configureSwaggerMiddleware() {
 
   swagger.http.withCredentials = true
   const swaggerOpts = {
-    url: config.vtnSwaggerUrl,
-    success: function ( e ) {
-      console.log( 'Successfully connect to Swagger Backend' )
-      config.isConnectionPending = false;
-      config.isConnected = true;
-    },
-    failure: function ( e ) {
-      console.error( 'Can\'t connect to Swagger Backend' );
-      console.log( e );
-      config.isConnectionPending = false;
-      config.isConnected = false;
-    }
+    url: config.vtnSwaggerUrl
   };
-  return swaggerMiddleware( swaggerOpts );
+  return swaggerMiddleware( swaggerOpts, config );
 }
 
 function configureStoreProd( initialState ) {
@@ -43,7 +34,7 @@ function configureStoreProd( initialState ) {
   const middlewares = [
     thunk,
     reactRouterMiddleware,
-    configureSwaggerMiddleware(),
+    configureSwaggerMiddleware(config),
   ];
 
   return createStore(
@@ -83,3 +74,5 @@ function configureStoreDev( initialState ) {
 const configureStore = process.env.NODE_ENV === 'production' ? configureStoreProd : configureStoreDev;
 
 export default configureStore;
+
+
