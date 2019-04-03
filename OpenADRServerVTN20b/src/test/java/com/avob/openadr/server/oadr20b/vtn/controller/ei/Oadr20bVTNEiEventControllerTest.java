@@ -312,6 +312,9 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		oadrMockMvc.postEiEventAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, build, HttpStatus.OK_200,
 				OadrResponseType.class);
+		
+
+		assertEquals(new Long(0), venPollService.countAll());
 
 	}
 
@@ -839,6 +842,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		}
 
 		int nbPoll = 8;
+		Thread.sleep(500);
 		for (int i = 0; i < nbPoll; i++) {
 			assertEquals(new Long(nbPoll - i), venPollService.countAll());
 
