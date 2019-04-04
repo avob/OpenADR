@@ -4,8 +4,8 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import * as accountActions from '../../actions/accountActions';
+import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions';
 
-import * as venActions from '../../actions/venActions';
 
 import { withStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
@@ -16,11 +16,7 @@ import Divider from '@material-ui/core/Divider';
 import amber from '@material-ui/core/colors/amber';
 
 
-import AccountUser from '../Account/AccountUser'
-import AccountApp from '../Account/AccountApp'
-
-import { history } from '../../store/configureStore';
-
+import AccountUserCreate from '../AccountCreate/AccountUserCreate'
 
 
 
@@ -86,7 +82,7 @@ const styles = theme => ({
   },
 });
 
-export class AccountPage extends React.Component {
+export class AccountUserCreatePage extends React.Component {
   state = {
     value: 0,
   };
@@ -95,33 +91,15 @@ export class AccountPage extends React.Component {
     this.setState( {
       value
     } );
-    switch(value) {
-      case 0:
-        history.push("/account/user")
-        break;
-      case 1:
-        history.push("/account/app")
-        break;
-    }
   };
 
 
   componentDidMount() {
-    this.props.accountActions.loadAccountUser();
-    this.props.accountActions.loadAccountApp();
-    switch(this.props.match.params.panel){
-      case "user":
-        this.setState({value:0});
-        break;
-      case "app":
-        this.setState({value:1});
-        break;
-    }
+    this.props.vtnConfigurationActions.loadVtnConfiguration();
   }
 
-
   render() {
-    const {classes, account} = this.props;
+    const {classes, account_create} = this.props;
     const {value} = this.state;
     return (
     <div className={ classes.root }>
@@ -130,15 +108,11 @@ export class AccountPage extends React.Component {
             indicatorColor="primary"
             textColor="primary"
             centered>
-        <Tab label="Users" />
-        <Tab label="Apps" />
+        <Tab label="User Create" />
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
-                        <AccountUser classes={classes} user={account.user}/>
-                       </TabContainer> }
-      { value === 1 && <TabContainer>
-                          <AccountApp classes={classes} app={account.app}/>
+              <AccountUserCreate classes={classes} vtnConfiguration={account_create.parameters}/>
                        </TabContainer> }
     </div>
 
@@ -146,23 +120,25 @@ export class AccountPage extends React.Component {
   }
 }
 
-AccountPage.propTypes = {
-  accountActions: PropTypes.object.isRequired
+AccountUserCreatePage.propTypes = {
+  accountActions: PropTypes.object.isRequired,
+  vtnConfigurationActions: PropTypes.object.isRequired
 };
 
 function mapStateToProps( state ) {
   return {
-    account: state.account
+    account_create: state.account_create
   };
 }
 
 function mapDispatchToProps( dispatch ) {
   return {
     accountActions: bindActionCreators( accountActions, dispatch ),
+    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch )
   };
 }
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)( withStyles( styles )( AccountPage ) );
+)( withStyles( styles )( AccountUserCreatePage ) );

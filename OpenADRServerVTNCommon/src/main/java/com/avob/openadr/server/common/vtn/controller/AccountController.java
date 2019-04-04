@@ -1,6 +1,7 @@
 package com.avob.openadr.server.common.vtn.controller;
 
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,10 +44,18 @@ public class AccountController {
 	@Resource
 	private OadrAppService oadrAppService;
 
+	@Value("${oadr.security.admin.username:#{null}}")
+	private String adminUsername;
+
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	@ResponseBody
 	public OadrUserDto registeredUser(Principal principal) {
-
+		if (adminUsername != null && adminUsername.equals(principal.getName())) {
+			OadrUserDto dto = new OadrUserDto();
+			dto.setUsername(principal.getName());
+			dto.setRoles(Arrays.asList("ROLE_ADMIN"));
+			return dto;
+		}
 		OadrUser findByUsername = oadrUserService.findByUsername(principal.getName());
 		return dtoMapper.map(findByUsername, OadrUserDto.class);
 	}

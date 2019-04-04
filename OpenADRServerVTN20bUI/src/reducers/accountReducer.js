@@ -36,8 +36,13 @@ export default function accountReducer( state = initialState.account, action ) {
     case types.LOAD_ACCOUNT_APP_ERROR:
       return state;
 
-  	case types.LOCATION_CHANGE:
-      return initialState.account;
+    case types.LOCATION_CHANGE:
+      if(action.payload.location.pathname.includes("/account")){
+        return state;
+      }
+      else {
+        return initialState.account;
+      }
 
     default:
       return state;

@@ -224,7 +224,7 @@ export class EventTargetPanel extends React.Component {
           </Grid> : null}
 
           { (this.state.createTargetType != "") ? <Grid item xs={ 2 }>
-            <Button key="btn_create"
+            <Button key="btn_cancel"
                             variant="outlined"
                             color="secondary"
                             size="small"

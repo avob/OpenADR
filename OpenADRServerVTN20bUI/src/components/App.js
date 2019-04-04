@@ -8,6 +8,8 @@ import NotFoundPage from './NotFoundPage';
 import VtnConfigurationPage from './containers/VtnConfigurationPage';
 import VenPage from './containers/VenPage'
 import AccountPage from './containers/AccountPage'
+import AccountUserCreatePage from './containers/AccountUserCreatePage'
+import AccountAppCreatePage from './containers/AccountAppCreatePage'
 import EventPage from './containers/EventPage'
 import EventDetailPage from './containers/EventDetailPage'
 import EventCreatePage from './containers/EventCreatePage'
@@ -170,8 +172,7 @@ class App extends React.Component {
 
   state = {
     open: true,
-    anchorEl: null,
-    mobileMoreAnchorEl: null,
+    anchorEl: null
   };
 
   handleDrawerOpen = () => {
@@ -192,7 +193,6 @@ class App extends React.Component {
 
   handleMenuClose = () => {
     this.setState({ anchorEl: null });
-    this.handleMobileMenuClose();
   };
 
 
@@ -209,8 +209,13 @@ class App extends React.Component {
         open={isMenuOpen}
         onClose={this.handleMenuClose}
       >
-        <MenuItem onClick={this.handleMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={this.handleMenuClose}>My account</MenuItem>
+        <MenuItem key="menu_items_profile" onClick={this.handleMenuClose}>Profile</MenuItem>
+        <MenuItem key="menu_items_myaccount" onClick={this.handleMenuClose}>My account</MenuItem>
+
+
+        {config.user && config.user.roles.map(row => (
+           <MenuItem key={"menu_items"+row}>{row}</MenuItem>
+        ))}
       </Menu>
     );
 
@@ -283,7 +288,12 @@ class App extends React.Component {
           <Route path="/login" component={ LoginPage } />
           <Route path="/about" component={ AboutPage } />
 
+          <PrivateRoute path="/account/app/create" component={ AccountAppCreatePage } />
+          <PrivateRoute path="/account/user/create" component={ AccountUserCreatePage } />
+          <PrivateRoute path="/account/:panel(user|app)" component={ AccountPage } />
           <PrivateRoute path="/account" component={ AccountPage } />
+
+          AccountAppCreatePage
 
           <PrivateRoute path="/vtn_configuration/:panel(marketcontext|group|parameter)" component={ VtnConfigurationPage } />
           <PrivateRoute path="/vtn_configuration" component={ VtnConfigurationPage } />

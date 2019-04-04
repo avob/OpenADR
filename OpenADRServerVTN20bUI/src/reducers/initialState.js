@@ -39,6 +39,9 @@ export default {
     user:[],
     app: []
   },
+  account_create: {
+    parameters: {}
+  },
   event: {
     marketContext: [],
     event: [],
