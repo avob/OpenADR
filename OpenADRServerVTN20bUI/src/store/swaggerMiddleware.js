@@ -20,9 +20,19 @@ var loadClient = function ( url, dispatch, config) {
       return Swagger( {url:url, responseInterceptor: responseInterceptor} ).then( client => {
         config.isConnected = true
         config.isConnectionPending = false
+        dispatch({
+          type: types.LOGIN_USER_SUCCESS
+        })
         swaggerClient = client; 
         resolve( client );
-      } )
+      } ).catch(err => {
+        config.isConnected = false
+        config.isConnectionPending = false
+        dispatch({
+          type: types.LOGIN_USER_ERROR,
+          payload: err
+        })
+      });
     }
   } );
 }

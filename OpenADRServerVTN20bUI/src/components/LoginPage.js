@@ -98,7 +98,6 @@ export class LoginPage extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log()
     if(nextProps.user.isConnected){
       if(this.props.history.location.state.from) {
         history.push( this.props.history.location.state.from.pathname)
@@ -112,9 +111,12 @@ export class LoginPage extends React.Component {
   render() {
     const {classes, account} = this.props;
     const {value} = this.state;
+
+    var hasError = this.props.user.connectionError != null;
     return (
     <div className={ classes.root }>
-      <Tabs value={ this.state.value }
+      {(!hasError) ? <div>
+          <Tabs value={ this.state.value }
             onChange={ this.handleChange }
             indicatorColor="primary"
             textColor="primary"
@@ -122,9 +124,18 @@ export class LoginPage extends React.Component {
         <Tab label="Login" />
       </Tabs>
       <Divider variant="middle" />
-      { value === 0 && <TabContainer>
 
+      { value === 0 && <TabContainer>
+          
                        </TabContainer> }
+
+        </div>: null }
+
+      {(hasError) ? <div>
+        { "Can't connect to VTN backend:" + this.props.user.connectionError}
+        </div>: null }
+        
+      
 
     </div>
 

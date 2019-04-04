@@ -19,14 +19,14 @@ export default function loginReducer( state = initialState.user, action ) {
       return state;
 
     case types.LOGIN_USER_SUCCESS:
-      action.payload.isConnected = true;
-      action.payload.isConnectionPending = false;
-      config.user = action.payload;
       newState = objectAssign( {}, {}, action.payload );
-      return newState;
+      return state;
 
     case types.LOGIN_USER_ERROR:
-      return state;
+      newState = objectAssign( {}, state, {
+          connectionError: action.payload
+      } );
+      return newState;
 
     default:
       return state;

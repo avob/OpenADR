@@ -116,7 +116,7 @@ public class VtnConfig {
 	private TrustManagerFactory trustManagerFactory;
 	private String oadr20bFingerprint;
 
-	@Bean // (initMethod = "start", destroyMethod = "stop")
+	@Bean(initMethod = "start", destroyMethod = "stop")
 	public SslBrokerService broker() throws Exception {
 		if (getKeyManagerFactory() != null) {
 
@@ -129,7 +129,7 @@ public class VtnConfig {
 
 			broker.setPersistent(false);
 			broker.setBrokerName("broker");
-			broker.setUseShutdownHook(false);
+			broker.setUseShutdownHook(true);
 
 			SystemUsage systemUsage = broker.getSystemUsage();
 			systemUsage.getStoreUsage().setLimit(1024 * 8);

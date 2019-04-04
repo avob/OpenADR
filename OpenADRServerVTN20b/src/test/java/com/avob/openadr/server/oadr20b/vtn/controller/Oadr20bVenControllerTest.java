@@ -25,6 +25,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.models.venpoll.VenPollDao;
+import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockMvc;
 
@@ -38,11 +39,16 @@ public class Oadr20bVenControllerTest {
 
 	@Resource
 	private VenPollDao venPollDao;
+
+	@Resource
+	private VenPollService venPollService;
 	@Resource
 	private OadrMockMvc oadrMockMvc;
 
 	@Test
 	public void testReportAction() throws Exception {
+		
+		venPollService.deleteAll();
 
 		// test nothing in poll queue
 		OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(OadrDataBaseSetup.VEN).build();

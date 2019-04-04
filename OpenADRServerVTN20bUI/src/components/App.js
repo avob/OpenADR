@@ -272,8 +272,7 @@ class App extends React.Component {
       </Drawer>
       <main className={ classes.content }>
         <div className={ classes.appBarSpacer } />
-
-        <Switch>
+        {(config.connectionError == null) ? <Switch>
 
           <Route exact
                  path="/"
@@ -305,7 +304,13 @@ class App extends React.Component {
 
           <Route component={ NotFoundPage } />
 
-        </Switch>
+        </Switch>: null}
+
+
+        {(config.connectionError != null) ? <div>
+          {console.log(config.connectionError)}
+        </div>: null}
+        
         
         
       </main>

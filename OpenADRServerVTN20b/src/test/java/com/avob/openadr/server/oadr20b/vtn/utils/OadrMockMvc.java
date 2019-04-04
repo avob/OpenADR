@@ -76,7 +76,7 @@ public class OadrMockMvc {
 	public <T> T postOadrPollAndExpect(UserRequestPostProcessor authSession, Object payload, int status, Class<T> klass)
 			throws Oadr20bMarshalException, Exception {
 		T postEiAndExpect = this.postEiAndExpect(OADRPOLL_ENDPOINT, authSession, payload, status, klass);
-		Thread.sleep(100);
+		
 		return postEiAndExpect;
 	}
 
@@ -111,6 +111,8 @@ public class OadrMockMvc {
 				.perform(MockMvcRequestBuilders.post(endpoint).content(content).with(authSession))
 				.andExpect(MockMvcResultMatchers.status().is(status)).andReturn();
 
+		Thread.sleep(200);
+		
 		if (String.class.equals(klass)) {
 			return (T) andReturn.getResponse().getContentAsString();
 		}

@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.activemq.broker.BrokerService;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,6 +58,7 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedde
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
+import com.avob.openadr.server.common.vtn.service.push.DemandResponseEventPublisher;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
@@ -89,11 +91,15 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Resource
 	private OadrMockMvc oadrMockMvc;
 
+	@Resource
+	private BrokerService broker;
+
 	private Oadr20bJAXBContext jaxbContext;
 
 	@Before
 	public void setup() throws Exception {
 		jaxbContext = Oadr20bJAXBContext.getInstance();
+		broker.getAdminView().removeQueue(DemandResponseEventPublisher.OADR20B_QUEUE);
 	}
 
 	@Test
@@ -131,6 +137,9 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Test
 	public void testPullOadrRequestEventTypeEmptySuccessCase() throws Exception {
 
+//		assertEquals(new Long(0), venPollService.countAll());
+		venPollService.deleteAll();
+
 		String requestId = "0";
 		long replyLimit = 1L;
 
@@ -149,8 +158,6 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		assertNotNull(unmarshal.getOadrEvent());
 		assertTrue(unmarshal.getOadrEvent().isEmpty());
-
-		assertEquals(new Long(0), venPollService.countAll());
 
 	}
 
@@ -283,18 +290,12 @@ public class Oadr20bVTNEiEventControllerTest {
 				OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200, OadrDistributeEventType.class);
 		assertEquals(String.valueOf(HttpStatus.OK_200), oadrDistributeEventType.getEiResponse().getResponseCode());
 
-		
-		
-		
-		assertEquals(new Long(0), venPollService.countAll());
-
-
-
 	}
 
 	@Test
 	public void testOadrCreatedEventTypeSuccessCase() throws Exception {
 
+		venPollService.deleteAll();
 		OadrCreatedEventType build = Oadr20bEiEventBuilders.newCreatedEventBuilder(OadrDataBaseSetup.VEN, "0", 123)
 				.addEventResponse(Oadr20bEiEventBuilders
 						.newOadr20bCreatedEventEventResponseBuilder("1", 0L, "0", 123, OptTypeType.OPT_IN).build())
@@ -502,16 +503,6 @@ public class Oadr20bVTNEiEventControllerTest {
 		assertEquals(DemandResponseEventOptEnum.OPT_OUT, venOpt);
 
 		demandResponseEventService.delete(eventId);
-
-		Thread.sleep(1000);
-		assertEquals(new Long(0), venPollService.countAll());
-
-//		OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(OadrDataBaseSetup.VEN).build();
-//		OadrDistributeEventType oadrDistributeEventType = oadrMockMvc.postOadrPollAndExpect(
-//				OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200, OadrDistributeEventType.class);
-//		assertEquals(String.valueOf(HttpStatus.OK_200), oadrDistributeEventType.getEiResponse().getResponseCode());
-//
-//		assertEquals(new Long(0), venPollService.countAll());
 
 	}
 
@@ -832,19 +823,6 @@ public class Oadr20bVTNEiEventControllerTest {
 		// clean bdd
 		for (DemandResponseEventReadDto e : created) {
 			demandResponseEventService.delete(e.getId());
-		}
-
-		int nbPoll = 7;
-		Thread.sleep(1000);
-		for (int i = 0; i < nbPoll; i++) {
-			assertEquals(new Long(nbPoll - i), venPollService.countAll());
-
-			OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(OadrDataBaseSetup.VEN).build();
-			OadrDistributeEventType oadrDistributeEventType = oadrMockMvc.postOadrPollAndExpect(
-					OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200, OadrDistributeEventType.class);
-			assertEquals(String.valueOf(HttpStatus.OK_200), oadrDistributeEventType.getEiResponse().getResponseCode());
-
-			assertEquals(new Long(nbPoll - i - 1), venPollService.countAll());
 		}
 
 	}
