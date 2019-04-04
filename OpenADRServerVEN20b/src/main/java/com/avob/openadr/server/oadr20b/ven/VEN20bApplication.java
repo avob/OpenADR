@@ -130,8 +130,11 @@ public class VEN20bApplication {
 	@EventListener({ ApplicationReadyEvent.class })
 	void applicationReadyEvent() {
 		for (VtnSessionConfiguration vtnSessionConfiguration : multiVtnConfig.getMultiConfig().values()) {
-			oadr20bVENAutoStartRegisterPartyService.initRegistration(vtnSessionConfiguration);
-			oadr20bPollService.initPoll(vtnSessionConfiguration);
+			if(oadr20bVENAutoStartRegisterPartyService != null) {
+				oadr20bVENAutoStartRegisterPartyService.initRegistration(vtnSessionConfiguration);
+				oadr20bPollService.initPoll(vtnSessionConfiguration);
+			}
+			
 		}
 	}
 

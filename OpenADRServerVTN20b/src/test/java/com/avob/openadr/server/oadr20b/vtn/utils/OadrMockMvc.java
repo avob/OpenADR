@@ -75,7 +75,9 @@ public class OadrMockMvc {
 
 	public <T> T postOadrPollAndExpect(UserRequestPostProcessor authSession, Object payload, int status, Class<T> klass)
 			throws Oadr20bMarshalException, Exception {
-		return this.postEiAndExpect(OADRPOLL_ENDPOINT, authSession, payload, status, klass);
+		T postEiAndExpect = this.postEiAndExpect(OADRPOLL_ENDPOINT, authSession, payload, status, klass);
+		Thread.sleep(100);
+		return postEiAndExpect;
 	}
 
 	public void postOadrEventAndExpect(UserRequestPostProcessor authSession, JAXBElement<EiEventType> payload,
@@ -114,7 +116,6 @@ public class OadrMockMvc {
 		}
 		T unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), klass);
 		assertNotNull(unmarshal);
-		Thread.sleep(200);
 		return unmarshal;
 	}
 
