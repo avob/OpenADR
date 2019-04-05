@@ -13,6 +13,12 @@ public class AbstractUserCreateDto implements Serializable {
 
 	private String password;
 
+	private String authenticationType;
+
+	private String needCertificateGeneration;
+
+	private String commonName;
+
 	public String getUsername() {
 		return username;
 	}
@@ -27,5 +33,29 @@ public class AbstractUserCreateDto implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getAuthenticationType() {
+		return authenticationType;
+	}
+
+	public void setAuthenticationType(String authenticationType) {
+		this.authenticationType = authenticationType;
+	}
+
+	public String getNeedCertificateGeneration() {
+		return needCertificateGeneration;
+	}
+
+	public void setNeedCertificateGeneration(String needCertificateGeneration) {
+		this.needCertificateGeneration = needCertificateGeneration;
+	}
+
+	public String getCommonName() {
+		return commonName;
+	}
+
+	public void setCommonName(String commonName) {
+		this.commonName = commonName;
 	}
 }

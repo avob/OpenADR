@@ -32,13 +32,13 @@ import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
-import com.avob.openadr.server.common.vtn.models.ven.Ven;
-import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
+import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
+import com.avob.openadr.server.common.vtn.models.user.AbstractUserCreateDto;
 import com.google.common.collect.Maps;
 
 @ConditionalOnProperty(value = VtnConfig.CA_KEY_CONF)
 @Service
-public class GenerateX509VenService {
+public class GenerateX509CertificateService {
 
 	@Resource
 	private VtnConfig vtnConfig;
@@ -70,8 +70,9 @@ public class GenerateX509VenService {
 		}
 		return caKeyPair;
 	}
+	
 
-	public File generateCredentials(VenCreateDto dto, Ven ven) throws GenerateX509VenException {
+	public File generateCredentials(AbstractUserCreateDto dto, AbstractUser abstractUser) throws GenerateX509VenException {
 		try {
 
 			long now = System.currentTimeMillis();
@@ -92,7 +93,7 @@ public class GenerateX509VenService {
 			X509Certificate crt = OadrHttpSecurity.signCsr(csr, loadCaKeyPair, caCert, serialNumber);
 
 			String fingerprint = OadrHttpSecurity.getOadr20bFingerprint(crt);
-			ven.setUsername(fingerprint);
+			abstractUser.setUsername(fingerprint);
 
 			File crtFile = writeToFile(venCN, "crt", OadrHttpSecurity.writeCrtToString(crt));
 			File caCrtFile = writeToFile("ca", "crt", OadrHttpSecurity.writeCrtToString(caCert));

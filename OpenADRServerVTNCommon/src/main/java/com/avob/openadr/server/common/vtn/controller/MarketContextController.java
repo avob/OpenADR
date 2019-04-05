@@ -25,7 +25,7 @@ import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 
 @RestController
 @RequestMapping("/MarketContext")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEVICE_MANAGER')")
 public class MarketContextController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MarketContextController.class);

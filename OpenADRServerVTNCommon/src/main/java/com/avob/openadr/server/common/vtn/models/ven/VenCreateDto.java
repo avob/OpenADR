@@ -19,11 +19,7 @@ public class VenCreateDto extends AbstractUserCreateDto {
 
 	private Boolean httpPullModel;
 
-	private String authenticationType;
-
-	private String needCertificateGeneration;
-
-	private String commonName;
+	
 
 	public VenCreateDto() {
 	}
@@ -64,29 +60,7 @@ public class VenCreateDto extends AbstractUserCreateDto {
 		this.pushUrl = pushUrl;
 	}
 
-	public String getAuthenticationType() {
-		return authenticationType;
-	}
-
-	public void setAuthenticationType(String authenticationType) {
-		this.authenticationType = authenticationType;
-	}
-
-	public String getNeedCertificateGeneration() {
-		return needCertificateGeneration;
-	}
-
-	public void setNeedCertificateGeneration(String needCertificateGeneration) {
-		this.needCertificateGeneration = needCertificateGeneration;
-	}
-
-	public String getCommonName() {
-		return commonName;
-	}
-
-	public void setCommonName(String commonName) {
-		this.commonName = commonName;
-	}
+	
 
 	public Boolean getHttpPullModel() {
 		return httpPullModel;

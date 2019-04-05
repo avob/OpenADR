@@ -112,7 +112,9 @@ export class AccountAppCreatePage extends React.Component {
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
-                    <AccountAppCreate classes={classes} vtnConfiguration={account_create.parameters}/>
+                    <AccountAppCreate classes={classes} 
+                        vtnConfiguration={account_create.parameters}
+                        createApp={this.props.accountActions.createApp}/>
                        </TabContainer> }
     </div>
 

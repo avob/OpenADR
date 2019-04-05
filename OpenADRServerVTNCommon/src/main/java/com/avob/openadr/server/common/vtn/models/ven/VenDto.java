@@ -1,18 +1,12 @@
 package com.avob.openadr.server.common.vtn.models.ven;
 
-import java.io.Serializable;
+import com.avob.openadr.server.common.vtn.models.user.AbstractUserDto;
 
-public class VenDto implements Serializable {
+public class VenDto extends AbstractUserDto {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6150349820747401714L;
-
-	private String id;
-
-	private String username;
-
-	private String password;
 
 	private String oadrName;
 
@@ -24,10 +18,6 @@ public class VenDto implements Serializable {
 
 	private Boolean httpPullModel;
 
-	private String authenticationType;
-
-	private String commonName;
-
 	private Long lastUpdateDatetime;
 
 	private String registrationId;
@@ -35,30 +25,6 @@ public class VenDto implements Serializable {
 	private Boolean reportOnly;
 
 	private Boolean xmlSignature;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
 
 	public String getOadrName() {
 		return oadrName;
@@ -98,22 +64,6 @@ public class VenDto implements Serializable {
 
 	public void setHttpPullModel(Boolean httpPullModel) {
 		this.httpPullModel = httpPullModel;
-	}
-
-	public String getAuthenticationType() {
-		return authenticationType;
-	}
-
-	public void setAuthenticationType(String authenticationType) {
-		this.authenticationType = authenticationType;
-	}
-
-	public String getCommonName() {
-		return commonName;
-	}
-
-	public void setCommonName(String commonName) {
-		this.commonName = commonName;
 	}
 
 	public Long getLastUpdateDatetime() {

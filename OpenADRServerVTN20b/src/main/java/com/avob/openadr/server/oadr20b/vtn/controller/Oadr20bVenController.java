@@ -58,7 +58,7 @@ import com.google.common.collect.Lists;
 
 @RestController
 @RequestMapping("/Ven")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEVICE_MANAGER')")
 public class Oadr20bVenController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVenController.class);

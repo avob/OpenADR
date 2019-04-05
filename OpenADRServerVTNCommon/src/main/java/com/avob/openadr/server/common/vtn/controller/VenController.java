@@ -46,7 +46,7 @@ import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 
 @RestController
 @RequestMapping("/Ven")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEVICE_MANAGER')")
 public class VenController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(VenController.class);
@@ -135,7 +135,7 @@ public class VenController {
 			return null;
 		}
 		if (dto.getName() != null) {
-			ven.setName(dto.getName());
+			ven.setCommonName(dto.getName());
 		}
 		if (dto.getPullFrequencySeconds() != null) {
 			ven.setPullFrequencySeconds(dto.getPullFrequencySeconds());

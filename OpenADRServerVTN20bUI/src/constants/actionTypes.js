@@ -173,6 +173,18 @@ export const LOGIN_USER = 'LOGIN_USER';
 export const LOGIN_USER_SUCCESS = 'LOGIN_USER_SUCCESS';
 export const LOGIN_USER_ERROR = 'LOGIN_USER_ERROR';
 
+export const CREATE_APP = 'CREATE_APP';
+export const CREATE_APP_SUCCESS = 'CREATE_APP_SUCCESS';
+export const CREATE_APP_ERROR = 'CREATE_APP_ERROR';
+
+export const CREATE_USER = 'CREATE_USER';
+export const CREATE_USER_SUCCESS = 'CREATE_USER_SUCCESS';
+export const CREATE_USER_ERROR = 'CREATE_USER_ERROR';
+
+
+
+
+
 
 
 

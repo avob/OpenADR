@@ -41,7 +41,7 @@ import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 
 @RestController
 @RequestMapping("/DemandResponseEvent")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DRPROGRAM')")
 public class DemandResponseController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DemandResponseController.class);

@@ -1,11 +1,15 @@
 package com.avob.openadr.server.common.vtn.service;
 
+import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
 import com.avob.openadr.server.common.vtn.models.user.OadrApp;
 import com.avob.openadr.server.common.vtn.models.user.OadrAppCreateDto;
 import com.avob.openadr.server.common.vtn.models.user.OadrAppDao;
@@ -16,12 +20,22 @@ public class OadrAppService extends AbstractUserService<OadrApp> {
 	@Resource
 	private OadrAppDao appDao;
 
+	@Autowired(required = false)
+	private GenerateX509CertificateService generateX509VenService;
+
 	public OadrApp prepare(String username, String password) {
 		return super.prepare(new OadrApp(), username, password);
 	}
 
 	public OadrApp prepare(String username) {
 		return super.prepare(new OadrApp(), username);
+	}
+
+	public OadrApp prepare(OadrAppCreateDto app) {
+		OadrApp prepare = super.prepare(new OadrApp(), app.getUsername(), app.getPassword());
+		prepare.setRoles(app.getRoles());
+		return prepare;
+
 	}
 
 	@Override
@@ -52,10 +66,20 @@ public class OadrAppService extends AbstractUserService<OadrApp> {
 		return appDao.findAll();
 	}
 
-	public OadrApp create(OadrAppCreateDto app) {
-		OadrApp prepare = this.prepare(app.getUsername(), app.getPassword());
-		prepare.setRoles(app.getRoles());
-		OadrApp save = appDao.save(prepare);
-		return save;
+	public Optional<File> generateCertificateIfRequired(OadrAppCreateDto dto, OadrApp app)
+			throws GenerateX509VenException {
+
+		if (dto.getAuthenticationType() != null && !"no".equals(dto.getAuthenticationType())) {
+
+			if (generateX509VenService != null) {
+				File generateCredentials = generateX509VenService.generateCredentials(dto, app);
+				return Optional.of(generateCredentials);
+			} else {
+				throw new GenerateX509VenException(
+						"Client certificate feature require CA certificate to be provided to the vtn");
+			}
+		}
+
+		return Optional.empty();
 	}
 }

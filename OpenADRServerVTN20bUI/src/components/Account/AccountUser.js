@@ -55,7 +55,12 @@ var AccountUserTable = (props) => {
           {user.map(row => (
             <TableRow key={row.id}>
               <TableCell align="right">{row.username}</TableCell>
-              <TableCell align="right">{row.roles}</TableCell>
+              <TableCell align="right">{row.roles.map(role => {
+                return (<span key={role}>
+                    {role} <br/>
+                    </span>
+                  );
+              })}</TableCell>
         
             </TableRow>
           ))}

@@ -40,11 +40,6 @@ public class Ven extends AbstractUser {
 	private String oadrName;
 
 	/**
-	 * Ven user given name
-	 */
-	private String name;
-
-	/**
 	 * 20a/20b profil
 	 */
 	private String oadrProfil;
@@ -97,10 +92,6 @@ public class Ven extends AbstractUser {
 	private List<VenDemandResponseEvent> venDemandResponseEvent;
 
 	private Long lastUpdateDatetime;
-
-	private String commonName;
-
-	private String authenticationType;
 
 	public Ven() {
 	}
@@ -230,36 +221,12 @@ public class Ven extends AbstractUser {
 		this.pullFrequencySeconds = pullFrequencySeconds;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public Long getLastUpdateDatetime() {
 		return lastUpdateDatetime;
 	}
 
 	public void setLastUpdateDatetime(Long lastUpdateDatetime) {
 		this.lastUpdateDatetime = lastUpdateDatetime;
-	}
-
-	public String getCommonName() {
-		return commonName;
-	}
-
-	public void setCommonName(String commonName) {
-		this.commonName = commonName;
-	}
-
-	public String getAuthenticationType() {
-		return authenticationType;
-	}
-
-	public void setAuthenticationType(String authenticationType) {
-		this.authenticationType = authenticationType;
 	}
 
 	public List<VenDemandResponseEvent> getVenDemandResponseEvent() {

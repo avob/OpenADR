@@ -28,7 +28,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 
 var AccountUserTable = (props) => {
   const {classes, app} = props
-
+  console.log(props.app);
   return (
     <Paper className={classes.root}>
       <Toolbar
@@ -46,7 +46,9 @@ var AccountUserTable = (props) => {
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
+            <TableCell align="right">Common Name</TableCell>
             <TableCell align="right">Username</TableCell>
+            <TableCell align="right">Authentication Method</TableCell>
             <TableCell align="right">Roles</TableCell>
     
           </TableRow>
@@ -54,7 +56,9 @@ var AccountUserTable = (props) => {
         <TableBody>
           {app.map(row => (
             <TableRow key={row.id}>
+              <TableCell align="right">{row.commonName}</TableCell>
               <TableCell align="right">{row.username}</TableCell>
+              <TableCell align="right">{row.commonName}</TableCell>
               <TableCell align="right">{row.roles}</TableCell>
         
             </TableRow>

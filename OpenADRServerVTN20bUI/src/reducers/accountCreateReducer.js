@@ -26,6 +26,28 @@ export default function accountCreateReducer( state = initialState.account_creat
     case types.LOAD_VTN_CONFIGURATION_ERROR:
       return state;
 
+    case types.CREATE_APP:
+      return state;
+
+    case types.CREATE_APP_SUCCESS:
+
+      return state;
+
+    case types.CREATE_APP_ERROR:
+      return state;
+
+    case types.CREATE_USER:
+      return state;
+
+    case types.CREATE_USER_SUCCESS:
+
+      return state;
+
+    case types.CREATE_USER_ERROR:
+      return state;
+
+    
+
     default:
       return state;
   }

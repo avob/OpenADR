@@ -39,7 +39,7 @@ public class VenService extends AbstractUserService<Ven> {
 	private VenDemandResponseEventDao venDemandResponseEventDao;
 
 	@Autowired(required = false)
-	private GenerateX509VenService generateX509VenService;
+	private GenerateX509CertificateService generateX509VenService;
 
 	private Mapper mapper = new DozerBeanMapper();
 

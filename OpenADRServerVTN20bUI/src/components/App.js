@@ -47,9 +47,12 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
-import { mainListItems, secondaryListItems } from './listItems';
 
-import { config } from '../store/configureStore';
+import NavigationMain from './Navigation';
+
+
+
+import { history, config } from '../store/configureStore';
 
 
 
@@ -132,18 +135,6 @@ const styles = theme => ({
   },
 });
 
-const fakeAuth = {
-  isAuthenticated: config,
-  authenticate(cb) {
-    this.isAuthenticated = true;
-    setTimeout(cb, 100); // fake async
-  },
-  signout(cb) {
-    this.isAuthenticated = false;
-    setTimeout(cb, 100);
-  }
-};
-
 function PrivateRoute({ component: Component, ...rest }) {
   return (
     <Route
@@ -170,11 +161,16 @@ function PrivateRoute({ component: Component, ...rest }) {
 
 class App extends React.Component {
 
-  state = {
-    open: true,
-    anchorEl: null
-  };
+  constructor(props) {
+    super(props)
+    this.state = {
+      open: true,
+      anchorEl: null, 
+      config: null
+    };
 
+  }
+  
   handleDrawerOpen = () => {
     this.setState( {
       open: true
@@ -195,12 +191,21 @@ class App extends React.Component {
     this.setState({ anchorEl: null });
   };
 
+  handleSignOut = () => {
+    this.handleMenuClose();
+    config.username = null;
+    config.password = null;
+    config.user = null;
+    config.isConnected = false;
+    config.isConnectionPending = false;
+    history.push("/login")
+  }
+
 
   render() {
     const {classes} = this.props;
     const { anchorEl, mobileMoreAnchorEl } = this.state;
     const isMenuOpen = Boolean(anchorEl);
-
     const renderMenu = (
       <Menu
         anchorEl={anchorEl}
@@ -216,6 +221,7 @@ class App extends React.Component {
         {config.user && config.user.roles.map(row => (
            <MenuItem key={"menu_items"+row}>{row}</MenuItem>
         ))}
+        <MenuItem key="menu_items_signout" onClick={this.handleSignOut}>Sign Out</MenuItem>
       </Menu>
     );
 
@@ -268,18 +274,18 @@ class App extends React.Component {
         </div>
         <Divider />
         <List>
-          { mainListItems }
+          <NavigationMain classes={classes}/>
         </List>
         <Divider />
         <List>
-          { secondaryListItems }
+
         </List>
       </Drawer>
       <main className={ classes.content }>
         <div className={ classes.appBarSpacer } />
         {(config.connectionError == null) ? <Switch>
 
-          <Route exact
+          <PrivateRoute exact
                  path="/"
                  component={ HomePage } />
 

@@ -10,68 +10,90 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "abstract_user")
 public abstract class AbstractUser implements Serializable {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -4987643291191994638L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4987643291191994638L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 
-    @Column(name = "username", unique = true)
-    private String username;
+	@NotNull
+	@Column(name = "username", unique = true)
+	private String username;
 
-    @Column(name = "token_1")
-    private String digestPassword;
+	@Column(name = "token_1")
+	private String digestPassword;
 
-    @Column(name = "token_2")
-    private String basicPassword;
+	@Column(name = "token_2")
+	private String basicPassword;
 
-    public AbstractUser() {
-    }
+	private String commonName;
 
-    public AbstractUser(String username, String password) {
-        this.setUsername(username);
-        this.setDigestPassword(password);
-    }
+	private String authenticationType;
 
-    public Long getId() {
-        return id;
-    }
+	public AbstractUser() {
+	}
 
-    public String getUsername() {
-        return username;
-    }
+	public AbstractUser(String username, String password) {
+		this.setUsername(username);
+		this.setDigestPassword(password);
+	}
 
-    public String getDigestPassword() {
-        return digestPassword;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public String getBasicPassword() {
-        return basicPassword;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public String getDigestPassword() {
+		return digestPassword;
+	}
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+	public String getBasicPassword() {
+		return basicPassword;
+	}
 
-    public void setDigestPassword(String password) {
-        this.digestPassword = password;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setBasicPassword(String basicPassword) {
-        this.basicPassword = basicPassword;
-    }
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void setDigestPassword(String password) {
+		this.digestPassword = password;
+	}
+
+	public void setBasicPassword(String basicPassword) {
+		this.basicPassword = basicPassword;
+	}
+
+	public String getCommonName() {
+		return commonName;
+	}
+
+	public void setCommonName(String commonName) {
+		this.commonName = commonName;
+	}
+
+	public String getAuthenticationType() {
+		return authenticationType;
+	}
+
+	public void setAuthenticationType(String authenticationType) {
+		this.authenticationType = authenticationType;
+	}
 
 }

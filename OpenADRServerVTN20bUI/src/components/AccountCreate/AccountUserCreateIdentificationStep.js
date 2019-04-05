@@ -29,22 +29,8 @@ import Divider from '@material-ui/core/Divider';
 
 import HelpIcon from '@material-ui/icons/Help';
 
+import UserCreateIdentificationSSLCertificatePanel from '../common/UserCreateIdentificationSSLCertificatePanel'
 
-
-const labelStyle = {
-
-  boxSizing: 'border-box',
-  color: 'rgba(0, 0, 0, 0.54)',
-  fontSize: '1rem',
-  fontWeight: 400,
-  left: '0px',
-  lineHeight: 1,
-  transition: 'color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms',
-  transform: 'translate(0, 1.5px) scale(0.75)',
-  transformOrigin: 'top left',
-  top: 0,
-  left: 0,
-}
 export class AccountUserCreateIdentificationStep extends React.Component {
 
   constructor( props ) {
@@ -66,22 +52,6 @@ export class AccountUserCreateIdentificationStep extends React.Component {
 
   render() {
     const {classes, identification, vtnConfiguration} = this.props;
-    var generateOptionView = null;
-    if ( vtnConfiguration && vtnConfiguration.supportCertificateGeneration ) {
-      generateOptionView = [
-        <FormControlLabel key="generate_rsa_radio"
-                          value="rsa"
-                          control={ <Radio color="primary" /> }
-                          label="Generate RSA certificate"
-                          labelPlacement="end" />,
-        <FormControlLabel key="generate_ecc_radio"
-                          value="ecc"
-                          control={ <Radio color="primary" /> }
-                          label="Generate ECC certificate"
-                          labelPlacement="end" />
-      ]
-    }
-
     return (
 
     <Grid container
@@ -122,23 +92,10 @@ export class AccountUserCreateIdentificationStep extends React.Component {
             spacing={ 24 }>
         <Grid item xs={ 2 } />
         <Grid item xs={ 8 }>
-          <FormControl className={ classes.formControl }>
-            <FormLabel style={ labelStyle } component="label">
-              SSL Certificate
-            </FormLabel>
-            <RadioGroup aria-label="position"
-                        name="position"
-                        value={ identification.needCertificateGeneration }
-                        onChange={ this.handleNeedCertificateGenerationChange }
-                        row>
-              <FormControlLabel value="no"
-                                style={ { marginLeft: 0 } }
-                                control={ <Radio color="primary" /> }
-                                label="Provide VenID fingerprint"
-                                labelPlacement="end" />
-              { generateOptionView }
-            </RadioGroup>
-          </FormControl>
+          <UserCreateIdentificationSSLCertificatePanel classes={classes}
+            identification={identification}
+            vtnConfiguration={vtnConfiguration}
+            onChange={this.props.onChange} />
         </Grid>
         <Grid item xs={ 2 } />
       </Grid>

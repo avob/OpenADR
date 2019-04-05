@@ -29,7 +29,7 @@ import Divider from '@material-ui/core/Divider';
 
 import HelpIcon from '@material-ui/icons/Help';
 
-
+import UserCreateIdentificationSSLCertificatePanel from '../common/UserCreateIdentificationSSLCertificatePanel'
 
 const labelStyle = {
 
@@ -45,15 +45,35 @@ const labelStyle = {
   top: 0,
   left: 0,
 }
+
+
 export class VenCreateIndentificationStep extends React.Component {
 
   constructor( props ) {
     super( props );
   }
 
+  handleVenCommonNameChange = (e) => {
+    var identification = this.props.identification;
+    identification.venCommonName = e.target.value;
+    this.props.onChange(identification);
+  };
+  handleVenOadrProfileChange = (e) => {
+    var identification = this.props.identification;
+    identification.venOadrProfile = e.target.value;
+    this.props.onChange(identification);
+  };
+
+  handleNeedCertificateGenerationChange = (e) => {
+    var identification = this.props.identification;
+    identification.needCertificateGeneration = e.target.value;
+    this.props.onChange(identification);
+  };
+
+
 
   render() {
-    const {classes} = this.props;
+    const {classes, hasError, identification, vtnConfiguration} = this.props;
 
     var profileView = []
 
@@ -66,22 +86,6 @@ export class VenCreateIndentificationStep extends React.Component {
         </MenuItem>
 
       )
-    }
-
-    var generateOptionView = null;
-    if ( this.props.vtnConfiguration && this.props.vtnConfiguration.supportCertificateGeneration ) {
-      generateOptionView = [
-        <FormControlLabel key="generate_rsa_radio"
-                          value="rsa"
-                          control={ <Radio color="primary" /> }
-                          label="Generate RSA certificate"
-                          labelPlacement="end" />,
-        <FormControlLabel key="generate_ecc_radio"
-                          value="ecc"
-                          control={ <Radio color="primary" /> }
-                          label="Generate ECC certificate"
-                          labelPlacement="end" />
-      ]
     }
 
     return (
@@ -98,8 +102,8 @@ export class VenCreateIndentificationStep extends React.Component {
             </FormLabel>
             <Select autoWidth={ true }
                     style={ { marginTop: '0' } }
-                    value={ this.props.venOadrProfile }
-                    onChange={ this.props.handleVenOadrProfileChange }
+                    value={ identification.venOadrProfile }
+                    onChange={ this.handleVenOadrProfileChange }
                     inputProps={ { name: 'OpenADR Profile', id: 'oadr_profile_select', } }>
               { profileView }
             </Select>
@@ -112,10 +116,10 @@ export class VenCreateIndentificationStep extends React.Component {
                        fullWidth={ true }
                        label="VEN Common Name"
                        placeholder="myven.oadr.com"
-                       value={ this.props.venCommonName }
+                       value={ identification.venCommonName }
                        className={ classes.textField }
-                       error={ this.props.hasError }
-                       onChange={ this.props.handleVenCommonNameChange }
+                       error={ hasError }
+                       onChange={ this.handleVenCommonNameChange }
                        InputLabelProps={ { shrink: true, } } />
           </FormControl>
         </Grid>
@@ -135,23 +139,10 @@ export class VenCreateIndentificationStep extends React.Component {
             spacing={ 24 }>
         <Grid item xs={ 2 } />
         <Grid item xs={ 8 }>
-          <FormControl className={ classes.formControl }>
-            <FormLabel style={ labelStyle } component="label">
-              SSL Certificate
-            </FormLabel>
-            <RadioGroup aria-label="position"
-                        name="position"
-                        value={ this.props.needCertificateGeneration }
-                        onChange={ this.props.handleNeedCertificateGenerationChange }
-                        row>
-              <FormControlLabel value="no"
-                                style={ { marginLeft: 0 } }
-                                control={ <Radio color="primary" /> }
-                                label="Provide VenID fingerprint"
-                                labelPlacement="end" />
-              { generateOptionView }
-            </RadioGroup>
-          </FormControl>
+          <UserCreateIdentificationSSLCertificatePanel classes={classes}
+            identification={identification}
+            vtnConfiguration={vtnConfiguration}
+            onChange={this.props.onChange} />
         </Grid>
         <Grid item xs={ 2 } />
       </Grid>

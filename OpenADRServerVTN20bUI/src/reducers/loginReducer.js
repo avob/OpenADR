@@ -22,19 +22,23 @@ export default function loginReducer( state = initialState.user, action ) {
       config.isConnected = true
       config.isConnectionPending = false
       config.user = action.payload;
+      console.log(action)
       newState = objectAssign( {}, state, {
           isConnected: true,
           isConnectionPending: false,
-          user: action.payload
+          user: action.payload,
+          connectionError: null
       } );
       return newState;
 
     case types.LOGIN_USER_ERROR:
+
       newState = objectAssign( {}, state, {
           connectionError: action.payload,
           isConnected: false,
           isConnectionPending: false
       } );
+      console.log(newState)
       return newState;
 
     default:

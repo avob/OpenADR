@@ -1,5 +1,8 @@
 import Swagger from 'swagger-client';
 import * as types from '../constants/actionTypes';
+import swagger from 'swagger-client'
+
+import { config, history } from './configureStore';
 
 
 var swaggerClient = null;
@@ -10,29 +13,45 @@ var responseInterceptor=  (res) => {
   }
 
 
-var loadClient = function ( url, dispatch, config) {
+var loadClient = function ( url, dispatch) {
   return new Promise( (resolve, reject) => {
     if ( swaggerClient != null ) {
       resolve( swaggerClient );
 
     } else {
+      var params = {url:url, responseInterceptor: responseInterceptor
+        , requestInterceptor: req => {
+          if(config.username != null && config.password != null) {
+            var encoded = btoa(config.username +":"+config.password);
+            console.log(encoded)
+            req.headers["Authorization"] = "Basic "+ encoded
+          }
+        }};
+
       
-      return Swagger( {url:url, responseInterceptor: responseInterceptor} ).then( client => {
+      return Swagger( params ).then( client => {
         config.isConnected = true
         config.isConnectionPending = false
-
+        // dispatch({
+        //   type: types.LOGIN_USER_SUCCESS
+        // })
         swaggerClient = client; 
         resolve( client );
       } ).catch(err => {
         config.isConnected = false
         config.isConnectionPending = false
-
+        dispatch({
+          type: types.LOGIN_USER_ERROR,
+          payload: err
+        });
+        history.push("/login")
+        swaggerClient = null;
       });
     }
   } );
 }
 
-export default function swaggerMiddleware( opts, config ) {
+export default function swaggerMiddleware( opts ) {
   return store => next => action => {
     
     console.log( action.type )

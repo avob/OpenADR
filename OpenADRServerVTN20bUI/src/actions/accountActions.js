@@ -31,5 +31,25 @@ export const loadLoginUser = (username) => {
   );
 }
 
+export const createApp = (app) => {
+  return swaggerAction(types.CREATE_APP, 
+    (api) => {
+      var params = { dto: app };
+      return api.apis[ 'account-controller' ].createAppUsingPOST(params, multipartResponseContentType);
+    },
+    (data) => { saveData( data.data, app.commonName + '-credentials.tar' ); history.push("/account/app") }
+  );
+}
+
+export const createUser = (user) => {
+  return swaggerAction(types.CREATE_USER, 
+    (api) => {
+      var params = { dto: user };
+      return api.apis[ 'account-controller' ].createUserUsingPOST(params, multipartResponseContentType);
+    },
+    (data) => { saveData( data.data, user.commonName + '-credentials.tar' ); history.push("/account/user") }
+  );
+}
+
 
 

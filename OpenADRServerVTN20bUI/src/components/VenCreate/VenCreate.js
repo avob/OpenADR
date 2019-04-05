@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 
 
 import VenCreateIndentificationStep from './VenCreateIndentificationStep';
-import VenCreateAuthenticationStep from './VenCreateAuthenticationStep';
+import UserCreateAuthenticationFormPanel from '../common/UserCreateAuthenticationFormPanel'
 import VenCreateConfirmationStep from './VenCreateConfirmationStep';
 
 
@@ -47,15 +47,27 @@ export class VenCreate extends React.Component {
     super( props );
     this.state = {
       activeStep: 0,
-      venCommonName: 'oadr.avob.com',
-      venOadrProfile: defaultOadrProfile,
+     
 
-      authenticationType: defaultAuthenticationType,
-      authenticationVenId: '',
-      authenticationPassword: '',
-      authenticationPasswordConfirm: '',
-      needLogin: false,
-      needCertificateGeneration: 'rsa'
+      
+
+
+
+
+      identification: {
+        venCommonName: 'oadr.avob.com',
+        venOadrProfile: defaultOadrProfile,
+        needCertificateGeneration: 'rsa'
+      },
+      authentication: {
+        authenticationTypes:authenticationTypes,
+        authenticationType: defaultAuthenticationType,
+        authenticationPassword: '',
+        authenticationPasswordConfirm: '',
+        authenticationVenId: '',
+        
+      },
+
     };
   }
 
@@ -86,23 +98,18 @@ export class VenCreate extends React.Component {
       activeStep: 0,
     } );
   };
-  handleVenCommonNameChange = (e) => {
-    this.setState( {
-      venCommonName: e.target.value,
-    } );
-  };
-  handleVenOadrProfileChange = (e) => {
-    this.setState( {
-      venOadrProfile: e.target.value,
-    } );
-  };
 
-  handleNeedCertificateGenerationChange = (e) => {
-    this.setState( {
-      needCertificateGeneration: e.target.value,
-    } );
-  };
 
+  handleIndentificationStepChange = (identification) => {
+    this.setState({identification});
+  }
+
+  handleAuthenticationStepChange = (authentication) => {
+    this.setState({authentication});
+  } 
+
+
+  
   handleAuthenticationTypeChange = (e) => {
     this.setState( {
       authenticationType: e.target.value,
@@ -126,16 +133,18 @@ export class VenCreate extends React.Component {
   };
 
   handleCreateVen = () => {
+    const {identification, authentication} = this.state;
     var dto = {
-      'authenticationType': this.state.authenticationType,
-      'commonName': this.state.venCommonName,
-      'needCertificateGeneration': this.state.needCertificateGeneration,
-      'oadrProfil': this.state.venOadrProfile,
-      'username': this.state.authenticationVenId
+      'commonName': identification.venCommonName,
+      'needCertificateGeneration': identification.needCertificateGeneration,
+      'oadrProfil': identification.venOadrProfile,
+
+      'authenticationType': authentication.authenticationType,
+      'username': authentication.authenticationVenId
     }
 
-    if ( this.state.authenticationType == 'login' ) {
-      dto.password = this.state.authenticationPassword
+    if ( authentication.authenticationType == 'login' ) {
+      dto.password = authentication.authenticationPassword
     }
 
     this.props.createVen( dto );
@@ -153,32 +162,20 @@ export class VenCreate extends React.Component {
       switch (step) {
         case 0:
           return <VenCreateIndentificationStep classes={ classes }
-                                               hasError={ that.state.hasError }
-                                               oadrProfiles={ oadrProfiles }
-                                               venCommonName={ that.state.venCommonName }
-                                               venOadrProfile={ that.state.venOadrProfile }
-                                               needCertificateGeneration={ that.state.needCertificateGeneration }
-                                               handleVenCommonNameChange={ that.handleVenCommonNameChange }
-                                               handleVenOadrProfileChange={ that.handleVenOadrProfileChange }
-                                               handleNeedCertificateGenerationChange={ that.handleNeedCertificateGenerationChange }
-                                               vtnConfiguration={ vtnConfiguration } />;
-        case 1:
-          return <VenCreateAuthenticationStep classes={ classes }
                                               hasError={ that.state.hasError }
-                                              authenticationTypes={ authenticationTypes }
-                                              authenticationType={ that.state.authenticationType }
-                                              authenticationVenId={ that.state.authenticationVenId }
-                                              authenticationPassword={ that.state.authenticationPassword }
-                                              authenticationPasswordConfirm={ that.state.authenticationPasswordConfirm }
-                                              handleAuthenticationTypeChange={ that.handleAuthenticationTypeChange }
-                                              handleAuthenticationVenIdChange={ that.handleAuthenticationVenIdChange }
-                                              handleAuthenticationPasswordChange={ that.handleAuthenticationPasswordChange }
-                                              authenticationPasswordConfirm={ that.authenticationPasswordConfirm }
-                                              needLogin={ that.state.authenticationType == 'login' }
-                                              needCertificateGeneration={ that.state.needCertificateGeneration != 'no' }
-                                              vtnConfiguration={ vtnConfiguration } />;
+                                              oadrProfiles={oadrProfiles}
+                                              identification={that.state.identification}
+                                              onChange={that.handleIndentificationStepChange}
+                                              vtnConfiguration={vtnConfiguration} />;
+        case 1:
+          return <UserCreateAuthenticationFormPanel classes={classes}
+            authentication={that.state.authentication}
+            identification={that.state.identification}
+            onChange={that.handleAuthenticationStepChange}/>;
         case 2:
-          return <VenCreateConfirmationStep classes={ classes } ven={ that.state } />;
+          return <VenCreateConfirmationStep classes={ classes } 
+            authentication={that.state.authentication}
+            identification={that.state.identification} />;
         default:
           return 'Unknown step';
       }

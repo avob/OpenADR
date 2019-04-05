@@ -13,9 +13,9 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 
 import AccountUserCreateIdentificationStep from './AccountUserCreateIdentificationStep'
-import AccountCreateAuthenticationStep from './AccountCreateAuthenticationStep'
+import UserCreateAuthenticationFormPanel from '../common/UserCreateAuthenticationFormPanel'
 import AccountCreateRoleStep from './AccountCreateRoleStep'
-import AccountCreateConfirmationStep from './AccountCreateConfirmationStep'
+import UserCreateConfirmationFormPanel from '../common/UserCreateConfirmationFormPanel'
 
 const defaultAuthenticationType = 'x509'
 const authenticationTypes = {
@@ -42,6 +42,7 @@ export class AccountUserCreate extends React.Component {
         needCertificateGeneration: 'rsa'
       },
       authentication: {
+          username: '',
           authenticationTypes:authenticationTypes,
           authenticationType: defaultAuthenticationType,
           authenticationPassword: '',
@@ -52,8 +53,28 @@ export class AccountUserCreate extends React.Component {
     };
   }
 
-  handleFinish = () => {
+  handleCreateUser = () => {
+    const {identification, authentication, roles} = this.state;
+    var dto = {
+      'commonName': identification.venCommonName,
+      'needCertificateGeneration': identification.needCertificateGeneration,
+      'oadrProfil': identification.venOadrProfile,
 
+      'authenticationType': authentication.authenticationType,
+      'username': authentication.username,
+      'roles': roles
+    }
+
+    if ( authentication.authenticationType == 'login' ) {
+      dto.password = authentication.authenticationPassword
+    }
+
+    this.props.createUser( dto );
+  }
+
+
+  handleFinish = () => {
+    this.handleCreateUser();
   }
 
   handleNext = () => {
@@ -109,7 +130,8 @@ export class AccountUserCreate extends React.Component {
             onChange={that.handleIndentificationStepChange}
             vtnConfiguration={vtnConfiguration}/>;
         case 1:
-          return <AccountCreateAuthenticationStep classes={classes}
+          return <UserCreateAuthenticationFormPanel classes={classes}
+            identification={that.state.identification}
             authentication={that.state.authentication}
             onChange={that.handleAuthenticationStepChange}/>;
         case 2:
@@ -117,7 +139,10 @@ export class AccountUserCreate extends React.Component {
             roles={that.state.roles}
             onChange={that.handleRoleStepChange}/>;
         case 3:
-          return <AccountCreateConfirmationStep classes={classes}/>;
+          return <UserCreateConfirmationFormPanel classes={classes}
+            identification={that.state.identification}
+            authentication={that.state.authentication}
+            roles={that.state.roles}/>;
         default:
           return 'Unknown step';
       }
@@ -193,7 +218,7 @@ export class AccountUserCreate extends React.Component {
                         color="primary"
                         onClick={ handleValidatedNext( activeStep ) }
                         className={ classes.button }>
-                  { activeStep === steps.length - 1 ? 'Create Ven' : 'Next' }
+                  { activeStep === steps.length - 1 ? 'Create User' : 'Next' }
                 </Button>
               </div>
               <Typography component="div" className={ classes.instructions }>

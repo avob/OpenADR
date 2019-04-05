@@ -36,20 +36,46 @@ const labelStyle = {
   left: 0,
 }
 
-export class VenCreateAuthenticationStep extends React.Component {
+export class UserCreateAuthenticationFormPanel extends React.Component {
 
   constructor( props ) {
     super( props );
   }
 
+  handleAuthenticationTypeChange = (e) => {
+    var authentication = this.props.authentication;
+    authentication.authenticationType = e.target.value;
+    this.props.onChange(authentication);
+  };
+
+
+  handleAuthenticationPasswordChange = (e) => {
+    var authentication = this.props.authentication;
+    authentication.authenticationPassword = e.target.value;
+    this.props.onChange(authentication);
+  };
+
+  handleAuthenticationPasswordConfirmChange = (e) => {
+    var authentication = this.props.authentication;
+    authentication.authenticationPasswordConfirm = e.target.value;
+    this.props.onChange(authentication);
+  };
+
+  handleAuthenticationUsernameChange = (e) => {
+    console.log(e)
+    var authentication = this.props.authentication;
+    authentication.username = e.target.value;
+    this.props.onChange(authentication);
+  }
+
 
   render() {
-    const {classes, hasError} = this.props;
+    const {classes, hasError, identification, authentication, OnChange} = this.props;
 
     var authenticationTypeView = []
 
-    for (var key in this.props.authenticationTypes) {
-      var value = this.props.authenticationTypes[ key ];
+    for (var key in authentication.authenticationTypes) {
+      var value = authentication.authenticationTypes[ key ];
       authenticationTypeView.push( <MenuItem key={ key } value={ key }>
                                    { value.label }
                                    </MenuItem> )
@@ -57,18 +83,12 @@ export class VenCreateAuthenticationStep extends React.Component {
 
     var loginPasswordView = null;
 
-    var missingVenId = false;
-    if ( hasError && !this.props.needCertificateGeneration && this.props.authenticationVenId == '' ) {
-      missingVenId = true;
-    }
-
-    console.log( this.props )
     var missingPassword = null;
-    if ( hasError && this.props.needLogin && this.props.authenticationPassword == '' ) {
+    if ( hasError && authentication.authenticationType == "login" && authentication.authenticationPassword == '' ) {
       missingPassword = true;
     }
 
-    if ( this.props.needLogin ) {
+    if ( authentication.authenticationType == "login" ) {
 
       loginPasswordView = <Grid container spacing={ 24 }>
                             <Grid item xs={ 2 } />
@@ -78,10 +98,10 @@ export class VenCreateAuthenticationStep extends React.Component {
                                            type="password"
                                            id="password_textfield"
                                            label="Password"
-                                           value={ this.props.authenticationPassword }
+                                           value={ authentication.authenticationPassword }
                                            className={ classes.textField }
                                            error={ missingPassword }
-                                           onChange={ this.props.handleAuthenticationPasswordChange }
+                                           onChange={ this.handleAuthenticationPasswordChange }
                                            InputLabelProps={ { shrink: true, } } />
                               </FormControl>
                             </Grid>
@@ -92,10 +112,10 @@ export class VenCreateAuthenticationStep extends React.Component {
                                            fullWidth={ true }
                                            id="password_confirm_textfield"
                                            label="Password Confirm"
-                                           value={ this.props.authenticationPasswordConfirm }
+                                           value={ authentication.authenticationPasswordConfirm }
                                            className={ classes.textField }
                                            error={ this.props.hasError }
-                                           onChange={ this.props.handleAuthenticationPasswordConfirmChange }
+                                           onChange={ this.handleAuthenticationPasswordConfirmChange }
                                            InputLabelProps={ { shrink: true, } } />
                               </FormControl>
                             </Grid>
@@ -112,11 +132,11 @@ export class VenCreateAuthenticationStep extends React.Component {
         <Grid item xs={ 4 }>
           <FormControl className={ classes.formControl }>
             <FormLabel style={ labelStyle } component="label">
-              VEN Authentication
+              Authentication Method
             </FormLabel>
-            <Select value={ this.props.authenticationType }
+            <Select value={ authentication.authenticationType }
                     style={ { marginTop: 0 } }
-                    onChange={ this.props.handleAuthenticationTypeChange }
+                    onChange={ this.handleAuthenticationTypeChange }
                     inputProps={ { name: 'VEN Authentication Type', id: 'oadr_authentication_select', } }>
               { authenticationTypeView }
             </Select>
@@ -125,15 +145,14 @@ export class VenCreateAuthenticationStep extends React.Component {
         <Grid item xs={ 4 }>
           <FormControl className={ classes.formControl }>
             <TextField required
-                       error={ missingVenId }
                        id="login_textfield"
-                       label="VEN Id"
-                       value={ (this.props.needCertificateGeneration) ? '<generated>' : this.props.authenticationVenId }
+                       label="Username"
+                       value={ (identification.needCertificateGeneration != "no" 
+                        && authentication.authenticationType != "login") ? '<generated>' : authentication.username }
+                       disabled={ (identification.needCertificateGeneration != "no")}
                        className={ classes.textField }
-                       error={ missingVenId }
-                       onChange={ this.props.handleAuthenticationVenIdChange }
-                       InputLabelProps={ { shrink: true, } }
-                       disabled={ this.props.needCertificateGeneration } />
+                       onChange={ this.handleAuthenticationUsernameChange }
+                       InputLabelProps={ { shrink: true, } } />
           </FormControl>
         </Grid>
         <Grid item xs={ 2 } />
@@ -144,4 +163,4 @@ export class VenCreateAuthenticationStep extends React.Component {
   }
 }
 
-export default VenCreateAuthenticationStep;
+export default UserCreateAuthenticationFormPanel;

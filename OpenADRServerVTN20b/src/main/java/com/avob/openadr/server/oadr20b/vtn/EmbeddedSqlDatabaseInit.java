@@ -173,7 +173,8 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 	private OadrUser saveUserIfMissing(OadrUserCreateDto dto) {
 		OadrUser findOneByName = oadrUserService.findByUsername(dto.getUsername());
 		if (findOneByName == null) {
-			OadrUser prepare = oadrUserService.create(dto);
+			OadrUser prepare = oadrUserService.prepare(dto);
+			oadrUserService.save(prepare);
 			LOGGER.debug("Create User: " + prepare.getUsername());
 		}
 		return findOneByName;
@@ -182,7 +183,8 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 	private OadrApp saveAppIfMissing(OadrAppCreateDto dto) {
 		OadrApp findOneByName = oadrAppService.findByUsername(dto.getUsername());
 		if (findOneByName == null) {
-			OadrApp prepare = oadrAppService.create(dto);
+			OadrApp prepare = oadrAppService.prepare(dto);
+			oadrAppService.save(prepare);
 			LOGGER.debug("Create App: " + prepare.getUsername());
 		}
 		return findOneByName;

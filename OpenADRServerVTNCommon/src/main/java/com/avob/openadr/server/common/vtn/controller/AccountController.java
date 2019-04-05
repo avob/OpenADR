@@ -1,8 +1,12 @@
 package com.avob.openadr.server.common.vtn.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -11,6 +15,9 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
 import com.avob.openadr.server.common.vtn.models.user.OadrApp;
 import com.avob.openadr.server.common.vtn.models.user.OadrAppCreateDto;
 import com.avob.openadr.server.common.vtn.models.user.OadrAppDto;
@@ -30,7 +38,6 @@ import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 
 @RestController
 @RequestMapping("/Account")
-@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class AccountController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AccountController.class);
@@ -49,6 +56,7 @@ public class AccountController {
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	@ResponseBody
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEVICE_MANAGER') or hasRole('ROLE_DRPROGRAM')")
 	public OadrUserDto registeredUser(Principal principal) {
 		if (adminUsername != null && adminUsername.equals(principal.getName())) {
 			OadrUserDto dto = new OadrUserDto();
@@ -60,6 +68,7 @@ public class AccountController {
 		return dtoMapper.map(findByUsername, OadrUserDto.class);
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/user", method = RequestMethod.GET)
 	@ResponseBody
 	public List<OadrUserDto> listUser() {
@@ -68,18 +77,51 @@ public class AccountController {
 		return dtoMapper.mapList(find, OadrUserDto.class);
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/user", method = RequestMethod.POST)
 	@ResponseBody
-	public OadrUserDto createUser(@RequestBody OadrUserCreateDto user, HttpServletResponse response) {
-		OadrUser save = oadrUserService.create(user);
+	public ResponseEntity<InputStreamResource> createUser(@RequestBody OadrUserCreateDto dto,
+			HttpServletResponse response) {
 
-		response.setStatus(HttpStatus.CREATED_201);
+		OadrUser findOneByUsername = oadrUserService.findByUsername(dto.getUsername());
 
-		LOGGER.info("create user: " + save.toString());
+		if (findOneByUsername != null) {
+			LOGGER.warn("User: " + dto.getUsername() + " already exists");
+			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE_406)
+					.contentType(MediaType.parseMediaType("application/octet-stream")).body(null);
+		}
+		OadrUser prepare = oadrUserService.prepare(dto);
+		ResponseEntity<InputStreamResource> body = null;
+		try {
+			Optional<File> generateCertificateIfRequired = oadrUserService.generateCertificateIfRequired(dto, prepare);
 
-		return dtoMapper.map(save, OadrUserDto.class);
+			if (generateCertificateIfRequired.isPresent()) {
+				InputStreamResource resource = new InputStreamResource(
+						new FileInputStream(generateCertificateIfRequired.get()));
+				body = ResponseEntity.ok().header("Content-Disposition", "attachment; filename=\"archive.tar\"")
+						.header("x-Username", prepare.getUsername())
+						.contentLength(generateCertificateIfRequired.get().length())
+						.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+			} else {
+				body = ResponseEntity.status(HttpStatus.CREATED_201).header("x-username", prepare.getUsername())
+						.body(null);
+			}
+
+		} catch (GenerateX509VenException e) {
+			LOGGER.error("", e);
+			response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
+		} catch (FileNotFoundException e) {
+			LOGGER.error("", e);
+			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
+		}
+
+		oadrUserService.save(prepare);
+		LOGGER.info("Create User: " + prepare.getUsername());
+
+		return body;
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/app", method = RequestMethod.GET)
 	@ResponseBody
 	public List<OadrAppDto> listApp() {
@@ -88,16 +130,48 @@ public class AccountController {
 		return dtoMapper.mapList(find, OadrAppDto.class);
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/app", method = RequestMethod.POST)
 	@ResponseBody
-	public OadrAppDto createApp(@RequestBody OadrAppCreateDto app, HttpServletResponse response) {
-		OadrApp save = oadrAppService.create(app);
+	public ResponseEntity<InputStreamResource> createApp(@RequestBody OadrAppCreateDto dto,
+			HttpServletResponse response) {
 
-		response.setStatus(HttpStatus.CREATED_201);
+		OadrApp findOneByUsername = oadrAppService.findByUsername(dto.getUsername());
 
-		LOGGER.info("create user: " + save.toString());
+		if (findOneByUsername != null) {
+			LOGGER.warn("App: " + dto.getUsername() + " already exists");
+			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE_406)
+					.contentType(MediaType.parseMediaType("application/octet-stream")).body(null);
+		}
+		OadrApp prepare = oadrAppService.prepare(dto);
+		ResponseEntity<InputStreamResource> body = null;
+		try {
+			Optional<File> generateCertificateIfRequired = oadrAppService.generateCertificateIfRequired(dto, prepare);
 
-		return dtoMapper.map(save, OadrAppDto.class);
+			if (generateCertificateIfRequired.isPresent()) {
+				InputStreamResource resource = new InputStreamResource(
+						new FileInputStream(generateCertificateIfRequired.get()));
+				body = ResponseEntity.ok().header("Content-Disposition", "attachment; filename=\"archive.tar\"")
+						.header("x-Username", prepare.getUsername())
+						.contentLength(generateCertificateIfRequired.get().length())
+						.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+			} else {
+				body = ResponseEntity.status(HttpStatus.CREATED_201).header("x-username", prepare.getUsername())
+						.body(null);
+			}
+
+		} catch (GenerateX509VenException e) {
+			LOGGER.error("", e);
+			response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
+		} catch (FileNotFoundException e) {
+			LOGGER.error("", e);
+			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
+		}
+
+		oadrAppService.save(prepare);
+		LOGGER.info("Create App: " + prepare.getUsername());
+
+		return body;
 	}
 
 }
