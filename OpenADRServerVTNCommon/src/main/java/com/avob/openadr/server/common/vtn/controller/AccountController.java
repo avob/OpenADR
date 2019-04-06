@@ -19,6 +19,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -122,6 +123,20 @@ public class AccountController {
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@RequestMapping(value = "/user/{username}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public void deleteUser(@PathVariable("username") String username, HttpServletResponse response) {
+		OadrUser findByUsername = oadrUserService.findByUsername(username);
+		if (findByUsername == null) {
+			LOGGER.warn("Unknown User: " + username);
+			response.setStatus(HttpStatus.NOT_FOUND_404);
+			return;
+		}
+		oadrUserService.delete(findByUsername);
+		LOGGER.info("Delete Ven: " + findByUsername.getUsername());
+	}
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@RequestMapping(value = "/app", method = RequestMethod.GET)
 	@ResponseBody
 	public List<OadrAppDto> listApp() {
@@ -172,6 +187,20 @@ public class AccountController {
 		LOGGER.info("Create App: " + prepare.getUsername());
 
 		return body;
+	}
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@RequestMapping(value = "/app/{username}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public void deleteApp(@PathVariable("username") String username, HttpServletResponse response) {
+		OadrApp findByUsername = oadrAppService.findByUsername(username);
+		if (findByUsername == null) {
+			LOGGER.warn("Unknown User: " + username);
+			response.setStatus(HttpStatus.NOT_FOUND_404);
+			return;
+		}
+		oadrAppService.delete(findByUsername);
+		LOGGER.info("Delete Ven: " + findByUsername.getUsername());
 	}
 
 }

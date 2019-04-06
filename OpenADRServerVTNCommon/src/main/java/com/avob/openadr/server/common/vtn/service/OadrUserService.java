@@ -32,7 +32,7 @@ public class OadrUserService extends AbstractUserService<OadrUser> {
 	}
 
 	public OadrUser prepare(OadrUserCreateDto user) {
-		OadrUser prepare = super.prepare(new OadrUser(), user.getUsername(), user.getPassword());
+		OadrUser prepare = super.prepare(new OadrUser(), user);
 		prepare.setRoles(user.getRoles());
 		return prepare;
 	}

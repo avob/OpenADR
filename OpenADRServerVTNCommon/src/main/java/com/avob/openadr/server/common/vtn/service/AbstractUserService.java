@@ -3,6 +3,7 @@ package com.avob.openadr.server.common.vtn.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
+import com.avob.openadr.server.common.vtn.models.user.AbstractUserCreateDto;
 import com.avob.openadr.server.common.vtn.security.DigestAuthenticationProvider;
 import com.avob.openadr.server.common.vtn.security.DigestMD5PasswordEncoder;
 
@@ -33,6 +34,15 @@ public abstract class AbstractUserService<T extends AbstractUser> {
 	protected T prepare(T instance, String username) {
 		instance.setUsername(username);
 		return instance;
+	}
+
+	protected T prepare(T instance, AbstractUserCreateDto dto) {
+		T prepare = prepare(instance, dto.getUsername(), dto.getPassword());
+		prepare.setUsername(dto.getUsername());
+		prepare.setAuthenticationType(dto.getAuthenticationType());
+		prepare.setCommonName(dto.getCommonName());
+		
+		return prepare;
 	}
 
 	protected abstract void delete(T instance);

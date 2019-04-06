@@ -46,22 +46,28 @@ var AccountUserTable = (props) => {
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
+            <TableCell align="right">Common Name</TableCell>
             <TableCell align="right">Username</TableCell>
+            <TableCell align="right">Authentication Method</TableCell>
             <TableCell align="right">Roles</TableCell>
-    
+            <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {user.map(row => (
             <TableRow key={row.id}>
+              <TableCell align="right">{row.commonName}</TableCell>
               <TableCell align="right">{row.username}</TableCell>
+              <TableCell align="right">{row.authenticationType}</TableCell>
               <TableCell align="right">{row.roles.map(role => {
                 return (<span key={role}>
                     {role} <br/>
                     </span>
                   );
               })}</TableCell>
-        
+              <TableCell scope="row" align="right">
+                  <Button size="small" color="secondary" onClick={props.handleDeleteUser(row.username)}> REMOVE </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -82,6 +88,9 @@ export class AccountUser extends React.Component {
     history.push( '/account/user/create' )
   }
 
+  handleDeleteUser = (username) => () => {
+    this.props.deleteUser(username);
+  }
 
   render() {
     const {classes, user} = this.props;
@@ -111,7 +120,7 @@ export class AccountUser extends React.Component {
           </Grid>
         </Grid> 
         <Divider style={ { marginBottom: '30px', marginTop: '20px' } } /> 
-      <AccountUserTable user={user} classes={classes}/>
+      <AccountUserTable user={user} classes={classes} handleDeleteUser={this.handleDeleteUser}/>
       
       
  

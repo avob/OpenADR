@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 
 import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
+import com.avob.openadr.server.common.vtn.VTNRoleEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
@@ -376,8 +377,9 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 				String fingerprint = getFingerprint(commonName);
 				OadrUserCreateDto dto = new OadrUserCreateDto();
 				dto.setUsername(fingerprint);
-				List<String> roles = Arrays.asList("ROLE_ADMIN");
-				dto.setRoles(roles);
+				dto.setAuthenticationType("x509");
+				dto.setCommonName(commonName);
+				dto.setRoles(Arrays.asList(VTNRoleEnum.ROLE_ADMIN.name()));
 				saveUserIfMissing(dto);
 			}
 		}
@@ -388,10 +390,38 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 				String commonName = filename.replace("." + split[split.length - 1], "");
 				String fingerprint = getFingerprint(commonName);
 				OadrUserCreateDto dto = new OadrUserCreateDto();
+				dto.setAuthenticationType("x509");
+				dto.setCommonName(commonName);
 				dto.setUsername(fingerprint);
+				dto.setRoles(Arrays.asList(VTNRoleEnum.ROLE_DEVICE_MANAGER.name(), VTNRoleEnum.ROLE_DRPROGRAM.name()));
 				saveUserIfMissing(dto);
 			}
 		}
+
+		// create users with login
+		OadrUserCreateDto dto = new OadrUserCreateDto();
+		dto.setAuthenticationType("login");
+		dto.setCommonName("admin");
+		dto.setUsername("admin");
+		dto.setPassword("admin");
+		dto.setRoles(Arrays.asList(VTNRoleEnum.ROLE_ADMIN.name()));
+		saveUserIfMissing(dto);
+
+		dto = new OadrUserCreateDto();
+		dto.setAuthenticationType("login");
+		dto.setCommonName("user_device_manager");
+		dto.setUsername("user_device_manager");
+		dto.setPassword("user_device_manager");
+		dto.setRoles(Arrays.asList(VTNRoleEnum.ROLE_DEVICE_MANAGER.name()));
+		saveUserIfMissing(dto);
+
+		dto = new OadrUserCreateDto();
+		dto.setAuthenticationType("login");
+		dto.setCommonName("user_drprogram");
+		dto.setUsername("user_drprogram");
+		dto.setPassword("user_drprogram");
+		dto.setRoles(Arrays.asList(VTNRoleEnum.ROLE_DRPROGRAM.name()));
+		saveUserIfMissing(dto);
 
 		// load fake app from ./cert
 		filenames = getAppFilename();
@@ -400,11 +430,30 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 				String[] split = filename.split("\\.");
 				String commonName = filename.replace("." + split[split.length - 1], "");
 				String fingerprint = getFingerprint(commonName);
-				OadrAppCreateDto dto = new OadrAppCreateDto();
-				dto.setUsername(fingerprint);
-				saveAppIfMissing(dto);
+				OadrAppCreateDto appDto = new OadrAppCreateDto();
+				appDto.setAuthenticationType("x509");
+				appDto.setCommonName(commonName);
+				appDto.setUsername(fingerprint);
+				appDto.setRoles(Arrays.asList(VTNRoleEnum.ROLE_DEVICE_MANAGER.name(), VTNRoleEnum.ROLE_DRPROGRAM.name()));
+				saveAppIfMissing(appDto);
 			}
 		}
+
+		OadrAppCreateDto appDto = new OadrAppCreateDto();
+		appDto.setAuthenticationType("login");
+		appDto.setCommonName("app_device_manager");
+		appDto.setUsername("app_device_manager");
+		appDto.setPassword("app_device_manager");
+		appDto.setRoles(Arrays.asList(VTNRoleEnum.ROLE_DEVICE_MANAGER.name()));
+		saveAppIfMissing(appDto);
+
+		appDto = new OadrAppCreateDto();
+		appDto.setAuthenticationType("login");
+		appDto.setCommonName("app_drprogram");
+		appDto.setUsername("app_drprogram");
+		appDto.setPassword("app_drprogram");
+		appDto.setRoles(Arrays.asList(VTNRoleEnum.ROLE_DRPROGRAM.name()));
+		saveAppIfMissing(appDto);
 
 	}
 }

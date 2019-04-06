@@ -32,7 +32,7 @@ public class OadrAppService extends AbstractUserService<OadrApp> {
 	}
 
 	public OadrApp prepare(OadrAppCreateDto app) {
-		OadrApp prepare = super.prepare(new OadrApp(), app.getUsername(), app.getPassword());
+		OadrApp prepare = super.prepare(new OadrApp(), app);
 		prepare.setRoles(app.getRoles());
 		return prepare;
 

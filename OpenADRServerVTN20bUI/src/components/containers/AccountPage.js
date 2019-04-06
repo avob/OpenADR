@@ -135,10 +135,10 @@ export class AccountPage extends React.Component {
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <TabContainer>
-                        <AccountUser classes={classes} user={account.user}/>
+                        <AccountUser classes={classes} user={account.user} deleteUser={this.props.accountActions.deleteUser}/>
                        </TabContainer> }
       { value === 1 && <TabContainer>
-                          <AccountApp classes={classes} app={account.app}/>
+                          <AccountApp classes={classes} app={account.app} deleteApp={this.props.accountActions.deleteApp}/>
                        </TabContainer> }
     </div>
 

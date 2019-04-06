@@ -9,6 +9,9 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 
 /**
@@ -32,6 +35,7 @@ public class VenPoll {
 	 */
 	@ManyToOne
 	@JoinColumn(name = "ven_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Ven ven;
 
 	private Long createdTimestamp;
@@ -59,7 +63,7 @@ public class VenPoll {
 	public Ven getVen() {
 		return ven;
 	}
-	
+
 	public String getMessage() {
 		return message;
 	}

@@ -146,7 +146,7 @@ export class LoginPage extends React.Component {
         history.push( this.props.history.location.state.from.pathname)
       }
       else {
-        history.push( '/ven' )
+        history.push( '/' )
       }
     }
   }
@@ -162,7 +162,6 @@ export class LoginPage extends React.Component {
   handleSubmit = () => {
     config.username = this.state.username;
     config.password = this.state.password;
-    console.log(config)
     this.setState({username: "", password: ""});
     this.props.accountActions.loadLoginUser();
   }

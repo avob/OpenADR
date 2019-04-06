@@ -25,7 +25,6 @@ import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 
 @RestController
 @RequestMapping("/MarketContext")
-@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEVICE_MANAGER')")
 public class MarketContextController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MarketContextController.class);
@@ -36,12 +35,14 @@ public class MarketContextController {
 	@Resource
 	private DtoMapper dtoMapper;
 
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEVICE_MANAGER') or hasRole('ROLE_DRPROGRAM')")
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	@ResponseBody
 	public List<VenMarketContextDto> listMarketContext() {
 		return dtoMapper.mapList(venMarketContextService.findAll(), VenMarketContextDto.class);
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DRPROGRAM')")
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	@ResponseBody
 	public VenMarketContextDto createMarketContext(@Valid @RequestBody VenMarketContextDto dto,
@@ -61,7 +62,8 @@ public class MarketContextController {
 
 		return dtoMapper.map(marketContext, VenMarketContextDto.class);
 	}
-	
+
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DRPROGRAM')")
 	@RequestMapping(value = "/", method = RequestMethod.PUT)
 	@ResponseBody
 	public VenMarketContextDto updateMarketContext(@Valid @RequestBody VenMarketContextDto dto,
@@ -83,6 +85,7 @@ public class MarketContextController {
 		return dtoMapper.map(marketContext, VenMarketContextDto.class);
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEVICE_MANAGER') or hasRole('ROLE_DRPROGRAM')")
 	@RequestMapping(value = "/{marketContextName}", method = RequestMethod.GET)
 	@ResponseBody
 	public VenMarketContextDto findMarketContextByName(@PathVariable("marketContextName") String groupName,
@@ -95,17 +98,16 @@ public class MarketContextController {
 		return dtoMapper.map(group, VenMarketContextDto.class);
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DRPROGRAM')")
 	@RequestMapping(value = "/{marketContextId}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public void deleteMarketContextById(@PathVariable("marketContextId") Long id,
-			HttpServletResponse response) {
+	public void deleteMarketContextById(@PathVariable("marketContextId") Long id, HttpServletResponse response) {
 		Optional<VenMarketContext> findById = venMarketContextService.findById(id);
 		if (!findById.isPresent()) {
 			response.setStatus(HttpStatus.NOT_FOUND_404);
-			return ;
+			return;
 		}
 		venMarketContextService.delete(findById.get());
 	}
-
 
 }

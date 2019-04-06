@@ -50,7 +50,7 @@ var AccountUserTable = (props) => {
             <TableCell align="right">Username</TableCell>
             <TableCell align="right">Authentication Method</TableCell>
             <TableCell align="right">Roles</TableCell>
-    
+            <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -58,8 +58,16 @@ var AccountUserTable = (props) => {
             <TableRow key={row.id}>
               <TableCell align="right">{row.commonName}</TableCell>
               <TableCell align="right">{row.username}</TableCell>
-              <TableCell align="right">{row.commonName}</TableCell>
-              <TableCell align="right">{row.roles}</TableCell>
+              <TableCell align="right">{row.authenticationType}</TableCell>
+              <TableCell align="right">{row.roles.map(role => {
+                return (<span key={role}>
+                    {role} <br/>
+                    </span>
+                  );
+              })}</TableCell>
+              <TableCell scope="row" align="right">
+                  <Button size="small" color="secondary" onClick={props.handleDeleteApp(row.username)}> REMOVE </Button>
+              </TableCell>
         
             </TableRow>
           ))}
@@ -80,6 +88,10 @@ export class AccountApp extends React.Component {
 
   handleCreateAppClick = () => {
     history.push( '/account/app/create' )
+  }
+
+  handleDeleteApp = (username) => () => {
+    this.props.deleteApp(username)
   }
 
   render() {
@@ -110,7 +122,7 @@ export class AccountApp extends React.Component {
           </Grid>
         </Grid> 
         <Divider style={ { marginBottom: '30px', marginTop: '20px' } } /> 
-      <AccountUserTable app={app} classes={classes}/>
+      <AccountUserTable app={app} classes={classes} handleDeleteApp={this.handleDeleteApp}/>
       
       
  
