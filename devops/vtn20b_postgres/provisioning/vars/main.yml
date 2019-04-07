@@ -18,7 +18,14 @@ postgresql_databases:
 postgresql_users:
   - name: oadr-vtn20b
     password: supersecure
- 
+
+# RABBITMQ
+rabbitmq_daemon: rabbitmq-server
+rabbitmq_state: started
+rabbitmq_enabled: true
+rabbitmq_version: "3.6.16"
+# rabbitmq_version: "3.7.14" investigate python rabbitmq mismatch erlang dependecies
+
 # OADRVTN SPRING BOOT APP CONF
 springboot_application_name: oadr-vtn20b
 springboot_src_file: ../../../OpenADRServerVTN20b/target/OpenADRServerVTN20b-0.0.1-SNAPSHOT.jar

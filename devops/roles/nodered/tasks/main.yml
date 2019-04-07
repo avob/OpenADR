@@ -1,7 +1,7 @@
 --- # provisioning/roles/nodered/tasks/main.yml
 
   - name: install node-red globally
-    become: no
+    # become: no
     shell: sudo npm install -g node-red # intentional sudo
 #   args:
 #     creates: /usr/bin/node-red
@@ -9,17 +9,12 @@
       - nodered
 
   - name: add modules to Node Red
-    become: no
+    # become: no
     npm:
       name: "{{ item }}"
       path: "{{ nodered_home }}"  
     with_items:
-      - https://github.com/ELL-i/node-red-contrib-coap.git
-      - node-red-contrib-fsm
-      - node-red-node-google
       - node-red-dashboard
-      - node-red-contrib-boolean-logic
-      - https://github.com/ELL-i/node-red-contrib-nordpool.git
     tags:
       - nodered
 

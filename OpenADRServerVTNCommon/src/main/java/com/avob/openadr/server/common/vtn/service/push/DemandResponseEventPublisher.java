@@ -20,12 +20,10 @@ public class DemandResponseEventPublisher {
 
 	public void publish20a(Ven ven) {
 		jmsTemplate.convertAndSend(OADR20A_QUEUE, ven.getUsername());
-
 	}
 
 	public void publish20b(Ven ven) {
 		jmsTemplate.convertAndSend(OADR20B_QUEUE, ven.getUsername());
-
 	}
 
 }

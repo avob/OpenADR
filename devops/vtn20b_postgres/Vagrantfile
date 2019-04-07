@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "bento/ubuntu-16.04"
+  config.vm.box = "bento/ubuntu-18.04"
   config.vm.hostname = "vtn20b"
   # config.vm.network "forwarded_port", guest: 8181, host: 8181
   # config.vm.network "forwarded_port", guest: 8080, host: 8080

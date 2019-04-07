@@ -31,6 +31,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.util.SocketUtils;
 
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
@@ -56,6 +57,14 @@ public class VtnConfig {
 	public static final String REPLAY_PROTECTACCEPTED_DELAY_SECONDS_CONF = "oadr.security.replayProtectAcceptedDelaySecond";
 	public static final String CA_KEY_CONF = "oadr.security.ca.key";
 	public static final String CA_CERT_CONF = "oadr.security.ca.cert";
+
+	public static final String BROKER_USER_CONF = "oadr.broker.user";
+	public static final String BROKER_PASS_CONF = "oadr.broker.password";
+	public static final String BROKER_PORT_CONF = "oadr.broker.port";
+	public static final String BROKER_HOST_CONF = "oadr.broker.host";
+
+	public static final String BROKER_SSL_HOST_CONF = "oadr.broker.ssl.host";
+	public static final String BROKER_SSL_PORT_CONF = "oadr.broker.ssl.port";
 
 	@Value("${" + CONTEXT_PATH_CONF + ":#{null}}")
 	private String contextPath;
@@ -98,16 +107,29 @@ public class VtnConfig {
 	@Value("${" + REPLAY_PROTECTACCEPTED_DELAY_SECONDS_CONF + ":#{1200}}")
 	private Long replayProtectAcceptedDelaySecond;
 
-	@Value("${" + CA_KEY_CONF + ":null}")
+	@Value("${" + CA_KEY_CONF + ":#{null}}")
 	private String caKey;
 
-	@Value("${" + CA_CERT_CONF + ":null}")
+	@Value("${" + CA_CERT_CONF + ":#{null}}")
 	private String caCert;
 
-//	@Value("${activemq.broker-url}")
-	private String brokerUrl = "tcp://localhost:61616";
-//	private String sslBrokerUrlClient = "ssl://vtn.oadr.com:61617";
-	private String sslBrokerUrl = "ssl://0.0.0.0:61617";
+	@Value("${" + BROKER_HOST_CONF + ":localhost}")
+	private String brokerHost;
+
+	@Value("${" + BROKER_PORT_CONF + ":#{null}}")
+	private Integer brokerPort;
+
+	@Value("${" + BROKER_USER_CONF + ":#{null}}")
+	private String brokerUser;
+
+	@Value("${" + BROKER_PASS_CONF + ":#{null}}")
+	private String brokerPass;
+
+	@Value("${" + BROKER_SSL_PORT_CONF + ":#{null}}")
+	private Integer brokerSslPort;
+
+	@Value("${" + BROKER_SSL_HOST_CONF + ":localhost}")
+	private String brokerSslHost;
 
 	@Resource
 	private ActiveMQAuthorizationPlugin activeMQAuthorizationPlugin;
@@ -115,75 +137,12 @@ public class VtnConfig {
 	private KeyManagerFactory keyManagerFactory;
 	private TrustManagerFactory trustManagerFactory;
 	private String oadr20bFingerprint;
-
-	@Bean(initMethod = "start", destroyMethod = "stop")
-	public SslBrokerService broker() throws Exception {
-		if (getKeyManagerFactory() != null) {
-
-			SslBrokerService broker = new SslBrokerService();
-			broker.addConnector(brokerUrl);
-
-			broker.addSslConnector(sslBrokerUrl + "?transport.needClientAuth=true",
-					getKeyManagerFactory().getKeyManagers(), getTrustManagerFactory().getTrustManagers(),
-					new SecureRandom());
-
-			broker.setPersistent(false);
-			broker.setBrokerName("broker");
-			broker.setUseShutdownHook(true);
-
-			SystemUsage systemUsage = broker.getSystemUsage();
-			systemUsage.getStoreUsage().setLimit(1024 * 8);
-			systemUsage.getTempUsage().setLimit(1024 * 8);
-			broker.setSystemUsage(systemUsage);
-			broker.setPlugins(new BrokerPlugin[] { activeMQAuthorizationPlugin });
-
-			return broker;
-		}
-		return null;
-
-	}
-
-	@Bean
-	public ActiveMQConnectionFactory activeMQConnectionFactory() throws Exception {
-		ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
-		activeMQConnectionFactory.setBrokerURL(brokerUrl);
-		return activeMQConnectionFactory;
-	}
-
-//	@Bean
-//	public ActiveMQSslConnectionFactory activeMQSslConnectionFactory() throws Exception {
-//		ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory();
-//		if (getKeyManagerFactory() != null) {
-//			activeMQConnectionFactory.setBrokerURL(sslBrokerUrlClient);
-////			activeMQConnectionFactory.
-//			activeMQConnectionFactory.setKeyAndTrustManagers(getKeyManagerFactory().getKeyManagers(),
-//					getTrustManagerFactory().getTrustManagers(), new SecureRandom());
-//		}
-//
-//		return activeMQConnectionFactory;
-//	}
-
-	@Bean
-	public JmsTemplate jmsTemplate() throws Exception {
-		JmsTemplate jmsTemplate = new JmsTemplate(activeMQConnectionFactory());
-		return jmsTemplate;
-	}
-
-	@Bean
-	public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() throws Exception {
-		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-		factory.setConnectionFactory(activeMQConnectionFactory());
-		return factory;
-	}
-
-	@Profile({ "test-functional" })
-	@Bean(destroyMethod = "shutdown")
-	public EmbeddedDatabase dataSource() {
-		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
-	}
+	private String brokerUrl;
+	private String sslBrokerUrl;
 
 	@PostConstruct
 	public void init() {
+
 		if (trustCertificatesStr != null) {
 			trustCertificates = Arrays.asList(trustCertificatesStr.split(","));
 		} else {
@@ -229,6 +188,86 @@ public class VtnConfig {
 			}
 		}
 
+		if (brokerPort == null) {
+			brokerPort = SocketUtils.findAvailableTcpPort();
+		}
+
+		if (brokerSslPort == null) {
+			brokerSslPort = SocketUtils.findAvailableTcpPort();
+		}
+		brokerUrl = "tcp://" + brokerHost + ":" + brokerPort;
+		sslBrokerUrl = "ssl://" + brokerSslHost + ":" + brokerSslPort;
+
+	}
+
+	@Profile({ "in-memory-broker" })
+	@Bean(initMethod = "start", destroyMethod = "stop")
+	public SslBrokerService broker() throws Exception {
+		if (getKeyManagerFactory() != null) {
+
+			SslBrokerService broker = new SslBrokerService();
+
+			broker.addConnector(brokerUrl);
+
+			broker.addSslConnector(sslBrokerUrl + "?transport.needClientAuth=true",
+					getKeyManagerFactory().getKeyManagers(), getTrustManagerFactory().getTrustManagers(),
+					new SecureRandom());
+
+			broker.setPersistent(false);
+			broker.setBrokerName("broker");
+			broker.setUseShutdownHook(true);
+
+			SystemUsage systemUsage = broker.getSystemUsage();
+			systemUsage.getStoreUsage().setLimit(1024 * 8);
+			systemUsage.getTempUsage().setLimit(1024 * 8);
+			broker.setSystemUsage(systemUsage);
+			broker.setPlugins(new BrokerPlugin[] { activeMQAuthorizationPlugin });
+
+			return broker;
+		}
+		return null;
+
+	}
+
+	@Bean
+	public ActiveMQConnectionFactory activeMQConnectionFactory() throws Exception {
+		ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
+		activeMQConnectionFactory.setBrokerURL(brokerUrl);
+		activeMQConnectionFactory.setUserName(brokerUser);
+		activeMQConnectionFactory.setPassword(brokerPass);
+		return activeMQConnectionFactory;
+	}
+
+//	@Bean
+//	public ActiveMQSslConnectionFactory activeMQSslConnectionFactory() throws Exception {
+//		ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory();
+//		if (getKeyManagerFactory() != null) {
+//			activeMQConnectionFactory.setBrokerURL(sslBrokerUrlClient);
+////			activeMQConnectionFactory.
+//			activeMQConnectionFactory.setKeyAndTrustManagers(getKeyManagerFactory().getKeyManagers(),
+//					getTrustManagerFactory().getTrustManagers(), new SecureRandom());
+//		}
+//
+//		return activeMQConnectionFactory;
+//	}
+
+	@Bean
+	public JmsTemplate jmsTemplate() throws Exception {
+		JmsTemplate jmsTemplate = new JmsTemplate(activeMQConnectionFactory());
+		return jmsTemplate;
+	}
+
+	@Bean
+	public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() throws Exception {
+		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
+		factory.setConnectionFactory(activeMQConnectionFactory());
+		return factory;
+	}
+
+	@Profile({ "test-functional", "in-memory-bdd" })
+	@Bean(destroyMethod = "shutdown")
+	public EmbeddedDatabase dataSource() {
+		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
 	}
 
 	public String getContextPath() {

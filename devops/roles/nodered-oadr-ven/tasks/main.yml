@@ -11,33 +11,48 @@
       dest: /home/vagrant/node-red-contrib-oadr-ven
       force: yes
 
-  - name: Set oadr-vtn20b.conf permission
-    file: 
-      path: /home/vagrant/node-red-contrib-oadr-ven
-      state: directory
-      mode: 0777
-      recurse: yes
+  # - name: Set oadr-vtn20b.conf permission
+  #   file: 
+  #     path: /home/vagrant/node-red-contrib-oadr-ven
+  #     state: directory
+  #     mode: 0777
+  #     recurse: yes
+
+  # - name: Install node-red-contrib-oadr-ven
+  #   shell:  sudo npm install
+  #   become: no
+  #   args:
+  #     chdir: /home/vagrant/node-red-contrib-oadr-ven 
+
+  # - name: Add node-red-contrib-oadr-ven module to nodered
+  #   shell:  sudo npm install
+  #   become: no
+  #   args:
+  #     chdir: /home/vagrant/.node-red
+
+  # - name: Add node-red-contrib-oadr-ven module to nodered
+  #   shell:  sudo npm install ../node-red-contrib-oadr-ven
+  #   become: no
+  #   args:
+  #     chdir: /home/vagrant/.node-red
 
   - name: Install node-red-contrib-oadr-ven
-    shell: sudo npm install
-    become: no
-    args:
-      chdir: /home/vagrant/node-red-contrib-oadr-ven 
+    npm:
+      path: /home/vagrant/node-red-contrib-oadr-ven 
+      executable: /usr/bin/npm --unsafe-perm=true --allow-root
+
+  - name: Install node-red
+    npm:
+      path: /home/vagrant/.node-red
+      executable: /usr/bin/npm --unsafe-perm=true --allow-root
 
   - name: Add node-red-contrib-oadr-ven module to nodered
-    shell: sudo npm install
-    become: no
-    args:
-      chdir: /home/vagrant/.node-red
+    npm:
+      name: ../node-red-contrib-oadr-ven
+      path: /home/vagrant/.node-red
 
-  - name: Add node-red-contrib-oadr-ven module to nodered
-    shell: sudo npm install ../node-red-contrib-oadr-ven
-    become: no
-    args:
-      chdir: /home/vagrant/.node-red
-
-
-
+  # - npm:
+  #   executable: /usr/bin/npm --unsafe-perm=true --allow-root
 
   - name: Install example flow
     copy:

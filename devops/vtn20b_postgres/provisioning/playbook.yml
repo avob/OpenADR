@@ -5,17 +5,89 @@
   pre_tasks:
     - name: 'update'
       raw: sudo apt-get update
-    - name: 'upgrade'
-      raw: sudo apt-get -y upgrade
+    # - name: 'upgrade'
+    #   raw: sudo apt-get -y upgrade
     - name: 'install python2'
-      raw: sudo apt-get -y install python
+      raw: sudo apt-get -y install python zip
+
 
   vars_files:
     - vars/main.yml
+  
+  tasks:
 
+    - name: add rabbitmq repo pubkey
+      raw: sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B73A36E6026DFCA
+
+    - name: check if rules file exists
+      stat: 
+        path: /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.16/plugins/rabbitmq_auth_backend_cache-20171215-3.6.x.zip
+      register: rabbitmq_auth_backend_cache
+
+    - name: check if rules file exists
+      stat: 
+        path: /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.16/plugins/rabbitmq_auth_backend_http-20171215-3.6.x.zip
+      register: rabbitmq_auth_backend_http
+
+    - name: download rabbitmq_auth_backend_cache
+      shell: wget -O rabbitmq_auth_backend_cache-20171215-3.6.x.zip https://bintray.com/rabbitmq/community-plugins/download_file?file_path=3.6.x%2Frabbitmq_auth_backend_cache%2Frabbitmq_auth_backend_cache-20171215-3.6.x.zip
+      args:
+        chdir: /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.16/plugins/
+      when: rabbitmq_auth_backend_cache.stat.exists == false
+
+    - name: unzip rabbitmq_auth_backend_cache
+      shell: unzip rabbitmq_auth_backend_cache-20171215-3.6.x.zip
+      args:
+        chdir: /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.16/plugins/
+      when: rabbitmq_auth_backend_cache.stat.exists == false
+
+    - name: download rabbitmq_auth_backend_http
+      shell: wget -O rabbitmq_auth_backend_http-20171215-3.6.x.zip https://dl.bintray.com/rabbitmq/community-plugins/3.6.x/rabbitmq_auth_backend_http/rabbitmq_auth_backend_http-20171215-3.6.x.zip; 
+      args:
+        chdir: /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.16/plugins/
+      when: rabbitmq_auth_backend_http.stat.exists == false
+
+    - name: unzip rabbitmq_auth_backend_http
+      shell: unzip rabbitmq_auth_backend_http-20171215-3.6.x.zip; 
+      args:
+        chdir: /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.16/plugins/
+      when: rabbitmq_auth_backend_http.stat.exists == false
+
+    - name: add rabbitmq official apt repository
+      apt_repository: repo='deb http://www.rabbitmq.com/debian/ testing main' state=present
+      # allow_unauthenticated: yes
+
+    
+    - name: install package
+      apt: name={{ item }} update_cache=yes state=installed
+      with_items:
+        - rabbitmq-server
+
+    - name: enable rabbitmq plugins
+      rabbitmq_plugin: names=rabbitmq_management,rabbitmq_tracing,rabbitmq_federation,rabbitmq_auth_backend_http,rabbitmq_amqp1_0 state=enabled
+      notify:
+      - restart rabbitmq
+
+    - name: add users
+      rabbitmq_user: user={{item}} password=changeme tags=administrator,{{item}} vhost=/ configure_priv=.* write_priv=.* read_priv=.* state=present
+      with_items:
+      - user1
+      - user2
+
+    - name: remove default guest user
+      rabbitmq_user: user=guest state=absent
+
+    - name: ensure vhost /test is present
+      rabbitmq_vhost: name=/test state=present
+
+  handlers:
+    - name: restart rabbitmq
+      service: name=rabbitmq-server state=restarted
+        
   roles:
     - ansiblebit.oracle-java
     - geerlingguy.postgresql
+    - geerlingguy.rabbitmq
     - remyma.ansible-springboot
     - geerlingguy.apache
     - ../../roles/common

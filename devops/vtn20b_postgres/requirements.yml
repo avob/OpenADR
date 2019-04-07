@@ -1,6 +1,7 @@
 ---
 - src: ansiblebit.oracle-java
 - src: geerlingguy.postgresql
+- src: geerlingguy.rabbitmq
 - src: https://github.com/remyma/ansible-springboot.git 
   name: remyma.ansible-springboot
 - src: geerlingguy.apache

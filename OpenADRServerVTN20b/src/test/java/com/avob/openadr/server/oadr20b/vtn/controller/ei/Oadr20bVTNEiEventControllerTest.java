@@ -28,7 +28,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bPollBuilders;
 import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
@@ -94,11 +93,8 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Resource
 	private BrokerService broker;
 
-	private Oadr20bJAXBContext jaxbContext;
-
 	@Before
 	public void setup() throws Exception {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
 		broker.getAdminView().removeQueue(DemandResponseEventPublisher.OADR20B_QUEUE);
 	}
 
