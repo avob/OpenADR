@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
@@ -14,28 +13,15 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.broker.BrokerPlugin;
-import org.apache.activemq.broker.SslBrokerService;
-import org.apache.activemq.usage.SystemUsage;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.util.SocketUtils;
 
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
-import com.avob.openadr.server.common.vtn.broker.activemq.ActiveMQAuthorizationPlugin;
 import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
 import com.google.common.collect.Maps;
 
@@ -131,9 +117,6 @@ public class VtnConfig {
 	@Value("${" + BROKER_SSL_HOST_CONF + ":localhost}")
 	private String brokerSslHost;
 
-	@Resource
-	private ActiveMQAuthorizationPlugin activeMQAuthorizationPlugin;
-
 	private KeyManagerFactory keyManagerFactory;
 	private TrustManagerFactory trustManagerFactory;
 	private String oadr20bFingerprint;
@@ -188,86 +171,16 @@ public class VtnConfig {
 			}
 		}
 
-		if (brokerPort == null) {
-			brokerPort = SocketUtils.findAvailableTcpPort();
+		if (getBrokerPort() == null) {
+			setBrokerPort(SocketUtils.findAvailableTcpPort());
 		}
 
 		if (brokerSslPort == null) {
 			brokerSslPort = SocketUtils.findAvailableTcpPort();
 		}
-		brokerUrl = "tcp://" + brokerHost + ":" + brokerPort;
-		sslBrokerUrl = "ssl://" + brokerSslHost + ":" + brokerSslPort;
+		setBrokerUrl("tcp://" + getBrokerHost() + ":" + getBrokerPort());
+		setSslBrokerUrl("ssl://" + brokerSslHost + ":" + brokerSslPort);
 
-	}
-
-	@Profile({ "in-memory-broker" })
-	@Bean(initMethod = "start", destroyMethod = "stop")
-	public SslBrokerService broker() throws Exception {
-		if (getKeyManagerFactory() != null) {
-
-			SslBrokerService broker = new SslBrokerService();
-
-			broker.addConnector(brokerUrl);
-
-			broker.addSslConnector(sslBrokerUrl + "?transport.needClientAuth=true",
-					getKeyManagerFactory().getKeyManagers(), getTrustManagerFactory().getTrustManagers(),
-					new SecureRandom());
-
-			broker.setPersistent(false);
-			broker.setBrokerName("broker");
-			broker.setUseShutdownHook(true);
-
-			SystemUsage systemUsage = broker.getSystemUsage();
-			systemUsage.getStoreUsage().setLimit(1024 * 8);
-			systemUsage.getTempUsage().setLimit(1024 * 8);
-			broker.setSystemUsage(systemUsage);
-			broker.setPlugins(new BrokerPlugin[] { activeMQAuthorizationPlugin });
-
-			return broker;
-		}
-		return null;
-
-	}
-
-	@Bean
-	public ActiveMQConnectionFactory activeMQConnectionFactory() throws Exception {
-		ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
-		activeMQConnectionFactory.setBrokerURL(brokerUrl);
-		activeMQConnectionFactory.setUserName(brokerUser);
-		activeMQConnectionFactory.setPassword(brokerPass);
-		return activeMQConnectionFactory;
-	}
-
-//	@Bean
-//	public ActiveMQSslConnectionFactory activeMQSslConnectionFactory() throws Exception {
-//		ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory();
-//		if (getKeyManagerFactory() != null) {
-//			activeMQConnectionFactory.setBrokerURL(sslBrokerUrlClient);
-////			activeMQConnectionFactory.
-//			activeMQConnectionFactory.setKeyAndTrustManagers(getKeyManagerFactory().getKeyManagers(),
-//					getTrustManagerFactory().getTrustManagers(), new SecureRandom());
-//		}
-//
-//		return activeMQConnectionFactory;
-//	}
-
-	@Bean
-	public JmsTemplate jmsTemplate() throws Exception {
-		JmsTemplate jmsTemplate = new JmsTemplate(activeMQConnectionFactory());
-		return jmsTemplate;
-	}
-
-	@Bean
-	public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() throws Exception {
-		DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-		factory.setConnectionFactory(activeMQConnectionFactory());
-		return factory;
-	}
-
-	@Profile({ "test-functional", "in-memory-bdd" })
-	@Bean(destroyMethod = "shutdown")
-	public EmbeddedDatabase dataSource() {
-		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
 	}
 
 	public String getContextPath() {
@@ -408,6 +321,54 @@ public class VtnConfig {
 
 	public String getOadr20bFingerprint() {
 		return oadr20bFingerprint;
+	}
+
+	public String getBrokerUrl() {
+		return brokerUrl;
+	}
+
+	public void setBrokerUrl(String brokerUrl) {
+		this.brokerUrl = brokerUrl;
+	}
+
+	public String getSslBrokerUrl() {
+		return sslBrokerUrl;
+	}
+
+	public void setSslBrokerUrl(String sslBrokerUrl) {
+		this.sslBrokerUrl = sslBrokerUrl;
+	}
+
+	public String getBrokerUser() {
+		return brokerUser;
+	}
+
+	public void setBrokerUser(String brokerUser) {
+		this.brokerUser = brokerUser;
+	}
+
+	public String getBrokerPass() {
+		return brokerPass;
+	}
+
+	public void setBrokerPass(String brokerPass) {
+		this.brokerPass = brokerPass;
+	}
+
+	public String getBrokerHost() {
+		return brokerHost;
+	}
+
+	public void setBrokerHost(String brokerHost) {
+		this.brokerHost = brokerHost;
+	}
+
+	public Integer getBrokerPort() {
+		return brokerPort;
+	}
+
+	public void setBrokerPort(Integer brokerPort) {
+		this.brokerPort = brokerPort;
 	}
 
 }

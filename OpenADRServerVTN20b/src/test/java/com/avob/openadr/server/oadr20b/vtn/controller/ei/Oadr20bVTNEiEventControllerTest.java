@@ -12,9 +12,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.apache.activemq.broker.BrokerService;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,7 +55,6 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedde
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
-import com.avob.openadr.server.common.vtn.service.push.DemandResponseEventPublisher;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
@@ -89,14 +86,14 @@ public class Oadr20bVTNEiEventControllerTest {
 
 	@Resource
 	private OadrMockMvc oadrMockMvc;
-
-	@Resource
-	private BrokerService broker;
-
-	@Before
-	public void setup() throws Exception {
-		broker.getAdminView().removeQueue(DemandResponseEventPublisher.OADR20B_QUEUE);
-	}
+//
+//	@Resource
+//	private BrokerService broker;
+//
+//	@Before
+//	public void setup() throws Exception {
+//		broker.getAdminView().removeQueue(DemandResponseEventPublisher.OADR20B_QUEUE);
+//	}
 
 	@Test
 	public void testErrorCase() throws Exception {

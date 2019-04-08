@@ -48,7 +48,18 @@ public class Oadr20bDemandResponseEventCreateListener {
 		Ven ven = venService.findOneByUsername(venUsername);
 		if (ven != null && ven.getUsername() != null) {
 			if (ven.getHttpPullModel() != null && !ven.getHttpPullModel() && ven.getPushUrl() != null) {
-				oadr20bPushService.pushDistributeEventToVen(ven.getUsername(), ven.getPushUrl(), ven.getXmlSignature());
+
+				List<DemandResponseEvent> findToSentEventByVenUsername = demandResponseEventService
+						.findToSentEventByVenUsername(venUsername);
+
+				if (!findToSentEventByVenUsername.isEmpty()) {
+					OadrDistributeEventType createOadrDistributeEventPayload = oadr20bVTNEiEventService
+							.createOadrDistributeEventPayload(venUsername, findToSentEventByVenUsername);
+
+					oadr20bPushService.pushMessageToVen(ven.getPushUrl(), ven.getXmlSignature(),
+							createOadrDistributeEventPayload);
+				}
+
 				LOGGER.info("pushed event to: " + ven.getUsername() + " at:" + ven.getPushUrl());
 				return;
 			} else {

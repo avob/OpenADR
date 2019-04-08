@@ -20,7 +20,7 @@
 	</properties>
 
 	<dependencies>
-	<dependency>
+		<dependency>
 			<groupId>com.avob.openadr.model</groupId>
 			<artifactId>OpenADRModel20a</artifactId>
 			<version>${project.version}</version>
@@ -136,5 +136,52 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
+	<profiles>
+		<profile>
+			<id>swagger</id>
+			<properties>
+				<oadr.swagger>true</oadr.swagger>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>io.springfox</groupId>
+					<artifactId>springfox-swagger2</artifactId>
+					<version>2.9.2</version>
+				</dependency>
+				<dependency>
+					<groupId>io.springfox</groupId>
+					<artifactId>springfox-swagger-ui</artifactId>
+					<version>2.9.2</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>in-memory</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.apache.activemq</groupId>
+					<artifactId>activemq-broker</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>com.h2database</groupId>
+					<artifactId>h2</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>external</id>
+			<dependencies>
+
+				<dependency>
+					<groupId>com.rabbitmq.jms</groupId>
+					<artifactId>rabbitmq-jms</artifactId>
+					<version>1.11.2</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
 
 </project>
