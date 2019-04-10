@@ -41,16 +41,17 @@ OpenADRServerVTN20bUI | OADR 2.0b VTN Control UI
 
 ### Endpoints
 
-- VTN 2.0b Endpoint: https://vtn.oadr.com:8181/testvtn
-- VTN Control UI: https://vtn.oadr.com:8080/oadr-vtn20b-ui
+- VTN RootURL: https://vtn.oadr.com:8181/testvtn
 - VTN Control Swagger UI: https://vtn.oadr.com:8181/testvtn/swagger-ui.html
+- VTN RabbitMQ Management UI: http://vtn.oadr.com:15672
+- VTN Control UI: https://vtn.oadr.com:8080/oadr-vtn20b-ui
 - Nodered Terminal: http://vtn.oadr.com:1880 
 - Ven1 Nodered Dashboard: http://vtn.oadr.com:1880/ui/#!/0
 
 ### Build apps and start VM
 ```shell
-	# build backend
-	mvn clean package install
+	# build backend with external profile
+	mvn clean package install -P external -DskipTests=true
 
 	# build frontend
 	export PUBLIC_PATH=/oadr-vtn20b-ui/; npm run headless-build --prefix OpenADRServerVTN20bUI/
@@ -94,8 +95,13 @@ Useful when developping on VTN or VTN Control UI
 	cd {root}/devops/nodered
 	vagrant up
 	
+	# in-memory middleware build profile + tests
+	mvn clean package install
+	
 	# start backend (in your IDE) using following args:
-	--spring.profiles.active=test-functional,custom-cert --vtn.swagger=true  --vtn.cors=http://testlocal:3000,http://vtn2.oadr.com:3000 --vtn.custom-cert-folder=../cert
+	--spring.profiles.active=test-functional,custom-cert,swagger
+	--vtn.cors=http://vtn.oadr.com:3000 
+	--vtn.custom-cert-folder=../cert
 
 	# start frontend
 	cd {root}/OpenADRServerVTN20bUI

@@ -16,8 +16,10 @@ import javax.annotation.PostConstruct;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.SocketUtils;
 
 import com.avob.openadr.security.OadrHttpSecurity;
@@ -117,6 +119,9 @@ public class VtnConfig {
 	@Value("${" + BROKER_SSL_HOST_CONF + ":localhost}")
 	private String brokerSslHost;
 
+	@Autowired
+	private ConfigurableEnvironment env;
+
 	private KeyManagerFactory keyManagerFactory;
 	private TrustManagerFactory trustManagerFactory;
 	private String oadr20bFingerprint;
@@ -181,6 +186,15 @@ public class VtnConfig {
 		setBrokerUrl("tcp://" + getBrokerHost() + ":" + getBrokerPort());
 		setSslBrokerUrl("ssl://" + brokerSslHost + ":" + brokerSslPort);
 
+	}
+
+	public boolean hasExternalRabbitMQBroker() {
+		List<String> profiles = Arrays.asList(env.getActiveProfiles());
+		return profiles.contains("rabbitmq-broker") || profiles.contains("external");
+	}
+
+	public boolean hasInMemoryBroker() {
+		return !this.hasExternalRabbitMQBroker();
 	}
 
 	public String getContextPath() {

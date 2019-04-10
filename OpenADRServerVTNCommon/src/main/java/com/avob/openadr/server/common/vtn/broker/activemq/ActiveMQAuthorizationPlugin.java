@@ -4,10 +4,12 @@ import javax.annotation.Resource;
 
 import org.apache.activemq.broker.Broker;
 import org.apache.activemq.broker.BrokerPlugin;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.server.common.vtn.security.OadrSecurityRoleService;
 
+@Profile({ "test", "in-memory-broker" })
 @Service
 public class ActiveMQAuthorizationPlugin implements BrokerPlugin {
 

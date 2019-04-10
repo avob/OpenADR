@@ -29,17 +29,12 @@ import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
-import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.common.vtn.service.VenService;
-import com.avob.openadr.server.common.vtn.service.push.OadrAppNotificationPublisher;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCanceledPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCreatePartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bQueryRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bResponsePartyReregistrationApplicationLayerException;
-import com.avob.openadr.server.oadr20b.vtn.service.dtomapper.Oadr20bDtoMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class Oadr20bVTNEiRegisterPartyService {
@@ -70,14 +65,6 @@ public class Oadr20bVTNEiRegisterPartyService {
 
 	@Resource
 	private XmlSignatureService xmlSignatureService;
-
-	@Resource
-	private OadrAppNotificationPublisher oadrAppNotificationPublisher;
-
-	@Resource
-	private Oadr20bDtoMapper oadr20bDtoMapper;
-
-	private ObjectMapper mapper = new ObjectMapper();
 
 	public Oadr20bVTNEiRegisterPartyService() throws JAXBException {
 		jaxbContext = Oadr20bJAXBContext.getInstance();
@@ -141,14 +128,6 @@ public class Oadr20bVTNEiRegisterPartyService {
 		ven.setReportOnly(oadrReportOnly);
 		ven.setXmlSignature(oadrXmlSignature);
 		venService.save(ven);
-
-		try {
-			VenDto map = oadr20bDtoMapper.map(ven, VenDto.class);
-			oadrAppNotificationPublisher.notify(mapper.writeValueAsString(map));
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 		Oadr20bCreatedPartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatedPartyRegistrationBuilder(requestID, HttpStatus.OK_200, venID, vtnConfig.getVtnId())

@@ -32,6 +32,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.security.BasicAuthenticationManager;
 import com.avob.openadr.server.common.vtn.security.DigestAuthenticationProvider;
 import com.avob.openadr.server.common.vtn.security.DigestUserDetailsService;
@@ -60,6 +61,9 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Resource
 	private DigestUserDetailsService digestUserDetailsService;
+
+	@Resource
+	private VtnConfig vtnConfig;
 
 	@PostConstruct
 	public void init() {
@@ -91,6 +95,10 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		http.authorizeRequests().regexMatchers(HttpMethod.OPTIONS, ".*").permitAll();
+		
+		http.authorizeRequests().regexMatchers(HttpMethod.POST, ".*/auth/.*").permitAll();
+		
+		
 
 		http.authorizeRequests().anyRequest().authenticated().and().x509().subjectPrincipalRegex("CN=(.*?)(?:,|$)")
 				.authenticationUserDetailsService(oadr20bX509AuthenticatedUserDetailsService);
@@ -124,6 +132,7 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 		web.ignoring()
 
 				.regexMatchers("/health");
+
 	}
 
 	@Bean
