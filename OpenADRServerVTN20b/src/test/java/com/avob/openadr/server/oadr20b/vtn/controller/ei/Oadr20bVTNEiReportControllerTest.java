@@ -93,7 +93,7 @@ public class Oadr20bVTNEiReportControllerTest {
 
 	private static final String VEN_ENDPOINT = "/Ven/";
 	private static final String VTN_ENDPOINT = "/Vtn/";
-
+	
 	@Resource
 	private VenService venService;
 

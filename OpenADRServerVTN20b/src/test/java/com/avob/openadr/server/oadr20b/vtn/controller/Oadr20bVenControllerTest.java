@@ -47,7 +47,7 @@ public class Oadr20bVenControllerTest {
 
 	@Test
 	public void testReportAction() throws Exception {
-		
+
 		venPollService.deleteAll();
 
 		// test nothing in poll queue
@@ -60,6 +60,8 @@ public class Oadr20bVenControllerTest {
 		oadrMockMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/registerparty/requestReregistration", HttpStatus.OK_200);
 
+		Thread.sleep(200);
+		
 		// test register report payload is in poll queue
 		oadrMockMvc.postOadrPollAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200,
 				OadrRequestReregistrationType.class);

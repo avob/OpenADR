@@ -5,8 +5,8 @@
   pre_tasks:
     - name: 'update'
       raw: sudo apt-get update
-    - name: 'upgrade'
-      raw: sudo apt-get -y upgrade
+    # - name: 'upgrade'
+    #   raw: sudo apt-get -y upgrade
     - name: 'install python2'
       raw: sudo apt-get -y install python
 
