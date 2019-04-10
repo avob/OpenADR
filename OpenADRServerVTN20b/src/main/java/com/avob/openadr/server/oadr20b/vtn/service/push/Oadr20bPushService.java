@@ -2,7 +2,6 @@ package com.avob.openadr.server.oadr20b.vtn.service.push;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -37,7 +36,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenService;
@@ -97,7 +95,6 @@ public class Oadr20bPushService {
 		}
 
 	}
-
 
 	@Async
 	public void pushMessageToVen(String venPushUrl, Boolean xmlSignatureRequired, Object payload) {

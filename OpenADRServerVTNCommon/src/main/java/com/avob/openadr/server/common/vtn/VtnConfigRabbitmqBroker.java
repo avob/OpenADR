@@ -10,7 +10,7 @@ import org.springframework.jms.core.JmsTemplate;
 
 import com.rabbitmq.jms.admin.RMQConnectionFactory;
 
-@Profile({ "external", "rabbitmq-broker" })
+@Profile({ "!test", "external", "rabbitmq-broker" })
 @Configuration
 public class VtnConfigRabbitmqBroker {
 
