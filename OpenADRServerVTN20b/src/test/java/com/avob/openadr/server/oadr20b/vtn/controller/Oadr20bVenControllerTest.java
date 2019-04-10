@@ -65,19 +65,24 @@ public class Oadr20bVenControllerTest {
 		// test register report payload is in poll queue
 		oadrMockMvc.postOadrPollAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200,
 				OadrRequestReregistrationType.class);
-
+		
 		// send register party requestReregistration action
 		oadrMockMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/registerparty/cancelPartyRegistration", HttpStatus.OK_200);
 
+		Thread.sleep(200);
+		
 		// test register report payload is in poll queue
 		oadrMockMvc.postOadrPollAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200,
 				OadrCancelPartyRegistrationType.class);
-
+		
+		
 		// send request register report action
 		oadrMockMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/report_action/requestRegister", HttpStatus.OK_200);
 
+		Thread.sleep(200);
+		
 		// test register report payload is in poll queue
 		oadrMockMvc.postOadrPollAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200,
 				OadrCreateReportType.class);
@@ -86,6 +91,8 @@ public class Oadr20bVenControllerTest {
 		oadrMockMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/report_action/sendRegister", HttpStatus.OK_200);
 
+		Thread.sleep(200);
+		
 		// test register report payload is in poll queue
 		oadrMockMvc.postOadrPollAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200,
 				OadrRegisterReportType.class);
@@ -97,6 +104,8 @@ public class Oadr20bVenControllerTest {
 		oadrMockMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/report_action/cancel", HttpStatus.OK_200, params);
 
+		Thread.sleep(200);
+		
 		// test cancel report payload is in poll queue
 		oadrMockMvc.postOadrPollAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200,
 				OadrCancelReportType.class);
