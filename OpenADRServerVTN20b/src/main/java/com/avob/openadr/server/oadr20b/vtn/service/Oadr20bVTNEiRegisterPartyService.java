@@ -29,6 +29,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
+import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCanceledPartyRegistrationTypeApplicationLayerException;
@@ -65,6 +66,9 @@ public class Oadr20bVTNEiRegisterPartyService {
 
 	@Resource
 	private XmlSignatureService xmlSignatureService;
+
+	@Resource
+	private Oadr20bAppNotificationPublisher oadr20bAppNotificationPublisher;
 
 	public Oadr20bVTNEiRegisterPartyService() throws JAXBException {
 		jaxbContext = Oadr20bJAXBContext.getInstance();
@@ -129,6 +133,8 @@ public class Oadr20bVTNEiRegisterPartyService {
 		ven.setXmlSignature(oadrXmlSignature);
 		venService.save(ven);
 
+		oadr20bAppNotificationPublisher.convertAndNotify(ven, VenDto.class);
+
 		Oadr20bCreatedPartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatedPartyRegistrationBuilder(requestID, HttpStatus.OK_200, venID, vtnConfig.getVtnId())
 				.addOadrProfile(Oadr20bEiRegisterPartyBuilders.newOadr20bOadrProfileBuilder(oadrProfileName)
@@ -176,6 +182,7 @@ public class Oadr20bVTNEiRegisterPartyService {
 		}
 
 		clearRegistration(ven);
+		oadr20bAppNotificationPublisher.convertAndNotify(ven, VenDto.class);
 		OadrResponseType response = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder(requestID, HttpStatus.OK_200, venID).build();
 		if (signed) {
@@ -210,6 +217,7 @@ public class Oadr20bVTNEiRegisterPartyService {
 							Oadr20bApplicationLayerErrorCode.INVALID_ID_452, null, ven.getUsername()).build());
 		}
 		clearRegistration(ven);
+		oadr20bAppNotificationPublisher.convertAndNotify(ven, VenDto.class);
 		OadrCanceledPartyRegistrationType response = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCanceledPartyRegistrationBuilder(requestID, HttpStatus.OK_200, registrationID,
 						ven.getUsername())

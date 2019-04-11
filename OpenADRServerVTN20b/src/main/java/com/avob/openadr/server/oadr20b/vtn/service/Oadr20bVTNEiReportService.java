@@ -89,11 +89,15 @@ import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bRegisterRep
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bUpdateReportApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDescriptionDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapabilityDescription;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.VenReportCapabilityDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.VenReportDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportData;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequest;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.SelfReportRequest;
+import com.avob.openadr.server.oadr20b.vtn.service.dtomapper.Oadr20bDtoMapper;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityDescriptionService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportDataService;
@@ -151,6 +155,12 @@ public class Oadr20bVTNEiReportService {
 	@Resource
 	private VtnConfig vtnConfig;
 
+	@Resource
+	private Oadr20bAppNotificationPublisher oadr20bAppNotificationPublisher;
+
+	@Resource
+	private Oadr20bDtoMapper oadr20bDtoMapper;
+
 	public Oadr20bVTNEiReportService() {
 		try {
 			jaxbContext = Oadr20bJAXBContext.getInstance();
@@ -181,7 +191,8 @@ public class Oadr20bVTNEiReportService {
 		String requestID = payload.getRequestID();
 		String venID = payload.getVenID();
 		Ven ven = venService.findOneByUsername(venID);
-
+		VenReportDto venReportDto = oadr20bDtoMapper.map(ven, VenReportDto.class);
+		List<VenReportCapabilityDto> capabilitiesDto = new ArrayList<>();
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
 					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
@@ -236,6 +247,10 @@ public class Oadr20bVTNEiReportService {
 			if (createdDateTime != null) {
 				otherReportCapability.setCreatedDatetime(Oadr20bFactory.xmlCalendarToTimestamp(createdDateTime));
 			}
+
+			VenReportCapabilityDto capabilityDto = oadr20bDtoMapper.map(otherReportCapability,
+					VenReportCapabilityDto.class);
+			List<ReportCapabilityDescriptionDto> descriptionDto = new ArrayList<>();
 			capabilities.add(otherReportCapability);
 			List<OtherReportCapabilityDescription> capabilityDescription = new ArrayList<OtherReportCapabilityDescription>();
 			for (OadrReportDescriptionType oadrReportDescriptionType : oadrReportType.getOadrReportDescription()) {
@@ -381,16 +396,21 @@ public class Oadr20bVTNEiReportService {
 				} catch (Oadr20bMarshalException e) {
 					LOGGER.warn("Can't marshall report description payload", e);
 				}
+
+				descriptionDto.add(oadr20bDtoMapper.map(description, ReportCapabilityDescriptionDto.class));
 				descriptions.add(description);
 				capabilityDescription.add(description);
 
 			}
+			capabilityDto.setDescriptions(descriptionDto);
+			capabilitiesDto.add(capabilityDto);
 			if (!created) {
 				this.distributeSubscriptionOadrCreatedReportPayload(ven, otherReportCapability, capabilityDescription);
 			}
 
 		}
-
+		venReportDto.setCapabilities(capabilitiesDto);
+		oadr20bAppNotificationPublisher.notify(venReportDto);
 		otherReportCapabilityService.save(capabilities);
 		otherReportCapabilityDescriptionService.save(descriptions);
 

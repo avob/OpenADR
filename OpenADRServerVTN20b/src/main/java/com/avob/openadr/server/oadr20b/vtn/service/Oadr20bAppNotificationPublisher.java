@@ -20,9 +20,18 @@ public class Oadr20bAppNotificationPublisher {
 
 	private ObjectMapper mapper = new ObjectMapper();
 
-	public <T> void notify(Object dto, Class<T> klass) {
+	public <T> void convertAndNotify(Object po, Class<T> klass) {
 		try {
-//			VenDto map = oadr20bDtoMapper.map(dto, klass);
+			T map = oadr20bDtoMapper.map(po, klass);
+			oadrAppNotificationPublisher.notify(mapper.writeValueAsString(map));
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void notify(Object dto) {
+		try {
 			oadrAppNotificationPublisher.notify(mapper.writeValueAsString(dto));
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
