@@ -84,6 +84,13 @@
         owner: rabbitmq
         group: root
 
+    - name: Add the inventory into /etc/hosts
+      become: true
+      blockinfile:
+        dest: /etc/hosts
+        content: "{{ lookup('template', 'templates/hosts.j2') }}"
+        state: present
+
   handlers:
     - name: restart rabbitmq
       service: name=rabbitmq-server state=restarted

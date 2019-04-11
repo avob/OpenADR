@@ -7,9 +7,12 @@ import { connectRouter, routerMiddleware } from 'connected-react-router';
 import swaggerMiddleware from './swaggerMiddleware'
 import swagger from 'swagger-client'
 import rootReducer from '../reducers';
+// publicPath env
+const publicPath = process.env.PUBLIC_PATH;
 
-
-export const history = createHistory();
+export const history = createHistory({
+  basename: publicPath
+});
 const connectRouterHistory = connectRouter( history );
 
 export var config = {

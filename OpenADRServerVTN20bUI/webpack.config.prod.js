@@ -11,7 +11,8 @@ console.log("PUBLIC_PATH: "+publicPath)
 
 const GLOBALS = {
   'process.env.NODE_ENV': JSON.stringify('production'),
-  __DEV__: false
+  __DEV__: false,
+  'process.env.PUBLIC_PATH': JSON.stringify(publicPath),
 };
 
 export default {
@@ -23,8 +24,8 @@ export default {
   target: 'web',
   mode: 'production',
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    publicPath: publicPath,
+    path: path.resolve(__dirname, 'dist'+publicPath),
+    // publicPath: "https://vtn.oadr.com:8080/oadr-vtn20b-ui/",
     filename: '[name].[contenthash].js'
   },
   plugins: [

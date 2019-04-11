@@ -6,10 +6,25 @@
 
   - name: Install oadr-vtn20b-ui apache2 app
     copy:
-      src: ../../../OpenADRServerVTN20bUI/dist/
-      dest: /var/www/html/oadr-vtn20b-ui
+      src: ../../../OpenADRServerVTN20bUI/dist/oadr-vtn20b-ui
+      dest: /var/www/html/
   
+  - name: Install .htaccess
+    template:
+      src: templates/apache2_htaccess.conf
+      dest: /var/www/html/oadr-vtn20b-ui/.htaccess
+      owner: rabbitmq
+      group: root
+
+  - name: Restart Apache2
+    service:
+      name: apache2
+      state: restarted
+
   - name: Start service oadr-vtn20b, if not started
     service:
       name: oadr-vtn20b
       state: started
+
+  - name: Restart Nodered
+    shell: systemctl restart nodered
