@@ -20,6 +20,8 @@ import com.avob.openadr.server.common.vtn.service.dtomapper.MarketContextMapper;
 import com.avob.openadr.server.common.vtn.service.dtomapper.VenMapper;
 import com.avob.openadr.server.oadr20b.vtn.models.venopt.VenOpt;
 import com.avob.openadr.server.oadr20b.vtn.models.venopt.VenOptDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequest;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.ReportRequestDto;
 
@@ -45,6 +47,7 @@ public class Oadr20bDtoMapper extends DtoMapper {
 		this.mapper.setCustomConvertersWithId(customConvertersWithId);
 		this.mapper.addMapping(venOptMappingConfiguration());
 		this.mapper.addMapping(reportRequestMappingconfiguration());
+		this.mapper.addMapping(venReportRequestCapabilityMappingConfiguration());
 
 	}
 
@@ -59,6 +62,18 @@ public class Oadr20bDtoMapper extends DtoMapper {
 						customConverterId(MARKET_CONTEXT_CONVERTER_ID)).fields("event", "eventId",
 								customConverter(DemandResponseEventMapper.class),
 								customConverterId(DEMAND_RESPONSE_CONVERTER_ID));
+			}
+		};
+	}
+
+	private BeanMappingBuilder venReportRequestCapabilityMappingConfiguration() {
+		return new BeanMappingBuilder() {
+			@Override
+			protected void configure() {
+				TypeMappingBuilder fields = mapping(OtherReportCapability.class, OtherReportCapabilityDto.class);
+				fields.fields("source", "venId", customConverter(VenMapper.class),
+						customConverterId(Oadr20bDtoMapper.VEN_CONVERTER_ID));
+
 			}
 		};
 	}

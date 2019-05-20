@@ -752,7 +752,6 @@ public class Oadr20bFactory {
 		createOadrReportRequestType.setReportRequestID(reportRequestId);
 		ReportSpecifierType reportSpecifier = Oadr20bFactory.createReportSpecifierType(reportSpecifierId, granularity,
 				reportBackDuration);
-
 		createOadrReportRequestType.setReportSpecifier(reportSpecifier);
 		return createOadrReportRequestType;
 	}
@@ -771,7 +770,7 @@ public class Oadr20bFactory {
 	}
 
 	public static OadrReportType createOadrUpdateReportOadrReportType(String reportId, String reportrequestId,
-			String reportSpecifierId, ReportNameEnumeratedType reportName, long createdTimestamp, long startTimestamp,
+			String reportSpecifierId, ReportNameEnumeratedType reportName, long createdTimestamp, Long startTimestamp,
 			String duration) {
 		OadrReportType createOadrReportType = factory.createOadrReportType();
 		createOadrReportType.setReportRequestID(reportrequestId);
@@ -780,8 +779,12 @@ public class Oadr20bFactory {
 			createOadrReportType.setReportName(reportName.value());
 		}
 		createOadrReportType.setCreatedDateTime(timestamptoXMLCalendar(createdTimestamp));
-		createOadrReportType.setDtstart(Oadr20bFactory.createDtstart(startTimestamp));
-		createOadrReportType.setDuration(Oadr20bFactory.createDurationPropType(duration));
+		if (startTimestamp != null) {
+			createOadrReportType.setDtstart(Oadr20bFactory.createDtstart(startTimestamp));
+		}
+		if (duration != null) {
+			createOadrReportType.setDuration(Oadr20bFactory.createDurationPropType(duration));
+		}
 		Intervals intervals = Oadr20bFactory.createIntervals();
 		createOadrReportType.setIntervals(intervals);
 		return createOadrReportType;
@@ -1047,7 +1050,7 @@ public class Oadr20bFactory {
 		return createIntervalType;
 	}
 
-	public static IntervalType createReportIntervalType(String intervalId, long start, String xmlDuration, String rid,
+	public static IntervalType createReportIntervalType(String intervalId, Long start, String xmlDuration, String rid,
 			Long confidence, Float accuracy, Float value) {
 		IntervalType createIntervalType = eiFactory.createIntervalType();
 		createIntervalType.setUid(Oadr20bFactory.createUidType(intervalId));
@@ -1059,12 +1062,16 @@ public class Oadr20bFactory {
 		return createIntervalType;
 	}
 
-	public static IntervalType createKeyTokenReportIntervalType(String intervalId, long start, String xmlDuration,
+	public static IntervalType createKeyTokenReportIntervalType(String intervalId, Long start, String xmlDuration,
 			String rid, Long confidence, Float accuracy, PayloadKeyTokenType tokens) {
 		IntervalType createIntervalType = eiFactory.createIntervalType();
 		createIntervalType.setUid(Oadr20bFactory.createUidType(intervalId));
-		createIntervalType.setDuration(Oadr20bFactory.createDurationPropType(xmlDuration));
-		createIntervalType.setDtstart(Oadr20bFactory.createDtstart(start));
+		if (xmlDuration != null) {
+			createIntervalType.setDuration(Oadr20bFactory.createDurationPropType(xmlDuration));
+		}
+		if (start != null) {
+			createIntervalType.setDtstart(Oadr20bFactory.createDtstart(start));
+		}
 
 		OadrReportPayloadType createReportPayloadType = Oadr20bFactory.createReportPayloadType(rid, confidence,
 				accuracy, tokens);
@@ -1073,7 +1080,7 @@ public class Oadr20bFactory {
 		return createIntervalType;
 	}
 
-	public static IntervalType createAvobVenServiceRequestReportIntervalType(String intervalId, long start,
+	public static IntervalType createAvobVenServiceRequestReportIntervalType(String intervalId, Long start,
 			String xmlDuration, String rid, Long confidence, Float accuracy,
 			PayloadAvobVenServiceRequestType requests) {
 		IntervalType createIntervalType = eiFactory.createIntervalType();
@@ -1088,7 +1095,7 @@ public class Oadr20bFactory {
 		return createIntervalType;
 	}
 
-	public static IntervalType createReportIntervalType(String intervalId, long start, String xmlDuration, String rid,
+	public static IntervalType createReportIntervalType(String intervalId, Long start, String xmlDuration, String rid,
 			Long confidence, Float accuracy, OadrPayloadResourceStatusType value) {
 		IntervalType createIntervalType = eiFactory.createIntervalType();
 		createIntervalType.setUid(Oadr20bFactory.createUidType(intervalId));
@@ -1100,7 +1107,7 @@ public class Oadr20bFactory {
 		return createIntervalType;
 	}
 
-	public static IntervalType createReportIntervalType(String intervalId, long start, String xmlDuration, String rid,
+	public static IntervalType createReportIntervalType(String intervalId, Long start, String xmlDuration, String rid,
 			Long confidence, Float accuracy, JAXBElement<? extends PayloadBaseType> payloadBase) {
 		IntervalType createIntervalType = eiFactory.createIntervalType();
 		createIntervalType.setUid(Oadr20bFactory.createUidType(intervalId));

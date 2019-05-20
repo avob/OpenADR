@@ -68,6 +68,8 @@ public class Oadr20bVTNEiReportController {
 			Oadr20bCreateReportApplicationLayerException, Oadr20bCreatedReportApplicationLayerException,
 			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException {
 
+		LOGGER.debug(payload);
+		
 		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
 
 		String username = principal.getName();

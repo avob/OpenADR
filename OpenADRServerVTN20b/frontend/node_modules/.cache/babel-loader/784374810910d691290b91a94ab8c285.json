@@ -1,0 +1,1 @@
+{"ast":null,"code":"var hide = require('./_hide');\n\nmodule.exports = function (target, src, safe) {\n  for (var key in src) {\n    if (safe && target[key]) target[key] = src[key];else hide(target, key, src[key]);\n  }\n\n  return target;\n};","map":null,"metadata":{},"sourceType":"script"}

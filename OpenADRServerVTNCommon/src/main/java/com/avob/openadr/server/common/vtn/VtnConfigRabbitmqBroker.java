@@ -10,15 +10,15 @@ import org.springframework.jms.core.JmsTemplate;
 
 import com.rabbitmq.jms.admin.RMQConnectionFactory;
 
-@Profile({ "!test", "external", "rabbitmq-broker" })
 @Configuration
+@Profile("external")
 public class VtnConfigRabbitmqBroker {
 
 	@Resource
 	private VtnConfig vtnConfig;
 
 	@Bean
-	public ConnectionFactory connectionFactory() {
+	public ConnectionFactory externalConnectionFactory() {
 		RMQConnectionFactory rmqConnectionFactory = new RMQConnectionFactory();
 		rmqConnectionFactory.setHost(vtnConfig.getBrokerHost());
 		rmqConnectionFactory.setPort(vtnConfig.getBrokerPort());
@@ -28,8 +28,8 @@ public class VtnConfigRabbitmqBroker {
 	}
 
 	@Bean
-	public JmsTemplate jmsTemplate() throws Exception {
-		JmsTemplate jmsTemplate = new JmsTemplate(connectionFactory());
+	public JmsTemplate externalJmsTemplate() throws Exception {
+		JmsTemplate jmsTemplate = new JmsTemplate(externalConnectionFactory());
 		return jmsTemplate;
 	}
 

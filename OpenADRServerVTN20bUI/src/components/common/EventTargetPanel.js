@@ -174,7 +174,7 @@ export class EventTargetPanel extends React.Component {
       
       <Grid container spacing={ 24 }>
           <Grid item xs={ 2 }>
-           <TextField label="Select Target Type" error={hasError && descriptor.marketContext == null}
+           <TextField label="Select Target Type" error={hasError && eventTarget.marketContext == null}
                  value={ this.state.createTargetType }
                  placeholder="Ven, Group ..."
                  className={classes.textField}

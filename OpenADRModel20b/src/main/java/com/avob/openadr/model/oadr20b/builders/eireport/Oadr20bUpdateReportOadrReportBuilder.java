@@ -13,7 +13,7 @@ public class Oadr20bUpdateReportOadrReportBuilder {
     private OadrReportType oadrReportType;
 
     public Oadr20bUpdateReportOadrReportBuilder(String reportId, String reportrequestId, String reportSpecifierId,
-            ReportNameEnumeratedType reportName, long createdTimestamp, long startTimestamp, String duration) {
+            ReportNameEnumeratedType reportName, long createdTimestamp, Long startTimestamp, String duration) {
         oadrReportType = Oadr20bFactory.createOadrUpdateReportOadrReportType(reportId, reportrequestId,
                 reportSpecifierId, reportName, createdTimestamp, startTimestamp, duration);
     }

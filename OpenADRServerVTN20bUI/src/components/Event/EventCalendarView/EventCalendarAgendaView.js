@@ -13,14 +13,14 @@ class EventCalendarAgendaView extends AgendaView {
 
 }
 
-var getRange = (date) => {
-   
-    return {
-      start:start.toDate(),
-      end:end.toDate()
-    }
+// var getRange = (date) => {
+    
+//     return {
+//       start:start.toDate(),
+//       end:end.toDate()
+//     }
 
-}
+// }
 
 EventCalendarAgendaView.range = date => {
 
@@ -52,7 +52,6 @@ EventCalendarAgendaView.navigate = (date, action) => {
       return d.toDate();
 
     case BigCalendar.Navigate.TODAY:
-    console.log("today")
       date = new Date();
      
       return date;

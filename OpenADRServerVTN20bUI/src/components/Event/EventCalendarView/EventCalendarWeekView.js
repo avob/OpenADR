@@ -15,14 +15,14 @@ class EventCalendarWeekView extends React.Component {
   }
 }
 
-var getRange = (date) => {
+// var getRange = (date) => {
    
-    return {
-      start:start.toDate(),
-      end:end.toDate()
-    }
+//     return {
+//       start:start.toDate(),
+//       end:end.toDate()
+//     }
 
-}
+// }
 
 EventCalendarWeekView.range = date => {
 

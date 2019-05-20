@@ -80,7 +80,7 @@ public class Oadr20bEiReportBuilders {
 
 	public static Oadr20bUpdateReportOadrReportBuilder newOadr20bUpdateReportOadrReportBuilder(String reportId,
 			String reportrequestId, String reportSpecifierId, ReportNameEnumeratedType reportName,
-			long createdTimestamp, long startTimestamp, String duration) {
+			long createdTimestamp, Long startTimestamp, String duration) {
 		return new Oadr20bUpdateReportOadrReportBuilder(reportId, reportrequestId, reportSpecifierId, reportName,
 				createdTimestamp, startTimestamp, duration);
 	}

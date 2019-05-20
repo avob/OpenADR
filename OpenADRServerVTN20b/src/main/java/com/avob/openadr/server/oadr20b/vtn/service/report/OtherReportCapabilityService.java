@@ -3,6 +3,7 @@ package com.avob.openadr.server.oadr20b.vtn.service.report;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
@@ -18,20 +19,29 @@ public class OtherReportCapabilityService extends GenericService<OtherReportCapa
 	@Resource
 	private OtherReportCapabilityDao otherReportCapabilityDao;
 
+	@Transactional
 	public List<OtherReportCapability> findByReportSpecifierIdStartingWith(String reportSpecifierId) {
 		return otherReportCapabilityDao.findByReportSpecifierIdStartingWith(reportSpecifierId);
 	}
 
+	@Transactional
 	public List<OtherReportCapability> findByReportRequestId(List<String> payloadReportRequestId) {
 		return otherReportCapabilityDao.findByReportRequestIdIn(payloadReportRequestId);
 	}
 
+	@Transactional
 	public OtherReportCapability findByReportSpecifierId(String reportSpecifierId) {
 		return otherReportCapabilityDao.findOneByReportSpecifierId(reportSpecifierId);
 	}
 
+	@Transactional
 	public List<OtherReportCapability> findBySource(Ven source) {
 		return otherReportCapabilityDao.findBySource(source);
+	}
+
+	@Transactional
+	public List<OtherReportCapability> findBySourceUsernameIn(List<String> username) {
+		return otherReportCapabilityDao.findBySourceUsernameIn(username);
 	}
 
 	@Override

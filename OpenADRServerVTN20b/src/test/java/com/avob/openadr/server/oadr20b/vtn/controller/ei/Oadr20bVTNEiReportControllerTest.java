@@ -2,7 +2,6 @@ package com.avob.openadr.server.oadr20b.vtn.controller.ei;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.text.DecimalFormat;
@@ -71,13 +70,16 @@ import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCap
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapabilityDescription;
-import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.ReportDataDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataFloatDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataPayloadResourceStatusDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequest;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.ReportRequestDto;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityDescriptionService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityService;
-import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportDataService;
+import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportDataFloatService;
+import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportDataKeyTokenService;
+import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportDataPayloadResourceStatusService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportRequestService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportCapabilityDescriptionService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportCapabilityService;
@@ -88,12 +90,12 @@ import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockMvc;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VTN20bSecurityApplicationTest.class })
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles( "test")
+@ActiveProfiles("test")
 public class Oadr20bVTNEiReportControllerTest {
 
 	private static final String VEN_ENDPOINT = "/Ven/";
 	private static final String VTN_ENDPOINT = "/Vtn/";
-	
+
 	@Resource
 	private VenService venService;
 
@@ -119,7 +121,13 @@ public class Oadr20bVTNEiReportControllerTest {
 	private OtherReportRequestService otherReportRequestService;
 
 	@Resource
-	private OtherReportDataService otherReportDataService;
+	private OtherReportDataFloatService otherReportDataService;
+
+	@Resource
+	private OtherReportDataPayloadResourceStatusService otherReportDataPayloadResourceStatusService;
+
+	@Resource
+	private OtherReportDataKeyTokenService otherReportDataKeyTokenService;
 
 	@Resource
 	private SelfReportCapabilityService selfReportCapabilityservice;
@@ -313,23 +321,23 @@ public class Oadr20bVTNEiReportControllerTest {
 
 		// test previous payload has successfully inserted report data in
 		// database
-		List<ReportDataDto> reportDataList = mockMvc.getRestJsonControllerAndExpectList(
+		List<OtherReportDataFloatDto> reportDataList = mockMvc.getRestJsonControllerAndExpectList(
 				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/" + reportSpecifierId, HttpStatus.OK_200,
-				ReportDataDto.class);
+				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/float/" + reportSpecifierId, HttpStatus.OK_200,
+				OtherReportDataFloatDto.class);
 		assertEquals(1, reportDataList.size());
 
 		mockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/fakeReportSpecifierId",
+				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/float/fakeReportSpecifierId",
 				HttpStatus.NOT_ACCEPTABLE_406, null);
 
 		reportDataList = mockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/" + reportSpecifierId + "/rid/" + rid,
-				HttpStatus.OK_200, ReportDataDto.class);
+				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/float/" + reportSpecifierId + "/rid/" + rid,
+				HttpStatus.OK_200, OtherReportDataFloatDto.class);
 		assertEquals(1, reportDataList.size());
 
 		mockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/" + reportSpecifierId + "/rid/fakeRid",
+				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/float/" + reportSpecifierId + "/rid/fakeRid",
 				HttpStatus.NOT_ACCEPTABLE_406, null);
 
 		// xml date do not support millisecond therefore I floor timestamp to
@@ -375,29 +383,31 @@ public class Oadr20bVTNEiReportControllerTest {
 
 		// test previous payload has successfully inserted report data in
 		// database
-		reportDataList = mockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/" + reportSpecifierId, HttpStatus.OK_200,
-				ReportDataDto.class);
+		List<OtherReportDataPayloadResourceStatusDto> reportDataResourceStatusList = mockMvc
+				.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+						VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/resourcestatus/" + reportSpecifierId,
+						HttpStatus.OK_200, OtherReportDataPayloadResourceStatusDto.class);
 		assertEquals(1, reportDataList.size());
 
-		reportDataList = mockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/" + reportSpecifierId + "/rid/" + rid,
-				HttpStatus.OK_200, ReportDataDto.class);
+		reportDataResourceStatusList = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, VEN_ENDPOINT + OadrDataBaseSetup.VEN
+						+ "/report/data/resourcestatus/" + reportSpecifierId + "/rid/" + rid,
+				HttpStatus.OK_200, OtherReportDataPayloadResourceStatusDto.class);
 		assertEquals(1, reportDataList.size());
 
 		assertEquals(new Double(Math.floor(new Long(start) / 1000) * 1000),
-				new Double(reportDataList.get(0).getStart()));
-		assertEquals(confidence, reportDataList.get(0).getConfidence());
-		assertNull(reportDataList.get(0).getValue());
-		assertEquals(new Float(0), reportDataList.get(0).getOadrCapacityCurrent());
-		assertEquals(new Float(0), reportDataList.get(0).getOadrCapacityNormal());
-		assertEquals(new Float(0), reportDataList.get(0).getOadrCapacityMin());
-		assertEquals(new Float(0), reportDataList.get(0).getOadrCapacityMax());
+				new Double(reportDataResourceStatusList.get(0).getStart()));
+		assertEquals(confidence, reportDataResourceStatusList.get(0).getConfidence());
 
-		reportDataPrivateId = reportDataList.get(0).getId();
+		assertEquals(new Float(0), reportDataResourceStatusList.get(0).getOadrCapacityCurrent());
+		assertEquals(new Float(0), reportDataResourceStatusList.get(0).getOadrCapacityNormal());
+		assertEquals(new Float(0), reportDataResourceStatusList.get(0).getOadrCapacityMin());
+		assertEquals(new Float(0), reportDataResourceStatusList.get(0).getOadrCapacityMax());
 
-		// cleanup data
-		otherReportDataService.delete(reportDataPrivateId);
+		reportDataPrivateId = reportDataResourceStatusList.get(0).getId();
+
+		// cleanup data PayloadResourceStatus
+		otherReportDataPayloadResourceStatusService.delete(reportDataPrivateId);
 
 		otherReportRequestService.delete(reportRequestPrivateId);
 		otherReportCapabilityDescriptionService.delete(reportCapabilityDescriptionPrivateId);

@@ -24,7 +24,6 @@ import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VTN20bSecurityApplicationTest.class })
@@ -32,8 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ActiveProfiles("test")
 public class Oadr20bVTNOadrPollControllerTest {
 	private static final String OADRPOLL_ENDPOINT = "/OpenADR2/Simple/2.0b/OadrPoll";
-
-	private ObjectMapper mapper = new ObjectMapper();
 
 	@Value("${oadr.vtnid}")
 	private String vtnId;

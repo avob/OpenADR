@@ -2,10 +2,15 @@ package com.avob.openadr.server.oadr20b.vtn.models.venreport.capability;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Query;
+
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 
 public interface OtherReportCapabilityDao extends ReportCapabilityDao<OtherReportCapability> {
-    
-    public List<OtherReportCapability> findBySource(Ven source);
-    
+
+	public List<OtherReportCapability> findBySource(Ven source);
+
+	@Query(value = "select report from OtherReportCapability report where report.source.username in :username")
+	public List<OtherReportCapability> findBySourceUsernameIn(List<String> username);
+
 }

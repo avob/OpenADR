@@ -8,7 +8,7 @@
     # - name: 'upgrade'
     #   raw: sudo apt-get -y upgrade
     - name: 'install python2'
-      raw: sudo apt-get -y install python zip
+      raw: sudo apt-get -y install python zip 
 
 
   vars_files:
@@ -57,7 +57,6 @@
       apt_repository: repo='deb http://www.rabbitmq.com/debian/ testing main' state=present
       # allow_unauthenticated: yes
 
-    
     - name: install package
       apt: name={{ item }} update_cache=yes state=installed
       with_items:
@@ -100,10 +99,10 @@
     - geerlingguy.postgresql
     - geerlingguy.rabbitmq
     - remyma.ansible-springboot
-    - geerlingguy.apache
+    # - geerlingguy.apache
     - ../../roles/common
     - ../../roles/nodejs
     - ../../roles/nodered
     - ../../roles/nodered-oadr-ven
     - ../../roles/oadr-vtn20b
-    - ../../roles/oadr-vtn20b-ui
+    # - ../../roles/oadr-vtn20b-ui

@@ -54,6 +54,10 @@ public class OtherReportRequestService extends GenericService<OtherReportRequest
 	public void deleteByOtherReportCapabilityDescriptionIn(Collection<OtherReportCapabilityDescription> descriptions) {
 		otherReportRequestDao.deleteByOtherReportCapabilityDescriptionIn(descriptions);
 	}
+	
+	public void deleteByOtherReportCapabilitySource(Ven source) {
+		otherReportRequestDao.deleteByOtherReportCapabilitySource(source);
+	}
 
 	@Override
 	public CrudRepository<OtherReportRequest, Long> getDao() {

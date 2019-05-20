@@ -83,4 +83,5 @@ public class ReportCapabilityDto {
 	public void setStart(Long start) {
 		this.start = start;
 	}
+
 }

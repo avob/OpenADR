@@ -10,14 +10,14 @@ class EventCalendarMonthView extends MonthView {
 
 }
 
-var getRange = (date) => {
+// var getRange = (date) => {
    
-    return {
-      start:start.toDate(),
-      end:end.toDate()
-    }
+//     return {
+//       start:start.toDate(),
+//       end:end.toDate()
+//     }
 
-}
+// }
 
 EventCalendarMonthView.range = date => {
 

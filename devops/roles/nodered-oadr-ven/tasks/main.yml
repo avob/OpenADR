@@ -5,11 +5,17 @@
     with_items:
       - build-essential
 
+  - name: Ansible check file exists example.
+    stat:
+      path: /home/vagrant/node-red-contrib-oadr-ven
+    register: repo
+
   - name: Git clone node-red-contrib-oadr-ven module
     git:
       repo: 'https://github.com/avob/node-red-contrib-oadr-ven'
       dest: /home/vagrant/node-red-contrib-oadr-ven
       force: yes
+    when: repo.stat.exists == false
 
   # - name: Set oadr-vtn20b.conf permission
   #   file: 

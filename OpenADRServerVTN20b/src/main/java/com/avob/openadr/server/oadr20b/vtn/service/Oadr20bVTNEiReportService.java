@@ -17,9 +17,12 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.avob.KeyTokenType;
+import com.avob.openadr.model.oadr20b.avob.PayloadKeyTokenType;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.builders.eireport.Oadr20bCreateReportBuilder;
@@ -94,17 +97,27 @@ import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfRepor
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapabilityDescription;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.VenReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.VenReportDto;
-import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportData;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataFloat;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataFloatDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataKeyToken;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataKeyTokenDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataPayloadResourceStatus;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataPayloadResourceStatusDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequest;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.SelfReportRequest;
 import com.avob.openadr.server.oadr20b.vtn.service.dtomapper.Oadr20bDtoMapper;
+import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bAppNotificationPublisher;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityDescriptionService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityService;
-import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportDataService;
+import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportDataFloatService;
+import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportDataKeyTokenService;
+import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportDataPayloadResourceStatusService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportRequestService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportCapabilityDescriptionService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportCapabilityService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportRequestService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -135,7 +148,13 @@ public class Oadr20bVTNEiReportService {
 	protected OtherReportCapabilityDescriptionService otherReportCapabilityDescriptionService;
 
 	@Resource
-	protected OtherReportDataService otherReportDataService;
+	protected OtherReportDataFloatService otherReportDataService;
+
+	@Resource
+	private OtherReportDataPayloadResourceStatusService otherReportDataPayloadResourceStatusService;
+
+	@Resource
+	private OtherReportDataKeyTokenService otherReportDataKeyTokenService;
 
 	@Resource
 	protected OtherReportRequestService otherReportRequestService;
@@ -161,6 +180,8 @@ public class Oadr20bVTNEiReportService {
 	@Resource
 	private Oadr20bDtoMapper oadr20bDtoMapper;
 
+	private ObjectMapper jsonMapper = new ObjectMapper();
+
 	public Oadr20bVTNEiReportService() {
 		try {
 			jaxbContext = Oadr20bJAXBContext.getInstance();
@@ -184,12 +205,14 @@ public class Oadr20bVTNEiReportService {
 	 * @throws Oadr20bXMLSignatureException
 	 * @throws Oadr20bMarshalException
 	 */
+	@Transactional(readOnly=false)
 	public String oadrRegisterReport(OadrRegisterReportType payload, boolean signed)
 			throws Oadr20bRegisterReportApplicationLayerException, Oadr20bXMLSignatureException,
 			Oadr20bMarshalException {
 
 		String requestID = payload.getRequestID();
 		String venID = payload.getVenID();
+
 		Ven ven = venService.findOneByUsername(venID);
 		VenReportDto venReportDto = oadr20bDtoMapper.map(ven, VenReportDto.class);
 		List<VenReportCapabilityDto> capabilitiesDto = new ArrayList<>();
@@ -216,6 +239,7 @@ public class Oadr20bVTNEiReportService {
 
 		List<OtherReportCapability> capabilities = Lists.newArrayList();
 		List<OtherReportCapabilityDescription> descriptions = Lists.newArrayList();
+		boolean hasMetadataReport = false;
 		for (OadrReportType oadrReportType : payload.getOadrReport()) {
 
 			boolean created = false;
@@ -224,6 +248,9 @@ public class Oadr20bVTNEiReportService {
 			String reportName = oadrReportType.getReportName();
 			String reportRequestID = oadrReportType.getReportRequestID();
 			String reportSpecifierID = oadrReportType.getReportSpecifierID();
+			if ("METADATA".equals(reportSpecifierID)) {
+				hasMetadataReport = true;
+			}
 			DurationPropType duration = oadrReportType.getDuration();
 			Dtstart dtstart = oadrReportType.getDtstart();
 
@@ -410,7 +437,7 @@ public class Oadr20bVTNEiReportService {
 
 		}
 		venReportDto.setCapabilities(capabilitiesDto);
-		oadr20bAppNotificationPublisher.notify(venReportDto);
+		
 		otherReportCapabilityService.save(capabilities);
 		otherReportCapabilityDescriptionService.save(descriptions);
 
@@ -428,6 +455,12 @@ public class Oadr20bVTNEiReportService {
 			otherReportCapabilityService.delete(toDeleteCap);
 		}
 
+		if (hasMetadataReport) {
+			otherReportRequestService.deleteByOtherReportCapabilitySource(ven);
+		}
+		
+		oadr20bAppNotificationPublisher.notifyRegisterReport(venReportDto, venID);
+
 		OadrRegisteredReportType response = Oadr20bEiReportBuilders
 				.newOadr20bRegisteredReportBuilder(requestID, responseCode, venID).build();
 
@@ -438,6 +471,9 @@ public class Oadr20bVTNEiReportService {
 		}
 	}
 
+	/**
+	 * @param ven
+	 */
 	public void distributeRequestMetadataOadrCreateReportPayload(Ven ven) {
 		String requestId = "0";
 		String reportRequestId = "0";
@@ -457,6 +493,9 @@ public class Oadr20bVTNEiReportService {
 		}
 	}
 
+	/**
+	 * @param ven
+	 */
 	public void distributeOadrRegisterReport(Ven ven) {
 		List<OadrReportType> reports = Lists.newArrayList();
 		for (SelfReportCapability selfReportCapability : selfReportCapabilityService.findAll()) {
@@ -496,6 +535,14 @@ public class Oadr20bVTNEiReportService {
 		}
 	}
 
+	/**
+	 * @param payload
+	 * @param signed
+	 * @return
+	 * @throws Oadr20bCreateReportApplicationLayerException
+	 * @throws Oadr20bXMLSignatureException
+	 * @throws Oadr20bMarshalException
+	 */
 	public String oadrCreateReport(OadrCreateReportType payload, boolean signed)
 			throws Oadr20bCreateReportApplicationLayerException, Oadr20bXMLSignatureException, Oadr20bMarshalException {
 		String requestID = payload.getRequestID();
@@ -581,6 +628,14 @@ public class Oadr20bVTNEiReportService {
 		}
 	}
 
+	/**
+	 * @param payload
+	 * @param signed
+	 * @return
+	 * @throws Oadr20bCreatedReportApplicationLayerException
+	 * @throws Oadr20bXMLSignatureException
+	 * @throws Oadr20bMarshalException
+	 */
 	public String oadrCreatedReport(OadrCreatedReportType payload, boolean signed)
 			throws Oadr20bCreatedReportApplicationLayerException, Oadr20bXMLSignatureException,
 			Oadr20bMarshalException {
@@ -620,6 +675,14 @@ public class Oadr20bVTNEiReportService {
 		}
 	}
 
+	/**
+	 * @param payload
+	 * @param signed
+	 * @return
+	 * @throws Oadr20bCancelReportApplicationLayerException
+	 * @throws Oadr20bMarshalException
+	 * @throws Oadr20bXMLSignatureException
+	 */
 	public String oadrCancelReport(OadrCancelReportType payload, boolean signed)
 			throws Oadr20bCancelReportApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
 		String requestID = payload.getRequestID();
@@ -656,6 +719,10 @@ public class Oadr20bVTNEiReportService {
 		}
 	}
 
+	/**
+	 * @param payload
+	 * @throws Oadr20bCancelReportApplicationLayerException
+	 */
 	public void otherOadrCancelReport(OadrCancelReportType payload)
 			throws Oadr20bCancelReportApplicationLayerException {
 		String venID = payload.getVenID();
@@ -670,6 +737,14 @@ public class Oadr20bVTNEiReportService {
 
 	}
 
+	/**
+	 * @param payload
+	 * @param signed
+	 * @return
+	 * @throws Oadr20bUpdateReportApplicationLayerException
+	 * @throws Oadr20bXMLSignatureException
+	 * @throws Oadr20bMarshalException
+	 */
 	public String oadrUpdateReport(OadrUpdateReportType payload, boolean signed)
 			throws Oadr20bUpdateReportApplicationLayerException, Oadr20bXMLSignatureException, Oadr20bMarshalException {
 
@@ -690,7 +765,9 @@ public class Oadr20bVTNEiReportService {
 
 		int responseCode = HttpStatus.OK_200;
 
-		List<OtherReportData> list = Lists.newArrayList();
+		List<OtherReportDataFloat> list = Lists.newArrayList();
+		List<OtherReportDataPayloadResourceStatus> listPayloadResourceStatus = Lists.newArrayList();
+		List<OtherReportDataKeyToken> listPayloadKeyToken = Lists.newArrayList();
 		for (OadrReportType oadrReportType : payload.getOadrReport()) {
 			String reportRequestID = oadrReportType.getReportRequestID();
 			String reportSpecifierID = oadrReportType.getReportSpecifierID();
@@ -708,9 +785,15 @@ public class Oadr20bVTNEiReportService {
 			for (IntervalType intervalType : intervals.getInterval()) {
 
 				Dtstart intervalDtstart = intervalType.getDtstart();
-				Long start = Oadr20bFactory.xmlCalendarToTimestamp(intervalDtstart.getDateTime());
+				Long start = null;
+				if (intervalDtstart != null) {
+					start = Oadr20bFactory.xmlCalendarToTimestamp(intervalDtstart.getDateTime());
+				}
 				DurationPropType intervalDuration = intervalType.getDuration();
-				String durationInterval = intervalDuration.getDuration();
+				String durationInterval = null;
+				if (intervalDuration != null) {
+					durationInterval = intervalDuration.getDuration();
+				}
 				for (JAXBElement<? extends StreamPayloadBaseType> jaxbElement : intervalType.getStreamPayloadBase()) {
 					if (jaxbElement.getDeclaredType().equals(OadrReportPayloadType.class)) {
 
@@ -722,17 +805,15 @@ public class Oadr20bVTNEiReportService {
 
 						String lastUpdateValue = null;
 
-						OtherReportData otherReportData = new OtherReportData();
-						otherReportData.setStart(start);
-						otherReportData.setDuration(durationInterval);
-						otherReportData.setReportSpecifierId(reportSpecifierID);
-						otherReportData.setRid(rid);
-						otherReportData.setConfidence(confidence);
-						otherReportData.setAccuracy(accuracy);
-
 						JAXBElement<? extends PayloadBaseType> payloadBase = reportPayload.getPayloadBase();
 						if (payloadBase.getDeclaredType().equals(PayloadFloatType.class)) {
-
+							OtherReportDataFloat otherReportData = new OtherReportDataFloat();
+							otherReportData.setStart(start);
+							otherReportData.setDuration(durationInterval);
+							otherReportData.setReportSpecifierId(reportSpecifierID);
+							otherReportData.setRid(rid);
+							otherReportData.setConfidence(confidence);
+							otherReportData.setAccuracy(accuracy);
 							PayloadFloatType payloadFloat = (PayloadFloatType) payloadBase.getValue();
 							float value = payloadFloat.getValue();
 							otherReportData.setValue(value);
@@ -750,7 +831,47 @@ public class Oadr20bVTNEiReportService {
 								toUpdate.add(otherReportRequest);
 							}
 
+						} else if (payloadBase.getDeclaredType().equals(PayloadKeyTokenType.class)) {
+
+							OtherReportDataKeyToken otherReportData = new OtherReportDataKeyToken();
+							otherReportData.setStart(start);
+							otherReportData.setDuration(durationInterval);
+							otherReportData.setReportSpecifierId(reportSpecifierID);
+							otherReportData.setRid(rid);
+							otherReportData.setConfidence(confidence);
+							otherReportData.setAccuracy(accuracy);
+							PayloadKeyTokenType payloadKeyToken = (PayloadKeyTokenType) payloadBase.getValue();
+							List<KeyTokenType> tokens = payloadKeyToken.getTokens();
+							otherReportData.setTokens(tokens);
+
+							try {
+								lastUpdateValue = jsonMapper.writeValueAsString(tokens);
+								if (requests.containsKey(rid)) {
+									OtherReportRequest otherReportRequest = requests.get(rid);
+									if (otherReportRequest.getLastUpdateDatetime() == null
+											|| otherReportRequest.getLastUpdateDatetime() < start) {
+										otherReportRequest.setLastUpdateDatetime(start);
+										otherReportRequest.setLastUpdateValue(lastUpdateValue);
+									}
+
+									toUpdate.add(otherReportRequest);
+								}
+							} catch (JsonProcessingException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+
+							listPayloadKeyToken.add(otherReportData);
+
 						} else if (payloadBase.getDeclaredType().equals(OadrPayloadResourceStatusType.class)) {
+
+							OtherReportDataPayloadResourceStatus otherReportData = new OtherReportDataPayloadResourceStatus();
+							otherReportData.setStart(start);
+							otherReportData.setDuration(durationInterval);
+							otherReportData.setReportSpecifierId(reportSpecifierID);
+							otherReportData.setRid(rid);
+							otherReportData.setConfidence(confidence);
+							otherReportData.setAccuracy(accuracy);
 							OadrPayloadResourceStatusType payloadResourceStatus = (OadrPayloadResourceStatusType) payloadBase
 									.getValue();
 
@@ -790,18 +911,47 @@ public class Oadr20bVTNEiReportService {
 								otherReportData.setOadrSetPointNormal(oadrSetPoint.getOadrNormal());
 							}
 
-							list.add(otherReportData);
+							listPayloadResourceStatus.add(otherReportData);
 						}
 
 					}
 				}
 			}
 
+			if (!list.isEmpty()) {
+
+				oadr20bAppNotificationPublisher
+						.notifyUpdateReportFloat(oadr20bDtoMapper.mapList(list, OtherReportDataFloatDto.class), venID);
+			}
+			if (!listPayloadResourceStatus.isEmpty()) {
+
+				oadr20bAppNotificationPublisher.notifyUpdateReportResourceStatus(oadr20bDtoMapper
+						.mapList(listPayloadResourceStatus, OtherReportDataPayloadResourceStatusDto.class), venID);
+			}
+			if (!listPayloadKeyToken.isEmpty()) {
+
+				oadr20bAppNotificationPublisher.notifyUpdateReportKeyToken(
+						oadr20bDtoMapper.mapList(listPayloadKeyToken, OtherReportDataKeyTokenDto.class), venID);
+			}
+
 			if (vtnConfig.getSaveVenData()) {
-				otherReportDataService.save(list);
+				if (!list.isEmpty()) {
+					otherReportDataService.save(list);
+
+				}
+				if (!listPayloadResourceStatus.isEmpty()) {
+					otherReportDataPayloadResourceStatusService.save(listPayloadResourceStatus);
+
+				}
+				if (!listPayloadKeyToken.isEmpty()) {
+					otherReportDataKeyTokenService.save(listPayloadKeyToken);
+
+				}
+
 			}
 
 			otherReportRequestService.save(toUpdate);
+
 		}
 
 		ven.setLastUpdateDatetime(now);

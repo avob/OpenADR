@@ -15,6 +15,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -75,8 +76,11 @@ public class VenController {
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
 	@ResponseBody
 	public List<VenDto> searchVen(@RequestBody List<VenFilter> filters, @RequestParam("page") int page,
-			@RequestParam("size") int size) {
-		return dtoMapper.mapList(venService.search(filters, page, size), VenDto.class);
+			@RequestParam("size") int size, HttpServletResponse response) {
+		Page<Ven> search = venService.search(filters, page, size);
+		response.addHeader("X-total-page", String.valueOf(search.getTotalPages()));
+		response.addHeader("X-total-count", String.valueOf(search.getTotalElements()));
+		return dtoMapper.mapList(search, VenDto.class);
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)

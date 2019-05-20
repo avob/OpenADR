@@ -2,6 +2,7 @@ package com.avob.openadr.security;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -195,6 +196,13 @@ public class OadrHttpSecurity {
 
 	public static String getOadr20bFingerprint(X509Certificate cert) throws OadrSecurityException {
 		return OadrHttpSecurity.truncate(getFingerprint(cert, "SHA-256"));
+	}
+
+	public static KeyStore createKeyStore(String p12FilePath, String password) throws KeyStoreException,
+			NoSuchAlgorithmException, CertificateException, IOException, OadrSecurityException {
+		KeyStore p12 = KeyStore.getInstance("pkcs12");
+		p12.load(new FileInputStream(p12FilePath), password.toCharArray());
+		return p12;
 	}
 
 	public static KeyStore createKeyStore(String privateKeyFilePath, String clientCertificatefilePath, String password)

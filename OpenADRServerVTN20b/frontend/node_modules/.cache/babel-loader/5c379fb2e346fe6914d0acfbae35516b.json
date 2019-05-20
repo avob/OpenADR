@@ -1,0 +1,1 @@
+{"ast":null,"code":"var core = require('../../modules/_core');\n\nvar $JSON = core.JSON || (core.JSON = {\n  stringify: JSON.stringify\n});\n\nmodule.exports = function stringify(it) {\n  // eslint-disable-line no-unused-vars\n  return $JSON.stringify.apply($JSON, arguments);\n};","map":null,"metadata":{},"sourceType":"script"}
