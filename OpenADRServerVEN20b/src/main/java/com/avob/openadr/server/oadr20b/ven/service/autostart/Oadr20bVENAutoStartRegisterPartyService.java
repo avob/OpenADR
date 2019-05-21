@@ -24,7 +24,6 @@ import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyServ
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiReportService;
 import com.avob.openadr.server.oadr20b.ven.service.PlanRequestService;
 
-
 @Service
 @ConditionalOnProperty(name = "ven.autostart")
 public class Oadr20bVENAutoStartRegisterPartyService extends Oadr20bVENEiRegisterPartyService
@@ -39,7 +38,7 @@ public class Oadr20bVENAutoStartRegisterPartyService extends Oadr20bVENEiRegiste
 	private MultiVtnConfig multiVtnConfig;
 
 	@Resource
-	private Oadr20bVENEiReportService oadr20bVENEiReportService;
+	private Oadr20bVENEiReportService reportService;
 
 	@Resource
 	private PlanRequestService planRequestService;
@@ -83,7 +82,7 @@ public class Oadr20bVENAutoStartRegisterPartyService extends Oadr20bVENEiRegiste
 		if (sent.get(vtnConfiguration.getVtnId()) == null || !sent.get(vtnConfiguration.getVtnId())) {
 			String requestId = "0";
 			String reportRequestId = "0";
-			OadrRegisterReportType selfOadrRegisterReport = oadr20bVENEiReportService.selfOadrRegisterReport(requestId,
+			OadrRegisterReportType selfOadrRegisterReport = reportService.selfOadrRegisterReport(requestId,
 					venConfig.getVenId(), vtnConfiguration.getVtnId(), reportRequestId);
 
 			planRequestService.submitRegisterReport(multiVtnConfig.getMultiClientConfig(vtnConfiguration),

@@ -23,6 +23,8 @@ public class Oadr20bVENEiReportService {
 	protected static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVENEiReportService.class);
 
 	protected static final String METADATA_REPORT_SPECIFIER_ID = "METADATA";
+	protected static final String METADATA_REPORT_RID = "METADATA";
+	protected static final String NO_GRANULARITY = "P0D";
 
 	public OadrRegisterReportType selfOadrRegisterReport(String requestId, String venId, String vtnSource,
 			String reportRequestId) {

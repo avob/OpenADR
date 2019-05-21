@@ -30,8 +30,8 @@ public class OtherReportCapabilityService extends GenericService<OtherReportCapa
 	}
 
 	@Transactional
-	public OtherReportCapability findByReportSpecifierId(String reportSpecifierId) {
-		return otherReportCapabilityDao.findOneByReportSpecifierId(reportSpecifierId);
+	public List<OtherReportCapability> findByReportSpecifierId(String reportSpecifierId) {
+		return otherReportCapabilityDao.findByReportSpecifierId(reportSpecifierId);
 	}
 
 	@Transactional
@@ -42,6 +42,11 @@ public class OtherReportCapabilityService extends GenericService<OtherReportCapa
 	@Transactional
 	public List<OtherReportCapability> findBySourceUsernameIn(List<String> username) {
 		return otherReportCapabilityDao.findBySourceUsernameIn(username);
+	}
+
+	@Transactional
+	public OtherReportCapability findOneBySourceUsernameAndReportSpecifierId(String venID, String reportSpecifierID) {
+		return otherReportCapabilityDao.findOneBySourceUsernameAndReportSpecifierId(venID, reportSpecifierID);
 	}
 
 	@Override

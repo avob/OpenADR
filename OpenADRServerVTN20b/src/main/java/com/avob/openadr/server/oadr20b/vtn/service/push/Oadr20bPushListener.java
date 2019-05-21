@@ -5,8 +5,6 @@ import java.io.IOException;
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class Oadr20bPushListener {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bPushListener.class);
 
 	@Resource
 	private VenService venService;
@@ -152,8 +148,6 @@ public class Oadr20bPushListener {
 				// Oadr20b
 				// protocol)
 			}
-
-			LOGGER.debug(readValue.toString());
 
 		} catch (JsonParseException e) {
 			// TODO Auto-generated catch block

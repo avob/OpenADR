@@ -1,6 +1,5 @@
 package com.avob.openadr.server.oadr20b.vtn.models.venreport.capability;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -28,7 +27,6 @@ public abstract class ReportCapability {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 
-	@Column(unique = true)
 	private String reportSpecifierId;
 
 	private String reportRequestId;

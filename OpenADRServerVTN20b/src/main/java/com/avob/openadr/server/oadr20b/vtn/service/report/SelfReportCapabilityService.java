@@ -1,5 +1,7 @@
 package com.avob.openadr.server.oadr20b.vtn.service.report;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.data.repository.CrudRepository;
@@ -14,9 +16,12 @@ public class SelfReportCapabilityService extends GenericService<SelfReportCapabi
 
     @Resource
     private SelfReportCapabilityDao selfReportCapabilityDao;
-
     public SelfReportCapability findByReportSpecifierId(String reportSpecifierId) {
-        return selfReportCapabilityDao.findOneByReportSpecifierId(reportSpecifierId);
+    	 List<SelfReportCapability> findByReportSpecifierId = selfReportCapabilityDao.findByReportSpecifierId(reportSpecifierId);
+    	 if(findByReportSpecifierId.isEmpty()) {
+    		 return null;
+    	 }
+        return findByReportSpecifierId.get(0);
     }
 
     @Override

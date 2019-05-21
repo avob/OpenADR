@@ -8,7 +8,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface ReportCapabilityDao<T extends ReportCapability> extends CrudRepository<T, Long> {
 
-	public T findOneByReportSpecifierId(String reportSpecifierId);
+	public List<T> findByReportSpecifierId(String reportSpecifierId);
 
 	public List<T> findByReportSpecifierIdStartingWith(String reportSpecifierId);
 

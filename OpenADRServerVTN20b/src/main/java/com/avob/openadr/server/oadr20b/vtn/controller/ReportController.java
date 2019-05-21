@@ -1,5 +1,6 @@
 package com.avob.openadr.server.oadr20b.vtn.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -35,12 +36,18 @@ public class ReportController {
 
 	@RequestMapping(value = "/available/search", method = RequestMethod.GET)
 	@ResponseBody
-	public List<OtherReportCapabilityDto> viewOtherReportCapability(@RequestParam("venID") List<String> venID,
+	public List<OtherReportCapabilityDto> viewOtherReportCapability(
+			@RequestParam(value = "venID", required = false) List<String> venID,
 			@RequestParam(value = "reportSpecifierId", required = false) String reportSpecifierId)
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 
-		List<OtherReportCapability> findBySourceUsernameIn = otherReportCapabilityService.findBySourceUsernameIn(venID);
+		List<OtherReportCapability> report = new ArrayList<>();
+		if (venID != null && reportSpecifierId == null) {
+			report = otherReportCapabilityService.findBySourceUsernameIn(venID);
+		} else if (venID == null && reportSpecifierId != null) {
+			report = otherReportCapabilityService.findByReportSpecifierId(reportSpecifierId);
+		}
 
-		return oadr20bDtoMapper.mapList(findBySourceUsernameIn, OtherReportCapabilityDto.class);
+		return oadr20bDtoMapper.mapList(report, OtherReportCapabilityDto.class);
 	}
 }

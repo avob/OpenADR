@@ -165,9 +165,7 @@ public class Oadr20bVenController {
 		Ven ven = checkVen(venID);
 		List<OtherReportCapability> findBySource = null;
 		if (reportSpecifierId != null) {
-			OtherReportCapability findByReportSpecifierId = otherReportCapabilityService
-					.findByReportSpecifierId(reportSpecifierId);
-			findBySource = Arrays.asList(findByReportSpecifierId);
+			findBySource = otherReportCapabilityService.findByReportSpecifierId(reportSpecifierId);
 		} else {
 			findBySource = otherReportCapabilityService.findBySource(ven);
 		}
@@ -182,7 +180,7 @@ public class Oadr20bVenController {
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 
 		checkVen(venID);
-		OtherReportCapability reportCapability = checkOtherReportCapability(reportSpecifierId);
+		OtherReportCapability reportCapability = checkOtherReportCapability(venID, reportSpecifierId);
 
 		List<OtherReportCapabilityDescription> desc = otherReportCapabilityDescriptionService
 				.findByOtherReportCapability(reportCapability);
@@ -198,7 +196,7 @@ public class Oadr20bVenController {
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 
 		checkVen(venID);
-		OtherReportCapability reportCapability = checkOtherReportCapability(reportSpecifierId);
+		OtherReportCapability reportCapability = checkOtherReportCapability(venID, reportSpecifierId);
 
 		OtherReportCapabilityDescription findByOtherReportCapability = otherReportCapabilityDescriptionService
 				.findByOtherReportCapabilityAndRid(reportCapability, rid);
@@ -214,7 +212,7 @@ public class Oadr20bVenController {
 			@RequestParam(value = "reportBackDuration", required = true) String reportBackDuration)
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 		Ven ven = checkVen(venID);
-		OtherReportCapability reportCapability = checkOtherReportCapability(reportSpecifierId);
+		OtherReportCapability reportCapability = checkOtherReportCapability(venID, reportSpecifierId);
 
 		String[] split = rid.split("\\|");
 		List<String> rids = Arrays.asList(split);
@@ -232,7 +230,7 @@ public class Oadr20bVenController {
 
 		String[] split = reportSpecifierId.split(",");
 		for (String s : split) {
-			OtherReportCapability reportCapability = checkOtherReportCapability(s);
+			OtherReportCapability reportCapability = checkOtherReportCapability(venID, s);
 			reportService.subscribe(ven, reportCapability, null, reportBackDuration, granularity, null, null);
 		}
 	}
@@ -244,7 +242,7 @@ public class Oadr20bVenController {
 			@RequestParam(value = "rid", required = true) String rid)
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 		Ven ven = checkVen(venID);
-		OtherReportCapability reportCapability = checkOtherReportCapability(reportSpecifierId);
+		OtherReportCapability reportCapability = checkOtherReportCapability(venID, reportSpecifierId);
 
 		String[] split = rid.split("\\|");
 		List<String> rids = Arrays.asList(split);
@@ -261,7 +259,7 @@ public class Oadr20bVenController {
 			@RequestParam(value = "end", required = false) Long end)
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 		Ven ven = checkVen(venID);
-		OtherReportCapability reportCapability = checkOtherReportCapability(reportSpecifierId);
+		OtherReportCapability reportCapability = checkOtherReportCapability(venID, reportSpecifierId);
 
 		String[] split = rid.split("\\|");
 		List<String> rids = Arrays.asList(split);
@@ -276,7 +274,7 @@ public class Oadr20bVenController {
 			@RequestParam(value = "end", required = false) Long end)
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 		Ven ven = checkVen(venID);
-		OtherReportCapability reportCapability = checkOtherReportCapability(reportSpecifierId);
+		OtherReportCapability reportCapability = checkOtherReportCapability(venID, reportSpecifierId);
 
 		reportService.request(ven, reportCapability, null, start, end);
 	}
@@ -441,7 +439,7 @@ public class Oadr20bVenController {
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 
 		checkVen(venID);
-		checkOtherReportCapability(reportSpecifierId);
+		checkOtherReportCapability(venID, reportSpecifierId);
 
 		List<OtherReportDataFloat> findByReportSpecifierId = otherReportDataService
 				.findByReportSpecifierId(reportSpecifierId);
@@ -455,7 +453,7 @@ public class Oadr20bVenController {
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 
 		checkVen(venID);
-		checkOtherReportCapabilityDescription(reportSpecifierId, rid);
+		checkOtherReportCapabilityDescription(venID, reportSpecifierId, rid);
 
 		return oadr20bDtoMapper.mapList(otherReportDataService.findByReportSpecifierIdAndRid(reportSpecifierId, rid),
 				OtherReportDataFloatDto.class);
@@ -468,7 +466,7 @@ public class Oadr20bVenController {
 			throws OadrElementNotFoundException, Oadr20bMarshalException {
 
 		Ven checkVen = checkVen(venID);
-		checkOtherReportCapabilityDescription(reportSpecifierId, rid);
+		checkOtherReportCapabilityDescription(venID, reportSpecifierId, rid);
 
 		String intervalId = "intervalId";
 		long start = 3L;
@@ -506,7 +504,7 @@ public class Oadr20bVenController {
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 
 		checkVen(venID);
-		checkOtherReportCapability(reportSpecifierId);
+		checkOtherReportCapability(venID, reportSpecifierId);
 
 		List<OtherReportDataPayloadResourceStatus> findByReportSpecifierId = otherReportDataPayloadResourceStatusService
 				.findByReportSpecifierId(reportSpecifierId);
@@ -520,7 +518,7 @@ public class Oadr20bVenController {
 			@PathVariable("rid") String rid) throws Oadr20bMarshalException, OadrElementNotFoundException {
 
 		checkVen(venID);
-		checkOtherReportCapabilityDescription(reportSpecifierId, rid);
+		checkOtherReportCapabilityDescription(venID, reportSpecifierId, rid);
 
 		return oadr20bDtoMapper.mapList(
 				otherReportDataPayloadResourceStatusService.findByReportSpecifierIdAndRid(reportSpecifierId, rid),
@@ -534,7 +532,7 @@ public class Oadr20bVenController {
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 
 		checkVen(venID);
-		checkOtherReportCapability(reportSpecifierId);
+		checkOtherReportCapability(venID, reportSpecifierId);
 
 		List<OtherReportDataKeyToken> findByReportSpecifierId = otherReportDataKeyTokenService
 				.findByReportSpecifierId(reportSpecifierId);
@@ -548,7 +546,7 @@ public class Oadr20bVenController {
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 
 		checkVen(venID);
-		checkOtherReportCapabilityDescription(reportSpecifierId, rid);
+		checkOtherReportCapabilityDescription(venID, reportSpecifierId, rid);
 
 		return oadr20bDtoMapper.mapList(
 				otherReportDataKeyTokenService.findByReportSpecifierIdAndRid(reportSpecifierId, rid),
@@ -602,10 +600,10 @@ public class Oadr20bVenController {
 		}
 	}
 
-	private OtherReportCapability checkOtherReportCapability(String reportSpecifierId)
+	private OtherReportCapability checkOtherReportCapability(String venId, String reportSpecifierId)
 			throws OadrElementNotFoundException {
 		OtherReportCapability otherReportCapability = otherReportCapabilityService
-				.findByReportSpecifierId(reportSpecifierId);
+				.findOneBySourceUsernameAndReportSpecifierId(venId, reportSpecifierId);
 
 		if (otherReportCapability == null) {
 			throw new OadrElementNotFoundException();
@@ -622,9 +620,9 @@ public class Oadr20bVenController {
 		return ven;
 	}
 
-	private OtherReportCapability checkOtherReportCapabilityDescription(String reportSpecifierId, String rid)
-			throws OadrElementNotFoundException {
-		OtherReportCapability otherReportCapability = checkOtherReportCapability(reportSpecifierId);
+	private OtherReportCapability checkOtherReportCapabilityDescription(String venID, String reportSpecifierId,
+			String rid) throws OadrElementNotFoundException {
+		OtherReportCapability otherReportCapability = checkOtherReportCapability(venID, reportSpecifierId);
 		OtherReportCapabilityDescription otherReportCapabilityDescription = otherReportCapabilityDescriptionService
 				.findByOtherReportCapabilityAndRid(otherReportCapability, rid);
 		if (otherReportCapabilityDescription == null) {

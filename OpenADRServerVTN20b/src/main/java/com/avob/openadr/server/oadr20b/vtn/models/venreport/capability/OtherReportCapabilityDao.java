@@ -13,4 +13,6 @@ public interface OtherReportCapabilityDao extends ReportCapabilityDao<OtherRepor
 	@Query(value = "select report from OtherReportCapability report where report.source.username in :username")
 	public List<OtherReportCapability> findBySourceUsernameIn(List<String> username);
 
+	public OtherReportCapability findOneBySourceUsernameAndReportSpecifierId(String venID, String reportSpecifierId);
+
 }
