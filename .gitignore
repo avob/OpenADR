@@ -63,3 +63,8 @@ devops/vtn20b_postgres/provisioning/roles/*
 */package-lock.json
 
 devops/nodered/node-red-contrib-oadr-ven/
+
+cert_*
+OpenADRServerVTN20b/frontend/build/
+OpenADRServerVTN20b/frontend/node_modules/
+OpenADRServerVTN20b/frontend/package-lock.json
