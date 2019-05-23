@@ -12,6 +12,7 @@ import org.dozer.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
@@ -162,7 +163,11 @@ public class VenService extends AbstractUserService<Ven> {
 		if (size == null) {
 			size = DEFAULT_SEARCH_SIZE;
 		}
-		return venDao.findAll(VenSpecification.search(filters), PageRequest.of(page, size));
+		Sort sort = Sort.by(
+			    Sort.Order.desc("registrationId"),
+			    Sort.Order.asc("commonName"));
+		PageRequest of = PageRequest.of(page, size, sort);
+		return venDao.findAll(VenSpecification.search(filters), of);
 	}
 
 }
