@@ -1,11 +1,19 @@
 package com.avob.openadr.server.oadr20b.ven;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 public class VtnSessionConfiguration {
 
 	private static final String VTN_ID = "oadr.vtnid";
+	private static final String VTN_ID_FILE = "oadr.vtnid.file";
 	private static final String VTN_URL = "oadr.vtnUrl";
 
 	private static final String AUTHENTIFICATION_BASIC_USER = "oadr.security.authentication.basic.username";
@@ -23,7 +31,31 @@ public class VtnSessionConfiguration {
 			String prop = (String) e.getValue();
 			if (VTN_ID.equals(keyStr)) {
 				this.setVtnId(prop);
-			} else if (VTN_URL.equals(keyStr)) {
+			} else if (VTN_ID_FILE.equals(keyStr)) {
+
+				// set vtnId by reading vtnIdFile path first line
+				Path path = Paths.get(prop);
+				File file = path.toFile();
+				if (!file.exists()) {
+					throw new IllegalArgumentException(
+							"oadr.vtnid.file must be a valid file path containing venId as it's first line");
+				}
+				try (Stream<String> lines = Files.lines(path);) {
+					Optional<String> findFirst = lines.findFirst();
+					if (!findFirst.isPresent()) {
+						throw new IllegalArgumentException(
+								"oadr.vtnid.file must be a valid file path containing venId as it's first line");
+
+					}
+
+					this.setVtnId(findFirst.get().trim());
+				} catch (IOException exp) {
+					throw new IllegalArgumentException(
+							"oadr.vtnid.file must be a valid file path containing venId as it's first line", exp);
+
+				}
+				
+			}else if (VTN_URL.equals(keyStr)) {
 				this.setVtnUrl(prop);
 			} else if (AUTHENTIFICATION_BASIC_USER.equals(keyStr)) {
 				getVenSessionConfig().setBasicUsername(prop);
