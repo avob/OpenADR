@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,11 @@ public class OtherReportCapabilityDescriptionService extends GenericService<Othe
 
 	@Resource
 	private OtherReportCapabilityDescriptionDao otherReportCapabilityDescriptionDao;
+
+	@Transactional(readOnly = true)
+	public List<OtherReportCapabilityDescription> search(Specification<OtherReportCapabilityDescription> spec) {
+		return otherReportCapabilityDescriptionDao.findAll(spec);
+	}
 
 	@Transactional(readOnly = true)
 	public List<OtherReportCapabilityDescription> findByOtherReportCapabilityAndRidIn(

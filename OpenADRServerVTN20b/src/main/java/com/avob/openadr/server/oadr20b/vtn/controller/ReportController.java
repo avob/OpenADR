@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,12 +13,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
+import com.avob.openadr.model.oadr20b.ei.ReportEnumeratedType;
+import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescriptionDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescriptionSpecification;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.service.dtomapper.Oadr20bDtoMapper;
+import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityDescriptionService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityService;
 
 @RestController
@@ -30,6 +38,9 @@ public class ReportController {
 
 	@Resource
 	private OtherReportCapabilityService otherReportCapabilityService;
+
+	@Resource
+	private OtherReportCapabilityDescriptionService otherReportCapabilityDescriptionService;
 
 	@Resource
 	private Oadr20bDtoMapper oadr20bDtoMapper;
@@ -49,5 +60,36 @@ public class ReportController {
 		}
 
 		return oadr20bDtoMapper.mapList(report, OtherReportCapabilityDto.class);
+	}
+
+	@RequestMapping(value = "/available/description/search", method = RequestMethod.GET)
+	@ResponseBody
+	public List<OtherReportCapabilityDescriptionDto> searchOtherReportCapabilityDescription(
+			@RequestParam(value = "reportSpecifierId", required = false) String reportSpecifierId,
+			@RequestParam(value = "reportName", required = false) ReportNameEnumeratedType reportName,
+			@RequestParam(value = "reportType", required = false) ReportEnumeratedType reportType,
+			@RequestParam(value = "readingType", required = false) ReadingTypeEnumeratedType readingType)
+
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+		Specification<OtherReportCapabilityDescription> hasReportspecifierId = (reportSpecifierId != null)
+				? OtherReportCapabilityDescriptionSpecification.hasReportspecifierId(reportSpecifierId)
+				: null;
+		Specification<OtherReportCapabilityDescription> hasReadingType = (readingType != null)
+				? OtherReportCapabilityDescriptionSpecification.hasReadingType(readingType)
+				: null;
+		Specification<OtherReportCapabilityDescription> hasReportName = (reportName != null)
+				? OtherReportCapabilityDescriptionSpecification.hasReportName(reportName)
+				: null;
+		Specification<OtherReportCapabilityDescription> hasReportType = (reportType != null)
+				? OtherReportCapabilityDescriptionSpecification.hasReportType(reportType)
+				: null;
+
+		Specification<OtherReportCapabilityDescription> spec = Specification.where(hasReportspecifierId)
+				.and(hasReadingType).and(hasReportName).and(hasReportType);
+
+		List<OtherReportCapabilityDescription> search = otherReportCapabilityDescriptionService.search(spec);
+
+		return oadr20bDtoMapper.mapList(search, OtherReportCapabilityDescriptionDto.class);
 	}
 }

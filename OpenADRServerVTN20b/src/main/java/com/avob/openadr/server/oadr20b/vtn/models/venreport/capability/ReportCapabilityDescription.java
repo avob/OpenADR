@@ -50,9 +50,6 @@ public class ReportCapabilityDescription {
 	@Enumerated(EnumType.STRING)
 	private SiScaleCodeType siScaleCode;
 
-	@Lob
-	private String payload;
-
 	public Long getId() {
 		return id;
 	}
@@ -83,14 +80,6 @@ public class ReportCapabilityDescription {
 
 	public void setReadingType(ReadingTypeEnumeratedType readingType) {
 		this.readingType = readingType;
-	}
-
-	public String getPayload() {
-		return payload;
-	}
-
-	public void setPayload(String payload) {
-		this.payload = payload;
 	}
 
 	public String getOadrMaxPeriod() {

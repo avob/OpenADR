@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,8 @@ import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
+import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
+import com.avob.openadr.server.common.vtn.models.user.AbstractUserDao;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venresource.VenResource;
@@ -117,6 +120,9 @@ public class Oadr20bVenController {
 	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
+	@Resource
+	private AbstractUserDao abstractUserDao;
+
 	@RequestMapping(value = "/{venID}/registerparty/requestReregistration", method = RequestMethod.POST)
 	@ResponseBody
 	public void registerPartyRequestReregistration(@PathVariable("venID") String venID)
@@ -186,21 +192,6 @@ public class Oadr20bVenController {
 				.findByOtherReportCapability(reportCapability);
 
 		return oadr20bDtoMapper.mapList(desc, ReportCapabilityDescriptionDto.class);
-	}
-
-	@RequestMapping(value = "/{venID}/report/available/description/payload", method = RequestMethod.GET)
-	@ResponseBody
-	public String viewOtherReportCapabilityDescriptionRid(@PathVariable("venID") String venID,
-			@RequestParam(value = "reportSpecifierId", required = true) String reportSpecifierId,
-			@RequestParam(value = "rid", required = true) String rid)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
-
-		checkVen(venID);
-		OtherReportCapability reportCapability = checkOtherReportCapability(venID, reportSpecifierId);
-
-		OtherReportCapabilityDescription findByOtherReportCapability = otherReportCapabilityDescriptionService
-				.findByOtherReportCapabilityAndRid(reportCapability, rid);
-		return findByOtherReportCapability.getPayload();
 	}
 
 	@RequestMapping(value = "/{venID}/report/available/description/subscribe", method = RequestMethod.POST)
@@ -297,6 +288,19 @@ public class Oadr20bVenController {
 		}
 
 		return oadr20bDtoMapper.mapList(findBySource, ReportRequestDto.class);
+	}
+
+	@RequestMapping(value = "/{venID}/report/requested", method = RequestMethod.DELETE)
+	@ResponseBody
+	public void deleteReportRequest(@PathVariable("venID") String venID, HttpServletRequest request)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+		AbstractUser findOneByUsername = abstractUserDao.findOneByUsername(request.getUserPrincipal().getName());
+
+		if (findOneByUsername != null) {
+			otherReportRequestService.deleteByRequestorAndOtherReportCapabilitySourceUsername(findOneByUsername, venID);
+		}
+
 	}
 
 	@RequestMapping(value = "/{venID}/report/requested/cancelSubscription", method = RequestMethod.POST)

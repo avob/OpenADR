@@ -26,8 +26,6 @@ public class ReportCapabilityDescriptionDto {
 
 	private SiScaleCodeType siScaleCode;
 
-	private String payload;
-
 	public long getId() {
 		return id;
 	}
@@ -58,14 +56,6 @@ public class ReportCapabilityDescriptionDto {
 
 	public void setReadingType(ReadingTypeEnumeratedType readingType) {
 		this.readingType = readingType;
-	}
-
-	public String getPayload() {
-		return payload;
-	}
-
-	public void setPayload(String payload) {
-		this.payload = payload;
 	}
 
 	public String getOadrMaxPeriod() {

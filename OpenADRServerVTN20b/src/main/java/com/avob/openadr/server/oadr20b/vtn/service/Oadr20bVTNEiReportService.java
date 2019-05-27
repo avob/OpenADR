@@ -205,7 +205,7 @@ public class Oadr20bVTNEiReportService {
 	 * @throws Oadr20bXMLSignatureException
 	 * @throws Oadr20bMarshalException
 	 */
-	@Transactional(readOnly=false)
+	@Transactional(readOnly = false)
 	public String oadrRegisterReport(OadrRegisterReportType payload, boolean signed)
 			throws Oadr20bRegisterReportApplicationLayerException, Oadr20bXMLSignatureException,
 			Oadr20bMarshalException {
@@ -414,15 +414,15 @@ public class Oadr20bVTNEiReportService {
 					VenMarketContext findOneByName = venMarketContextService.findOneByName(marketContext);
 					description.setVenMarketContext(findOneByName);
 				}
-				JAXBElement<OadrReportDescriptionType> createOadrReportDescription = Oadr20bFactory
-						.createOadrReportDescription(oadrReportDescriptionType);
-				String marshal;
-				try {
-					marshal = jaxbContext.marshal(createOadrReportDescription);
-					description.setPayload(marshal);
-				} catch (Oadr20bMarshalException e) {
-					LOGGER.warn("Can't marshall report description payload", e);
-				}
+//				JAXBElement<OadrReportDescriptionType> createOadrReportDescription = Oadr20bFactory
+//						.createOadrReportDescription(oadrReportDescriptionType);
+//				String marshal;
+//				try {
+//					marshal = jaxbContext.marshal(createOadrReportDescription);
+//					description.setPayload(marshal);
+//				} catch (Oadr20bMarshalException e) {
+//					LOGGER.warn("Can't marshall report description payload", e);
+//				}
 
 				descriptionDto.add(oadr20bDtoMapper.map(description, ReportCapabilityDescriptionDto.class));
 				descriptions.add(description);
@@ -437,7 +437,7 @@ public class Oadr20bVTNEiReportService {
 
 		}
 		venReportDto.setCapabilities(capabilitiesDto);
-		
+
 		otherReportCapabilityService.save(capabilities);
 		otherReportCapabilityDescriptionService.save(descriptions);
 
@@ -458,7 +458,7 @@ public class Oadr20bVTNEiReportService {
 		if (hasMetadataReport) {
 			otherReportRequestService.deleteByOtherReportCapabilitySource(ven);
 		}
-		
+
 		oadr20bAppNotificationPublisher.notifyRegisterReport(venReportDto, venID);
 
 		OadrRegisteredReportType response = Oadr20bEiReportBuilders

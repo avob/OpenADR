@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
 
@@ -30,9 +31,13 @@ public interface OtherReportRequestDao extends ReportRequestDao<OtherReportReque
 	public List<OtherReportRequest> findBySourceAndOtherReportCapability_ReportRequestId(@Param("ven") Ven ven,
 			@Param("reportRequestId") String reportRequestId);
 
-	@Transactional
+	@Transactional(readOnly = false)
 	public void deleteByOtherReportCapabilityDescriptionIn(Collection<OtherReportCapabilityDescription> descriptions);
 
-	@Transactional
+	@Transactional(readOnly = false)
 	public void deleteByOtherReportCapabilitySource(Ven source);
+
+	@Transactional(readOnly = false)
+	public void deleteByRequestorAndOtherReportCapabilitySourceUsername(AbstractUser requestor, String username);
+
 }

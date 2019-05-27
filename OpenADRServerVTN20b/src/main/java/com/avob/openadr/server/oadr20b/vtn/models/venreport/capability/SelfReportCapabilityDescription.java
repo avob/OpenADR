@@ -2,6 +2,7 @@ package com.avob.openadr.server.oadr20b.vtn.models.venreport.capability;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -12,29 +13,40 @@ import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketConte
 @Table(name = "selfreportcapabilitydescription")
 public class SelfReportCapabilityDescription extends ReportCapabilityDescription {
 
-    @NotNull
-    @ManyToOne
-    @JoinColumn(name = "selfreportcapability_id")
-    private SelfReportCapability selfReportCapability;
+	@NotNull
+	@ManyToOne
+	@JoinColumn(name = "selfreportcapability_id")
+	private SelfReportCapability selfReportCapability;
 
-    @ManyToOne
-    @JoinColumn(name = "marketcontext_id")
-    private VenMarketContext venMarketContext;
+	@ManyToOne
+	@JoinColumn(name = "marketcontext_id")
+	private VenMarketContext venMarketContext;
 
-    public SelfReportCapability getSelfReportCapability() {
-        return selfReportCapability;
-    }
+	@Lob
+    private String payload;
 
-    public void setSelfReportCapability(SelfReportCapability selfReportCapability) {
-        this.selfReportCapability = selfReportCapability;
-    }
+	public SelfReportCapability getSelfReportCapability() {
+		return selfReportCapability;
+	}
 
-    public VenMarketContext getVenMarketContext() {
-        return venMarketContext;
-    }
+	public void setSelfReportCapability(SelfReportCapability selfReportCapability) {
+		this.selfReportCapability = selfReportCapability;
+	}
 
-    public void setVenMarketContext(VenMarketContext venMarketContext) {
-        this.venMarketContext = venMarketContext;
-    }
+	public VenMarketContext getVenMarketContext() {
+		return venMarketContext;
+	}
+
+	public void setVenMarketContext(VenMarketContext venMarketContext) {
+		this.venMarketContext = venMarketContext;
+	}
+
+	public String getPayload() {
+		return payload;
+	}
+
+	public void setPayload(String payload) {
+		this.payload = payload;
+	}
 
 }

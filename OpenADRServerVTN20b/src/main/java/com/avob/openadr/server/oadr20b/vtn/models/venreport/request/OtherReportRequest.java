@@ -5,6 +5,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
@@ -24,6 +25,10 @@ public class OtherReportRequest extends ReportRequest {
 	@ManyToOne
 	@JoinColumn(name = "ven_id")
 	private Ven source;
+
+	@ManyToOne
+	@JoinColumn(name = "requestor_id")
+	private AbstractUser requestor;
 
 	public OtherReportRequest() {
 	}

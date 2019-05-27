@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
+import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequest;
@@ -58,6 +59,13 @@ public class OtherReportRequestService extends GenericService<OtherReportRequest
 	public void deleteByOtherReportCapabilitySource(Ven source) {
 		otherReportRequestDao.deleteByOtherReportCapabilitySource(source);
 	}
+	
+	
+	public void deleteByRequestorAndOtherReportCapabilitySourceUsername(AbstractUser requestor,
+			String venId) {
+		otherReportRequestDao.deleteByRequestorAndOtherReportCapabilitySourceUsername(requestor, venId);
+	}
+	
 
 	@Override
 	public CrudRepository<OtherReportRequest, Long> getDao() {

@@ -29,5 +29,5 @@ public abstract class GenericService<T> {
 	public Iterable<T> findAll() {
 		return getDao().findAll();
 	}
-
+	
 }

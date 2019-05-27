@@ -4,21 +4,21 @@ import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
 
 public class ReportCapabilityDto {
 
-	private long id;
+	protected long id;
 
-	private String reportId;
+	protected String reportId;
 
-	private String reportSpecifierId;
+	protected String reportSpecifierId;
 
-	private String reportRequestId;
+	protected String reportRequestId;
 
-	private ReportNameEnumeratedType reportName;
+	protected ReportNameEnumeratedType reportName;
 
-	private Long start;
+	protected Long start;
 
-	private String duration;
+	protected String duration;
 
-	private Long createdDatetime;
+	protected Long createdDatetime;
 
 	public long getId() {
 		return id;

@@ -21,6 +21,8 @@ import com.avob.openadr.server.common.vtn.service.dtomapper.VenMapper;
 import com.avob.openadr.server.oadr20b.vtn.models.venopt.VenOpt;
 import com.avob.openadr.server.oadr20b.vtn.models.venopt.VenOptDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescriptionDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequest;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.ReportRequestDto;
@@ -48,6 +50,7 @@ public class Oadr20bDtoMapper extends DtoMapper {
 		this.mapper.addMapping(venOptMappingConfiguration());
 		this.mapper.addMapping(reportRequestMappingconfiguration());
 		this.mapper.addMapping(venReportRequestCapabilityMappingConfiguration());
+		this.mapper.addMapping(venReportRequestCapabilityDescriptionMappingConfiguration());
 
 	}
 
@@ -78,6 +81,22 @@ public class Oadr20bDtoMapper extends DtoMapper {
 		};
 	}
 
+	private BeanMappingBuilder venReportRequestCapabilityDescriptionMappingConfiguration() {
+		return new BeanMappingBuilder() {
+			@Override
+			protected void configure() {
+				TypeMappingBuilder fields = mapping(OtherReportCapabilityDescription.class,
+						OtherReportCapabilityDescriptionDto.class);
+				fields.fields("otherReportCapability.source", "venId", customConverter(VenMapper.class),
+						customConverterId(Oadr20bDtoMapper.VEN_CONVERTER_ID));
+				fields.fields("otherReportCapability", "reportSpecifierId",
+						customConverter(OtherReportCapabilityMapper.class),
+						customConverterId(Oadr20bDtoMapper.OTHER_REPORT_CAPABILITY_MAPPER_ID));
+
+			}
+		};
+	}
+
 	private BeanMappingBuilder reportRequestMappingconfiguration() {
 		return new BeanMappingBuilder() {
 			@Override
@@ -85,10 +104,10 @@ public class Oadr20bDtoMapper extends DtoMapper {
 				TypeMappingBuilder fields = mapping(OtherReportRequest.class, ReportRequestDto.class);
 				fields.fields("otherReportCapability", "reportSpecifierId",
 						customConverter(OtherReportCapabilityMapper.class),
-						customConverterId(OTHER_REPORT_CAPABILITY_MAPPER_ID));
+						customConverterId(Oadr20bDtoMapper.OTHER_REPORT_CAPABILITY_MAPPER_ID));
 				fields.fields("otherReportCapabilityDescription", "rid",
 						customConverter(OtherReportCapabilityDescriptionMapper.class),
-						customConverterId(OTHER_REPORT_CAPABILITY_DESCRIPTION_MAPPER_ID));
+						customConverterId(Oadr20bDtoMapper.OTHER_REPORT_CAPABILITY_DESCRIPTION_MAPPER_ID));
 			}
 		};
 	}
