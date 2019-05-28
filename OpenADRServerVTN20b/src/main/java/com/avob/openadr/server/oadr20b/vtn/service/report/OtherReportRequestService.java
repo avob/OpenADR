@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,10 @@ public class OtherReportRequestService extends GenericService<OtherReportRequest
 
 	public List<OtherReportRequest> findBySource(Ven ven) {
 		return otherReportRequestDao.findBySource(ven);
+	}
+	
+	public Page<OtherReportRequest> findBySource(Ven ven, Integer page, Integer size) {
+		return otherReportRequestDao.findBySource(ven, PageRequest.of(page, size));
 	}
 
 	public List<OtherReportRequest> findBySourceAndReportSpecifierId(Ven ven, String reportSpecifierId) {

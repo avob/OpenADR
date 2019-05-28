@@ -4,16 +4,20 @@ export function swaggerAction (actionType, getAction, getPayload, getNext) {
       type: actionType,
       swagger: function ( api ) {
           getAction(api)
-          .then( data => {
-           
+          .then( (resp) => {
             var msg = {
               type: actionType + "_SUCCESS"
             }
             if(getPayload) {
-              var payload = getPayload(data);
+              var payload = getPayload(resp);
               if(payload) {
                 msg.payload = payload;
               }
+            }
+            console.log(resp.headers)
+            if(resp.headers && resp.headers["x-total-count"] && resp.headers["x-total-page"]) {
+            	msg.total = parseInt(resp.headers["x-total-count"]);
+            	msg.totalPage = parseInt(resp.headers["x-total-page"]);
             }
             dispatch(msg);
             if(getNext) {

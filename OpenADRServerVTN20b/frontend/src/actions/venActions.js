@@ -268,4 +268,24 @@ export const loadVenOpt = (venId) => {
   );
 }
 
+export const pageVenAvailableReport = (venId, page, size) => {
+	  return swaggerAction(types.LOAD_VEN_AVAILABLE_REPORT, 
+	    (api) => {
+	      var params = { venID: venId, page:page, size: size };
+	      return  api.apis[ 'oadr-20b-ven-controller' ].pageOtherReportCapabilityUsingGET(params, jsonResponseContentType);
+	    },
+	    parseJsonData
+	  );
+	}
+
+export const pageVenRequestedReport = (venId, page, size) => {
+	  return swaggerAction(types.LOAD_VEN_REQUESTED_REPORT, 
+	    (api) => {
+	      var params = { venID: venId, page:page, size: size };
+	      return  api.apis[ 'oadr-20b-ven-controller' ].pageReportRequestUsingGET(params, jsonResponseContentType);
+	    },
+	    parseJsonData
+	  );
+	}
+
 

@@ -7,7 +7,7 @@ import { config, history } from './configureStore';
 var swaggerClient = null;
 
 var responseInterceptor=  (res) => {
-    // console.log(res);
+     console.log(res);
   }
 
 
@@ -21,7 +21,6 @@ var loadClient = function ( url, dispatch) {
         , requestInterceptor: req => {
           if(config.username != null && config.password != null) {
             var encoded = btoa(config.username +":"+config.password);
-            console.log(encoded)
             req.headers["Authorization"] = "Basic "+ encoded
           }
         }};

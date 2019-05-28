@@ -15,6 +15,7 @@ import Divider from '@material-ui/core/Divider';
 
 import VenDetailSettings from '../VenDetail/VenDetailSettings'
 import VenDetailReport from '../VenDetail/VenDetailReport'
+import VenDetailRequest from '../VenDetail/VenDetailRequest'
 import VenDetailOptSchedule from '../VenDetail/VenDetailOptSchedule'
 import VenDetailEnrollment from '../VenDetail/VenDetailEnrollment'
 import VenDetailGroup from '../VenDetail/VenDetailGroup'
@@ -98,6 +99,7 @@ export class VenDetailPage extends React.Component {
     super();
     this.state = {
       value: 0,
+      venId: null
     };
     
   }
@@ -114,12 +116,15 @@ export class VenDetailPage extends React.Component {
         history.push("/ven/detail/"+this.props.match.params.username+"/reports")
         break;
       case 2:
+          history.push("/ven/detail/"+this.props.match.params.username+"/requests")
+          break;
+      case 3:
         history.push("/ven/detail/"+this.props.match.params.username+"/optschedules")
         break;
-      case 3:
+      case 4:
         history.push("/ven/detail/"+this.props.match.params.username+"/enrollments")
         break;
-      case 4:
+      case 5:
         history.push("/ven/detail/"+this.props.match.params.username+"/groups")
         break;
       default:
@@ -129,14 +134,17 @@ export class VenDetailPage extends React.Component {
 
 
   componentDidMount() {
+	  
     this.props.vtnConfigurationActions.loadMarketContext();
     this.props.vtnConfigurationActions.loadGroup();
     this.props.venActions.loadVenDetail( this.props.match.params.username );
     this.props.venActions.loadVenGroup( this.props.match.params.username );
     this.props.venActions.loadVenMarketContext( this.props.match.params.username );
-    this.props.venActions.loadVenAvailableReport( this.props.match.params.username );
+//    this.props.venActions.loadVenAvailableReport( this.props.match.params.username );
     this.props.venActions.loadVenRequestedReport( this.props.match.params.username );
     this.props.venActions.loadVenOpt( this.props.match.params.username );
+    this.setState({venId: this.props.match.params.username})
+    
     switch(this.props.match.params.panel){
       case "settings":
         this.setState({value:0});
@@ -144,14 +152,17 @@ export class VenDetailPage extends React.Component {
       case "reports":
         this.setState({value:1});
         break;
+      case "requests":
+          this.setState({value:2});
+          break;
       case "optschedules":
-        this.setState({value:2});
-        break;
-      case "enrollments":
         this.setState({value:3});
         break;
-      case "groups":
+      case "enrollments":
         this.setState({value:4});
+        break;
+      case "groups":
+        this.setState({value:5});
         break;
       default:
         this.setState({value:0});
@@ -171,7 +182,8 @@ export class VenDetailPage extends React.Component {
             centered>
         <Tab label="Settings" />
         <Tab label="Reports" />
-        <Tab label="OptSchedules" />
+    	<Tab label="Requests" />
+    	<Tab label="OptSchedules" />
         <Tab label="Enrollments" />
         <Tab label="Groups" />
       </Tabs>
@@ -196,18 +208,39 @@ export class VenDetailPage extends React.Component {
                                             ven={ ven_detail.ven }
                                             marketContext={ ven_detail.marketContext }
                                             availableReport={ven_detail.availableReport}
-                                            requestedReport={ven_detail.requestedReport}
-
+                        					totalReport={ven_detail.totalReport}
+                        					totalPageReport={ven_detail.totalPageReport}
                                             requestRegisterReport={this.props.venActions.requestRegisterReport}
                                             sendRegisterReport={this.props.venActions.sendRegisterReport}
                                             cancelRequestReportSubscription={this.props.venActions.cancelRequestReportSubscription}
 
-                                            
+                        					pageVenAvailableReport={this.props.venActions.pageVenAvailableReport}
+                        					venId={this.state.venId}
                                              />
                                           
         
                        </TabContainer> }
+      
       { value === 2 && <TabContainer>
+					      <VenDetailRequest classes={ classes }
+					                          ven={ ven_detail.ven }
+					                          marketContext={ ven_detail.marketContext }
+					                          availableReport={ven_detail.availableReport}
+					                          requestedReport={ven_detail.requestedReport}
+											      totalRequest={ven_detail.totalRequest}
+						      					totalPageRequest={ven_detail.totalPageRequest}
+					                          requestRegisterReport={this.props.venActions.requestRegisterReport}
+					                          sendRegisterReport={this.props.venActions.sendRegisterReport}
+					                          cancelRequestReportSubscription={this.props.venActions.cancelRequestReportSubscription}
+					
+					      						pageVenRequestedReport={this.props.venActions.pageVenRequestedReport}
+					      venId={this.state.venId}
+					                           />
+					                        
+					
+					     </TabContainer> }
+      
+      { value === 3 && <TabContainer>
                       <VenDetailOptSchedule classes={ classes }
                                             ven={ ven_detail.ven }
                                             venOpt={ven_detail.venOpt}
@@ -217,7 +250,7 @@ export class VenDetailPage extends React.Component {
 
         
                        </TabContainer> }
-      { value === 3 && <TabContainer>
+      { value === 4 && <TabContainer>
                       <VenDetailEnrollment classes={ classes }
                                             ven={ ven_detail.ven }
                                             marketContext={ ven_detail.marketContext }
@@ -230,7 +263,7 @@ export class VenDetailPage extends React.Component {
 
         
                        </TabContainer> }
-      { value === 4 && <TabContainer>
+      { value === 5 && <TabContainer>
                       <VenDetailGroup classes={ classes }
                                             ven={ ven_detail.ven }
                                             

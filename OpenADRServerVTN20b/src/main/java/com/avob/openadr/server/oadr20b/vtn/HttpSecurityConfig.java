@@ -141,8 +141,10 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 		configuration.setAllowCredentials(true);
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "OPTIONS", "HEAD", "DELETE"));
 		configuration.setAllowedOrigins(cors);
-		configuration.setAllowedHeaders(Arrays.asList("*"));
+		
 		configuration.applyPermitDefaultValues();
+		configuration.setExposedHeaders(Arrays.asList("X-total-count", "X-total-page"));
+		configuration.setAllowedHeaders(Arrays.asList("*"));
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);

@@ -3,6 +3,8 @@ package com.avob.openadr.server.oadr20b.vtn.models.venreport.request;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,8 @@ public interface OtherReportRequestDao extends ReportRequestDao<OtherReportReque
 			String reportSpecifierId);
 
 	public List<OtherReportRequest> findBySource(Ven ven);
+
+	public Page<OtherReportRequest> findBySource(Ven ven, Pageable page);
 
 	@Query("select req from OtherReportRequest req left join req.otherReportCapability cap where req.source = :ven and cap.reportSpecifierId like :reportSpecifierId%")
 	public List<OtherReportRequest> findBySourceAndOtherReportCapability_ReportSpecifierIdStartingWith(

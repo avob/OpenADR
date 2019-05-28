@@ -164,8 +164,11 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
       return state;
 
     case types.LOAD_VEN_AVAILABLE_REPORT_SUCCESS:
+    	console.log(action)
       newState = objectAssign( {}, state, {
-        availableReport: action.payload
+        availableReport: action.payload,
+        totalReport: action.total,
+        totalPageReport: action.totalPage
       } );
       return newState;
 
@@ -177,7 +180,9 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
 
     case types.LOAD_VEN_REQUESTED_REPORT_SUCCESS:
       newState = objectAssign( {}, state, {
-        requestedReport: action.payload
+        requestedReport: action.payload,
+        totalRequest: action.total,
+        totalPageRequest: action.totalPage
       } );
       return newState;
 

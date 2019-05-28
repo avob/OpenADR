@@ -17,7 +17,11 @@ export default {
     venMarketContext: [],
     venGroup: [],
     availableReport:[],
+    totalReport:0,
+    totalPageReport: 0,
     requestedReport:[],
+    totalRequest:0,
+    totalPageRequest: 0,
     venOpt:[]
   },
   ven_detail_create_report: {

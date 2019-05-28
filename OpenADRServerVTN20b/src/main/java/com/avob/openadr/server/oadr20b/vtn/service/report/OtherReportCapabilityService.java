@@ -5,6 +5,8 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,11 @@ public class OtherReportCapabilityService extends GenericService<OtherReportCapa
 	@Transactional
 	public List<OtherReportCapability> findBySource(Ven source) {
 		return otherReportCapabilityDao.findBySource(source);
+	}
+
+	@Transactional
+	public Page<OtherReportCapability> findBySource(Ven source, Integer page, Integer size) {
+		return otherReportCapabilityDao.findBySource(source, PageRequest.of(page, size));
 	}
 
 	@Transactional

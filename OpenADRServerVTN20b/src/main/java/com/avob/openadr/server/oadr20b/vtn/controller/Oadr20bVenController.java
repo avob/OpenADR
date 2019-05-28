@@ -7,9 +7,11 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -75,6 +77,8 @@ import com.google.common.collect.Lists;
 @RequestMapping("/Ven")
 @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEVICE_MANAGER')")
 public class Oadr20bVenController {
+
+	private static final String PAGINATION_SIZE_DEFAULT = "20";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVenController.class);
 
@@ -586,6 +590,35 @@ public class Oadr20bVenController {
 
 		venDistributeService.distribute(checkVen, request);
 
+	}
+
+	@RequestMapping(value = "/{venID}/report/available/search", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ReportCapabilityDto> pageOtherReportCapability(@PathVariable("venID") String venID,
+			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+			@RequestParam(value = "size", required = false, defaultValue = Oadr20bVenController.PAGINATION_SIZE_DEFAULT) Integer size,
+			HttpServletResponse response) throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+		Ven ven = checkVen(venID);
+		Page<OtherReportCapability> pageBySource = otherReportCapabilityService.findBySource(ven, page, size);
+		response.addHeader("X-total-page", String.valueOf(pageBySource.getTotalPages()));
+		response.addHeader("X-total-count", String.valueOf(pageBySource.getTotalElements()));
+		response.addHeader("mouaiccool", String.valueOf(pageBySource.getTotalElements()));
+		return oadr20bDtoMapper.mapList(pageBySource.getContent(), ReportCapabilityDto.class);
+	}
+
+	@RequestMapping(value = "/{venID}/report/requested/search", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ReportRequestDto> pageReportRequest(@PathVariable("venID") String venID,
+			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+			@RequestParam(value = "size", required = false, defaultValue = Oadr20bVenController.PAGINATION_SIZE_DEFAULT) Integer size,
+			HttpServletResponse response) throws Oadr20bMarshalException, OadrElementNotFoundException {
+
+		Ven ven = checkVen(venID);
+		Page<OtherReportRequest> pageBySource = otherReportRequestService.findBySource(ven, page, size);
+		response.addHeader("X-total-page", String.valueOf(pageBySource.getTotalPages()));
+		response.addHeader("X-total-count", String.valueOf(pageBySource.getTotalElements()));
+		return oadr20bDtoMapper.mapList(pageBySource.getContent(), ReportRequestDto.class);
 	}
 
 	private void checkResource(Ven ven, String resourceName) throws OadrElementNotFoundException {
