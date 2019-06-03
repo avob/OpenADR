@@ -1,6 +1,5 @@
 package com.avob.openadr.server.oadr20b.vtn.models.venreport.request;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -11,14 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
-import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
 
 public interface OtherReportRequestDao extends ReportRequestDao<OtherReportRequest> {
 
 	public List<OtherReportRequest> findBySourceAndReportRequestIdIn(Ven ven, List<String> reportRequestId);
-
-	public OtherReportRequest findBySourceAndOtherReportCapabilityDescriptionAndReportRequestId(Ven ven,
-			OtherReportCapabilityDescription otherReportCapabilityDescription, String reportRequestId);
 
 	public List<OtherReportRequest> findBySourceAndOtherReportCapability_ReportSpecifierId(Ven ven,
 			String reportSpecifierId);
@@ -34,9 +29,6 @@ public interface OtherReportRequestDao extends ReportRequestDao<OtherReportReque
 	@Query("select req from OtherReportRequest req where req.source = :ven and req.reportRequestId = :reportRequestId")
 	public List<OtherReportRequest> findBySourceAndOtherReportCapability_ReportRequestId(@Param("ven") Ven ven,
 			@Param("reportRequestId") String reportRequestId);
-
-	@Transactional(readOnly = false)
-	public void deleteByOtherReportCapabilityDescriptionIn(Collection<OtherReportCapabilityDescription> descriptions);
 
 	@Transactional(readOnly = false)
 	public void deleteByOtherReportCapabilitySource(Ven source);

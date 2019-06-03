@@ -51,7 +51,6 @@ public class Oadr20bVtnControllerTest {
 		assertEquals(vtnConfig.getSupportPush(), conf.getSupportPush());
 		assertEquals(vtnConfig.getSupportUnsecuredHttpPush(), conf.getSupportUnsecuredHttpPush());
 		assertEquals(vtnConfig.getReplayProtectAcceptedDelaySecond(), conf.getXmlSignatureReplayProtectSecond());
-		assertEquals(vtnConfig.getSaveVenData(), conf.isSaveVenDate());
 
 		oadrMockMvc
 				.perform(MockMvcRequestBuilders.get(VTN_URL + "/configuration")

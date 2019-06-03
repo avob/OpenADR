@@ -175,6 +175,16 @@ export const loadVenRequestedReport = (venId, reportRequestId) => {
   );
 }
 
+export const loadVenRequestedReportSpecifier = (venId, reportRequestId) => {
+	  return swaggerAction(types.LOAD_VEN_REQUESTED_REPORT_SPECIFIER, 
+	    (api) => {
+	      var params = {venID: venId, criteria: { reportRequestId: [reportRequestId] }};
+	      return  api.apis[ 'oadr-20b-ven-controller' ].viewReportRequestSpecifierUsingPOST(params, jsonResponseContentType);
+	    },
+	    parseJsonData
+	  );
+	}
+
 export const requestRegisterReport  = (venId) => {
   return swaggerAction(types.REQUEST_VEN_REGISTER_REPORT, 
     (api) => {

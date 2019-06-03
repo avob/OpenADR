@@ -93,6 +93,8 @@ export class VenDetailReportRequestPage extends React.Component {
   componentDidMount() {
     this.props.venActions.loadVenAvailableReport( this.props.match.params.username, this.props.match.params.reportSpecifierId);
     this.props.venActions.loadVenRequestedReport(this.props.match.params.username, this.props.match.params.reportRequestId);
+    this.props.venActions.loadVenRequestedReportSpecifier(this.props.match.params.username, this.props.match.params.reportRequestId);
+    
   }
 
   render() {
@@ -113,6 +115,7 @@ export class VenDetailReportRequestPage extends React.Component {
       
                           <VenDetailReportRequest classes={classes}  
                             requestedReport={ven_detail_report_request.requestedReport}
+                          requestedReportSpecifier={ven_detail_report_request.requestedReportSpecifier}
                             availableReport={ven_detail_report_request.availableReport}
                             />
                        </TabContainer> }

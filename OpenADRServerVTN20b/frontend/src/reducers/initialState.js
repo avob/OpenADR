@@ -34,7 +34,9 @@ export default {
   },
   ven_detail_report_request: {
     requestedReport: [],
-    availableReport: {}
+    requestedReportSpecifier: [],
+    availableReport: {},
+    
   },
   ven_create: {
     parameters: {}

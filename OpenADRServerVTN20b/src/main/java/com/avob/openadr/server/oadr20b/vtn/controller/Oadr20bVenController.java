@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -60,7 +61,14 @@ import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportData
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataPayloadResourceStatus;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataPayloadResourceStatusDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequest;
-import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.ReportRequestDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestDtoCreateRequestDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestDtoCreateSubscriptionDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifier;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierDao;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierSearchCriteria;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierSpecification;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenOptService;
@@ -107,6 +115,9 @@ public class Oadr20bVenController {
 	private OtherReportRequestService otherReportRequestService;
 
 	@Resource
+	private OtherReportRequestSpecifierDao otherReportRequestSpecifierDao;
+
+	@Resource
 	private OtherReportDataFloatService otherReportDataService;
 
 	@Resource
@@ -127,6 +138,11 @@ public class Oadr20bVenController {
 	@Resource
 	private AbstractUserDao abstractUserDao;
 
+	/**
+	 * @param venID
+	 * @throws Oadr20bMarshalException
+	 * @throws OadrElementNotFoundException
+	 */
 	@RequestMapping(value = "/{venID}/registerparty/requestReregistration", method = RequestMethod.POST)
 	@ResponseBody
 	public void registerPartyRequestReregistration(@PathVariable("venID") String venID)
@@ -141,6 +157,11 @@ public class Oadr20bVenController {
 		venDistributeService.distribute(ven, build);
 	}
 
+	/**
+	 * @param venID
+	 * @throws Oadr20bMarshalException
+	 * @throws OadrElementNotFoundException
+	 */
 	@RequestMapping(value = "/{venID}/registerparty/cancelPartyRegistration", method = RequestMethod.POST)
 	@ResponseBody
 	public void registerPartyCancelPartyRegistration(@PathVariable("venID") String venID)
@@ -155,6 +176,13 @@ public class Oadr20bVenController {
 		venDistributeService.distribute(ven, build);
 	}
 
+	/**
+	 * @param venID
+	 * @param reportSpecifierId
+	 * @return
+	 * @throws Oadr20bMarshalException
+	 * @throws OadrElementNotFoundException
+	 */
 	@RequestMapping(value = "/{venID}/report", method = RequestMethod.GET)
 	@ResponseBody
 	public VenReportDto viewVen(@PathVariable("venID") String venID,
@@ -166,6 +194,13 @@ public class Oadr20bVenController {
 		return oadr20bDtoMapper.map(ven, VenReportDto.class);
 	}
 
+	/**
+	 * @param venID
+	 * @param reportSpecifierId
+	 * @return
+	 * @throws Oadr20bMarshalException
+	 * @throws OadrElementNotFoundException
+	 */
 	@RequestMapping(value = "/{venID}/report/available", method = RequestMethod.GET)
 	@ResponseBody
 	public List<ReportCapabilityDto> viewOtherReportCapability(@PathVariable("venID") String venID,
@@ -182,6 +217,13 @@ public class Oadr20bVenController {
 		return oadr20bDtoMapper.mapList(findBySource, ReportCapabilityDto.class);
 	}
 
+	/**
+	 * @param venID
+	 * @param reportSpecifierId
+	 * @return
+	 * @throws Oadr20bMarshalException
+	 * @throws OadrElementNotFoundException
+	 */
 	@RequestMapping(value = "/{venID}/report/available/description", method = RequestMethod.GET)
 	@ResponseBody
 	public List<ReportCapabilityDescriptionDto> viewOtherReportCapabilityDescription(
@@ -198,38 +240,33 @@ public class Oadr20bVenController {
 		return oadr20bDtoMapper.mapList(desc, ReportCapabilityDescriptionDto.class);
 	}
 
+	/**
+	 * @param venID
+	 * @param reportSpecifierId
+	 * @param rid
+	 * @param granularity
+	 * @param reportBackDuration
+	 * @param archivated
+	 * @throws Oadr20bMarshalException
+	 * @throws OadrElementNotFoundException
+	 */
 	@RequestMapping(value = "/{venID}/report/available/description/subscribe", method = RequestMethod.POST)
 	@ResponseBody
 	public void subscribeOtherReportCapabilityDescriptionRid(@PathVariable("venID") String venID,
-			@RequestParam(value = "reportSpecifierId", required = true) String reportSpecifierId,
-			@RequestParam(value = "rid", required = true) String rid,
-			@RequestParam(value = "granularity", required = true) String granularity,
-			@RequestParam(value = "reportBackDuration", required = true) String reportBackDuration)
+			@RequestBody List<OtherReportRequestDtoCreateSubscriptionDto> subscriptions, HttpServletRequest r)
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 		Ven ven = checkVen(venID);
-		OtherReportCapability reportCapability = checkOtherReportCapability(venID, reportSpecifierId);
-
-		String[] split = rid.split("\\|");
-		List<String> rids = Arrays.asList(split);
-		reportService.subscribe(ven, reportCapability, rids, reportBackDuration, granularity, null, null);
+		AbstractUser requestor = abstractUserDao.findOneByUsername(r.getUserPrincipal().getName());
+		reportService.subscribe(requestor, ven, subscriptions);
 	}
 
-	@RequestMapping(value = "/{venID}/report/available/description/subscribeAll", method = RequestMethod.POST)
-	@ResponseBody
-	public void subscribeAllOtherReportCapabilityDescriptionRid(@PathVariable("venID") String venID,
-			@RequestParam(value = "reportSpecifierId", required = true) String reportSpecifierId,
-			@RequestParam(value = "granularity", required = true) String granularity,
-			@RequestParam(value = "reportBackDuration", required = true) String reportBackDuration)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
-		Ven ven = checkVen(venID);
-
-		String[] split = reportSpecifierId.split(",");
-		for (String s : split) {
-			OtherReportCapability reportCapability = checkOtherReportCapability(venID, s);
-			reportService.subscribe(ven, reportCapability, null, reportBackDuration, granularity, null, null);
-		}
-	}
-
+	/**
+	 * @param venID
+	 * @param reportSpecifierId
+	 * @param rid
+	 * @throws Oadr20bMarshalException
+	 * @throws OadrElementNotFoundException
+	 */
 	@RequestMapping(value = "/{venID}/report/available/description/removeFromSubscribe", method = RequestMethod.POST)
 	@ResponseBody
 	public void removeSubscribeOtherReportCapabilityDescriptionRid(@PathVariable("venID") String venID,
@@ -245,38 +282,36 @@ public class Oadr20bVenController {
 		reportService.removeFromSubscription(ven, reportCapability, rids);
 	}
 
+	/**
+	 * @param venID
+	 * @param reportSpecifierId
+	 * @param rid
+	 * @param start
+	 * @param end
+	 * @throws Oadr20bMarshalException
+	 * @throws OadrElementNotFoundException
+	 */
 	@RequestMapping(value = "/{venID}/report/available/description/request", method = RequestMethod.POST)
 	@ResponseBody
 	public void requestOtherReportCapabilityDescriptionRid(@PathVariable("venID") String venID,
-			@RequestParam(value = "reportSpecifierId", required = true) String reportSpecifierId,
-			@RequestParam(value = "rid", required = true) String rid,
-			@RequestParam(value = "start", required = false) Long start,
-			@RequestParam(value = "end", required = false) Long end)
+			@RequestBody List<OtherReportRequestDtoCreateRequestDto> requests, HttpServletRequest r)
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 		Ven ven = checkVen(venID);
-		OtherReportCapability reportCapability = checkOtherReportCapability(venID, reportSpecifierId);
-
-		String[] split = rid.split("\\|");
-		List<String> rids = Arrays.asList(split);
-		reportService.request(ven, reportCapability, rids, start, end);
+		AbstractUser requestor = abstractUserDao.findOneByUsername(r.getUserPrincipal().getName());
+		reportService.request(requestor, ven, requests);
 	}
 
-	@RequestMapping(value = "/{venID}/report/available/description/requestAll", method = RequestMethod.POST)
-	@ResponseBody
-	public void requestAllOtherReportCapabilityDescriptionRid(@PathVariable("venID") String venID,
-			@RequestParam(value = "reportSpecifierId", required = true) String reportSpecifierId,
-			@RequestParam(value = "start", required = false) Long start,
-			@RequestParam(value = "end", required = false) Long end)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
-		Ven ven = checkVen(venID);
-		OtherReportCapability reportCapability = checkOtherReportCapability(venID, reportSpecifierId);
-
-		reportService.request(ven, reportCapability, null, start, end);
-	}
-
+	/**
+	 * @param venID
+	 * @param reportSpecifierId
+	 * @param reportRequestId
+	 * @return
+	 * @throws Oadr20bMarshalException
+	 * @throws OadrElementNotFoundException
+	 */
 	@RequestMapping(value = "/{venID}/report/requested", method = RequestMethod.GET)
 	@ResponseBody
-	public List<ReportRequestDto> viewReportRequest(@PathVariable("venID") String venID,
+	public List<OtherReportRequestDto> viewReportRequest(@PathVariable("venID") String venID,
 			@RequestParam(value = "reportSpecifierId", required = false) String reportSpecifierId,
 			@RequestParam(value = "reportRequestId", required = false) String reportRequestId)
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
@@ -291,7 +326,25 @@ public class Oadr20bVenController {
 			findBySource = otherReportRequestService.findBySourceAndReportRequestId(ven, reportRequestId);
 		}
 
-		return oadr20bDtoMapper.mapList(findBySource, ReportRequestDto.class);
+		return oadr20bDtoMapper.mapList(findBySource, OtherReportRequestDto.class);
+	}
+
+	/**
+	 * @param venID
+	 * @param reportRequestId
+	 * @return
+	 * @throws Oadr20bMarshalException
+	 * @throws OadrElementNotFoundException
+	 */
+	@RequestMapping(value = "/{venID}/report/requested/specifier", method = RequestMethod.POST)
+	@ResponseBody
+	public List<OtherReportRequestSpecifierDto> viewReportRequestSpecifier(@PathVariable("venID") String venID,
+			@RequestBody OtherReportRequestSpecifierSearchCriteria criteria)
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
+		checkVen(venID);
+		Specification<OtherReportRequestSpecifier> search = OtherReportRequestSpecifierSpecification.search(criteria);
+		List<OtherReportRequestSpecifier> findAll = otherReportRequestSpecifierDao.findAll(search);
+		return oadr20bDtoMapper.mapList(findAll, OtherReportRequestSpecifierDto.class);
 	}
 
 	@RequestMapping(value = "/{venID}/report/requested", method = RequestMethod.DELETE)
@@ -609,7 +662,7 @@ public class Oadr20bVenController {
 
 	@RequestMapping(value = "/{venID}/report/requested/search", method = RequestMethod.GET)
 	@ResponseBody
-	public List<ReportRequestDto> pageReportRequest(@PathVariable("venID") String venID,
+	public List<OtherReportRequestDto> pageReportRequest(@PathVariable("venID") String venID,
 			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
 			@RequestParam(value = "size", required = false, defaultValue = Oadr20bVenController.PAGINATION_SIZE_DEFAULT) Integer size,
 			HttpServletResponse response) throws Oadr20bMarshalException, OadrElementNotFoundException {
@@ -618,7 +671,7 @@ public class Oadr20bVenController {
 		Page<OtherReportRequest> pageBySource = otherReportRequestService.findBySource(ven, page, size);
 		response.addHeader("X-total-page", String.valueOf(pageBySource.getTotalPages()));
 		response.addHeader("X-total-count", String.valueOf(pageBySource.getTotalElements()));
-		return oadr20bDtoMapper.mapList(pageBySource.getContent(), ReportRequestDto.class);
+		return oadr20bDtoMapper.mapList(pageBySource.getContent(), OtherReportRequestDto.class);
 	}
 
 	private void checkResource(Ven ven, String resourceName) throws OadrElementNotFoundException {

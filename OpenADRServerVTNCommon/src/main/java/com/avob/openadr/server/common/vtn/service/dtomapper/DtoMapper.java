@@ -29,6 +29,8 @@ public class DtoMapper {
 	protected static final String DEMAND_RESPONSE_CONVERTER_ID = "demandResponseEventConverter";
 	protected static final String VEN_RESOURCE_CONVERTER_ID = "venResourceConverter";
 
+	protected static final String ABSTRACT_USER_CONVERTER_ID = "abstractUserConverter";
+
 	@Resource
 	protected MarketContextMapper marketContextConverter;
 
@@ -41,6 +43,9 @@ public class DtoMapper {
 	@Resource
 	private VenResourceMapper venResourceMapper;
 
+	@Resource
+	private AbstractUserMapper abstractUserMapper;
+
 	protected DozerBeanMapper mapper;
 
 	@PostConstruct
@@ -51,6 +56,7 @@ public class DtoMapper {
 		customConvertersWithId.put(VEN_CONVERTER_ID, venConverter);
 		customConvertersWithId.put(DEMAND_RESPONSE_CONVERTER_ID, demandResponseEventConverter);
 		customConvertersWithId.put(VEN_RESOURCE_CONVERTER_ID, venResourceMapper);
+		customConvertersWithId.put(ABSTRACT_USER_CONVERTER_ID, abstractUserMapper);
 		mapper.setCustomConvertersWithId(customConvertersWithId);
 		mapper.addMapping(demandResponseEventMappingConfiguration());
 		mapper.addMapping(venDemandResponseEventMappingConfiguration());

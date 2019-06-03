@@ -14,6 +14,7 @@ import org.dozer.loader.api.BeanMappingBuilder;
 import org.dozer.loader.api.TypeMappingBuilder;
 import org.springframework.stereotype.Service;
 
+import com.avob.openadr.server.common.vtn.service.dtomapper.AbstractUserMapper;
 import com.avob.openadr.server.common.vtn.service.dtomapper.DemandResponseEventMapper;
 import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 import com.avob.openadr.server.common.vtn.service.dtomapper.MarketContextMapper;
@@ -25,7 +26,9 @@ import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherRepo
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescriptionDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequest;
-import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.ReportRequestDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifier;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierDto;
 
 @Service
 public class Oadr20bDtoMapper extends DtoMapper {
@@ -33,6 +36,8 @@ public class Oadr20bDtoMapper extends DtoMapper {
 	protected static String OTHER_REPORT_CAPABILITY_MAPPER_ID = "otherReportCapabilityMapper";
 
 	protected static String OTHER_REPORT_CAPABILITY_DESCRIPTION_MAPPER_ID = "otherReportCapabilityDescriptionMapper";
+
+	protected static String OTHER_REPORT_REQUEST_MAPPER_ID = "otherReportRequestMapper";
 
 	@Resource
 	private VenMapper venMapper;
@@ -46,11 +51,14 @@ public class Oadr20bDtoMapper extends DtoMapper {
 		customConvertersWithId.put(OTHER_REPORT_CAPABILITY_MAPPER_ID, new OtherReportCapabilityMapper());
 		customConvertersWithId.put(OTHER_REPORT_CAPABILITY_DESCRIPTION_MAPPER_ID,
 				new OtherReportCapabilityDescriptionMapper());
+		customConvertersWithId.put(OTHER_REPORT_REQUEST_MAPPER_ID, new OtherReportRequestMapper());
+
 		this.mapper.setCustomConvertersWithId(customConvertersWithId);
 		this.mapper.addMapping(venOptMappingConfiguration());
 		this.mapper.addMapping(reportRequestMappingconfiguration());
 		this.mapper.addMapping(venReportRequestCapabilityMappingConfiguration());
 		this.mapper.addMapping(venReportRequestCapabilityDescriptionMappingConfiguration());
+		this.mapper.addMapping(reportRequestSpecifierMappingconfiguration());
 
 	}
 
@@ -101,13 +109,31 @@ public class Oadr20bDtoMapper extends DtoMapper {
 		return new BeanMappingBuilder() {
 			@Override
 			protected void configure() {
-				TypeMappingBuilder fields = mapping(OtherReportRequest.class, ReportRequestDto.class);
+				TypeMappingBuilder fields = mapping(OtherReportRequest.class, OtherReportRequestDto.class);
 				fields.fields("otherReportCapability", "reportSpecifierId",
 						customConverter(OtherReportCapabilityMapper.class),
 						customConverterId(Oadr20bDtoMapper.OTHER_REPORT_CAPABILITY_MAPPER_ID));
+
+				fields.fields("requestor", "requestorUsername", customConverter(AbstractUserMapper.class),
+						customConverterId(Oadr20bDtoMapper.ABSTRACT_USER_CONVERTER_ID));
+			}
+		};
+	}
+
+	private BeanMappingBuilder reportRequestSpecifierMappingconfiguration() {
+		return new BeanMappingBuilder() {
+			@Override
+			protected void configure() {
+				TypeMappingBuilder fields = mapping(OtherReportRequestSpecifier.class,
+						OtherReportRequestSpecifierDto.class);
+
+				fields.fields("request", "reportRequestId", customConverter(OtherReportRequestMapper.class),
+						customConverterId(Oadr20bDtoMapper.OTHER_REPORT_REQUEST_MAPPER_ID));
+
 				fields.fields("otherReportCapabilityDescription", "rid",
 						customConverter(OtherReportCapabilityDescriptionMapper.class),
 						customConverterId(Oadr20bDtoMapper.OTHER_REPORT_CAPABILITY_DESCRIPTION_MAPPER_ID));
+
 			}
 		};
 	}

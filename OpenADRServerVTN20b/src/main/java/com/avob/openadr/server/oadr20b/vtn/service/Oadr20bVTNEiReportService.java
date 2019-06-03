@@ -3,9 +3,13 @@ package com.avob.openadr.server.oadr20b.vtn.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -81,6 +85,7 @@ import com.avob.openadr.model.oadr20b.xcal.WsCalendarIntervalType;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
+import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
@@ -104,6 +109,10 @@ import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportData
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataPayloadResourceStatus;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataPayloadResourceStatusDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequest;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestDtoCreateRequestDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestDtoCreateSubscriptionDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifier;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierDao;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.SelfReportRequest;
 import com.avob.openadr.server.oadr20b.vtn.service.dtomapper.Oadr20bDtoMapper;
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bAppNotificationPublisher;
@@ -119,7 +128,6 @@ import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportRequestServi
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 @Service
 public class Oadr20bVTNEiReportService {
@@ -158,6 +166,9 @@ public class Oadr20bVTNEiReportService {
 
 	@Resource
 	protected OtherReportRequestService otherReportRequestService;
+
+	@Resource
+	private OtherReportRequestSpecifierDao otherReportRequestSpecifierDao;
 
 	@Resource
 	protected SelfReportCapabilityService selfReportCapabilityService;
@@ -414,15 +425,6 @@ public class Oadr20bVTNEiReportService {
 					VenMarketContext findOneByName = venMarketContextService.findOneByName(marketContext);
 					description.setVenMarketContext(findOneByName);
 				}
-//				JAXBElement<OadrReportDescriptionType> createOadrReportDescription = Oadr20bFactory
-//						.createOadrReportDescription(oadrReportDescriptionType);
-//				String marshal;
-//				try {
-//					marshal = jaxbContext.marshal(createOadrReportDescription);
-//					description.setPayload(marshal);
-//				} catch (Oadr20bMarshalException e) {
-//					LOGGER.warn("Can't marshall report description payload", e);
-//				}
 
 				descriptionDto.add(oadr20bDtoMapper.map(description, ReportCapabilityDescriptionDto.class));
 				descriptions.add(description);
@@ -432,7 +434,7 @@ public class Oadr20bVTNEiReportService {
 			capabilityDto.setDescriptions(descriptionDto);
 			capabilitiesDto.add(capabilityDto);
 			if (!created) {
-				this.distributeSubscriptionOadrCreatedReportPayload(ven, otherReportCapability, capabilityDescription);
+				this.distributeSubscriptionOadrCreatedReportPayload(ven);
 			}
 
 		}
@@ -444,7 +446,7 @@ public class Oadr20bVTNEiReportService {
 		Collection<OtherReportCapabilityDescription> toDeleteDesc = currentVenCapabilityDescriptionMap.values();
 		toDeleteDesc.removeAll(descriptions);
 		if (!toDeleteDesc.isEmpty()) {
-			otherReportRequestService.deleteByOtherReportCapabilityDescriptionIn(toDeleteDesc);
+			otherReportRequestSpecifierDao.deleteByOtherReportCapabilityDescriptionIn(toDeleteDesc);
 			otherReportCapabilityDescriptionService.delete(toDeleteDesc);
 
 		}
@@ -604,7 +606,6 @@ public class Oadr20bVTNEiReportService {
 					selfReportRequest.setReportRequestId(reportRequestID);
 					selfReportRequest.setStart(start);
 					selfReportRequest.setEnd(end);
-					selfReportRequest.setReadingType(ReadingTypeEnumeratedType.fromValue(readingType));
 
 					selfReportRequests.add(selfReportRequest);
 				}
@@ -765,23 +766,28 @@ public class Oadr20bVTNEiReportService {
 
 		int responseCode = HttpStatus.OK_200;
 
-		List<OtherReportDataFloat> list = Lists.newArrayList();
+		List<OtherReportDataFloat> listPayloadFloat = Lists.newArrayList();
+		List<OtherReportDataFloat> listPayloadFloatToSave = Lists.newArrayList();
 		List<OtherReportDataPayloadResourceStatus> listPayloadResourceStatus = Lists.newArrayList();
+		List<OtherReportDataPayloadResourceStatus> listPayloadResourceStatusToSave = Lists.newArrayList();
 		List<OtherReportDataKeyToken> listPayloadKeyToken = Lists.newArrayList();
+		List<OtherReportDataKeyToken> listPayloadKeyTokenToSave = Lists.newArrayList();
 		for (OadrReportType oadrReportType : payload.getOadrReport()) {
 			String reportRequestID = oadrReportType.getReportRequestID();
 			String reportSpecifierID = oadrReportType.getReportSpecifierID();
 			Intervals intervals = oadrReportType.getIntervals();
 
-			List<OtherReportRequest> findByReportRequestId = otherReportRequestService
-					.findByReportRequestId(reportRequestID);
+			OtherReportRequest findByReportRequestId = otherReportRequestService
+					.findOneByReportRequestId(reportRequestID);
 
-			Map<String, OtherReportRequest> requests = Maps.newHashMap();
-			for (OtherReportRequest r : findByReportRequestId) {
-				requests.put(r.getOtherReportCapabilityDescription().getRid(), r);
+			List<OtherReportRequestSpecifier> findByRequest = otherReportRequestSpecifierDao
+					.findByRequest(findByReportRequestId);
+			Map<String, OtherReportRequestSpecifier> perRid = new HashMap<>();
+			for (OtherReportRequestSpecifier otherReportRequestSpecifier : findByRequest) {
+				perRid.put(otherReportRequestSpecifier.getOtherReportCapabilityDescription().getRid(),
+						otherReportRequestSpecifier);
 			}
-
-			List<OtherReportRequest> toUpdate = Lists.newArrayList();
+			List<OtherReportRequestSpecifier> toUpdate = Lists.newArrayList();
 			for (IntervalType intervalType : intervals.getInterval()) {
 
 				Dtstart intervalDtstart = intervalType.getDtstart();
@@ -818,17 +824,25 @@ public class Oadr20bVTNEiReportService {
 							float value = payloadFloat.getValue();
 							otherReportData.setValue(value);
 							lastUpdateValue = String.valueOf(value);
-							list.add(otherReportData);
+							listPayloadFloat.add(otherReportData);
 
-							if (requests.containsKey(rid)) {
-								OtherReportRequest otherReportRequest = requests.get(rid);
-								if (otherReportRequest.getLastUpdateDatetime() == null
-										|| otherReportRequest.getLastUpdateDatetime() < start) {
-									otherReportRequest.setLastUpdateDatetime(start);
-									otherReportRequest.setLastUpdateValue(lastUpdateValue);
+							if (perRid.containsKey(rid)) {
+								OtherReportRequestSpecifier otherReportRequestSpecifier = perRid.get(rid);
+								if (otherReportRequestSpecifier != null) {
+									if (otherReportRequestSpecifier.getLastUpdateDatetime() == null
+											|| otherReportRequestSpecifier.getLastUpdateDatetime() < start) {
+										otherReportRequestSpecifier.setLastUpdateDatetime(start);
+										otherReportRequestSpecifier.setLastUpdateValue(lastUpdateValue);
+									}
+
+									if (otherReportRequestSpecifier.getArchived() != null
+											&& otherReportRequestSpecifier.getArchived()) {
+										listPayloadFloatToSave.add(otherReportData);
+									}
+
+									perRid.put(rid, otherReportRequestSpecifier);
+									toUpdate.add(otherReportRequestSpecifier);
 								}
-
-								toUpdate.add(otherReportRequest);
 							}
 
 						} else if (payloadBase.getDeclaredType().equals(PayloadKeyTokenType.class)) {
@@ -843,25 +857,32 @@ public class Oadr20bVTNEiReportService {
 							PayloadKeyTokenType payloadKeyToken = (PayloadKeyTokenType) payloadBase.getValue();
 							List<KeyTokenType> tokens = payloadKeyToken.getTokens();
 							otherReportData.setTokens(tokens);
-
+							listPayloadKeyToken.add(otherReportData);
 							try {
 								lastUpdateValue = jsonMapper.writeValueAsString(tokens);
-								if (requests.containsKey(rid)) {
-									OtherReportRequest otherReportRequest = requests.get(rid);
-									if (otherReportRequest.getLastUpdateDatetime() == null
-											|| otherReportRequest.getLastUpdateDatetime() < start) {
-										otherReportRequest.setLastUpdateDatetime(start);
-										otherReportRequest.setLastUpdateValue(lastUpdateValue);
-									}
+								if (perRid.containsKey(rid)) {
+									OtherReportRequestSpecifier otherReportRequestSpecifier = perRid.get(rid);
+									if (otherReportRequestSpecifier != null) {
+										if (otherReportRequestSpecifier.getLastUpdateDatetime() == null
+												|| otherReportRequestSpecifier.getLastUpdateDatetime() < start) {
+											otherReportRequestSpecifier.setLastUpdateDatetime(start);
+											otherReportRequestSpecifier.setLastUpdateValue(lastUpdateValue);
+										}
 
-									toUpdate.add(otherReportRequest);
+										if (otherReportRequestSpecifier.getArchived() != null
+												&& otherReportRequestSpecifier.getArchived()) {
+											listPayloadKeyTokenToSave.add(otherReportData);
+										}
+
+										perRid.put(rid, otherReportRequestSpecifier);
+										toUpdate.add(otherReportRequestSpecifier);
+									}
 								}
+
 							} catch (JsonProcessingException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-
-							listPayloadKeyToken.add(otherReportData);
 
 						} else if (payloadBase.getDeclaredType().equals(OadrPayloadResourceStatusType.class)) {
 
@@ -912,16 +933,35 @@ public class Oadr20bVTNEiReportService {
 							}
 
 							listPayloadResourceStatus.add(otherReportData);
+
+							if (perRid.containsKey(rid)) {
+								OtherReportRequestSpecifier otherReportRequestSpecifier = perRid.get(rid);
+								if (otherReportRequestSpecifier != null) {
+									if (otherReportRequestSpecifier.getLastUpdateDatetime() == null
+											|| otherReportRequestSpecifier.getLastUpdateDatetime() < start) {
+										otherReportRequestSpecifier.setLastUpdateDatetime(start);
+										otherReportRequestSpecifier.setLastUpdateValue(lastUpdateValue);
+									}
+
+									if (otherReportRequestSpecifier.getArchived() != null
+											&& otherReportRequestSpecifier.getArchived()) {
+										listPayloadResourceStatusToSave.add(otherReportData);
+									}
+
+									perRid.put(rid, otherReportRequestSpecifier);
+									toUpdate.add(otherReportRequestSpecifier);
+								}
+							}
 						}
 
 					}
 				}
 			}
 
-			if (!list.isEmpty()) {
+			if (!listPayloadFloat.isEmpty()) {
 
-				oadr20bAppNotificationPublisher
-						.notifyUpdateReportFloat(oadr20bDtoMapper.mapList(list, OtherReportDataFloatDto.class), venID);
+				oadr20bAppNotificationPublisher.notifyUpdateReportFloat(
+						oadr20bDtoMapper.mapList(listPayloadFloat, OtherReportDataFloatDto.class), venID);
 			}
 			if (!listPayloadResourceStatus.isEmpty()) {
 
@@ -934,23 +974,20 @@ public class Oadr20bVTNEiReportService {
 						oadr20bDtoMapper.mapList(listPayloadKeyToken, OtherReportDataKeyTokenDto.class), venID);
 			}
 
-			if (vtnConfig.getSaveVenData()) {
-				if (!list.isEmpty()) {
-					otherReportDataService.save(list);
+			if (!listPayloadFloatToSave.isEmpty()) {
+				otherReportDataService.save(listPayloadFloat);
 
-				}
-				if (!listPayloadResourceStatus.isEmpty()) {
-					otherReportDataPayloadResourceStatusService.save(listPayloadResourceStatus);
+			}
+			if (!listPayloadResourceStatusToSave.isEmpty()) {
+				otherReportDataPayloadResourceStatusService.save(listPayloadResourceStatus);
 
-				}
-				if (!listPayloadKeyToken.isEmpty()) {
-					otherReportDataKeyTokenService.save(listPayloadKeyToken);
-
-				}
+			}
+			if (!listPayloadKeyTokenToSave.isEmpty()) {
+				otherReportDataKeyTokenService.save(listPayloadKeyToken);
 
 			}
 
-			otherReportRequestService.save(toUpdate);
+			otherReportRequestSpecifierDao.saveAll(toUpdate);
 
 		}
 
@@ -968,207 +1005,211 @@ public class Oadr20bVTNEiReportService {
 		}
 	}
 
-	public void distributeSubscriptionOadrCreatedReportPayload(Ven ven, OtherReportCapability reportCapability,
-			List<OtherReportCapabilityDescription> descriptions) throws Oadr20bMarshalException {
+	public void distributeSubscriptionOadrCreatedReportPayload(Ven ven) throws Oadr20bMarshalException {
 
 		boolean send = false;
 		String requestId = "";
 		Oadr20bCreateReportBuilder newOadr20bCreateReportBuilder = Oadr20bEiReportBuilders
 				.newOadr20bCreateReportBuilder(requestId, ven.getUsername());
 
-		for (OtherReportCapabilityDescription description : descriptions) {
-
-			if (description.getId() != null) {
-				OtherReportRequest otherReportRequest = otherReportRequestService
-						.findBySourceAndOtherReportCapabilityDescriptionAndReportRequestId(ven, description,
-								reportCapability.getReportRequestId());
-				if (otherReportRequest != null) {
-
-					String granularity = otherReportRequest.getGranularity();
-					String reportBackDuration = otherReportRequest.getReportBackDuration();
-					String reportRequestId = otherReportRequest.getReportRequestId();
-
-					send = true;
-					Oadr20bReportRequestTypeBuilder reportRequestBuilder = Oadr20bEiReportBuilders
-							.newOadr20bReportRequestTypeBuilder(reportRequestId,
-									reportCapability.getReportSpecifierId(), granularity, reportBackDuration);
-
-					if (otherReportRequest.getStart() != null && otherReportRequest.getEnd() != null) {
-						String duration = Oadr20bFactory
-								.millisecondToXmlDuration(otherReportRequest.getEnd() - otherReportRequest.getStart());
-						WsCalendarIntervalType createWsCalendarIntervalType = Oadr20bFactory
-								.createWsCalendarIntervalType(otherReportRequest.getStart(), duration);
-						reportRequestBuilder.withWsCalendarIntervalType(createWsCalendarIntervalType);
-					}
-
-					reportRequestBuilder.addSpecifierPayload(null, description.getReadingType(), description.getRid());
-
-					newOadr20bCreateReportBuilder.addReportRequest(reportRequestBuilder.build());
+		List<OtherReportRequest> findBySource = otherReportRequestService.findBySource(ven);
+		if (findBySource != null) {
+			for (OtherReportRequest request : findBySource) {
+				send = true;
+				OtherReportCapability otherReportCapability = request.getOtherReportCapability();
+				Oadr20bReportRequestTypeBuilder reportRequestBuilder = Oadr20bEiReportBuilders
+						.newOadr20bReportRequestTypeBuilder(request.getReportRequestId(),
+								otherReportCapability.getReportSpecifierId(), request.getGranularity(),
+								request.getReportBackDuration());
+				if (request.getStart() != null && request.getEnd() != null) {
+					String duration = Oadr20bFactory.millisecondToXmlDuration(request.getEnd() - request.getStart());
+					WsCalendarIntervalType createWsCalendarIntervalType = Oadr20bFactory
+							.createWsCalendarIntervalType(request.getStart(), duration);
+					reportRequestBuilder.withWsCalendarIntervalType(createWsCalendarIntervalType);
 				}
-			}
+				List<OtherReportRequestSpecifier> findByRequest = otherReportRequestSpecifierDao.findByRequest(request);
+				for (OtherReportRequestSpecifier otherReportRequestSpecifier : findByRequest) {
 
+					OtherReportCapabilityDescription otherReportCapabilityDescription = otherReportRequestSpecifier
+							.getOtherReportCapabilityDescription();
+					reportRequestBuilder.addSpecifierPayload(null, otherReportCapabilityDescription.getReadingType(),
+							otherReportCapabilityDescription.getRid());
+
+				}
+				newOadr20bCreateReportBuilder.addReportRequest(reportRequestBuilder.build());
+			}
 		}
+
 		if (send) {
 			venDistributeService.distribute(ven, newOadr20bCreateReportBuilder.build());
 		}
 	}
 
-	public void distributeSubscriptionOadrCreatedReportPayload(Ven ven, List<OtherReportRequest> requests)
-			throws Oadr20bMarshalException {
+	public void distributeRequestOadrCreatedReportPayload(Ven ven, List<OtherReportRequest> request,
+			List<OtherReportRequestSpecifier> specifiers) throws Oadr20bMarshalException {
 
 		boolean send = false;
 		String requestId = "";
 		Oadr20bCreateReportBuilder newOadr20bCreateReportBuilder = Oadr20bEiReportBuilders
 				.newOadr20bCreateReportBuilder(requestId, ven.getUsername());
 
-		for (OtherReportRequest request : requests) {
+		Map<String, Set<OtherReportRequestSpecifier>> groupByReportRequestIdSpecifiers = specifiers.stream()
+				.collect(Collectors.groupingBy(spec -> spec.getRequest().getReportRequestId(), Collectors.toSet()));
 
-			OtherReportCapability otherReportCapability = request.getOtherReportCapability();
-			OtherReportCapabilityDescription otherReportCapabilityDescription = request
-					.getOtherReportCapabilityDescription();
+		Map<String, OtherReportRequest> collect = request.stream()
+				.collect(Collectors.toMap(r -> r.getReportRequestId(), r -> r));
 
-			String granularity = request.getGranularity();
-			String reportBackDuration = request.getReportBackDuration();
-			String reportRequestId = request.getReportRequestId();
+		for (Entry<String, Set<OtherReportRequestSpecifier>> entry : groupByReportRequestIdSpecifiers.entrySet()) {
 
-			send = true;
-			Oadr20bReportRequestTypeBuilder reportRequestBuilder = Oadr20bEiReportBuilders
-					.newOadr20bReportRequestTypeBuilder(reportRequestId, otherReportCapability.getReportSpecifierId(),
-							granularity, reportBackDuration);
+			if (collect.containsKey(entry.getKey())) {
 
-			if (request.getStart() != null && request.getEnd() != null) {
-				String duration = Oadr20bFactory.millisecondToXmlDuration(request.getEnd() - request.getStart());
-				WsCalendarIntervalType createWsCalendarIntervalType = Oadr20bFactory
-						.createWsCalendarIntervalType(request.getStart(), duration);
-				reportRequestBuilder.withWsCalendarIntervalType(createWsCalendarIntervalType);
-			} else if (request.getStart() != null) {
-				String duration = "P0D";
-				WsCalendarIntervalType createWsCalendarIntervalType = Oadr20bFactory
-						.createWsCalendarIntervalType(request.getStart(), duration);
-				reportRequestBuilder.withWsCalendarIntervalType(createWsCalendarIntervalType);
+				send = true;
+				OtherReportRequest otherReportRequest = collect.get(entry.getKey());
+
+				Oadr20bReportRequestTypeBuilder reportRequestBuilder = Oadr20bEiReportBuilders
+						.newOadr20bReportRequestTypeBuilder(otherReportRequest.getReportRequestId(),
+								otherReportRequest.getOtherReportCapability().getReportSpecifierId(),
+								otherReportRequest.getGranularity(), otherReportRequest.getReportBackDuration());
+
+				Long end = otherReportRequest.getEnd();
+				if (end == null) {
+					end = System.currentTimeMillis();
+				}
+				if (otherReportRequest.getStart() != null) {
+					String duration = Oadr20bFactory.millisecondToXmlDuration(end - otherReportRequest.getStart());
+					WsCalendarIntervalType createWsCalendarIntervalType = Oadr20bFactory
+							.createWsCalendarIntervalType(otherReportRequest.getStart(), duration);
+					reportRequestBuilder.withWsCalendarIntervalType(createWsCalendarIntervalType);
+				}
+
+				for (OtherReportRequestSpecifier specifier : entry.getValue()) {
+
+					OtherReportCapabilityDescription otherReportCapabilityDescription = specifier
+							.getOtherReportCapabilityDescription();
+					reportRequestBuilder.addSpecifierPayload(null, otherReportCapabilityDescription.getReadingType(),
+							otherReportCapabilityDescription.getRid());
+
+				}
+
+				OadrReportRequestType build = reportRequestBuilder.build();
+
+				newOadr20bCreateReportBuilder.addReportRequest(build);
+
 			}
-
-			reportRequestBuilder.addSpecifierPayload(null, otherReportCapabilityDescription.getReadingType(),
-					otherReportCapabilityDescription.getRid());
-
-			newOadr20bCreateReportBuilder.addReportRequest(reportRequestBuilder.build());
-
 		}
+
 		if (send) {
 			venDistributeService.distribute(ven, newOadr20bCreateReportBuilder.build());
 		}
 	}
 
 	/**
+	 * @param requestor
 	 * @param ven
-	 * @param reportCapability
-	 * @param rids
-	 * @param reportBackDuration
-	 * @param granularity
+	 * @param subscriptions
 	 * @throws Oadr20bMarshalException
 	 */
-	public void subscribe(Ven ven, OtherReportCapability reportCapability, List<String> rids, String reportBackDuration,
-			String granularity, Long start, Long end) throws Oadr20bMarshalException {
+	public void subscribe(AbstractUser requestor, Ven ven,
+			List<OtherReportRequestDtoCreateSubscriptionDto> subscriptions) throws Oadr20bMarshalException {
 
-		String reportRequestId = UUID.randomUUID().toString();
+		List<OtherReportRequest> requests = new ArrayList<>();
+		List<OtherReportRequestSpecifier> specifiers = new ArrayList<>();
+		for (OtherReportRequestDtoCreateSubscriptionDto subscription : subscriptions) {
+			Long granularityMillisecond = null;
+			Long reportBackDurationMillisecond = null;
 
-		List<OtherReportCapabilityDescription> descriptions = otherReportCapabilityDescriptionService
-				.findByOtherReportCapability(reportCapability);
+			granularityMillisecond = Oadr20bFactory.xmlDurationToMillisecond(subscription.getGranularity());
+			reportBackDurationMillisecond = Oadr20bFactory
+					.xmlDurationToMillisecond(subscription.getReportBackDuration());
 
-		if (descriptions == null || descriptions.isEmpty()) {
-			throw new IllegalArgumentException("reportCapability is not associated with any description");
-		}
+			if (granularityMillisecond == null || reportBackDurationMillisecond == null) {
+				throw new IllegalArgumentException(
+						"reportBackDuration and granularity must be valid xmlduration lexical representation (PnYnMnDTnHnMnS)");
+			}
 
-		Long granularityMillisecond = null;
-		Long reportBackDurationMillisecond = null;
+			OtherReportCapability reportCapability = otherReportCapabilityService
+					.findOneBySourceUsernameAndReportSpecifierId(ven.getUsername(),
+							subscription.getReportSpecifierId());
 
-		granularityMillisecond = Oadr20bFactory.xmlDurationToMillisecond(granularity);
-		reportBackDurationMillisecond = Oadr20bFactory.xmlDurationToMillisecond(reportBackDuration);
+			String reportRequestId = UUID.randomUUID().toString();
+			OtherReportRequest otherReportRequest = new OtherReportRequest();
+			otherReportRequest.setGranularity(subscription.getGranularity());
+			otherReportRequest.setReportBackDuration(subscription.getReportBackDuration());
+			otherReportRequest.setSource(ven);
+			otherReportRequest.setOtherReportCapability(reportCapability);
+			otherReportRequest.setReportRequestId(reportRequestId);
+			otherReportRequest.setRequestor(requestor);
 
-		if (granularityMillisecond == null || reportBackDurationMillisecond == null) {
-			throw new IllegalArgumentException(
-					"reportBackDuration and granularity must be valid xmlduration lexical representation (PnYnMnDTnHnMnS)");
-		}
+			List<OtherReportCapabilityDescription> findByOtherReportCapability = otherReportCapabilityDescriptionService
+					.findByOtherReportCapability(reportCapability);
+			Map<String, OtherReportCapabilityDescription> descriptions = findByOtherReportCapability.stream()
+					.collect(Collectors.toMap(OtherReportCapabilityDescription::getRid, Function.identity()));
+			for (Entry<String, Boolean> entry : subscription.getRid().entrySet()) {
 
-		List<OtherReportRequest> otherReportRequests = new ArrayList<OtherReportRequest>();
-		for (OtherReportCapabilityDescription description : descriptions) {
-
-			if (rids == null || rids.contains(description.getRid())) {
-
-				OtherReportRequest otherReportRequest = otherReportRequestService
-						.findBySourceAndOtherReportCapabilityDescriptionAndReportRequestId(ven, description,
-								reportRequestId);
-
-				if (otherReportRequest == null) {
-					otherReportRequest = new OtherReportRequest(ven, reportCapability, description, reportRequestId,
-							granularity, reportBackDuration);
+				if (descriptions.containsKey(entry.getKey())) {
+					OtherReportRequestSpecifier otherReportRequestSpecifier = new OtherReportRequestSpecifier();
+					otherReportRequestSpecifier.setArchived(entry.getValue());
+					otherReportRequestSpecifier.setOtherReportCapabilityDescription(descriptions.get(entry.getKey()));
+					otherReportRequestSpecifier.setRequest(otherReportRequest);
+					specifiers.add(otherReportRequestSpecifier);
 				}
-
-				otherReportRequest.setGranularity(granularity);
-				otherReportRequest.setReportBackDuration(reportBackDuration);
-				otherReportRequest.setStart(start);
-				otherReportRequest.setEnd(end);
-
-				otherReportRequests.add(otherReportRequest);
 
 			}
 
+			requests.add(otherReportRequest);
 		}
 
-		if (reportCapability.getReportName().equals(ReportNameEnumeratedType.METADATA_TELEMETRY_USAGE)
-				|| reportCapability.getReportName().equals(ReportNameEnumeratedType.METADATA_TELEMETRY_STATUS)
-				|| reportCapability.getReportName().equals(ReportNameEnumeratedType.METADATA_HISTORY_USAGE)) {
+		otherReportRequestService.save(requests);
+		otherReportRequestSpecifierDao.saveAll(specifiers);
 
-			reportCapability.setReportRequestId(reportRequestId);
-
-			otherReportCapabilityService.save(reportCapability);
-
-			otherReportCapabilityDescriptionService.save(descriptions);
-		}
-
-		otherReportRequestService.save(otherReportRequests);
-
-		distributeSubscriptionOadrCreatedReportPayload(ven, reportCapability, descriptions);
+		distributeSubscriptionOadrCreatedReportPayload(ven);
 
 	}
 
-	public void request(Ven ven, OtherReportCapability reportCapability, List<String> rids, Long start, Long end)
+	/**
+	 * @param requestor
+	 * @param ven
+	 * @param dto
+	 * @throws Oadr20bMarshalException
+	 */
+	public void request(AbstractUser requestor, Ven ven, List<OtherReportRequestDtoCreateRequestDto> dto)
 			throws Oadr20bMarshalException {
+		List<OtherReportRequest> requests = new ArrayList<>();
+		List<OtherReportRequestSpecifier> specifiers = new ArrayList<>();
+		for (OtherReportRequestDtoCreateRequestDto request : dto) {
 
-		String reportRequestId = UUID.randomUUID().toString();
+			OtherReportCapability reportCapability = otherReportCapabilityService
+					.findOneBySourceUsernameAndReportSpecifierId(ven.getUsername(), request.getReportSpecifierId());
 
-		List<OtherReportCapabilityDescription> descriptions = otherReportCapabilityDescriptionService
-				.findByOtherReportCapability(reportCapability);
+			String reportRequestId = UUID.randomUUID().toString();
+			OtherReportRequest otherReportRequest = new OtherReportRequest();
+			otherReportRequest.setStart(request.getStart());
+			otherReportRequest.setEnd(request.getEnd());
+			otherReportRequest.setSource(ven);
+			otherReportRequest.setOtherReportCapability(reportCapability);
+			otherReportRequest.setReportRequestId(reportRequestId);
+			otherReportRequest.setRequestor(requestor);
 
-		if (descriptions == null || descriptions.isEmpty()) {
-			throw new IllegalArgumentException("reportCapability is not associated with any description");
-		}
+			List<OtherReportCapabilityDescription> findByOtherReportCapability = otherReportCapabilityDescriptionService
+					.findByOtherReportCapability(reportCapability);
+			Map<String, OtherReportCapabilityDescription> descriptions = findByOtherReportCapability.stream()
+					.collect(Collectors.toMap(OtherReportCapabilityDescription::getRid, Function.identity()));
+			for (String rid : request.getRid()) {
 
-		List<OtherReportRequest> otherReportRequests = new ArrayList<OtherReportRequest>();
-		for (OtherReportCapabilityDescription description : descriptions) {
-
-			if (rids == null || rids.contains(description.getRid())) {
-
-				OtherReportRequest otherReportRequest = new OtherReportRequest(ven, reportCapability, description,
-						reportRequestId, "P0D", "P0D");
-
-				otherReportRequest.setGranularity("P0D");
-				otherReportRequest.setReportBackDuration("P0D");
-				otherReportRequest.setStart(start);
-				otherReportRequest.setEnd(end);
-				otherReportRequest.setReportRequestId(reportRequestId);
-				otherReportRequests.add(otherReportRequest);
+				if (descriptions.containsKey(rid)) {
+					OtherReportRequestSpecifier otherReportRequestSpecifier = new OtherReportRequestSpecifier();
+					otherReportRequestSpecifier.setArchived(false);
+					otherReportRequestSpecifier.setOtherReportCapabilityDescription(descriptions.get(rid));
+					otherReportRequestSpecifier.setRequest(otherReportRequest);
+					specifiers.add(otherReportRequestSpecifier);
+				}
 
 			}
 
+			requests.add(otherReportRequest);
 		}
 
-		otherReportRequestService.save(otherReportRequests);
-
-		List<OtherReportRequest> findBySourceAndReportSpecifierId = otherReportRequestService
-				.findBySourceAndReportSpecifierId(ven, reportCapability.getReportSpecifierId());
-		otherReportRequests.addAll(findBySourceAndReportSpecifierId);
-		distributeSubscriptionOadrCreatedReportPayload(ven, otherReportRequests);
+		distributeRequestOadrCreatedReportPayload(ven, requests, specifiers);
 
 	}
 
@@ -1180,32 +1221,19 @@ public class Oadr20bVTNEiReportService {
 		List<OtherReportCapabilityDescription> descriptions = otherReportCapabilityDescriptionService
 				.findByOtherReportCapability(reportCapability);
 
-		List<OtherReportRequest> otherReportRequests = new ArrayList<OtherReportRequest>();
-		boolean stillSubscribed = false;
-		for (OtherReportCapabilityDescription description : descriptions) {
+		otherReportRequestSpecifierDao
+				.deleteByOtherReportCapabilityDescriptionRidInAndOtherReportCapabilityDescriptionOtherReportCapability(
+						rids, reportCapability);
 
-			if (rids.contains(description.getRid())) {
+		Long countByOtherReportCapabilityDescriptionOtherReportCapability = otherReportRequestSpecifierDao
+				.countByOtherReportCapabilityDescriptionOtherReportCapability(reportCapability);
 
-				OtherReportRequest otherReportRequest = otherReportRequestService
-						.findBySourceAndOtherReportCapabilityDescriptionAndReportRequestId(ven, description,
-								reportRequestId);
+		if (countByOtherReportCapabilityDescriptionOtherReportCapability == 0) {
 
-				if (otherReportRequest != null) {
-					otherReportRequests.add(otherReportRequest);
-				}
-
-			}
-
-		}
-
-		if (stillSubscribed) {
-			otherReportRequestService.delete(otherReportRequests);
-
-			otherReportCapabilityDescriptionService.save(descriptions);
-
-			distributeSubscriptionOadrCreatedReportPayload(ven, reportCapability, descriptions);
-		} else {
 			this.unsubscribe(ven, reportRequestId);
+
+		} else {
+			distributeSubscriptionOadrCreatedReportPayload(ven);
 		}
 
 	}
@@ -1221,9 +1249,8 @@ public class Oadr20bVTNEiReportService {
 
 		otherReportCapabilityService.save(findByPayloadReportRequestId2);
 
-		List<OtherReportRequest> findByReportRequestId = otherReportRequestService
-				.findByReportRequestId(reportRequestID);
-		otherReportRequestService.delete(findByReportRequestId);
+		OtherReportRequest findByReportRequestId = otherReportRequestService.findOneByReportRequestId(reportRequestID);
+		otherReportRequestService.delete(findByReportRequestId.getId());
 
 		String requestId = "";
 		OadrCancelReportType build = Oadr20bEiReportBuilders

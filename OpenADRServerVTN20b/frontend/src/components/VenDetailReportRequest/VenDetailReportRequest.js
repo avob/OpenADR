@@ -35,7 +35,7 @@ export class VenDetailReportRequest extends React.Component {
   }
 
   render() {
-    const {classes, requestedReport} = this.props;
+    const {classes, requestedReportSpecifier} = this.props;
 
     var getFormatedDatetime = (datetime) => {
     var format = formatTimestamp(datetime);
@@ -63,16 +63,18 @@ export class VenDetailReportRequest extends React.Component {
         <TableHead>
           <TableRow>
             <TableCell align="right">rID</TableCell>
-            <TableCell align="right">Created<br/>Date/Time</TableCell>
+            <TableCell align="right">Archived</TableCell>
             <TableCell align="right">Last Update<br/>Date/Time</TableCell>
+            <TableCell align="right">Last Update<br/>Value</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {requestedReport.map(row => (
+          {requestedReportSpecifier.map(row => (
             <TableRow key={row.id}>
               <TableCell align="right">{row.rid}</TableCell>
-              <TableCell align="right">{getFormatedDatetime(row.createdDatetime)}</TableCell>
+              <TableCell align="right">{(row.archived) ? "Archived": ""}</TableCell>
               <TableCell align="right">{(row.lastUpdateDatetime != null) ? getFormatedDatetime(row.lastUpdateDatetime) : null } </TableCell>
+              <TableCell align="right">{(row.lastUpdateValue != null) ? row.lastUpdateValue : null } </TableCell>
             </TableRow>
           ))}
         </TableBody>

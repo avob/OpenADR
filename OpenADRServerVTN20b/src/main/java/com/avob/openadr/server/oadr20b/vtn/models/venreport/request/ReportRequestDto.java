@@ -1,14 +1,10 @@
 package com.avob.openadr.server.oadr20b.vtn.models.venreport.request;
 
-import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
-
 public class ReportRequestDto {
 
 	private Long id;
 
 	private String reportRequestId;
-
-	private String rid;
 
 	private String reportSpecifierId;
 
@@ -20,15 +16,9 @@ public class ReportRequestDto {
 
 	private Long end;
 
-	private ReadingTypeEnumeratedType readingType;
-
 	private boolean acked = false;
 
 	private Long createdDatetime;
-	
-	private Long lastUpdateDatetime;
-
-	private String lastUpdateValue;
 
 	public Long getId() {
 		return id;
@@ -78,22 +68,6 @@ public class ReportRequestDto {
 		this.end = end;
 	}
 
-	public ReadingTypeEnumeratedType getReadingType() {
-		return readingType;
-	}
-
-	public void setReadingType(ReadingTypeEnumeratedType readingType) {
-		this.readingType = readingType;
-	}
-
-	public String getRid() {
-		return rid;
-	}
-
-	public void setRid(String rid) {
-		this.rid = rid;
-	}
-
 	public boolean isAcked() {
 		return acked;
 	}
@@ -102,28 +76,12 @@ public class ReportRequestDto {
 		this.acked = acked;
 	}
 
-	public Long getLastUpdateDatetime() {
-		return lastUpdateDatetime;
-	}
-
-	public void setLastUpdateDatetime(Long lastUpdateDatetime) {
-		this.lastUpdateDatetime = lastUpdateDatetime;
-	}
-
 	public String getReportSpecifierId() {
 		return reportSpecifierId;
 	}
 
 	public void setReportSpecifierId(String reportSpecifierId) {
 		this.reportSpecifierId = reportSpecifierId;
-	}
-
-	public String getLastUpdateValue() {
-		return lastUpdateValue;
-	}
-
-	public void setLastUpdateValue(String lastUpdateValue) {
-		this.lastUpdateValue = lastUpdateValue;
 	}
 
 	public Long getCreatedDatetime() {

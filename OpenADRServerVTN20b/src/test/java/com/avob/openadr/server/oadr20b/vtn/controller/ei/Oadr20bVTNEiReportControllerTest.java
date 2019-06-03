@@ -2,6 +2,7 @@ package com.avob.openadr.server.oadr20b.vtn.controller.ei;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.text.DecimalFormat;
@@ -73,6 +74,9 @@ import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfRepor
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataFloatDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataPayloadResourceStatusDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequest;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifier;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierDao;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.ReportRequestDto;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityDescriptionService;
@@ -119,6 +123,9 @@ public class Oadr20bVTNEiReportControllerTest {
 
 	@Resource
 	private OtherReportRequestService otherReportRequestService;
+
+	@Resource
+	private OtherReportRequestSpecifierDao otherReportRequestSpecifierDao;
 
 	@Resource
 	private OtherReportDataFloatService otherReportDataService;
@@ -243,13 +250,20 @@ public class Oadr20bVTNEiReportControllerTest {
 		OtherReportCapabilityDescription reportCapabilityDescription = otherReportCapabilityDescriptionService
 				.findOne(reportCapabilityDescriptionPrivateId);
 		String granularity = "PT1H";
-		OtherReportRequest otherReportRequest = new OtherReportRequest(ven, reportCapability,
-				reportCapabilityDescription, reportRequestId, granularity, reportBackDuration);
+		OtherReportRequest otherReportRequest = new OtherReportRequest();
 		otherReportRequest.setGranularity(minPeriod);
 		otherReportRequest.setReportRequestId(reportRequestId);
-		otherReportRequest.setReadingType(readingType);
 		otherReportRequest.setReportBackDuration(reportBackDuration);
-		otherReportRequestService.save(otherReportRequest);
+		otherReportRequest.setSource(ven);
+		otherReportRequest.setOtherReportCapability(reportCapability);
+		otherReportRequest.setReportRequestId(reportRequestId);
+		Boolean archived = true;
+		otherReportRequest = otherReportRequestService.save(otherReportRequest);
+		OtherReportRequestSpecifier otherReportRequestSpecifier = new OtherReportRequestSpecifier();
+		otherReportRequestSpecifier.setOtherReportCapabilityDescription(reportCapabilityDescription);
+		otherReportRequestSpecifier.setRequest(otherReportRequest);
+		otherReportRequestSpecifier.setArchived(archived);
+		otherReportRequestSpecifierDao.save(otherReportRequestSpecifier);
 
 		// create VEN oadrCreatedReport
 		OadrCreatedReportType oadrCreatedReportType = Oadr20bEiReportBuilders
@@ -275,15 +289,15 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(OadrDataBaseSetup.VEN, response.getVenID());
 
 		// test previous payload has successfully acked requestreport
-		List<ReportRequestDto> reportRequestList = mockMvc.getRestJsonControllerAndExpectList(
+		List<OtherReportRequestDto> reportRequestList = mockMvc.getRestJsonControllerAndExpectList(
 				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/requested",
-				HttpStatus.OK_200, ReportRequestDto.class);
+				HttpStatus.OK_200, OtherReportRequestDto.class);
 		assertEquals(1, reportRequestList.size());
 		assertTrue(reportRequestList.get(0).isAcked());
 		assertEquals(minPeriod, reportRequestList.get(0).getGranularity());
 		assertEquals(reportBackDuration, reportRequestList.get(0).getReportBackDuration());
-		assertEquals(readingType, reportRequestList.get(0).getReadingType());
 		assertEquals(reportRequestId, reportRequestList.get(0).getReportRequestId());
+		assertNull(reportRequestList.get(0).getRequestorUsername());
 
 		Long reportRequestPrivateId = reportRequestList.get(0).getId();
 
@@ -408,7 +422,8 @@ public class Oadr20bVTNEiReportControllerTest {
 
 		// cleanup data PayloadResourceStatus
 		otherReportDataPayloadResourceStatusService.delete(reportDataPrivateId);
-
+		otherReportRequestSpecifierDao.deleteByRequestReportRequestId(otherReportRequest.getReportRequestId());
+		
 		otherReportRequestService.delete(reportRequestPrivateId);
 		otherReportCapabilityDescriptionService.delete(reportCapabilityDescriptionPrivateId);
 		otherReportCapabilityService.delete(reportCapabilityPrivateId);

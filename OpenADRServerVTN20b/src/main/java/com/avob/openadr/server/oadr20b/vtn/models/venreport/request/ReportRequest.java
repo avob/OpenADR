@@ -7,9 +7,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.Lob;
-
-import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 
 /**
  * @author bzanni
@@ -26,6 +23,7 @@ public abstract class ReportRequest {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 
+	@Column(unique = true)
 	private String reportRequestId;
 
 	private String granularity;
@@ -38,16 +36,9 @@ public abstract class ReportRequest {
 	@Column(name = "endReportRequest")
 	private Long end;
 
-	private ReadingTypeEnumeratedType readingType;
-
 	private boolean acked = false;
 
 	private Long createdDatetime;
-
-	private Long lastUpdateDatetime;
-
-	@Lob
-	private String lastUpdateValue;
 
 	protected ReportRequest() {
 		setCreatedDatetime(System.currentTimeMillis());
@@ -93,14 +84,6 @@ public abstract class ReportRequest {
 		this.end = end;
 	}
 
-	public ReadingTypeEnumeratedType getReadingType() {
-		return readingType;
-	}
-
-	public void setReadingType(ReadingTypeEnumeratedType readingType) {
-		this.readingType = readingType;
-	}
-
 	public boolean isAcked() {
 		return acked;
 	}
@@ -123,22 +106,6 @@ public abstract class ReportRequest {
 
 	public void setCreatedDatetime(Long createdDatetime) {
 		this.createdDatetime = createdDatetime;
-	}
-
-	public Long getLastUpdateDatetime() {
-		return lastUpdateDatetime;
-	}
-
-	public void setLastUpdateDatetime(Long lastUpdateDatetime) {
-		this.lastUpdateDatetime = lastUpdateDatetime;
-	}
-
-	public String getLastUpdateValue() {
-		return lastUpdateValue;
-	}
-
-	public void setLastUpdateValue(String lastUpdateValue) {
-		this.lastUpdateValue = lastUpdateValue;
 	}
 
 }

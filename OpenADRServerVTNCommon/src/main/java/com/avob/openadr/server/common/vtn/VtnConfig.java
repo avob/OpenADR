@@ -89,9 +89,6 @@ public class VtnConfig {
 	@Value("${" + VTN_ID_CONF + ":#{null}}")
 	private String vtnId;
 
-	@Value("${" + SAVE_VEN_UPDATE_REPORT_CONF + ":#{false}}")
-	private Boolean saveVenData;
-
 	@Value("${" + REPLAY_PROTECTACCEPTED_DELAY_SECONDS_CONF + ":#{1200}}")
 	private Long replayProtectAcceptedDelaySecond;
 
@@ -283,14 +280,6 @@ public class VtnConfig {
 
 	public void setVtnId(String vtnId) {
 		this.vtnId = vtnId;
-	}
-
-	public Boolean getSaveVenData() {
-		return saveVenData;
-	}
-
-	public void setSaveVenData(Boolean saveVenData) {
-		this.saveVenData = saveVenData;
 	}
 
 	public Long getReplayProtectAcceptedDelaySecond() {

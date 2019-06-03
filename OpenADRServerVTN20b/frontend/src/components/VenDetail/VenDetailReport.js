@@ -5,7 +5,7 @@ import React from 'react';
 import Grid from '@material-ui/core/Grid';
 
 
-import Typography from '@material-ui/core/Typography';
+
 
 import Divider from '@material-ui/core/Divider';
 
@@ -45,7 +45,7 @@ import Paper from '@material-ui/core/Paper';
 
 import { history } from '../../store/configureStore';
 
-import {iCalDurationInSeconds, formatTimestamp} from '../../utils/time'
+import { formatTimestamp} from '../../utils/time'
 import {isActionReport, isHistoryReport, isTelemetryReport, isMetadataReport} from '../../utils/venReport'
 
 
@@ -192,7 +192,7 @@ export class VenDetailReport extends React.Component {
   }
 
   render() {
-    const {classes, ven, availableReport, totalReport, totalPageReport} = this.props;
+    const {classes, ven, availableReport, totalReport} = this.props;
 
     return (
     <div className={ classes.root } >

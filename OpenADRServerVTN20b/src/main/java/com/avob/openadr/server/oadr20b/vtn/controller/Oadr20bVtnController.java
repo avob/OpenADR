@@ -55,7 +55,7 @@ public class Oadr20bVtnController {
 	@ResponseBody
 	public VtnConfigurationDto viewConf() throws Oadr20bMarshalException {
 
-		VtnConfigurationDto dto = oadr20bDtoMapper.map(vtnConfig, VtnConfigurationDto.class);		
+		VtnConfigurationDto dto = oadr20bDtoMapper.map(vtnConfig, VtnConfigurationDto.class);
 		String oadr20bFingerprint;
 		try {
 			oadr20bFingerprint = OadrHttpSecurity.getOadr20bFingerprint(vtnConfig.getCert());
@@ -67,7 +67,6 @@ public class Oadr20bVtnController {
 		dto.setSupportCertificateGeneration(vtnConfig.getCaKey() != null && vtnConfig.getCaCert() != null);
 		dto.setXmlSignatureReplayProtectSecond(vtnConfig.getReplayProtectAcceptedDelaySecond());
 		dto.setXsdValidation(vtnConfig.getValidateOadrPayloadAgainstXsd());
-		dto.setSaveVenDate(vtnConfig.getSaveVenData());
 		return dto;
 	}
 
