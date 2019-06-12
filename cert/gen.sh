@@ -72,10 +72,23 @@ gen_ecc_key_csr()
 
 	rm $OPENSSL_CONFIG_FILENAME
 }
-# gen_pkcs12 "in/out key/crt/p12 name"
+# gen_pkcs12 "in/out key crt/p12 name"
+# prompt password
 gen_pkcs12()
 {
 	openssl pkcs12 -export  -inkey $1.key -in $1.crt -certfile $CA_NAME.crt -out $1.p12
+}
+# gen_java_keystore "in/out p12 / keystore name"
+# prompt password
+gen_java_keystore()
+{
+	keytool -importkeystore -v -srckeystore $1.p12 -srcstoretype PKCS12 -destkeystore $1.jks -deststoretype JCEKS
+}
+# gen_java_trustore
+# promt trust 
+gen_java_truststore()
+{
+	keytool -import -alias ca -file $1.crt -keystore $1.trust
 }
 # gen_oadr20b_fingerprint "in/out crt/fingerprint name"
 gen_oadr20b_fingerprint()
@@ -104,6 +117,9 @@ gen_selfsigned_key_crt $CA_NAME
 gen_rsa_key_csr $VTN_NAME-rsa $VTN_NAME $CA_NAME 01 365
 gen_oadr20b_fingerprint $VTN_NAME-rsa
 gen_oadr20a_fingerprint $VTN_NAME-rsa
+# gen_pkcs12 $VTN_NAME-rsa
+# gen_java_keystore $VTN_NAME-rsa
+# gen_java_truststore $VTN_NAME-rsa
 
 ###################################
 # VTN ECC

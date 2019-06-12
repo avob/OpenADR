@@ -39,8 +39,8 @@
 
   - name: Copy cert folder
     copy:
-      src: ../../../cert
-      dest: /opt/oadr-vtn20b
+      src: ../../../cert_local/
+      dest: /opt/oadr-vtn20b/cert/
       owner: oadr-vtn20b
       group: oadr-vtn20b
 

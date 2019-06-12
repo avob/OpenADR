@@ -1,0 +1,100 @@
+---
+  - name: check if openfire already installed
+    stat: 
+      path: /etc/openfire
+    register: openfire_installed
+
+  - name: download openfire_4.3.2_all.deb
+    raw: wget -O openfire_4.3.2_all.deb https://www.igniterealtime.org/downloadServlet?filename=openfire/openfire_4.3.2_all.deb
+    when: openfire_installed.stat.exists == false
+
+  - name: install openfire_4.3.2_all.deb
+    raw: sudo dpkg -i openfire_4.3.2_all.deb
+    when: openfire_installed.stat.exists == false
+
+  - name: Install openfire.xml
+    template:
+      src: templates/openfire.xml
+      dest: /etc/openfire/openfire.xml
+      owner: openfire
+      group: openfire
+    when: openfire_installed.stat.exists == false
+
+  - name: Install available-plugins.xml
+    template:
+      src: templates/available-plugins.xml
+      dest: /etc/openfire/available-plugins.xml
+      owner: openfire
+      group: openfire
+    when: openfire_installed.stat.exists == false
+
+  - name: Init postgresql database
+    shell: psql -h localhost -U oadr-openfire -d oadr-openfire -f /usr/share/openfire/resources/database/openfire_postgresql.sql; 
+    environment:
+      PGPASSWORD: 'supersecure'
+    when: openfire_installed.stat.exists == false
+
+  - name: Copy Identity Store
+    become: true
+    command: chdir=/usr/share/openfire/resources/security cp keystore keystore.back
+    when: openfire_installed.stat.exists == false
+
+  - name: Copy Truststore
+    become: true
+    command: chdir=/usr/share/openfire/resources/security cp truststore truststore.back
+    when: openfire_installed.stat.exists == false
+
+  - name: Copy Client Truststore
+    become: true
+    command: chdir=/usr/share/openfire/resources/security cp client.truststore client.truststore.back
+    when: openfire_installed.stat.exists == false
+
+  - name: Copy Identity Store Backup
+    become: true
+    command: chdir=/usr/share/openfire/resources/security cp keystore.back keystore
+    when: openfire_installed.stat.exists == true
+
+  - name: Copy Truststore Backup
+    become: true
+    command: chdir=/usr/share/openfire/resources/security cp truststore.back truststore
+    when: openfire_installed.stat.exists == true
+
+  - name: Copy Truststore Backup
+    become: true
+    command: chdir=/usr/share/openfire/resources/security cp client.truststore.back client.truststore
+    when: openfire_installed.stat.exists == true
+
+  - name: Setup security ownership
+    file:
+      path: /usr/share/openfire/resources/security
+      state: directory
+      recurse: yes
+      owner: openfire
+      group: openfire
+
+  - name: Change Identity Store pass
+    command: chdir=/usr/share/openfire/resources/security keytool -importkeystore -srckeystore keystore -srcstorepass changeit -deststorepass mouaiccool -destkeystore keystore
+
+
+  - name: Import VTN identoty
+    command: chdir=/usr/share/openfire/resources/security keytool -v -importkeystore -srcstorepass mouaiccool -srckeystore /opt/oadr-vtn20b/cert/vtn.oadr.com-rsa.p12 -srcstoretype PKCS12 -deststorepass mouaiccool -destkeystore keystore -deststoretype JKS
+
+  - name: Change Truststore pass
+    command: chdir=/usr/share/openfire/resources/security keytool -importkeystore -srckeystore truststore -srcstorepass changeit -deststorepass mouaiccool -destkeystore truststore
+
+
+  - name: Import CA certificate
+    command: chdir=/usr/share/openfire/resources/security keytool -v -import -alias OadrCA -file /opt/oadr-vtn20b/cert/oadr.com.crt -deststorepass mouaiccool -destkeystore truststore -deststoretype JKS -noprompt
+
+  - name: Change Client Truststore pass
+    command: chdir=/usr/share/openfire/resources/security keytool -importkeystore -srckeystore client.truststore -srcstorepass changeit -deststorepass mouaiccool -destkeystore client.truststore
+
+
+  - name: Import CA certificate
+    command: chdir=/usr/share/openfire/resources/security keytool -v -import -alias OadrCA -file /opt/oadr-vtn20b/cert/oadr.com.crt -deststorepass mouaiccool -destkeystore client.truststore -deststoretype JKS -noprompt
+
+
+  - name: Restart openfire
+    command: /bin/true
+    notify:
+    - restart openfire

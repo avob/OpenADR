@@ -1,33 +1,21 @@
----
-# ntp_timezone: UTC
-
-# oracle_java_use_defaults: no
-# oracle_java_apt_repository: "ppa:webupd8team/java"
-# oracle_java_cache_valid_time: 3600
-# oracle_java_deb_package: 'oracle-java8-installer'
-# oracle_java_debconf_package_default: 'oracle-java8-set-default'
-# oracle_java_home: "/usr/lib/jvm/java-8-oracle"
-# oracle_java_license_version: "shared/accepted-oracle-license-v1-1"
-# oracle_java_set_as_default: no
-# oracle_java_state: latest
-
-# oracle_java_use_defaults: no
-# oracle_java_apt_repository: "ppa:webupd8team/java"
-# oracle_java_cache_valid_time: 3600
-# oracle_java_deb_package: 'oracle-java8-installer'
-# oracle_java_debconf_package_default: 'oracle-java8-set-default'
-# oracle_java_home: "/usr/lib/jvm/java-8-oracle"
-# oracle_java_license_version: "shared/accepted-oracle-license-v1-1"
-# oracle_java_set_as_default: no
-# oracle_java_state: latest
-
 # POSTGRES CONF
 postgresql_databases:
   - name: oadr-vtn20b
+  - name: oadr-openfire
 
 postgresql_users:
   - name: oadr-vtn20b
     password: supersecure
+  - name: oadr-openfire
+    password: supersecure
+
+postgresql_hba_entries:
+  - { type: local, database: all, user: postgres, auth_method: peer }
+  - { type: local, database: all, user: all, auth_method: peer }
+  - { type: host, database: all, user: all, address: '127.0.0.1/32', auth_method: md5 }
+  - { type: host, database: all, user: all, address: '::1/128', auth_method: md5 }
+  - { type: host, database: oadr-vtn20b, user: oadr-vtn20b, address: '127.0.0.1/32', auth_method: md5 }
+  - { type: host, database: oadr-openfire, user: oadr-openfire, address: '127.0.0.1/32', auth_method: md5 }
 
 # RABBITMQ
 rabbitmq_daemon: rabbitmq-server
@@ -43,27 +31,3 @@ springboot_propertyfile_template: templates/application.properties
 springboot_configuration_template: templates/oadr-vtn20b.conf
 springboot_user: oadr-vtn20b
 springboot_group: oadr-vtn20b
-
-# APACHE CONF
-apache_global_vhost_settings: |
-  DirectoryIndex index.php index.html
-  Listen 8080
-apache_remove_default_vhost: false
-apache_listen_port_ssl: 8080
-apache_vhosts: []
-apache_vhosts_ssl:
-  - servername: "vtn.oadr.com"
-    serveralias: "localhost"
-    documentroot: "/var/www/html"
-    certificate_file: "/opt/oadr-vtn20b/cert/vtn.oadr.com-rsa.crt"
-    certificate_key_file: "/opt/oadr-vtn20b/cert/vtn.oadr.com-rsa.key"
-    extra_parameters: |
-      RewriteCond %{HTTP_HOST} !^www\. [NC]
-      RewriteRule ^(.*)$ http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-      # Don't rewrite files or directories
-      RewriteCond %{REQUEST_FILENAME} -f [OR]
-      RewriteCond %{REQUEST_FILENAME} -d
-      RewriteRule ^ - [L]
-      # Rewrite everything else to index.html to allow html5 state links
-      RewriteRule ^ index.html [L]
-

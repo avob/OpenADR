@@ -9,80 +9,24 @@
     #   raw: sudo apt-get -y upgrade
     - name: 'install python2'
       raw: sudo apt-get -y install python zip 
+    ### JAVA 8
+    - name: Install add-apt-repostory
+      become: yes
+      apt: name=software-properties-common state=latest
+
+    - name: Install Oracle Java 8
+      become: yes
+      apt:
+        pkg:
+          - openjdk-8-jre-headless
+          - ca-certificates
+        state: present
 
 
   vars_files:
     - vars/main.yml
   
   tasks:
-
-    - name: add rabbitmq repo pubkey
-      raw: sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B73A36E6026DFCA
-
-    - name: check if rules file exists
-      stat: 
-        path: /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.16/plugins/rabbitmq_auth_backend_cache-20171215-3.6.x.zip
-      register: rabbitmq_auth_backend_cache
-
-    - name: check if rules file exists
-      stat: 
-        path: /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.16/plugins/rabbitmq_auth_backend_http-20171215-3.6.x.zip
-      register: rabbitmq_auth_backend_http
-
-    - name: download rabbitmq_auth_backend_cache
-      shell: wget -O rabbitmq_auth_backend_cache-20171215-3.6.x.zip https://bintray.com/rabbitmq/community-plugins/download_file?file_path=3.6.x%2Frabbitmq_auth_backend_cache%2Frabbitmq_auth_backend_cache-20171215-3.6.x.zip
-      args:
-        chdir: /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.16/plugins/
-      when: rabbitmq_auth_backend_cache.stat.exists == false
-
-    - name: unzip rabbitmq_auth_backend_cache
-      shell: unzip rabbitmq_auth_backend_cache-20171215-3.6.x.zip
-      args:
-        chdir: /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.16/plugins/
-      when: rabbitmq_auth_backend_cache.stat.exists == false
-
-    - name: download rabbitmq_auth_backend_http
-      shell: wget -O rabbitmq_auth_backend_http-20171215-3.6.x.zip https://dl.bintray.com/rabbitmq/community-plugins/3.6.x/rabbitmq_auth_backend_http/rabbitmq_auth_backend_http-20171215-3.6.x.zip; 
-      args:
-        chdir: /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.16/plugins/
-      when: rabbitmq_auth_backend_http.stat.exists == false
-
-    - name: unzip rabbitmq_auth_backend_http
-      shell: unzip rabbitmq_auth_backend_http-20171215-3.6.x.zip; 
-      args:
-        chdir: /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.16/plugins/
-      when: rabbitmq_auth_backend_http.stat.exists == false
-
-    - name: add rabbitmq official apt repository
-      apt_repository: repo='deb http://www.rabbitmq.com/debian/ testing main' state=present
-      # allow_unauthenticated: yes
-
-    - name: install package
-      apt: name={{ item }} update_cache=yes state=installed
-      with_items:
-        - rabbitmq-server
-
-    - name: enable rabbitmq plugins
-      rabbitmq_plugin: names=rabbitmq_amqp1_0,rabbitmq_auth_backend_http,rabbitmq_federation,rabbitmq_management,rabbitmq_tracing,rabbitmq_auth_mechanism_ssl,rabbitmq_auth_backend_cache state=enabled
-      notify:
-      - restart rabbitmq
-
-    - name: add users
-      rabbitmq_user: user={{item}} password=changeme tags=administrator,{{item}} vhost=/ configure_priv=.* write_priv=.* read_priv=.* state=present
-      with_items:
-      - user1
-      - user2
-
-    - name: remove default guest user
-      rabbitmq_user: user=guest state=absent
-
-    - name: Install rabbitmq.config
-      template:
-        src: templates/rabbitmq.config
-        dest: /etc/rabbitmq/rabbitmq.config
-        owner: rabbitmq
-        group: root
-
     - name: Add the inventory into /etc/hosts
       become: true
       blockinfile:
@@ -90,19 +34,19 @@
         content: "{{ lookup('template', 'templates/hosts.j2') }}"
         state: present
 
+    
+
   handlers:
-    - name: restart rabbitmq
-      service: name=rabbitmq-server state=restarted
-        
+
   roles:
-    - ansiblebit.oracle-java
+    # - ansiblebit.oracle-java
     - geerlingguy.postgresql
-    - geerlingguy.rabbitmq
+    # - geerlingguy.rabbitmq
     - remyma.ansible-springboot
-    # - geerlingguy.apache
     - ../../roles/common
     - ../../roles/nodejs
     - ../../roles/nodered
     - ../../roles/nodered-oadr-ven
     - ../../roles/oadr-vtn20b
-    # - ../../roles/oadr-vtn20b-ui
+    - ../../roles/oadr-rabbitmq
+    - ../../roles/oadr-openfire

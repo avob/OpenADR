@@ -98,6 +98,7 @@
 		<module>./OpenADRHTTPClient</module>
 		<module>./OpenADRHTTPClient20a</module>
 		<module>./OpenADRHTTPClient20b</module>
+		<module>./OpenADRXMPPClient</module>
 		<module>./OpenADRModel20a</module>
 		<module>./OpenADRModel20b</module>
 		<module>./OpenADRSecurity</module>

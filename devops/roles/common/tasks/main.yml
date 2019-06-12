@@ -9,9 +9,10 @@
 
   - name: install base software on Debian-like
     when: ( ansible_os_family  == "Debian" )
-    apt: name={{item}} state=installed
-    with_items:
-      - build-essential
-      - git
-      - curl
-      - zsh
+    apt:
+      pkg:
+        - build-essential
+        - git
+        - curl
+        - zsh
+      state: present
