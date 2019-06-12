@@ -50,7 +50,7 @@ public class OadrXmppClient {
 			NoSuchAlgorithmException, CertificateException, OadrSecurityException, UnrecoverableKeyException,
 			KeyManagementException {
 
-		String path = "../cert_local/";
+		String path = "../cert/";
 		String key = path + "ven1.oadr.com.key";
 		String cert = path + "ven1.oadr.com.crt";
 		String pass = "";

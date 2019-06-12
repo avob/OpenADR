@@ -76,8 +76,8 @@
     command: chdir=/usr/share/openfire/resources/security keytool -importkeystore -srckeystore keystore -srcstorepass changeit -deststorepass mouaiccool -destkeystore keystore
 
 
-  - name: Import VTN identoty
-    command: chdir=/usr/share/openfire/resources/security keytool -v -importkeystore -srcstorepass mouaiccool -srckeystore /opt/oadr-vtn20b/cert/vtn.oadr.com-rsa.p12 -srcstoretype PKCS12 -deststorepass mouaiccool -destkeystore keystore -deststoretype JKS
+  - name: Import VTN identity
+    command: chdir=/usr/share/openfire/resources/security keytool -v -importkeystore -srcstorepass "" -srckeystore /opt/oadr-vtn20b/cert/vtn.oadr.com-rsa.p12 -srcstoretype PKCS12 -deststorepass mouaiccool -destkeystore keystore -deststoretype JKS
 
   - name: Change Truststore pass
     command: chdir=/usr/share/openfire/resources/security keytool -importkeystore -srckeystore truststore -srcstorepass changeit -deststorepass mouaiccool -destkeystore truststore
