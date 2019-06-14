@@ -29,6 +29,7 @@ import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.Presence.Type;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
@@ -36,6 +37,8 @@ import org.jivesoftware.smackx.disco.AbstractNodeInformationProvider;
 import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.disco.packet.DiscoverInfo;
 import org.jivesoftware.smackx.disco.packet.DiscoverItems;
+import org.jivesoftware.smackx.disco.packet.DiscoverItems.Item;
+import org.jxmpp.jid.DomainBareJid;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.impl.JidCreate;
 
@@ -46,11 +49,15 @@ public class OadrXmppClient {
 
 	private static final String OADR_NAMESPACE = "http://openadr.org/openadr2";
 
+	private static final String OADR_SERVICES_NAMESPACE = OADR_NAMESPACE + "#services";
+
 	public OadrXmppClient() throws SmackException, IOException, XMPPException, InterruptedException, KeyStoreException,
 			NoSuchAlgorithmException, CertificateException, OadrSecurityException, UnrecoverableKeyException,
 			KeyManagementException {
 
 		String path = "../cert/";
+//		String key = path + "vtn.oadr.com-rsa.key";
+//		String cert = path + "vtn.oadr.com-rsa.crt";
 		String key = path + "ven1.oadr.com.key";
 		String cert = path + "ven1.oadr.com.crt";
 		String pass = "";
@@ -79,16 +86,19 @@ public class OadrXmppClient {
 
 		XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
 //				.setHostAddress(address)
-				.setHost("192.168.33.2").setPort(5222).setUsernameAndPassword("admin", "admin")
+				.setHost("vtn.oadr.com").setPort(5222).setUsernameAndPassword("admin", "mouaiccool")
 				.setXmppDomain("vtn.oadr.com").setCustomSSLContext(sslContext).build();
 
 		XMPPTCPConnection connection = new XMPPTCPConnection(config);
 		// Obtain the ServiceDiscoveryManager associated with my XMPP connection
 		ServiceDiscoveryManager discoManager = ServiceDiscoveryManager.getInstanceFor(connection);
+
+//					ServiceDiscoveryManager.setDefaultIdentity(new Identity("client", "oadr"));
 		// Register that a new feature is supported by this XMPP entity
-//		discoManager.ad
+//					discoManager.ad
 		discoManager.addFeature(OADR_NAMESPACE);
-//		discoManager.addFeature("http://jabber.org/protocol/disco#info");
+		discoManager.addFeature("http://jabber.org/protocol/disco#info");
+		discoManager.addFeature(OADR_NAMESPACE + "#vtn");
 		discoManager.setNodeInformationProvider("", new AbstractNodeInformationProvider() {
 			@Override
 			public List<String> getNodeFeatures() {
@@ -108,61 +118,67 @@ public class OadrXmppClient {
 			public void processStanza(Stanza stanza) throws SmackException.NotConnectedException, InterruptedException,
 					SmackException.NotLoggedInException {
 				// handle stanza
-				System.out.println("IN: "+stanza.toXML(null));
+//							System.out.println("IN: " + stanza.toXML(null));
 			}
 		}, StanzaTypeFilter.IQ);
 		connection.addStanzaSendingListener(new StanzaListener() {
 			public void processStanza(Stanza stanza) throws SmackException.NotConnectedException, InterruptedException,
 					SmackException.NotLoggedInException {
 				// handle stanza
-				System.out.println("OUT: " +stanza.toXML(null));
+//							System.out.println("OUT: " + stanza.toXML(null));
 			}
 		}, StanzaTypeFilter.IQ);
-		connection.connect().login(); // Establishes a connection to the server
 		ChatManager chatManager = ChatManager.getInstanceFor(connection);
 		IncomingChatMessageListener listener = new IncomingChatMessageListener() {
 
 			@Override
 			public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-				System.out.println(from.getLocalpart() + " - " + message.getBody());
+//				System.out.println(from.getLocalpart() + " - " + message.getBody());
 			}
 
 		};
 		chatManager.addIncomingListener(listener);
-//		EntityBareJid jid = JidCreate.entityBareFrom("admin@vtn.oadr.com");
-//		Chat chat = chatManager.chatWith(jid);
-//		System.out.println(chat.getXmppAddressOfChatPartner().getLocalpart());
-//		chat.send("mouaiccool");
+		connection.connect().login(); // Establishes a connection to the server
+		if (connection.isConnected() && connection.isAuthenticated()) {
 
-//		discoManager.
 
-		connection.sendStanza(new Presence(Presence.Type.available));
 
-		// Get the items of a given XMPP entity
-		// This example gets the items associated with online catalog service
-		Thread.sleep(5000);
+			Presence p = new Presence(Type.available);
+			connection.sendStanza(p);
+			DomainBareJid domainBareFrom = JidCreate.domainBareFrom("xmpp.vtn.oadr.com");
+			DiscoverInfo discoverInfo = discoManager.discoverInfo(domainBareFrom, null);
 
-//		DiscoverItems discoverItems = discoManager.discoverItems(JidCreate.entityBareFrom("admin@vtn.oadr.com"));
+//			List<DiscoverInfo> findServicesDiscoverInfo = discoManager.findServicesDiscoverInfo("http://openadr.org/openadr2", true, false);
 
-		DiscoverInfo discoverInfo = discoManager.discoverInfo(null);
-		Iterator it = discoverInfo.getFeatures().iterator();
-		System.out.println("features");
-		while (it.hasNext()) {
-			DiscoverInfo.Feature identity = (DiscoverInfo.Feature) it.next();
-			System.out.println(identity.getVar());
+			Iterator it = discoverInfo.getFeatures().iterator();
+			System.out.println("features");
+			while (it.hasNext()) {
+				DiscoverInfo.Feature identity = (DiscoverInfo.Feature) it.next();
+				System.out.println(identity.getVar());
+			}
+
+			it = discoverInfo.getIdentities().iterator();
+			// Display the identities of the remote XMPP
+			// entitySystem.out.println(identity.getName());z
+			System.out.println("identitites");
+			while (it.hasNext()) {
+				DiscoverInfo.Identity identity = (DiscoverInfo.Identity) it.next();
+				System.out.println(identity.getName());
+				System.out.println(identity.getType());
+				System.out.println(identity.getCategory());
+			}
+
+			DiscoverItems discoverItems = discoManager.discoverItems(domainBareFrom, OADR_SERVICES_NAMESPACE);
+
+			for (Item item : discoverItems.getItems()) {
+				System.out.println(item.toXML());
+			}
+
+			Thread.sleep(1000);
+		} else {
+			System.out.println("Connection refused by Xmpp server");
 		}
 
-		it = discoverInfo.getIdentities().iterator();
-		// Display the identities of the remote XMPP
-		// entitySystem.out.println(identity.getName());z
-		System.out.println("identitites");
-		while (it.hasNext()) {
-			DiscoverInfo.Identity identity = (DiscoverInfo.Identity) it.next();
-			System.out.println(identity.getName());
-			System.out.println(identity.getType());
-			System.out.println(identity.getCategory());
-		}
-		Thread.sleep(1000);
 	}
 
 	public static void main(String[] args) throws SmackException, IOException, XMPPException, InterruptedException,

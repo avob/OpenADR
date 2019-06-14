@@ -1,8 +1,10 @@
 package com.avob.openadr.server.common.vtn.models.user;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,6 +13,9 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -39,6 +44,18 @@ public abstract class AbstractUser implements Serializable {
 	private String commonName;
 
 	private String authenticationType;
+	
+	@ElementCollection
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private List<String> roles;
+
+	public List<String> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<String> roles) {
+		this.roles = roles;
+	}
 
 	public AbstractUser() {
 	}
