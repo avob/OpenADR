@@ -56,5 +56,10 @@
 			<artifactId>OpenADRSecurity</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.avob.openadr.model</groupId>
+			<artifactId>OpenADRModel20b</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -85,8 +85,6 @@ public class OadrHttpVtnClient20bTest {
         OadrDistributeEventType mockDistributeEvent = Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder("", "")
                 .addOadrEvent(oadrEvent).build();
 
-        OadrHttpVtnClient20b.oadrDistributeEvent(mockDistributeEvent);
-
         OadrHttpVtnClient20b.oadrDistributeEvent("http://localhost:8080", mockDistributeEvent);
 
     }
