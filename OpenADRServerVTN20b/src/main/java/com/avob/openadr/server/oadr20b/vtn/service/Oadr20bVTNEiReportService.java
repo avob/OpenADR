@@ -594,7 +594,7 @@ public class Oadr20bVTNEiReportService {
 
 				for (SpecifierPayloadType specifierPayloadType : reportSpecifier.getSpecifierPayload()) {
 					String rid = specifierPayloadType.getRID();
-					String readingType = specifierPayloadType.getReadingType();
+//					String readingType = specifierPayloadType.getReadingType();
 
 					SelfReportCapabilityDescription selfReportCapabilityDescription = selfReportCapabilityDescriptionService
 							.findBySelfReportCapabilityAndRid(selfReportCapability, rid);

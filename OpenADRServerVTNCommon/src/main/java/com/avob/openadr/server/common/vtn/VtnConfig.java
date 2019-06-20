@@ -54,6 +54,9 @@ public class VtnConfig {
 	public static final String BROKER_SSL_HOST_CONF = "oadr.broker.ssl.host";
 	public static final String BROKER_SSL_PORT_CONF = "oadr.broker.ssl.port";
 
+	public static final String XMPP_HOST_CONF = "oadr.xmpp.host";
+	public static final String XMPP_PORT_CONF = "oadr.xmpp.port";
+
 	@Value("${" + CONTEXT_PATH_CONF + ":#{null}}")
 	private String contextPath;
 
@@ -115,6 +118,12 @@ public class VtnConfig {
 
 	@Value("${" + BROKER_SSL_HOST_CONF + ":localhost}")
 	private String brokerSslHost;
+
+	@Value("${" + XMPP_HOST_CONF + ":#{null}}")
+	private String xmppHost;
+
+	@Value("${" + XMPP_PORT_CONF + ":#{null}}")
+	private Integer xmppPort;
 
 	@Autowired
 	private ConfigurableEnvironment env;
@@ -372,6 +381,22 @@ public class VtnConfig {
 
 	public void setBrokerPort(Integer brokerPort) {
 		this.brokerPort = brokerPort;
+	}
+
+	public String getXmppHost() {
+		return xmppHost;
+	}
+
+	public void setXmppHost(String xmppHost) {
+		this.xmppHost = xmppHost;
+	}
+
+	public Integer getXmppPort() {
+		return xmppPort;
+	}
+
+	public void setXmppPort(Integer xmppPort) {
+		this.xmppPort = xmppPort;
 	}
 
 }

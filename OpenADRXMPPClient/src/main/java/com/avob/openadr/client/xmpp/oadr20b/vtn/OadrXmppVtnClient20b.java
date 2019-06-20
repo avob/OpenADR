@@ -1,6 +1,10 @@
 package com.avob.openadr.client.xmpp.oadr20b.vtn;
 
-import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20b;
+import javax.net.ssl.SSLContext;
+
+import org.jivesoftware.smack.StanzaListener;
+
+import com.avob.openadr.client.xmpp.oadr20b.OadrXmppException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
@@ -24,10 +28,11 @@ import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 
 public class OadrXmppVtnClient20b {
-	private OadrXmppClient20b client;
 
-	public OadrXmppVtnClient20b(OadrXmppClient20b client) {
-		this.client = client;
+	public OadrXmppVtnClient20b(String vtnId, String host, int port, SSLContext sslContext,
+			StanzaListener registerPartyListener, StanzaListener reportListener, StanzaListener eventListener)
+			throws OadrXmppException {
+
 	}
 
 	public OadrResponseType oadrDistributeEvent(String url, OadrDistributeEventType event) throws Oadr20bException,

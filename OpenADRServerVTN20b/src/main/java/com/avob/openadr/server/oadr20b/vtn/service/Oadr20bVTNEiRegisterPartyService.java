@@ -8,6 +8,8 @@ import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
@@ -17,12 +19,16 @@ import com.avob.openadr.model.oadr20b.builders.eiregisterparty.Oadr20bCreatedPar
 import com.avob.openadr.model.oadr20b.ei.EiResponseType;
 import com.avob.openadr.model.oadr20b.ei.SchemaVersionEnumeratedType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatePartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrProfiles.OadrProfile;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
@@ -39,6 +45,8 @@ import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bAppNotificationPu
 
 @Service
 public class Oadr20bVTNEiRegisterPartyService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiRegisterPartyService.class);
 
 	public static final OadrProfile profile20a = Oadr20bEiRegisterPartyBuilders
 			.newOadr20bOadrProfileBuilder(SchemaVersionEnumeratedType.OADR_20A.value())
@@ -355,6 +363,154 @@ public class Oadr20bVTNEiRegisterPartyService {
 							.build());
 		}
 
+	}
+
+	public String handle(String username, OadrPayload oadrPayload)
+			throws Oadr20bMarshalException, Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException,
+			Oadr20bCreatePartyRegistrationTypeApplicationLayerException,
+			Oadr20bCancelPartyRegistrationTypeApplicationLayerException,
+			Oadr20bQueryRegistrationTypeApplicationLayerException,
+			Oadr20bCanceledPartyRegistrationTypeApplicationLayerException, Oadr20bXMLSignatureException,
+			Oadr20bResponsePartyReregistrationApplicationLayerException {
+
+		if (oadrPayload.getOadrSignedObject().getOadrCreatePartyRegistration() != null) {
+
+			LOGGER.info(username + " - OadrCreatePartyRegistration signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrCreatePartyRegistration(), true);
+
+		} else if (oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration() != null) {
+
+			LOGGER.info(username + " - OadrCancelPartyRegistration signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration(), true);
+
+		} else if (oadrPayload.getOadrSignedObject().getOadrCanceledPartyRegistration() != null) {
+
+			LOGGER.info(username + " - OadrCanceledPartyRegistrationType signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrCanceledPartyRegistration(), true);
+
+		} else if (oadrPayload.getOadrSignedObject().getOadrQueryRegistration() != null) {
+
+			LOGGER.info(username + " - OadrQueryRegistration signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrQueryRegistration(), true);
+
+		} else if (oadrPayload.getOadrSignedObject().getOadrResponse() != null) {
+
+			LOGGER.info(username + " - OadrResponseType signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrResponse(), true);
+
+		}
+
+		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiRegisterParty");
+	}
+
+	public String handle(String venId, OadrCreatePartyRegistrationType oadrCreatePartyRegistrationType, boolean signed)
+			throws Oadr20bMarshalException, Oadr20bCreatePartyRegistrationTypeApplicationLayerException,
+			Oadr20bXMLSignatureException {
+
+		checkMatchUsernameWithRequestVenId(venId, oadrCreatePartyRegistrationType);
+		return oadrCreatePartyRegistration(venId, oadrCreatePartyRegistrationType, signed);
+
+	}
+
+	public String handle(String username, OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType,
+			boolean signed) throws Oadr20bMarshalException, Oadr20bCancelPartyRegistrationTypeApplicationLayerException,
+			Oadr20bXMLSignatureException {
+
+		checkMatchUsernameWithRequestVenId(username, oadrCancelPartyRegistrationType);
+
+		return oadrCancelPartyRegistrationType(oadrCancelPartyRegistrationType, signed);
+
+	}
+
+	public String handle(String username, OadrCanceledPartyRegistrationType oadrCanceledPartyRegistrationType,
+			boolean signed) throws Oadr20bMarshalException,
+			Oadr20bCanceledPartyRegistrationTypeApplicationLayerException, Oadr20bXMLSignatureException {
+
+		checkMatchUsernameWithRequestVenId(username, oadrCanceledPartyRegistrationType);
+
+		return oadrCanceledPartyRegistrationType(oadrCanceledPartyRegistrationType, signed);
+
+	}
+
+	public String handle(String username, OadrQueryRegistrationType oadrQueryRegistrationType, boolean signed)
+			throws Oadr20bMarshalException, Oadr20bQueryRegistrationTypeApplicationLayerException,
+			Oadr20bXMLSignatureException {
+
+		return oadrQueryRegistrationType(oadrQueryRegistrationType, username, signed);
+
+	}
+
+	public String handle(String username, OadrResponseType oadrResponseType, boolean signed)
+			throws Oadr20bMarshalException, Oadr20bQueryRegistrationTypeApplicationLayerException,
+			Oadr20bXMLSignatureException, Oadr20bResponsePartyReregistrationApplicationLayerException {
+
+		checkMatchUsernameWithRequestVenId(username, oadrResponseType);
+
+		return oadrResponsePartyReregistration(oadrResponseType, signed);
+
+	}
+
+	public String request(String username, Object payload)
+			throws Oadr20bUnmarshalException, Oadr20bMarshalException, Oadr20bXMLSignatureValidationException,
+			Oadr20bApplicationLayerException, Oadr20bCreatePartyRegistrationTypeApplicationLayerException,
+			Oadr20bCancelPartyRegistrationTypeApplicationLayerException,
+			Oadr20bQueryRegistrationTypeApplicationLayerException,
+			Oadr20bCanceledPartyRegistrationTypeApplicationLayerException, Oadr20bXMLSignatureException,
+			Oadr20bResponsePartyReregistrationApplicationLayerException {
+		if (payload instanceof OadrPayload) {
+
+			OadrPayload oadrPayload = (OadrPayload) payload;
+
+			return handle(username, oadrPayload);
+
+		} else if (payload instanceof OadrCreatePartyRegistrationType) {
+
+			LOGGER.info(username + " - OadrCreatePartyRegistration");
+
+			OadrCreatePartyRegistrationType oadrCreatePartyRegistration = (OadrCreatePartyRegistrationType) payload;
+
+			return handle(username, oadrCreatePartyRegistration, false);
+
+		} else if (payload instanceof OadrCancelPartyRegistrationType) {
+
+			LOGGER.info(username + " - OadrCancelPartyRegistration");
+
+			OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType = (OadrCancelPartyRegistrationType) payload;
+
+			return handle(username, oadrCancelPartyRegistrationType, false);
+
+		} else if (payload instanceof OadrCanceledPartyRegistrationType) {
+
+			LOGGER.info(username + " - OadrCanceledPartyRegistrationType");
+
+			OadrCanceledPartyRegistrationType oadrCanceledPartyRegistrationType = (OadrCanceledPartyRegistrationType) payload;
+
+			return handle(username, oadrCanceledPartyRegistrationType, false);
+
+		} else if (payload instanceof OadrQueryRegistrationType) {
+
+			LOGGER.info(username + " - OadrQueryRegistration");
+
+			OadrQueryRegistrationType oadrQueryRegistrationType = (OadrQueryRegistrationType) payload;
+
+			return handle(username, oadrQueryRegistrationType, false);
+
+		} else if (payload instanceof OadrResponseType) {
+
+			LOGGER.info(username + " - OadrResponseType");
+
+			OadrResponseType oadrResponseType = (OadrResponseType) payload;
+
+			return handle(username, oadrResponseType, false);
+
+		}
+
+		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiRegisterParty");
 	}
 
 }

@@ -1,247 +1,237 @@
 package com.avob.openadr.client.xmpp.oadr20b;
 
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-import javax.xml.bind.JAXBException;
 
+import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.XMPPException.XMPPErrorException;
+import org.jivesoftware.smack.chat2.Chat;
+import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Type;
-import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.sasl.core.SASLAnonymous;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
-import org.jivesoftware.smackx.disco.AbstractNodeInformationProvider;
 import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.disco.packet.DiscoverInfo;
+import org.jivesoftware.smackx.disco.packet.DiscoverInfo.Feature;
 import org.jivesoftware.smackx.disco.packet.DiscoverItems;
 import org.jivesoftware.smackx.disco.packet.DiscoverItems.Item;
+import org.jivesoftware.smackx.ping.packet.Ping;
 import org.jxmpp.jid.DomainBareJid;
+import org.jxmpp.jid.EntityBareJid;
+import org.jxmpp.jid.EntityFullJid;
+import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.stringprep.XmppStringprepException;
 
-import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
-import com.avob.openadr.security.OadrHttpSecurity;
-import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 
 public class OadrXmppClient20b {
 
-	private static final String OADR_NAMESPACE = "http://openadr.org/openadr2";
+	public static final String OADR_NAMESPACE = "http://openadr.org/openadr2";
 
-	private static final String OADR_SERVICES_NAMESPACE = OADR_NAMESPACE + "#services";
+	public static final String OADR_SERVICES_NAMESPACE = OADR_NAMESPACE + "#services";
 
-	private static final String XMPP_OADR_SUBDOMAIN = "xmpp";
+	public static final String OADR_EVENT_SERVICE_NAMESPACE = "http://openadr.org/OpenADR2/EiEvent";
+
+	public static final String OADR_REPORT_SERVICE_NAMESPACE = "http://openadr.org/OpenADR2/EiReport";
+
+	public static final String OADR_REGISTERPARTY_SERVICE_NAMESPACE = "http://openadr.org/OpenADR2/EiRegisterParty";
+
+	public static final String XMPP_OADR_SUBDOMAIN = "xmpp";
 
 	private XMPPTCPConnection connection;
 
-	private Oadr20bJAXBContext jaxbContext;
+//	private Oadr20bJAXBContext jaxbContext;
 
 	private DomainBareJid domainJid;
+	private EntityFullJid clientJid;
 
-	public OadrXmppClient20b(String host, int port, SSLContext context)
-			throws SmackException, IOException, XMPPException, JAXBException, InterruptedException {
+	private ChatManager chatManager;
 
-		this.jaxbContext = Oadr20bJAXBContext.getInstance();
+	private Map<String, Jid> discoveredXmppOadrServices;
 
-		XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-//				.setHostAddress(address)
-				.setHost(host).setPort(port).setUsernameAndPassword("admin", "admin").setXmppDomain(host)
-				.setCustomSSLContext(context).build();
+	public OadrXmppClient20b(String fingerprint, String host, int port, String resource, SSLContext context,
+			StanzaListener onMessageListener) throws OadrXmppException {
 
-		connection = new XMPPTCPConnection(config);
+		try {
+//			this.jaxbContext = Oadr20bJAXBContext.getInstance();
+			SASLAnonymous mechanism = new SASLAnonymous();
+			SASLAuthentication.registerSASLMechanism(mechanism);
+			EntityBareJid authzid = JidCreate.entityBareFrom(resource + "@" + host);
+			XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
+//					.setHostAddress(address)
+					.setHost(host).setPort(port)
+//					.allowEmptyOrNullUsernames()
+//					.setUsernameAndPassword(resource,resource)
+//					.setAuthzid(authzid)
+//					.setAuthzid(authzid)
+					.performSaslAnonymousAuthentication()
+//					.addEnabledSaslMechanism("ANONYMOUS")
+//					.performSaslExternalAuthentication(context)
+//					.setUsernameAndPassword("admin", "mouaiccool")
+//					.addEnabledSaslMechanism("EXTERNAL")
+//					.addEnabledSaslMechanism("ANONYMOUS")
+					.setResource(resource).setXmppDomain(host).setCustomSSLContext(context).build();
 
-		domainJid = JidCreate.domainBareFrom(XMPP_OADR_SUBDOMAIN + "." + host);
+			connection = new XMPPTCPConnection(config);
 
-		// Obtain the ServiceDiscoveryManager associated with my XMPP connection
-		ServiceDiscoveryManager discoManager = ServiceDiscoveryManager.getInstanceFor(connection);
+			setDomainJid(JidCreate.domainBareFrom(XMPP_OADR_SUBDOMAIN + "." + host));
+			setClientJid(JidCreate.entityFullFrom(fingerprint, XMPP_OADR_SUBDOMAIN + "." + host, resource));
 
-//					ServiceDiscoveryManager.setDefaultIdentity(new Identity("client", "oadr"));
-		// Register that a new feature is supported by this XMPP entity
-//					discoManager.ad
-		discoManager.addFeature(OADR_NAMESPACE);
-		discoManager.addFeature("http://jabber.org/protocol/disco#info");
-		discoManager.addFeature(OADR_NAMESPACE + "#vtn");
-		discoManager.setNodeInformationProvider("", new AbstractNodeInformationProvider() {
-			@Override
-			public List<String> getNodeFeatures() {
-				return Arrays.asList(OADR_NAMESPACE);
+			chatManager = ChatManager.getInstanceFor(connection);
+
+			// Obtain the ServiceDiscoveryManager associated with my XMPP connection
+//			ServiceDiscoveryManager discoManager = ServiceDiscoveryManager.getInstanceFor(connection);
+
+//						ServiceDiscoveryManager.setDefaultIdentity(new Identity("client", "oadr"));
+			// Register that a new feature is supported by this XMPP entity
+//						discoManager.ad
+//
+//			connection.addAsyncStanzaListener(new StanzaListener() {
+//				public void processStanza(Stanza stanza) throws SmackException.NotConnectedException,
+//						InterruptedException, SmackException.NotLoggedInException {
+//					IQ iq = (IQ) stanza;
+//				}
+//			}, StanzaTypeFilter.IQ);
+//
+//			connection.addAsyncStanzaListener(new StanzaListener() {
+//				public void processStanza(Stanza stanza) throws SmackException.NotConnectedException,
+//						InterruptedException, SmackException.NotLoggedInException {
+//					Presence presence = (Presence) stanza;
+//				}
+//			}, StanzaTypeFilter.PRESENCE);
+//
+//			connection.addAsyncStanzaListener(new StanzaListener() {
+//				public void processStanza(Stanza stanza) throws SmackException.NotConnectedException,
+//						InterruptedException, SmackException.NotLoggedInException {
+//					Message message = (Message) stanza;
+//					String body = message.getBody();
+//
+//					try {
+//						Object unmarshal = jaxbContext.unmarshal(body);
+//					} catch (Oadr20bUnmarshalException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+//			}, StanzaTypeFilter.MESSAGE);
+
+			if (onMessageListener != null) {
+				connection.addAsyncStanzaListener(onMessageListener, StanzaTypeFilter.MESSAGE);
 			}
+//			
 
-			@Override
-			public List<DiscoverItems.Item> getNodeItems() {
+			connection.connect().login(resource, resource); // Establishes a connection to the server
+			if (connection.isConnected() && connection.isAuthenticated()) {
 
-				List<DiscoverItems.Item> answer = new ArrayList<DiscoverItems.Item>();
+				IQ request = new Ping(authzid);
+				connection.sendIqRequestAsync(request);
 
-				return answer;
-			}
-		});
+				Presence p = new Presence(Type.available);
+				connection.sendStanza(p);
 
-		connection.addAsyncStanzaListener(new StanzaListener() {
-			public void processStanza(Stanza stanza) throws SmackException.NotConnectedException, InterruptedException,
-					SmackException.NotLoggedInException {
-				IQ iq = (IQ) stanza;
-			}
-		}, StanzaTypeFilter.IQ);
+				boolean hasXmppOadrFeature = this.hasXmppOadrFeature();
 
-		connection.addAsyncStanzaListener(new StanzaListener() {
-			public void processStanza(Stanza stanza) throws SmackException.NotConnectedException, InterruptedException,
-					SmackException.NotLoggedInException {
-				Presence presence = (Presence) stanza;
-			}
-		}, StanzaTypeFilter.PRESENCE);
-
-		connection.addAsyncStanzaListener(new StanzaListener() {
-			public void processStanza(Stanza stanza) throws SmackException.NotConnectedException, InterruptedException,
-					SmackException.NotLoggedInException {
-				Message message = (Message) stanza;
-				String body = message.getBody();
-
-				try {
-					Object unmarshal = jaxbContext.unmarshal(body);
-				} catch (Oadr20bUnmarshalException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if (!hasXmppOadrFeature) {
+					throw new OadrXmppException("Xmpp Server does not provide OpenADR feature");
 				}
+
+				discoveredXmppOadrServices = this.discoverXmppOadrServices();
+
+			} else {
+				throw new OadrXmppException("Connection refused by Xmpp server ");
 			}
-		}, StanzaTypeFilter.MESSAGE);
 
-		connection.connect().login(); // Establishes a connection to the server
-		if (connection.isConnected() && connection.isAuthenticated()) {
-
-			Presence p = new Presence(Type.available);
-			connection.sendStanza(p);
-
-		} else {
-			System.out.println("Connection refused by Xmpp server");
+		}
+//		catch (JAXBException e) {
+//			throw new OadrXmppException(e);
+//		} 
+		catch (XmppStringprepException e) {
+			throw new OadrXmppException(e);
+		} catch (XMPPException e) {
+			throw new OadrXmppException(e);
+		} catch (SmackException e) {
+			throw new OadrXmppException(e);
+		} catch (IOException e) {
+			throw new OadrXmppException(e);
+		} catch (InterruptedException e) {
+			throw new OadrXmppException(e);
 		}
 
 	}
 
-	public void discoverXmppOadrFeature() {
+	public void sendMessage(Jid jid, String payload)
+			throws Oadr20bMarshalException, XmppStringprepException, NotConnectedException, InterruptedException {
+		EntityBareJid entityBareFrom = JidCreate.entityBareFrom(jid);
+		Chat chatWith = chatManager.chatWith(entityBareFrom);
+		Message message = new Message();
+		message.setFrom(getClientJid());
+		message.setTo(jid);
+		message.setBody(payload);
+		chatWith.send(message);
+	}
 
+	public boolean hasXmppOadrFeature()
+			throws NoResponseException, XMPPErrorException, NotConnectedException, InterruptedException {
 		ServiceDiscoveryManager discoManager = ServiceDiscoveryManager.getInstanceFor(connection);
 		DiscoverInfo discoverInfo;
-		try {
-			discoverInfo = discoManager.discoverInfo(domainJid, null);
-			Iterator it = discoverInfo.getFeatures().iterator();
-			System.out.println("features");
-			while (it.hasNext()) {
-				DiscoverInfo.Feature identity = (DiscoverInfo.Feature) it.next();
-				System.out.println(identity.getVar());
+		discoverInfo = discoManager.discoverInfo(getDomainJid(), null);
+		Iterator<Feature> it = discoverInfo.getFeatures().iterator();
+		while (it.hasNext()) {
+			DiscoverInfo.Feature identity = (DiscoverInfo.Feature) it.next();
+			if (OADR_NAMESPACE.equals(identity.getVar())) {
+				return true;
 			}
-
-			it = discoverInfo.getIdentities().iterator();
-			// Display the identities of the remote XMPP
-			// entitySystem.out.println(identity.getName());z
-			System.out.println("identitites");
-			while (it.hasNext()) {
-				DiscoverInfo.Identity identity = (DiscoverInfo.Identity) it.next();
-				System.out.println(identity.getName());
-				System.out.println(identity.getType());
-				System.out.println(identity.getCategory());
-			}
-
-		} catch (NoResponseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (XMPPErrorException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NotConnectedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+		return false;
 
 	}
 
-	public void discoverXmppOadrItems() {
+	public Map<String, Jid> discoverXmppOadrServices()
+			throws NoResponseException, XMPPErrorException, NotConnectedException, InterruptedException {
 		ServiceDiscoveryManager discoManager = ServiceDiscoveryManager.getInstanceFor(connection);
-		DiscoverItems discoverItems;
-		try {
-			discoverItems = discoManager.discoverItems(domainJid, OADR_SERVICES_NAMESPACE);
+		Map<String, Jid> discoveredServiceJid = new HashMap<>();
+		DiscoverItems discoverItems = discoManager.discoverItems(getDomainJid(), OADR_SERVICES_NAMESPACE);
 
-			for (Item item : discoverItems.getItems()) {
-				System.out.println(item.toXML());
-			}
-		} catch (NoResponseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (XMPPErrorException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NotConnectedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		for (Item item : discoverItems.getItems()) {
+			discoveredServiceJid.put(item.getNode(), item.getEntityID());
 		}
 
+		return discoveredServiceJid;
 	}
 
-	public static void main(String[] args) throws SmackException, IOException, XMPPException, InterruptedException,
-			UnrecoverableKeyException, KeyManagementException, KeyStoreException, NoSuchAlgorithmException,
-			CertificateException, OadrSecurityException, JAXBException {
-
-		String host = "vtn.oadr.com";
-		int port = 5222;
-		String path = "../cert/";
-//		String key = path + "vtn.oadr.com-rsa.key";
-//		String cert = path + "vtn.oadr.com-rsa.crt";
-		String key = path + "admin.oadr.com.key";
-		String cert = path + "admin.oadr.com.crt";
-		String pass = "";
-		Map<String, String> trustedCert = new HashMap<>();
-		trustedCert.put("ca", path + "oadr.com.crt");
-		KeyStore createKeyStore = OadrHttpSecurity.createKeyStore(key, cert, pass);
-		KeyStore truststore = OadrHttpSecurity.createTrustStore(trustedCert);
-
-		// init key manager factory
-		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		keyManagerFactory.init(createKeyStore, "".toCharArray());
-
-		// init trust manager factory
-		TrustManagerFactory trustManagerFactory = TrustManagerFactory
-				.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-		trustManagerFactory.init(truststore);
-
-		// SSL Context Factory
-		SSLContext sslContext = SSLContext.getInstance("TLS");
-
-		// init ssl context
-		String seed = UUID.randomUUID().toString();
-
-		sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
-				new SecureRandom(seed.getBytes()));
-
-		OadrXmppClient20b client = new OadrXmppClient20b(host, port, sslContext);
-
+	public Map<String, Jid> getDiscoveredXmppOadrServices() {
+		return discoveredXmppOadrServices;
 	}
+
+	public EntityFullJid getClientJid() {
+		return clientJid;
+	}
+
+	private void setClientJid(EntityFullJid clientJid) {
+		this.clientJid = clientJid;
+	}
+
+	public DomainBareJid getDomainJid() {
+		return domainJid;
+	}
+
+	private void setDomainJid(DomainBareJid domainJid) {
+		this.domainJid = domainJid;
+	}
+
 }
