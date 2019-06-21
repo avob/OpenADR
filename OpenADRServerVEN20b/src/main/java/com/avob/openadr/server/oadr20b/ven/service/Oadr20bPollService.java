@@ -95,7 +95,7 @@ public class Oadr20bPollService {
                 OadrCanceledPartyRegistrationType oadrCancelPartyRegistration = oadr20bVENEiRegisterPartyService
                         .oadrCancelPartyRegistration(vtnSession, val);
 
-                OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)
+                OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
                         .oadrCanceledPartyRegistrationType(oadrCancelPartyRegistration);
 
                 if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
@@ -114,7 +114,7 @@ public class Oadr20bPollService {
                 OadrResponseType oadrRequestReregistration = oadr20bVENEiRegisterPartyService.oadrRequestReregistration(vtnSession,
                         val);
                 reinitPoll(vtnSession);
-                OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)
+                OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
                         .oadrResponseReregisterParty(oadrRequestReregistration);
 
                 if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
@@ -132,7 +132,7 @@ public class Oadr20bPollService {
 
                 OadrCanceledReportType oadrCancelReport = oadr20bVENEiReportService.oadrCancelReport(vtnSession, val);
 
-                OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)
+                OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
                         .oadrCanceledReport(oadrCancelReport);
 
                 if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
@@ -149,7 +149,7 @@ public class Oadr20bPollService {
 
                 OadrCreatedReportType oadrCreateReport = oadr20bVENEiReportService.oadrCreateReport(vtnSession, val);
 
-                OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)
+                OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
                         .oadrCreatedReport(oadrCreateReport);
 
                 if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
@@ -176,7 +176,7 @@ public class Oadr20bPollService {
 
                 OadrUpdatedReportType oadrUpdateReport = oadr20bVENEiReportService.oadrUpdateReport(vtnSession, val);
 
-                OadrResponseType response = multiVtnConfig.getMultiClientConfig(vtnSession)
+                OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
                         .oadrUpdatedReport(oadrUpdateReport);
 
                 if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
@@ -215,7 +215,7 @@ public class Oadr20bPollService {
             OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(vtnSession.getVenSessionConfig().getVenId()).build();
 
             try {
-                Object payload = multiVtnConfig.getMultiClientConfig(vtnSession).oadrPoll(poll);
+                Object payload = multiVtnConfig.getMultiHttpClientConfig(vtnSession).oadrPoll(poll);
 
                 processPollResponse(payload);
 

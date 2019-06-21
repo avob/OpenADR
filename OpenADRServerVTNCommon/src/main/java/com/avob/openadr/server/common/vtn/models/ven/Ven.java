@@ -68,7 +68,7 @@ public class Ven extends AbstractUser {
 	/**
 	 * report only
 	 */
-	private Boolean reportOnly;
+	private Boolean reportOnly = false;
 
 	/**
 	 * support xml signature

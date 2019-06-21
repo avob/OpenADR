@@ -99,7 +99,7 @@ public class Main {
 		Oadr20bCreatePartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatePartyRegistrationBuilder(requestId, oadr20bFingerprint,
 						SchemaVersionEnumeratedType.OADR_20B.value())
-				.withOadrHttpPullModel(false).withOadrTransportAddress(client.getClientJid().toString())
+				.withOadrHttpPullModel(false).withOadrTransportAddress(client.getConnectionJid().toString())
 				.withOadrReportOnly(false).withOadrTransportName(OadrTransportType.XMPP).withOadrVenName("Xmpp VEN")
 				.withOadrXmlSignature(false);
 

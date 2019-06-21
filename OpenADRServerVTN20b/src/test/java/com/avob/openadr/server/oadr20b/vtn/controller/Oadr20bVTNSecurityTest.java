@@ -44,6 +44,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
@@ -173,6 +174,7 @@ public class Oadr20bVTNSecurityTest {
 		String username = fingerprint;
 		Ven ven = venService.prepare(username);
 		ven.setRegistrationId(username);
+		ven.setTransport(OadrTransportType.SIMPLE_HTTP.value());
 		venService.save(ven);
 		genericTest(x509HttpClient, ven);
 		venService.delete(ven);
@@ -192,6 +194,7 @@ public class Oadr20bVTNSecurityTest {
 		username = fingerprint;
 		ven = venService.prepare(username);
 		ven.setRegistrationId(username);
+		ven.setTransport(OadrTransportType.SIMPLE_HTTP.value());
 		venService.save(ven);
 		genericTest(x509HttpClient, ven);
 		venService.delete(ven);
@@ -217,6 +220,7 @@ public class Oadr20bVTNSecurityTest {
 
 		Ven ven = venService.prepare(username, password);
 		ven.setRegistrationId(username);
+		ven.setTransport(OadrTransportType.SIMPLE_HTTP.value());
 		venService.save(ven);
 		genericTest(digestHttpClient, ven);
 		venService.delete(ven);
@@ -245,6 +249,7 @@ public class Oadr20bVTNSecurityTest {
 		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
 		ven.setPushUrl("http://localhost");
 		ven.setRegistrationId(venUsername);
+		ven.setTransport(OadrTransportType.SIMPLE_HTTP.value());
 		venService.save(ven);
 
 		genericTest(venBasicHttpClient, ven);
@@ -254,6 +259,7 @@ public class Oadr20bVTNSecurityTest {
 		Ven ven2 = venService.prepare(venUsername2, venPassword2);
 		ven2.setVenMarketContexts(Sets.newHashSet(marketContext));
 		ven2.setRegistrationId(venUsername2);
+		ven2.setTransport(OadrTransportType.SIMPLE_HTTP.value());
 		venService.save(ven2);
 
 		String userUsername = "securityUser1";

@@ -70,6 +70,7 @@ public class Oadr20bPushService {
 	private OadrHttpVtnClient20b oadrHttpVtnClient20b;
 
 	private OadrHttpVtnClient20b securedOadrHttpVtnClient20b;
+	
 
 	@PostConstruct
 	public void init() {

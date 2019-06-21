@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

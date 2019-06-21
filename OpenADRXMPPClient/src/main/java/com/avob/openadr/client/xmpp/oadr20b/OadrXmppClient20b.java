@@ -48,6 +48,8 @@ public class OadrXmppClient20b {
 	public static final String OADR_EVENT_SERVICE_NAMESPACE = "http://openadr.org/OpenADR2/EiEvent";
 
 	public static final String OADR_REPORT_SERVICE_NAMESPACE = "http://openadr.org/OpenADR2/EiReport";
+	
+	public static final String OADR_OPT_SERVICE_NAMESPACE = "http://openadr.org/OpenADR2/EiOpt";
 
 	public static final String OADR_REGISTERPARTY_SERVICE_NAMESPACE = "http://openadr.org/OpenADR2/EiRegisterParty";
 
@@ -59,6 +61,7 @@ public class OadrXmppClient20b {
 
 	private DomainBareJid domainJid;
 	private EntityFullJid clientJid;
+	private EntityFullJid connectionJid;
 
 	private ChatManager chatManager;
 
@@ -137,6 +140,10 @@ public class OadrXmppClient20b {
 
 			connection.connect().login(resource, resource); // Establishes a connection to the server
 			if (connection.isConnected() && connection.isAuthenticated()) {
+
+				EntityFullJid user = connection.getUser();
+				
+				this.setConnectionJid(user);
 
 				IQ request = new Ping(authzid);
 				connection.sendIqRequestAsync(request);
@@ -232,6 +239,14 @@ public class OadrXmppClient20b {
 
 	private void setDomainJid(DomainBareJid domainJid) {
 		this.domainJid = domainJid;
+	}
+
+	public EntityFullJid getConnectionJid() {
+		return connectionJid;
+	}
+
+	public void setConnectionJid(EntityFullJid connectionJid) {
+		this.connectionJid = connectionJid;
 	}
 
 }

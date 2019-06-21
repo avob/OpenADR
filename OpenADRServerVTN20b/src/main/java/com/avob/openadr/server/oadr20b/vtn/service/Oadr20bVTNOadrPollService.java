@@ -1,7 +1,6 @@
 package com.avob.openadr.server.oadr20b.vtn.service;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,67 +20,64 @@ import com.avob.openadr.server.oadr20b.vtn.exception.poll.Oadr20bPollApplication
 @Service
 public class Oadr20bVTNOadrPollService {
 
-    private Oadr20bJAXBContext jaxbContext;
+	@Resource
+	private Oadr20bJAXBContext jaxbContext;
 
-    @Resource
-    private VenPollService venPollService;
+	@Resource
+	private VenPollService venPollService;
 
-    @Resource
-    private VenService venService;
+	@Resource
+	private VenService venService;
 
-    @Resource
-    private XmlSignatureService xmlSignatureService;
+	@Resource
+	private XmlSignatureService xmlSignatureService;
 
-    public Oadr20bVTNOadrPollService() throws JAXBException {
-        jaxbContext = Oadr20bJAXBContext.getInstance();
-    }
+	public String oadrPoll(OadrPollType event, boolean signed) throws Oadr20bPollApplicationLayerException,
+			Oadr20bXMLSignatureException, Oadr20bUnmarshalException, Oadr20bMarshalException {
+		String requestID = "";
+		String venID = event.getVenID();
+		Ven ven = venService.findOneByUsername(venID);
 
-    public String oadrPoll(OadrPollType event, boolean signed) throws Oadr20bPollApplicationLayerException,
-            Oadr20bXMLSignatureException, Oadr20bUnmarshalException, Oadr20bMarshalException {
-        String requestID = "";
-        String venID = event.getVenID();
-        Ven ven = venService.findOneByUsername(venID);
+		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
+			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
+			throw new Oadr20bPollApplicationLayerException(xmlSignatureRequiredButAbsent.getResponseDescription(),
+					Oadr20bResponseBuilders.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build());
+		}
 
-        if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
-            EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-                    .newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
-            throw new Oadr20bPollApplicationLayerException(xmlSignatureRequiredButAbsent.getResponseDescription(),
-                    Oadr20bResponseBuilders.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build());
-        }
+		String responseStr = venPollService.retrievePollForVenUsername(venID);
+		OadrResponseType response = null;
+		if (responseStr == null) {
+			response = Oadr20bResponseBuilders.newOadr20bResponseBuilder("", HttpStatus.OK_200, venID).build();
+		}
+		if (signed) {
+			if (response != null) {
+				return xmlSignatureService.sign(response);
+			} else if (responseStr != null) {
+				Object unmarshal = jaxbContext.unmarshal(responseStr);
+				return xmlSignatureService.sign(unmarshal);
+			}
 
-        String responseStr = venPollService.retrievePollForVenUsername(venID);
-        OadrResponseType response = null;
-        if (responseStr == null) {
-            response = Oadr20bResponseBuilders.newOadr20bResponseBuilder("", HttpStatus.OK_200, venID).build();
-        }
-        if (signed) {
-            if (response != null) {
-                return xmlSignatureService.sign(response);
-            } else if (responseStr != null) {
-                Object unmarshal = jaxbContext.unmarshal(responseStr);
-                return xmlSignatureService.sign(unmarshal);
-            }
+		} else {
+			if (response != null) {
+				return jaxbContext.marshalRoot(response);
+			} else if (responseStr != null) {
+				return responseStr;
+			}
+		}
+		return null;
+	}
 
-        } else {
-            if (response != null) {
-                return jaxbContext.marshalRoot(response);
-            } else if (responseStr != null) {
-                return responseStr;
-            }
-        }
-        return null;
-    }
-
-    public void checkMatchUsernameWithRequestVenId(String username, OadrPollType oadrPollType)
-            throws Oadr20bPollApplicationLayerException {
-        String venID = oadrPollType.getVenID();
-        String requestID = "";
-        if (!username.equals(venID)) {
-            EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-                    .newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();
-            throw new Oadr20bPollApplicationLayerException(mismatchCredentialsVenIdResponse.getResponseDescription(),
-                    Oadr20bResponseBuilders.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, venID).build());
-        }
-    }
+	public void checkMatchUsernameWithRequestVenId(String username, OadrPollType oadrPollType)
+			throws Oadr20bPollApplicationLayerException {
+		String venID = oadrPollType.getVenID();
+		String requestID = "";
+		if (!username.equals(venID)) {
+			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();
+			throw new Oadr20bPollApplicationLayerException(mismatchCredentialsVenIdResponse.getResponseDescription(),
+					Oadr20bResponseBuilders.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, venID).build());
+		}
+	}
 
 }

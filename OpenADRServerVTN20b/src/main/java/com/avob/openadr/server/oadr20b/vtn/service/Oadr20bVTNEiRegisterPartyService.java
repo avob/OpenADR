@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
@@ -64,6 +63,7 @@ public class Oadr20bVTNEiRegisterPartyService {
 		supportedProfiles.add(profile20b);
 	}
 
+	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
@@ -77,10 +77,6 @@ public class Oadr20bVTNEiRegisterPartyService {
 
 	@Resource
 	private Oadr20bAppNotificationPublisher oadr20bAppNotificationPublisher;
-
-	public Oadr20bVTNEiRegisterPartyService() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
 
 	private Oadr20bCreatePartyRegistrationTypeApplicationLayerException invalidRegistrationId(String requestId,
 			String venId) {
@@ -455,56 +451,78 @@ public class Oadr20bVTNEiRegisterPartyService {
 
 	}
 
-	public String request(String username, Object payload)
+	/**
+	 * 
+	 * @param username
+	 * @param payload
+	 * @param transport
+	 * @return
+	 * @throws Oadr20bUnmarshalException
+	 * @throws Oadr20bMarshalException
+	 * @throws Oadr20bXMLSignatureValidationException
+	 * @throws Oadr20bApplicationLayerException
+	 * @throws Oadr20bCreatePartyRegistrationTypeApplicationLayerException
+	 * @throws Oadr20bCancelPartyRegistrationTypeApplicationLayerException
+	 * @throws Oadr20bQueryRegistrationTypeApplicationLayerException
+	 * @throws Oadr20bCanceledPartyRegistrationTypeApplicationLayerException
+	 * @throws Oadr20bXMLSignatureException
+	 * @throws Oadr20bResponsePartyReregistrationApplicationLayerException
+	 */
+	public String request(String username, String payload)
 			throws Oadr20bUnmarshalException, Oadr20bMarshalException, Oadr20bXMLSignatureValidationException,
 			Oadr20bApplicationLayerException, Oadr20bCreatePartyRegistrationTypeApplicationLayerException,
 			Oadr20bCancelPartyRegistrationTypeApplicationLayerException,
 			Oadr20bQueryRegistrationTypeApplicationLayerException,
 			Oadr20bCanceledPartyRegistrationTypeApplicationLayerException, Oadr20bXMLSignatureException,
 			Oadr20bResponsePartyReregistrationApplicationLayerException {
-		if (payload instanceof OadrPayload) {
 
-			OadrPayload oadrPayload = (OadrPayload) payload;
+		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
+
+		if (unmarshal instanceof OadrPayload) {
+
+			OadrPayload oadrPayload = (OadrPayload) unmarshal;
+
+			xmlSignatureService.validate(payload, oadrPayload);
 
 			return handle(username, oadrPayload);
 
-		} else if (payload instanceof OadrCreatePartyRegistrationType) {
+		} else if (unmarshal instanceof OadrCreatePartyRegistrationType) {
 
 			LOGGER.info(username + " - OadrCreatePartyRegistration");
 
-			OadrCreatePartyRegistrationType oadrCreatePartyRegistration = (OadrCreatePartyRegistrationType) payload;
+			OadrCreatePartyRegistrationType oadrCreatePartyRegistration = (OadrCreatePartyRegistrationType) unmarshal;
 
 			return handle(username, oadrCreatePartyRegistration, false);
 
-		} else if (payload instanceof OadrCancelPartyRegistrationType) {
+		} else if (unmarshal instanceof OadrCancelPartyRegistrationType) {
 
 			LOGGER.info(username + " - OadrCancelPartyRegistration");
 
-			OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType = (OadrCancelPartyRegistrationType) payload;
+			OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType = (OadrCancelPartyRegistrationType) unmarshal;
 
 			return handle(username, oadrCancelPartyRegistrationType, false);
 
-		} else if (payload instanceof OadrCanceledPartyRegistrationType) {
+		} else if (unmarshal instanceof OadrCanceledPartyRegistrationType) {
 
 			LOGGER.info(username + " - OadrCanceledPartyRegistrationType");
 
-			OadrCanceledPartyRegistrationType oadrCanceledPartyRegistrationType = (OadrCanceledPartyRegistrationType) payload;
+			OadrCanceledPartyRegistrationType oadrCanceledPartyRegistrationType = (OadrCanceledPartyRegistrationType) unmarshal;
 
 			return handle(username, oadrCanceledPartyRegistrationType, false);
 
-		} else if (payload instanceof OadrQueryRegistrationType) {
+		} else if (unmarshal instanceof OadrQueryRegistrationType) {
 
 			LOGGER.info(username + " - OadrQueryRegistration");
 
-			OadrQueryRegistrationType oadrQueryRegistrationType = (OadrQueryRegistrationType) payload;
+			OadrQueryRegistrationType oadrQueryRegistrationType = (OadrQueryRegistrationType) unmarshal;
 
 			return handle(username, oadrQueryRegistrationType, false);
 
-		} else if (payload instanceof OadrResponseType) {
+		} else if (unmarshal instanceof OadrResponseType) {
 
 			LOGGER.info(username + " - OadrResponseType");
 
-			OadrResponseType oadrResponseType = (OadrResponseType) payload;
+			OadrResponseType oadrResponseType = (OadrResponseType) unmarshal;
 
 			return handle(username, oadrResponseType, false);
 

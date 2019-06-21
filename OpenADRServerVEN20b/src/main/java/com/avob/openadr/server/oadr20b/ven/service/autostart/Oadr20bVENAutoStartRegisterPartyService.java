@@ -85,7 +85,7 @@ public class Oadr20bVENAutoStartRegisterPartyService extends Oadr20bVENEiRegiste
 			OadrRegisterReportType selfOadrRegisterReport = reportService.selfOadrRegisterReport(requestId,
 					venConfig.getVenId(), vtnConfiguration.getVtnId(), reportRequestId);
 
-			planRequestService.submitRegisterReport(multiVtnConfig.getMultiClientConfig(vtnConfiguration),
+			planRequestService.submitRegisterReport(multiVtnConfig.getMultiHttpClientConfig(vtnConfiguration),
 					selfOadrRegisterReport);
 
 			sent.put(vtnConfiguration.getVtnId(), true);

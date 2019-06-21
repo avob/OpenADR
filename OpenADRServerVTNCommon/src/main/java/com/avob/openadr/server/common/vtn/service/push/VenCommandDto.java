@@ -6,6 +6,8 @@ public class VenCommandDto<T> {
 
 	private String venPushUrl;
 
+	private String venTransport;
+
 	private boolean xmlSignature;
 
 	private String payload;
@@ -56,6 +58,14 @@ public class VenCommandDto<T> {
 
 	public void setPayloadClass(Class<T> payloadClass) {
 		this.payloadClass = payloadClass;
+	}
+
+	public String getVenTransport() {
+		return venTransport;
+	}
+
+	public void setVenTransport(String venTransport) {
+		this.venTransport = venTransport;
 	}
 
 }

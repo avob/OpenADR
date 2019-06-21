@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
@@ -35,10 +34,14 @@ import com.avob.openadr.model.oadr20b.ei.IntervalType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.ei.QualifiedEventIDType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.pyld.EiCreatedEvent;
@@ -91,11 +94,8 @@ public class Oadr20bVTNEiEventService {
 		}
 	}
 
+	@Resource
 	private Oadr20bJAXBContext jaxbContext;
-
-	public Oadr20bVTNEiEventService() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
 
 	public void checkMatchUsernameWithRequestVenId(String username, OadrCreatedEventType oadrCreatedEvent)
 			throws Oadr20bCreatedEventApplicationLayerException {
@@ -453,4 +453,106 @@ public class Oadr20bVTNEiEventService {
 				.withPriority(priority).withTestEvent(testEvent).withVtnComment(vtnComment).build();
 
 	}
+
+	/**
+	 * @param username
+	 * @param oadrPayload
+	 * @return
+	 * @throws Oadr20bMarshalException
+	 * @throws Oadr20bApplicationLayerException
+	 * @throws Oadr20bXMLSignatureValidationException
+	 * @throws Oadr20bCreatedEventApplicationLayerException
+	 * @throws Oadr20bRequestEventApplicationLayerException
+	 * @throws Oadr20bXMLSignatureException
+	 */
+	private String handle(String username, OadrPayload oadrPayload)
+			throws Oadr20bMarshalException, Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException,
+			Oadr20bCreatedEventApplicationLayerException, Oadr20bRequestEventApplicationLayerException,
+			Oadr20bXMLSignatureException {
+
+		if (oadrPayload.getOadrSignedObject().getOadrCreatedEvent() != null) {
+
+			LOGGER.info(username + " - OadrCreatedEvent signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrCreatedEvent(), true);
+
+		} else if (oadrPayload.getOadrSignedObject().getOadrRequestEvent() != null) {
+
+			LOGGER.info(username + " - OadrRequestEvent signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrRequestEvent(), true);
+		}
+		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
+	}
+
+	/**
+	 * @param username
+	 * @param oadrCreatedEvent
+	 * @return
+	 * @throws Oadr20bCreatedEventApplicationLayerException
+	 * @throws Oadr20bMarshalException
+	 * @throws Oadr20bXMLSignatureException
+	 */
+	private String handle(String username, OadrCreatedEventType oadrCreatedEvent, boolean signed)
+			throws Oadr20bCreatedEventApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
+
+		this.checkMatchUsernameWithRequestVenId(username, oadrCreatedEvent);
+
+		return this.oadrCreatedEvent(oadrCreatedEvent, signed);
+
+	}
+
+	/**
+	 * @param username
+	 * @param oadrRequestEvent
+	 * @return
+	 * @throws Oadr20bRequestEventApplicationLayerException
+	 * @throws Oadr20bMarshalException
+	 * @throws Oadr20bXMLSignatureException
+	 */
+	private String handle(String username, OadrRequestEventType oadrRequestEvent, boolean signed)
+			throws Oadr20bRequestEventApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
+
+		this.checkMatchUsernameWithRequestVenId(username, oadrRequestEvent);
+
+		return this.oadrRequestEvent(oadrRequestEvent, signed);
+
+	}
+
+	public String request(String username, String payload)
+			throws Oadr20bUnmarshalException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
+			Oadr20bXMLSignatureValidationException, Oadr20bCreatedEventApplicationLayerException,
+			Oadr20bRequestEventApplicationLayerException, Oadr20bXMLSignatureException {
+
+		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
+
+		if (unmarshal instanceof OadrPayload) {
+
+			OadrPayload oadrPayload = (OadrPayload) unmarshal;
+
+			xmlSignatureService.validate(payload, oadrPayload);
+
+			return handle(username, oadrPayload);
+
+		} else if (unmarshal instanceof OadrCreatedEventType) {
+
+			LOGGER.info(username + " - OadrCreatedEvent");
+
+			OadrCreatedEventType oadrCreatedEvent = (OadrCreatedEventType) unmarshal;
+
+			return handle(username, oadrCreatedEvent, false);
+
+		} else if (unmarshal instanceof OadrRequestEventType) {
+
+			LOGGER.info(username + " - OadrRequestEvent");
+
+			OadrRequestEventType oadrRequestEvent = (OadrRequestEventType) unmarshal;
+
+			return handle(username, oadrRequestEvent, false);
+
+		}
+
+		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
+	}
+
 }

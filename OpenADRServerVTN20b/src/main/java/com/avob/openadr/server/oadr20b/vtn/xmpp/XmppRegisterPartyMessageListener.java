@@ -13,13 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
-import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCanceledPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCreatePartyRegistrationTypeApplicationLayerException;
@@ -33,13 +31,7 @@ public class XmppRegisterPartyMessageListener implements StanzaListener {
 	private static final Logger LOGGER = LoggerFactory.getLogger(XmppRegisterPartyMessageListener.class);
 
 	@Resource
-	private VtnConfig vtnConfig;
-
-	@Resource
 	private Oadr20bVTNEiRegisterPartyService oadr20bVTNEiRegisterPartyService;
-
-	@Resource
-	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
 	private XmppUplinkClient xmppUplinkClient;
@@ -47,8 +39,6 @@ public class XmppRegisterPartyMessageListener implements StanzaListener {
 	@Override
 	public void processStanza(Stanza packet) {
 		Message message = (Message) packet;
-
-		Jid to = packet.getTo();
 
 		Jid from = packet.getFrom();
 
@@ -59,12 +49,10 @@ public class XmppRegisterPartyMessageListener implements StanzaListener {
 		String body = message.getBody();
 
 		try {
-			
+
 			LOGGER.debug(body);
 
-			Object unmarshal = jaxbContext.unmarshal(body, vtnConfig.getValidateOadrPayloadAgainstXsd());
-
-			String response = oadr20bVTNEiRegisterPartyService.request(username, unmarshal);
+			String response = oadr20bVTNEiRegisterPartyService.request(username, body);
 
 			xmppUplinkClient.getUplinkClient().sendMessage(from, response);
 

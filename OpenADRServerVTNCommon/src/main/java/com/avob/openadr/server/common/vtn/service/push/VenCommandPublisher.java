@@ -5,6 +5,7 @@ import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
+import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,12 +19,12 @@ public class VenCommandPublisher {
 
 	private ObjectMapper mapper = new ObjectMapper();
 
-	public <T> void publish(String venUsername, String venPushUrl, Boolean xmlSignature, String payload, Class<T> klass)
-			throws JsonProcessingException {
+	public <T> void publish(Ven ven, String payload, Class<T> klass) throws JsonProcessingException {
 		VenCommandDto<T> command = new VenCommandDto<T>();
-		command.setVenUsername(venUsername);
-		command.setVenPushUrl(venPushUrl);
-		command.setXmlSignature(xmlSignature);
+		command.setVenUsername(ven.getUsername());
+		command.setVenPushUrl(ven.getPushUrl());
+		command.setVenTransport(ven.getTransport());
+		command.setXmlSignature(ven.getXmlSignature());
 		command.setPayload(payload);
 		command.setPayloadClass(klass);
 

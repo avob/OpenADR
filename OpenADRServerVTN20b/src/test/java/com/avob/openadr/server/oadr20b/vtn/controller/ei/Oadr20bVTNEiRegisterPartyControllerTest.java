@@ -95,6 +95,7 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		Ven ven = new Ven();
 		ven.setUsername(VEN_ID);
 		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
+		ven.setTransport(OadrTransportType.SIMPLE_HTTP.value());
 		venService.save(ven);
 
 		// test ven is not registred
@@ -106,7 +107,7 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		assertTrue(venDto.getHttpPullModel());
 		assertNull(venDto.getOadrProfil());
 		assertNull(venDto.getPushUrl());
-		assertNull(venDto.getTransport());
+		assertNotNull(venDto.getTransport());
 
 		// test oadrQueryRegistration
 		String requestId = "requestId";
@@ -157,7 +158,7 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		assertTrue(venDto.getHttpPullModel());
 		assertNull(venDto.getOadrProfil());
 		assertNull(venDto.getPushUrl());
-		assertNull(venDto.getTransport());
+		assertNotNull(venDto.getTransport());
 
 		// test create oadrCreateRegistration
 		String venName = "venName";

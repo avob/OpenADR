@@ -1,7 +1,6 @@
 package com.avob.openadr.server.oadr20b.vtn.service;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
 
 import org.springframework.stereotype.Service;
 
@@ -21,59 +20,42 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 @Service
 public class VenDistributeService {
 
-//	@Resource
-//	private VenPollService venPollService;
-//
-//	@Resource
-//	private Oadr20bPushService oadr20bPushService;
-
 	@Resource
 	private VenCommandPublisher venCommandPublisher;
-//
-	private Oadr20bJAXBContext jaxbContext;
 
-	public VenDistributeService() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
+	@Resource
+	private Oadr20bJAXBContext jaxbContext;
 
 	public void distribute(Ven ven, Object payload) throws Oadr20bMarshalException {
 		try {
 			String marshalRoot = jaxbContext.marshalRoot(payload);
 			if (payload instanceof OadrDistributeEventType) {
-				
-				venCommandPublisher.publish(ven.getUsername(), ven.getPushUrl(), ven.getXmlSignature(), marshalRoot,
-						OadrDistributeEventType.class);
+
+				venCommandPublisher.publish(ven, marshalRoot, OadrDistributeEventType.class);
 
 			} else if (payload instanceof OadrCancelReportType) {
 
-
-				venCommandPublisher.publish(ven.getUsername(), ven.getPushUrl(), ven.getXmlSignature(), marshalRoot,
-						OadrCancelReportType.class);
+				venCommandPublisher.publish(ven, marshalRoot, OadrCancelReportType.class);
 
 			} else if (payload instanceof OadrCreateReportType) {
 
-				venCommandPublisher.publish(ven.getUsername(), ven.getPushUrl(), ven.getXmlSignature(), marshalRoot,
-						OadrCreateReportType.class);
+				venCommandPublisher.publish(ven, marshalRoot, OadrCreateReportType.class);
 
 			} else if (payload instanceof OadrRegisterReportType) {
 
-				venCommandPublisher.publish(ven.getUsername(), ven.getPushUrl(), ven.getXmlSignature(), marshalRoot,
-						OadrRegisterReportType.class);
+				venCommandPublisher.publish(ven, marshalRoot, OadrRegisterReportType.class);
 
 			} else if (payload instanceof OadrUpdateReportType) {
 
-				venCommandPublisher.publish(ven.getUsername(), ven.getPushUrl(), ven.getXmlSignature(), marshalRoot,
-						OadrUpdateReportType.class);
+				venCommandPublisher.publish(ven, marshalRoot, OadrUpdateReportType.class);
 
 			} else if (payload instanceof OadrCancelPartyRegistrationType) {
 
-				venCommandPublisher.publish(ven.getUsername(), ven.getPushUrl(), ven.getXmlSignature(), marshalRoot,
-						OadrCancelPartyRegistrationType.class);
+				venCommandPublisher.publish(ven, marshalRoot, OadrCancelPartyRegistrationType.class);
 
 			} else if (payload instanceof OadrRequestReregistrationType) {
 
-				venCommandPublisher.publish(ven.getUsername(), ven.getPushUrl(), ven.getXmlSignature(), marshalRoot,
-						OadrRequestReregistrationType.class);
+				venCommandPublisher.publish(ven, marshalRoot, OadrRequestReregistrationType.class);
 
 			} else {
 				// TODO bzanni: exception cannot be pushed payload (outside

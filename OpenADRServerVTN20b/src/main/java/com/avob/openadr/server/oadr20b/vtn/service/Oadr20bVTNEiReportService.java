@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.eclipse.jetty.http.HttpStatus;
@@ -41,9 +40,11 @@ import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportSpecifierType;
 import com.avob.openadr.model.oadr20b.ei.SpecifierPayloadType;
 import com.avob.openadr.model.oadr20b.emix.ItemBaseType;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.BaseUnitType;
 import com.avob.openadr.model.oadr20b.oadr.CurrencyType;
 import com.avob.openadr.model.oadr20b.oadr.CurrentType;
@@ -54,6 +55,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrGBItemBase;
 import com.avob.openadr.model.oadr20b.oadr.OadrLoadControlStateTypeType;
+import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayloadResourceStatusType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisteredReportType;
@@ -84,12 +86,14 @@ import com.avob.openadr.model.oadr20b.xcal.Properties;
 import com.avob.openadr.model.oadr20b.xcal.WsCalendarIntervalType;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
-import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
 import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenService;
+import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
+import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCreatePartyRegistrationTypeApplicationLayerException;
+import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bQueryRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCancelReportApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCreateReportApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCreatedReportApplicationLayerException;
@@ -138,6 +142,7 @@ public class Oadr20bVTNEiReportService {
 
 	protected static final String METADATA_REPORT_RID = "METADATA";
 
+	@Resource
 	protected Oadr20bJAXBContext jaxbContext;
 
 	@Resource
@@ -192,14 +197,6 @@ public class Oadr20bVTNEiReportService {
 	private Oadr20bDtoMapper oadr20bDtoMapper;
 
 	private ObjectMapper jsonMapper = new ObjectMapper();
-
-	public Oadr20bVTNEiReportService() {
-		try {
-			jaxbContext = Oadr20bJAXBContext.getInstance();
-		} catch (JAXBException e) {
-			throw new OadrVTNInitializationException(e);
-		}
-	}
 
 	/**
 	 * Register reporting capabilities
@@ -1335,6 +1332,158 @@ public class Oadr20bVTNEiReportService {
 									Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID)
 							.build());
 		}
+	}
+
+	private String handle(String username, OadrPayload oadrPayload)
+			throws Oadr20bMarshalException, Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException,
+			Oadr20bCreatePartyRegistrationTypeApplicationLayerException,
+			Oadr20bCancelPartyRegistrationTypeApplicationLayerException,
+			Oadr20bQueryRegistrationTypeApplicationLayerException, Oadr20bRegisterReportApplicationLayerException,
+			Oadr20bUpdateReportApplicationLayerException, Oadr20bCancelReportApplicationLayerException,
+			Oadr20bCreateReportApplicationLayerException, Oadr20bCreatedReportApplicationLayerException,
+			Oadr20bXMLSignatureException {
+
+		if (oadrPayload.getOadrSignedObject().getOadrCancelReport() != null) {
+
+			LOGGER.info(username + " - OadrCancelReport signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrCancelReport(), true);
+
+		} else if (oadrPayload.getOadrSignedObject().getOadrCreateReport() != null) {
+
+			LOGGER.info(username + " - OadrCreateReport signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrCreateReport(), true);
+
+		} else if (oadrPayload.getOadrSignedObject().getOadrCreatedReport() != null) {
+
+			LOGGER.info(username + " - OadrCreatedReport signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrCreatedReport(), true);
+
+		} else if (oadrPayload.getOadrSignedObject().getOadrUpdateReport() != null) {
+
+			LOGGER.info(username + " - OadrUpdateReport signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrUpdateReport(), true);
+
+		} else if (oadrPayload.getOadrSignedObject().getOadrRegisterReport() != null) {
+
+			LOGGER.info(username + " - OadrRegisterReport signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrRegisterReport(), true);
+
+		}
+
+		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiReport");
+	}
+
+	private String handle(String username, OadrRegisterReportType oadrRegisterReport, boolean signed)
+			throws Oadr20bRegisterReportApplicationLayerException, Oadr20bMarshalException,
+			Oadr20bXMLSignatureException {
+
+		this.checkMatchUsernameWithRequestVenId(username, oadrRegisterReport);
+
+		return this.oadrRegisterReport(oadrRegisterReport, signed);
+
+	}
+
+	private String handle(String username, OadrUpdateReportType oadrUpdateReport, boolean signed)
+			throws Oadr20bUpdateReportApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
+
+		this.checkMatchUsernameWithRequestVenId(username, oadrUpdateReport);
+
+		return this.oadrUpdateReport(oadrUpdateReport, signed);
+
+	}
+
+	private String handle(String username, OadrCreatedReportType oadrCreatedReport, boolean signed)
+			throws Oadr20bCreatedReportApplicationLayerException, Oadr20bMarshalException,
+			Oadr20bXMLSignatureException {
+
+		this.checkMatchUsernameWithRequestVenId(username, oadrCreatedReport);
+
+		return this.oadrCreatedReport(oadrCreatedReport, signed);
+
+	}
+
+	private String handle(String username, OadrCreateReportType oadrCreateReport, boolean signed)
+			throws Oadr20bCreateReportApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
+		this.checkMatchUsernameWithRequestVenId(username, oadrCreateReport);
+
+		return this.oadrCreateReport(oadrCreateReport, signed);
+
+	}
+
+	private String handle(String username, OadrCancelReportType oadrCancelReport, boolean signed)
+			throws Oadr20bCancelReportApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
+		this.checkMatchUsernameWithRequestVenId(username, oadrCancelReport);
+
+		return this.oadrCancelReport(oadrCancelReport, signed);
+
+	}
+
+	public String request(String username, String payload) throws Oadr20bUnmarshalException, Oadr20bMarshalException,
+			Oadr20bApplicationLayerException, Oadr20bCreatePartyRegistrationTypeApplicationLayerException,
+			Oadr20bCancelPartyRegistrationTypeApplicationLayerException,
+			Oadr20bQueryRegistrationTypeApplicationLayerException, Oadr20bRegisterReportApplicationLayerException,
+			Oadr20bUpdateReportApplicationLayerException, Oadr20bCancelReportApplicationLayerException,
+			Oadr20bCreateReportApplicationLayerException, Oadr20bCreatedReportApplicationLayerException,
+			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException {
+
+		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
+
+		if (unmarshal instanceof OadrPayload) {
+
+			OadrPayload obj = (OadrPayload) unmarshal;
+
+			xmlSignatureService.validate(payload, obj);
+
+			return handle(username, obj);
+
+		} else if (unmarshal instanceof OadrRegisterReportType) {
+
+			LOGGER.info(username + " - OadrRegisterReport");
+
+			OadrRegisterReportType obj = (OadrRegisterReportType) unmarshal;
+
+			return handle(username, obj, false);
+
+		} else if (unmarshal instanceof OadrUpdateReportType) {
+
+			LOGGER.info(username + " - OadrUpdateReport");
+
+			OadrUpdateReportType obj = (OadrUpdateReportType) unmarshal;
+
+			return handle(username, obj, false);
+
+		} else if (unmarshal instanceof OadrCreatedReportType) {
+
+			LOGGER.info(username + " - OadrCreatedReport");
+
+			OadrCreatedReportType obj = (OadrCreatedReportType) unmarshal;
+
+			return handle(username, obj, false);
+
+		} else if (unmarshal instanceof OadrCreateReportType) {
+
+			LOGGER.info(username + " - OadrCreateReport");
+
+			OadrCreateReportType obj = (OadrCreateReportType) unmarshal;
+
+			return handle(username, obj, false);
+
+		} else if (unmarshal instanceof OadrCancelReportType) {
+
+			LOGGER.info(username + " - OadrCancelReport");
+
+			OadrCancelReportType obj = (OadrCancelReportType) unmarshal;
+
+			return handle(username, obj, false);
+
+		}
+
+		return null;
 	}
 
 }

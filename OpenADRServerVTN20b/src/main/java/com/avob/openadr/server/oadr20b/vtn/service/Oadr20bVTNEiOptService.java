@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBException;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -63,11 +62,8 @@ public class Oadr20bVTNEiOptService {
 	@Resource
 	private XmlSignatureService xmlSignatureService;
 
+	@Resource
 	private Oadr20bJAXBContext jaxbContext;
-
-	public Oadr20bVTNEiOptService() throws JAXBException {
-		this.jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
 
 	/**
 	 * Does a VEN can sent Opt for another VEN or another VEN's resource ?

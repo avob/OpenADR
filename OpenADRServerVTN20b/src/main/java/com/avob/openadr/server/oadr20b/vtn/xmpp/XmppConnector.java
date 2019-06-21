@@ -40,6 +40,12 @@ public class XmppConnector {
 	@Resource
 	private XmppRegisterPartyMessageListener xmppRegisterPartyMessageListener;
 
+	@Resource
+	private XmppReportMessageListener xmppReportMessageListener;
+
+	@Resource
+	private XmppEventMessageListener xmppEventMessageListener;
+
 	private Map<String, OadrXmppClient20b> perOadrServiceDownlinkClient = new HashMap<>();
 
 	@EventListener(ApplicationReadyEvent.class)
@@ -64,6 +70,12 @@ public class XmppConnector {
 
 				perOadrServiceDownlinkClient.put(REGISTERPARTY_SERVICE, new OadrXmppClient20b(vtnId, host, port,
 						REGISTERPARTY_SERVICE, sslContext, xmppRegisterPartyMessageListener));
+
+				perOadrServiceDownlinkClient.put(EVENT_SERVICE,
+						new OadrXmppClient20b(vtnId, host, port, EVENT_SERVICE, sslContext, xmppEventMessageListener));
+
+				perOadrServiceDownlinkClient.put(REPORT_SERVICE, new OadrXmppClient20b(vtnId, host, port,
+						REPORT_SERVICE, sslContext, xmppReportMessageListener));
 //				
 //				perOadrServiceDownlinkClient.put(REPORT_SERVICE,
 //						new OadrXmppClient20b(vtnId, host, port, REPORT_SERVICE, sslContext, reportListener));

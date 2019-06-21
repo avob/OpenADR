@@ -7,6 +7,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor;
 import org.springframework.stereotype.Service;
 
+import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
@@ -89,6 +90,7 @@ public class OadrDataBaseSetup {
 		ven.setRegistrationId(VEN_REGISTRATION_ID);
 		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
 		ven.setVenGroup(Sets.newHashSet(group));
+		ven.setTransport(OadrTransportType.SIMPLE_HTTP.value());
 		venService.save(ven);
 
 		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));

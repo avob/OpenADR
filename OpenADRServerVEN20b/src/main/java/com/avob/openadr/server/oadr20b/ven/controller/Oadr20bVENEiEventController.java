@@ -22,15 +22,9 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
-import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
-import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
-import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.security.exception.OadrSecurityException;
-import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
-import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bDistributeEventApplicationLayerException;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiEventService;
-import com.avob.openadr.server.oadr20b.ven.service.XmlSignatureService;
 
 @ConditionalOnExpression("#{!${oadr.pullModel}}")
 @PreAuthorize("hasRole('ROLE_VTN')")
@@ -44,14 +38,7 @@ public class Oadr20bVENEiEventController {
 	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
-	private Oadr20bVENEiEventService eventService;
-
-	@Resource
-	private XmlSignatureService xmlSignatureService;
-
-	@Resource
-	private MultiVtnConfig multiVtnConfig;
-
+	private Oadr20bVENEiEventService oadr20bVENEiEventService;
 
 	/**
 	 * Handle exception during oadrCreatedEvent response generation
@@ -79,62 +66,7 @@ public class Oadr20bVENEiEventController {
 			Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException,
 			OadrSecurityException {
 
-		Object unmarshal = jaxbContext.unmarshal(payload);
-
-		LOGGER.debug(payload);
-
-		String username = principal.getName();
-
-		VtnSessionConfiguration multiConfig = multiVtnConfig.getMultiConfig(username);
-
-		if (unmarshal instanceof OadrPayload) {
-
-			OadrPayload oadrPayload = (OadrPayload) unmarshal;
-
-			return handle(multiConfig, payload, oadrPayload);
-
-		} else if (unmarshal instanceof OadrDistributeEventType) {
-
-			OadrDistributeEventType oadrDistributeEvent = (OadrDistributeEventType) unmarshal;
-
-			LOGGER.info(username + " - OadrDistributeEventType");
-
-			return handle(multiConfig, oadrDistributeEvent, false);
-
-		}
-
-		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
-	}
-
-	private String handle(VtnSessionConfiguration multiConfig, String raw, OadrPayload oadrPayload)
-			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
-			Oadr20bXMLSignatureException, OadrSecurityException {
-
-		xmlSignatureService.validate(raw, oadrPayload, multiConfig);
-
-		if (oadrPayload.getOadrSignedObject().getOadrDistributeEvent() != null) {
-			LOGGER.info(multiConfig.getVtnId() + " - OadrDistributeEventType signed");
-			return handle(multiConfig, oadrPayload.getOadrSignedObject().getOadrDistributeEvent(), true);
-		} else {
-			throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
-		}
-	}
-
-	private String handle(VtnSessionConfiguration multiConfig, OadrDistributeEventType oadrDistributeEvent,
-			boolean signed) throws Oadr20bDistributeEventApplicationLayerException, Oadr20bMarshalException,
-			Oadr20bXMLSignatureException, OadrSecurityException {
-
-		OadrResponseType response = eventService.oadrDistributeEvent(multiConfig, oadrDistributeEvent);
-
-		String responseStr = null;
-
-		if (signed) {
-			responseStr = xmlSignatureService.sign(response, multiConfig);
-		} else {
-			responseStr = jaxbContext.marshalRoot(response);
-		}
-
-		return responseStr;
+		return oadr20bVENEiEventService.request(principal.getName(), payload);
 	}
 
 }

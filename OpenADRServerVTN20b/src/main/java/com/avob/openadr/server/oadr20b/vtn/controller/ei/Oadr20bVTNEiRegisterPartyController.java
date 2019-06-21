@@ -11,14 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
-import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCanceledPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCreatePartyRegistrationTypeApplicationLayerException;
@@ -29,12 +27,6 @@ import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiRegisterPartyServ
 @Controller
 @RequestMapping(Oadr20bUrlPath.OADR_BASE_PATH)
 public class Oadr20bVTNEiRegisterPartyController {
-
-	@Resource
-	private Oadr20bJAXBContext jaxbContext;
-
-	@Resource
-	private VtnConfig vtnConfig;
 
 	@Resource
 	private Oadr20bVTNEiRegisterPartyService oadr20bVTNEiRegisterPartyService;
@@ -50,11 +42,7 @@ public class Oadr20bVTNEiRegisterPartyController {
 			Oadr20bCanceledPartyRegistrationTypeApplicationLayerException, Oadr20bXMLSignatureException,
 			Oadr20bResponsePartyReregistrationApplicationLayerException {
 
-		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
-
-		String username = principal.getName();
-
-		return oadr20bVTNEiRegisterPartyService.request(username, unmarshal);
+		return oadr20bVTNEiRegisterPartyService.request(principal.getName(), payload);
 
 	}
 

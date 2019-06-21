@@ -16,12 +16,17 @@ public class VtnSessionConfiguration {
 	private static final String VTN_ID_FILE = "oadr.vtnid.file";
 	private static final String VTN_URL = "oadr.vtnUrl";
 
+	private static final String VTN_XMPP_HOST = "oadr.xmpp.host";
+	private static final String VTN_XMPP_PORT = "oadr.xmpp.port";
+
 	private static final String AUTHENTIFICATION_BASIC_USER = "oadr.security.authentication.basic.username";
 	private static final String AUTHENTIFICATION_BASIC_PASS = "oadr.security.authentication.basic.password";
 	private static final String AUTHENTIFICATION_DIGEST_USER = "oadr.security.authentication.digest.username";
 	private static final String AUTHENTIFICATION_DIGEST_PASS = "oadr.security.authentication.digest.password";
 	private String vtnId;
 	private String vtnUrl;
+	private String vtnXmppHost;
+	private Integer vtnXmppPort;
 	private VenConfig venSessionConfig;
 
 	public VtnSessionConfiguration(Properties properties, VenConfig defaultVenSessionConfig) {
@@ -54,9 +59,13 @@ public class VtnSessionConfiguration {
 							"oadr.vtnid.file must be a valid file path containing venId as it's first line", exp);
 
 				}
-				
-			}else if (VTN_URL.equals(keyStr)) {
+
+			} else if (VTN_URL.equals(keyStr)) {
 				this.setVtnUrl(prop);
+			} else if (VTN_XMPP_HOST.equals(keyStr)) {
+				this.setVtnXmppHost(prop);
+			} else if (VTN_XMPP_PORT.equals(keyStr)) {
+				this.setVtnXmppPort(Integer.parseInt(prop));
 			} else if (AUTHENTIFICATION_BASIC_USER.equals(keyStr)) {
 				getVenSessionConfig().setBasicUsername(prop);
 			} else if (AUTHENTIFICATION_BASIC_PASS.equals(keyStr)) {
@@ -86,11 +95,10 @@ public class VtnSessionConfiguration {
 		this.vtnUrl = vtnUrl;
 	}
 
-
 	public boolean isDigestAuthenticationConfigured() {
 		return getVenSessionConfig().getDigestUsername() != null && getVenSessionConfig().getDigestPassword() != null;
 	}
-	
+
 	public boolean isBasicAuthenticationConfigured() {
 		return getVenSessionConfig().getBasicUsername() != null && getVenSessionConfig().getBasicPassword() != null;
 	}
@@ -103,5 +111,20 @@ public class VtnSessionConfiguration {
 		this.venSessionConfig = venSessionConfig;
 	}
 
+	public String getVtnXmppHost() {
+		return vtnXmppHost;
+	}
+
+	public void setVtnXmppHost(String vtnXmpphost) {
+		this.vtnXmppHost = vtnXmpphost;
+	}
+
+	public Integer getVtnXmppPort() {
+		return vtnXmppPort;
+	}
+
+	public void setVtnXmppPort(Integer vtnXmppPort) {
+		this.vtnXmppPort = vtnXmppPort;
+	}
 
 }
