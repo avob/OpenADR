@@ -47,7 +47,7 @@ public class XmppUplinkClient {
 				sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
 						new SecureRandom(seed.getBytes()));
 
-				String vtnId = vtnConfig.getVtnId();
+				String vtnId = vtnConfig.getOadr20bFingerprint();
 				String host = vtnConfig.getXmppHost();
 				int port = vtnConfig.getXmppPort();
 				setUplinkClient(new OadrXmppClient20b(vtnId, host, port, "uplink", sslContext, null));

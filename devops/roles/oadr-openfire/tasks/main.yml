@@ -73,25 +73,25 @@
       group: openfire
 
   - name: Change Identity Store pass
-    command: chdir=/usr/share/openfire/resources/security keytool -importkeystore -srckeystore keystore -srcstorepass changeit -deststorepass mouaiccool -destkeystore keystore
+    command: chdir=/usr/share/openfire/resources/security keytool -importkeystore -srckeystore keystore -srcstorepass changeit -deststorepass changeme -destkeystore keystore
 
 
   - name: Import VTN identity
-    command: chdir=/usr/share/openfire/resources/security keytool -v -importkeystore -srcstorepass "" -srckeystore /opt/oadr-vtn20b/cert/vtn.oadr.com-rsa.p12 -srcstoretype PKCS12 -deststorepass mouaiccool -destkeystore keystore -deststoretype JKS
+    command: chdir=/usr/share/openfire/resources/security keytool -v -importkeystore -srcstorepass "changeme" -srckeystore /opt/oadr-vtn20b/cert/vtn.oadr.com-rsa.p12 -srcstoretype PKCS12 -deststorepass changeme -destkeystore keystore -deststoretype JKS
 
   - name: Change Truststore pass
-    command: chdir=/usr/share/openfire/resources/security keytool -importkeystore -srckeystore truststore -srcstorepass changeit -deststorepass mouaiccool -destkeystore truststore
+    command: chdir=/usr/share/openfire/resources/security keytool -importkeystore -srckeystore truststore -srcstorepass changeit -deststorepass changeme -destkeystore truststore
 
 
   - name: Import CA certificate
-    command: chdir=/usr/share/openfire/resources/security keytool -v -import -alias OadrCA -file /opt/oadr-vtn20b/cert/oadr.com.crt -deststorepass mouaiccool -destkeystore truststore -deststoretype JKS -noprompt
+    command: chdir=/usr/share/openfire/resources/security keytool -v -import -alias OadrCA -file /opt/oadr-vtn20b/cert/oadr.com.crt -deststorepass changeme -destkeystore truststore -deststoretype JKS -noprompt
 
   - name: Change Client Truststore pass
-    command: chdir=/usr/share/openfire/resources/security keytool -importkeystore -srckeystore client.truststore -srcstorepass changeit -deststorepass mouaiccool -destkeystore client.truststore
+    command: chdir=/usr/share/openfire/resources/security keytool -importkeystore -srckeystore client.truststore -srcstorepass changeit -deststorepass changeme -destkeystore client.truststore
 
 
   - name: Import CA certificate
-    command: chdir=/usr/share/openfire/resources/security keytool -v -import -alias OadrCA -file /opt/oadr-vtn20b/cert/oadr.com.crt -deststorepass mouaiccool -destkeystore client.truststore -deststoretype JKS -noprompt
+    command: chdir=/usr/share/openfire/resources/security keytool -v -import -alias OadrCA -file /opt/oadr-vtn20b/cert/oadr.com.crt -deststorepass changeme -destkeystore client.truststore -deststoretype JKS -noprompt
 
 
   - name: Restart openfire

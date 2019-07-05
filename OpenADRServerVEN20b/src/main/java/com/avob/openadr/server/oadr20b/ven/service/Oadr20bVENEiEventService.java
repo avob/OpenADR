@@ -292,7 +292,7 @@ public class Oadr20bVENEiEventService {
 							responseCode)
 					.addEventResponse(eventResponses).build();
 
-			planRequestService.submitCreatedEvent(multiVtnConfig.getMultiHttpClientConfig(vtnConfiguration), build);
+			planRequestService.submitCreatedEvent(vtnConfiguration, build);
 		}
 
 		return Oadr20bResponseBuilders.newOadr20bResponseBuilder(vtnRequestID, responseCode, "").build();

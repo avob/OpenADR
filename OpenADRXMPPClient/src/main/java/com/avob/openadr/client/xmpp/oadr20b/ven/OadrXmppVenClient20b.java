@@ -3,6 +3,7 @@ package com.avob.openadr.client.xmpp.oadr20b.ven;
 import javax.xml.bind.JAXBException;
 
 import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jxmpp.jid.EntityFullJid;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.stringprep.XmppStringprepException;
 
@@ -25,6 +26,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRegisteredReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
@@ -41,36 +43,61 @@ public class OadrXmppVenClient20b {
 
 	}
 
-	private void sendEventMessage(Object payload)
+	public void sendEventMessage(Object payload)
 			throws XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
-		String marshalRoot = jaxbContext.marshalRoot(payload);
+		String marshalRoot = null;
+		if (payload instanceof String) {
+			marshalRoot = (String) payload;
+		} else {
+			marshalRoot = jaxbContext.marshalRoot(payload);
+		}
+
 		Jid jid = client.getDiscoveredXmppOadrServices().get(OadrXmppClient20b.OADR_EVENT_SERVICE_NAMESPACE);
 		client.sendMessage(jid.asEntityBareJidIfPossible(), marshalRoot);
 
 	}
 
-	private void sendOptMessage(Object payload)
+	public void sendOptMessage(Object payload)
 			throws XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
-		String marshalRoot = jaxbContext.marshalRoot(payload);
+		String marshalRoot = null;
+		if (payload instanceof String) {
+			marshalRoot = (String) payload;
+		} else {
+			marshalRoot = jaxbContext.marshalRoot(payload);
+		}
 		Jid jid = client.getDiscoveredXmppOadrServices().get(OadrXmppClient20b.OADR_OPT_SERVICE_NAMESPACE);
 		client.sendMessage(jid.asEntityBareJidIfPossible(), marshalRoot);
 
 	}
 
-	private void sendReportMessage(Object payload)
+	public void sendReportMessage(Object payload)
 			throws XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
-		String marshalRoot = jaxbContext.marshalRoot(payload);
+		String marshalRoot = null;
+		if (payload instanceof String) {
+			marshalRoot = (String) payload;
+		} else {
+			marshalRoot = jaxbContext.marshalRoot(payload);
+		}
 		Jid jid = client.getDiscoveredXmppOadrServices().get(OadrXmppClient20b.OADR_REPORT_SERVICE_NAMESPACE);
 		client.sendMessage(jid.asEntityBareJidIfPossible(), marshalRoot);
 
 	}
 
-	private void sendRegisterPartyMessage(Object payload)
+	public void sendRegisterPartyMessage(Object payload)
 			throws XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
-		String marshalRoot = jaxbContext.marshalRoot(payload);
+		String marshalRoot = null;
+		if (payload instanceof String) {
+			marshalRoot = (String) payload;
+		} else {
+			marshalRoot = jaxbContext.marshalRoot(payload);
+		}
 		Jid jid = client.getDiscoveredXmppOadrServices().get(OadrXmppClient20b.OADR_REGISTERPARTY_SERVICE_NAMESPACE);
 		client.sendMessage(jid.asEntityBareJidIfPossible(), marshalRoot);
 
+	}
+
+	public EntityFullJid getConnectionJid() {
+		return client.getConnectionJid();
 	}
 
 	/**
@@ -175,6 +202,12 @@ public class OadrXmppVenClient20b {
 	public void oadrRegisterReport(OadrRegisterReportType payload) throws Oadr20bException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
 			NotConnectedException, Oadr20bMarshalException, InterruptedException {
+		this.sendReportMessage(payload);
+	}
+
+	public void oadrRegisteredReport(OadrRegisteredReportType payload) throws Oadr20bException,
+			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException,
+			XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendReportMessage(payload);
 	}
 

@@ -153,7 +153,7 @@ public class VtnConfig {
 
 			KeyStore keystore;
 			try {
-				oadr20bFingerprint = OadrHttpSecurity.getOadr20bFingerprint(this.getCert());
+				setOadr20bFingerprint(OadrHttpSecurity.getOadr20bFingerprint(this.getCert()));
 
 				keystore = OadrHttpSecurity.createKeyStore(this.getKey(), this.getCert(), keystorePassword);
 				KeyStore truststore = OadrHttpSecurity.createTrustStore(trustedCertificates);
@@ -397,6 +397,10 @@ public class VtnConfig {
 
 	public void setXmppPort(Integer xmppPort) {
 		this.xmppPort = xmppPort;
+	}
+
+	private void setOadr20bFingerprint(String oadr20bFingerprint) {
+		this.oadr20bFingerprint = oadr20bFingerprint;
 	}
 
 }

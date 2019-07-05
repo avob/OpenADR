@@ -290,7 +290,8 @@ public class Oadr20bVTNEiReportService {
 			List<OtherReportCapabilityDescription> capabilityDescription = new ArrayList<OtherReportCapabilityDescription>();
 			for (OadrReportDescriptionType oadrReportDescriptionType : oadrReportType.getOadrReportDescription()) {
 				String rid = oadrReportDescriptionType.getRID();
-				OtherReportCapabilityDescription description = null;
+				OtherReportCapabilityDescription description = currentVenCapabilityDescriptionMap
+						.get(otherReportCapability.getReportSpecifierId() + rid);
 				if (!created) {
 					currentVenCapabilityDescriptionMap.get(otherReportCapability.getReportSpecifierId() + rid);
 				}

@@ -114,6 +114,7 @@ public class VEN20bApplication {
 	}
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(VEN20bApplication.class, args);
 	}
 }

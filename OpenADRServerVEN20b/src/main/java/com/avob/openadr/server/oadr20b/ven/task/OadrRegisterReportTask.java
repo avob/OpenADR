@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avob.openadr.client.http.oadr20b.ven.OadrHttpVenClient20b;
+import com.avob.openadr.client.xmpp.oadr20b.ven.OadrXmppVenClient20b;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
@@ -14,48 +15,55 @@ import com.avob.openadr.model.oadr20b.oadr.OadrRegisteredReportType;
 
 public class OadrRegisterReportTask implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OadrRegisterReportTask.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(OadrRegisterReportTask.class);
 
-    private OadrRegisterReportType payload;
+	private OadrRegisterReportType payload;
 
-    private OadrHttpVenClient20b client;
+	private OadrHttpVenClient20b httpClient;
 
-    public OadrRegisterReportTask(OadrHttpVenClient20b client, OadrRegisterReportType payload) {
-        this.payload = payload;
-        this.client = client;
-    }
+	private OadrXmppVenClient20b xmppClient;
 
-    @Override
-    public void run() {
+	public OadrRegisterReportTask(OadrHttpVenClient20b client, OadrRegisterReportType payload) {
+		this.payload = payload;
+		this.httpClient = client;
+	}
 
-        try {
-            OadrRegisteredReportType response = client.oadrRegisterReport(payload);
+	public OadrRegisterReportTask(OadrXmppVenClient20b client, OadrRegisterReportType payload) {
+		this.payload = payload;
+		this.xmppClient = client;
+	}
 
-            String responseCode = response.getEiResponse().getResponseCode();
+	@Override
+	public void run() {
 
-            if (HttpStatus.OK_200 != Integer.valueOf(responseCode)) {
-                LOGGER.error(
-                        "Fail oadrRegisterReport: " + responseCode + response.getEiResponse().getResponseDescription());
-            } else {
-                LOGGER.info("oadrRegisterReport: " + responseCode);
-            }
+		try {
 
-        } catch (Oadr20bException e) {
-            LOGGER.error("", e);
-        } catch (Oadr20bHttpLayerException e) {
+			if (httpClient != null) {
+				OadrRegisteredReportType response = httpClient.oadrRegisterReport(payload);
 
-            if (e.getErrorCode() == HttpStatus.FORBIDDEN_403) {
+				String responseCode = response.getEiResponse().getResponseCode();
 
-            }
+				if (HttpStatus.OK_200 != Integer.valueOf(responseCode)) {
+					LOGGER.error("Fail oadrRegisterReport: " + responseCode
+							+ response.getEiResponse().getResponseDescription());
+				} else {
+					LOGGER.info("oadrRegisterReport: " + responseCode);
+				}
+			} else if (xmppClient != null) {
+				xmppClient.oadrRegisterReport(payload);
+			}
 
-            LOGGER.error("", e);
-        } catch (Oadr20bXMLSignatureException e) {
-            LOGGER.error("", e);
-        } catch (Oadr20bXMLSignatureValidationException e) {
-            LOGGER.error("", e);
-        } catch (Exception e) {
-            LOGGER.error("", e);
-        }
-    }
+		} catch (Oadr20bException e) {
+			LOGGER.error("", e);
+		} catch (Oadr20bHttpLayerException e) {
+			LOGGER.error("", e);
+		} catch (Oadr20bXMLSignatureException e) {
+			LOGGER.error("", e);
+		} catch (Oadr20bXMLSignatureValidationException e) {
+			LOGGER.error("", e);
+		} catch (Exception e) {
+			LOGGER.error("", e);
+		}
+	}
 
 }

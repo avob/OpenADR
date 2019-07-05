@@ -6,6 +6,8 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,8 @@ import com.avob.openadr.server.common.vtn.models.ven.Ven;
 @RestController
 @RequestMapping("/Role")
 public class RoleController {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(RoleController.class);
 
 	@Resource
 	private AbstractUserDao abstractUserDao;
@@ -42,6 +46,9 @@ public class RoleController {
 		} else if (user instanceof OadrApp) {
 			roles.add("ROLE_APP");
 		}
+
+		LOGGER.info(user.toString() + " roles: " + roles.toString());
+
 		return roles;
 	}
 

@@ -12,17 +12,17 @@ import java.util.stream.Stream;
 
 public class VtnSessionConfiguration {
 
-	private static final String VTN_ID = "oadr.vtnid";
-	private static final String VTN_ID_FILE = "oadr.vtnid.file";
-	private static final String VTN_URL = "oadr.vtnUrl";
+	private static final String VTN_ID = "oadr.vtn.vtnid";
+	private static final String VTN_ID_FILE = "oadr.vtn.vtnid.file";
+	private static final String VTN_URL = "oadr.vtn.vtnUrl";
 
-	private static final String VTN_XMPP_HOST = "oadr.xmpp.host";
-	private static final String VTN_XMPP_PORT = "oadr.xmpp.port";
+	private static final String VTN_XMPP_HOST = "oadr.vtn.xmpp.host";
+	private static final String VTN_XMPP_PORT = "oadr.vtn.xmpp.port";
 
-	private static final String AUTHENTIFICATION_BASIC_USER = "oadr.security.authentication.basic.username";
-	private static final String AUTHENTIFICATION_BASIC_PASS = "oadr.security.authentication.basic.password";
-	private static final String AUTHENTIFICATION_DIGEST_USER = "oadr.security.authentication.digest.username";
-	private static final String AUTHENTIFICATION_DIGEST_PASS = "oadr.security.authentication.digest.password";
+	private static final String AUTHENTIFICATION_BASIC_USER = "oadr.vtn.security.authentication.basic.username";
+	private static final String AUTHENTIFICATION_BASIC_PASS = "oadr.vtn.security.authentication.basic.password";
+	private static final String AUTHENTIFICATION_DIGEST_USER = "oadr.vtn.security.authentication.digest.username";
+	private static final String AUTHENTIFICATION_DIGEST_PASS = "oadr.vtn.security.authentication.digest.password";
 	private String vtnId;
 	private String vtnUrl;
 	private String vtnXmppHost;

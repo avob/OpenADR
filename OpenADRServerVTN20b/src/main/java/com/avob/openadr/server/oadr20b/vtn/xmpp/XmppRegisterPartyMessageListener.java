@@ -7,6 +7,7 @@ import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.jid.parts.Localpart;
 import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
@@ -18,6 +19,8 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
+import com.avob.openadr.server.common.vtn.models.ven.Ven;
+import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCanceledPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCreatePartyRegistrationTypeApplicationLayerException;
@@ -36,11 +39,16 @@ public class XmppRegisterPartyMessageListener implements StanzaListener {
 	@Resource
 	private XmppUplinkClient xmppUplinkClient;
 
+	@Resource
+	private VenService venService;
+
 	@Override
 	public void processStanza(Stanza packet) {
 		Message message = (Message) packet;
 
 		Jid from = packet.getFrom();
+
+		Jid to = packet.getTo();
 
 		Localpart localpartOrThrow = from.getLocalpartOrThrow();
 
@@ -54,7 +62,11 @@ public class XmppRegisterPartyMessageListener implements StanzaListener {
 
 			String response = oadr20bVTNEiRegisterPartyService.request(username, body);
 
-			xmppUplinkClient.getUplinkClient().sendMessage(from, response);
+			Ven findOneByUsername = venService.findOneByUsername(username);
+
+			Jid jid = JidCreate.from(findOneByUsername.getPushUrl());
+
+			xmppUplinkClient.getUplinkClient().sendMessage(jid, response);
 
 		} catch (Oadr20bUnmarshalException e) {
 			LOGGER.error(e.getMessage());

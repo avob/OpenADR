@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -38,6 +39,7 @@ public class Oadr20bVENAutoStartRegisterPartyService extends Oadr20bVENEiRegiste
 	private MultiVtnConfig multiVtnConfig;
 
 	@Resource
+	@Qualifier("reportService")
 	private Oadr20bVENEiReportService reportService;
 
 	@Resource
@@ -82,11 +84,10 @@ public class Oadr20bVENAutoStartRegisterPartyService extends Oadr20bVENEiRegiste
 		if (sent.get(vtnConfiguration.getVtnId()) == null || !sent.get(vtnConfiguration.getVtnId())) {
 			String requestId = "0";
 			String reportRequestId = "0";
-			OadrRegisterReportType selfOadrRegisterReport = reportService.selfOadrRegisterReport(requestId,
-					venConfig.getVenId(), vtnConfiguration.getVtnId(), reportRequestId);
+			OadrRegisterReportType payload = reportService.selfOadrRegisterReport(requestId, venConfig.getVenId(),
+					vtnConfiguration.getVtnId(), reportRequestId);
 
-			planRequestService.submitRegisterReport(multiVtnConfig.getMultiHttpClientConfig(vtnConfiguration),
-					selfOadrRegisterReport);
+			planRequestService.submitRegisterReport(vtnConfiguration, payload);
 
 			sent.put(vtnConfiguration.getVtnId(), true);
 		}

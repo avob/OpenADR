@@ -36,12 +36,9 @@ public class Oadr20bVENEiReportService {
 	protected static final String METADATA_REPORT_SPECIFIER_ID = "METADATA";
 	protected static final String METADATA_REPORT_RID = "METADATA";
 	protected static final String NO_GRANULARITY = "P0D";
-	
-	@Resource
-	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
-	private Oadr20bVENEiReportService reportService;
+	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
 	private XmlSignatureService xmlSignatureService;
@@ -97,26 +94,10 @@ public class Oadr20bVENEiReportService {
 				.build();
 	}
 
-	private String handle(VtnSessionConfiguration multiConfig, OadrUpdateReportType oadrUpdateReportType,
-			boolean signed) throws Oadr20bXMLSignatureException, Oadr20bMarshalException, OadrSecurityException {
+	public String handle(VtnSessionConfiguration multiConfig, OadrUpdateReportType oadrUpdateReportType, boolean signed)
+			throws Oadr20bXMLSignatureException, Oadr20bMarshalException, OadrSecurityException {
 
-		OadrUpdatedReportType response = reportService.oadrUpdateReport(multiConfig, oadrUpdateReportType);
-
-		String responseStr = null;
-
-		if (signed) {
-			responseStr = xmlSignatureService.sign(response, multiConfig);
-		} else {
-			responseStr = jaxbContext.marshalRoot(response);
-		}
-
-		return responseStr;
-	}
-
-	private String handle(VtnSessionConfiguration multiConfig, OadrRegisterReportType oadrRegisterReportType,
-			boolean signed) throws Oadr20bXMLSignatureException, Oadr20bMarshalException, OadrSecurityException {
-
-		OadrRegisteredReportType response = reportService.oadrRegisterReport(multiConfig, oadrRegisterReportType);
+		OadrUpdatedReportType response = this.oadrUpdateReport(multiConfig, oadrUpdateReportType);
 
 		String responseStr = null;
 
@@ -129,10 +110,10 @@ public class Oadr20bVENEiReportService {
 		return responseStr;
 	}
 
-	private String handle(VtnSessionConfiguration multiConfig, OadrCreateReportType oadrCreateReportType,
+	public String handle(VtnSessionConfiguration multiConfig, OadrRegisterReportType oadrRegisterReportType,
 			boolean signed) throws Oadr20bXMLSignatureException, Oadr20bMarshalException, OadrSecurityException {
 
-		OadrCreatedReportType response = reportService.oadrCreateReport(multiConfig, oadrCreateReportType);
+		OadrRegisteredReportType response = this.oadrRegisterReport(multiConfig, oadrRegisterReportType);
 
 		String responseStr = null;
 
@@ -145,10 +126,10 @@ public class Oadr20bVENEiReportService {
 		return responseStr;
 	}
 
-	private String handle(VtnSessionConfiguration multiConfig, OadrCancelReportType oadrCancelReportType,
-			boolean signed) throws Oadr20bXMLSignatureException, Oadr20bMarshalException, OadrSecurityException {
+	public String handle(VtnSessionConfiguration multiConfig, OadrCreateReportType oadrCreateReportType, boolean signed)
+			throws Oadr20bXMLSignatureException, Oadr20bMarshalException, OadrSecurityException {
 
-		OadrCanceledReportType response = reportService.oadrCancelReport(multiConfig, oadrCancelReportType);
+		OadrCreatedReportType response = this.oadrCreateReport(multiConfig, oadrCreateReportType);
 
 		String responseStr = null;
 
@@ -161,7 +142,23 @@ public class Oadr20bVENEiReportService {
 		return responseStr;
 	}
 
-	private String handle(VtnSessionConfiguration multiConfig, String raw, OadrPayload oadrPayload)
+	public String handle(VtnSessionConfiguration multiConfig, OadrCancelReportType oadrCancelReportType, boolean signed)
+			throws Oadr20bXMLSignatureException, Oadr20bMarshalException, OadrSecurityException {
+
+		OadrCanceledReportType response = this.oadrCancelReport(multiConfig, oadrCancelReportType);
+
+		String responseStr = null;
+
+		if (signed) {
+			responseStr = xmlSignatureService.sign(response, multiConfig);
+		} else {
+			responseStr = jaxbContext.marshalRoot(response);
+		}
+
+		return responseStr;
+	}
+
+	public String handle(VtnSessionConfiguration multiConfig, String raw, OadrPayload oadrPayload)
 			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureException, OadrSecurityException {
 		xmlSignatureService.validate(raw, oadrPayload, multiConfig);

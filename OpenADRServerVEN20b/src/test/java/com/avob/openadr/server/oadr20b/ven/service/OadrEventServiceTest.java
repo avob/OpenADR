@@ -45,8 +45,8 @@ public class OadrEventServiceTest {
 	private static final VtnSessionConfiguration VTN_SOURCE;
 
 	static {
-		PROPERTIES.setProperty("oadr.vtnid", "AVOB_TEST_VTN");
-		PROPERTIES.setProperty("oadr.vtnUrl", "https://localhost:8181/testvtn");
+		PROPERTIES.setProperty("oadr.vtn.vtnid", "AVOB_TEST_VTN");
+		PROPERTIES.setProperty("oadr.vtn.vtnUrl", "https://localhost:8181/testvtn");
 		VTN_SOURCE = new VtnSessionConfiguration(PROPERTIES, new VenConfig());
 	}
 

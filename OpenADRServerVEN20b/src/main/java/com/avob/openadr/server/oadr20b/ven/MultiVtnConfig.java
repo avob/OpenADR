@@ -1,9 +1,6 @@
 package com.avob.openadr.server.oadr20b.ven;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -12,12 +9,13 @@ import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.StreamSupport;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -26,15 +24,16 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import javax.xml.bind.JAXBException;
 
-import org.apache.logging.log4j.core.util.FileUtils;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.PropertiesFactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.env.AbstractEnvironment;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.MutablePropertySources;
 
 import com.avob.openadr.client.http.OadrHttpClientBuilder;
 import com.avob.openadr.client.http.oadr20b.OadrHttpClient20b;
@@ -61,6 +60,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRegisteredReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
@@ -75,16 +75,14 @@ public class MultiVtnConfig {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MultiVtnConfig.class);
 
-	private static final Pattern venConfigurationFilePatter = Pattern.compile("vtn\\..*\\.properties");
-
 	@Resource
 	private XmppVenListener xmppVenListeners;
 
 	@Resource
 	private VenConfig venConfig;
 
-	@Value("${ven.home:#{null}}")
-	private String venHome;
+	@Autowired
+	private Environment env;
 
 	private Map<String, VtnSessionConfiguration> multiConfig = new HashMap<String, VtnSessionConfiguration>();
 
@@ -120,12 +118,12 @@ public class MultiVtnConfig {
 
 			OadrHttpVenClient20b client = null;
 			if (venConfig.getXmlSignature()) {
-				new OadrHttpVenClient20b(
+				client = new OadrHttpVenClient20b(
 						new OadrHttpClient20b(builder.build(), session.getVenSessionConfig().getVenPrivateKeyPath(),
 								session.getVenSessionConfig().getVenCertificatePath(),
 								session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond()));
 			} else {
-				new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
+				client = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
 			}
 
 			getMultiHttpClientConfig().put(session.getVtnId(), client);
@@ -188,52 +186,61 @@ public class MultiVtnConfig {
 
 	}
 
+	@SuppressWarnings("rawtypes")
+	private Map<String, Properties> loadVtnConf() {
+
+		String dynamicConfigurationPattern = "oadr.vtn.";
+//		List<String> uniqueVtnKey = new ArrayList<>();
+		Map<String, Properties> perVtnProperties = new HashMap<>();
+		Properties props = new Properties();
+		MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
+		StreamSupport.stream(propSrcs.spliterator(), false).filter(ps -> ps instanceof EnumerablePropertySource)
+				.map(ps -> ((EnumerablePropertySource) ps).getPropertyNames()).flatMap(Arrays::<String>stream)
+				.forEach(propName -> {
+					if (propName.contains(dynamicConfigurationPattern)) {
+						String replaceAll = propName.replaceAll(dynamicConfigurationPattern, "");
+						String key = replaceAll.split("\\.")[0];
+						Properties vtnProps = perVtnProperties.get(key);
+						if (vtnProps == null) {
+							vtnProps = new Properties();
+						}
+						String propKey = replaceAll.replaceAll(key + ".", "");
+						vtnProps.put(dynamicConfigurationPattern + propKey, env.getProperty(propName));
+						perVtnProperties.put(key, vtnProps);
+//						if (!uniqueVtnKey.contains(key)) {
+//							uniqueVtnKey.add(key);
+//						}
+						LOGGER.info(propName + " " + env.getProperty(propName));
+						props.setProperty(propName, env.getProperty(propName));
+
+					}
+				});
+
+		return perVtnProperties;
+	}
+
 	@PostConstruct
 	public void init() {
-		if (venHome == null) {
-			LOGGER.error("Ven home config must point to a local folder");
-			throw new IllegalArgumentException("Ven home config must point to a local folder");
-		}
-		URI uri;
-		try {
-			uri = new URI(venHome);
-			File fileFromUri = FileUtils.fileFromUri(uri);
-			if (fileFromUri.isDirectory()) {
+		Map<String, Properties> loadVtnConf = loadVtnConf();
+		for (Entry<String, Properties> entry : loadVtnConf.entrySet()) {
 
-				for (File file : fileFromUri.listFiles()) {
-
-					Matcher matcher = MultiVtnConfig.venConfigurationFilePatter.matcher(file.getName());
-					if (matcher.find()) {
-
-						PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
-						propertiesFactoryBean.setLocation(new FileSystemResource(file.getAbsolutePath()));
-						try {
-							propertiesFactoryBean.afterPropertiesSet();
-							Properties properties = propertiesFactoryBean.getObject();
-							VtnSessionConfiguration session = new VtnSessionConfiguration(properties, venConfig);
-							LOGGER.debug("Valid vtn configuration file: " + file.getName());
-							LOGGER.info(session.toString());
-							getMultiConfig().put(session.getVtnId(), session);
-							configureClient(session);
-
-						} catch (IOException e) {
-							LOGGER.error("File: " + file.getName() + " is not a valid vtn configuration file", e);
-						} catch (OadrSecurityException e) {
-							LOGGER.error("File: " + file.getName() + " is not a valid vtn configuration file", e);
-						} catch (JAXBException e) {
-							LOGGER.error("File: " + file.getName() + " is not a valid vtn configuration file", e);
-						} catch (OadrVTNInitializationException e) {
-							LOGGER.error(e.getMessage());
-						}
-					}
-				}
-
-			} else {
-				LOGGER.error("Ven home config must point to a local folder");
-				throw new IllegalArgumentException("Ven home config must point to a local folder");
+			try {
+				VtnSessionConfiguration session = new VtnSessionConfiguration(entry.getValue(), venConfig);
+				LOGGER.debug("Valid vtn configuration: " + entry.getKey());
+				LOGGER.info(session.toString());
+				getMultiConfig().put(session.getVtnId(), session);
+				configureClient(session);
+			} catch (OadrSecurityException e) {
+				LOGGER.error("Dynamic Vtn conf key: " + entry.getKey() + " is not a valid vtn configuration", e);
+			} catch (JAXBException e) {
+				LOGGER.error("Dynamic Vtn conf key: " + entry.getKey() + " is not a valid vtn configuration", e);
+			} catch (OadrVTNInitializationException e) {
+				LOGGER.error("Dynamic Vtn conf key: " + entry.getKey() + " is not a valid vtn configuration", e);
 			}
-		} catch (URISyntaxException e) {
-			LOGGER.error("Avob home config must point to a local folder", e);
+		}
+
+		if (getMultiConfig().isEmpty()) {
+			throw new IllegalArgumentException("No Vtn configuration has been found");
 		}
 
 	}
@@ -246,7 +253,7 @@ public class MultiVtnConfig {
 		return multiConfig.get(vtnId);
 	}
 
-	public Map<String, OadrHttpVenClient20b> getMultiHttpClientConfig() {
+	private Map<String, OadrHttpVenClient20b> getMultiHttpClientConfig() {
 		return multiHttpClientConfig;
 	}
 
@@ -429,6 +436,17 @@ public class MultiVtnConfig {
 		}
 	}
 
+	public void oadrRegisteredReport(VtnSessionConfiguration vtnConfiguration, OadrRegisteredReportType payload)
+			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
+			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
+			Oadr20bMarshalException, InterruptedException {
+		if (vtnConfiguration.getVtnUrl() != null) {
+			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrRegisteredReport(payload);
+		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
+			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrRegisteredReport(payload);
+		}
+	}
+
 	public void oadrQueryRegistrationType(VtnSessionConfiguration vtnConfiguration, OadrQueryRegistrationType payload)
 			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
 			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
@@ -438,6 +456,10 @@ public class MultiVtnConfig {
 		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
 			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrQueryRegistrationType(payload);
 		}
+	}
+
+	public OadrXmppVenClient20b getMultiXmppClientConfig(VtnSessionConfiguration vtnConfiguration) {
+		return multiXmppClientConfig.get(vtnConfiguration.getVtnId());
 	}
 
 	public Map<String, OadrXmppVenClient20b> getMultiXmppClientConfig() {

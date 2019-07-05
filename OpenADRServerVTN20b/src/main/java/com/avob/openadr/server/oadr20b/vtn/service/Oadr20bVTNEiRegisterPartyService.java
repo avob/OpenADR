@@ -218,8 +218,8 @@ public class Oadr20bVTNEiRegisterPartyService {
 					Oadr20bEiRegisterPartyBuilders.newOadr20bCanceledPartyRegistrationBuilder(requestID,
 							Oadr20bApplicationLayerErrorCode.INVALID_ID_452, null, ven.getUsername()).build());
 		}
-		clearRegistration(ven);
 
+		clearRegistration(ven);
 		OadrCanceledPartyRegistrationType response = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCanceledPartyRegistrationBuilder(requestID, HttpStatus.OK_200, registrationID,
 						ven.getUsername())
@@ -240,6 +240,7 @@ public class Oadr20bVTNEiRegisterPartyService {
 		ven.setHttpPullModel(null);
 		ven.setReportOnly(null);
 		ven.setXmlSignature(null);
+		ven.setLastUpdateDatetime(null);
 		venService.save(ven);
 	}
 

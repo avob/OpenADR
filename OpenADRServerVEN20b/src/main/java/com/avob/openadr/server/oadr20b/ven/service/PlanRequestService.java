@@ -8,10 +8,13 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.client.http.oadr20b.ven.OadrHttpVenClient20b;
+import com.avob.openadr.client.xmpp.oadr20b.ven.OadrXmppVenClient20b;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
+import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
+import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.task.OadrCreateReportTask;
 import com.avob.openadr.server.oadr20b.ven.task.OadrCreatedEventTask;
 import com.avob.openadr.server.oadr20b.ven.task.OadrRegisterReportTask;
@@ -25,19 +28,45 @@ public class PlanRequestService {
 	@Resource
 	private ScheduledExecutorService scheduledExecutorService;
 
-	public void submitCreatedEvent(OadrHttpVenClient20b client, OadrCreatedEventType payload) {
-		scheduledExecutorService.schedule(new OadrCreatedEventTask(client, payload),
-				DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS, TimeUnit.SECONDS);
+	@Resource
+	private MultiVtnConfig multiVtnConfig;
+
+	public void submitCreatedEvent(VtnSessionConfiguration vtnConfiguration, OadrCreatedEventType payload) {
+		
+		if (vtnConfiguration.getVtnUrl() != null) {
+
+			OadrHttpVenClient20b multiHttpClientConfig = multiVtnConfig.getMultiHttpClientConfig(vtnConfiguration);
+
+			scheduledExecutorService.schedule(new OadrCreatedEventTask(multiHttpClientConfig, payload),
+					DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS, TimeUnit.SECONDS);
+
+		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
+
+			OadrXmppVenClient20b multiXmppClientConfig = multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration);
+
+			scheduledExecutorService.schedule(new OadrCreatedEventTask(multiXmppClientConfig, payload),
+					DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS, TimeUnit.SECONDS);
+		}
+		
 	}
 
-//	public void submitResponse(OadrHttpVenClient20b client, OadrResponseType payload) {
-//		scheduledExecutorService.schedule(new OadrResponseTask(client, payload),
-//				DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS, TimeUnit.SECONDS);
-//	}
+	public void submitRegisterReport(VtnSessionConfiguration vtnConfiguration, OadrRegisterReportType payload) {
 
-	public void submitRegisterReport(OadrHttpVenClient20b client, OadrRegisterReportType payload) {
-		scheduledExecutorService.schedule(new OadrRegisterReportTask(client, payload),
-				DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS, TimeUnit.SECONDS);
+		if (vtnConfiguration.getVtnUrl() != null) {
+
+			OadrHttpVenClient20b multiHttpClientConfig = multiVtnConfig.getMultiHttpClientConfig(vtnConfiguration);
+
+			scheduledExecutorService.schedule(new OadrRegisterReportTask(multiHttpClientConfig, payload),
+					DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS, TimeUnit.SECONDS);
+
+		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
+
+			OadrXmppVenClient20b multiXmppClientConfig = multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration);
+
+			scheduledExecutorService.schedule(new OadrRegisterReportTask(multiXmppClientConfig, payload),
+					DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS, TimeUnit.SECONDS);
+		}
+
 	}
 
 	public void submitUpdateReport(OadrHttpVenClient20b client, OadrUpdateReportType payload) {
