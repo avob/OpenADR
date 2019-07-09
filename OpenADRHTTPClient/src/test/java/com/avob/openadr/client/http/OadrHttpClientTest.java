@@ -22,8 +22,8 @@ public class OadrHttpClientTest {
     private static final String rsaClientCertPemFilePath = "src/test/resources/rsa/TEST_RSA_VTN_17011882657_cert.pem";
     private static final String rsaClientCertSHA1Fingerprint = "86:72:C8:0C:8D:18:01:04:2A:33:74:3B:28:B5:90:4D:D2:D4:AD:8F";
     private static final String rsaClientCertSHA256Fingerprint = "81:0F:F6:97:C0:EA:D9:60:D5:BD:64:B6:CF:CB:A5:6F:E6:0B:36:4D:73:3C:8A:7D:CB:97:24:ED:35:24:2A:AD";
-    private static final String rsaClientCertOadr20aFingerprint = "74:3B:28:B5:90:4D:D2:D4:AD:8F";
-    private static final String rsaClientCertOadr20bFingerprint = "8A:7D:CB:97:24:ED:35:24:2A:AD";
+    private static final String rsaClientCertOadr20aFingerprint = "743b28b5904dd2d4ad8f";
+    private static final String rsaClientCertOadr20bFingerprint = "8a7dcb9724ed35242aad";
     private static final String rsaTrustedRootCertificate = "src/test/resources/rsa/TEST_OpenADR_RSA_RCA0002_Cert.pem";
     private static final String rsaTrustedIntermediateCertificate = "src/test/resources/rsa/TEST_OpenADR_RSA_SPCA0002_Cert.pem";
 
@@ -31,8 +31,8 @@ public class OadrHttpClientTest {
     private static final String eccClientCertPemFilePath = "src/test/resources/ecc/TEST_ECC_VTN_17011961812_cert.pem";
     private static final String eccClientCertSHA1Fingerprint = "6D:9B:CF:E3:82:94:5B:0B:4E:EF:3A:D7:16:3F:5A:73:84:AA:24:A7";
     private static final String eccClientCertSHA256Fingerprint = "A6:83:F7:CE:4E:BC:E7:D5:DC:3E:61:53:7C:0D:0B:42:14:2F:66:3F:BE:49:FD:5B:51:D8:27:E5:B6:94:FF:C2";
-    private static final String eccClientCertOadr20aFingerprint = "3A:D7:16:3F:5A:73:84:AA:24:A7";
-    private static final String eccClientCertOadr20bFingerprint = "FD:5B:51:D8:27:E5:B6:94:FF:C2";
+    private static final String eccClientCertOadr20aFingerprint = "3ad7163f5a7384aa24a7";
+    private static final String eccClientCertOadr20bFingerprint = "fd5b51d827e5b694ffc2";
     private static final String eccTrustedRootCertificate = "src/test/resources/ecc/TEST_OpenADR_ECC_Root_CA3_cert.pem";
     private static final String eccTrustedIntermediateCertificate = "src/test/resources/ecc/TEST_OpenADR_ECC_SHA256_VTN_Int_CA3_cert.pem";
 
