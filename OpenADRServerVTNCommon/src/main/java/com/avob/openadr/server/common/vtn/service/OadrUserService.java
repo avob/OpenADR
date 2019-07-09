@@ -13,6 +13,7 @@ import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.user.OadrUserCreateDto;
 import com.avob.openadr.server.common.vtn.models.user.OadrUserDao;
+import com.avob.openadr.server.common.vtn.security.DigestAuthenticationProvider;
 
 @Service
 public class OadrUserService extends AbstractUserService<OadrUser> {
@@ -23,8 +24,11 @@ public class OadrUserService extends AbstractUserService<OadrUser> {
 	@Autowired(required = false)
 	private GenerateX509CertificateService generateX509VenService;
 
+	@Resource
+	private DigestAuthenticationProvider digestAuthenticationProvider;
+
 	public OadrUser prepare(String username, String password) {
-		return super.prepare(new OadrUser(), username, password);
+		return super.prepare(new OadrUser(), username, password, digestAuthenticationProvider.getRealm());
 	}
 
 	public OadrUser prepare(String username) {
@@ -32,7 +36,7 @@ public class OadrUserService extends AbstractUserService<OadrUser> {
 	}
 
 	public OadrUser prepare(OadrUserCreateDto user) {
-		OadrUser prepare = super.prepare(new OadrUser(), user);
+		OadrUser prepare = super.prepare(new OadrUser(), user, digestAuthenticationProvider.getRealm());
 		prepare.setRoles(user.getRoles());
 		return prepare;
 	}

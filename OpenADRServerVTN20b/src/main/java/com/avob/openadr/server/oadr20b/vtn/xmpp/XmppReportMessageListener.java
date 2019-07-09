@@ -56,11 +56,9 @@ public class XmppReportMessageListener implements StanzaListener {
 
 		Jid from = packet.getFrom();
 
-		Jid to = packet.getTo();
-
 		Localpart localpartOrThrow = from.getLocalpartOrThrow();
 
-		String username = localpartOrThrow.asUnescapedString().toUpperCase();
+		String username = localpartOrThrow.asUnescapedString().toLowerCase();
 
 		String body = message.getBody();
 

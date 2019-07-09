@@ -107,7 +107,8 @@ public class MultiVtnConfig {
 
 			} else if (session.isDigestAuthenticationConfigured()) {
 				LOGGER.info("Init HTTP VEN client with digest authentication");
-				builder.withDefaultDigestAuthentication(session.getVtnUrl(), "", "",
+				builder.withDefaultDigestAuthentication(session.getVtnUrl(),
+						session.getVenSessionConfig().getDigestRealm(), "",
 						session.getVenSessionConfig().getDigestUsername(),
 						session.getVenSessionConfig().getDigestPassword());
 
@@ -161,7 +162,15 @@ public class MultiVtnConfig {
 				OadrXmppClient20b oadrXmppClient20b = new OadrXmppClient20b(session.getVtnId(),
 						session.getVtnXmppHost(), session.getVtnXmppPort(), "client", sslContext, xmppVenListeners);
 
-				OadrXmppVenClient20b venClient = new OadrXmppVenClient20b(oadrXmppClient20b);
+				OadrXmppVenClient20b venClient = null;
+				if (venConfig.getXmlSignature()) {
+					venClient = new OadrXmppVenClient20b(oadrXmppClient20b,
+							session.getVenSessionConfig().getVenPrivateKeyPath(),
+							session.getVenSessionConfig().getVenCertificatePath(),
+							session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond());
+				} else {
+					venClient = new OadrXmppVenClient20b(oadrXmppClient20b);
+				}
 				getMultiXmppClientConfig().put(session.getVtnId(), venClient);
 
 			} catch (KeyStoreException e) {
@@ -366,6 +375,7 @@ public class MultiVtnConfig {
 		if (vtnConfiguration.getVtnUrl() != null) {
 			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrResponseReregisterParty(payload);
 		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
+
 			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrResponseReregisterParty(payload);
 		}
 	}

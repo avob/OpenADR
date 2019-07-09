@@ -122,6 +122,9 @@ public class Oadr20bVTNSecurityTest {
 	private Oadr20bPushService oadr20bDemandResponseEventPushService;
 
 	@Resource
+	private DigestAuthenticationProvider digestAuthenticationProvider;
+
+	@Resource
 	private OadrMockMvc oadrMockMvc;
 
 	private String eiEventEndpointUrl = null;
@@ -163,7 +166,7 @@ public class Oadr20bVTNSecurityTest {
 		// access
 		byte[] encoded = Files.readAllBytes(Paths.get(rsaClientFingerprintFilePath));
 		String fingerprint = new String(encoded, Charsets.UTF_8);
-		fingerprint = fingerprint.trim();
+		fingerprint = fingerprint.trim().replaceAll(":", "").toLowerCase();
 		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
 				.withTrustedCertificate(Arrays.asList(allCerts))
 				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers())
@@ -183,7 +186,7 @@ public class Oadr20bVTNSecurityTest {
 		// access
 		encoded = Files.readAllBytes(Paths.get(eccClientFingerprintFilePath));
 		fingerprint = new String(encoded, Charsets.UTF_8);
-		fingerprint = fingerprint.trim();
+		fingerprint = fingerprint.trim().replaceAll(":", "").toLowerCase();
 		builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
 				.withTrustedCertificate(Arrays.asList(allCerts))
 				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers())
@@ -208,7 +211,7 @@ public class Oadr20bVTNSecurityTest {
 
 		String username = "securityVen1";
 		String password = "securityVen1";
-		String realm = DigestAuthenticationProvider.DIGEST_REALM;
+		String realm = digestAuthenticationProvider.getRealm();
 		String key = DigestAuthenticationProvider.DIGEST_KEY;
 
 		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
@@ -234,7 +237,6 @@ public class Oadr20bVTNSecurityTest {
 
 		String venUsername = "securityVen1";
 		String venPassword = "securityVen1";
-
 		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
 				.withTrustedCertificate(Arrays.asList(allCerts))
 				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers())

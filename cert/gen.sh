@@ -93,12 +93,12 @@ gen_java_truststore()
 # gen_oadr20b_fingerprint "in/out crt/fingerprint name"
 gen_oadr20b_fingerprint()
 {
-	openssl x509 -in $1.crt -fingerprint -sha256 -noout | cut -d'=' -f2 | cat | tail -c 30 > $1.fingerprint
+	openssl x509 -in $1.crt -fingerprint -sha256 -noout | cut -d'=' -f2 | cat | tail -c 30 | sed -r 's/[:]+//g' | tr '[:upper:]' '[:lower:]' > $1.fingerprint
 }
 # gen_oadr20a_fingerprint "in/out crt/fingerprint name"
 gen_oadr20a_fingerprint()
 {
-	openssl x509 -in $1.crt -fingerprint -sha1 -noout | cut -d'=' -f2 | cat | tail -c 30 > $1.fingerprint.oadr20a
+	openssl x509 -in $1.crt -fingerprint -sha1 -noout | cut -d'=' -f2 | cat | tail -c 30 | sed -r 's/[:]+//g' | tr '[:upper:]' '[:lower:]' > $1.fingerprint.oadr20a
 }
 # gen_selfsigned_key_crt "out key/crt name"
 gen_selfsigned_key_crt()

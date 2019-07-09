@@ -129,7 +129,7 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 
 			String currentLine = reader.readLine();
 
-			return currentLine.trim();
+			return currentLine.trim().replaceAll(":", "").toLowerCase();
 
 		} catch (IOException ex) {
 			ex.printStackTrace(); // handle an exception here
@@ -340,9 +340,14 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 				String fingerprintForVen = getFingerprint(commonName);
 				VenCreateDto dto = new VenCreateDto();
 				String ven1Username = fingerprintForVen;
-
 				dto.setUsername(ven1Username);
-				dto.setAuthenticationType("x509");
+				if (commonName.contains("login")) {
+					dto.setAuthenticationType("login");
+					dto.setPassword(commonName);
+				} else {
+					dto.setAuthenticationType("x509");
+				}
+
 				dto.setCommonName(commonName);
 				dto.setOadrProfil("20b");
 				HashSet<VenGroup> groups = Sets.newHashSet(customCaCert);
@@ -434,7 +439,8 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 				appDto.setAuthenticationType("x509");
 				appDto.setCommonName(commonName);
 				appDto.setUsername(fingerprint);
-				appDto.setRoles(Arrays.asList(VTNRoleEnum.ROLE_DEVICE_MANAGER.name(), VTNRoleEnum.ROLE_DRPROGRAM.name()));
+				appDto.setRoles(
+						Arrays.asList(VTNRoleEnum.ROLE_DEVICE_MANAGER.name(), VTNRoleEnum.ROLE_DRPROGRAM.name()));
 				saveAppIfMissing(appDto);
 			}
 		}

@@ -8,7 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.Lob;
 
 import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportEnumeratedType;

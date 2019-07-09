@@ -48,7 +48,7 @@ public class OadrXmppClient20b {
 	public static final String OADR_EVENT_SERVICE_NAMESPACE = "http://openadr.org/OpenADR2/EiEvent";
 
 	public static final String OADR_REPORT_SERVICE_NAMESPACE = "http://openadr.org/OpenADR2/EiReport";
-	
+
 	public static final String OADR_OPT_SERVICE_NAMESPACE = "http://openadr.org/OpenADR2/EiOpt";
 
 	public static final String OADR_REGISTERPARTY_SERVICE_NAMESPACE = "http://openadr.org/OpenADR2/EiRegisterParty";
@@ -67,82 +67,73 @@ public class OadrXmppClient20b {
 
 	private Map<String, Jid> discoveredXmppOadrServices;
 
-	public OadrXmppClient20b(String fingerprint, String host, int port, String resource, SSLContext context,
-			StanzaListener onMessageListener) throws OadrXmppException {
-
+	private static XMPPTCPConnectionConfiguration anonymousConnection(String host, int port, String resource,
+			SSLContext context) throws OadrXmppException {
 		try {
-//			this.jaxbContext = Oadr20bJAXBContext.getInstance();
+			return XMPPTCPConnectionConfiguration.builder()
+//				.setHostAddress(address)
+					.setHost(host).setPort(port)
+//				.allowEmptyOrNullUsernames()
+//				.setUsernameAndPassword(resource,resource)
+//				.setAuthzid(authzid)
+//				.setAuthzid(authzid)
+					.performSaslAnonymousAuthentication()
+//				.addEnabledSaslMechanism("ANONYMOUS")
+//				.performSaslExternalAuthentication(context)
+//				.setUsernameAndPassword("admin", "mouaiccool")
+//				.addEnabledSaslMechanism("EXTERNAL")
+//				.addEnabledSaslMechanism("ANONYMOUS")
+					.setResource(resource).setXmppDomain(host).setCustomSSLContext(context).build();
+		} catch (XmppStringprepException e) {
+			throw new OadrXmppException(e);
+		}
+	}
+
+	private static XMPPTCPConnectionConfiguration passwordConnection(String host, int port, String resource,
+			SSLContext context, String username, String password) throws OadrXmppException {
+		try {
+			return XMPPTCPConnectionConfiguration.builder()
+//				.setHostAddress(address)
+					.setHost(host).setPort(port)
+//				.allowEmptyOrNullUsernames()
+					.setUsernameAndPassword(username, password)
+//				.setAuthzid(authzid)
+//				.setAuthzid(authzid)
+//					.performSaslAnonymousAuthentication()
+//				.addEnabledSaslMechanism("ANONYMOUS")
+//				.performSaslExternalAuthentication(context)
+//				.setUsernameAndPassword("admin", "mouaiccool")
+//				.addEnabledSaslMechanism("EXTERNAL")
+//				.addEnabledSaslMechanism("ANONYMOUS")
+					.setResource(resource).setXmppDomain(host).setCustomSSLContext(context).build();
+		} catch (XmppStringprepException e) {
+			throw new OadrXmppException(e);
+		}
+	}
+
+	private OadrXmppClient20b(XMPPTCPConnectionConfiguration config, String venId, String host, int port,
+			String resource, SSLContext context, StanzaListener onMessageListener) throws OadrXmppException {
+		try {
 			SASLAnonymous mechanism = new SASLAnonymous();
 			SASLAuthentication.registerSASLMechanism(mechanism);
 			EntityBareJid authzid = JidCreate.entityBareFrom(resource + "@" + host);
-			XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-//					.setHostAddress(address)
-					.setHost(host).setPort(port)
-//					.allowEmptyOrNullUsernames()
-//					.setUsernameAndPassword(resource,resource)
-//					.setAuthzid(authzid)
-//					.setAuthzid(authzid)
-					.performSaslAnonymousAuthentication()
-//					.addEnabledSaslMechanism("ANONYMOUS")
-//					.performSaslExternalAuthentication(context)
-//					.setUsernameAndPassword("admin", "mouaiccool")
-//					.addEnabledSaslMechanism("EXTERNAL")
-//					.addEnabledSaslMechanism("ANONYMOUS")
-					.setResource(resource).setXmppDomain(host).setCustomSSLContext(context).build();
 
 			connection = new XMPPTCPConnection(config);
 
 			setDomainJid(JidCreate.domainBareFrom(XMPP_OADR_SUBDOMAIN + "." + host));
-			setClientJid(JidCreate.entityFullFrom(fingerprint, XMPP_OADR_SUBDOMAIN + "." + host, resource));
+			setClientJid(JidCreate.entityFullFrom(venId, XMPP_OADR_SUBDOMAIN + "." + host, resource));
 
 			chatManager = ChatManager.getInstanceFor(connection);
-
-			// Obtain the ServiceDiscoveryManager associated with my XMPP connection
-//			ServiceDiscoveryManager discoManager = ServiceDiscoveryManager.getInstanceFor(connection);
-
-//						ServiceDiscoveryManager.setDefaultIdentity(new Identity("client", "oadr"));
-			// Register that a new feature is supported by this XMPP entity
-//						discoManager.ad
-//
-//			connection.addAsyncStanzaListener(new StanzaListener() {
-//				public void processStanza(Stanza stanza) throws SmackException.NotConnectedException,
-//						InterruptedException, SmackException.NotLoggedInException {
-//					IQ iq = (IQ) stanza;
-//				}
-//			}, StanzaTypeFilter.IQ);
-//
-//			connection.addAsyncStanzaListener(new StanzaListener() {
-//				public void processStanza(Stanza stanza) throws SmackException.NotConnectedException,
-//						InterruptedException, SmackException.NotLoggedInException {
-//					Presence presence = (Presence) stanza;
-//				}
-//			}, StanzaTypeFilter.PRESENCE);
-//
-//			connection.addAsyncStanzaListener(new StanzaListener() {
-//				public void processStanza(Stanza stanza) throws SmackException.NotConnectedException,
-//						InterruptedException, SmackException.NotLoggedInException {
-//					Message message = (Message) stanza;
-//					String body = message.getBody();
-//
-//					try {
-//						Object unmarshal = jaxbContext.unmarshal(body);
-//					} catch (Oadr20bUnmarshalException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				}
-//			}, StanzaTypeFilter.MESSAGE);
 
 			if (onMessageListener != null) {
 				connection.addAsyncStanzaListener(onMessageListener, StanzaTypeFilter.MESSAGE);
 			}
-//			
 
 			connection.connect().login(resource, resource); // Establishes a connection to the server
 			if (connection.isConnected() && connection.isAuthenticated()) {
 
 				EntityFullJid user = connection.getUser();
-				
+
 				this.setConnectionJid(user);
 
 				IQ request = new Ping(authzid);
@@ -163,11 +154,7 @@ public class OadrXmppClient20b {
 				throw new OadrXmppException("Connection refused by Xmpp server ");
 			}
 
-		}
-//		catch (JAXBException e) {
-//			throw new OadrXmppException(e);
-//		} 
-		catch (XmppStringprepException e) {
+		} catch (XmppStringprepException e) {
 			throw new OadrXmppException(e);
 		} catch (XMPPException e) {
 			throw new OadrXmppException(e);
@@ -178,6 +165,20 @@ public class OadrXmppClient20b {
 		} catch (InterruptedException e) {
 			throw new OadrXmppException(e);
 		}
+
+	}
+
+	public OadrXmppClient20b(String venId, String host, int port, String resource, SSLContext context,
+			StanzaListener onMessageListener) throws OadrXmppException {
+		this(OadrXmppClient20b.anonymousConnection(host, port, resource, context), venId, host, port, resource, context,
+				onMessageListener);
+
+	}
+
+	public OadrXmppClient20b(String venId, String host, int port, String resource, SSLContext context, String password,
+			StanzaListener onMessageListener) throws OadrXmppException {
+		this(OadrXmppClient20b.passwordConnection(host, port, resource, context, venId, password), venId, host, port,
+				resource, context, onMessageListener);
 
 	}
 

@@ -134,7 +134,7 @@ public class OadrHttpClient20b {
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 				EntityUtils.consumeQuietly(response.getEntity());
 				throw new Oadr20bHttpLayerException(response.getStatusLine().getStatusCode(),
-						response.getStatusLine().getReasonPhrase());
+						response.getStatusLine().getStatusCode() + "");
 
 			} else {
 				if (isXmlSignatureEnabled()) {

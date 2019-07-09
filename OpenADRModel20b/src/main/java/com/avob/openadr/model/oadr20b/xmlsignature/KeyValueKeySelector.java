@@ -3,6 +3,8 @@ package com.avob.openadr.model.oadr20b.xmlsignature;
 import java.security.Key;
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.crypto.AlgorithmMethod;
@@ -14,6 +16,7 @@ import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 
 public class KeyValueKeySelector extends KeySelector {
 
@@ -52,6 +55,28 @@ public class KeyValueKeySelector extends KeySelector {
                 if (algEquals(sm.getAlgorithm(), pk.getAlgorithm())) {
                     return new SimpleKeySelectorResult(pk);
                 }
+            }
+            else if (xmlStructure instanceof X509Data) {
+            	X509Data x509Data = (X509Data) xmlStructure;
+                Iterator xi = x509Data.getContent().iterator();
+                while (xi.hasNext()) {
+                    Object o = xi.next();
+                    if (!(o instanceof X509Certificate)) {
+                        continue;
+                    }
+                    final PublicKey key = ((X509Certificate) o).getPublicKey();
+                    // Make sure the algorithm is compatible
+                    // with the method.
+                    if (algEquals(method.getAlgorithm(), key.getAlgorithm())) {
+                        return new KeySelectorResult() {
+                            @Override
+                            public Key getKey() {
+                                return key;
+                            }
+                        };
+                    }
+                }
+ 
             }
         }
         throw new KeySelectorException("No KeyValue element found!");

@@ -4,11 +4,12 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +36,7 @@ import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -50,6 +51,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jcajce.provider.asymmetric.rsa.BCRSAPrivateKey;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -87,12 +89,15 @@ public class OadrXMLSignatureHandler {
 		try {
 			jaxbContext = Oadr20bJAXBContext.getInstance();
 			replayProtectContext = JAXBContext.newInstance(ReplayProtectType.class);
+			Security.addProvider(new BouncyCastleProvider());
 		} catch (JAXBException e) {
 			throw new Oadr20bInitializationException(e);
 		}
 	}
 
-	private OadrXMLSignatureHandler() {
+	private OadrXMLSignatureHandler()
+			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+
 	}
 
 	private static <T> List<T> asElement(List<Object> list, Class<T> klass) {
@@ -278,10 +283,11 @@ public class OadrXMLSignatureHandler {
 
 		PublicKey publicKey = certificate.getPublicKey();
 
-		XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
-
+		XMLSignatureFactory fac = null;
 		SignedInfo si = null;
 		try {
+			fac = XMLSignatureFactory.getInstance("DOM");
+//			fac = XMLSignatureFactory.getInstance("DES", "BC");
 			// require digest signedObjectNode
 			Reference ref = fac.newReference("", fac.newDigestMethod(DigestMethod.SHA256, null),
 					Collections.singletonList(fac.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null)),
@@ -315,18 +321,9 @@ public class OadrXMLSignatureHandler {
 		} catch (InvalidAlgorithmParameterException e) {
 			throw new Oadr20bXMLSignatureException(e);
 		}
-
-		KeyInfo ki = null;
-		try {
-			KeyInfoFactory kif = fac.getKeyInfoFactory();
-			KeyValue kv = kif.newKeyValue(publicKey);
-			List<KeyValue> keyInfoItems = new ArrayList<KeyValue>();
-			keyInfoItems.add(kv);
-
-			ki = kif.newKeyInfo(keyInfoItems);
-		} catch (KeyException e) {
-			throw new Oadr20bXMLSignatureException(e);
-		}
+//		catch (NoSuchProviderException e) {
+//			throw new Oadr20bXMLSignatureException(e);
+//		}
 
 		List<XMLStructure> lstruct = null;
 		try {
@@ -352,6 +349,7 @@ public class OadrXMLSignatureHandler {
 			SignatureProperties newSignatureProperties = fac.newSignatureProperties(listSignatureProperty, null);
 			objectContent.add(newSignatureProperties);
 			XMLObject newXMLObject = fac.newXMLObject(objectContent, SIGNATUREOBJECT_PAYLOAD_ID, null, null);
+
 			lstruct = new ArrayList<XMLStructure>();
 			lstruct.add(newXMLObject);
 		} catch (ParserConfigurationException e) {
@@ -359,6 +357,32 @@ public class OadrXMLSignatureHandler {
 		} catch (JAXBException e) {
 			throw new Oadr20bXMLSignatureException(e);
 		}
+
+		KeyInfo ki = null;
+
+//		SubjectPublicKeyInfo subPubKeyInfo = SubjectPublicKeyInfo.getInstance(certificate.getPublicKey().getEncoded());
+//		ASN1ObjectIdentifier alg = subPubKeyInfo.getAlgorithm().getAlgorithm();
+//		
+		KeyInfoFactory kif = fac.getKeyInfoFactory();
+        List<Object> x509Content = new ArrayList<Object>();
+        x509Content.add(certificate.getSubjectX500Principal().getName());
+        x509Content.add(certificate);
+        X509Data xd = kif.newX509Data(x509Content);
+         ki = kif.newKeyInfo(Collections.singletonList(xd));
+
+//		try {
+//			KeyInfoFactory kif = fac.getKeyInfoFactory();
+//			KeyValue kv = kif.newKeyValue(publicKey);
+//			List<KeyValue> keyInfoItems = new ArrayList<KeyValue>();
+//			keyInfoItems.add(kv);
+//
+//			ki = kif.newKeyInfo(keyInfoItems);			
+//		} catch (KeyException e) {
+//			throw new Oadr20bXMLSignatureException(e);
+//		}
+
+//		KeyInfoFactory kif = fac.getKeyInfoFactory();
+//		ki = kif.newKeyInfo(Collections.singletonList(kif.newKeyName("key123")));
 
 		// sign payload
 		XMLSignature signature = fac.newXMLSignature(si, ki, lstruct, null, null);

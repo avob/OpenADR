@@ -24,39 +24,39 @@ import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 @ActiveProfiles("test")
 public class OadrUserServiceTest {
 
-    @Resource
-    private OadrUserService oadrUserService;
+	@Resource
+	private OadrUserService oadrUserService;
 
-    @Test
-    public void test() {
-        String username = "user";
-        OadrUser user = oadrUserService.prepare(username);
-        oadrUserService.save(user);
+	@Test
+	public void test() {
+		String username = "user";
+		OadrUser user = oadrUserService.prepare(username);
+		oadrUserService.save(user);
 
-        OadrUser findByUsername = oadrUserService.findByUsername(username);
-        assertNotNull(findByUsername);
-        assertEquals(username, findByUsername.getUsername());
-        assertNull(findByUsername.getBasicPassword());
-        assertNull(findByUsername.getDigestPassword());
+		OadrUser findByUsername = oadrUserService.findByUsername(username);
+		assertNotNull(findByUsername);
+		assertEquals(username, findByUsername.getUsername());
+		assertNull(findByUsername.getBasicPassword());
+		assertNull(findByUsername.getDigestPassword());
 
-        oadrUserService.delete(findByUsername);
-        findByUsername = oadrUserService.findByUsername(username);
-        assertNull(findByUsername);
+		oadrUserService.delete(findByUsername);
+		findByUsername = oadrUserService.findByUsername(username);
+		assertNull(findByUsername);
 
-        String password = "password";
-        user = oadrUserService.prepare(username, password);
-        oadrUserService.save(user);
+		String password = "password";
+		user = oadrUserService.prepare(username, password);
+		oadrUserService.save(user);
 
-        findByUsername = oadrUserService.findByUsername(username);
-        assertNotNull(findByUsername);
-        assertEquals(username, findByUsername.getUsername());
-        assertNotNull(findByUsername.getBasicPassword());
-        assertNotNull(findByUsername.getDigestPassword());
+		findByUsername = oadrUserService.findByUsername(username);
+		assertNotNull(findByUsername);
+		assertEquals(username, findByUsername.getUsername());
+		assertNotNull(findByUsername.getBasicPassword());
+		assertNotNull(findByUsername.getDigestPassword());
 
-        oadrUserService.delete(Arrays.asList(findByUsername));
-        findByUsername = oadrUserService.findByUsername(username);
-        assertNull(findByUsername);
+		oadrUserService.delete(Arrays.asList(findByUsername));
+		findByUsername = oadrUserService.findByUsername(username);
+		assertNull(findByUsername);
 
-    }
+	}
 
 }

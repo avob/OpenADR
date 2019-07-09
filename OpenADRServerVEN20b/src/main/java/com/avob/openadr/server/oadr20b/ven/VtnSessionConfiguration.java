@@ -23,6 +23,11 @@ public class VtnSessionConfiguration {
 	private static final String AUTHENTIFICATION_BASIC_PASS = "oadr.vtn.security.authentication.basic.password";
 	private static final String AUTHENTIFICATION_DIGEST_USER = "oadr.vtn.security.authentication.digest.username";
 	private static final String AUTHENTIFICATION_DIGEST_PASS = "oadr.vtn.security.authentication.digest.password";
+	private static final String AUTHENTIFICATION_DIGEST_REALM = "oadr.vtn.security.authentication.digest.realm";
+
+	private static final String AUTHENTIFICATION_XMPP_USER = "oadr.vtn.security.authentication.xmpp.username";
+	private static final String AUTHENTIFICATION_XMPP_PASS = "oadr.vtn.security.authentication.xmpp.password";
+
 	private String vtnId;
 	private String vtnUrl;
 	private String vtnXmppHost;
@@ -74,7 +79,14 @@ public class VtnSessionConfiguration {
 				getVenSessionConfig().setDigestUsername(prop);
 			} else if (AUTHENTIFICATION_DIGEST_PASS.equals(keyStr)) {
 				getVenSessionConfig().setDigestPassword(prop);
+			} else if (AUTHENTIFICATION_DIGEST_REALM.equals(keyStr)) {
+				getVenSessionConfig().setDigestRealm(prop);
+			} else if (AUTHENTIFICATION_XMPP_USER.equals(keyStr)) {
+				getVenSessionConfig().setDigestPassword(prop);
+			} else if (AUTHENTIFICATION_XMPP_PASS.equals(keyStr)) {
+				getVenSessionConfig().setDigestRealm(prop);
 			}
+
 		}
 
 	}

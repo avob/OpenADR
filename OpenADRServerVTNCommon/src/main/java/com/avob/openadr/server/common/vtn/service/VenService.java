@@ -24,6 +24,7 @@ import com.avob.openadr.server.common.vtn.models.ven.filter.VenFilter;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDao;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venresource.VenResourceDao;
+import com.avob.openadr.server.common.vtn.security.DigestAuthenticationProvider;
 
 @Service
 public class VenService extends AbstractUserService<Ven> {
@@ -42,10 +43,13 @@ public class VenService extends AbstractUserService<Ven> {
 	@Autowired(required = false)
 	private GenerateX509CertificateService generateX509VenService;
 
+	@Resource
+	private DigestAuthenticationProvider digestAuthenticationProvider;
+
 	private Mapper mapper = new DozerBeanMapper();
 
 	public Ven prepare(String username, String password) {
-		return super.prepare(new Ven(), username, password);
+		return super.prepare(new Ven(), username, password, digestAuthenticationProvider.getRealm());
 	}
 
 	/**
@@ -63,7 +67,8 @@ public class VenService extends AbstractUserService<Ven> {
 	public Ven prepare(VenCreateDto dto) {
 		Ven prepare;
 		if (dto.getPassword() != null) {
-			prepare = super.prepare(new Ven(), dto.getUsername(), dto.getPassword());
+			prepare = super.prepare(new Ven(), dto.getUsername(), dto.getPassword(),
+					digestAuthenticationProvider.getRealm());
 		} else {
 			prepare = super.prepare(new Ven(), dto.getUsername());
 		}
@@ -163,9 +168,7 @@ public class VenService extends AbstractUserService<Ven> {
 		if (size == null) {
 			size = DEFAULT_SEARCH_SIZE;
 		}
-		Sort sort = Sort.by(
-			    Sort.Order.desc("registrationId"),
-			    Sort.Order.asc("commonName"));
+		Sort sort = Sort.by(Sort.Order.desc("registrationId"), Sort.Order.asc("commonName"));
 		PageRequest of = PageRequest.of(page, size, sort);
 		return venDao.findAll(VenSpecification.search(filters), of);
 	}

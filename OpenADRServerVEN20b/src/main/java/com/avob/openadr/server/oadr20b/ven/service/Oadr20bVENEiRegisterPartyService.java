@@ -64,7 +64,7 @@ public class Oadr20bVENEiRegisterPartyService {
 
 	private Map<String, OadrCreatedPartyRegistrationType> registration = new ConcurrentHashMap<String, OadrCreatedPartyRegistrationType>();
 
-	protected List<Oadr20bVENEiRegisterPartyServiceListener> listeners;
+	private List<Oadr20bVENEiRegisterPartyServiceListener> listeners;
 
 	public interface Oadr20bVENEiRegisterPartyServiceListener {
 		public void onRegistrationSuccess(VtnSessionConfiguration vtnConfiguration,
@@ -190,9 +190,9 @@ public class Oadr20bVENEiRegisterPartyService {
 				LOGGER.info("        reportOnly  : " + vtnConfiguration.getVenSessionConfig().getReportOnly());
 				LOGGER.info("        pullModel   : " + vtnConfiguration.getVenSessionConfig().getPullModel());
 				setRegistration(vtnConfiguration, loadRegistration);
-				if (listeners != null) {
+				if (getListeners() != null) {
 					final OadrCreatedPartyRegistrationType reg = loadRegistration;
-					listeners.forEach(listener -> listener.onRegistrationSuccess(vtnConfiguration, reg));
+					getListeners().forEach(listener -> listener.onRegistrationSuccess(vtnConfiguration, reg));
 				}
 				return;
 			} else {
@@ -257,8 +257,8 @@ public class Oadr20bVENEiRegisterPartyService {
 			} catch (Exception e) {
 				LOGGER.error("", e);
 			}
-			if (listeners != null) {
-				listeners.forEach(listener -> listener.onRegistrationError(vtnConfiguration));
+			if (getListeners() != null) {
+				getListeners().forEach(listener -> listener.onRegistrationError(vtnConfiguration));
 			}
 			setRegistration(vtnConfiguration, null);
 		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
@@ -323,9 +323,9 @@ public class Oadr20bVENEiRegisterPartyService {
 		LOGGER.debug("        xmlSignature: " + vtnConfiguration.getVenSessionConfig().getXmlSignature());
 		LOGGER.debug("        reportOnly  : " + vtnConfiguration.getVenSessionConfig().getReportOnly());
 		LOGGER.debug("        pullModel   : " + vtnConfiguration.getVenSessionConfig().getPullModel());
-		if (listeners != null) {
+		if (getListeners() != null) {
 			final OadrCreatedPartyRegistrationType reg = registration;
-			listeners.forEach(listener -> listener.onRegistrationSuccess(vtnConfiguration, reg));
+			getListeners().forEach(listener -> listener.onRegistrationSuccess(vtnConfiguration, reg));
 		}
 	}
 
@@ -343,10 +343,14 @@ public class Oadr20bVENEiRegisterPartyService {
 	}
 
 	public void addListener(Oadr20bVENEiRegisterPartyServiceListener listener) {
-		if (listeners == null) {
-			listeners = new ArrayList<Oadr20bVENEiRegisterPartyServiceListener>();
+		if (getListeners() == null) {
+			setListeners(new ArrayList<Oadr20bVENEiRegisterPartyServiceListener>());
 		}
-		listeners.add(listener);
+		
+		if(!getListeners().contains(listener)) {
+			getListeners().add(listener);
+		}
+		
 	}
 
 	public String handle(VtnSessionConfiguration vtnConfig, String raw, OadrPayload oadrPayload)
@@ -434,6 +438,15 @@ public class Oadr20bVENEiRegisterPartyService {
 		}
 
 		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
+	}
+
+	public List<Oadr20bVENEiRegisterPartyServiceListener> getListeners() {
+		return listeners;
+	}
+
+
+	private void setListeners(List<Oadr20bVENEiRegisterPartyServiceListener> listeners) {
+		this.listeners = listeners;
 	}
 
 }

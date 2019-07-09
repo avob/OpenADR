@@ -27,8 +27,7 @@ import com.avob.openadr.server.oadr20b.ven.service.PlanRequestService;
 
 @Service
 @ConditionalOnProperty(name = "ven.autostart")
-public class Oadr20bVENAutoStartRegisterPartyService extends Oadr20bVENEiRegisterPartyService
-		implements Oadr20bVENEiRegisterPartyServiceListener {
+public class Oadr20bVENAutoStartRegisterPartyService implements Oadr20bVENEiRegisterPartyServiceListener {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVENEiRegisterPartyService.class);
 
@@ -45,15 +44,16 @@ public class Oadr20bVENAutoStartRegisterPartyService extends Oadr20bVENEiRegiste
 	@Resource
 	private PlanRequestService planRequestService;
 
+	@Resource
+	private Oadr20bVENEiRegisterPartyService oadr20bVENEiRegisterPartyService;
+
 	private boolean contextStarted = false;
 	private Map<String, Boolean> registrated = new HashMap<String, Boolean>();
 	private Map<String, Boolean> sent = new HashMap<String, Boolean>();
 
 	@PostConstruct
 	public void init() {
-		if (this.listeners == null || !this.listeners.contains(this)) {
-			this.addListener(this);
-		}
+		oadr20bVENEiRegisterPartyService.addListener(this);
 	}
 
 	@EventListener({ ApplicationReadyEvent.class })

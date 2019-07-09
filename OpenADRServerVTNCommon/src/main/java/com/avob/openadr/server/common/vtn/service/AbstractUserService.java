@@ -4,7 +4,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.user.AbstractUserCreateDto;
-import com.avob.openadr.server.common.vtn.security.DigestAuthenticationProvider;
 import com.avob.openadr.server.common.vtn.security.DigestMD5PasswordEncoder;
 
 public abstract class AbstractUserService<T extends AbstractUser> {
@@ -17,16 +16,15 @@ public abstract class AbstractUserService<T extends AbstractUser> {
 		return bCryptPasswordEncoder.encode(password);
 	}
 
-	public String encodeDigest(String username, String password) {
-		return digestMD5PasswordEncoder
-				.encode(username + ":" + DigestAuthenticationProvider.DIGEST_REALM + ":" + password);
+	public String encodeDigest(String username, String password, String realm) {
+		return digestMD5PasswordEncoder.encode(username + ":" + realm + ":" + password);
 	}
 
-	protected T prepare(T instance, String username, String password) {
+	protected T prepare(T instance, String username, String password, String digestRealm) {
 		instance.setUsername(username);
 		if (password != null) {
 			instance.setBasicPassword(this.encodeBasic(password));
-			instance.setDigestPassword(this.encodeDigest(username, password));
+			instance.setDigestPassword(this.encodeDigest(username, password, digestRealm));
 		}
 		return instance;
 	}
@@ -36,12 +34,12 @@ public abstract class AbstractUserService<T extends AbstractUser> {
 		return instance;
 	}
 
-	protected T prepare(T instance, AbstractUserCreateDto dto) {
-		T prepare = prepare(instance, dto.getUsername(), dto.getPassword());
+	protected T prepare(T instance, AbstractUserCreateDto dto, String realm) {
+		T prepare = prepare(instance, dto.getUsername(), dto.getPassword(), realm);
 		prepare.setUsername(dto.getUsername());
 		prepare.setAuthenticationType(dto.getAuthenticationType());
 		prepare.setCommonName(dto.getCommonName());
-		
+
 		return prepare;
 	}
 

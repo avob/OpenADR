@@ -68,6 +68,8 @@ public class XmppConnector {
 				String host = vtnConfig.getXmppHost();
 				int port = vtnConfig.getXmppPort();
 
+				
+				
 				perOadrServiceDownlinkClient.put(REGISTERPARTY_SERVICE, new OadrXmppClient20b(vtnId, host, port,
 						REGISTERPARTY_SERVICE, sslContext, xmppRegisterPartyMessageListener));
 

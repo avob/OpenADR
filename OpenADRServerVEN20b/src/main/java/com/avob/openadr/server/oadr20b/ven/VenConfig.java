@@ -63,6 +63,9 @@ public class VenConfig implements Cloneable {
 
 	@Value("${oadr.security.authentication.digest.password:#{null}}")
 	private String digestPassword;
+	
+	@Value("${oadr.security.authentication.digest.realm:#{null}}")
+	private String digestRealm;
 
 	@Value("${oadr.security.replayProtectAcceptedDelaySecond}")
 	private Long replayProtectAcceptedDelaySecond;
@@ -240,6 +243,14 @@ public class VenConfig implements Cloneable {
 			cnse.printStackTrace(System.err);
 		}
 		return o;
+	}
+
+	public String getDigestRealm() {
+		return digestRealm;
+	}
+
+	public void setDigestRealm(String digestRealm) {
+		this.digestRealm = digestRealm;
 	}
 
 }

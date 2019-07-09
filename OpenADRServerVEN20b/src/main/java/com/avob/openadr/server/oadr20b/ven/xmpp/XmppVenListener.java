@@ -69,7 +69,7 @@ public class XmppVenListener implements StanzaListener {
 
 		Localpart localpartOrThrow = from.getLocalpartOrThrow();
 
-		String username = localpartOrThrow.asUnescapedString().toUpperCase();
+		String username = localpartOrThrow.asUnescapedString().toLowerCase();
 
 		String payload = message.getBody();
 
@@ -111,6 +111,11 @@ public class XmppVenListener implements StanzaListener {
 
 					multiXmppClientConfig.sendReportMessage(response);
 
+				} else if (oadrPayload.getOadrSignedObject().getOadrCreatedPartyRegistration() != null) {
+					LOGGER.info(multiConfig.getVtnId() + " - getOadrCreatedPartyRegistration signed");
+					multiXmppClientConfig.validate(payload, oadrPayload);
+					oadr20bVENEiRegisterPartyService.register(multiConfig,
+							oadrPayload.getOadrSignedObject().getOadrCreatedPartyRegistration());
 				}
 
 			} else if (unmarshal instanceof OadrDistributeEventType) {

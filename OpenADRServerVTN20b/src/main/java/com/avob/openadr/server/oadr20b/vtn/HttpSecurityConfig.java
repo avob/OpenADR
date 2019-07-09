@@ -63,6 +63,9 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 	private DigestUserDetailsService digestUserDetailsService;
 
 	@Resource
+	private DigestAuthenticationProvider digestAuthenticationProvider;
+
+	@Resource
 	private VtnConfig vtnConfig;
 
 	@PostConstruct
@@ -78,7 +81,7 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		DigestAuthenticationEntryPoint authenticationEntryPoint = new DigestAuthenticationEntryPoint();
 		authenticationEntryPoint.setKey(DigestAuthenticationProvider.DIGEST_KEY);
-		authenticationEntryPoint.setRealmName(DigestAuthenticationProvider.DIGEST_REALM);
+		authenticationEntryPoint.setRealmName(digestAuthenticationProvider.getRealm());
 
 		DigestAuthenticationFilter digestAuthenticationFilter = new DigestAuthenticationFilter();
 		digestAuthenticationFilter.setAuthenticationEntryPoint(authenticationEntryPoint);
@@ -95,10 +98,8 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		http.authorizeRequests().regexMatchers(HttpMethod.OPTIONS, ".*").permitAll();
-		
+
 		http.authorizeRequests().regexMatchers(HttpMethod.POST, ".*/auth/.*").permitAll();
-		
-		
 
 		http.authorizeRequests().anyRequest().authenticated().and().x509().subjectPrincipalRegex("CN=(.*?)(?:,|$)")
 				.authenticationUserDetailsService(oadr20bX509AuthenticatedUserDetailsService);
@@ -141,7 +142,7 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 		configuration.setAllowCredentials(true);
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "OPTIONS", "HEAD", "DELETE"));
 		configuration.setAllowedOrigins(cors);
-		
+
 		configuration.applyPermitDefaultValues();
 		configuration.setExposedHeaders(Arrays.asList("X-total-count", "X-total-page"));
 		configuration.setAllowedHeaders(Arrays.asList("*"));

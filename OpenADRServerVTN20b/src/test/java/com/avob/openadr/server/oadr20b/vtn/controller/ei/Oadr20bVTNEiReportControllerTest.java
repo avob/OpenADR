@@ -249,7 +249,7 @@ public class Oadr20bVTNEiReportControllerTest {
 		OtherReportCapability reportCapability = otherReportCapabilityService.findOne(reportCapabilityPrivateId);
 		OtherReportCapabilityDescription reportCapabilityDescription = otherReportCapabilityDescriptionService
 				.findOne(reportCapabilityDescriptionPrivateId);
-		String granularity = "PT1H";
+
 		OtherReportRequest otherReportRequest = new OtherReportRequest();
 		otherReportRequest.setGranularity(minPeriod);
 		otherReportRequest.setReportRequestId(reportRequestId);

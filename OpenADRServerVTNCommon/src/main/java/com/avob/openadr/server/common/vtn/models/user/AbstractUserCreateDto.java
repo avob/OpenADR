@@ -58,4 +58,5 @@ public class AbstractUserCreateDto implements Serializable {
 	public void setCommonName(String commonName) {
 		this.commonName = commonName;
 	}
+
 }

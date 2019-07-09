@@ -1,17 +1,11 @@
 package com.avob.openadr.server.common.vtn.service.push;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.Resource;
 import javax.jms.JMSException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessagePostProcessor;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.server.common.vtn.VtnConfig;
@@ -59,15 +53,13 @@ public class OadrAppNotificationPublisher {
 					e.printStackTrace();
 				}
 
-				
-
 //				jmsTemplate.convertAndSend(OADR_APP_NOTIFICATION_TOPIC + "." + subTopic + "." + venId, writeValueAsString);
 //				jmsTemplate.convertAndSend(OADR_APP_NOTIFICATION_TOPIC, writeValueAsString);
 
 			}
 
 			else {
-		
+
 				jmsTemplate.convertAndSend(OADR_APP_NOTIFICATION_TOPIC + "." + subTopic + "." + venId,
 						writeValueAsString, new MessagePostProcessor() {
 
@@ -76,8 +68,8 @@ public class OadrAppNotificationPublisher {
 								arg0.setStringProperty("venID", venId);
 								return arg0;
 							}
-					      
-					    });
+
+						});
 			}
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block

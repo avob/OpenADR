@@ -127,9 +127,7 @@ public class OadrHttpSecurity {
 	}
 
 	private static String hexify(byte[] bytes) {
-
 		char[] hexDigits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-
 		StringBuilder buf = new StringBuilder(bytes.length * 2);
 		String delimiter = "";
 		for (int i = 0; i < bytes.length; ++i) {
@@ -138,7 +136,6 @@ public class OadrHttpSecurity {
 			buf.append(hexDigits[(bytes[i] & 0xf0) >> 4]);
 			buf.append(hexDigits[bytes[i] & 0x0f]);
 		}
-
 		return buf.toString();
 	}
 
@@ -180,13 +177,17 @@ public class OadrHttpSecurity {
 		}
 	}
 
+	private static String format(String fingerprint) {
+		return fingerprint.replaceAll(":", "").toLowerCase();
+	}
+
 	public static String getOadr20aFingerprint(String pemFilePath) throws OadrSecurityException {
 		X509Certificate cert = OadrHttpSecurity.parseCertificate(pemFilePath);
 		return OadrHttpSecurity.getOadr20aFingerprint(cert);
 	}
 
 	public static String getOadr20aFingerprint(X509Certificate cert) throws OadrSecurityException {
-		return OadrHttpSecurity.truncate(getFingerprint(cert, "SHA1"));
+		return OadrHttpSecurity.format(OadrHttpSecurity.truncate(getFingerprint(cert, "SHA1")));
 	}
 
 	public static String getOadr20bFingerprint(String pemFilePath) throws OadrSecurityException {
@@ -195,7 +196,7 @@ public class OadrHttpSecurity {
 	}
 
 	public static String getOadr20bFingerprint(X509Certificate cert) throws OadrSecurityException {
-		return OadrHttpSecurity.truncate(getFingerprint(cert, "SHA-256"));
+		return OadrHttpSecurity.format(OadrHttpSecurity.truncate(getFingerprint(cert, "SHA-256")));
 	}
 
 	public static KeyStore createKeyStore(String p12FilePath, String password) throws KeyStoreException,

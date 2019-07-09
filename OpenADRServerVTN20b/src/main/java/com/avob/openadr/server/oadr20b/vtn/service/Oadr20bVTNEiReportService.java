@@ -1216,9 +1216,6 @@ public class Oadr20bVTNEiReportService {
 
 		String reportRequestId = reportCapability.getReportRequestId();
 
-		List<OtherReportCapabilityDescription> descriptions = otherReportCapabilityDescriptionService
-				.findByOtherReportCapability(reportCapability);
-
 		otherReportRequestSpecifierDao
 				.deleteByOtherReportCapabilityDescriptionRidInAndOtherReportCapabilityDescriptionOtherReportCapability(
 						rids, reportCapability);
