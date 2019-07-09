@@ -36,12 +36,15 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Resource
 	private DigestUserDetailsService digestUserDetailsService;
+	
+	@Resource
+	private DigestAuthenticationProvider digestAuthenticationProvider;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		DigestAuthenticationEntryPoint authenticationEntryPoint = new DigestAuthenticationEntryPoint();
 		authenticationEntryPoint.setKey(DigestAuthenticationProvider.DIGEST_KEY);
-		authenticationEntryPoint.setRealmName(DigestAuthenticationProvider.DIGEST_REALM);
+		authenticationEntryPoint.setRealmName(digestAuthenticationProvider.getRealm());
 
 		DigestAuthenticationFilter digestAuthenticationFilter = new DigestAuthenticationFilter();
 		digestAuthenticationFilter.setAuthenticationEntryPoint(authenticationEntryPoint);

@@ -91,6 +91,9 @@ public class Oadr20aVTNSecurityTest {
 	@Value("${oadr.security.ven.ecc.fingerprint}")
 	private String eccClientFingerprintFilePath;
 
+	@Resource
+	private DigestAuthenticationProvider digestAuthenticationProvider;
+
 	private static final String eiEventEndpointUrl = "https://localhost:8181/testvtn";
 
 	private static final String demandResponseEnpointUrl = "https://localhost:8181/testvtn/DemandResponseEvent/";
@@ -178,7 +181,7 @@ public class Oadr20aVTNSecurityTest {
 
 		String username = "ven1";
 		String password = "ven1";
-		String realm = DigestAuthenticationProvider.DIGEST_REALM;
+		String realm = digestAuthenticationProvider.getRealm();
 		String key = DigestAuthenticationProvider.DIGEST_KEY;
 
 		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
