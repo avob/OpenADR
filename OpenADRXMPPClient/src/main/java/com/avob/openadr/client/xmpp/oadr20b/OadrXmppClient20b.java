@@ -22,6 +22,8 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Type;
 import org.jivesoftware.smack.sasl.core.SASLAnonymous;
+import org.jivesoftware.smack.sasl.javax.SASLExternalMechanism;
+import org.jivesoftware.smack.sasl.javax.SASLPlainMechanism;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
@@ -103,9 +105,12 @@ public class OadrXmppClient20b {
 //				.addEnabledSaslMechanism("ANONYMOUS")
 //				.performSaslExternalAuthentication(context)
 //				.setUsernameAndPassword("admin", "mouaiccool")
-//				.addEnabledSaslMechanism("EXTERNAL")
-//				.addEnabledSaslMechanism("ANONYMOUS")
-					.setResource(resource).setXmppDomain(host).setCustomSSLContext(context).build();
+//					.addEnabledSaslMechanism("EXTERNAL")
+//				.addEnabledSaslMechanism("ANONYMOUS"
+//					.performSaslExternalAuthentication(context)
+					.setResource(resource).setXmppDomain(host)
+					.setCustomSSLContext(context)
+					.build();
 		} catch (XmppStringprepException e) {
 			throw new OadrXmppException(e);
 		}
@@ -115,7 +120,13 @@ public class OadrXmppClient20b {
 			String resource, SSLContext context, StanzaListener onMessageListener) throws OadrXmppException {
 		try {
 			SASLAnonymous mechanism = new SASLAnonymous();
+			SASLExternalMechanism ext = new SASLExternalMechanism();
+			SASLPlainMechanism plain = new SASLPlainMechanism();
 			SASLAuthentication.registerSASLMechanism(mechanism);
+			SASLAuthentication.registerSASLMechanism(ext);
+			SASLAuthentication.registerSASLMechanism(plain);
+			SASLAuthentication.unBlacklistSASLMechanism("PLAIN");
+			SASLAuthentication.blacklistSASLMechanism("DIGEST-MD5");
 			EntityBareJid authzid = JidCreate.entityBareFrom(resource + "@" + host);
 
 			connection = new XMPPTCPConnection(config);

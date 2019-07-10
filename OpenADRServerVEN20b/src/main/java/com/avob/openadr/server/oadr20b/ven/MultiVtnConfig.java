@@ -39,6 +39,7 @@ import com.avob.openadr.client.http.OadrHttpClientBuilder;
 import com.avob.openadr.client.http.oadr20b.OadrHttpClient20b;
 import com.avob.openadr.client.http.oadr20b.ven.OadrHttpVenClient20b;
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20b;
+import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20bBuilder;
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppException;
 import com.avob.openadr.client.xmpp.oadr20b.ven.OadrXmppVenClient20b;
 import com.avob.openadr.model.oadr20b.Oadr20bSecurity;
@@ -159,8 +160,18 @@ public class MultiVtnConfig {
 
 				sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom(seed.getBytes()));
 
-				OadrXmppClient20b oadrXmppClient20b = new OadrXmppClient20b(session.getVtnId(),
-						session.getVtnXmppHost(), session.getVtnXmppPort(), "client", sslContext, xmppVenListeners);
+//				OadrXmppClient20b oadrXmppClient20b = new OadrXmppClient20b(session.getVtnId(),
+//						session.getVtnXmppHost(), session.getVtnXmppPort(), "client", sslContext, xmppVenListeners);
+
+				OadrXmppClient20bBuilder builder = new OadrXmppClient20bBuilder()
+						.withHostAndPort(session.getVtnXmppHost(), session.getVtnXmppPort())
+						.withVenID(session.getVtnId()).withResource("client").withSSLContext(sslContext);
+
+				if (session.getVtnXmppUser() != null && session.getVtnXmppPass() != null) {
+					builder.withPassword(session.getVtnXmppPass());
+				}
+
+				OadrXmppClient20b oadrXmppClient20b = builder.build();
 
 				OadrXmppVenClient20b venClient = null;
 				if (venConfig.getXmlSignature()) {

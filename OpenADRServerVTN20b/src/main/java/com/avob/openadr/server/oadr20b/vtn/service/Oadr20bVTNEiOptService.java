@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -19,14 +21,19 @@ import com.avob.openadr.model.oadr20b.ei.EiTargetType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.ei.QualifiedEventIDType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedOptType;
+import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.xcal.AvailableType;
 import com.avob.openadr.model.oadr20b.xcal.VavailabilityType;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
@@ -43,6 +50,11 @@ import com.google.common.collect.Lists;
 
 @Service
 public class Oadr20bVTNEiOptService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiOptService.class);
+
+	@Resource
+	private VtnConfig vtnConfig;
 
 	@Resource
 	private VenService venService;
@@ -263,6 +275,81 @@ public class Oadr20bVTNEiOptService {
 									Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), optID)
 							.build());
 		}
+	}
+
+	private String handle(String username, String raw, OadrPayload oadrPayload)
+			throws Oadr20bMarshalException, Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException,
+			Oadr20bCancelOptApplicationLayerException, Oadr20bCreateOptApplicationLayerException,
+			Oadr20bXMLSignatureException {
+
+		xmlSignatureService.validate(raw, oadrPayload);
+		if (oadrPayload.getOadrSignedObject().getOadrCreateOpt() != null) {
+
+			LOGGER.info(username + " - OadrCreateOptType signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrCreateOpt(), true);
+
+		} else if (oadrPayload.getOadrSignedObject().getOadrCancelOpt() != null) {
+
+			LOGGER.info(username + " - OadrCancelOptType signed");
+
+			return handle(username, oadrPayload.getOadrSignedObject().getOadrCancelOpt(), true);
+
+		}
+
+		throw new Oadr20bApplicationLayerException("Unacceptable request payload for OadrPoll");
+	}
+
+	private String handle(String username, OadrCreateOptType oadrCreateOpt, boolean signed)
+			throws Oadr20bCreateOptApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
+
+		this.checkMatchUsernameWithRequestVenId(username, oadrCreateOpt);
+
+		return this.oadrCreateOpt(oadrCreateOpt, signed);
+
+	}
+
+	private String handle(String username, OadrCancelOptType oadrCancelOpt, boolean signed)
+			throws Oadr20bCancelOptApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
+
+		this.checkMatchUsernameWithRequestVenId(username, oadrCancelOpt);
+
+		return this.oadrCancelOptType(oadrCancelOpt, signed);
+
+	}
+
+	public String request(String username, String payload)
+			throws Oadr20bUnmarshalException, Oadr20bApplicationLayerException,
+			Oadr20bCancelOptApplicationLayerException, Oadr20bCreateOptApplicationLayerException,
+			Oadr20bMarshalException, Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException {
+
+		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
+
+		if (unmarshal instanceof OadrPayload) {
+
+			OadrPayload oadrPayload = (OadrPayload) unmarshal;
+
+			return handle(username, payload, oadrPayload);
+
+		} else if (unmarshal instanceof OadrCreateOptType) {
+
+			LOGGER.info(username + " - OadrCreateOptType");
+
+			OadrCreateOptType oadrCreateOptType = (OadrCreateOptType) unmarshal;
+
+			return handle(username, oadrCreateOptType, false);
+
+		} else if (unmarshal instanceof OadrCancelOptType) {
+
+			LOGGER.info(username + " - OadrCancelOptType");
+
+			OadrCancelOptType oadrCancelOptType = (OadrCancelOptType) unmarshal;
+
+			return handle(username, oadrCancelOptType, false);
+
+		}
+
+		throw new Oadr20bApplicationLayerException("Unacceptable request payload for OadrPoll");
 	}
 
 }

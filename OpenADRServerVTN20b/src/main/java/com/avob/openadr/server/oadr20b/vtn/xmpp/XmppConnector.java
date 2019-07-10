@@ -34,6 +34,8 @@ public class XmppConnector {
 
 	private static final String REGISTERPARTY_SERVICE = "EiRegisterParty";
 
+	private static final String OPT_SERVICE = "EiOpt";
+
 	@Resource
 	private VtnConfig vtnConfig;
 
@@ -45,6 +47,9 @@ public class XmppConnector {
 
 	@Resource
 	private XmppEventMessageListener xmppEventMessageListener;
+
+	@Resource
+	private XmppOptMessageListener xmppOptMessageListener;
 
 	private Map<String, OadrXmppClient20b> perOadrServiceDownlinkClient = new HashMap<>();
 
@@ -68,8 +73,6 @@ public class XmppConnector {
 				String host = vtnConfig.getXmppHost();
 				int port = vtnConfig.getXmppPort();
 
-				
-				
 				perOadrServiceDownlinkClient.put(REGISTERPARTY_SERVICE, new OadrXmppClient20b(vtnId, host, port,
 						REGISTERPARTY_SERVICE, sslContext, xmppRegisterPartyMessageListener));
 
@@ -78,16 +81,9 @@ public class XmppConnector {
 
 				perOadrServiceDownlinkClient.put(REPORT_SERVICE, new OadrXmppClient20b(vtnId, host, port,
 						REPORT_SERVICE, sslContext, xmppReportMessageListener));
-//				
-//				perOadrServiceDownlinkClient.put(REPORT_SERVICE,
-//						new OadrXmppClient20b(vtnId, host, port, REPORT_SERVICE, sslContext, reportListener));
-//				
-//				perOadrServiceDownlinkClient.put(EVENT_SERVICE,
-//						new OadrXmppClient20b(vtnId, host, port, EVENT_SERVICE, sslContext, eventListener));
 
-//				OadrXmppVtnClient20b oadrXmppVtnClient20b = new OadrXmppVtnClient20b(vtnConfig.getVtnId(),
-//						vtnConfig.getHost(), vtnConfig.getPort(), sslContext, new XmppRegisterPartyMessageListener(),
-//						null, null);
+				perOadrServiceDownlinkClient.put(OPT_SERVICE,
+						new OadrXmppClient20b(vtnId, host, port, OPT_SERVICE, sslContext, xmppOptMessageListener));
 
 				LOGGER.info("Xmpp VTN connector successfully initialized");
 

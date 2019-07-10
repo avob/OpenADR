@@ -19,6 +19,8 @@ ADMIN_NAME="admin.oadr.com"
 VTN_NAME="vtn.oadr.com"
 VEN1_NAME="ven1.oadr.com"
 VEN2_NAME="ven2.oadr.com"
+VEN3_NAME="ven3.login.oadr.com"
+VEN4_NAME="ven4.login.oadr.com"
 USER_NAME="user.oadr.com"
 APP_NAME="app.oadr.com"
 
@@ -93,12 +95,12 @@ gen_java_truststore()
 # gen_oadr20b_fingerprint "in/out crt/fingerprint name"
 gen_oadr20b_fingerprint()
 {
-	openssl x509 -in $1.crt -fingerprint -sha256 -noout | cut -d'=' -f2 | cat | tail -c 30 | sed -r 's/[:]+//g' | tr '[:upper:]' '[:lower:]' > $1.fingerprint
+	openssl x509 -in $1.crt -fingerprint -sha256 -noout | cut -d'=' -f2 | cat | tail -c 30 | sed 's#:##g' | tr '[:upper:]' '[:lower:]' > $1.fingerprint
 }
 # gen_oadr20a_fingerprint "in/out crt/fingerprint name"
 gen_oadr20a_fingerprint()
 {
-	openssl x509 -in $1.crt -fingerprint -sha1 -noout | cut -d'=' -f2 | cat | tail -c 30 | sed -r 's/[:]+//g' | tr '[:upper:]' '[:lower:]' > $1.fingerprint.oadr20a
+	openssl x509 -in $1.crt -fingerprint -sha1 -noout | cut -d'=' -f2 | cat | tail -c 30 | sed 's#:##g' | tr '[:upper:]' '[:lower:]' > $1.fingerprint.oadr20a
 }
 # gen_selfsigned_key_crt "out key/crt name"
 gen_selfsigned_key_crt()
@@ -162,3 +164,18 @@ gen_oadr20b_fingerprint $USER_NAME
 gen_rsa_key_csr $APP_NAME $APP_NAME $CA_NAME 07 365
 gen_pkcs12 $APP_NAME
 gen_oadr20b_fingerprint $APP_NAME
+
+###################################
+# VEN3
+###################################
+gen_rsa_key_csr $VEN3_NAME $VEN3_NAME $CA_NAME 08 365
+gen_oadr20b_fingerprint $VEN3_NAME
+gen_oadr20a_fingerprint $VEN3_NAME
+
+###################################
+# VEN4
+###################################
+gen_ecc_key_csr $VEN4_NAME $VEN4_NAME $CA_NAME 09 365
+gen_oadr20b_fingerprint $VEN4_NAME
+gen_oadr20a_fingerprint $VEN4_NAME
+

@@ -32,6 +32,8 @@ public class VtnSessionConfiguration {
 	private String vtnUrl;
 	private String vtnXmppHost;
 	private Integer vtnXmppPort;
+	private String vtnXmppUser;
+	private String vtnXmppPass;
 	private VenConfig venSessionConfig;
 
 	public VtnSessionConfiguration(Properties properties, VenConfig defaultVenSessionConfig) {
@@ -82,9 +84,9 @@ public class VtnSessionConfiguration {
 			} else if (AUTHENTIFICATION_DIGEST_REALM.equals(keyStr)) {
 				getVenSessionConfig().setDigestRealm(prop);
 			} else if (AUTHENTIFICATION_XMPP_USER.equals(keyStr)) {
-				getVenSessionConfig().setDigestPassword(prop);
+				this.setVtnXmppUser(prop);
 			} else if (AUTHENTIFICATION_XMPP_PASS.equals(keyStr)) {
-				getVenSessionConfig().setDigestRealm(prop);
+				this.setVtnXmppPass(prop);
 			}
 
 		}
@@ -137,6 +139,22 @@ public class VtnSessionConfiguration {
 
 	public void setVtnXmppPort(Integer vtnXmppPort) {
 		this.vtnXmppPort = vtnXmppPort;
+	}
+
+	public String getVtnXmppUser() {
+		return vtnXmppUser;
+	}
+
+	public void setVtnXmppUser(String vtnXmppUser) {
+		this.vtnXmppUser = vtnXmppUser;
+	}
+
+	public String getVtnXmppPass() {
+		return vtnXmppPass;
+	}
+
+	public void setVtnXmppPass(String vtnXmppPass) {
+		this.vtnXmppPass = vtnXmppPass;
 	}
 
 }
