@@ -18,10 +18,8 @@ import org.springframework.stereotype.Service;
 import com.avob.openadr.client.xmpp.oadr20b.ven.OadrXmppVenClient20b;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
-import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.builders.eiregisterparty.Oadr20bCreatePartyRegistrationBuilder;
-import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SchemaVersionEnumeratedType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
@@ -34,15 +32,15 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationExc
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatePartyRegistrationType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
-import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
+import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
+import com.avob.openadr.server.oadr20b.ven.VenConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 
 @Service
@@ -60,7 +58,7 @@ public class Oadr20bVENEiRegisterPartyService {
 	private Oadr20bJAXBContext jaxbContext;
 
 	@Resource
-	protected StatePersistenceService statePersistenceService;
+	private VenConfig venConfig;
 
 	private Map<String, OadrCreatedPartyRegistrationType> registration = new ConcurrentHashMap<String, OadrCreatedPartyRegistrationType>();
 
@@ -104,13 +102,7 @@ public class Oadr20bVENEiRegisterPartyService {
 	}
 
 	public void clearRegistration(VtnSessionConfiguration vtnConfiguration) {
-		try {
-			statePersistenceService.deleteRegistration(vtnConfiguration.getVenSessionConfig().getVenId(),
-					vtnConfiguration);
-			setRegistration(vtnConfiguration, null);
-		} catch (IOException e) {
-			LOGGER.error("", e);
-		}
+		setRegistration(vtnConfiguration, null);
 	}
 
 	public void initRegistration(VtnSessionConfiguration vtnConfiguration) {
@@ -125,187 +117,42 @@ public class Oadr20bVENEiRegisterPartyService {
 		this.initRegistration(vtnConfiguration, registrationId);
 	}
 
-	private boolean isSameConfig(VtnSessionConfiguration vtnConfiguration) {
-		return true;
-	}
-
 	private void initRegistration(VtnSessionConfiguration vtnConfiguration, String registrationId) {
-		OadrCreatedPartyRegistrationType loadRegistration = null;
+
+		String requestId = "0";
+		OadrQueryRegistrationType queryRegistration = Oadr20bEiRegisterPartyBuilders
+				.newOadr20bQueryRegistrationBuilder(requestId)
+				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value()).build();
+
 		try {
-			loadRegistration = statePersistenceService
-					.loadRegistration(vtnConfiguration.getVenSessionConfig().getVenId(), vtnConfiguration);
-
-			String requestId = "0";
-			String reportRequestId = "0";
-			String reportSpecifierId = "METADATA";
-			String granularity = "P0D";
-			String reportBackDuration = "P0D";
-			OadrReportRequestType oadrReportRequestType = Oadr20bEiReportBuilders
-					.newOadr20bReportRequestTypeBuilder(reportRequestId, reportSpecifierId, granularity,
-							reportBackDuration)
-					.addSpecifierPayload(null, ReadingTypeEnumeratedType.DIRECT_READ, reportSpecifierId).build();
-			OadrCreateReportType build = Oadr20bEiReportBuilders
-					.newOadr20bCreateReportBuilder(requestId, vtnConfiguration.getVenSessionConfig().getVenId())
-					.addReportRequest(oadrReportRequestType).build();
-
-			multiVtnConfig.oadrCreateReport(vtnConfiguration, build);
-
-		} catch (Oadr20bUnmarshalException e) {
-			LOGGER.error("", e);
-		} catch (IOException e) {
-			LOGGER.error("", e);
-		} catch (Oadr20bException e) {
-			LOGGER.error("", e);
-		} catch (Oadr20bHttpLayerException e) {
-			if (e.getErrorCode() == HttpStatus.FORBIDDEN_403) {
-				loadRegistration = null;
-				try {
-					statePersistenceService.deleteRegistration(vtnConfiguration.getVenSessionConfig().getVenId(),
-							vtnConfiguration);
-				} catch (IOException e1) {
-					LOGGER.error("", e1);
-				}
-				LOGGER.warn("Local registration have been rejected by VTN, trying manual registration");
+			if (vtnConfiguration.getVtnUrl() != null) {
+				OadrCreatedPartyRegistrationType oadrQueryRegistrationType = multiVtnConfig
+						.getMultiHttpClientConfig(vtnConfiguration).oadrQueryRegistrationType(queryRegistration);
+				String handle = this.handle(vtnConfiguration, oadrQueryRegistrationType, venConfig.getXmlSignature());
 			} else {
-				LOGGER.error("", e);
+				multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).oadrQueryRegistrationType(queryRegistration);
 			}
 
-		} catch (Oadr20bXMLSignatureException e) {
-			LOGGER.error("", e);
-		} catch (Oadr20bXMLSignatureValidationException e) {
-			LOGGER.error("", e);
+		} catch (XmppStringprepException e) {
+			LOGGER.error("Fail to query registration", e);
 		} catch (NotConnectedException e) {
-			LOGGER.error("", e);
+			LOGGER.error("Fail to query registration", e);
+		} catch (Oadr20bException e) {
+			LOGGER.error("Fail to query registration", e);
+		} catch (Oadr20bHttpLayerException e) {
+			LOGGER.error("Fail to query registration", e);
+		} catch (Oadr20bXMLSignatureException e) {
+			LOGGER.error("Fail to query registration", e);
+		} catch (Oadr20bXMLSignatureValidationException e) {
+			LOGGER.error("Fail to query registration", e);
 		} catch (Oadr20bMarshalException e) {
-			LOGGER.error("", e);
+			LOGGER.error("Fail to query registration", e);
 		} catch (InterruptedException e) {
-			LOGGER.error("", e);
-		}
-
-		if (loadRegistration != null) {
-
-			if (isSameConfig(vtnConfiguration)) {
-				LOGGER.info("Ven already registered using registrationId: " + loadRegistration.getRegistrationID());
-				LOGGER.info("        xmlSignature: " + vtnConfiguration.getVenSessionConfig().getXmlSignature());
-				LOGGER.info("        reportOnly  : " + vtnConfiguration.getVenSessionConfig().getReportOnly());
-				LOGGER.info("        pullModel   : " + vtnConfiguration.getVenSessionConfig().getPullModel());
-				setRegistration(vtnConfiguration, loadRegistration);
-				if (getListeners() != null) {
-					final OadrCreatedPartyRegistrationType reg = loadRegistration;
-					getListeners().forEach(listener -> listener.onRegistrationSuccess(vtnConfiguration, reg));
-				}
-				return;
-			} else {
-				this.reinitRegistration(vtnConfiguration);
-			}
-
-		}
-
-		LOGGER.info("Ven is not yet registered");
-
-		if (vtnConfiguration.getVtnUrl() != null) {
-			try {
-
-				Boolean pullModel = vtnConfiguration.getVenSessionConfig().getPullModel();
-				String transportAddress = null;
-				if (!pullModel) {
-					transportAddress = vtnConfiguration.getVenSessionConfig().getVenUrl();
-				}
-				boolean reportOnly = vtnConfiguration.getVenSessionConfig().getReportOnly();
-				OadrTransportType transportType = OadrTransportType.SIMPLE_HTTP;
-				String venName = vtnConfiguration.getVenSessionConfig().getVenName();
-				boolean xmlSignature = vtnConfiguration.getVenSessionConfig().getXmlSignature();
-				String requestId = "";
-				Oadr20bCreatePartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
-						.newOadr20bCreatePartyRegistrationBuilder(requestId,
-								vtnConfiguration.getVenSessionConfig().getVenId(),
-								SchemaVersionEnumeratedType.OADR_20B.value())
-						.withOadrHttpPullModel(pullModel).withOadrTransportAddress(transportAddress)
-						.withOadrReportOnly(reportOnly).withOadrTransportName(transportType).withOadrVenName(venName)
-						.withOadrXmlSignature(xmlSignature);
-				if (registrationId != null) {
-					builder.withRegistrationId(registrationId);
-				}
-
-				OadrCreatePartyRegistrationType createPartyRegistration = builder.build();
-
-				LOGGER.info("Ven try to register using HTTP...");
-
-				loadRegistration = multiVtnConfig.getMultiHttpClientConfig(vtnConfiguration)
-						.oadrCreatePartyRegistration(createPartyRegistration);
-
-				if (loadRegistration.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
-					register(vtnConfiguration, loadRegistration);
-				} else {
-					LOGGER.error("Ven has failed to register - responseCode: "
-							+ loadRegistration.getEiResponse().getResponseCode() + ", responseDescription: "
-							+ loadRegistration.getEiResponse().getResponseDescription());
-				}
-
-				return;
-
-			} catch (Oadr20bHttpLayerException e) {
-				LOGGER.error("Fail to create registration: HttpLayerException[" + e.getErrorCode() + "]: "
-						+ e.getErrorMessage());
-
-			} catch (Oadr20bException e) {
-				LOGGER.error("Fail to create registration", e);
-			} catch (Oadr20bXMLSignatureException e) {
-				LOGGER.error("Fail to sign request payload", e);
-			} catch (Oadr20bXMLSignatureValidationException e) {
-				LOGGER.error("Fail to validate response xml signature", e);
-			} catch (Exception e) {
-				LOGGER.error("", e);
-			}
-			if (getListeners() != null) {
-				getListeners().forEach(listener -> listener.onRegistrationError(vtnConfiguration));
-			}
-			setRegistration(vtnConfiguration, null);
-		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			LOGGER.info("Ven try to register using XMPP...");
-
-			try {
-				OadrXmppVenClient20b xmppClient = multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration);
-
-				Boolean pullModel = vtnConfiguration.getVenSessionConfig().getPullModel();
-				String transportAddress = xmppClient.getConnectionJid().toString();
-
-				boolean reportOnly = vtnConfiguration.getVenSessionConfig().getReportOnly();
-				OadrTransportType transportType = OadrTransportType.XMPP;
-				String venName = vtnConfiguration.getVenSessionConfig().getVenName();
-				boolean xmlSignature = vtnConfiguration.getVenSessionConfig().getXmlSignature();
-				String requestId = "";
-				Oadr20bCreatePartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
-						.newOadr20bCreatePartyRegistrationBuilder(requestId,
-								vtnConfiguration.getVenSessionConfig().getVenId(),
-								SchemaVersionEnumeratedType.OADR_20B.value())
-						.withOadrHttpPullModel(pullModel).withOadrTransportAddress(transportAddress)
-						.withOadrReportOnly(reportOnly).withOadrTransportName(transportType).withOadrVenName(venName)
-						.withOadrXmlSignature(xmlSignature);
-				if (registrationId != null) {
-					builder.withRegistrationId(registrationId);
-				}
-
-				OadrCreatePartyRegistrationType createPartyRegistration = builder.build();
-
-				xmppClient.oadrCreatePartyRegistration(createPartyRegistration);
-			} catch (XmppStringprepException e) {
-				LOGGER.error("Fail to create registration", e);
-			} catch (NotConnectedException e) {
-				LOGGER.error("Fail to create registration", e);
-			} catch (Oadr20bException e) {
-				LOGGER.error("Fail to create registration", e);
-			} catch (Oadr20bHttpLayerException e) {
-				LOGGER.error("Fail to create registration", e);
-			} catch (Oadr20bXMLSignatureException e) {
-				LOGGER.error("Fail to create registration", e);
-			} catch (Oadr20bXMLSignatureValidationException e) {
-				LOGGER.error("Fail to create registration", e);
-			} catch (Oadr20bMarshalException e) {
-				LOGGER.error("Fail to create registration", e);
-			} catch (InterruptedException e) {
-				LOGGER.error("Fail to create registration", e);
-			}
+			LOGGER.error("Fail to query registration", e);
+		} catch (OadrSecurityException e) {
+			LOGGER.error("Fail to query registration", e);
+		} catch (IOException e) {
+			LOGGER.error("Fail to query registration", e);
 		}
 
 	}
@@ -313,11 +160,6 @@ public class Oadr20bVENEiRegisterPartyService {
 	public void register(VtnSessionConfiguration vtnConfiguration, OadrCreatedPartyRegistrationType registration)
 			throws Oadr20bMarshalException, IOException {
 		setRegistration(vtnConfiguration, registration);
-		// session do not have to be persisted for xmpp vtn profil
-		if (vtnConfiguration.getVtnUrl() != null) {
-			statePersistenceService.persistRegistration(vtnConfiguration.getVenSessionConfig().getVenId(),
-					vtnConfiguration, registration);
-		}
 
 		LOGGER.info("Ven has successfully register using registrationId: " + registration.getRegistrationID());
 		LOGGER.debug("        xmlSignature: " + vtnConfiguration.getVenSessionConfig().getXmlSignature());
@@ -346,16 +188,16 @@ public class Oadr20bVENEiRegisterPartyService {
 		if (getListeners() == null) {
 			setListeners(new ArrayList<Oadr20bVENEiRegisterPartyServiceListener>());
 		}
-		
-		if(!getListeners().contains(listener)) {
+
+		if (!getListeners().contains(listener)) {
 			getListeners().add(listener);
 		}
-		
+
 	}
 
 	public String handle(VtnSessionConfiguration vtnConfig, String raw, OadrPayload oadrPayload)
 			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
-			Oadr20bXMLSignatureException, OadrSecurityException {
+			Oadr20bXMLSignatureException, OadrSecurityException, IOException {
 		xmlSignatureService.validate(raw, oadrPayload, vtnConfig);
 
 		if (oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration() != null) {
@@ -364,6 +206,9 @@ public class Oadr20bVENEiRegisterPartyService {
 		} else if (oadrPayload.getOadrSignedObject().getOadrRequestReregistration() != null) {
 			LOGGER.info(vtnConfig.getVtnId() + " - OadrRequestReregistrationType signed");
 			return handle(vtnConfig, oadrPayload.getOadrSignedObject().getOadrRequestReregistration(), true);
+		} else if (oadrPayload.getOadrSignedObject().getOadrCreatedPartyRegistration() != null) {
+			LOGGER.info(vtnConfig.getVtnId() + " - OadrCreatedPartyRegistrationType signed");
+			return handle(vtnConfig, oadrPayload.getOadrSignedObject().getOadrCreatedPartyRegistration(), true);
 		}
 
 		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
@@ -405,9 +250,91 @@ public class Oadr20bVENEiRegisterPartyService {
 
 	}
 
+	public String handle(VtnSessionConfiguration vtnConfig,
+			OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType, boolean signed)
+			throws Oadr20bMarshalException, Oadr20bXMLSignatureException, OadrSecurityException, IOException {
+
+		if (getRegistration(vtnConfig) != null && getRegistration(vtnConfig).getRegistrationID() != null
+				&& getRegistration(vtnConfig).getRegistrationID()
+						.equals(oadrCreatedPartyRegistrationType.getRegistrationID())) {
+			return null;
+		} else if (oadrCreatedPartyRegistrationType.getRegistrationID() != null) {
+			this.register(vtnConfig, oadrCreatedPartyRegistrationType);
+		}
+
+		String venName = vtnConfig.getVenSessionConfig().getVenName();
+
+		boolean xmlSignature = vtnConfig.getVenSessionConfig().getXmlSignature();
+		boolean reportOnly = vtnConfig.getVenSessionConfig().getReportOnly();
+		String requestId = "";
+		Oadr20bCreatePartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
+				.newOadr20bCreatePartyRegistrationBuilder(requestId, vtnConfig.getVenSessionConfig().getVenId(),
+						SchemaVersionEnumeratedType.OADR_20B.value())
+				.withRegistrationId(oadrCreatedPartyRegistrationType.getRegistrationID());
+
+		if (vtnConfig.getVtnUrl() != null) {
+
+			Boolean pullModel = vtnConfig.getVenSessionConfig().getPullModel();
+			String transportAddress = null;
+			if (!pullModel) {
+				transportAddress = vtnConfig.getVenSessionConfig().getVenUrl();
+			}
+
+			OadrTransportType transportType = OadrTransportType.SIMPLE_HTTP;
+
+			builder.withOadrHttpPullModel(pullModel).withOadrTransportAddress(transportAddress)
+					.withOadrReportOnly(reportOnly).withOadrTransportName(transportType).withOadrVenName(venName)
+					.withOadrXmlSignature(xmlSignature);
+
+//			if (getListeners() != null) {
+//				getListeners().forEach(listener -> listener.onRegistrationError(vtnConfig));
+//			}
+
+		} else if (vtnConfig.getVtnXmppHost() != null && vtnConfig.getVtnXmppPort() != null) {
+
+			OadrXmppVenClient20b xmppClient = multiVtnConfig.getMultiXmppClientConfig(vtnConfig);
+
+			String transportAddress = xmppClient.getConnectionJid().toString();
+
+			OadrTransportType transportType = OadrTransportType.XMPP;
+
+			builder.withOadrTransportAddress(transportAddress).withOadrReportOnly(reportOnly)
+					.withOadrTransportName(transportType).withOadrVenName(venName).withOadrXmlSignature(xmlSignature);
+
+		}
+
+		OadrCreatePartyRegistrationType createPartyRegistration = builder.build();
+
+		try {
+//			multiVtnConfig.oadrCreatePartyRegistration(vtnConfig, createPartyRegistration);
+
+			if (vtnConfig.getVtnUrl() != null) {
+				OadrCreatedPartyRegistrationType oadrQueryRegistrationType = multiVtnConfig
+						.getMultiHttpClientConfig(vtnConfig).oadrCreatePartyRegistration(createPartyRegistration);
+				this.handle(vtnConfig, oadrQueryRegistrationType, false);
+			} else {
+				multiVtnConfig.getMultiXmppClientConfig(vtnConfig).oadrCreatePartyRegistration(createPartyRegistration);
+			}
+
+		} catch (NotConnectedException e) {
+			LOGGER.error("", e);
+		} catch (Oadr20bException e) {
+			LOGGER.error("", e);
+		} catch (Oadr20bHttpLayerException e) {
+			LOGGER.error("", e);
+		} catch (Oadr20bXMLSignatureValidationException e) {
+			LOGGER.error("", e);
+		} catch (InterruptedException e) {
+			LOGGER.error("", e);
+		}
+
+		return null;
+
+	}
+
 	public String request(String username, String payload)
 			throws Oadr20bMarshalException, Oadr20bUnmarshalException, Oadr20bApplicationLayerException,
-			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException {
+			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException, IOException {
 
 		Object unmarshal = jaxbContext.unmarshal(payload);
 
@@ -435,6 +362,14 @@ public class Oadr20bVENEiRegisterPartyService {
 
 			return handle(vtnConfig, oadrCancelPartyRegistrationType, false);
 
+		} else if (unmarshal instanceof OadrCreatedPartyRegistrationType) {
+
+			OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType = (OadrCreatedPartyRegistrationType) unmarshal;
+
+			LOGGER.info(username + " - OadrCancelPartyRegistrationType");
+
+			return handle(vtnConfig, oadrCreatedPartyRegistrationType, false);
+
 		}
 
 		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
@@ -443,7 +378,6 @@ public class Oadr20bVENEiRegisterPartyService {
 	public List<Oadr20bVENEiRegisterPartyServiceListener> getListeners() {
 		return listeners;
 	}
-
 
 	private void setListeners(List<Oadr20bVENEiRegisterPartyServiceListener> listeners) {
 		this.listeners = listeners;

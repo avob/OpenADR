@@ -39,9 +39,7 @@
   handlers:
 
   roles:
-    # - ansiblebit.oracle-java
     - geerlingguy.postgresql
-    # - geerlingguy.rabbitmq
     - remyma.ansible-springboot
     - ../../roles/common
     - ../../roles/nodejs

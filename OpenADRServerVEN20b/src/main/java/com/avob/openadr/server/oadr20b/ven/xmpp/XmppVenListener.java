@@ -27,6 +27,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
@@ -128,6 +129,14 @@ public class XmppVenListener implements StanzaListener {
 
 				multiXmppClientConfig.sendEventMessage(response);
 
+			} else if (unmarshal instanceof OadrCreatedPartyRegistrationType) {
+
+				OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType = (OadrCreatedPartyRegistrationType) unmarshal;
+
+				LOGGER.info(username + " - OadrCreatedPartyRegistrationType");
+
+				oadr20bVENEiRegisterPartyService.handle(multiConfig, oadrCreatedPartyRegistrationType, false);
+
 			} else if (unmarshal instanceof OadrRequestReregistrationType) {
 
 				OadrRequestReregistrationType oadrRequestReregistrationType = (OadrRequestReregistrationType) unmarshal;
@@ -152,9 +161,9 @@ public class XmppVenListener implements StanzaListener {
 
 				OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType = (OadrCreatedPartyRegistrationType) unmarshal;
 
-				LOGGER.info(username + " - OadrCreateReport");
+				LOGGER.info(username + " - OadrCreatedPartyRegistration");
 
-				oadr20bVENEiRegisterPartyService.register(multiConfig, oadrCreatedPartyRegistrationType);
+				oadr20bVENEiRegisterPartyService.handle(multiConfig, oadrCreatedPartyRegistrationType, false);
 
 			} else if (unmarshal instanceof OadrCancelReportType) {
 
@@ -175,6 +184,10 @@ public class XmppVenListener implements StanzaListener {
 				response = reportService.handle(multiConfig, oadrCreateReportType, false);
 
 				multiXmppClientConfig.sendReportMessage(response);
+
+			} else if (unmarshal instanceof OadrCreatedReportType) {
+
+				LOGGER.info(username + " - OadrCreateReport");
 
 			} else if (unmarshal instanceof OadrRegisterReportType) {
 

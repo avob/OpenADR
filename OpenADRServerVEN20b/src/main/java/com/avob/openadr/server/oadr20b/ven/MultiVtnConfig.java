@@ -57,6 +57,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatePartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
@@ -165,7 +166,8 @@ public class MultiVtnConfig {
 
 				OadrXmppClient20bBuilder builder = new OadrXmppClient20bBuilder()
 						.withHostAndPort(session.getVtnXmppHost(), session.getVtnXmppPort())
-						.withVenID(session.getVtnId()).withResource("client").withSSLContext(sslContext);
+						.withVenID(session.getVtnId()).withResource("client").withSSLContext(sslContext)
+						.withListener(xmppVenListeners);
 
 				if (session.getVtnXmppUser() != null && session.getVtnXmppPass() != null) {
 					builder.withPassword(session.getVtnXmppPass());
@@ -210,7 +212,6 @@ public class MultiVtnConfig {
 	private Map<String, Properties> loadVtnConf() {
 
 		String dynamicConfigurationPattern = "oadr.vtn.";
-//		List<String> uniqueVtnKey = new ArrayList<>();
 		Map<String, Properties> perVtnProperties = new HashMap<>();
 		Properties props = new Properties();
 		MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
@@ -227,10 +228,7 @@ public class MultiVtnConfig {
 						String propKey = replaceAll.replaceAll(key + ".", "");
 						vtnProps.put(dynamicConfigurationPattern + propKey, env.getProperty(propName));
 						perVtnProperties.put(key, vtnProps);
-//						if (!uniqueVtnKey.contains(key)) {
-//							uniqueVtnKey.add(key);
-//						}
-						LOGGER.info(propName + " " + env.getProperty(propName));
+
 						props.setProperty(propName, env.getProperty(propName));
 
 					}
@@ -468,16 +466,6 @@ public class MultiVtnConfig {
 		}
 	}
 
-	public void oadrQueryRegistrationType(VtnSessionConfiguration vtnConfiguration, OadrQueryRegistrationType payload)
-			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
-			Oadr20bMarshalException, InterruptedException {
-		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrQueryRegistrationType(payload);
-		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrQueryRegistrationType(payload);
-		}
-	}
 
 	public OadrXmppVenClient20b getMultiXmppClientConfig(VtnSessionConfiguration vtnConfiguration) {
 		return multiXmppClientConfig.get(vtnConfiguration.getVtnId());

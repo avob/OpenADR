@@ -1,5 +1,6 @@
 package com.avob.openadr.server.oadr20b.ven.controller;
 
+import java.io.IOException;
 import java.security.Principal;
 
 import javax.annotation.Resource;
@@ -34,7 +35,7 @@ public class Oadr20bVENEiRegisterPartyController {
 	@ResponseBody
 	public String request(@RequestBody String payload, Principal principal)
 			throws Oadr20bMarshalException, Oadr20bUnmarshalException, Oadr20bApplicationLayerException,
-			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException {
+			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException, IOException {
 
 		return oadr20bVENEiRegisterPartyService.request(principal.getName(), payload);
 	}

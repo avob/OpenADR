@@ -36,9 +36,10 @@ public class RoleController {
 	public List<String> getUserRole(@PathVariable("username") String username, HttpServletResponse response) {
 		AbstractUser user = abstractUserDao.findOneByUsername(username);
 		List<String> roles = new ArrayList<>();
-		if (user != null) {
-			roles = user.getRoles();
+		if (user == null) {
+			return roles;
 		}
+
 		if (user instanceof Ven) {
 			roles.add("ROLE_VEN");
 		} else if (user instanceof OadrUser) {

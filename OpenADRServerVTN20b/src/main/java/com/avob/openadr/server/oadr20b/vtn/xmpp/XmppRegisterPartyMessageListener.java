@@ -9,6 +9,7 @@ import org.jivesoftware.smack.packet.Stanza;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.jid.parts.Localpart;
+import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,6 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
-import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCanceledPartyRegistrationTypeApplicationLayerException;
@@ -50,6 +50,10 @@ public class XmppRegisterPartyMessageListener implements StanzaListener {
 
 		Localpart localpartOrThrow = from.getLocalpartOrThrow();
 
+		Resourcepart resourceOrThrow = from.getResourceOrThrow();
+
+		
+
 		String username = localpartOrThrow.asUnescapedString().toLowerCase();
 
 		String body = message.getBody();
@@ -60,11 +64,15 @@ public class XmppRegisterPartyMessageListener implements StanzaListener {
 
 			String response = oadr20bVTNEiRegisterPartyService.request(username, body);
 
-			Ven findOneByUsername = venService.findOneByUsername(username);
+//			Jid jid = JidCreate.from(findOneByUsername.getPushUrl());
 
-			Jid jid = JidCreate.from(findOneByUsername.getPushUrl());
+//			Ven findOneByUsername = venService.findOneByUsername(username);
+//
+//			Jid jid = JidCreate.from(findOneByUsername.getPushUrl());
 
-			xmppUplinkClient.getUplinkClient().sendMessage(jid, response);
+			 from = JidCreate.from(resourceOrThrow + "@" + from.getDomain().toString() + "/" + resourceOrThrow);
+			
+			xmppUplinkClient.getUplinkClient().sendMessage(from, response);
 
 		} catch (Oadr20bUnmarshalException e) {
 			LOGGER.error(e.getMessage());

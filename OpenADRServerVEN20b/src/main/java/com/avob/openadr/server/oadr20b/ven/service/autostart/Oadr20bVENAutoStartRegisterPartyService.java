@@ -15,8 +15,12 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
+import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.VenConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
@@ -80,6 +84,8 @@ public class Oadr20bVENAutoStartRegisterPartyService implements Oadr20bVENEiRegi
 		}
 	}
 
+
+
 	private void sendRegisterReportPaylad(VtnSessionConfiguration vtnConfiguration) {
 		if (sent.get(vtnConfiguration.getVtnId()) == null || !sent.get(vtnConfiguration.getVtnId())) {
 			String requestId = "0";
@@ -90,6 +96,21 @@ public class Oadr20bVENAutoStartRegisterPartyService implements Oadr20bVENEiRegi
 			planRequestService.submitRegisterReport(vtnConfiguration, payload);
 
 			sent.put(vtnConfiguration.getVtnId(), true);
+			
+	
+			String reportSpecifierId = "METADATA";
+			String granularity = "P0D";
+			String reportBackDuration = "P0D";
+
+			OadrReportRequestType oadrReportRequestType = Oadr20bEiReportBuilders
+					.newOadr20bReportRequestTypeBuilder(reportRequestId, reportSpecifierId, granularity,
+							reportBackDuration)
+					.addSpecifierPayload(null, ReadingTypeEnumeratedType.DIRECT_READ, reportSpecifierId).build();
+			OadrCreateReportType createReport = Oadr20bEiReportBuilders
+					.newOadr20bCreateReportBuilder(requestId, vtnConfiguration.getVenSessionConfig().getVenId())
+					.addReportRequest(oadrReportRequestType).build();
+
+			planRequestService.submitCreateReport(vtnConfiguration, createReport);
 		}
 	}
 
