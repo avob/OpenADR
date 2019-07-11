@@ -103,7 +103,6 @@
 		<module>./OpenADRModel20b</module>
 		<module>./OpenADRSecurity</module>
 		<module>./OpenADRServerVTNCommon</module>
-		<module>./OpenADRServerVEN20a</module>
 		<module>./OpenADRServerVTN20a</module>
 		<module>./OpenADRServerVEN20b</module>
 		<module>./OpenADRServerVTN20b</module>
