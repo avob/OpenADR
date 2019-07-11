@@ -227,9 +227,12 @@ public class Oadr20bFactory {
 
 	public static String millisecondToXmlDuration(Long millisecond) {
 		Duration newDuration = datatypeFactory.newDuration(millisecond);
-
+		if (millisecond.equals(0L)) {
+			return "PT0S";
+		}
 		StringBuilder builder = new StringBuilder();
 		builder.append("P");
+
 		if (newDuration.getYears() > 0) {
 			builder.append(newDuration.getYears());
 			builder.append("Y");
@@ -242,7 +245,7 @@ public class Oadr20bFactory {
 			builder.append(newDuration.getDays());
 			builder.append("D");
 		}
-		if (newDuration.getHours() > 0 || newDuration.getMinutes() > 0) {
+		if (newDuration.getHours() > 0 || newDuration.getMinutes() > 0 || newDuration.getSeconds() > 0) {
 			builder.append("T");
 			if (newDuration.getHours() > 0) {
 				builder.append(newDuration.getHours());
@@ -251,6 +254,11 @@ public class Oadr20bFactory {
 			if (newDuration.getMinutes() > 0) {
 				builder.append(newDuration.getMinutes());
 				builder.append("M");
+			}
+
+			if (newDuration.getSeconds() > 0) {
+				builder.append(newDuration.getSeconds());
+				builder.append("S");
 			}
 		}
 
@@ -275,17 +283,6 @@ public class Oadr20bFactory {
 		return factory.createOadrTransports();
 	}
 
-	public static OadrServiceSpecificInfo createOadrServiceSpecificInfo() {
-		OadrServiceSpecificInfo createOadrServiceSpecificInfo = factory.createOadrServiceSpecificInfo();
-		OadrService oadrService = Oadr20bFactory.createOadrServiceSpecificInfoOadrService();
-		OadrServiceNameType oadrServiceName = OadrServiceNameType.EI_REPORT;
-		oadrService.setOadrServiceName(oadrServiceName);
-		OadrInfo oadrInfo = Oadr20bFactory.createOadrInfo();
-		oadrService.getOadrInfo().add(oadrInfo);
-		createOadrServiceSpecificInfo.getOadrService().add(oadrService);
-		return createOadrServiceSpecificInfo;
-	}
-
 	public static OadrCreatedPartyRegistrationType createOadrCreatedPartyRegistrationType(String requestId,
 			int responseCode, String venId, String vtnId) {
 		OadrCreatedPartyRegistrationType createOadrCreatedPartyRegistrationType = factory
@@ -297,10 +294,6 @@ public class Oadr20bFactory {
 		OadrProfiles createOadrProfiles = Oadr20bFactory.createOadrProfiles();
 		createOadrCreatedPartyRegistrationType.setOadrProfiles(createOadrProfiles);
 		return createOadrCreatedPartyRegistrationType;
-	}
-
-	public static OadrExtensions createOadrCreatedPartyRegistrationTypeOadrExtensions() {
-		return factory.createOadrCreatedPartyRegistrationTypeOadrExtensions();
 	}
 
 	public static OadrDistributeEventType createOadrDistributeEventType(String vtnId, String requestId) {
@@ -1588,17 +1581,6 @@ public class Oadr20bFactory {
 		return createOadrLoadControlStateTypeType;
 	}
 
-	public static OadrService createOadrServiceSpecificInfoOadrService() {
-		return factory.createOadrServiceSpecificInfoOadrService();
-	}
-
-	public static OadrInfo createOadrInfo() {
-		return factory.createOadrInfo();
-	}
-
-	public static OadrExtension createOadrCreatedPartyRegistrationTypeOadrExtensionsOadrExtension() {
-		return factory.createOadrCreatedPartyRegistrationTypeOadrExtensionsOadrExtension();
-	}
 
 	public static PayloadKeyTokenType createPayloadKeyTokenType(List<KeyTokenType> tokens) {
 		PayloadKeyTokenType createPayloadKeyTokenType = avobFactory.createPayloadKeyTokenType();
@@ -1606,35 +1588,13 @@ public class Oadr20bFactory {
 		return createPayloadKeyTokenType;
 	}
 
-	public static KeyTokenType createKeyTokenType() {
-		return avobFactory.createKeyTokenType();
-	}
-
 	public static JAXBElement<PayloadKeyTokenType> createPayloadKeyToken(PayloadKeyTokenType value) {
 		return avobFactory.createPayloadKeyToken(value);
-	}
-
-	public static AvobVenServiceRequestType createAvobVenServiceRequestType(String requestId, String serviceName,
-			String command, boolean refresh) {
-		AvobVenServiceRequestType createAvobVenServiceRequestType = avobFactory.createAvobVenServiceRequestType();
-		createAvobVenServiceRequestType.setRequestId(requestId);
-		createAvobVenServiceRequestType.setServiceName(serviceName);
-		createAvobVenServiceRequestType.setCommand(command);
-		createAvobVenServiceRequestType.setRefresh(refresh);
-		return createAvobVenServiceRequestType;
 	}
 
 	public static JAXBElement<PayloadAvobVenServiceRequestType> createPayloadAvobVenServiceRequest(
 			PayloadAvobVenServiceRequestType value) {
 		return avobFactory.createPayloadAvobVenServiceRequest(value);
-	}
-
-	public static PayloadAvobVenServiceRequestType createPayloadAvobVenServiceRequestType(
-			List<AvobVenServiceRequestType> requests) {
-		PayloadAvobVenServiceRequestType createPayloadAvobVenServiceRequestType = avobFactory
-				.createPayloadAvobVenServiceRequestType();
-		createPayloadAvobVenServiceRequestType.getRequests().addAll(requests);
-		return createPayloadAvobVenServiceRequestType;
 	}
 
 }
