@@ -13,11 +13,9 @@ import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.parts.Localpart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.client.xmpp.oadr20b.ven.OadrXmppVenClient20b;
-import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
@@ -39,6 +37,7 @@ import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiEventService;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyService;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiReportService;
+import com.avob.openadr.server.oadr20b.ven.service.PayloadHandler;
 
 @Service
 public class XmppVenListener implements StanzaListener {
@@ -46,7 +45,7 @@ public class XmppVenListener implements StanzaListener {
 	private static final Logger LOGGER = LoggerFactory.getLogger(XmppVenListener.class);
 
 	@Resource
-	private Oadr20bJAXBContext jaxbContext;
+	private PayloadHandler payloadHandler;
 
 	@Resource
 	private MultiVtnConfig multiVtnConfig;
@@ -58,7 +57,6 @@ public class XmppVenListener implements StanzaListener {
 	private Oadr20bVENEiRegisterPartyService oadr20bVENEiRegisterPartyService;
 
 	@Resource
-	@Qualifier("reportService")
 	private Oadr20bVENEiReportService reportService;
 
 	@Override
@@ -80,7 +78,7 @@ public class XmppVenListener implements StanzaListener {
 			return;
 		}
 		try {
-			unmarshal = jaxbContext.unmarshal(payload);
+			unmarshal = payloadHandler.stringToObject(payload);
 
 			VtnSessionConfiguration multiConfig = multiVtnConfig.getMultiConfig(username);
 			OadrXmppVenClient20b multiXmppClientConfig = multiVtnConfig.getMultiXmppClientConfig(multiConfig);
@@ -92,14 +90,16 @@ public class XmppVenListener implements StanzaListener {
 
 				if (oadrPayload.getOadrSignedObject().getOadrDistributeEvent() != null) {
 
-					response = oadr20bVENEiEventService.handle(multiConfig, payload, oadrPayload);
+					Object handle = oadr20bVENEiEventService.handle(multiConfig, payload, oadrPayload);
+					response = payloadHandler.payloadToString(multiConfig, handle, true);
 
 					multiXmppClientConfig.sendEventMessage(response);
 
 				} else if (oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration() != null
 						|| oadrPayload.getOadrSignedObject().getOadrRequestReregistration() != null) {
 
-					response = oadr20bVENEiRegisterPartyService.handle(multiConfig, payload, oadrPayload);
+					Object handle = oadr20bVENEiRegisterPartyService.handle(multiConfig, payload, oadrPayload);
+					response = payloadHandler.payloadToString(multiConfig, handle, true);
 
 					multiXmppClientConfig.sendRegisterPartyMessage(response);
 
@@ -108,7 +108,8 @@ public class XmppVenListener implements StanzaListener {
 						|| oadrPayload.getOadrSignedObject().getOadrRegisterReport() != null
 						|| oadrPayload.getOadrSignedObject().getOadrCancelReport() != null) {
 
-					response = reportService.handle(multiConfig, payload, oadrPayload);
+					Object handle = reportService.handle(multiConfig, payload, oadrPayload);
+					response = payloadHandler.payloadToString(multiConfig, handle, true);
 
 					multiXmppClientConfig.sendReportMessage(response);
 
@@ -125,7 +126,8 @@ public class XmppVenListener implements StanzaListener {
 
 				LOGGER.info(username + " - OadrDistributeEventType");
 
-				response = oadr20bVENEiEventService.handle(multiConfig, oadrDistributeEvent, false);
+				Object handle = oadr20bVENEiEventService.oadrDistributeEvent(multiConfig, oadrDistributeEvent);
+				response = payloadHandler.payloadToString(multiConfig, handle, false);
 
 				multiXmppClientConfig.sendEventMessage(response);
 
@@ -135,7 +137,8 @@ public class XmppVenListener implements StanzaListener {
 
 				LOGGER.info(username + " - OadrCreatedPartyRegistrationType");
 
-				oadr20bVENEiRegisterPartyService.handle(multiConfig, oadrCreatedPartyRegistrationType, false);
+				oadr20bVENEiRegisterPartyService.oadrCreatedPartyRegistration(multiConfig,
+						oadrCreatedPartyRegistrationType);
 
 			} else if (unmarshal instanceof OadrRequestReregistrationType) {
 
@@ -143,7 +146,9 @@ public class XmppVenListener implements StanzaListener {
 
 				LOGGER.info(username + " - OadrRequestReregistrationType");
 
-				response = oadr20bVENEiRegisterPartyService.handle(multiConfig, oadrRequestReregistrationType, false);
+				Object handle = oadr20bVENEiRegisterPartyService.oadrRequestReregistration(multiConfig,
+						oadrRequestReregistrationType);
+				response = payloadHandler.payloadToString(multiConfig, handle, false);
 
 				multiXmppClientConfig.sendRegisterPartyMessage(response);
 
@@ -153,17 +158,11 @@ public class XmppVenListener implements StanzaListener {
 
 				LOGGER.info(username + " - OadrCancelPartyRegistrationType");
 
-				response = oadr20bVENEiRegisterPartyService.handle(multiConfig, oadrCancelPartyRegistrationType, false);
+				Object handle = oadr20bVENEiRegisterPartyService.oadrCancelPartyRegistration(multiConfig,
+						oadrCancelPartyRegistrationType);
+				response = payloadHandler.payloadToString(multiConfig, handle, false);
 
 				multiXmppClientConfig.sendRegisterPartyMessage(response);
-
-			} else if (unmarshal instanceof OadrCreatedPartyRegistrationType) {
-
-				OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType = (OadrCreatedPartyRegistrationType) unmarshal;
-
-				LOGGER.info(username + " - OadrCreatedPartyRegistration");
-
-				oadr20bVENEiRegisterPartyService.handle(multiConfig, oadrCreatedPartyRegistrationType, false);
 
 			} else if (unmarshal instanceof OadrCancelReportType) {
 
@@ -171,7 +170,8 @@ public class XmppVenListener implements StanzaListener {
 
 				LOGGER.info(username + " - OadrCancelReport");
 
-				response = reportService.handle(multiConfig, oadrCancelReportType, false);
+				Object handle = reportService.oadrCancelReport(multiConfig, oadrCancelReportType);
+				response = payloadHandler.payloadToString(multiConfig, handle, false);
 
 				multiXmppClientConfig.sendReportMessage(response);
 
@@ -181,7 +181,8 @@ public class XmppVenListener implements StanzaListener {
 
 				LOGGER.info(username + " - OadrCreateReport");
 
-				response = reportService.handle(multiConfig, oadrCreateReportType, false);
+				Object handle = reportService.oadrCreateReport(multiConfig, oadrCreateReportType);
+				response = payloadHandler.payloadToString(multiConfig, handle, false);
 
 				multiXmppClientConfig.sendReportMessage(response);
 
@@ -197,7 +198,8 @@ public class XmppVenListener implements StanzaListener {
 
 				LOGGER.info(username + " - OadrRegisterReport");
 
-				response = reportService.handle(multiConfig, oadrRegisterReportType, false);
+				Object handle = reportService.oadrRegisterReport(multiConfig, oadrRegisterReportType);
+				response = payloadHandler.payloadToString(multiConfig, handle, false);
 
 				multiXmppClientConfig.sendReportMessage(response);
 
@@ -209,7 +211,8 @@ public class XmppVenListener implements StanzaListener {
 
 				LOGGER.info(username + " - OadrUpdateReport");
 
-				response = reportService.handle(multiConfig, oadrUpdateReportType, false);
+				Object handle = reportService.oadrUpdateReport(multiConfig, oadrUpdateReportType);
+				response = payloadHandler.payloadToString(multiConfig, handle, false);
 
 				multiXmppClientConfig.sendReportMessage(response);
 

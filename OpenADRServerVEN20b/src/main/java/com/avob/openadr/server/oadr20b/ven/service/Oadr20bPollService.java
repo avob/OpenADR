@@ -29,6 +29,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRegisteredReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
@@ -163,11 +164,19 @@ public class Oadr20bPollService {
 				LOGGER.info("Retrieved OadrRegisterReportType");
 				OadrRegisterReportType val = (OadrRegisterReportType) payload;
 
-				// OadrResponseType oadrRegisterReport =
-				oadr20bVENEiReportService.oadrRegisterReport(vtnSession, val);
+				OadrRegisteredReportType oadrRegisterReport = oadr20bVENEiReportService.oadrRegisterReport(vtnSession,
+						val);
 
-				// TODO bzanni: do VEN has to propagate this response ?
-				// if so, need to add this payload to vtn eireport endpoint
+				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
+						.oadrRegisteredReport(oadrRegisterReport);
+
+				if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
+					LOGGER.error("Fail OadrRegisterReportType - requestID:" + response.getEiResponse().getRequestID()
+							+ ", responseCode: " + response.getEiResponse().getResponseCode()
+							+ ", responseDescription: " + response.getEiResponse().getResponseDescription());
+				} else {
+					LOGGER.info("VEN successfully register report");
+				}
 
 			} else if (payload instanceof OadrUpdateReportType) {
 				LOGGER.info("Retrieved OadrUpdateReportType");

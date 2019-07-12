@@ -4,7 +4,6 @@ import java.security.Principal;
 
 import javax.annotation.Resource;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -29,7 +28,6 @@ import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiReportService;
 public class Oadr20bVENEiReportController {
 
 	@Resource
-	@Qualifier("reportService")
 	private Oadr20bVENEiReportService reportService;
 
 	@RequestMapping(value = Oadr20bUrlPath.EI_REPORT_SERVICE, method = RequestMethod.POST)

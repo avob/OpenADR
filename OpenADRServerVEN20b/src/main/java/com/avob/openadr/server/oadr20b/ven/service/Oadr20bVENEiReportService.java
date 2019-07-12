@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
@@ -38,10 +37,7 @@ public class Oadr20bVENEiReportService {
 	protected static final String NO_GRANULARITY = "P0D";
 
 	@Resource
-	private Oadr20bJAXBContext jaxbContext;
-
-	@Resource
-	private XmlSignatureService xmlSignatureService;
+	private PayloadHandler payloadHandler;
 
 	@Resource
 	private MultiVtnConfig multiVtnConfig;
@@ -83,6 +79,10 @@ public class Oadr20bVENEiReportService {
 				.build();
 	}
 
+	public void oadrCreatedReport(VtnSessionConfiguration vtnConfig, OadrCreatedReportType oadrCreatedReportType) {
+
+	}
+
 	public OadrCanceledReportType oadrCancelReport(VtnSessionConfiguration vtnConfig,
 			OadrCancelReportType oadrCancelReportType) {
 
@@ -94,87 +94,22 @@ public class Oadr20bVENEiReportService {
 				.build();
 	}
 
-	public String handle(VtnSessionConfiguration multiConfig, OadrUpdateReportType oadrUpdateReportType, boolean signed)
-			throws Oadr20bXMLSignatureException, Oadr20bMarshalException, OadrSecurityException {
-
-		OadrUpdatedReportType response = this.oadrUpdateReport(multiConfig, oadrUpdateReportType);
-
-		String responseStr = null;
-
-		if (signed) {
-			responseStr = xmlSignatureService.sign(response, multiConfig);
-		} else {
-			responseStr = jaxbContext.marshalRoot(response);
-		}
-
-		return responseStr;
-	}
-
-	public String handle(VtnSessionConfiguration multiConfig, OadrRegisterReportType oadrRegisterReportType,
-			boolean signed) throws Oadr20bXMLSignatureException, Oadr20bMarshalException, OadrSecurityException {
-
-		OadrRegisteredReportType response = this.oadrRegisterReport(multiConfig, oadrRegisterReportType);
-
-		String responseStr = null;
-
-		if (signed) {
-			responseStr = xmlSignatureService.sign(response, multiConfig);
-		} else {
-			responseStr = jaxbContext.marshalRoot(response);
-		}
-
-		return responseStr;
-	}
-
-	public String handle(VtnSessionConfiguration multiConfig, OadrCreateReportType oadrCreateReportType, boolean signed)
-			throws Oadr20bXMLSignatureException, Oadr20bMarshalException, OadrSecurityException {
-
-		OadrCreatedReportType response = this.oadrCreateReport(multiConfig, oadrCreateReportType);
-
-		String responseStr = null;
-
-		if (signed) {
-			responseStr = xmlSignatureService.sign(response, multiConfig);
-		} else {
-			responseStr = jaxbContext.marshalRoot(response);
-		}
-
-		return responseStr;
-	}
-
-	public String handle(VtnSessionConfiguration multiConfig, OadrCancelReportType oadrCancelReportType, boolean signed)
-			throws Oadr20bXMLSignatureException, Oadr20bMarshalException, OadrSecurityException {
-
-		OadrCanceledReportType response = this.oadrCancelReport(multiConfig, oadrCancelReportType);
-
-		String responseStr = null;
-
-		if (signed) {
-			responseStr = xmlSignatureService.sign(response, multiConfig);
-		} else {
-			responseStr = jaxbContext.marshalRoot(response);
-		}
-
-		return responseStr;
-	}
-
-	public String handle(VtnSessionConfiguration multiConfig, String raw, OadrPayload oadrPayload)
+	public Object handle(VtnSessionConfiguration multiConfig, String raw, OadrPayload oadrPayload)
 			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureException, OadrSecurityException {
-		xmlSignatureService.validate(raw, oadrPayload, multiConfig);
 
 		if (oadrPayload.getOadrSignedObject().getOadrUpdateReport() != null) {
 			LOGGER.info(multiConfig.getVtnId() + " - OadrUpdateReport signed");
-			return handle(multiConfig, oadrPayload.getOadrSignedObject().getOadrUpdateReport(), true);
+			return oadrUpdateReport(multiConfig, oadrPayload.getOadrSignedObject().getOadrUpdateReport());
 		} else if (oadrPayload.getOadrSignedObject().getOadrCreateReport() != null) {
 			LOGGER.info(multiConfig.getVtnId() + " - OadrCreateReport signed");
-			return handle(multiConfig, oadrPayload.getOadrSignedObject().getOadrCreateReport(), true);
+			return oadrCreateReport(multiConfig, oadrPayload.getOadrSignedObject().getOadrCreateReport());
 		} else if (oadrPayload.getOadrSignedObject().getOadrRegisterReport() != null) {
 			LOGGER.info(multiConfig.getVtnId() + " - OadrRegisterReport signed");
-			return handle(multiConfig, oadrPayload.getOadrSignedObject().getOadrRegisterReport(), true);
+			return oadrRegisterReport(multiConfig, oadrPayload.getOadrSignedObject().getOadrRegisterReport());
 		} else if (oadrPayload.getOadrSignedObject().getOadrCancelReport() != null) {
 			LOGGER.info(multiConfig.getVtnId() + " - OadrCancelReport signed");
-			return handle(multiConfig, oadrPayload.getOadrSignedObject().getOadrCancelReport(), true);
+			return oadrCancelReport(multiConfig, oadrPayload.getOadrSignedObject().getOadrCancelReport());
 		}
 
 		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiReport");
@@ -184,15 +119,23 @@ public class Oadr20bVENEiReportService {
 			throws Oadr20bMarshalException, Oadr20bUnmarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException {
 
-		Object unmarshal = jaxbContext.unmarshal(payload);
+		Object unmarshal = payloadHandler.stringToObject(payload);
 
 		VtnSessionConfiguration multiConfig = multiVtnConfig.getMultiConfig(username);
+
+		Object response = null;
+
+		Boolean sign = false;
 
 		if (unmarshal instanceof OadrPayload) {
 
 			OadrPayload oadrPayload = (OadrPayload) unmarshal;
 
-			return handle(multiConfig, payload, oadrPayload);
+			payloadHandler.validate(multiConfig, payload, oadrPayload);
+
+			response = handle(multiConfig, payload, oadrPayload);
+
+			sign = true;
 
 		} else if (unmarshal instanceof OadrCancelReportType) {
 
@@ -202,7 +145,7 @@ public class Oadr20bVENEiReportService {
 
 			LOGGER.info(username + " - OadrCancelReport");
 
-			return handle(multiConfig, oadrCancelReportType, false);
+			response = oadrCancelReport(multiConfig, oadrCancelReportType);
 
 		} else if (unmarshal instanceof OadrCreateReportType) {
 
@@ -212,7 +155,7 @@ public class Oadr20bVENEiReportService {
 
 			LOGGER.info(username + " - OadrCreateReport");
 
-			return handle(multiConfig, oadrCreateReportType, false);
+			response = oadrCreateReport(multiConfig, oadrCreateReportType);
 
 		} else if (unmarshal instanceof OadrRegisterReportType) {
 
@@ -222,7 +165,7 @@ public class Oadr20bVENEiReportService {
 
 			LOGGER.info(username + " - OadrRegisterReport");
 
-			return handle(multiConfig, oadrRegisterReportType, false);
+			response = oadrRegisterReport(multiConfig, oadrRegisterReportType);
 
 		} else if (unmarshal instanceof OadrUpdateReportType) {
 
@@ -232,8 +175,14 @@ public class Oadr20bVENEiReportService {
 
 			LOGGER.info(username + " - OadrUpdateReport");
 
-			return handle(multiConfig, oadrUpdateReportType, false);
+			response = oadrUpdateReport(multiConfig, oadrUpdateReportType);
 
+		}
+
+		if (response != null) {
+
+			return payloadHandler.payloadToString(multiConfig, response, sign);
+			
 		}
 
 		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiReport");

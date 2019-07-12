@@ -362,10 +362,10 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 			}
 
 			Calendar c = Calendar.getInstance();
-			c.add(Calendar.DATE, -7);
+			c.add(Calendar.DATE, -1);
 			Date start = c.getTime();
 			c = Calendar.getInstance();
-			c.add(Calendar.DATE, 14);
+			c.add(Calendar.DATE, 1);
 			Date end = c.getTime();
 
 			// gen fake DR events links to loaded ven

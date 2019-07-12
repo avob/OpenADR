@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.client.xmpp.oadr20b.ven.OadrXmppVenClient20b;
-import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.builders.eiregisterparty.Oadr20bCreatePartyRegistrationBuilder;
@@ -49,13 +48,13 @@ public class Oadr20bVENEiRegisterPartyService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVENEiRegisterPartyService.class);
 
 	@Resource
-	private XmlSignatureService xmlSignatureService;
+	private PayloadHandler payloadHandler;
 
 	@Resource
 	private MultiVtnConfig multiVtnConfig;
 
 	@Resource
-	private Oadr20bJAXBContext jaxbContext;
+	private Oadr20bPollService oadrPollService;
 
 	@Resource
 	private VenConfig venConfig;
@@ -92,6 +91,7 @@ public class Oadr20bVENEiRegisterPartyService {
 		int responseCode = HttpStatus.OK_200;
 		if (getRegistration(vtnConfiguration).getRegistrationID().equals(registrationID)) {
 			clearRegistration(vtnConfiguration);
+			oadrPollService.cancelHttpScheduledPullRequestTask(vtnConfiguration, false);
 		} else {
 			responseCode = Oadr20bApplicationLayerErrorCode.INVALID_ID_452;
 		}
@@ -128,7 +128,7 @@ public class Oadr20bVENEiRegisterPartyService {
 			if (vtnConfiguration.getVtnUrl() != null) {
 				OadrCreatedPartyRegistrationType oadrQueryRegistrationType = multiVtnConfig
 						.getMultiHttpClientConfig(vtnConfiguration).oadrQueryRegistrationType(queryRegistration);
-				String handle = this.handle(vtnConfiguration, oadrQueryRegistrationType, venConfig.getXmlSignature());
+				this.oadrCreatedPartyRegistration(vtnConfiguration, oadrQueryRegistrationType);
 			} else {
 				multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).oadrQueryRegistrationType(queryRegistration);
 			}
@@ -165,6 +165,7 @@ public class Oadr20bVENEiRegisterPartyService {
 		LOGGER.debug("        xmlSignature: " + vtnConfiguration.getVenSessionConfig().getXmlSignature());
 		LOGGER.debug("        reportOnly  : " + vtnConfiguration.getVenSessionConfig().getReportOnly());
 		LOGGER.debug("        pullModel   : " + vtnConfiguration.getVenSessionConfig().getPullModel());
+
 		if (getListeners() != null) {
 			final OadrCreatedPartyRegistrationType reg = registration;
 			getListeners().forEach(listener -> listener.onRegistrationSuccess(vtnConfiguration, reg));
@@ -195,69 +196,36 @@ public class Oadr20bVENEiRegisterPartyService {
 
 	}
 
-	public String handle(VtnSessionConfiguration vtnConfig, String raw, OadrPayload oadrPayload)
+	public Object handle(VtnSessionConfiguration vtnConfig, String raw, OadrPayload oadrPayload)
 			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureException, OadrSecurityException, IOException {
-		xmlSignatureService.validate(raw, oadrPayload, vtnConfig);
 
 		if (oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration() != null) {
 			LOGGER.info(vtnConfig.getVtnId() + " - OadrCancelPartyRegistrationType signed");
-			return handle(vtnConfig, oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration(), true);
+			return oadrCancelPartyRegistration(vtnConfig,
+					oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration());
 		} else if (oadrPayload.getOadrSignedObject().getOadrRequestReregistration() != null) {
 			LOGGER.info(vtnConfig.getVtnId() + " - OadrRequestReregistrationType signed");
-			return handle(vtnConfig, oadrPayload.getOadrSignedObject().getOadrRequestReregistration(), true);
+			return oadrRequestReregistration(vtnConfig,
+					oadrPayload.getOadrSignedObject().getOadrRequestReregistration());
 		} else if (oadrPayload.getOadrSignedObject().getOadrCreatedPartyRegistration() != null) {
 			LOGGER.info(vtnConfig.getVtnId() + " - OadrCreatedPartyRegistrationType signed");
-			return handle(vtnConfig, oadrPayload.getOadrSignedObject().getOadrCreatedPartyRegistration(), true);
+			oadrCreatedPartyRegistration(vtnConfig,
+					oadrPayload.getOadrSignedObject().getOadrCreatedPartyRegistration());
+			return null;
 		}
 
 		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
 	}
 
-	public String handle(VtnSessionConfiguration vtnConfig, OadrRequestReregistrationType oadrRequestReregistrationType,
-			boolean signed) throws Oadr20bMarshalException, Oadr20bXMLSignatureException, OadrSecurityException {
-
-		OadrResponseType response = this.oadrRequestReregistration(vtnConfig, oadrRequestReregistrationType);
-
-		String responseStr = null;
-
-		if (signed) {
-			responseStr = xmlSignatureService.sign(response, vtnConfig);
-		} else {
-			responseStr = jaxbContext.marshalRoot(response);
-		}
-
-		return responseStr;
-
-	}
-
-	public String handle(VtnSessionConfiguration vtnConfig,
-			OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType, boolean signed)
-			throws Oadr20bMarshalException, Oadr20bXMLSignatureException, OadrSecurityException {
-
-		OadrCanceledPartyRegistrationType response = this.oadrCancelPartyRegistration(vtnConfig,
-				oadrCancelPartyRegistrationType);
-
-		String responseStr = null;
-
-		if (signed) {
-			responseStr = xmlSignatureService.sign(response, vtnConfig);
-		} else {
-			responseStr = jaxbContext.marshalRoot(response);
-		}
-
-		return responseStr;
-
-	}
-
-	public String handle(VtnSessionConfiguration vtnConfig,
-			OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType, boolean signed)
+	public void oadrCreatedPartyRegistration(VtnSessionConfiguration vtnConfig,
+			OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType)
 			throws Oadr20bMarshalException, Oadr20bXMLSignatureException, OadrSecurityException, IOException {
 
 		if (getRegistration(vtnConfig) != null && getRegistration(vtnConfig).getRegistrationID() != null
 				&& getRegistration(vtnConfig).getRegistrationID()
 						.equals(oadrCreatedPartyRegistrationType.getRegistrationID())) {
-			return null;
+			return;
 		} else if (oadrCreatedPartyRegistrationType.getRegistrationID() != null) {
 			this.register(vtnConfig, oadrCreatedPartyRegistrationType);
 		}
@@ -286,10 +254,6 @@ public class Oadr20bVENEiRegisterPartyService {
 					.withOadrReportOnly(reportOnly).withOadrTransportName(transportType).withOadrVenName(venName)
 					.withOadrXmlSignature(xmlSignature);
 
-//			if (getListeners() != null) {
-//				getListeners().forEach(listener -> listener.onRegistrationError(vtnConfig));
-//			}
-
 		} else if (vtnConfig.getVtnXmppHost() != null && vtnConfig.getVtnXmppPort() != null) {
 
 			OadrXmppVenClient20b xmppClient = multiVtnConfig.getMultiXmppClientConfig(vtnConfig);
@@ -306,12 +270,11 @@ public class Oadr20bVENEiRegisterPartyService {
 		OadrCreatePartyRegistrationType createPartyRegistration = builder.build();
 
 		try {
-//			multiVtnConfig.oadrCreatePartyRegistration(vtnConfig, createPartyRegistration);
 
 			if (vtnConfig.getVtnUrl() != null) {
 				OadrCreatedPartyRegistrationType oadrQueryRegistrationType = multiVtnConfig
 						.getMultiHttpClientConfig(vtnConfig).oadrCreatePartyRegistration(createPartyRegistration);
-				this.handle(vtnConfig, oadrQueryRegistrationType, false);
+				this.oadrCreatedPartyRegistration(vtnConfig, oadrQueryRegistrationType);
 			} else {
 				multiVtnConfig.getMultiXmppClientConfig(vtnConfig).oadrCreatePartyRegistration(createPartyRegistration);
 			}
@@ -328,23 +291,29 @@ public class Oadr20bVENEiRegisterPartyService {
 			LOGGER.error("", e);
 		}
 
-		return null;
-
 	}
 
 	public String request(String username, String payload)
 			throws Oadr20bMarshalException, Oadr20bUnmarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException, IOException {
 
-		Object unmarshal = jaxbContext.unmarshal(payload);
+		Object unmarshal = payloadHandler.stringToObject(payload);
 
 		VtnSessionConfiguration vtnConfig = multiVtnConfig.getMultiConfig(username);
+
+		Object response = null;
+
+		Boolean sign = false;
 
 		if (unmarshal instanceof OadrPayload) {
 
 			OadrPayload oadrPayload = (OadrPayload) unmarshal;
 
-			return handle(vtnConfig, payload, oadrPayload);
+			payloadHandler.validate(vtnConfig, payload, oadrPayload);
+
+			response = handle(vtnConfig, payload, oadrPayload);
+
+			sign = true;
 
 		} else if (unmarshal instanceof OadrRequestReregistrationType) {
 
@@ -352,7 +321,7 @@ public class Oadr20bVENEiRegisterPartyService {
 
 			LOGGER.info(username + " - OadrRequestReregistrationType");
 
-			return handle(vtnConfig, oadrRequestReregistrationType, false);
+			response = oadrRequestReregistration(vtnConfig, oadrRequestReregistrationType);
 
 		} else if (unmarshal instanceof OadrCancelPartyRegistrationType) {
 
@@ -360,15 +329,22 @@ public class Oadr20bVENEiRegisterPartyService {
 
 			LOGGER.info(username + " - OadrCancelPartyRegistrationType");
 
-			return handle(vtnConfig, oadrCancelPartyRegistrationType, false);
+			response = oadrCancelPartyRegistration(vtnConfig, oadrCancelPartyRegistrationType);
 
 		} else if (unmarshal instanceof OadrCreatedPartyRegistrationType) {
 
 			OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType = (OadrCreatedPartyRegistrationType) unmarshal;
 
-			LOGGER.info(username + " - OadrCancelPartyRegistrationType");
+			LOGGER.info(username + " - OadrCreatedPartyRegistrationType");
 
-			return handle(vtnConfig, oadrCreatedPartyRegistrationType, false);
+			oadrCreatedPartyRegistration(vtnConfig, oadrCreatedPartyRegistrationType);
+			return null;
+
+		}
+
+		if (response != null) {
+
+			return payloadHandler.payloadToString(vtnConfig, response, sign);
 
 		}
 
