@@ -14,10 +14,14 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.avob.openadr.client.http.oadr20b.ven.OadrHttpVenClient20b;
+import com.avob.openadr.client.xmpp.oadr20b.ven.OadrXmppVenClient20b;
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
@@ -28,6 +32,8 @@ import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
@@ -46,6 +52,8 @@ import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bDistributeEventAppli
 @Service
 public class Oadr20bVENEiEventService {
 
+	private static final long DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS = 1;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVENEiEventService.class);
 
 	@Resource
@@ -53,9 +61,6 @@ public class Oadr20bVENEiEventService {
 
 	@Resource
 	private MultiVtnConfig multiVtnConfig;
-
-	@Resource
-	private PlanRequestService planRequestService;
 
 	@Resource
 	private ScheduledExecutorService scheduledExecutorService;
@@ -124,6 +129,67 @@ public class Oadr20bVENEiEventService {
 			listeners.forEach(
 					listener -> listener.onLastIntervalEnd(vtnConfiguration, event, eiEventSignalType, intervalType));
 		}
+	}
+
+	private static class OadrCreatedEventTask implements Runnable {
+
+		private static final Logger LOGGER = LoggerFactory.getLogger(OadrCreatedEventTask.class);
+
+		private OadrCreatedEventType payload;
+
+		private OadrHttpVenClient20b httpClient;
+
+		private OadrXmppVenClient20b xmppClient;
+
+		public OadrCreatedEventTask(OadrHttpVenClient20b client, OadrCreatedEventType payload) {
+			this.payload = payload;
+			this.httpClient = client;
+		}
+
+		public OadrCreatedEventTask(OadrXmppVenClient20b client, OadrCreatedEventType payload) {
+			this.payload = payload;
+			this.xmppClient = client;
+		}
+
+		@Override
+		public void run() {
+
+			try {
+
+				if (httpClient != null) {
+					OadrResponseType response = httpClient.oadrCreatedEvent(payload);
+
+					String responseCode = response.getEiResponse().getResponseCode();
+
+					if (HttpStatus.OK_200 != Integer.valueOf(responseCode)) {
+						LOGGER.error("Fail oadrCreatedEvent: " + responseCode
+								+ response.getEiResponse().getResponseDescription());
+					} else {
+						LOGGER.info("oadrCreatedEvent: " + responseCode);
+					}
+				} else if (xmppClient != null) {
+					xmppClient.oadrCreatedEvent(payload);
+				}
+
+			} catch (Oadr20bException e) {
+				LOGGER.error("", e);
+			} catch (Oadr20bHttpLayerException e) {
+				LOGGER.error("", e);
+			} catch (Oadr20bXMLSignatureException e) {
+				LOGGER.error("", e);
+			} catch (Oadr20bXMLSignatureValidationException e) {
+				LOGGER.error("", e);
+			} catch (XmppStringprepException e) {
+				LOGGER.error("", e);
+			} catch (NotConnectedException e) {
+				LOGGER.error("", e);
+			} catch (Oadr20bMarshalException e) {
+				LOGGER.error("", e);
+			} catch (InterruptedException e) {
+				LOGGER.error("", e);
+			}
+		}
+
 	}
 
 	private void applyPreActiveOadrEventScheduling(VtnSessionConfiguration vtnConfiguration, long now,
@@ -288,7 +354,21 @@ public class Oadr20bVENEiEventService {
 							responseCode)
 					.addEventResponse(eventResponses).build();
 
-			planRequestService.submitCreatedEvent(vtnConfiguration, build);
+			if (vtnConfiguration.getVtnUrl() != null) {
+
+				OadrHttpVenClient20b multiHttpClientConfig = multiVtnConfig.getMultiHttpClientConfig(vtnConfiguration);
+
+				scheduledExecutorService.schedule(new OadrCreatedEventTask(multiHttpClientConfig, build),
+						DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS, TimeUnit.SECONDS);
+
+			} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
+
+				OadrXmppVenClient20b multiXmppClientConfig = multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration);
+
+				scheduledExecutorService.schedule(new OadrCreatedEventTask(multiXmppClientConfig, build),
+						DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS, TimeUnit.SECONDS);
+			}
+
 		}
 
 		return Oadr20bResponseBuilders.newOadr20bResponseBuilder(vtnRequestID, responseCode, "").build();

@@ -188,11 +188,13 @@ public class XmppVenListener implements StanzaListener {
 
 			} else if (unmarshal instanceof OadrCreatedReportType) {
 
+				OadrCreatedReportType oadrCreatedReportType = (OadrCreatedReportType) unmarshal;
+
 				LOGGER.info(username + " - OadrCreateReport");
 
-			} else if (unmarshal instanceof OadrRegisterReportType) {
+				reportService.oadrCreatedReport(multiConfig, oadrCreatedReportType);
 
-				LOGGER.debug(payload);
+			} else if (unmarshal instanceof OadrRegisterReportType) {
 
 				OadrRegisterReportType oadrRegisterReportType = (OadrRegisterReportType) unmarshal;
 
@@ -204,8 +206,6 @@ public class XmppVenListener implements StanzaListener {
 				multiXmppClientConfig.sendReportMessage(response);
 
 			} else if (unmarshal instanceof OadrUpdateReportType) {
-
-				LOGGER.debug(payload);
 
 				OadrUpdateReportType oadrUpdateReportType = (OadrUpdateReportType) unmarshal;
 

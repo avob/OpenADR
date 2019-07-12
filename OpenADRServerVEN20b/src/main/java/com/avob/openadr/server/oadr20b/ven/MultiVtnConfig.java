@@ -49,22 +49,10 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelOptType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCanceledReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreatePartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrRegisteredReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
-import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.security.OadrHttpSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.oadr20b.ven.exception.OadrVTNInitializationException;
@@ -134,9 +122,6 @@ public class MultiVtnConfig {
 
 			KeyStore keystore;
 			try {
-//				String oadr20bFingerprint = OadrHttpSecurity
-//						.getOadr20bFingerprint(session.getVenSessionConfig().getVenCertificatePath());
-
 				keystore = OadrHttpSecurity.createKeyStore(session.getVenSessionConfig().getVenPrivateKeyPath(),
 						session.getVenSessionConfig().getVenCertificatePath(), keystorePassword);
 				KeyStore truststore = OadrHttpSecurity
@@ -158,9 +143,6 @@ public class MultiVtnConfig {
 				String seed = UUID.randomUUID().toString();
 
 				sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom(seed.getBytes()));
-
-//				OadrXmppClient20b oadrXmppClient20b = new OadrXmppClient20b(session.getVtnId(),
-//						session.getVtnXmppHost(), session.getVtnXmppPort(), "client", sslContext, xmppVenListeners);
 
 				OadrXmppClient20bBuilder builder = new OadrXmppClient20bBuilder()
 						.withHostAndPort(session.getVtnXmppHost(), session.getVtnXmppPort())
@@ -277,19 +259,6 @@ public class MultiVtnConfig {
 		return multiHttpClientConfig.get(vtnConfiguration.getVtnId());
 	}
 
-	public void oadrCreatedReport(VtnSessionConfiguration vtnConfiguration, OadrCreatedReportType payload)
-			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
-			Oadr20bMarshalException, InterruptedException {
-
-		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrCreatedReport(payload);
-		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrCreatedReport(payload);
-		}
-
-	}
-
 	public void oadrCreateReport(VtnSessionConfiguration vtnConfiguration, OadrCreateReportType payload)
 			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
 			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
@@ -309,92 +278,6 @@ public class MultiVtnConfig {
 			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrUpdateReport(payload);
 		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
 			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrUpdateReport(payload);
-		}
-	}
-
-	public void oadrUpdatedReport(VtnSessionConfiguration vtnConfiguration, OadrUpdatedReportType payload)
-			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
-			Oadr20bMarshalException, InterruptedException {
-		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrUpdatedReport(payload);
-		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrUpdatedReport(payload);
-		}
-	}
-
-	public void oadrCancelReport(VtnSessionConfiguration vtnConfiguration, OadrCancelReportType payload)
-			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
-			Oadr20bMarshalException, InterruptedException {
-		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrCancelReport(payload);
-		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrCancelReport(payload);
-		}
-	}
-
-	public void oadrCanceledReport(VtnSessionConfiguration vtnConfiguration, OadrCanceledReportType payload)
-			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
-			Oadr20bMarshalException, InterruptedException {
-		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrCanceledReport(payload);
-		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrCanceledReport(payload);
-		}
-	}
-
-	public Object oadrPoll(VtnSessionConfiguration vtnConfiguration, OadrPollType event) throws Oadr20bException,
-			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
-		if (vtnConfiguration.getVtnUrl() != null) {
-			return multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrPoll(event);
-		}
-		return null;
-	}
-
-	public void oadrCreatePartyRegistration(VtnSessionConfiguration vtnConfiguration,
-			OadrCreatePartyRegistrationType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
-		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrCreatePartyRegistration(payload);
-		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrCreatePartyRegistration(payload);
-		}
-	}
-
-	public void oadrCancelPartyRegistration(VtnSessionConfiguration vtnConfiguration,
-			OadrCancelPartyRegistrationType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
-		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrCancelPartyRegistration(payload);
-		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrCancelPartyRegistration(payload);
-		}
-	}
-
-	public void oadrResponseReregisterParty(VtnSessionConfiguration vtnConfiguration, OadrResponseType payload)
-			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
-			Oadr20bMarshalException, InterruptedException {
-		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrResponseReregisterParty(payload);
-		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrResponseReregisterParty(payload);
-		}
-	}
-
-	public void oadrCanceledPartyRegistrationType(VtnSessionConfiguration vtnConfiguration,
-			OadrCanceledPartyRegistrationType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
-		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrCanceledPartyRegistrationType(payload);
-		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrCanceledPartyRegistrationType(payload);
 		}
 	}
 
@@ -420,28 +303,6 @@ public class MultiVtnConfig {
 		}
 	}
 
-	public void oadrCreatedEvent(VtnSessionConfiguration vtnConfiguration, OadrCreatedEventType event)
-			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
-			Oadr20bMarshalException, InterruptedException {
-		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrCreatedEvent(event);
-		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrCreatedEvent(event);
-		}
-	}
-
-	public void oadrRequestEvent(VtnSessionConfiguration vtnConfiguration, OadrRequestEventType payload)
-			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
-			Oadr20bMarshalException, InterruptedException {
-		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrRequestEvent(payload);
-		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrRequestEvent(payload);
-		}
-	}
-
 	public void oadrRegisterReport(VtnSessionConfiguration vtnConfiguration, OadrRegisterReportType payload)
 			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
 			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
@@ -450,17 +311,6 @@ public class MultiVtnConfig {
 			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrRegisterReport(payload);
 		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
 			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrRegisterReport(payload);
-		}
-	}
-
-	public void oadrRegisteredReport(VtnSessionConfiguration vtnConfiguration, OadrRegisteredReportType payload)
-			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
-			Oadr20bMarshalException, InterruptedException {
-		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrRegisteredReport(payload);
-		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrRegisteredReport(payload);
 		}
 	}
 

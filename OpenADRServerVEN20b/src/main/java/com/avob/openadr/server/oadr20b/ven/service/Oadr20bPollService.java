@@ -68,6 +68,14 @@ public class Oadr20bPollService {
 			this.vtnSession = vtnSession;
 		}
 
+		private void processOadrResponse(OadrResponseType response, Class<?> klass) {
+			String responseCode = response.getEiResponse().getResponseCode();
+			if (HttpStatus.OK_200 != Integer.valueOf(responseCode)) {
+				LOGGER.error("Fail " + klass.getSimpleName() + ": " + responseCode
+						+ response.getEiResponse().getResponseDescription());
+			}
+		}
+
 		private void processPollResponse(Object payload) throws Oadr20bException, Oadr20bHttpLayerException,
 				Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 			if (payload instanceof OadrPayload) {
@@ -81,12 +89,7 @@ public class Oadr20bPollService {
 				LOGGER.info("Retrieved OadrDistributeEventType");
 				OadrDistributeEventType val = (OadrDistributeEventType) payload;
 				OadrResponseType oadrDistributeEvent = oadr20bVENEiEventService.oadrDistributeEvent(vtnSession, val);
-
-				String responseCode = oadrDistributeEvent.getEiResponse().getResponseCode();
-				if (HttpStatus.OK_200 != Integer.valueOf(responseCode)) {
-					LOGGER.error("Fail OadrRequestEvent: " + responseCode
-							+ oadrDistributeEvent.getEiResponse().getResponseDescription());
-				}
+				processOadrResponse(oadrDistributeEvent, OadrDistributeEventType.class);
 
 			} else if (payload instanceof OadrCancelPartyRegistrationType) {
 				LOGGER.info("Retrieved OadrCancelPartyRegistrationType");
@@ -98,14 +101,7 @@ public class Oadr20bPollService {
 				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
 						.oadrCanceledPartyRegistrationType(oadrCancelPartyRegistration);
 
-				if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
-					LOGGER.error("Fail OadrCanceledPartyRegistrationType - requestID:"
-							+ response.getEiResponse().getRequestID() + ", responseCode: "
-							+ response.getEiResponse().getResponseCode() + ", responseDescription: "
-							+ response.getEiResponse().getResponseDescription());
-				} else {
-					LOGGER.info("VEN successfully cancel registration");
-				}
+				processOadrResponse(response, OadrCanceledPartyRegistrationType.class);
 
 			} else if (payload instanceof OadrRequestReregistrationType) {
 				LOGGER.info("Retrieved OadrRequestReregistrationType");
@@ -113,18 +109,14 @@ public class Oadr20bPollService {
 
 				OadrResponseType oadrRequestReregistration = oadr20bVENEiRegisterPartyService
 						.oadrRequestReregistration(vtnSession, val);
+				
 				reinitPoll(vtnSession);
+				
+				
 				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
 						.oadrResponseReregisterParty(oadrRequestReregistration);
 
-				if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
-					LOGGER.error("Fail OadrCanceledPartyRegistrationType - requestID:"
-							+ response.getEiResponse().getRequestID() + ", responseCode: "
-							+ response.getEiResponse().getResponseCode() + ", responseDescription: "
-							+ response.getEiResponse().getResponseDescription());
-				} else {
-					LOGGER.info("VEN successfully initialize registration");
-				}
+				processOadrResponse(response, OadrRequestReregistrationType.class);
 
 			} else if (payload instanceof OadrCancelReportType) {
 				LOGGER.info("Retrieved OadrCancelReportType");
@@ -135,13 +127,7 @@ public class Oadr20bPollService {
 				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
 						.oadrCanceledReport(oadrCancelReport);
 
-				if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
-					LOGGER.error("Fail OadrCancelReportType - requestID:" + response.getEiResponse().getRequestID()
-							+ ", responseCode: " + response.getEiResponse().getResponseCode()
-							+ ", responseDescription: " + response.getEiResponse().getResponseDescription());
-				} else {
-					LOGGER.info("VEN successfully cancel report");
-				}
+				processOadrResponse(response, OadrCancelReportType.class);
 
 			} else if (payload instanceof OadrCreateReportType) {
 				LOGGER.info("Retrieved OadrCreateReportType");
@@ -152,13 +138,7 @@ public class Oadr20bPollService {
 				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
 						.oadrCreatedReport(oadrCreateReport);
 
-				if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
-					LOGGER.error("Fail OadrCreateReportType - requestID:" + response.getEiResponse().getRequestID()
-							+ ", responseCode: " + response.getEiResponse().getResponseCode()
-							+ ", responseDescription: " + response.getEiResponse().getResponseDescription());
-				} else {
-					LOGGER.info("VEN successfully create report");
-				}
+				processOadrResponse(response, OadrCreateReportType.class);
 
 			} else if (payload instanceof OadrRegisterReportType) {
 				LOGGER.info("Retrieved OadrRegisterReportType");
@@ -170,13 +150,7 @@ public class Oadr20bPollService {
 				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
 						.oadrRegisteredReport(oadrRegisterReport);
 
-				if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
-					LOGGER.error("Fail OadrRegisterReportType - requestID:" + response.getEiResponse().getRequestID()
-							+ ", responseCode: " + response.getEiResponse().getResponseCode()
-							+ ", responseDescription: " + response.getEiResponse().getResponseDescription());
-				} else {
-					LOGGER.info("VEN successfully register report");
-				}
+				processOadrResponse(response, OadrRegisterReportType.class);
 
 			} else if (payload instanceof OadrUpdateReportType) {
 				LOGGER.info("Retrieved OadrUpdateReportType");
@@ -187,23 +161,13 @@ public class Oadr20bPollService {
 				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
 						.oadrUpdatedReport(oadrUpdateReport);
 
-				if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
-					LOGGER.error("Fail OadrUpdateReportType - requestID:" + response.getEiResponse().getRequestID()
-							+ ", responseCode: " + response.getEiResponse().getResponseCode()
-							+ ", responseDescription: " + response.getEiResponse().getResponseDescription());
-				} else {
-					LOGGER.info("VEN successfully update report");
-				}
+				processOadrResponse(response, OadrUpdateReportType.class);
 
 			} else if (payload instanceof OadrResponseType) {
 				LOGGER.info("Retrieved OadrResponseType");
 				OadrResponseType response = (OadrResponseType) payload;
 
-				if (!response.getEiResponse().getResponseCode().equals(String.valueOf(HttpStatus.OK_200))) {
-					LOGGER.error("Fail OadrResponseType - requestID:" + response.getEiResponse().getRequestID()
-							+ ", responseCode: " + response.getEiResponse().getResponseCode()
-							+ ", responseDescription: " + response.getEiResponse().getResponseDescription());
-				}
+				processOadrResponse(response, OadrUpdateReportType.class);
 
 			} else if (payload != null) {
 				LOGGER.warn("Unknown retrieved payload: " + payload.getClass().toString());

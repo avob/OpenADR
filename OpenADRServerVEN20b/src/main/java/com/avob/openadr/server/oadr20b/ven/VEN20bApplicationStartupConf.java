@@ -28,7 +28,6 @@ import com.avob.openadr.server.oadr20b.ven.service.Oadr20bPollService;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyService;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyService.Oadr20bVENEiRegisterPartyServiceListener;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiReportService;
-import com.avob.openadr.server.oadr20b.ven.service.PlanRequestService;
 
 @Configuration
 @ConditionalOnProperty(name = "ven.autostart")
@@ -48,9 +47,6 @@ public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartySe
 	@Resource
 	@Qualifier("reportService")
 	private Oadr20bVENEiReportService reportService;
-
-	@Resource
-	private PlanRequestService planRequestService;
 
 	@Resource
 	private Oadr20bVENEiRegisterPartyService oadr20bVENEiRegisterPartyService;
