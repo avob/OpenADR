@@ -423,7 +423,7 @@ public class Oadr20bVTNEiReportControllerTest {
 		// cleanup data PayloadResourceStatus
 		otherReportDataPayloadResourceStatusService.delete(reportDataPrivateId);
 		otherReportRequestSpecifierDao.deleteByRequestReportRequestId(otherReportRequest.getReportRequestId());
-		
+
 		otherReportRequestService.delete(reportRequestPrivateId);
 		otherReportCapabilityDescriptionService.delete(reportCapabilityDescriptionPrivateId);
 		otherReportCapabilityService.delete(reportCapabilityPrivateId);

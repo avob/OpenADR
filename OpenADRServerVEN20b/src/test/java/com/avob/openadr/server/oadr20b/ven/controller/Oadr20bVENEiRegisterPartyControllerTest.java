@@ -84,4 +84,6 @@ public class Oadr20bVENEiRegisterPartyControllerTest {
 				MockMvcRequestBuilders.post(EIREGISTERPARTY_ENDPOINT).with(VTN_SECURITY_SESSION).content(content))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
 	}
+	
+	
 }

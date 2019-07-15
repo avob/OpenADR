@@ -259,6 +259,16 @@ public class MultiVtnConfig {
 		return multiHttpClientConfig.get(vtnConfiguration.getVtnId());
 	}
 
+	/**
+	 * only for test purpose
+	 * 
+	 * @param vtnConfiguration
+	 * @param client
+	 */
+	public void setMultiHttpClientConfigClient(VtnSessionConfiguration vtnConfiguration, OadrHttpVenClient20b client) {
+		multiHttpClientConfig.put(vtnConfiguration.getVtnId(), client);
+	}
+
 	public void oadrCreateReport(VtnSessionConfiguration vtnConfiguration, OadrCreateReportType payload)
 			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
 			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,

@@ -35,6 +35,7 @@ public class VtnSessionConfiguration {
 	private String vtnXmppUser;
 	private String vtnXmppPass;
 	private VenConfig venSessionConfig;
+	
 
 	public VtnSessionConfiguration(Properties properties, VenConfig defaultVenSessionConfig) {
 		setVenSessionConfig(defaultVenSessionConfig.clone());

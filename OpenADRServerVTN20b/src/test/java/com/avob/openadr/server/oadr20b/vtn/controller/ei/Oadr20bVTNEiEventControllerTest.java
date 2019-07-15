@@ -86,14 +86,6 @@ public class Oadr20bVTNEiEventControllerTest {
 
 	@Resource
 	private OadrMockMvc oadrMockMvc;
-//
-//	@Resource
-//	private BrokerService broker;
-//
-//	@Before
-//	public void setup() throws Exception {
-//		broker.getAdminView().removeQueue(DemandResponseEventPublisher.OADR20B_QUEUE);
-//	}
 
 	@Test
 	public void testErrorCase() throws Exception {
@@ -130,7 +122,6 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Test
 	public void testPullOadrRequestEventTypeEmptySuccessCase() throws Exception {
 
-//		assertEquals(new Long(0), venPollService.countAll());
 		venPollService.deleteAll();
 
 		String requestId = "0";
