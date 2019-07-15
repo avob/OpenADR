@@ -5,10 +5,8 @@ import javax.servlet.ServletContext;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mock.web.MockServletContext;
@@ -22,11 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.avob.openadr.client.http.oadr20b.ven.OadrHttpVenClient20b;
 import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
-import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
-import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.OadrMockMvc;
 import com.avob.openadr.server.oadr20b.ven.VEN20bApplicationTest;
@@ -59,7 +53,6 @@ public class Oadr20bVENEiRegisterPartyControllerTest {
 	@Value("${oadr.vtn.myvtn.vtnid}")
 	private String vtnHttpId;
 
-	
 	@Test
 	public void givenWac_whenServletContext_thenItProvidesOadr20aVENEiEventController() {
 		ServletContext servletContext = wac.getServletContext();

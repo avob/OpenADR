@@ -7,7 +7,6 @@ import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
@@ -45,7 +44,6 @@ public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartySe
 	private MultiVtnConfig multiVtnConfig;
 
 	@Resource
-	@Qualifier("reportService")
 	private Oadr20bVENEiReportService reportService;
 
 	@Resource

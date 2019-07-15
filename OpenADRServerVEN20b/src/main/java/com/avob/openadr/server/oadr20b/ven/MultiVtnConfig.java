@@ -226,8 +226,8 @@ public class MultiVtnConfig {
 				VtnSessionConfiguration session = new VtnSessionConfiguration(entry.getValue(), venConfig);
 				LOGGER.debug("Valid vtn configuration: " + entry.getKey());
 				LOGGER.info(session.toString());
-				getMultiConfig().put(session.getVtnId(), session);
 				configureClient(session);
+				getMultiConfig().put(session.getVtnId(), session);
 			} catch (OadrSecurityException e) {
 				LOGGER.error("Dynamic Vtn conf key: " + entry.getKey() + " is not a valid vtn configuration", e);
 			} catch (JAXBException e) {

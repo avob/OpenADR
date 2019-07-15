@@ -893,57 +893,10 @@ public class Oadr20bFactory {
 		return factory.createOadrPoll(value);
 	}
 
-	public static JAXBElement<String> createOadrVenName(String value) {
-		return factory.createOadrVenName(value);
-	}
-
-	public static JAXBElement<String> createOadrProfileName(String value) {
-		return factory.createOadrProfileName(value);
-	}
-
-	public static JAXBElement<OadrTransportType> createOadrTransportName(OadrTransportType value) {
-		return factory.createOadrTransportName(value);
-	}
-
-	public static JAXBElement<Boolean> createOadrHttpPullModel(Boolean value) {
-		return factory.createOadrHttpPullModel(value);
-	}
-
-	public static JAXBElement<OadrServiceNameType> createOadrServiceName(OadrServiceNameType value) {
-		return factory.createOadrServiceName(value);
-	}
-
-	public static JAXBElement<Boolean> createOadrXmlSignature(Boolean value) {
-		return factory.createOadrXmlSignature(value);
-	}
-
-	public static JAXBElement<Boolean> createOadrReportOnly(Boolean value) {
-		return factory.createOadrReportOnly(value);
-	}
-
-	public static JAXBElement<String> createOadrTransportAddress(String value) {
-		return factory.createOadrTransportAddress(value);
-	}
-
-	public static JAXBElement<DurationPropType> createOadrRequestedOadrPollFreq(DurationPropType value) {
-		return factory.createOadrRequestedOadrPollFreq(value);
-	}
-
-	public static JAXBElement<ResponseRequiredType> createOadrResponseRequired(ResponseRequiredType value) {
-		return factory.createOadrResponseRequired(value);
-	}
-
-	public static JAXBElement<OadrPendingReportsType> createOadrPendingReports(OadrPendingReportsType value) {
-		return factory.createOadrPendingReports(value);
-	}
-
 	public static JAXBElement<BaseUnitType> createCustomUnit(BaseUnitType value) {
 		return factory.createCustomUnit(value);
 	}
 
-	public static JAXBElement<CurrentType> createCurrent(CurrentType value) {
-		return factory.createCurrent(value);
-	}
 
 	public static JAXBElement<CurrencyType> createCurrency(CurrencyType value) {
 		return factory.createCurrency(value);
@@ -955,10 +908,6 @@ public class Oadr20bFactory {
 
 	public static JAXBElement<CurrencyType> createCurrencyPerKW(CurrencyType value) {
 		return factory.createCurrencyPerKW(value);
-	}
-
-	public static JAXBElement<CurrencyType> createCurrencyPerThm(CurrencyType value) {
-		return factory.createCurrencyPerThm(value);
 	}
 
 	public static JAXBElement<FrequencyType> createFrequency(FrequencyType value) {
@@ -977,9 +926,6 @@ public class Oadr20bFactory {
 		return factory.createPulseCount(value);
 	}
 
-	public static JAXBElement<Float> createPulseFactor(Float value) {
-		return factory.createPulseFactor(value);
-	}
 
 	public static EventResponses createEventResponses() {
 		return eiFactory.createEventResponses();
@@ -1411,10 +1357,6 @@ public class Oadr20bFactory {
 
 	public static JAXBElement<PowerApparentType> createPowerApparent(PowerApparentType value) {
 		return powerFactory.createPowerApparent(value);
-	}
-
-	public static JAXBElement<PowerItemType> createPowerItem(PowerItemType value) {
-		return powerFactory.createPowerItem(value);
 	}
 
 	public static JAXBElement<PowerReactiveType> createPowerReactive(PowerReactiveType value) {

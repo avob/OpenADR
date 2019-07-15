@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.avob.openadr.client.http.oadr20b.ven.OadrHttpVenClient20b;
-import com.avob.openadr.client.xmpp.oadr20b.ven.OadrXmppVenClient20b;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VEN20bApplicationTest.class })
@@ -43,6 +42,7 @@ public class MultiVtnConfigTest {
 
 	@Test
 	public void test() {
+		// http client successfull init
 		VtnSessionConfiguration multiConfig = multiVtnConfig.getMultiConfig(vtnHttpId);
 		assertNotNull(multiConfig);
 		assertEquals(multiConfig.getVtnId(), vtnHttpId);
@@ -50,18 +50,17 @@ public class MultiVtnConfigTest {
 		assertNull(multiConfig.getVtnXmppHost());
 		assertNull(multiConfig.getVtnXmppPass());
 		OadrHttpVenClient20b multiHttpClientConfig = multiVtnConfig.getMultiHttpClientConfig(multiConfig);
-		// http client successfull init
 		assertNotNull(multiHttpClientConfig);
 
-		multiConfig = multiVtnConfig.getMultiConfig(vtnXmppId);
-		assertNotNull(multiConfig);
-		assertNotNull(multiConfig.getVtnId(), vtnXmppId);
-		assertNull(multiConfig.getVtnUrl());
-		assertEquals(multiConfig.getVtnXmppHost(), vtnXmppHost);
-		assertEquals(multiConfig.getVtnXmppPort(), vtnXmppPort);
 		// xmpp client failed init
-		OadrXmppVenClient20b multiXmppClientConfig = multiVtnConfig.getMultiXmppClientConfig(multiConfig);
-		assertNull(multiXmppClientConfig);
+		multiConfig = multiVtnConfig.getMultiConfig(vtnXmppId);
+		assertNull(multiConfig);
+//		assertNotNull(multiConfig.getVtnId(), vtnXmppId);
+//		assertNull(multiConfig.getVtnUrl());
+//		assertEquals(multiConfig.getVtnXmppHost(), vtnXmppHost);
+//		assertEquals(multiConfig.getVtnXmppPort(), vtnXmppPort);
+//		OadrXmppVenClient20b multiXmppClientConfig = multiVtnConfig.getMultiXmppClientConfig(multiConfig);
+//		assertNull(multiXmppClientConfig);
 
 	}
 }
