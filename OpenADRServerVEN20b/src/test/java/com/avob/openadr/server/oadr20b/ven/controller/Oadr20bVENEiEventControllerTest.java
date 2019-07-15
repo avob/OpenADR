@@ -3,9 +3,6 @@ package com.avob.openadr.server.oadr20b.ven.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.ServletContext;
@@ -14,7 +11,6 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -76,14 +72,9 @@ public class Oadr20bVENEiEventControllerTest {
 	@Value("${oadr.vtn.myvtn.vtnid}")
 	private String vtnHttpId;
 
-	@Mock
-	private ScheduledExecutorService scheduledExecutorService;
-
 	@Resource
 	private Oadr20bVENEiEventService oadr20bVENEiEventService;
 
-	@Mock
-	private ScheduledFuture<?> t;
 
 	@PostConstruct
 	public void init() throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
