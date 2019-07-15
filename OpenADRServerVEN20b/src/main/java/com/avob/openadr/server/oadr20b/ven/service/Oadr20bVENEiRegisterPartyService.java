@@ -331,15 +331,6 @@ public class Oadr20bVENEiRegisterPartyService {
 
 			response = oadrCancelPartyRegistration(vtnConfig, oadrCancelPartyRegistrationType);
 
-		} else if (unmarshal instanceof OadrCreatedPartyRegistrationType) {
-
-			OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType = (OadrCreatedPartyRegistrationType) unmarshal;
-
-			LOGGER.info(username + " - OadrCreatedPartyRegistrationType");
-
-			oadrCreatedPartyRegistration(vtnConfig, oadrCreatedPartyRegistrationType);
-			return null;
-
 		}
 
 		if (response != null) {
