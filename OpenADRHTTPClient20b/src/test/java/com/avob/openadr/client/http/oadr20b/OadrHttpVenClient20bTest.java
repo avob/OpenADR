@@ -107,7 +107,7 @@ public class OadrHttpVenClient20bTest {
                         .thenReturn(mockOadrResponseType);
 
         OadrCreatedEventType createdEvent = new OadrCreatedEventType();
-        OadrHttpVenClient20bTestClass.oadrCreatedEvent(createdEvent);
+        OadrResponseType oadrCreatedEvent = OadrHttpVenClient20bTestClass.oadrCreatedEvent(createdEvent);
 
     }
 }

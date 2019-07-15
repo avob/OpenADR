@@ -50,13 +50,16 @@ public class Oadr20bFactoryTest {
 		duration = Oadr20bFactory.millisecondToXmlDuration(0L);
 		assertNotNull(duration);
 		assertEquals("PT0S", duration);
-		
+
 		duration = Oadr20bFactory.millisecondToXmlDuration(1000L);
 		assertNotNull(duration);
 		assertEquals("PT1S", duration);
-		
-		
-		
+
+		Long dur = 25 * 60 * 60 * 1000L + 60 * 1000L + 1000L;
+		duration = Oadr20bFactory.millisecondToXmlDuration(dur);
+		assertNotNull(duration);
+		assertEquals("P1DT1H1M1S", duration);
+
 		boolean ex = false;
 		try {
 			duration = Oadr20bFactory.millisecondToXmlDuration(null);
@@ -64,17 +67,16 @@ public class Oadr20bFactoryTest {
 			ex = true;
 		}
 		assertTrue(ex);
-		
-		
+
 	}
-	
+
 	@Test
 	public void multiplyXmlDurationTest() {
 		String duration = null;
 		duration = Oadr20bFactory.multiplyXmlDuration("PT0S", 2);
 		assertNotNull(duration);
 		assertEquals("PT0S", duration);
-		
+
 		duration = Oadr20bFactory.multiplyXmlDuration("PT1S", 2);
 		assertNotNull(duration);
 		assertEquals("PT2S", duration);

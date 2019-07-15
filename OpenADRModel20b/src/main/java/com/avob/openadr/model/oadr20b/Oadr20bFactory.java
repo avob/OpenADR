@@ -491,13 +491,6 @@ public class Oadr20bFactory {
 		return createOadrResponseType;
 	}
 
-	public static OadrResponseType createOadrResponseType(EiResponseType eiResponse, String venId) {
-		OadrResponseType createOadrResponseType = factory.createOadrResponseType();
-		createOadrResponseType.setEiResponse(eiResponse);
-		createOadrResponseType.setVenID(venId);
-		return createOadrResponseType;
-	}
-
 	public static OadrCancelOptType createOadrCancelOptType(String requestId, String optId, String venId) {
 		OadrCancelOptType createOadrCancelOptType = factory.createOadrCancelOptType();
 		createOadrCancelOptType.setRequestID(requestId);
@@ -699,10 +692,6 @@ public class Oadr20bFactory {
 		createBaseUnitType.setItemUnits(units);
 		createBaseUnitType.setSiScaleCode(siscaleCode);
 		return createBaseUnitType;
-	}
-
-	public static JAXBElement<BaseUnitType> createBaseUnit(BaseUnitType type) {
-		return factory.createCustomUnit(type);
 	}
 
 	public static CurrencyType createCurrencyType(CurrencyItemDescriptionType description,
