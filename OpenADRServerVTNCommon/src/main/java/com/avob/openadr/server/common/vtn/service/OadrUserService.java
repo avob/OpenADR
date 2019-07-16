@@ -72,7 +72,7 @@ public class OadrUserService extends AbstractUserService<OadrUser> {
 	public Optional<File> generateCertificateIfRequired(OadrUserCreateDto dto, OadrUser user)
 			throws GenerateX509VenException {
 
-		if (dto.getAuthenticationType() != null && !"login".equals(dto.getAuthenticationType())) {
+		if (dto.getAuthenticationType() != null && !"login".equals(dto.getAuthenticationType()) && dto.getNeedCertificateGeneration() != null) {
 
 			if (generateX509VenService != null) {
 				File generateCredentials = generateX509VenService.generateCredentials(dto, user);

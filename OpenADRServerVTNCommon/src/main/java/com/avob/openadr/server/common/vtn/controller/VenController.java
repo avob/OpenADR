@@ -103,7 +103,8 @@ public class VenController {
 			if (generateCertificateIfRequired.isPresent()) {
 				InputStreamResource resource = new InputStreamResource(
 						new FileInputStream(generateCertificateIfRequired.get()));
-				body = ResponseEntity.ok().header("Content-Disposition", "attachment; filename=\"archive.tar\"")
+				body = ResponseEntity.status(HttpStatus.CREATED_201)
+						.header("Content-Disposition", "attachment; filename=\"archive.tar\"")
 						.header("X-VenID", prepare.getUsername())
 						.contentLength(generateCertificateIfRequired.get().length())
 						.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);

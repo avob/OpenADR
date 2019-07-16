@@ -1,11 +1,13 @@
 package com.avob.openadr.server.common.vtn.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 
@@ -31,11 +33,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.avob.openadr.server.common.vtn.ApplicationTest;
+import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
 import com.avob.openadr.server.common.vtn.models.venresource.VenResourceDto;
+import com.avob.openadr.server.common.vtn.service.VenService;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -66,6 +70,9 @@ public class VenControllerTest {
 	private UserRequestPostProcessor adminSession = SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN");
 	private UserRequestPostProcessor venSession = SecurityMockMvcRequestPostProcessors.user("ven1").roles("VEN");
 	private UserRequestPostProcessor userSession = SecurityMockMvcRequestPostProcessors.user("ven1").roles("USER");
+
+	@Resource
+	private VenService venService;
 
 	@Before
 	public void before() {
@@ -499,6 +506,78 @@ public class VenControllerTest {
 		readValue = this.convertMvcResultToDtoList(andReturn, VenCreateDto.class);
 		assertNotNull(readValue);
 		assertEquals(0, readValue.size());
+
+	}
+
+	@Test
+	public void createVenTest() throws Exception {
+
+		// create login auth app no certificate gen
+		VenCreateDto dto = new VenCreateDto();
+		dto.setCommonName("myapp");
+		dto.setUsername("myapp");
+		dto.setAuthenticationType("login");
+		dto.setPassword("pass");
+		byte[] content = mapper.writeValueAsBytes(dto);
+		MvcResult andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(VEN_URL).content(content)
+						.header("Content-Type", "application/json").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
+		assertEquals(0, andReturn.getResponse().getContentLength());
+		// verify app has been created
+		Ven findByUsername = venService.findOneByUsername("myapp");
+		assertNotNull(findByUsername);
+		venService.delete(findByUsername);
+
+		// create x509 auth app no certificate gen
+		dto = new VenCreateDto();
+		dto.setCommonName("myapp");
+		dto.setUsername("myapp");
+		dto.setAuthenticationType("x509");
+		content = mapper.writeValueAsBytes(dto);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(VEN_URL).content(content)
+						.header("Content-Type", "application/json").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
+		assertEquals(0, andReturn.getResponse().getContentLength());
+		// verify app has been created
+		findByUsername = venService.findOneByUsername("myapp");
+		assertNotNull(findByUsername);
+		venService.delete(findByUsername);
+
+		// create x509 app user rsa certificate gen
+		dto = new VenCreateDto();
+		dto.setCommonName("myapp");
+		dto.setAuthenticationType("x509");
+		dto.setNeedCertificateGeneration("rsa");
+		content = mapper.writeValueAsBytes(dto);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(VEN_URL).content(content)
+						.header("Content-Type", "application/json").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
+		assertNotEquals(0, andReturn.getResponse().getContentLength());
+		// verify app has been created
+		assertNotNull(andReturn.getResponse().getHeader("x-VenID"));
+		findByUsername = venService.findOneByUsername(andReturn.getResponse().getHeader("x-VenID"));
+		assertNotNull(findByUsername);
+		venService.delete(findByUsername);
+
+		// create x509 auth app ecc certificate gen
+		dto = new VenCreateDto();
+		dto.setCommonName("myapp");
+		dto.setAuthenticationType("x509");
+		dto.setNeedCertificateGeneration("ecc");
+		content = mapper.writeValueAsBytes(dto);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(VEN_URL).content(content)
+						.header("Content-Type", "application/json").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
+		assertNotEquals(0, andReturn.getResponse().getContentLength());
+		// verify app has been created
+		assertNotNull(andReturn.getResponse().getHeader("x-VenID"));
+		findByUsername = venService.findOneByUsername(andReturn.getResponse().getHeader("x-VenID"));
+		assertNotNull(findByUsername);
+		venService.delete(findByUsername);
 
 	}
 

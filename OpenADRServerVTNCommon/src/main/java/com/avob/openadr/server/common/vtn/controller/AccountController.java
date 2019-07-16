@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +25,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
+import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
+import com.avob.openadr.server.common.vtn.models.user.AbstractUserDao;
+import com.avob.openadr.server.common.vtn.models.user.AbstractUserWithRoleDto;
 import com.avob.openadr.server.common.vtn.models.user.OadrApp;
 import com.avob.openadr.server.common.vtn.models.user.OadrAppCreateDto;
 import com.avob.openadr.server.common.vtn.models.user.OadrAppDto;
@@ -47,26 +48,25 @@ public class AccountController {
 	private DtoMapper dtoMapper;
 
 	@Resource
+	private AbstractUserDao abstractUserDao;
+
+	@Resource
 	private OadrUserService oadrUserService;
 
 	@Resource
 	private OadrAppService oadrAppService;
 
-	@Value("${oadr.security.admin.username:#{null}}")
-	private String adminUsername;
-
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	@ResponseBody
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEVICE_MANAGER') or hasRole('ROLE_DRPROGRAM')")
-	public OadrUserDto registeredUser(Principal principal) {
-		if (adminUsername != null && adminUsername.equals(principal.getName())) {
-			OadrUserDto dto = new OadrUserDto();
-			dto.setUsername(principal.getName());
-			dto.setRoles(Arrays.asList("ROLE_ADMIN"));
-			return dto;
+	public AbstractUserWithRoleDto registeredUser(Principal principal) {
+
+		AbstractUser findOneByUsername = abstractUserDao.findOneByUsername(principal.getName());
+		if (findOneByUsername != null) {
+			return dtoMapper.map(findOneByUsername, AbstractUserWithRoleDto.class);
 		}
-		OadrUser findByUsername = oadrUserService.findByUsername(principal.getName());
-		return dtoMapper.map(findByUsername, OadrUserDto.class);
+
+		return null;
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -99,7 +99,8 @@ public class AccountController {
 			if (generateCertificateIfRequired.isPresent()) {
 				InputStreamResource resource = new InputStreamResource(
 						new FileInputStream(generateCertificateIfRequired.get()));
-				body = ResponseEntity.ok().header("Content-Disposition", "attachment; filename=\"archive.tar\"")
+				body = ResponseEntity.status(HttpStatus.CREATED_201)
+						.header("Content-Disposition", "attachment; filename=\"archive.tar\"")
 						.header("x-Username", prepare.getUsername())
 						.contentLength(generateCertificateIfRequired.get().length())
 						.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
@@ -166,7 +167,8 @@ public class AccountController {
 			if (generateCertificateIfRequired.isPresent()) {
 				InputStreamResource resource = new InputStreamResource(
 						new FileInputStream(generateCertificateIfRequired.get()));
-				body = ResponseEntity.ok().header("Content-Disposition", "attachment; filename=\"archive.tar\"")
+				body = ResponseEntity.status(HttpStatus.CREATED_201)
+						.header("Content-Disposition", "attachment; filename=\"archive.tar\"")
 						.header("x-Username", prepare.getUsername())
 						.contentLength(generateCertificateIfRequired.get().length())
 						.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);

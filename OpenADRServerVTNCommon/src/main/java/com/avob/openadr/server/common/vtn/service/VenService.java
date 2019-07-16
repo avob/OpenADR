@@ -80,7 +80,8 @@ public class VenService extends AbstractUserService<Ven> {
 
 	public Optional<File> generateCertificateIfRequired(VenCreateDto dto, Ven ven) throws GenerateX509VenException {
 
-		if (dto.getAuthenticationType() != null && !"no".equals(dto.getAuthenticationType())) {
+		if (dto.getAuthenticationType() != null && !"no".equals(dto.getAuthenticationType())
+				&& dto.getNeedCertificateGeneration() != null) {
 
 			if (generateX509VenService != null) {
 				File generateCredentials = generateX509VenService.generateCredentials(dto, ven);

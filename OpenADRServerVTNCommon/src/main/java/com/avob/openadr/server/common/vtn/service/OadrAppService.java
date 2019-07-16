@@ -73,7 +73,8 @@ public class OadrAppService extends AbstractUserService<OadrApp> {
 	public Optional<File> generateCertificateIfRequired(OadrAppCreateDto dto, OadrApp app)
 			throws GenerateX509VenException {
 
-		if (dto.getAuthenticationType() != null && !"no".equals(dto.getAuthenticationType())) {
+		if (dto.getAuthenticationType() != null && !"no".equals(dto.getAuthenticationType())
+				&& dto.getNeedCertificateGeneration() != null) {
 
 			if (generateX509VenService != null) {
 				File generateCredentials = generateX509VenService.generateCredentials(dto, app);
