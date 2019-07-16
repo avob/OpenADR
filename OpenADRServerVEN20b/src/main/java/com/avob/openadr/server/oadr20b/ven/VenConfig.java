@@ -63,7 +63,7 @@ public class VenConfig implements Cloneable {
 
 	@Value("${oadr.security.authentication.digest.password:#{null}}")
 	private String digestPassword;
-	
+
 	@Value("${oadr.security.authentication.digest.realm:#{null}}")
 	private String digestRealm;
 
@@ -102,64 +102,28 @@ public class VenConfig implements Cloneable {
 		return venId;
 	}
 
-	public void setVenId(String venId) {
-		this.venId = venId;
-	}
-
 	public String getVenName() {
 		return venName;
-	}
-
-	public void setVenName(String venName) {
-		this.venName = venName;
 	}
 
 	public Long getPullFrequencySeconds() {
 		return pullFrequencySeconds;
 	}
 
-	public void setPullFrequencySeconds(Long pullFrequencySeconds) {
-		this.pullFrequencySeconds = pullFrequencySeconds;
-	}
-
 	public Boolean getReportOnly() {
 		return reportOnly;
-	}
-
-	public void setReportOnly(Boolean reportOnly) {
-		this.reportOnly = reportOnly;
 	}
 
 	public Boolean getXmlSignature() {
 		return xmlSignature;
 	}
 
-	public void setXmlSignature(Boolean xmlSignature) {
-		this.xmlSignature = xmlSignature;
-	}
-
 	public Boolean getPullModel() {
 		return pullModel;
 	}
 
-	public void setPullModel(Boolean pullModel) {
-		this.pullModel = pullModel;
-	}
-
 	public String getVenUrl() {
 		return venUrl;
-	}
-
-	public void setVenUrl(String venUrl) {
-		this.venUrl = venUrl;
-	}
-
-	public boolean isBasicAuthenticationConfigured() {
-		return basicUsername != null && basicPassword != null;
-	}
-
-	public boolean isDigestAuthenticationConfigured() {
-		return digestUsername != null && digestPassword != null;
 	}
 
 	public Map<String, String> getVtnTrustCertificate() {
@@ -199,22 +163,6 @@ public class VenConfig implements Cloneable {
 		return replayProtectAcceptedDelaySecond;
 	}
 
-	public List<String> getTrustCertificates() {
-		return trustCertificates;
-	}
-
-	public void setTrustCertificates(List<String> trustCertificates) {
-		this.trustCertificates = trustCertificates;
-	}
-
-	public void setVenPrivateKeyPath(String venPrivateKeyPath) {
-		this.venPrivateKeyPath = venPrivateKeyPath;
-	}
-
-	public void setVenCertificatePath(String venCertificatePath) {
-		this.venCertificatePath = venCertificatePath;
-	}
-
 	public void setBasicUsername(String basicUsername) {
 		this.basicUsername = basicUsername;
 	}
@@ -229,10 +177,6 @@ public class VenConfig implements Cloneable {
 
 	public void setDigestPassword(String digestPassword) {
 		this.digestPassword = digestPassword;
-	}
-
-	public void setReplayProtectAcceptedDelaySecond(Long replayProtectAcceptedDelaySecond) {
-		this.replayProtectAcceptedDelaySecond = replayProtectAcceptedDelaySecond;
 	}
 
 	public VenConfig clone() {

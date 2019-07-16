@@ -3,6 +3,9 @@ package com.avob.openadr.server.oadr20b.ven.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.ServletContext;
@@ -29,9 +32,11 @@ import com.avob.openadr.client.http.oadr20b.ven.OadrHttpVenClient20b;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
 import com.avob.openadr.model.oadr20b.builders.eipayload.Oadr20bEiTargetTypeBuilder;
 import com.avob.openadr.model.oadr20b.ei.EiActivePeriodType;
+import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
 import com.avob.openadr.model.oadr20b.ei.EiTargetType;
 import com.avob.openadr.model.oadr20b.ei.EventDescriptorType;
 import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
+import com.avob.openadr.model.oadr20b.ei.IntervalType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
@@ -46,6 +51,7 @@ import com.avob.openadr.server.oadr20b.ven.VEN20bApplicationTest;
 import com.avob.openadr.server.oadr20b.ven.VenConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiEventService;
+import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiEventService.Oadr20bVENEiEventServiceListener;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VEN20bApplicationTest.class })
@@ -75,6 +81,49 @@ public class Oadr20bVENEiEventControllerTest {
 	@Resource
 	private Oadr20bVENEiEventService oadr20bVENEiEventService;
 
+	private Oadr20bVENEiEventListener oadr20bVENEiEventListener = new Oadr20bVENEiEventListener();
+
+	private class Oadr20bVENEiEventListener implements Oadr20bVENEiEventServiceListener {
+
+		private Map<String, OadrEvent> events = new HashMap<>();
+
+		public int size() {
+			return events.size();
+		}
+
+		@Override
+		public void onCreateEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
+			events.put(event.getEiEvent().getEventDescriptor().getEventID(), event);
+
+		}
+
+		@Override
+		public void onUpdateEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
+			events.put(event.getEiEvent().getEventDescriptor().getEventID(), event);
+
+		}
+
+		@Override
+		public void onDeleteEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
+			events.remove(event.getEiEvent().getEventDescriptor().getEventID());
+
+		}
+
+		@Override
+		public void onIntervalStart(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+				EiEventSignalType eiEventSignalType, IntervalType intervalType) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onLastIntervalEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+				EiEventSignalType eiEventSignalType, IntervalType intervalType) {
+			// TODO Auto-generated method stub
+
+		}
+
+	}
 
 	@PostConstruct
 	public void init() throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
@@ -88,6 +137,8 @@ public class Oadr20bVENEiEventControllerTest {
 		OadrCreatedEventType event = null;
 		OadrResponseType value = null;
 		Mockito.when(mock.oadrCreatedEvent(event)).thenReturn(value);
+
+		oadr20bVENEiEventService.addListener(oadr20bVENEiEventListener);
 
 	}
 
@@ -129,6 +180,9 @@ public class Oadr20bVENEiEventControllerTest {
 	@Test
 	public void oadrDistributeEventResponse() throws Exception {
 
+		// listener not called yet
+		assertEquals(0, oadr20bVENEiEventListener.size());
+		// create dr event
 		long timestampStart = 0L;
 		String eventXmlDuration = "PT24H";
 		String toleranceXmlDuration = "PT0S";
@@ -156,11 +210,36 @@ public class Oadr20bVENEiEventControllerTest {
 				.newOadr20bDistributeEventBuilder(multiVtnConfig.getMultiConfig(vtnHttpId).getVtnId(), "0")
 				.addOadrEvent(event).build();
 
+		// push dr event to VEN
 		OadrResponseType postEiEventAndExpect = oadrMockMvc.postEiEventAndExpect(VTN_SECURITY_SESSION, build,
 				HttpStatus.OK_200, OadrResponseType.class);
 		assertNotNull(postEiEventAndExpect);
 
+		// assert event stored in service event list
 		assertEquals(oadr20bVENEiEventService.getOadrEvents(multiConfig).size(), 1);
+		assertEquals(new Long(0),
+				new Long(oadr20bVENEiEventService.getOadrEvents(multiConfig)
+						.get(event.getEiEvent().getEventDescriptor().getEventID()).getEiEvent().getEventDescriptor()
+						.getModificationNumber()));
+		// assert listener called
+		assertEquals(1, oadr20bVENEiEventListener.size());
+
+		// update event
+		event.getEiEvent().getEventDescriptor().setModificationNumber(++modificationNumber);
+		build = Oadr20bEiEventBuilders
+				.newOadr20bDistributeEventBuilder(multiVtnConfig.getMultiConfig(vtnHttpId).getVtnId(), "0")
+				.addOadrEvent(event).build();
+
+		postEiEventAndExpect = oadrMockMvc.postEiEventAndExpect(VTN_SECURITY_SESSION, build, HttpStatus.OK_200,
+				OadrResponseType.class);
+		assertNotNull(postEiEventAndExpect);
+
+		assertEquals(oadr20bVENEiEventService.getOadrEvents(multiConfig).size(), 1);
+		assertEquals(new Long(1),
+				new Long(oadr20bVENEiEventService.getOadrEvents(multiConfig)
+						.get(event.getEiEvent().getEventDescriptor().getEventID()).getEiEvent().getEventDescriptor()
+						.getModificationNumber()));
+		assertEquals(1, oadr20bVENEiEventListener.size());
 
 		build = Oadr20bEiEventBuilders
 				.newOadr20bDistributeEventBuilder(multiVtnConfig.getMultiConfig(vtnHttpId).getVtnId(), "0").build();
@@ -170,6 +249,7 @@ public class Oadr20bVENEiEventControllerTest {
 		assertNotNull(postEiEventAndExpect);
 
 		assertEquals(oadr20bVENEiEventService.getOadrEvents(multiConfig).size(), 0);
+		assertEquals(0, oadr20bVENEiEventListener.size());
 
 	}
 
