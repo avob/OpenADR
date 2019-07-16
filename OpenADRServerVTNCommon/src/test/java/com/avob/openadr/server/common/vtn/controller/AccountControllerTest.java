@@ -93,6 +93,8 @@ public class AccountControllerTest {
 	public void before() {
 
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilters(springSecurityFilterChain).build();
+		oadrUserService.delete(oadrUserService.findAll());
+		oadrAppService.delete(oadrAppService.findAll());
 		String username = "admin";
 		adminUser = oadrUserService.prepare(username);
 		adminUser.setRoles(Lists.newArrayList("ROLE_ADMIN"));
