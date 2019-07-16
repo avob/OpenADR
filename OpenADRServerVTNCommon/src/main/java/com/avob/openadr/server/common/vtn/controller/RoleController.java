@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,8 +38,10 @@ public class RoleController {
 		AbstractUser user = abstractUserDao.findOneByUsername(username);
 		List<String> roles = new ArrayList<>();
 		if (user == null) {
+			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return roles;
 		}
+		roles = user.getRoles();
 
 		if (user instanceof Ven) {
 			roles.add("ROLE_VEN");

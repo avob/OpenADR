@@ -3,6 +3,7 @@ package com.avob.openadr.server.common.vtn.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -130,6 +131,11 @@ public class AccountControllerTest {
 
 	@Test
 	public void registeredUserTest() throws Exception {
+
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.get(ACCOUNT_URL).header("Content-Type", "application/json").with(user))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.get(ACCOUNT_URL).header("Content-Type", "application/json").with(admin))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
@@ -151,6 +157,11 @@ public class AccountControllerTest {
 
 	@Test
 	public void listUserTest() throws Exception {
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.get(ACCOUNT_USER_URL).header("Content-Type", "application/json").with(user))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+
 		MvcResult andReturn = this.mockMvc.perform(
 				MockMvcRequestBuilders.get(ACCOUNT_USER_URL).header("Content-Type", "application/json").with(admin))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
@@ -163,13 +174,30 @@ public class AccountControllerTest {
 	@Test
 	public void createUserTest() throws Exception {
 
-		// create login auth user no certificate gen
 		OadrUserCreateDto dto = new OadrUserCreateDto();
+		dto.setCommonName("admin");
+		dto.setUsername("admin");
+		dto.setAuthenticationType("login");
+		dto.setPassword("pass");
+		byte[] content = mapper.writeValueAsBytes(dto);
+		// no authorization
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(ACCOUNT_USER_URL).content(content)
+						.header("Content-Type", "application/json").with(user))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		// already created user
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(ACCOUNT_USER_URL).content(content)
+						.header("Content-Type", "application/json").with(admin))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
+
+		// create login auth user no certificate gen
+		dto = new OadrUserCreateDto();
 		dto.setCommonName("myuser");
 		dto.setUsername("myuser");
 		dto.setAuthenticationType("login");
 		dto.setPassword("pass");
-		byte[] content = mapper.writeValueAsBytes(dto);
+		content = mapper.writeValueAsBytes(dto);
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(ACCOUNT_USER_URL).content(content)
 						.header("Content-Type", "application/json").with(admin))
@@ -233,7 +261,54 @@ public class AccountControllerTest {
 	}
 
 	@Test
+	public void deleteUserTest() throws Exception {
+
+		// no authorization
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.delete(ACCOUNT_USER_URL + "/mouaiccool")
+						.header("Content-Type", "application/json").with(user))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+
+		// delete unknown user account
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.delete(ACCOUNT_USER_URL + "/mouaiccool")
+						.header("Content-Type", "application/json").with(admin))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+
+		// create login auth user no certificate gen
+		OadrUserCreateDto dto = new OadrUserCreateDto();
+		dto.setCommonName("myuser");
+		dto.setUsername("myuser");
+		dto.setAuthenticationType("login");
+		dto.setPassword("pass");
+		byte[] content = mapper.writeValueAsBytes(dto);
+		MvcResult andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(ACCOUNT_USER_URL).content(content)
+						.header("Content-Type", "application/json").with(admin))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
+		assertEquals(0, andReturn.getResponse().getContentLength());
+
+		// verify user has been created
+		OadrUser findByUsername = oadrUserService.findByUsername("myuser");
+		assertNotNull(findByUsername);
+
+		// delete user account
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.delete(ACCOUNT_USER_URL + "/myuser")
+						.header("Content-Type", "application/json").with(admin))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
+
+		// verify user has been deleted
+		findByUsername = oadrUserService.findByUsername("myuser");
+		assertNull(findByUsername);
+	}
+
+	@Test
 	public void listAppTest() throws Exception {
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.get(ACCOUNT_APP_URL).header("Content-Type", "application/json").with(user))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+
 		MvcResult andReturn = this.mockMvc.perform(
 				MockMvcRequestBuilders.get(ACCOUNT_APP_URL).header("Content-Type", "application/json").with(admin))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
@@ -246,13 +321,30 @@ public class AccountControllerTest {
 	@Test
 	public void createAppTest() throws Exception {
 
-		// create login auth app no certificate gen
 		OadrAppCreateDto dto = new OadrAppCreateDto();
+		dto.setCommonName("app");
+		dto.setUsername("app");
+		dto.setAuthenticationType("login");
+		dto.setPassword("pass");
+		byte[] content = mapper.writeValueAsBytes(dto);
+		// forbidden
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(ACCOUNT_APP_URL).content(content)
+						.header("Content-Type", "application/json").with(user))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		// already created app
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(ACCOUNT_APP_URL).content(content)
+						.header("Content-Type", "application/json").with(admin))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
+
+		// create login auth app no certificate gen
+		dto = new OadrAppCreateDto();
 		dto.setCommonName("myapp");
 		dto.setUsername("myapp");
 		dto.setAuthenticationType("login");
 		dto.setPassword("pass");
-		byte[] content = mapper.writeValueAsBytes(dto);
+		content = mapper.writeValueAsBytes(dto);
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(ACCOUNT_APP_URL).content(content)
 						.header("Content-Type", "application/json").with(admin))
@@ -313,6 +405,48 @@ public class AccountControllerTest {
 		assertNotNull(findByUsername);
 		oadrAppService.delete(findByUsername);
 
+	}
+
+	@Test
+	public void deleteAppTest() throws Exception {
+		// forbidden
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.delete(ACCOUNT_APP_URL + "/mouaiccool")
+						.header("Content-Type", "application/json").with(user))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+
+		// delete unknown app account
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.delete(ACCOUNT_APP_URL + "/mouaiccool")
+						.header("Content-Type", "application/json").with(admin))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+
+		// create login auth app no certificate gen
+		OadrAppCreateDto dto = new OadrAppCreateDto();
+		dto.setCommonName("myapp");
+		dto.setUsername("myapp");
+		dto.setAuthenticationType("login");
+		dto.setPassword("pass");
+		byte[] content = mapper.writeValueAsBytes(dto);
+		MvcResult andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(ACCOUNT_APP_URL).content(content)
+						.header("Content-Type", "application/json").with(admin))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
+		assertEquals(0, andReturn.getResponse().getContentLength());
+
+		// verify app has been created
+		OadrApp findByUsername = oadrAppService.findByUsername("myapp");
+		assertNotNull(findByUsername);
+
+		// delete app account
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.delete(ACCOUNT_APP_URL + "/myapp")
+						.header("Content-Type", "application/json").with(admin))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
+
+		// verify app has been deleted
+		findByUsername = oadrAppService.findByUsername("myapp");
+		assertNull(findByUsername);
 	}
 
 }
