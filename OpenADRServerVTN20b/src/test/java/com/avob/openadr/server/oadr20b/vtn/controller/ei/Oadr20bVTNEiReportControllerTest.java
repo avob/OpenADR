@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
@@ -30,6 +31,7 @@ import com.avob.openadr.model.oadr20b.builders.Oadr20bEiBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bPollBuilders;
 import com.avob.openadr.model.oadr20b.builders.eipayload.EndDeviceAssertMridType;
+import com.avob.openadr.model.oadr20b.builders.eireport.PowerRealUnitType;
 import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
@@ -184,7 +186,59 @@ public class Oadr20bVTNEiReportControllerTest {
 								.addEndDeviceAsset(Arrays.asList(Oadr20bFactory
 										.createEndDeviceAssetType(EndDeviceAssertMridType.BASEBOARD_HEATER)))
 								.build())
+
 						.withDataSource(Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addResourceId("res1").build())
+						.withOadrSamplingRate(minPeriod, maxPeriod, false).build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "2", reportType, readingType)
+						.withVoltageBase(SiScaleCodeType.NONE).withOadrSamplingRate(minPeriod, maxPeriod, false)
+						.build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "3", reportType, readingType)
+						.withEnergyApparentBase(SiScaleCodeType.NONE).withOadrSamplingRate(minPeriod, maxPeriod, false)
+						.build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "4", reportType, readingType)
+						.withEnergyReactiveBase(SiScaleCodeType.NONE).withOadrSamplingRate(minPeriod, maxPeriod, false)
+						.build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "5", reportType, readingType)
+						.withEnergyRealBase(SiScaleCodeType.NONE).withOadrSamplingRate(minPeriod, maxPeriod, false)
+						.build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "6", reportType, readingType)
+						.withPowerApparentBase(SiScaleCodeType.NONE, new BigDecimal(60), new BigDecimal(230), true)
+						.withOadrSamplingRate(minPeriod, maxPeriod, false).build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "7", reportType, readingType)
+						.withPowerReactiveBase(SiScaleCodeType.NONE, new BigDecimal(60), new BigDecimal(230), true)
+						.withOadrSamplingRate(minPeriod, maxPeriod, false).build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "8", reportType, readingType)
+						.withPowerRealBase(PowerRealUnitType.WATT, SiScaleCodeType.NONE, new BigDecimal(60),
+								new BigDecimal(230), true)
+						.withOadrSamplingRate(minPeriod, maxPeriod, false).build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "9", reportType, readingType)
+						.withFrequencyBase(SiScaleCodeType.NONE).withOadrSamplingRate(minPeriod, maxPeriod, false)
+						.build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "10", reportType, readingType)
+						.withPulseCountBase(5.0F).withOadrSamplingRate(minPeriod, maxPeriod, false).build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "11", reportType, readingType)
+						.withTemperatureBase(TemperatureUnitType.CELSIUS, SiScaleCodeType.NONE)
+						.withOadrSamplingRate(minPeriod, maxPeriod, false).build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "12", reportType, readingType)
+						.withThermBase(SiScaleCodeType.NONE).withOadrSamplingRate(minPeriod, maxPeriod, false).build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "13", reportType, readingType)
+						.withVoltageBase(SiScaleCodeType.NONE).withOadrSamplingRate(minPeriod, maxPeriod, false)
+						.build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "14", reportType, readingType)
+						.withCustomUnitBase("mouaiccool", "mouaiccool", SiScaleCodeType.NONE)
 						.withOadrSamplingRate(minPeriod, maxPeriod, false).build())
 				.build();
 
@@ -199,13 +253,9 @@ public class Oadr20bVTNEiReportControllerTest {
 				oadrRegisteredReportType.getEiResponse().getResponseCode());
 
 		// sign and push this payload into EiReport controller
-//		OadrPayload payload = mockMvc.postEiReportAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
-//				xmlSignatureService.sign(oadrRegisterReportType), HttpStatus.OK_200, OadrPayload.class);
 		String str = mockMvc.postEiReportAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
 				xmlSignatureService.sign(oadrRegisterReportType), HttpStatus.OK_200, String.class);
 		OadrPayload payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
-		xmlSignatureService.validate(str, payload);
-
 		xmlSignatureService.validate(str, payload);
 		oadrRegisteredReportType = payload.getOadrSignedObject().getOadrRegisteredReport();
 
@@ -231,12 +281,58 @@ public class Oadr20bVTNEiReportControllerTest {
 						VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/available/description", HttpStatus.OK_200,
 						ReportCapabilityDescriptionDto.class, params);
 
-		assertEquals(1, reportcapabilityDescriptionList.size());
+		assertEquals(14, reportcapabilityDescriptionList.size());
 		assertEquals(rid, reportcapabilityDescriptionList.get(0).getRid());
 		assertEquals(readingType, reportcapabilityDescriptionList.get(0).getReadingType());
 		assertEquals(reportType, reportcapabilityDescriptionList.get(0).getReportType());
 
 		Long reportCapabilityDescriptionPrivateId = reportcapabilityDescriptionList.get(0).getId();
+
+		// update register report
+		report = Oadr20bEiReportBuilders
+				.newOadr20bRegisterReportOadrReportBuilder(reportSpecifierId, reportRequestId, reportName,
+						createdTimestamp)
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid, reportType, readingType)
+						.withCurrencyBase(CurrencyItemDescriptionType.CURRENCY, ISO3AlphaCurrencyCodeContentType.EUR,
+								SiScaleCodeType.NONE)
+						.withSubject(Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder()
+								.addEndDeviceAsset(Arrays.asList(Oadr20bFactory
+										.createEndDeviceAssetType(EndDeviceAssertMridType.BASEBOARD_HEATER)))
+								.build())
+
+						.withDataSource(Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addResourceId("res1").build())
+						.withOadrSamplingRate(minPeriod, maxPeriod, false).build())
+
+				.build();
+
+		oadrRegisterReportType = Oadr20bEiReportBuilders
+				.newOadr20bRegisterReportBuilder(requestId, OadrDataBaseSetup.VEN, null).addOadrReport(report).build();
+
+		str = mockMvc.postEiReportAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
+				xmlSignatureService.sign(oadrRegisterReportType), HttpStatus.OK_200, String.class);
+		payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
+		xmlSignatureService.validate(str, payload);
+		oadrRegisteredReportType = payload.getOadrSignedObject().getOadrRegisteredReport();
+
+		assertNotNull(oadrRegisteredReportType);
+		assertEquals(String.valueOf(HttpStatus.OK_200), oadrRegisteredReportType.getEiResponse().getResponseCode());
+		assertEquals(OadrDataBaseSetup.VEN, oadrRegisteredReportType.getVenID());
+		assertNotNull(oadrRegisteredReportType.getOadrReportRequest());
+
+		params = new LinkedMultiValueMap<String, String>();
+		params.add("reportSpecifierId", reportSpecifierId);
+		reportcapabilityDescriptionList = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/available/description", HttpStatus.OK_200,
+				ReportCapabilityDescriptionDto.class, params);
+
+		assertEquals(1, reportcapabilityDescriptionList.size());
+		assertEquals(rid, reportcapabilityDescriptionList.get(0).getRid());
+		assertEquals(readingType, reportcapabilityDescriptionList.get(0).getReadingType());
+		assertEquals(reportType, reportcapabilityDescriptionList.get(0).getReportType());
+
+		reportCapabilityDescriptionPrivateId = reportcapabilityDescriptionList.get(0).getId();
 
 		// here we assume that VTN has successfully sent report create payload
 		// to VEN, either using oadrRegisteredReport or OadrCreateReport
