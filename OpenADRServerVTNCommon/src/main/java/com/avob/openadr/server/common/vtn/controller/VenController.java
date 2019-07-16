@@ -146,7 +146,7 @@ public class VenController {
 			ven.setPullFrequencySeconds(dto.getPullFrequencySeconds());
 		}
 		venService.save(ven);
-		response.setStatus(HttpStatus.CREATED_201);
+		response.setStatus(HttpStatus.OK_200);
 		LOGGER.info("Update Ven: " + ven.getUsername());
 		return dtoMapper.map(ven, VenCreateDto.class);
 	}

@@ -3,8 +3,10 @@ package com.avob.openadr.server.common.vtn.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -36,6 +38,9 @@ import com.avob.openadr.server.common.vtn.ApplicationTest;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenDto;
+import com.avob.openadr.server.common.vtn.models.ven.VenUpdateDto;
+import com.avob.openadr.server.common.vtn.models.ven.filter.VenFilter;
+import com.avob.openadr.server.common.vtn.models.ven.filter.VenFilterType;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
 import com.avob.openadr.server.common.vtn.models.venresource.VenResourceDto;
@@ -106,9 +111,8 @@ public class VenControllerTest {
 		assertNotNull(readValue);
 		assertEquals(0, readValue.size());
 
-		// create
+		// create ven1
 		String venUsername = "ven1";
-		String venUsername2 = "ven2";
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL).header("Content-Type", "application/json")
 						.content(mapper.writeValueAsString(new VenCreateDto(venUsername))).with(venSession))
@@ -118,12 +122,39 @@ public class VenControllerTest {
 				.perform(MockMvcRequestBuilders.post(VEN_URL).header("Content-Type", "application/json")
 						.content(mapper.writeValueAsString(new VenCreateDto(venUsername))).with(userSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
-
+		VenCreateDto createDto = new VenCreateDto(venUsername);
+		createDto.setCommonName("createdName");
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL).header("Content-Type", "application/json")
-						.content(mapper.writeValueAsString(new VenCreateDto(venUsername))).with(adminSession))
+						.content(mapper.writeValueAsString(createDto)).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 
+		// find all
+		andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(VEN_URL).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		List<VenDto> venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
+		assertNotNull(venDto);
+		assertEquals(1, venDto.size());
+		assertEquals("createdName", venDto.get(0).getCommonName());
+
+		// update ven1
+		VenUpdateDto updateDto = new VenUpdateDto();
+		updateDto.setName("updatedName");
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.put(VEN_URL + venUsername).header("Content-Type", "application/json")
+						.content(mapper.writeValueAsString(updateDto)).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+
+		// find all
+		andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(VEN_URL).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
+		assertNotNull(venDto);
+		assertEquals(1, venDto.size());
+		assertEquals("updatedName", venDto.get(0).getCommonName());
+
+		// create ven2
+		String venUsername2 = "ven2";
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL).header("Content-Type", "application/json")
 						.content(mapper.writeValueAsString(new VenCreateDto(venUsername2))).with(adminSession))
@@ -137,9 +168,40 @@ public class VenControllerTest {
 		// find all
 		andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(VEN_URL).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		List<VenDto> venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
+		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
 		assertNotNull(venDto);
 		assertEquals(2, venDto.size());
+
+		// search
+		List<VenFilter> filters = new ArrayList<>();
+		VenFilter filter = new VenFilter();
+		filter.setType(VenFilterType.VEN);
+		filter.setValue("ven");
+		filters.add(filter);
+
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(VEN_URL + "search?page=0&size=10")
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(filters))
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
+		assertNotNull(venDto);
+		assertEquals(2, venDto.size());
+
+		filters = new ArrayList<>();
+		filter = new VenFilter();
+		filter.setType(VenFilterType.VEN);
+		filter.setValue("ven1");
+		filters.add(filter);
+
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(VEN_URL + "search?page=0&size=10")
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(filters))
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
+		assertNotNull(venDto);
+		assertEquals(1, venDto.size());
 
 		// read
 		this.mockMvc.perform(MockMvcRequestBuilders.get(VEN_URL + "mouaiccool").with(venSession))
@@ -209,6 +271,22 @@ public class VenControllerTest {
 		this.mockMvc.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/group")
 				.header("Content-Type", "application/json").param("groupId", "" + dto.getId()).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
+
+		// search by group
+		filters = new ArrayList<>();
+		filter = new VenFilter();
+		filter.setType(VenFilterType.GROUP);
+		filter.setValue(groupName);
+		filters.add(filter);
+
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(VEN_URL + "search?page=0&size=10")
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(filters))
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
+		assertNotNull(venDto);
+		assertEquals(1, venDto.size());
 
 		// test ven is member of group
 		this.mockMvc
@@ -322,6 +400,22 @@ public class VenControllerTest {
 						.header("Content-Type", "application/json")
 						.param("marketContextId", "" + marketContextDto.getId()).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
+
+		// search by marketcontext
+		filters = new ArrayList<>();
+		filter = new VenFilter();
+		filter.setType(VenFilterType.MARKET_CONTEXT);
+		filter.setValue(marketContextName);
+		filters.add(filter);
+
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(VEN_URL + "search?page=0&size=10")
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(filters))
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
+		assertNotNull(venDto);
+		assertEquals(1, venDto.size());
 
 		// test ven is member of marketContext
 		this.mockMvc
@@ -579,6 +673,28 @@ public class VenControllerTest {
 		assertNotNull(findByUsername);
 		venService.delete(findByUsername);
 
+	}
+
+	@Test
+	public void cleanRegistrationTest() throws Exception {
+
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(VEN_URL + "mouaiccool/cleanRegistration")
+						.header("Content-Type", "application/json").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+
+		Ven prepare = venService.prepare("ven1");
+		prepare.setRegistrationId("mouaiccool");
+		venService.save(prepare);
+
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(VEN_URL + "ven1/cleanRegistration")
+						.header("Content-Type", "application/json").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
+
+		Ven findOneByUsername = venService.findOneByUsername("ven1");
+		assertNull(findOneByUsername.getRegistrationId());
+		venService.delete(findOneByUsername);
 	}
 
 	private <T> T convertMvcResultToDto(MvcResult result, Class<T> klass)
