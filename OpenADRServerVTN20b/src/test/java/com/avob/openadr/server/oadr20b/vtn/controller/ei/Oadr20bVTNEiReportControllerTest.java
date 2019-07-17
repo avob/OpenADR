@@ -272,7 +272,7 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(reportName, reportcapabilityList.get(0).getReportName());
 
 		Long reportCapabilityPrivateId = reportcapabilityList.get(0).getId();
-
+		
 		// retreive previous capability description from ven controller
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
 		params.add("reportSpecifierId", reportSpecifierId);
@@ -287,7 +287,7 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(reportType, reportcapabilityDescriptionList.get(0).getReportType());
 
 		Long reportCapabilityDescriptionPrivateId = reportcapabilityDescriptionList.get(0).getId();
-
+		
 		// update register report
 		report = Oadr20bEiReportBuilders
 				.newOadr20bRegisterReportOadrReportBuilder(reportSpecifierId, reportRequestId, reportName,

@@ -31,11 +31,8 @@ import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
 import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
@@ -397,22 +394,6 @@ public class Oadr20bVenController {
 		reportService.distributeOadrRegisterReport(ven);
 	}
 
-	@RequestMapping(value = "/{venID}/report_action/create", method = RequestMethod.POST)
-	@ResponseBody
-	public void createReport(@PathVariable("venID") String venID, @RequestBody String oadrReport)
-			throws Oadr20bMarshalException, Oadr20bUnmarshalException, OadrElementNotFoundException {
-
-		Ven ven = checkVen(venID);
-		Object unmarshal = jaxbContext.unmarshal(oadrReport, false);
-		if (unmarshal instanceof OadrReportRequestType) {
-			OadrReportRequestType reportRequest = (OadrReportRequestType) unmarshal;
-			OadrCreateReportType build = Oadr20bEiReportBuilders.newOadr20bCreateReportBuilder("", ven.getUsername())
-					.addReportRequest(reportRequest).build();
-			venDistributeService.distribute(ven, build);
-		}
-
-	}
-
 	@RequestMapping(value = "/{venID}/report_action/cancel", method = RequestMethod.POST)
 	@ResponseBody
 	public void cancelReport(@PathVariable("venID") String venID,
@@ -427,22 +408,6 @@ public class Oadr20bVenController {
 				.build();
 
 		venDistributeService.distribute(ven, build);
-	}
-
-	@RequestMapping(value = "/{venID}/report_action/update", method = RequestMethod.POST)
-	@ResponseBody
-	public void updateReport(@PathVariable("venID") String venID, @RequestBody String oadrReport)
-			throws Oadr20bMarshalException, Oadr20bUnmarshalException, OadrElementNotFoundException {
-
-		Ven ven = checkVen(venID);
-		Object unmarshal = jaxbContext.unmarshal(oadrReport, false);
-		if (unmarshal instanceof OadrReportType) {
-			OadrReportType report = (OadrReportType) unmarshal;
-			OadrUpdateReportType build = Oadr20bEiReportBuilders.newOadr20bUpdateReportBuilder("", ven.getUsername())
-					.addReport(report).build();
-			venDistributeService.distribute(ven, build);
-		}
-
 	}
 
 	@RequestMapping(value = "/{venID}/opt", method = RequestMethod.GET)
@@ -463,14 +428,6 @@ public class Oadr20bVenController {
 				VenOptDto.class);
 
 		return mapList;
-	}
-
-	@RequestMapping(value = "/{venID}/opt", method = RequestMethod.POST)
-	@ResponseBody
-	public VenOptDto createVenOpt(@PathVariable("venID") String venID)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
-
-		return null;
 	}
 
 	@RequestMapping(value = "/{venID}/opt/resource/{resourceName}", method = RequestMethod.GET)
