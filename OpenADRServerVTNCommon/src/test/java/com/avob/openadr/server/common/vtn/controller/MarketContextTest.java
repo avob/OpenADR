@@ -2,6 +2,7 @@ package com.avob.openadr.server.common.vtn.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,142 +44,186 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ActiveProfiles("test")
 public class MarketContextTest {
 
-    private static final String MARKET_CONTEXT_URL = "/MarketContext/";
+	private static final String MARKET_CONTEXT_URL = "/MarketContext/";
 
-    @Autowired
-    private WebApplicationContext wac;
+	@Autowired
+	private WebApplicationContext wac;
 
-    @Autowired
-    private Filter springSecurityFilterChain;
+	@Autowired
+	private Filter springSecurityFilterChain;
 
-    private MockMvc mockMvc;
+	private MockMvc mockMvc;
 
-    private ObjectMapper mapper = new ObjectMapper();
+	private ObjectMapper mapper = new ObjectMapper();
 
-    private UserRequestPostProcessor adminSession = SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN");
-    private UserRequestPostProcessor venSession = SecurityMockMvcRequestPostProcessors.user("ven1").roles("VEN");
-    private UserRequestPostProcessor userSession = SecurityMockMvcRequestPostProcessors.user("ven1").roles("USER");
+	private UserRequestPostProcessor adminSession = SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN");
+	private UserRequestPostProcessor venSession = SecurityMockMvcRequestPostProcessors.user("ven1").roles("VEN");
+	private UserRequestPostProcessor userSession = SecurityMockMvcRequestPostProcessors.user("ven1").roles("USER");
 
-    @Before
-    public void before() {
+	@Before
+	public void before() {
 
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilters(springSecurityFilterChain).build();
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilters(springSecurityFilterChain).build();
 
-    }
+	}
 
-    @Test
-    public void provideControllerTest() {
-        ServletContext servletContext = wac.getServletContext();
-        Assert.assertNotNull(servletContext);
-        Assert.assertTrue(servletContext instanceof MockServletContext);
-        Assert.assertNotNull(wac.getBean("marketContextController"));
-    }
+	@Test
+	public void provideControllerTest() {
+		ServletContext servletContext = wac.getServletContext();
+		Assert.assertNotNull(servletContext);
+		Assert.assertTrue(servletContext instanceof MockServletContext);
+		Assert.assertNotNull(wac.getBean("marketContextController"));
+	}
 
-    @Test
-    public void test() throws Exception {
+	@Test
+	public void test() throws Exception {
 
-        // empty find all
-        this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL).with(venSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		// empty find all
+		this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL).with(venSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL).with(userSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL).with(userSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        MvcResult andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL).with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		MvcResult andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
-        List<VenMarketContextDto> readValue = convertMvcResultToVenMarketContextDtoList(andReturn);
-        assertNotNull(readValue);
-        assertEquals(0, readValue.size());
+		List<VenMarketContextDto> readValue = convertMvcResultToVenMarketContextDtoList(andReturn);
+		assertNotNull(readValue);
+		assertEquals(0, readValue.size());
 
-        // create
-        String marketContextName = "marketContext";
-        this.mockMvc.perform(MockMvcRequestBuilders.post(MARKET_CONTEXT_URL).header("Content-Type", "application/json")
-                .content(mapper.writeValueAsString(new VenMarketContextDto(marketContextName))).with(venSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		// create
+		String marketContextName = "marketContext";
+		this.mockMvc.perform(MockMvcRequestBuilders.post(MARKET_CONTEXT_URL).header("Content-Type", "application/json")
+				.content(mapper.writeValueAsString(new VenMarketContextDto(marketContextName))).with(venSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.post(MARKET_CONTEXT_URL).header("Content-Type", "application/json")
-                .content(mapper.writeValueAsString(new VenMarketContextDto(marketContextName))).with(userSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		this.mockMvc.perform(MockMvcRequestBuilders.post(MARKET_CONTEXT_URL).header("Content-Type", "application/json")
+				.content(mapper.writeValueAsString(new VenMarketContextDto(marketContextName))).with(userSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        andReturn = this.mockMvc
-                .perform(MockMvcRequestBuilders.post(MARKET_CONTEXT_URL).header("Content-Type", "application/json")
-                        .content(mapper.writeValueAsString(new VenMarketContextDto(marketContextName)))
-                        .with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(MARKET_CONTEXT_URL).header("Content-Type", "application/json")
+						.content(mapper.writeValueAsString(new VenMarketContextDto(marketContextName)))
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 
-        VenMarketContextDto dto = convertMvcResultToVenMarketContextDto(andReturn);
-        assertNotNull(dto);
-        assertNotNull(dto.getId());
-        assertEquals(marketContextName, dto.getName());
-        
-       
+		VenMarketContextDto dto = convertMvcResultToVenMarketContextDto(andReturn);
+		assertNotNull(dto);
+		assertNotNull(dto.getId());
+		assertEquals(marketContextName, dto.getName());
 
-        this.mockMvc.perform(MockMvcRequestBuilders.post(MARKET_CONTEXT_URL).header("Content-Type", "application/json")
-                .content(mapper.writeValueAsString(new VenMarketContextDto(marketContextName))).with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
+		this.mockMvc.perform(MockMvcRequestBuilders.post(MARKET_CONTEXT_URL).header("Content-Type", "application/json")
+				.content(mapper.writeValueAsString(new VenMarketContextDto(marketContextName))).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
 
-        // find all
-        andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL).with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-        readValue = convertMvcResultToVenMarketContextDtoList(andReturn);
-        assertNotNull(readValue);
-        assertEquals(1, readValue.size());
+		// find all
+		andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		readValue = convertMvcResultToVenMarketContextDtoList(andReturn);
+		assertNotNull(readValue);
+		assertEquals(1, readValue.size());
 
-        // read
-        this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL + "mouaiccool").with(venSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		// read
+		this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL + "mouaiccool").with(venSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL + "mouaiccool").with(userSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL + "mouaiccool").with(userSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL + "mouaiccool").with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+		this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL + "mouaiccool").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
-        andReturn = this.mockMvc
-                .perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL + marketContextName).with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-        dto = convertMvcResultToVenMarketContextDto(andReturn);
-        assertNotNull(dto);
-        assertNotNull(dto.getId());
-        assertEquals(marketContextName, dto.getName());
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL + marketContextName).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		dto = convertMvcResultToVenMarketContextDto(andReturn);
+		assertNotNull(dto);
+		assertNotNull(dto.getId());
+		assertNull(dto.getDescription());
+		assertNull(dto.getColor());
+		assertEquals(marketContextName, dto.getName());
 
-        Long marketContextNameId = dto.getId();
-        // delete
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + marketContextNameId).with(venSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		Long marketContextNameId = dto.getId();
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + marketContextNameId).with(userSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		// update
+		VenMarketContextDto venMarketContextDto = new VenMarketContextDto(marketContextName);
+		venMarketContextDto.setDescription("mouaiccool");
+		venMarketContextDto.setColor("#abc");
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put(MARKET_CONTEXT_URL)
+						.content(mapper.writeValueAsString(venMarketContextDto))
+						.header("Content-Type", "application/json").with(venSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL + "mouaiccool").with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put(MARKET_CONTEXT_URL)
+						.content(mapper.writeValueAsString(venMarketContextDto))
+						.header("Content-Type", "application/json").with(userSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + marketContextNameId).with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put(MARKET_CONTEXT_URL)
+						.content(mapper.writeValueAsString(new VenMarketContextDto("mouaiccool")))
+						.header("Content-Type", "application/json").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
 
-        // empty find all
-        andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL).with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-        readValue = convertMvcResultToVenMarketContextDtoList(andReturn);
-        assertNotNull(readValue);
-        assertEquals(0, readValue.size());
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put(MARKET_CONTEXT_URL)
+						.content(mapper.writeValueAsString(venMarketContextDto))
+						.header("Content-Type", "application/json").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
-    }
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL + marketContextName).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		dto = convertMvcResultToVenMarketContextDto(andReturn);
+		assertNotNull(dto);
+		assertNotNull(dto.getId());
+		assertEquals(marketContextName, dto.getName());
+		assertEquals("mouaiccool", dto.getDescription());
+		assertEquals("#abc", dto.getColor());
 
-    private VenMarketContextDto convertMvcResultToVenMarketContextDto(MvcResult result)
-            throws JsonParseException, JsonMappingException, IOException {
-        MockHttpServletResponse mockHttpServletResponse = result.getResponse();
-        byte[] contentAsByteArray = mockHttpServletResponse.getContentAsByteArray();
-        return mapper.readValue(contentAsByteArray, VenMarketContextDto.class);
-    }
+		marketContextNameId = dto.getId();
 
-    private List<VenMarketContextDto> convertMvcResultToVenMarketContextDtoList(MvcResult result)
-            throws JsonParseException, JsonMappingException, IOException {
-        MockHttpServletResponse mockHttpServletResponse = result.getResponse();
-        byte[] contentAsByteArray = mockHttpServletResponse.getContentAsByteArray();
-        return mapper.readValue(contentAsByteArray, new TypeReference<List<VenMarketContextDto>>() {
-        });
-    }
+		// delete
+		this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + marketContextNameId).with(venSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + marketContextNameId).with(userSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + "12").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + "mouaiccool").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.delete(MARKET_CONTEXT_URL + marketContextNameId).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
+
+		// empty find all
+		andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(MARKET_CONTEXT_URL).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		readValue = convertMvcResultToVenMarketContextDtoList(andReturn);
+		assertNotNull(readValue);
+		assertEquals(0, readValue.size());
+
+	}
+
+	private VenMarketContextDto convertMvcResultToVenMarketContextDto(MvcResult result)
+			throws JsonParseException, JsonMappingException, IOException {
+		MockHttpServletResponse mockHttpServletResponse = result.getResponse();
+		byte[] contentAsByteArray = mockHttpServletResponse.getContentAsByteArray();
+		return mapper.readValue(contentAsByteArray, VenMarketContextDto.class);
+	}
+
+	private List<VenMarketContextDto> convertMvcResultToVenMarketContextDtoList(MvcResult result)
+			throws JsonParseException, JsonMappingException, IOException {
+		MockHttpServletResponse mockHttpServletResponse = result.getResponse();
+		byte[] contentAsByteArray = mockHttpServletResponse.getContentAsByteArray();
+		return mapper.readValue(contentAsByteArray, new TypeReference<List<VenMarketContextDto>>() {
+		});
+	}
 
 }

@@ -27,8 +27,10 @@ import org.springframework.web.context.WebApplicationContext;
 import com.avob.openadr.server.common.vtn.ApplicationTest;
 import com.avob.openadr.server.common.vtn.models.user.OadrApp;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
+import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.OadrAppService;
 import com.avob.openadr.server.common.vtn.service.OadrUserService;
+import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 import com.google.common.collect.Lists;
 
@@ -55,13 +57,18 @@ public class RoleControllerTest {
 	@Resource
 	private OadrAppService oadrAppService;
 
+	@Resource
+	private VenService venService;
+
 	private MockMvc mockMvc;
 
 	private OadrUser adminUser = null;
 	private OadrApp appUser = null;
+	private Ven venUser = null;
 
 	private UserRequestPostProcessor admin = SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN");
 	private UserRequestPostProcessor user = SecurityMockMvcRequestPostProcessors.user("user").roles("USER");
+	private UserRequestPostProcessor ven = SecurityMockMvcRequestPostProcessors.user("ven").roles("VEN");
 
 	@Before
 	public void before() {
@@ -79,12 +86,17 @@ public class RoleControllerTest {
 		appUser.setRoles(Lists.newArrayList("ROLE_DEVICE_MANAGER"));
 		oadrAppService.save(appUser);
 
+		username = "ven";
+		venUser = venService.prepare(username);
+		venService.save(venUser);
+
 	}
 
 	@After
 	public void after() {
 		oadrUserService.delete(adminUser);
 		oadrAppService.delete(appUser);
+		venService.delete(venUser);
 	}
 
 	@Test
@@ -108,6 +120,11 @@ public class RoleControllerTest {
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		assertTrue(andReturn.getResponse().getContentAsString().contains("ROLE_APP"));
 		assertTrue(andReturn.getResponse().getContentAsString().contains("ROLE_DEVICE_MANAGER"));
+
+		andReturn = this.mockMvc.perform(
+				MockMvcRequestBuilders.post(ROLE_URL + "ven").header("Content-Type", "application/json").with(admin))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		assertTrue(andReturn.getResponse().getContentAsString().contains("ROLE_VEN"));
 	}
 
 }

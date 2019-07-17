@@ -2,6 +2,7 @@ package com.avob.openadr.server.common.vtn.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -45,7 +46,10 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandR
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilterType;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
+import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
@@ -623,6 +627,17 @@ public class DemandResponseControllerTest {
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
 		assertEquals(new Long(modificationNumber), dto.getDescriptor().getModificationNumber());
 
+		// publish unknown
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "12/publish")
+						.header("Content-Type", "application/json").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "mouaiccool/publish")
+						.header("Content-Type", "application/json").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
 		// publish
 		// expect modificatioNumber to be incremented
 		modificationNumber = modificationNumber + 1;
@@ -850,6 +865,146 @@ public class DemandResponseControllerTest {
 		assertEquals("", mockHttpServletResponse.getContentAsString());
 	}
 
+	@Test
+	public void searchTest() throws Exception {
+
+		// search published state
+		List<DemandResponseEventFilter> filters = new ArrayList<>();
+		DemandResponseEventFilter filter = new DemandResponseEventFilter();
+		filter.setType(DemandResponseEventFilterType.EVENT_PUBLISHED);
+		filter.setValue("PUBLISHED");
+		filters.add(filter);
+		MvcResult andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
+						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		List<DemandResponseEventReadDto> list = convertMvcResultToDemandResponseDtoList(andReturn);
+		assertEquals(0, list.size());
+
+		filters = new ArrayList<>();
+		filter = new DemandResponseEventFilter();
+		filter.setType(DemandResponseEventFilterType.EVENT_PUBLISHED);
+		filter.setValue("NOT_PUBLISHED");
+		filters.add(filter);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
+						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		list = convertMvcResultToDemandResponseDtoList(andReturn);
+		assertEquals(2, list.size());
+
+		// search by marketcontext
+		filters = new ArrayList<>();
+		filter = new DemandResponseEventFilter();
+		filter.setType(DemandResponseEventFilterType.MARKET_CONTEXT);
+		filter.setValue(marketContext.getName());
+		filters.add(filter);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
+						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		list = convertMvcResultToDemandResponseDtoList(andReturn);
+		assertEquals(2, list.size());
+
+		filters = new ArrayList<>();
+		filter = new DemandResponseEventFilter();
+		filter.setType(DemandResponseEventFilterType.MARKET_CONTEXT);
+		filter.setValue("mouaiccool");
+		filters.add(filter);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
+						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		list = convertMvcResultToDemandResponseDtoList(andReturn);
+		assertEquals(0, list.size());
+
+		// search by ven
+		filters = new ArrayList<>();
+		filter = new DemandResponseEventFilter();
+		filter.setType(DemandResponseEventFilterType.VEN);
+		filter.setValue(ven1);
+		filters.add(filter);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
+						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		list = convertMvcResultToDemandResponseDtoList(andReturn);
+		assertEquals(1, list.size());
+
+		filters = new ArrayList<>();
+		filter = new DemandResponseEventFilter();
+		filter.setType(DemandResponseEventFilterType.VEN);
+		filter.setValue(ven2);
+		filters.add(filter);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
+						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		list = convertMvcResultToDemandResponseDtoList(andReturn);
+		assertEquals(2, list.size());
+
+		filters = new ArrayList<>();
+		filter = new DemandResponseEventFilter();
+		filter.setType(DemandResponseEventFilterType.VEN);
+		filter.setValue("mouaiccool");
+		filters.add(filter);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
+						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		list = convertMvcResultToDemandResponseDtoList(andReturn);
+		assertEquals(0, list.size());
+
+		// search by state
+		filters = new ArrayList<>();
+		filter = new DemandResponseEventFilter();
+		filter.setType(DemandResponseEventFilterType.EVENT_STATE);
+		filter.setValue(DemandResponseEventStateEnum.ACTIVE.toString());
+		filters.add(filter);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
+						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		list = convertMvcResultToDemandResponseDtoList(andReturn);
+		assertEquals(1, list.size());
+
+		filters = new ArrayList<>();
+		filter = new DemandResponseEventFilter();
+		filter.setType(DemandResponseEventFilterType.EVENT_STATE);
+		filter.setValue(DemandResponseEventStateEnum.CANCELLED.toString());
+		filters.add(filter);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
+						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		list = convertMvcResultToDemandResponseDtoList(andReturn);
+		assertEquals(1, list.size());
+
+	}
+
+	@Test
+	public void readVenDemandResponseEventTest() throws Exception {
+		MvcResult andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL + event1.getId() + "/venResponse")
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		List<VenDemandResponseEventDto> convertMvcResultToVenDemandResponseEventDtoList = convertMvcResultToVenDemandResponseEventDtoList(
+				andReturn);
+		assertEquals(2, convertMvcResultToVenDemandResponseEventDtoList.size());
+
+		
+
+	}
+
 	public void securityTest() throws Exception {
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
@@ -879,6 +1034,14 @@ public class DemandResponseControllerTest {
 		MockHttpServletResponse mockHttpServletResponse = result.getResponse();
 		byte[] contentAsByteArray = mockHttpServletResponse.getContentAsByteArray();
 		return mapper.readValue(contentAsByteArray, new TypeReference<List<DemandResponseEventReadDto>>() {
+		});
+	}
+
+	private List<VenDemandResponseEventDto> convertMvcResultToVenDemandResponseEventDtoList(MvcResult result)
+			throws JsonParseException, JsonMappingException, IOException {
+		MockHttpServletResponse mockHttpServletResponse = result.getResponse();
+		byte[] contentAsByteArray = mockHttpServletResponse.getContentAsByteArray();
+		return mapper.readValue(contentAsByteArray, new TypeReference<List<VenDemandResponseEventDto>>() {
 		});
 	}
 

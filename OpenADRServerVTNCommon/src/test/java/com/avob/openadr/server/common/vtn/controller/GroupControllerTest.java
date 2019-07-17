@@ -32,6 +32,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.avob.openadr.server.common.vtn.ApplicationTest;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
+import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -43,141 +44,178 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ActiveProfiles("test")
 public class GroupControllerTest {
 
-    private static final String GROUP_URL = "/Group/";
+	private static final String GROUP_URL = "/Group/";
 
-    @Autowired
-    private WebApplicationContext wac;
+	@Autowired
+	private WebApplicationContext wac;
 
-    @Autowired
-    private Filter springSecurityFilterChain;
+	@Autowired
+	private Filter springSecurityFilterChain;
 
-    private MockMvc mockMvc;
+	private MockMvc mockMvc;
 
-    private ObjectMapper mapper = new ObjectMapper();
+	private ObjectMapper mapper = new ObjectMapper();
 
-    private UserRequestPostProcessor adminSession = SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN");
-    private UserRequestPostProcessor venSession = SecurityMockMvcRequestPostProcessors.user("ven1").roles("VEN");
-    private UserRequestPostProcessor userSession = SecurityMockMvcRequestPostProcessors.user("ven1").roles("USER");
+	private UserRequestPostProcessor adminSession = SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN");
+	private UserRequestPostProcessor venSession = SecurityMockMvcRequestPostProcessors.user("ven1").roles("VEN");
+	private UserRequestPostProcessor userSession = SecurityMockMvcRequestPostProcessors.user("ven1").roles("USER");
 
-    @Before
-    public void before() {
+	@Before
+	public void before() {
 
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilters(springSecurityFilterChain).build();
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilters(springSecurityFilterChain).build();
 
-    }
+	}
 
-    @Test
-    public void provideControllerTest() {
-        ServletContext servletContext = wac.getServletContext();
-        Assert.assertNotNull(servletContext);
-        Assert.assertTrue(servletContext instanceof MockServletContext);
-        Assert.assertNotNull(wac.getBean("groupController"));
-    }
+	@Test
+	public void provideControllerTest() {
+		ServletContext servletContext = wac.getServletContext();
+		Assert.assertNotNull(servletContext);
+		Assert.assertTrue(servletContext instanceof MockServletContext);
+		Assert.assertNotNull(wac.getBean("groupController"));
+	}
 
-    @Test
-    public void test() throws Exception {
+	@Test
+	public void test() throws Exception {
 
-        // empty find all
-        this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL).with(venSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		// empty find all
+		this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL).with(venSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL).with(userSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL).with(userSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        MvcResult andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL).with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		MvcResult andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
-        List<VenGroupDto> readValue = convertMvcResultToVenGroupDtoList(andReturn);
-        assertNotNull(readValue);
-        assertEquals(0, readValue.size());
+		List<VenGroupDto> readValue = convertMvcResultToVenGroupDtoList(andReturn);
+		assertNotNull(readValue);
+		assertEquals(0, readValue.size());
 
-        // create
-        String groupName = "group";
-        this.mockMvc
-                .perform(MockMvcRequestBuilders.post(GROUP_URL).header("Content-Type", "application/json")
-                        .content(mapper.writeValueAsString(new VenGroupDto(groupName))).with(venSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		// create
+		String groupName = "group";
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(GROUP_URL).header("Content-Type", "application/json")
+						.content(mapper.writeValueAsString(new VenGroupDto(groupName))).with(venSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc
-                .perform(MockMvcRequestBuilders.post(GROUP_URL).header("Content-Type", "application/json")
-                        .content(mapper.writeValueAsString(new VenGroupDto(groupName))).with(userSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(GROUP_URL).header("Content-Type", "application/json")
+						.content(mapper.writeValueAsString(new VenGroupDto(groupName))).with(userSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        andReturn = this.mockMvc
-                .perform(MockMvcRequestBuilders.post(GROUP_URL).header("Content-Type", "application/json")
-                        .content(mapper.writeValueAsString(new VenGroupDto(groupName))).with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(GROUP_URL).header("Content-Type", "application/json")
+						.content(mapper.writeValueAsString(new VenGroupDto(groupName))).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 
-        VenGroupDto dto = convertMvcResultToVenGroupDto(andReturn);
-        assertNotNull(dto);
-        assertNotNull(dto.getId());
-        assertEquals(groupName, dto.getName());
+		VenGroupDto dto = convertMvcResultToVenGroupDto(andReturn);
+		assertNotNull(dto);
+		assertNotNull(dto.getId());
+		assertEquals(groupName, dto.getName());
 
-        this.mockMvc
-                .perform(MockMvcRequestBuilders.post(GROUP_URL).header("Content-Type", "application/json")
-                        .content(mapper.writeValueAsString(new VenGroupDto(groupName))).with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(GROUP_URL).header("Content-Type", "application/json")
+						.content(mapper.writeValueAsString(new VenGroupDto(groupName))).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
 
-        // find all
-        andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL).with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-        readValue = convertMvcResultToVenGroupDtoList(andReturn);
-        assertNotNull(readValue);
-        assertEquals(1, readValue.size());
+		// find all
+		andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		readValue = convertMvcResultToVenGroupDtoList(andReturn);
+		assertNotNull(readValue);
+		assertEquals(1, readValue.size());
 
-        // read
-        this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL + "mouaiccool").with(venSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		// read
+		this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL + "mouaiccool").with(venSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL + "mouaiccool").with(userSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL + "mouaiccool").with(userSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL + "mouaiccool").with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+		this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL + "mouaiccool").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
-        andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL + groupName).with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-        dto = convertMvcResultToVenGroupDto(andReturn);
-        assertNotNull(dto);
-        assertNotNull(dto.getId());
-        assertEquals(groupName, dto.getName());
-        Long groupId = dto.getId();
+		andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL + groupName).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		dto = convertMvcResultToVenGroupDto(andReturn);
+		assertNotNull(dto);
+		assertNotNull(dto.getId());
+		assertEquals(groupName, dto.getName());
+		Long groupId = dto.getId();
 
-        // delete
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + groupId).with(venSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		// update
+		VenGroupDto venMarketContextDto = new VenGroupDto(groupName);
+		venMarketContextDto.setDescription("mouaiccool");
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put(GROUP_URL).content(mapper.writeValueAsString(venMarketContextDto))
+						.header("Content-Type", "application/json").with(venSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + groupId).with(userSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put(GROUP_URL).content(mapper.writeValueAsString(venMarketContextDto))
+						.header("Content-Type", "application/json").with(userSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL + "mouaiccool").with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put(GROUP_URL)
+						.content(mapper.writeValueAsString(new VenMarketContextDto("mouaiccool")))
+						.header("Content-Type", "application/json").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + groupId).with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put(GROUP_URL).content(mapper.writeValueAsString(venMarketContextDto))
+						.header("Content-Type", "application/json").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
-        // empty find all
-        andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL).with(adminSession))
-                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-        readValue = convertMvcResultToVenGroupDtoList(andReturn);
-        assertNotNull(readValue);
-        assertEquals(0, readValue.size());
+		andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL + groupName).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		dto = convertMvcResultToVenGroupDto(andReturn);
+		assertNotNull(dto);
+		assertNotNull(dto.getId());
+		assertEquals(groupName, dto.getName());
+		assertEquals("mouaiccool", dto.getDescription());
 
-    }
+		groupId = dto.getId();
 
-    private VenGroupDto convertMvcResultToVenGroupDto(MvcResult result)
-            throws JsonParseException, JsonMappingException, IOException {
-        MockHttpServletResponse mockHttpServletResponse = result.getResponse();
-        byte[] contentAsByteArray = mockHttpServletResponse.getContentAsByteArray();
-        return mapper.readValue(contentAsByteArray, VenGroupDto.class);
-    }
+		// delete
+		this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + groupId).with(venSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-    private List<VenGroupDto> convertMvcResultToVenGroupDtoList(MvcResult result)
-            throws JsonParseException, JsonMappingException, IOException {
-        MockHttpServletResponse mockHttpServletResponse = result.getResponse();
-        byte[] contentAsByteArray = mockHttpServletResponse.getContentAsByteArray();
-        return mapper.readValue(contentAsByteArray, new TypeReference<List<VenGroupDto>>() {
-        });
-    }
+		this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + groupId).with(userSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + "12").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + "mouaiccool").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
+		this.mockMvc.perform(MockMvcRequestBuilders.delete(GROUP_URL + groupId).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
+
+		// empty find all
+		andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(GROUP_URL).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		readValue = convertMvcResultToVenGroupDtoList(andReturn);
+		assertNotNull(readValue);
+		assertEquals(0, readValue.size());
+
+	}
+
+	private VenGroupDto convertMvcResultToVenGroupDto(MvcResult result)
+			throws JsonParseException, JsonMappingException, IOException {
+		MockHttpServletResponse mockHttpServletResponse = result.getResponse();
+		byte[] contentAsByteArray = mockHttpServletResponse.getContentAsByteArray();
+		return mapper.readValue(contentAsByteArray, VenGroupDto.class);
+	}
+
+	private List<VenGroupDto> convertMvcResultToVenGroupDtoList(MvcResult result)
+			throws JsonParseException, JsonMappingException, IOException {
+		MockHttpServletResponse mockHttpServletResponse = result.getResponse();
+		byte[] contentAsByteArray = mockHttpServletResponse.getContentAsByteArray();
+		return mapper.readValue(contentAsByteArray, new TypeReference<List<VenGroupDto>>() {
+		});
+	}
 
 }

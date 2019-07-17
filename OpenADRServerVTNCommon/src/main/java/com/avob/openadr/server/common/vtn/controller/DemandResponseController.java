@@ -84,8 +84,8 @@ public class DemandResponseController {
 	public List<DemandResponseEventReadDto> search(@RequestBody List<DemandResponseEventFilter> filters,
 			@RequestParam(value = "start", required = false) Long start,
 			@RequestParam(value = "end", required = false) Long end,
-			@RequestParam(value = "page", required = false) int page,
-			@RequestParam(value = "size", required = false) int size) {
+			@RequestParam(value = "page", required = false) Integer page,
+			@RequestParam(value = "size", required = false) Integer size) {
 
 		Page<DemandResponseEvent> find = demandResponseEventService.search(filters, start, end, page, size);
 		return dtoMapper.mapList(find, DemandResponseEventReadDto.class);
