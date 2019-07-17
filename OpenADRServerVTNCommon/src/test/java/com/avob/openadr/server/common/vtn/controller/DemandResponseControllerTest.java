@@ -159,7 +159,7 @@ public class DemandResponseControllerTest {
 		dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
-		dto.getActivePeriod().setStart(System.currentTimeMillis());
+		dto.getActivePeriod().setStart(start);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
 		dto.getActivePeriod().setDuration(duration);
 		dto.getActivePeriod().setToleranceDuration(toleranceDuration);
@@ -1000,7 +1000,7 @@ public class DemandResponseControllerTest {
 						.with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(1, list.size());
+		assertEquals(0, list.size());
 
 		filters = new ArrayList<>();
 		filter = new DemandResponseEventFilter();
@@ -1013,7 +1013,7 @@ public class DemandResponseControllerTest {
 						.with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(1, list.size());
+		assertEquals(2, list.size());
 
 	}
 
@@ -1022,6 +1022,10 @@ public class DemandResponseControllerTest {
 
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL + "mouaiccool/venResponse").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+		
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL + "12/venResponse").with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 		MvcResult andReturn = this.mockMvc
