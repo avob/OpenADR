@@ -28,8 +28,22 @@
       group: openfire
     when: openfire_installed.stat.exists == false
 
-  - name: Init postgresql database
+  - name: Init openfire postgresql database
     shell: psql -h localhost -U oadr-openfire -d oadr-openfire -f /usr/share/openfire/resources/database/openfire_postgresql.sql; 
+    environment:
+      PGPASSWORD: 'supersecure'
+    when: openfire_installed.stat.exists == false
+
+  - name: Load properties template file
+    template:
+      src: templates/ofproperty.sql
+      dest: /tmp/ofproperty.sql
+      owner: openfire
+      group: openfire
+    when: openfire_installed.stat.exists == false
+
+  - name: Init openfire system proeprties table
+    shell: psql -h localhost -U oadr-openfire -d oadr-openfire -f /tmp/ofproperty.sql; 
     environment:
       PGPASSWORD: 'supersecure'
     when: openfire_installed.stat.exists == false
@@ -92,6 +106,14 @@
 
   - name: Import CA certificate
     command: chdir=/usr/share/openfire/resources/security keytool -v -import -alias OadrCA -file /opt/oadr-vtn20b/cert/oadr.com.crt -deststorepass changeme -destkeystore client.truststore -deststoretype JKS -noprompt
+
+
+  # - name: Copy cert folder
+  #   copy:
+  #     src: ../../../cert/
+  #     dest: /usr/share/openfire/plugins
+  #     owner: oadr-vtn20b
+  #     group: oadr-vtn20b
 
 
   - name: Restart openfire
