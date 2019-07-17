@@ -20,21 +20,12 @@ public class DemandResponseEventSpecification {
 		return (event, cq, cb) -> cb.equal(event.get("published"), published);
 	}
 
-	static public Specification<DemandResponseEvent> isNotPublished() {
-		return (event, cq, cb) -> cb.equal(event.get("published"), false);
-	}
-
 	static public Specification<DemandResponseEvent> hasDescriptorState(DemandResponseEventStateEnum state) {
 		return (event, cq, cb) -> cb.equal(event.get("descriptor").get("state"), state);
 	}
 
 	static public Specification<DemandResponseEvent> hasDescriptorMarketContext(String marketContextName) {
 		return (event, cq, cb) -> cb.equal(event.get("descriptor").get("marketContext").get("name"), marketContextName);
-	}
-
-	static public Specification<DemandResponseEvent> hasDescriptorOadrProfile(
-			DemandResponseEventOadrProfileEnum profile) {
-		return (event, cq, cb) -> cb.equal(event.get("descriptor").get("oadrProfile"), profile);
 	}
 
 	static public Specification<DemandResponseEvent> hasVenUsername(String username) {
@@ -54,10 +45,6 @@ public class DemandResponseEventSpecification {
 			return cb.or(cb.isNull(event.get("activePeriod").get("end")),
 					cb.lt(event.get("activePeriod").get("end"), timestamp));
 		};
-	}
-
-	static public Specification<DemandResponseEvent> hasActivePeriodStartBefore(Long timestamp) {
-		return (event, cq, cb) -> cb.le(event.get("activePeriod").get("start"), timestamp);
 	}
 
 	static public Specification<DemandResponseEvent> hasActivePeriodNotificationStartBefore(Long timestamp) {

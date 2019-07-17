@@ -137,9 +137,19 @@ public class VenControllerTest {
 		assertEquals(1, venDto.size());
 		assertEquals("createdName", venDto.get(0).getCommonName());
 
-		// update ven1
+		// update unknown
 		VenUpdateDto updateDto = new VenUpdateDto();
 		updateDto.setName("updatedName");
+		updateDto.setPullFrequencySeconds(120L);
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.put(VEN_URL + "mouaiccool").header("Content-Type", "application/json")
+						.content(mapper.writeValueAsString(updateDto)).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+
+		// update ven1
+		updateDto = new VenUpdateDto();
+		updateDto.setName("updatedName");
+		updateDto.setPullFrequencySeconds(120L);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.put(VEN_URL + venUsername).header("Content-Type", "application/json")
 						.content(mapper.writeValueAsString(updateDto)).with(adminSession))
@@ -577,8 +587,8 @@ public class VenControllerTest {
 		this.mockMvc.perform(MockMvcRequestBuilders.delete(VEN_URL + venUsername).with(userSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-		this.mockMvc.perform(MockMvcRequestBuilders.get(VEN_URL + "mouaiccool").with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+		this.mockMvc.perform(MockMvcRequestBuilders.delete(VEN_URL + "mouaiccool").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));;
 
 		this.mockMvc.perform(MockMvcRequestBuilders.delete(VEN_URL + venUsername).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));

@@ -2,7 +2,6 @@ package com.avob.openadr.server.common.vtn.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -160,7 +159,7 @@ public class DemandResponseControllerTest {
 		dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
-		dto.getActivePeriod().setStart(start);
+		dto.getActivePeriod().setStart(System.currentTimeMillis());
 		dto.getDescriptor().setMarketContext(marketContext.getName());
 		dto.getActivePeriod().setDuration(duration);
 		dto.getActivePeriod().setToleranceDuration(toleranceDuration);
@@ -989,10 +988,42 @@ public class DemandResponseControllerTest {
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(1, list.size());
 
+		// search sendable
+		filters = new ArrayList<>();
+		filter = new DemandResponseEventFilter();
+		filter.setType(DemandResponseEventFilterType.EVENT_SENDABLE);
+		filter.setValue("SENDABLE");
+		filters.add(filter);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
+						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		list = convertMvcResultToDemandResponseDtoList(andReturn);
+		assertEquals(1, list.size());
+
+		filters = new ArrayList<>();
+		filter = new DemandResponseEventFilter();
+		filter.setType(DemandResponseEventFilterType.EVENT_SENDABLE);
+		filter.setValue("NOT_SENDABLE");
+		filters.add(filter);
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
+						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		list = convertMvcResultToDemandResponseDtoList(andReturn);
+		assertEquals(1, list.size());
+
 	}
 
 	@Test
 	public void readVenDemandResponseEventTest() throws Exception {
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL + "mouaiccool/venResponse").with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL + event1.getId() + "/venResponse")
 						.with(adminSession))
@@ -1000,8 +1031,6 @@ public class DemandResponseControllerTest {
 		List<VenDemandResponseEventDto> convertMvcResultToVenDemandResponseEventDtoList = convertMvcResultToVenDemandResponseEventDtoList(
 				andReturn);
 		assertEquals(2, convertMvcResultToVenDemandResponseEventDtoList.size());
-
-		
 
 	}
 

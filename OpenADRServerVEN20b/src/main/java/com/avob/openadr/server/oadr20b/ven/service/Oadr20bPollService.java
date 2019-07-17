@@ -167,7 +167,7 @@ public class Oadr20bPollService {
 				LOGGER.info("Retrieved OadrResponseType");
 				OadrResponseType response = (OadrResponseType) payload;
 
-				processOadrResponse(response, OadrUpdateReportType.class);
+				processOadrResponse(response, OadrResponseType.class);
 
 			} else if (payload != null) {
 				LOGGER.warn("Unknown retrieved payload: " + payload.getClass().toString());

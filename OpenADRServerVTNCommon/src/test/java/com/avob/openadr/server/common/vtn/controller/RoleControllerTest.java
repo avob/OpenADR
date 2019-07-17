@@ -104,6 +104,10 @@ public class RoleControllerTest {
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.post(ROLE_URL + "admin").header("Content-Type", "application/json").with(user))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.post(ROLE_URL + "admin").header("Content-Type", "application/json").with(ven))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.post(ROLE_URL + "mouaiccool")
 				.header("Content-Type", "application/json").with(admin))
