@@ -149,8 +149,8 @@
 					<destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
 					<dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
 					<excludes>
-						<exclude>**/EmbeddedSqlDatabaseInit.*</exclude>
-						<exclude>**/SwaggerConfig.*</exclude>
+						<exclude>com.avob.openadr.server.oadr20b.vtn.EmbeddedSqlDatabaseInit.java</exclude>
+						<exclude>com.avob.openadr.server.oadr20b.vtn.SwaggerConfig.java</exclude>
 					</excludes>
 				</configuration>
 				<executions>
