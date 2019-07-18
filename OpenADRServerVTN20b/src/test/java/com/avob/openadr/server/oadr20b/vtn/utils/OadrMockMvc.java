@@ -107,11 +107,11 @@ public class OadrMockMvc {
 			content = jaxbContext.marshalRoot(payload);
 		}
 
+		Thread.sleep(200);
+		
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(endpoint).content(content).with(authSession))
 				.andExpect(MockMvcResultMatchers.status().is(status)).andReturn();
-
-		Thread.sleep(200);
 		
 		if (String.class.equals(klass)) {
 			return (T) andReturn.getResponse().getContentAsString();

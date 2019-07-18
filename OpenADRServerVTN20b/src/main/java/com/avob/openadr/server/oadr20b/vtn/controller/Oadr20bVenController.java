@@ -50,7 +50,6 @@ import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherRepo
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDescriptionDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDto;
-import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.VenReportDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataFloat;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataFloatDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataKeyToken;
@@ -171,24 +170,6 @@ public class Oadr20bVenController {
 				UUID.randomUUID().toString(), ven.getRegistrationId(), ven.getUsername()).build();
 
 		venDistributeService.distribute(ven, build);
-	}
-
-	/**
-	 * @param venID
-	 * @param reportSpecifierId
-	 * @return
-	 * @throws Oadr20bMarshalException
-	 * @throws OadrElementNotFoundException
-	 */
-	@RequestMapping(value = "/{venID}/report", method = RequestMethod.GET)
-	@ResponseBody
-	public VenReportDto viewVen(@PathVariable("venID") String venID,
-			@RequestParam(value = "reportSpecifierId", required = false) String reportSpecifierId)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
-
-		Ven ven = checkVen(venID);
-
-		return oadr20bDtoMapper.map(ven, VenReportDto.class);
 	}
 
 	/**

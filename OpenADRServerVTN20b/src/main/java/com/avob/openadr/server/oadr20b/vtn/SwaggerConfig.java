@@ -2,10 +2,13 @@ package com.avob.openadr.server.oadr20b.vtn;
 
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.VenReportDto;
+import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Sets;
@@ -26,6 +29,9 @@ public class SwaggerConfig {
 	public static final String securitySchemaOAuth2 = "oauth2schema";
 	public static final String authorizationScopeGlobal = "global";
 	public static final String authorizationScopeGlobalDesc = "accessEverything";
+
+	@Autowired
+	private TypeResolver typeResolver;
 
 	private ApiInfo apiInfo() {
 		String name = "Bertrand Zanni";
@@ -65,6 +71,7 @@ public class SwaggerConfig {
 
 		build.protocols(Sets.newHashSet("https"));
 		build.apiInfo(apiInfo());
+		build.additionalModels(typeResolver.resolve(VenReportDto.class));
 		return build;
 	}
 
