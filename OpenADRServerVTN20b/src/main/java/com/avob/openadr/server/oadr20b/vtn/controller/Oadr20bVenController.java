@@ -426,37 +426,26 @@ public class Oadr20bVenController {
 	@RequestMapping(value = "/{venID}/report/data/float/{reportSpecifierId}/rid/{rid}", method = RequestMethod.POST)
 	@ResponseBody
 	public void postFloatReportData(@PathVariable("venID") String venID,
-			@PathVariable("reportSpecifierId") String reportSpecifierId, @PathVariable("rid") String rid)
-			throws OadrElementNotFoundException, Oadr20bMarshalException {
+			@PathVariable("reportSpecifierId") String reportSpecifierId, @PathVariable("rid") String rid,
+			@RequestBody Float value) throws OadrElementNotFoundException, Oadr20bMarshalException {
 
 		Ven checkVen = checkVen(venID);
-		checkOtherReportCapabilityDescription(venID, reportSpecifierId, rid);
+//		checkOtherReportCapabilityDescription(venID, reportSpecifierId, rid);
 
 		String intervalId = "intervalId";
-		long start = 3L;
-		String xmlDuration = "PT1H";
-		Float value = 3f;
-		Long confidence = 1L;
-		Float accuracy = 1F;
-		IntervalType interval = Oadr20bEiBuilders
-				.newOadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration, rid, confidence, accuracy, value)
-				.build();
-
+		IntervalType build = Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, null, null, rid, null,
+				null, Oadr20bFactory.createPayloadFloat(value)).build();
 		String reportId = "reportId";
 		String reportrequestId = "reportrequestId";
 		ReportNameEnumeratedType reportName = ReportNameEnumeratedType.TELEMETRY_STATUS;
-		long createdTimestamp = 12L;
-		long startTimestamp = 12L;
-		String duration = "PT1H";
+		long createdTimestamp = System.currentTimeMillis();
 		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(reportId,
-				reportrequestId, reportSpecifierId, reportName, createdTimestamp, startTimestamp, duration)
-				.addInterval(interval).build();
-
+				reportrequestId, reportSpecifierId, reportName, createdTimestamp, null, null).addInterval(build)
+				.build();
 		String requestId = "requestId";
 		String venId = "venId";
 		OadrUpdateReportType request = Oadr20bEiReportBuilders.newOadr20bUpdateReportBuilder(requestId, venId)
 				.addReport(report).build();
-
 		venDistributeService.distribute(checkVen, request);
 
 	}
@@ -488,6 +477,7 @@ public class Oadr20bVenController {
 				otherReportDataPayloadResourceStatusService.findByReportSpecifierIdAndRid(reportSpecifierId, rid),
 				OtherReportDataPayloadResourceStatusDto.class);
 	}
+
 
 	@RequestMapping(value = "/{venID}/report/data/keytoken/{reportSpecifierId}", method = RequestMethod.GET)
 	@ResponseBody

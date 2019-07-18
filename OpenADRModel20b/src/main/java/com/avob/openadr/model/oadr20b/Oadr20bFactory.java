@@ -16,7 +16,6 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import com.avob.openadr.model.oadr20b.avob.AvobVenServiceRequestType;
 import com.avob.openadr.model.oadr20b.avob.KeyTokenType;
 import com.avob.openadr.model.oadr20b.avob.PayloadAvobVenServiceRequestType;
 import com.avob.openadr.model.oadr20b.avob.PayloadKeyTokenType;
@@ -56,7 +55,6 @@ import com.avob.openadr.model.oadr20b.iso.ISO3AlphaCurrencyCodeContentType;
 import com.avob.openadr.model.oadr20b.oadr.BaseUnitType;
 import com.avob.openadr.model.oadr20b.oadr.CurrencyItemDescriptionType;
 import com.avob.openadr.model.oadr20b.oadr.CurrencyType;
-import com.avob.openadr.model.oadr20b.oadr.CurrentType;
 import com.avob.openadr.model.oadr20b.oadr.FrequencyType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
@@ -70,12 +68,9 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType.OadrExtensions;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType.OadrExtensions.OadrExtension;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
-import com.avob.openadr.model.oadr20b.oadr.OadrInfo;
 import com.avob.openadr.model.oadr20b.oadr.OadrLoadControlStateType;
 import com.avob.openadr.model.oadr20b.oadr.OadrLoadControlStateTypeType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
@@ -95,9 +90,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrSamplingRateType;
-import com.avob.openadr.model.oadr20b.oadr.OadrServiceNameType;
-import com.avob.openadr.model.oadr20b.oadr.OadrServiceSpecificInfo;
-import com.avob.openadr.model.oadr20b.oadr.OadrServiceSpecificInfo.OadrService;
 import com.avob.openadr.model.oadr20b.oadr.OadrSignedObject;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransports;
@@ -105,7 +97,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrTransports.OadrTransport;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.PulseCountType;
-import com.avob.openadr.model.oadr20b.oadr.ResponseRequiredType;
 import com.avob.openadr.model.oadr20b.oadr.TemperatureType;
 import com.avob.openadr.model.oadr20b.oadr.TemperatureUnitType;
 import com.avob.openadr.model.oadr20b.oadr.ThermType;
@@ -118,7 +109,6 @@ import com.avob.openadr.model.oadr20b.power.MeterAssetType;
 import com.avob.openadr.model.oadr20b.power.PnodeType;
 import com.avob.openadr.model.oadr20b.power.PowerApparentType;
 import com.avob.openadr.model.oadr20b.power.PowerAttributesType;
-import com.avob.openadr.model.oadr20b.power.PowerItemType;
 import com.avob.openadr.model.oadr20b.power.PowerReactiveType;
 import com.avob.openadr.model.oadr20b.power.PowerRealType;
 import com.avob.openadr.model.oadr20b.power.ServiceDeliveryPointType;
@@ -897,7 +887,6 @@ public class Oadr20bFactory {
 		return factory.createCustomUnit(value);
 	}
 
-
 	public static JAXBElement<CurrencyType> createCurrency(CurrencyType value) {
 		return factory.createCurrency(value);
 	}
@@ -925,7 +914,6 @@ public class Oadr20bFactory {
 	public static JAXBElement<PulseCountType> createPulseCount(PulseCountType value) {
 		return factory.createPulseCount(value);
 	}
-
 
 	public static EventResponses createEventResponses() {
 		return eiFactory.createEventResponses();
@@ -982,8 +970,13 @@ public class Oadr20bFactory {
 			Long confidence, Float accuracy, Float value) {
 		IntervalType createIntervalType = eiFactory.createIntervalType();
 		createIntervalType.setUid(Oadr20bFactory.createUidType(intervalId));
-		createIntervalType.setDuration(Oadr20bFactory.createDurationPropType(xmlDuration));
-		createIntervalType.setDtstart(Oadr20bFactory.createDtstart(start));
+		if (xmlDuration != null) {
+			createIntervalType.setDuration(Oadr20bFactory.createDurationPropType(xmlDuration));
+		}
+		if (start != null) {
+			createIntervalType.setDtstart(Oadr20bFactory.createDtstart(start));
+		}
+
 		createIntervalType.getStreamPayloadBase().add(Oadr20bFactory
 				.createOadrReportPayload(Oadr20bFactory.createReportPayloadType(rid, confidence, accuracy, value)));
 
@@ -1039,8 +1032,13 @@ public class Oadr20bFactory {
 			Long confidence, Float accuracy, JAXBElement<? extends PayloadBaseType> payloadBase) {
 		IntervalType createIntervalType = eiFactory.createIntervalType();
 		createIntervalType.setUid(Oadr20bFactory.createUidType(intervalId));
-		createIntervalType.setDuration(Oadr20bFactory.createDurationPropType(xmlDuration));
-		createIntervalType.setDtstart(Oadr20bFactory.createDtstart(start));
+		if (xmlDuration != null) {
+			createIntervalType.setDuration(Oadr20bFactory.createDurationPropType(xmlDuration));
+		}
+		if (start != null) {
+			createIntervalType.setDtstart(Oadr20bFactory.createDtstart(start));
+		}
+
 		createIntervalType.getStreamPayloadBase().add(Oadr20bFactory.createOadrReportPayload(
 				Oadr20bFactory.createReportPayloadType(rid, confidence, accuracy, payloadBase)));
 
@@ -1511,7 +1509,6 @@ public class Oadr20bFactory {
 		createOadrLoadControlStateTypeType.setOadrMax(max);
 		return createOadrLoadControlStateTypeType;
 	}
-
 
 	public static PayloadKeyTokenType createPayloadKeyTokenType(List<KeyTokenType> tokens) {
 		PayloadKeyTokenType createPayloadKeyTokenType = avobFactory.createPayloadKeyTokenType();
