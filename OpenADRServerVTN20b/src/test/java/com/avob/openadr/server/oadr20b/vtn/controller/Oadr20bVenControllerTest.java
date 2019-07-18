@@ -224,6 +224,11 @@ public class Oadr20bVenControllerTest {
 						.newOadr20bOadrReportDescriptionBuilder(rid + "14", reportType, readingType)
 						.withCustomUnitBase("mouaiccool", "mouaiccool", SiScaleCodeType.NONE)
 						.withOadrSamplingRate(minPeriod, maxPeriod, false).build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "15", reportType, readingType)
+						.withCurrencyBase(CurrencyItemDescriptionType.CURRENCY_PER_K_WH,
+								ISO3AlphaCurrencyCodeContentType.EUR, SiScaleCodeType.NONE)
+						.build())
 				.build();
 
 		OadrRegisterReportType oadrRegisterReportType = Oadr20bEiReportBuilders
@@ -256,11 +261,8 @@ public class Oadr20bVenControllerTest {
 		assertEquals(reportName, reportcapabilityList.get(0).getReportName());
 
 		Long reportCapabilityPrivateId = reportcapabilityList.get(0).getId();
-		
+
 //		oadrMockMvc.pos
-		
-		
-		
 
 	}
 

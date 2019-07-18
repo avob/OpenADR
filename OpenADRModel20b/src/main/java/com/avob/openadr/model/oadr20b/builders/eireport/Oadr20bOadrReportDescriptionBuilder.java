@@ -112,7 +112,7 @@ public class Oadr20bOadrReportDescriptionBuilder {
 
 	public Oadr20bOadrReportDescriptionBuilder withCustomUnitBase(String description, String units,
 			SiScaleCodeType siscaleCode) {
-		BaseUnitType createBaseUnitType = Oadr20bFactory.createBaseUnitType(description, units, siscaleCode);
+		BaseUnitType createBaseUnitType = Oadr20bFactory.createBaseUnitType(description, units, siscaleCode);		
 		reportDescription.setItemBase(Oadr20bFactory.createCustomUnit(createBaseUnitType));
 		return this;
 	}

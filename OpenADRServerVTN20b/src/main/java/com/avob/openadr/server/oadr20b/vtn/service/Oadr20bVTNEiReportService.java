@@ -1183,6 +1183,8 @@ public class Oadr20bVTNEiReportService {
 			OtherReportRequest otherReportRequest = new OtherReportRequest();
 			otherReportRequest.setStart(request.getStart());
 			otherReportRequest.setEnd(request.getEnd());
+			otherReportRequest.setGranularity("P0D");
+			otherReportRequest.setReportBackDuration("P0D");
 			otherReportRequest.setSource(ven);
 			otherReportRequest.setOtherReportCapability(reportCapability);
 			otherReportRequest.setReportRequestId(reportRequestId);
@@ -1238,13 +1240,15 @@ public class Oadr20bVTNEiReportService {
 
 		Iterable<OtherReportCapability> findByPayloadReportRequestId2 = otherReportCapabilityService
 				.findByReportRequestId(Arrays.asList(reportRequestID));
-		for (OtherReportCapability cap : findByPayloadReportRequestId2) {
-			cap.setReportRequestId("0");
-		}
+
+//		for (OtherReportCapability cap : findByPayloadReportRequestId2) {
+//			cap.setReportRequestId("0");
+//		}
 
 		otherReportCapabilityService.save(findByPayloadReportRequestId2);
 
 		OtherReportRequest findByReportRequestId = otherReportRequestService.findOneByReportRequestId(reportRequestID);
+		otherReportRequestSpecifierDao.deleteByRequest(findByReportRequestId);
 		otherReportRequestService.delete(findByReportRequestId.getId());
 
 		String requestId = "";

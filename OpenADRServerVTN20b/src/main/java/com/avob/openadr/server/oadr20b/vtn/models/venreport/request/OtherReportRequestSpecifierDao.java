@@ -39,6 +39,9 @@ public interface OtherReportRequestSpecifierDao extends PagingAndSortingReposito
 	public void deleteByOtherReportCapabilityDescriptionRidInAndOtherReportCapabilityDescriptionOtherReportCapability(
 			Collection<String> rids, OtherReportCapability otherReportCapability);
 
+	@Transactional(readOnly = false)
+	public void deleteByRequest(OtherReportRequest request);
+
 	public Long countByOtherReportCapabilityDescriptionOtherReportCapability(
 			OtherReportCapability otherReportCapability);
 }

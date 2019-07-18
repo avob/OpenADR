@@ -1,7 +1,6 @@
 package com.avob.openadr.server.oadr20b.vtn.controller;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -242,28 +241,6 @@ public class Oadr20bVenController {
 	 * @param venID
 	 * @param reportSpecifierId
 	 * @param rid
-	 * @throws Oadr20bMarshalException
-	 * @throws OadrElementNotFoundException
-	 */
-	@RequestMapping(value = "/{venID}/report/available/description/removeFromSubscribe", method = RequestMethod.POST)
-	@ResponseBody
-	public void removeSubscribeOtherReportCapabilityDescriptionRid(@PathVariable("venID") String venID,
-			@RequestParam(value = "reportSpecifierId", required = true) String reportSpecifierId,
-			@RequestParam(value = "rid", required = true) String rid)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
-		Ven ven = checkVen(venID);
-		OtherReportCapability reportCapability = checkOtherReportCapability(venID, reportSpecifierId);
-
-		String[] split = rid.split("\\|");
-		List<String> rids = Arrays.asList(split);
-
-		reportService.removeFromSubscription(ven, reportCapability, rids);
-	}
-
-	/**
-	 * @param venID
-	 * @param reportSpecifierId
-	 * @param rid
 	 * @param start
 	 * @param end
 	 * @throws Oadr20bMarshalException
@@ -323,19 +300,6 @@ public class Oadr20bVenController {
 		Specification<OtherReportRequestSpecifier> search = OtherReportRequestSpecifierSpecification.search(criteria);
 		List<OtherReportRequestSpecifier> findAll = otherReportRequestSpecifierDao.findAll(search);
 		return oadr20bDtoMapper.mapList(findAll, OtherReportRequestSpecifierDto.class);
-	}
-
-	@RequestMapping(value = "/{venID}/report/requested", method = RequestMethod.DELETE)
-	@ResponseBody
-	public void deleteReportRequest(@PathVariable("venID") String venID, HttpServletRequest request)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
-
-		AbstractUser findOneByUsername = abstractUserDao.findOneByUsername(request.getUserPrincipal().getName());
-
-		if (findOneByUsername != null) {
-			otherReportRequestService.deleteByRequestorAndOtherReportCapabilitySourceUsername(findOneByUsername, venID);
-		}
-
 	}
 
 	@RequestMapping(value = "/{venID}/report/requested/cancelSubscription", method = RequestMethod.POST)

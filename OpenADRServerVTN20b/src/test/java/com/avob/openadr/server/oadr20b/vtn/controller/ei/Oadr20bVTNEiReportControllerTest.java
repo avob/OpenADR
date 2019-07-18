@@ -81,6 +81,7 @@ import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfRepor
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataFloatDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataPayloadResourceStatusDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestDtoCreateRequestDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestDtoCreateSubscriptionDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierDao;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierDto;
@@ -261,6 +262,11 @@ public class Oadr20bVTNEiReportControllerTest {
 						.newOadr20bOadrReportDescriptionBuilder(rid + "14", reportType, readingType)
 						.withCustomUnitBase("mouaiccool", "mouaiccool", SiScaleCodeType.NONE)
 						.withOadrSamplingRate(minPeriod, maxPeriod, false).build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder(rid + "15", reportType, readingType)
+						.withCurrencyBase(CurrencyItemDescriptionType.CURRENCY_PER_K_WH,
+								ISO3AlphaCurrencyCodeContentType.EUR, SiScaleCodeType.NONE)
+						.build())
 				.build();
 
 		OadrRegisterReportType oadrRegisterReportType = Oadr20bEiReportBuilders
@@ -302,7 +308,7 @@ public class Oadr20bVTNEiReportControllerTest {
 						VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/available/description", HttpStatus.OK_200,
 						ReportCapabilityDescriptionDto.class, params);
 
-		assertEquals(14, reportcapabilityDescriptionList.size());
+		assertEquals(15, reportcapabilityDescriptionList.size());
 		assertEquals(rid, reportcapabilityDescriptionList.get(0).getRid());
 		assertEquals(readingType, reportcapabilityDescriptionList.get(0).getReadingType());
 		assertEquals(reportType, reportcapabilityDescriptionList.get(0).getReportType());
@@ -354,12 +360,11 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(reportType, reportcapabilityDescriptionList.get(0).getReportType());
 
 		reportCapabilityDescriptionPrivateId = reportcapabilityDescriptionList.get(0).getId();
-
-		// subscribe
 		OtherReportCapability reportCapability = otherReportCapabilityService.findOne(reportCapabilityPrivateId);
 		OtherReportCapabilityDescription reportCapabilityDescription = otherReportCapabilityDescriptionService
 				.findOne(reportCapabilityDescriptionPrivateId);
 
+		// subscribe
 		List<OtherReportRequestDtoCreateSubscriptionDto> subscriptions = new ArrayList<>();
 		OtherReportRequestDtoCreateSubscriptionDto subscription = new OtherReportRequestDtoCreateSubscriptionDto();
 		subscription.setGranularity(minPeriod);
@@ -474,8 +479,6 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(maxPeriod, reportRequestList.get(0).getReportBackDuration());
 		assertEquals(reportRequestId, reportRequestList.get(0).getReportRequestId());
 		assertNull(reportRequestList.get(0).getRequestorUsername());
-
-		Long reportRequestPrivateId = reportRequestList.get(0).getId();
 
 		String intervalId = "intervalId";
 		long start = System.currentTimeMillis();
@@ -596,11 +599,101 @@ public class Oadr20bVTNEiReportControllerTest {
 
 		reportDataPrivateId = reportDataResourceStatusList.get(0).getId();
 
+		// cancel subscription
+		String reportRequestIdToDelete = convertMvcResultToDtoList.get(0).getReportRequestId();
+		params = new LinkedMultiValueMap<String, String>();
+		params.add("reportRequestId", reportRequestIdToDelete);
+		mockMvc.perform(MockMvcRequestBuilders
+				.post(VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/requested/cancelSubscription")
+				.header("Content-Type", "application/json").params(params)
+				.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION)).andExpect(status().is(HttpStatus.OK_200));
+
+		// test subscription has been deleted
+		restJsonControllerAndExpectList = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/requested",
+				HttpStatus.OK_200, OtherReportRequestDto.class);
+		assertNotNull(restJsonControllerAndExpectList);
+		assertEquals(0, restJsonControllerAndExpectList.size());
+
+		criteria = new OtherReportRequestSpecifierSearchCriteria();
+		criteria.setReportSpecifierId(Lists.newArrayList(reportCapability.getReportSpecifierId()));
+		andReturn = mockMvc
+				.perform(MockMvcRequestBuilders
+						.post(VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/requested/specifier")
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(criteria))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION))
+				.andExpect(status().is(HttpStatus.OK_200)).andReturn();
+		convertMvcResultToDtoList = Oadr20bTestUtils.convertMvcResultToDtoList(andReturn,
+				OtherReportRequestSpecifierDto.class);
+		assertNotNull(convertMvcResultToDtoList);
+		assertEquals(0, convertMvcResultToDtoList.size());
+
+		// third poll supposed to contains CancelReport cause user has cancel
+		// subscription
+		str = mockMvc.postOadrPollAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
+				xmlSignatureService.sign(Oadr20bPollBuilders.newOadr20bPollBuilder(OadrDataBaseSetup.VEN).build()),
+				HttpStatus.OK_200, String.class);
+		payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
+		xmlSignatureService.validate(str, payload);
+		assertNotNull(payload.getOadrSignedObject().getOadrCancelReport());
+		assertEquals(1, payload.getOadrSignedObject().getOadrCancelReport().getReportRequestID().size());
+		assertEquals(reportRequestIdToDelete,
+				payload.getOadrSignedObject().getOadrCancelReport().getReportRequestID().get(0));
+
+		// requests
+		List<OtherReportRequestDtoCreateRequestDto> requests = new ArrayList<>();
+		OtherReportRequestDtoCreateRequestDto request = new OtherReportRequestDtoCreateRequestDto();
+		request.setReportSpecifierId(reportCapability.getReportSpecifierId());
+		ridMap = new HashMap<>();
+		ridMap.put(reportCapabilityDescription.getRid(), true);
+		request.setRid(new ArrayList<>(ridMap.keySet()));
+		requests.add(request);
+		mockMvc.perform(MockMvcRequestBuilders
+				.post(VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/available/description/request")
+				.header("Content-Type", "application/json").content(mapper.writeValueAsString(requests))
+				.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION)).andExpect(status().is(HttpStatus.OK_200));
+
+		// test requests has NOT been stored
+		// (subscriptions are stored in database, requests are not)
+		restJsonControllerAndExpectList = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/requested",
+				HttpStatus.OK_200, OtherReportRequestDto.class);
+		assertNotNull(restJsonControllerAndExpectList);
+		assertEquals(0, restJsonControllerAndExpectList.size());
+
+		criteria = new OtherReportRequestSpecifierSearchCriteria();
+		criteria.setReportSpecifierId(Lists.newArrayList(reportCapability.getReportSpecifierId()));
+		andReturn = mockMvc
+				.perform(MockMvcRequestBuilders
+						.post(VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/requested/specifier")
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(criteria))
+						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION))
+				.andExpect(status().is(HttpStatus.OK_200)).andReturn();
+		convertMvcResultToDtoList = Oadr20bTestUtils.convertMvcResultToDtoList(andReturn,
+				OtherReportRequestSpecifierDto.class);
+		assertNotNull(convertMvcResultToDtoList);
+		assertEquals(0, convertMvcResultToDtoList.size());
+
+		// fourth poll supposed to contains CreatedReport cause user create request
+		str = mockMvc.postOadrPollAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
+				xmlSignatureService.sign(Oadr20bPollBuilders.newOadr20bPollBuilder(OadrDataBaseSetup.VEN).build()),
+				HttpStatus.OK_200, String.class);
+		payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
+		xmlSignatureService.validate(str, payload);
+		assertNotNull(payload.getOadrSignedObject().getOadrCreateReport());
+		assertEquals(1, payload.getOadrSignedObject().getOadrCreateReport().getOadrReportRequest().size());
+		assertEquals(reportCapability.getReportSpecifierId(), payload.getOadrSignedObject().getOadrCreateReport()
+				.getOadrReportRequest().get(0).getReportSpecifier().getReportSpecifierID());
+		assertEquals(1, payload.getOadrSignedObject().getOadrCreateReport().getOadrReportRequest().get(0)
+				.getReportSpecifier().getSpecifierPayload().size());
+		assertEquals(reportCapabilityDescription.getRid(), payload.getOadrSignedObject().getOadrCreateReport()
+				.getOadrReportRequest().get(0).getReportSpecifier().getSpecifierPayload().get(0).getRID());
+
 		// cleanup data PayloadResourceStatus
 		otherReportDataPayloadResourceStatusService.delete(reportDataPrivateId);
-		otherReportRequestSpecifierDao.deleteByRequestReportRequestId(reportRequestId);
+//		otherReportRequestSpecifierDao.deleteByRequestReportRequestId(reportRequestId);
 
-		otherReportRequestService.delete(reportRequestPrivateId);
+//		otherReportRequestService.delete(reportRequestPrivateId);
 		otherReportCapabilityDescriptionService.delete(reportCapabilityDescriptionPrivateId);
 		otherReportCapabilityService.delete(reportCapabilityPrivateId);
 
