@@ -148,6 +148,10 @@
 				<configuration>
 					<destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
 					<dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+					<excludes>
+						<exclude>**/EmbeddedSqlDatabaseInit.*</exclude>
+						<exclude>**/SwaggerConfig.*</exclude>
+					</excludes>
 				</configuration>
 				<executions>
 					<execution>

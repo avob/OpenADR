@@ -1213,37 +1213,11 @@ public class Oadr20bVTNEiReportService {
 
 	}
 
-	public void removeFromSubscription(Ven ven, OtherReportCapability reportCapability, List<String> rids)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
-
-		String reportRequestId = reportCapability.getReportRequestId();
-
-		otherReportRequestSpecifierDao
-				.deleteByOtherReportCapabilityDescriptionRidInAndOtherReportCapabilityDescriptionOtherReportCapability(
-						rids, reportCapability);
-
-		Long countByOtherReportCapabilityDescriptionOtherReportCapability = otherReportRequestSpecifierDao
-				.countByOtherReportCapabilityDescriptionOtherReportCapability(reportCapability);
-
-		if (countByOtherReportCapabilityDescriptionOtherReportCapability == 0) {
-
-			this.unsubscribe(ven, reportRequestId);
-
-		} else {
-			distributeSubscriptionOadrCreatedReportPayload(ven);
-		}
-
-	}
-
 	public void unsubscribe(Ven ven, String reportRequestID)
 			throws OadrElementNotFoundException, Oadr20bMarshalException {
 
 		Iterable<OtherReportCapability> findByPayloadReportRequestId2 = otherReportCapabilityService
 				.findByReportRequestId(Arrays.asList(reportRequestID));
-
-//		for (OtherReportCapability cap : findByPayloadReportRequestId2) {
-//			cap.setReportRequestId("0");
-//		}
 
 		otherReportCapabilityService.save(findByPayloadReportRequestId2);
 
