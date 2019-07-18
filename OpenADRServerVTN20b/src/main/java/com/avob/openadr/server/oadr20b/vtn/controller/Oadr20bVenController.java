@@ -47,6 +47,7 @@ import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.models.venopt.VenOptDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDescriptionDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataFloat;
@@ -549,7 +550,7 @@ public class Oadr20bVenController {
 
 	@RequestMapping(value = "/{venID}/report/available/search", method = RequestMethod.GET)
 	@ResponseBody
-	public List<ReportCapabilityDto> pageOtherReportCapability(@PathVariable("venID") String venID,
+	public List<OtherReportCapabilityDto> pageOtherReportCapability(@PathVariable("venID") String venID,
 			@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
 			@RequestParam(value = "size", required = false, defaultValue = Oadr20bVenController.PAGINATION_SIZE_DEFAULT) Integer size,
 			HttpServletResponse response) throws Oadr20bMarshalException, OadrElementNotFoundException {
@@ -559,7 +560,7 @@ public class Oadr20bVenController {
 		response.addHeader("X-total-page", String.valueOf(pageBySource.getTotalPages()));
 		response.addHeader("X-total-count", String.valueOf(pageBySource.getTotalElements()));
 		response.addHeader("mouaiccool", String.valueOf(pageBySource.getTotalElements()));
-		return oadr20bDtoMapper.mapList(pageBySource.getContent(), ReportCapabilityDto.class);
+		return oadr20bDtoMapper.mapList(pageBySource.getContent(), OtherReportCapabilityDto.class);
 	}
 
 	@RequestMapping(value = "/{venID}/report/requested/search", method = RequestMethod.GET)

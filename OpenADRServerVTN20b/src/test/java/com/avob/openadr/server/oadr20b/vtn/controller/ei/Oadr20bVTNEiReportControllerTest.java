@@ -33,6 +33,8 @@ import org.springframework.util.MultiValueMap;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.avob.KeyTokenType;
+import com.avob.openadr.model.oadr20b.avob.PayloadKeyTokenType;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bPollBuilders;
@@ -74,11 +76,13 @@ import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDescriptionDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapabilityDescription;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataFloatDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataKeyTokenDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.data.OtherReportDataPayloadResourceStatusDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestDtoCreateRequestDto;
@@ -359,6 +363,15 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(readingType, reportcapabilityDescriptionList.get(0).getReadingType());
 		assertEquals(reportType, reportcapabilityDescriptionList.get(0).getReportType());
 
+		// search other report capability
+		List<OtherReportCapabilityDto> restJsonControllerAndExpectList3 = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/available/search", HttpStatus.OK_200,
+				OtherReportCapabilityDto.class, params);
+
+		assertEquals(1, restJsonControllerAndExpectList3.size());
+		assertEquals(reportSpecifierId, restJsonControllerAndExpectList3.get(0).getReportSpecifierId());
+
 		reportCapabilityDescriptionPrivateId = reportcapabilityDescriptionList.get(0).getId();
 		OtherReportCapability reportCapability = otherReportCapabilityService.findOne(reportCapabilityPrivateId);
 		OtherReportCapabilityDescription reportCapabilityDescription = otherReportCapabilityDescriptionService
@@ -429,6 +442,15 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(1, convertMvcResultToDtoList.size());
 		assertEquals(reportCapabilityDescription.getRid(), convertMvcResultToDtoList.get(0).getRid());
 
+		// search other report request
+		List<OtherReportRequestDto> restJsonControllerAndExpectList4 = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/requested/search", HttpStatus.OK_200,
+				OtherReportRequestDto.class, params);
+
+		assertEquals(1, restJsonControllerAndExpectList4.size());
+		assertEquals(reportSpecifierId, restJsonControllerAndExpectList4.get(0).getReportSpecifierId());
+
 		// second poll supposed to contains CreateReport cause user has subscribe
 		str = mockMvc.postOadrPollAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
 				xmlSignatureService.sign(Oadr20bPollBuilders.newOadr20bPollBuilder(OadrDataBaseSetup.VEN).build()),
@@ -480,13 +502,13 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(reportRequestId, reportRequestList.get(0).getReportRequestId());
 		assertNull(reportRequestList.get(0).getRequestorUsername());
 
+		// create VEN oadrUpdateReport float payload
 		String intervalId = "intervalId";
 		long start = System.currentTimeMillis();
 		String xmlDuration = "P1D";
 		Long confidence = 80L;
 		Float accuracy = 1F;
 		Float value = 3F;
-		// create VEN oadrUpdateReport float payload
 		OadrReportType reportUpdate = Oadr20bEiReportBuilders
 				.newOadr20bRegisterReportOadrReportBuilder(reportSpecifierId, reportRequestId, reportName,
 						createdTimestamp)
@@ -599,6 +621,55 @@ public class Oadr20bVTNEiReportControllerTest {
 
 		reportDataPrivateId = reportDataResourceStatusList.get(0).getId();
 
+		// create VEN oadrUpdateReport keytoken payload
+		PayloadKeyTokenType tokens = new PayloadKeyTokenType();
+		KeyTokenType token = new KeyTokenType();
+		token.setKey("mouaiccool");
+		token.setValue("mouaiccool");
+		tokens.getTokens().add(token);
+
+		reportUpdate = Oadr20bEiReportBuilders
+				.newOadr20bRegisterReportOadrReportBuilder(reportSpecifierId, reportRequestId, reportName,
+						createdTimestamp)
+				.addInterval(Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration, rid,
+						confidence, accuracy, tokens).build())
+				.build();
+		oadrUpdateReportType = Oadr20bEiReportBuilders.newOadr20bUpdateReportBuilder("", OadrDataBaseSetup.VEN)
+				.addReport(reportUpdate).build();
+
+		// push this payload into EiReport controller
+		oadrUpdatedReportType = mockMvc.postEiReportAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
+				oadrUpdateReportType, HttpStatus.OK_200, OadrUpdatedReportType.class);
+
+		assertNotNull(oadrUpdatedReportType);
+		assertEquals(String.valueOf(HttpStatus.OK_200), oadrUpdatedReportType.getEiResponse().getResponseCode());
+		assertEquals(OadrDataBaseSetup.VEN, oadrUpdatedReportType.getVenID());
+
+		// test previous payload has successfully inserted report data in
+		// database
+		List<OtherReportDataKeyTokenDto> restJsonControllerAndExpectList2 = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/keytoken/" + reportSpecifierId, HttpStatus.OK_200,
+				OtherReportDataKeyTokenDto.class);
+		assertEquals(1, restJsonControllerAndExpectList2.size());
+
+		restJsonControllerAndExpectList2 = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/keytoken/" + reportSpecifierId + "/rid/" + rid,
+				HttpStatus.OK_200, OtherReportDataKeyTokenDto.class);
+		assertEquals(1, restJsonControllerAndExpectList2.size());
+
+		assertEquals(new Double(Math.floor(new Long(start) / 1000) * 1000),
+				new Double(restJsonControllerAndExpectList2.get(0).getStart()));
+		assertEquals(confidence, restJsonControllerAndExpectList2.get(0).getConfidence());
+		assertEquals(1, restJsonControllerAndExpectList2.get(0).getTokens().size());
+		assertEquals("mouaiccool", restJsonControllerAndExpectList2.get(0).getTokens().get(0).getKey());
+		assertEquals("mouaiccool", restJsonControllerAndExpectList2.get(0).getTokens().get(0).getValue());
+
+		reportDataPrivateId = restJsonControllerAndExpectList2.get(0).getId();
+
+		otherReportDataKeyTokenService.delete(reportDataPrivateId);
+
 		// cancel subscription
 		String reportRequestIdToDelete = convertMvcResultToDtoList.get(0).getReportRequestId();
 		params = new LinkedMultiValueMap<String, String>();
@@ -690,7 +761,7 @@ public class Oadr20bVTNEiReportControllerTest {
 				.getOadrReportRequest().get(0).getReportSpecifier().getSpecifierPayload().get(0).getRID());
 
 		// cleanup data PayloadResourceStatus
-		otherReportDataPayloadResourceStatusService.delete(reportDataPrivateId);
+
 //		otherReportRequestSpecifierDao.deleteByRequestReportRequestId(reportRequestId);
 
 //		otherReportRequestService.delete(reportRequestPrivateId);
