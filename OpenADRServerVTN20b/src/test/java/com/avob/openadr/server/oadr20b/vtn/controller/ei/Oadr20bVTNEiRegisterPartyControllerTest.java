@@ -338,18 +338,53 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		oadrMockMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + VEN_ID + "/registerparty/requestReregistration", HttpStatus.OK_200);
 		Thread.sleep(200);
-		// test nothing in poll queue
+
+		// poll and expect for OadrRequestReregistrationType
 		OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(VEN_ID).build();
 		OadrRequestReregistrationType oadrRequestReregistrationType = oadrMockMvc.postOadrPollAndExpect(venSession,
 				poll, HttpStatus.OK_200, OadrRequestReregistrationType.class);
 		assertNotNull(oadrRequestReregistrationType);
 
+		// ven response reregistration request
 		OadrResponseType respReregistration = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("0", HttpStatus.OK_200, VEN_ID).build();
 
 		OadrResponseType postEiRegisterPartyAndExpect = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
 				respReregistration, HttpStatus.OK_200, OadrResponseType.class);
 		assertEquals(String.valueOf(HttpStatus.OK_200), postEiRegisterPartyAndExpect.getEiResponse().getResponseCode());
+
+		// request cancelregistration
+		oadrMockMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				VEN_URL + VEN_ID + "/registerparty/cancelPartyRegistration", HttpStatus.OK_200);
+		Thread.sleep(200);
+
+		// poll and expect for OadrRequestReregistrationType
+		poll = Oadr20bPollBuilders.newOadr20bPollBuilder(VEN_ID).build();
+		OadrCancelPartyRegistrationType cancelPartyRegistration = oadrMockMvc.postOadrPollAndExpect(venSession, poll,
+				HttpStatus.OK_200, OadrCancelPartyRegistrationType.class);
+		assertNotNull(cancelPartyRegistration);
+
+		// ven response reregistration request
+		OadrCanceledPartyRegistrationType canceledPartyRegistration = Oadr20bEiRegisterPartyBuilders
+				.newOadr20bCanceledPartyRegistrationBuilder(cancelPartyRegistration.getRequestID(), HttpStatus.OK_200,
+						venDto.getRegistrationId(), venDto.getUsername())
+				.build();
+
+		postEiRegisterPartyAndExpect = oadrMockMvc.postEiRegisterPartyAndExpect(venSession, canceledPartyRegistration,
+				HttpStatus.OK_200, OadrResponseType.class);
+		assertEquals(String.valueOf(HttpStatus.OK_200), postEiRegisterPartyAndExpect.getEiResponse().getResponseCode());
+
+		// test ven is not registred
+		venDto = oadrMockMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
+				VenDto.class);
+		assertEquals(String.valueOf(ven.getId()), venDto.getId());
+		assertEquals(ven.getUsername(), venDto.getUsername());
+		assertNull(venDto.getHttpPullModel());
+		assertNull(venDto.getOadrProfil());
+		assertNull(venDto.getPushUrl());
+		assertNull(venDto.getTransport());
+		assertNull(venDto.getOadrName());
+		assertNull(venDto.getRegistrationId());
 
 		venService.delete(ven);
 		marketContextService.delete(marketContext);

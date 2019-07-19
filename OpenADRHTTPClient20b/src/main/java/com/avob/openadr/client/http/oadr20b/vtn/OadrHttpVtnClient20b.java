@@ -7,15 +7,11 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
-import com.avob.openadr.model.oadr20b.oadr.OadrCancelOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCanceledOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreatedOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
@@ -53,12 +49,6 @@ public class OadrHttpVtnClient20b {
 				Oadr20bFactory.createOadrRequestReregistration(payload), OadrResponseType.class);
 	}
 
-	public OadrResponseType oadrCreatedReport(String url, OadrCreatedReportType payload) throws Oadr20bException,
-			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
-		return client.post(url, Oadr20bUrlPath.EI_REPORT_SERVICE, null, Oadr20bFactory.createOadrCreatedReport(payload),
-				OadrResponseType.class);
-	}
-
 	public OadrCreatedReportType oadrCreateReport(String url, OadrCreateReportType payload) throws Oadr20bException,
 			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 		return client.post(url, Oadr20bUrlPath.EI_REPORT_SERVICE, null, Oadr20bFactory.createOadrCreateReport(payload),
@@ -75,18 +65,6 @@ public class OadrHttpVtnClient20b {
 			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 		return client.post(url, Oadr20bUrlPath.EI_REPORT_SERVICE, null, Oadr20bFactory.createOadrCancelReport(payload),
 				OadrCanceledReportType.class);
-	}
-
-	public OadrCreateOptType oadrCreatedOpt(String url, OadrCreatedOptType payload) throws Oadr20bException,
-			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
-		return client.post(url, Oadr20bUrlPath.EI_OPT_SERVICE, null, Oadr20bFactory.createOadrCreatedOpt(payload),
-				OadrCreateOptType.class);
-	}
-
-	public OadrCancelOptType oadrCanceledOptType(String url, OadrCanceledOptType payload) throws Oadr20bException,
-			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
-		return client.post(url, Oadr20bUrlPath.EI_OPT_SERVICE, null, Oadr20bFactory.createOadrCanceledOpt(payload),
-				OadrCancelOptType.class);
 	}
 
 	public OadrRegisteredReportType oadrRegisterReport(String url, OadrRegisterReportType payload)
