@@ -11,44 +11,44 @@ import com.avob.openadr.model.oadr20b.ei.SchemaVersionEnumeratedType;
 
 public class Oadr20bEiRegisterPartyBuilders {
 
-    private Oadr20bEiRegisterPartyBuilders() {
-    }
+	private Oadr20bEiRegisterPartyBuilders() {
+	}
 
-    public static Oadr20bCanceledPartyRegistrationBuilder newOadr20bCanceledPartyRegistrationBuilder(String requestId,
-            int responseCode, String registrationId, String venId) {
-        return new Oadr20bCanceledPartyRegistrationBuilder(requestId, responseCode, registrationId, venId)
-                .withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
-    }
+	public static Oadr20bCanceledPartyRegistrationBuilder newOadr20bCanceledPartyRegistrationBuilder(String requestId,
+			int responseCode, String registrationId, String venId) {
+		return new Oadr20bCanceledPartyRegistrationBuilder(requestId, responseCode, registrationId, venId)
+				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
+	}
 
-    public static Oadr20bCancelPartyRegistrationBuilder newOadr20bCancelPartyRegistrationBuilder(String requestId,
-            String registrationId, String venId) {
-        return new Oadr20bCancelPartyRegistrationBuilder(requestId, registrationId, venId)
-                .withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
-    }
+	public static Oadr20bCancelPartyRegistrationBuilder newOadr20bCancelPartyRegistrationBuilder(String requestId,
+			String registrationId, String venId) {
+		return new Oadr20bCancelPartyRegistrationBuilder(requestId, registrationId, venId)
+				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
+	}
 
-    public static Oadr20bCreatedPartyRegistrationBuilder newOadr20bCreatedPartyRegistrationBuilder(String requestId,
-            int responseCode, String venId, String vtnId) {
-        return new Oadr20bCreatedPartyRegistrationBuilder(requestId, responseCode, venId, vtnId)
-                .withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
-    }
+	public static Oadr20bCreatedPartyRegistrationBuilder newOadr20bCreatedPartyRegistrationBuilder(String requestId,
+			int responseCode, String venId, String vtnId) {
+		return new Oadr20bCreatedPartyRegistrationBuilder(requestId, responseCode, venId, vtnId)
+				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
+	}
 
-    public static Oadr20bCreatePartyRegistrationBuilder newOadr20bCreatePartyRegistrationBuilder(String requestId,
-            String venId, String profilName) {
-        return new Oadr20bCreatePartyRegistrationBuilder(requestId, venId, profilName)
-                .withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
-    }
+	public static Oadr20bCreatePartyRegistrationBuilder newOadr20bCreatePartyRegistrationBuilder(String requestId,
+			String venId, String profilName) {
+		return new Oadr20bCreatePartyRegistrationBuilder(requestId, venId, profilName)
+				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
+	}
 
-    public static Oadr20bQueryRegistrationBuilder newOadr20bQueryRegistrationBuilder(String requestId) {
-        return new Oadr20bQueryRegistrationBuilder(requestId)
-                .withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
-    }
+	public static Oadr20bQueryRegistrationBuilder newOadr20bQueryRegistrationBuilder(String requestId) {
+		return new Oadr20bQueryRegistrationBuilder(requestId)
+				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
+	}
 
-    public static Oadr20bRequestReregistrationBuilder newOadr20bRequestReregistrationBuilder(String venId) {
-        return new Oadr20bRequestReregistrationBuilder(venId)
-                .withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
-    }
+	public static Oadr20bRequestReregistrationBuilder newOadr20bRequestReregistrationBuilder(String venId) {
+		return new Oadr20bRequestReregistrationBuilder(venId)
+				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
+	}
 
-    public static Oadr20bOadrProfileBuilder newOadr20bOadrProfileBuilder(String profileName) {
-        return new Oadr20bOadrProfileBuilder(profileName);
-    }
+	public static Oadr20bOadrProfileBuilder newOadr20bOadrProfileBuilder(String profileName) {
+		return new Oadr20bOadrProfileBuilder(profileName);
+	}
 }

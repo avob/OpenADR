@@ -45,7 +45,7 @@ public class Oadr20bVTNOadrPollController {
 	@Resource
 	private XmlSignatureService xmlSignatureService;
 
-	@PreAuthorize("hasRole('ROLE_VEN') AND hasRole('ROLE_REGISTERED')")
+	@PreAuthorize("hasRole('ROLE_VEN')")
 	@RequestMapping(value = Oadr20bUrlPath.OADR_POLL_SERVICE, method = RequestMethod.POST)
 	@ResponseBody
 	public String request(@RequestBody String payload, Principal principal)

@@ -1525,4 +1525,8 @@ public class Oadr20bFactory {
 		return avobFactory.createPayloadAvobVenServiceRequest(value);
 	}
 
+	public static JAXBElement<?> createResponseType(OadrResponseType value) {
+		return factory.createOadrResponse(value);
+	}
+
 }
