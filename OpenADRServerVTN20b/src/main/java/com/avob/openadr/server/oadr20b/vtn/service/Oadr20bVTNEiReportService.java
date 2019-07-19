@@ -47,7 +47,6 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.BaseUnitType;
 import com.avob.openadr.model.oadr20b.oadr.CurrencyType;
-import com.avob.openadr.model.oadr20b.oadr.CurrentType;
 import com.avob.openadr.model.oadr20b.oadr.FrequencyType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledReportType;
@@ -361,12 +360,6 @@ public class Oadr20bVTNEiReportService {
 
 					} else if (declaredType.equals(BaseUnitType.class)) {
 						BaseUnitType el = (BaseUnitType) value;
-						itemDescription = el.getItemDescription();
-						itemUnits = el.getItemUnits();
-						siScaleCode = el.getSiScaleCode();
-
-					} else if (declaredType.equals(CurrentType.class)) {
-						CurrentType el = (CurrentType) value;
 						itemDescription = el.getItemDescription();
 						itemUnits = el.getItemUnits();
 						siScaleCode = el.getSiScaleCode();

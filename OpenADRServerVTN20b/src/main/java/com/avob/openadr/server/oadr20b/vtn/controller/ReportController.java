@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.http.HttpStatus;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,14 +51,18 @@ public class ReportController {
 	@ResponseBody
 	public List<OtherReportCapabilityDto> viewOtherReportCapability(
 			@RequestParam(value = "venID", required = false) List<String> venID,
-			@RequestParam(value = "reportSpecifierId", required = false) String reportSpecifierId)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
+			@RequestParam(value = "reportSpecifierId", required = false) String reportSpecifierId,
+			HttpServletResponse response) throws Oadr20bMarshalException, OadrElementNotFoundException {
 
 		List<OtherReportCapability> report = new ArrayList<>();
 		if (venID != null && reportSpecifierId == null) {
 			report = otherReportCapabilityService.findBySourceUsernameIn(venID);
 		} else if (venID == null && reportSpecifierId != null) {
 			report = otherReportCapabilityService.findByReportSpecifierId(reportSpecifierId);
+		} else if (venID != null && reportSpecifierId != null) {
+			report = otherReportCapabilityService.findBySourceUsernameInAndReportSpecifierId(venID, reportSpecifierId);
+		} else {
+			response.setStatus(HttpStatus.BAD_REQUEST_400);
 		}
 
 		return oadr20bDtoMapper.mapList(report, OtherReportCapabilityDto.class);

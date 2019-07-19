@@ -19,4 +19,6 @@ public interface OtherReportCapabilityDao extends ReportCapabilityDao<OtherRepor
 
 	public OtherReportCapability findOneBySourceUsernameAndReportSpecifierId(String venID, String reportSpecifierId);
 
+	public List<OtherReportCapability> findBySourceUsernameInAndReportSpecifierId(List<String> username,
+			String reportSpecifierId);
 }

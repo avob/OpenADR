@@ -55,6 +55,11 @@ public class OtherReportCapabilityService extends GenericService<OtherReportCapa
 	public OtherReportCapability findOneBySourceUsernameAndReportSpecifierId(String venID, String reportSpecifierID) {
 		return otherReportCapabilityDao.findOneBySourceUsernameAndReportSpecifierId(venID, reportSpecifierID);
 	}
+	
+	@Transactional
+	public List<OtherReportCapability> findBySourceUsernameInAndReportSpecifierId(List<String> venID, String reportSpecifierID) {
+		return otherReportCapabilityDao.findBySourceUsernameInAndReportSpecifierId(venID, reportSpecifierID);
+	}
 
 	@Override
 	public CrudRepository<OtherReportCapability, Long> getDao() {

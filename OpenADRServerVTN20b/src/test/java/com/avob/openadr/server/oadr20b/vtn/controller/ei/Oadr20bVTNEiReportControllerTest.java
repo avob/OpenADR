@@ -76,6 +76,7 @@ import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescriptionDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDescriptionDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDto;
@@ -113,6 +114,7 @@ import com.google.common.collect.Lists;
 @ActiveProfiles("test")
 public class Oadr20bVTNEiReportControllerTest {
 
+	private static final String REPORT_ENDPOINT = "/Report/";
 	private static final String VEN_ENDPOINT = "/Ven/";
 	private static final String VTN_ENDPOINT = "/Vtn/";
 
@@ -363,6 +365,11 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(readingType, reportcapabilityDescriptionList.get(0).getReadingType());
 		assertEquals(reportType, reportcapabilityDescriptionList.get(0).getReportType());
 
+		reportCapabilityDescriptionPrivateId = reportcapabilityDescriptionList.get(0).getId();
+		OtherReportCapability reportCapability = otherReportCapabilityService.findOne(reportCapabilityPrivateId);
+		OtherReportCapabilityDescription reportCapabilityDescription = otherReportCapabilityDescriptionService
+				.findOne(reportCapabilityDescriptionPrivateId);
+
 		// search other report capability
 		List<OtherReportCapabilityDto> restJsonControllerAndExpectList3 = mockMvc.getRestJsonControllerAndExpectList(
 				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
@@ -372,10 +379,71 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(1, restJsonControllerAndExpectList3.size());
 		assertEquals(reportSpecifierId, restJsonControllerAndExpectList3.get(0).getReportSpecifierId());
 
-		reportCapabilityDescriptionPrivateId = reportcapabilityDescriptionList.get(0).getId();
-		OtherReportCapability reportCapability = otherReportCapabilityService.findOne(reportCapabilityPrivateId);
-		OtherReportCapabilityDescription reportCapabilityDescription = otherReportCapabilityDescriptionService
-				.findOne(reportCapabilityDescriptionPrivateId);
+		// ReportController viewOtherReportCapability
+		mockMvc.perform(MockMvcRequestBuilders.get(REPORT_ENDPOINT + "/available/search")
+				.header("Content-Type", "application/json").with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION))
+				.andExpect(status().is(HttpStatus.BAD_REQUEST_400));
+
+		List<OtherReportCapabilityDto> restJsonControllerAndExpectList5 = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				REPORT_ENDPOINT + "/available/search?venID=" + OadrDataBaseSetup.VEN, HttpStatus.OK_200,
+				OtherReportCapabilityDto.class);
+		assertEquals(1, restJsonControllerAndExpectList5.size());
+		assertEquals(reportSpecifierId, restJsonControllerAndExpectList5.get(0).getReportSpecifierId());
+
+		restJsonControllerAndExpectList5 = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, REPORT_ENDPOINT + "/available/search?venID="
+						+ OadrDataBaseSetup.VEN + "&reportSpecifierId=" + reportCapability.getReportSpecifierId(),
+				HttpStatus.OK_200, OtherReportCapabilityDto.class);
+		assertEquals(1, restJsonControllerAndExpectList5.size());
+		assertEquals(reportSpecifierId, restJsonControllerAndExpectList5.get(0).getReportSpecifierId());
+
+		restJsonControllerAndExpectList5 = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, REPORT_ENDPOINT + "/available/search?venID=mouaiccool",
+				HttpStatus.OK_200, OtherReportCapabilityDto.class);
+		assertEquals(0, restJsonControllerAndExpectList5.size());
+
+		restJsonControllerAndExpectList5 = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				REPORT_ENDPOINT + "/available/search?reportSpecifierId=mouaiccool", HttpStatus.OK_200,
+				OtherReportCapabilityDto.class, params);
+		assertEquals(0, restJsonControllerAndExpectList5.size());
+
+		// ReportController searchOtherReportCapabilityDescription
+		List<OtherReportCapabilityDescriptionDto> restJsonControllerAndExpectList6 = mockMvc
+				.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+						REPORT_ENDPOINT + "/available/description/search?reportSpecifierId="
+								+ reportCapability.getReportSpecifierId(),
+						HttpStatus.OK_200, OtherReportCapabilityDescriptionDto.class);
+		assertEquals(1, restJsonControllerAndExpectList6.size());
+		assertEquals(reportSpecifierId, restJsonControllerAndExpectList6.get(0).getReportSpecifierId());
+		assertEquals(rid, restJsonControllerAndExpectList6.get(0).getRid());
+
+		restJsonControllerAndExpectList6 = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				REPORT_ENDPOINT + "/available/description/search?reportName=" + reportCapability.getReportName(),
+				HttpStatus.OK_200, OtherReportCapabilityDescriptionDto.class);
+		assertEquals(1, restJsonControllerAndExpectList6.size());
+		assertEquals(reportSpecifierId, restJsonControllerAndExpectList6.get(0).getReportSpecifierId());
+		assertEquals(rid, restJsonControllerAndExpectList6.get(0).getRid());
+
+		restJsonControllerAndExpectList6 = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				REPORT_ENDPOINT + "/available/description/search?reportType="
+						+ reportCapabilityDescription.getReportType(),
+				HttpStatus.OK_200, OtherReportCapabilityDescriptionDto.class);
+		assertEquals(1, restJsonControllerAndExpectList6.size());
+		assertEquals(reportSpecifierId, restJsonControllerAndExpectList6.get(0).getReportSpecifierId());
+		assertEquals(rid, restJsonControllerAndExpectList6.get(0).getRid());
+
+		restJsonControllerAndExpectList6 = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				REPORT_ENDPOINT + "/available/description/search?readingType="
+						+ reportCapabilityDescription.getReadingType(),
+				HttpStatus.OK_200, OtherReportCapabilityDescriptionDto.class);
+		assertEquals(1, restJsonControllerAndExpectList6.size());
+		assertEquals(reportSpecifierId, restJsonControllerAndExpectList6.get(0).getReportSpecifierId());
+		assertEquals(rid, restJsonControllerAndExpectList6.get(0).getRid());
 
 		// subscribe
 		List<OtherReportRequestDtoCreateSubscriptionDto> subscriptions = new ArrayList<>();
@@ -395,6 +463,22 @@ public class Oadr20bVTNEiReportControllerTest {
 		// test subscription has been stored
 		List<OtherReportRequestDto> restJsonControllerAndExpectList = mockMvc.getRestJsonControllerAndExpectList(
 				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/requested",
+				HttpStatus.OK_200, OtherReportRequestDto.class);
+		assertNotNull(restJsonControllerAndExpectList);
+		assertEquals(1, restJsonControllerAndExpectList.size());
+		reportRequestId = restJsonControllerAndExpectList.get(0).getReportRequestId();
+
+		restJsonControllerAndExpectList = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/requested?reportSpecifierId=" + reportSpecifierId,
+				HttpStatus.OK_200, OtherReportRequestDto.class);
+		assertNotNull(restJsonControllerAndExpectList);
+		assertEquals(1, restJsonControllerAndExpectList.size());
+		reportRequestId = restJsonControllerAndExpectList.get(0).getReportRequestId();
+
+		restJsonControllerAndExpectList = mockMvc.getRestJsonControllerAndExpectList(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/requested?reportRequestId=" + reportRequestId,
 				HttpStatus.OK_200, OtherReportRequestDto.class);
 		assertNotNull(restJsonControllerAndExpectList);
 		assertEquals(1, restJsonControllerAndExpectList.size());

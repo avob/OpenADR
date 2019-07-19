@@ -169,11 +169,8 @@
 					</execution>
 				</executions>
 			</plugin>
-
-
 		</plugins>
 	</build>
-
 	<profiles>
 		<profile>
 			<id>frontend</id>
