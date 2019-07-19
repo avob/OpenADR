@@ -14,12 +14,6 @@ public class Oadr20bCreatePartyRegistrationTypeApplicationLayerException extends
 
     private final transient OadrCreatedPartyRegistrationType response;
 
-    public Oadr20bCreatePartyRegistrationTypeApplicationLayerException(Exception e,
-            OadrCreatedPartyRegistrationType response) {
-        super(e);
-        this.response = response;
-    }
-
     public Oadr20bCreatePartyRegistrationTypeApplicationLayerException(String message,
             OadrCreatedPartyRegistrationType response) {
         super(message);

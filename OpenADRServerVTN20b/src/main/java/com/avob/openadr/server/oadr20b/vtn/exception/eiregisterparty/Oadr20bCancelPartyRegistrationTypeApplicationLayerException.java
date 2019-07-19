@@ -14,12 +14,6 @@ public class Oadr20bCancelPartyRegistrationTypeApplicationLayerException extends
 
     private final transient OadrCanceledPartyRegistrationType response;
 
-    public Oadr20bCancelPartyRegistrationTypeApplicationLayerException(Exception e,
-            OadrCanceledPartyRegistrationType response) {
-        super(e);
-        this.response = response;
-    }
-
     public Oadr20bCancelPartyRegistrationTypeApplicationLayerException(String message,
             OadrCanceledPartyRegistrationType response) {
         super(message);

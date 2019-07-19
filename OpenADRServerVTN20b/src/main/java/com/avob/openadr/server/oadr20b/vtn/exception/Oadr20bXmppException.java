@@ -10,9 +10,4 @@ public class Oadr20bXmppException extends Exception {
 	public Oadr20bXmppException(Exception e) {
 		super(e);
 	}
-	
-	public Oadr20bXmppException(String e) {
-		super(e);
-	}
-
 }
