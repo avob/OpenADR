@@ -86,7 +86,9 @@ public class OadrXmppVenClient20b {
 	public void sendEventMessage(Object payload) throws XmppStringprepException, NotConnectedException,
 			Oadr20bMarshalException, InterruptedException, Oadr20bXMLSignatureException {
 		String marshalRoot = null;
-		if (xmlSignature) {
+		if (payload instanceof String) {
+			marshalRoot = (String) payload;
+		} else if (xmlSignature) {
 			marshalRoot = sign(payload);
 		} else {
 			marshalRoot = jaxbContext.marshalRoot(payload);
@@ -100,7 +102,9 @@ public class OadrXmppVenClient20b {
 	public void sendOptMessage(Object payload) throws XmppStringprepException, NotConnectedException,
 			Oadr20bMarshalException, InterruptedException, Oadr20bXMLSignatureException {
 		String marshalRoot = null;
-		if (xmlSignature) {
+		if (payload instanceof String) {
+			marshalRoot = (String) payload;
+		} else if (xmlSignature) {
 			marshalRoot = sign(payload);
 		} else {
 			marshalRoot = jaxbContext.marshalRoot(payload);
@@ -112,8 +116,11 @@ public class OadrXmppVenClient20b {
 
 	public void sendReportMessage(Object payload) throws XmppStringprepException, NotConnectedException,
 			Oadr20bMarshalException, InterruptedException, Oadr20bXMLSignatureException {
+
 		String marshalRoot = null;
-		if (xmlSignature) {
+		if (payload instanceof String) {
+			marshalRoot = (String) payload;
+		} else if (xmlSignature) {
 			marshalRoot = sign(payload);
 		} else {
 			marshalRoot = jaxbContext.marshalRoot(payload);
@@ -126,7 +133,9 @@ public class OadrXmppVenClient20b {
 	public void sendRegisterPartyMessage(Object payload) throws XmppStringprepException, NotConnectedException,
 			Oadr20bMarshalException, InterruptedException, Oadr20bXMLSignatureException {
 		String marshalRoot = null;
-		if (xmlSignature) {
+		if (payload instanceof String) {
+			marshalRoot = (String) payload;
+		} else if (xmlSignature) {
 			marshalRoot = sign(payload);
 		} else {
 			marshalRoot = jaxbContext.marshalRoot(payload);

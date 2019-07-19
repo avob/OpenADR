@@ -6,9 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.Resource;
@@ -29,14 +27,12 @@ import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
 import com.avob.openadr.model.oadr20b.ei.EiTargetType;
 import com.avob.openadr.model.oadr20b.ei.EventDescriptorType;
 import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
-import com.avob.openadr.model.oadr20b.ei.IntervalType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
 import com.avob.openadr.server.oadr20b.ven.VEN20bApplicationTest;
 import com.avob.openadr.server.oadr20b.ven.VenConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bDistributeEventApplicationLayerException;
-import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiEventService.Oadr20bVENEiEventServiceListener;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VEN20bApplicationTest.class })
@@ -61,7 +57,6 @@ public class Oadr20bVENEiEventServiceTest {
 	public void clear() {
 		oadr20bVENEiEventService.clearOadrEvents();
 	}
-
 
 	private OadrEvent createOadrEvent(String eventId, long modificationNumber) {
 		long timestampStart = 0L;

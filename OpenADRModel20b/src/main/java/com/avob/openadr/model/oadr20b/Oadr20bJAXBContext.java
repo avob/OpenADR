@@ -331,7 +331,6 @@ public class Oadr20bJAXBContext {
 		} else if (payload instanceof OadrResponseType) {
 			OadrResponseType value = (OadrResponseType) payload;
 			el = Oadr20bFactory.createResponseType(value);
-
 		} else {
 			throw new Oadr20bMarshalException("payload have to be an Oadr20b root element");
 		}

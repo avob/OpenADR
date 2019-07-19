@@ -550,6 +550,14 @@ public class Oadr20bVTNEiEventService {
 
 			return handle(username, oadrRequestEvent, false);
 
+		} else if (unmarshal instanceof OadrResponseType) {
+
+			LOGGER.info(username + " - OadrResponseType");
+
+//			OadrResponseType oadrRequestEvent = (OadrResponseType) unmarshal;
+
+			return null;
+
 		}
 
 		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");

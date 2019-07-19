@@ -66,11 +66,15 @@ public class XmppEventMessageListener implements StanzaListener {
 
 			String response = oadr20bVTNEiEventService.request(username, body);
 
-			Ven findOneByUsername = venService.findOneByUsername(username);
+			if (response != null) {
 
-			Jid jid = JidCreate.from(findOneByUsername.getPushUrl());
+				Ven findOneByUsername = venService.findOneByUsername(username);
 
-			xmppUplinkClient.getUplinkClient().sendMessage(jid, response);
+				Jid jid = JidCreate.from(findOneByUsername.getPushUrl());
+
+				xmppUplinkClient.getUplinkClient().sendMessage(jid, response);
+
+			}
 
 		} catch (Oadr20bUnmarshalException e) {
 			LOGGER.error(e.getMessage());

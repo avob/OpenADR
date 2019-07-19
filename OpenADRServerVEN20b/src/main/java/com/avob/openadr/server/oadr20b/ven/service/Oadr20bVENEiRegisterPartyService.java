@@ -263,7 +263,8 @@ public class Oadr20bVENEiRegisterPartyService {
 			OadrTransportType transportType = OadrTransportType.XMPP;
 
 			builder.withOadrTransportAddress(transportAddress).withOadrReportOnly(reportOnly)
-					.withOadrTransportName(transportType).withOadrVenName(venName).withOadrXmlSignature(xmlSignature);
+					.withOadrHttpPullModel(false).withOadrTransportName(transportType).withOadrVenName(venName)
+					.withOadrXmlSignature(xmlSignature);
 
 		}
 

@@ -73,8 +73,8 @@ public class Oadr20bPushListener {
 						OadrDistributeEventType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
 								OadrDistributeEventType.class);
 
-						oadr20bPushService.pushMessageToVen(readValue.getVenPushUrl(), readValue.isXmlSignature(),
-								unmarshal);
+						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
+								readValue.isXmlSignature(), unmarshal);
 
 					} else {
 						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
@@ -87,8 +87,8 @@ public class Oadr20bPushListener {
 						OadrCancelReportType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
 								OadrCancelReportType.class);
 
-						oadr20bPushService.pushMessageToVen(readValue.getVenPushUrl(), readValue.isXmlSignature(),
-								unmarshal);
+						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
+								readValue.isXmlSignature(), unmarshal);
 					} else {
 						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
 						venPollService.create(findOneByUsername, readValue.getPayload());
@@ -100,8 +100,8 @@ public class Oadr20bPushListener {
 						OadrCreateReportType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
 								OadrCreateReportType.class);
 
-						oadr20bPushService.pushMessageToVen(readValue.getVenPushUrl(), readValue.isXmlSignature(),
-								unmarshal);
+						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
+								readValue.isXmlSignature(), unmarshal);
 					} else {
 						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
 						venPollService.create(findOneByUsername, readValue.getPayload());
@@ -113,8 +113,8 @@ public class Oadr20bPushListener {
 						OadrRegisterReportType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
 								OadrRegisterReportType.class);
 
-						oadr20bPushService.pushMessageToVen(readValue.getVenPushUrl(), readValue.isXmlSignature(),
-								unmarshal);
+						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
+								readValue.isXmlSignature(), unmarshal);
 					} else {
 						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
 						venPollService.create(findOneByUsername, readValue.getPayload());
@@ -126,8 +126,8 @@ public class Oadr20bPushListener {
 						OadrUpdateReportType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
 								OadrUpdateReportType.class);
 
-						oadr20bPushService.pushMessageToVen(readValue.getVenPushUrl(), readValue.isXmlSignature(),
-								unmarshal);
+						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
+								readValue.isXmlSignature(), unmarshal);
 					} else {
 						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
 						venPollService.create(findOneByUsername, readValue.getPayload());
@@ -139,8 +139,8 @@ public class Oadr20bPushListener {
 						OadrCancelPartyRegistrationType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
 								OadrCancelPartyRegistrationType.class);
 
-						oadr20bPushService.pushMessageToVen(readValue.getVenPushUrl(), readValue.isXmlSignature(),
-								unmarshal);
+						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
+								readValue.isXmlSignature(), unmarshal);
 					} else {
 						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
 						venPollService.create(findOneByUsername, readValue.getPayload());
@@ -152,8 +152,8 @@ public class Oadr20bPushListener {
 						OadrRequestReregistrationType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
 								OadrRequestReregistrationType.class);
 
-						oadr20bPushService.pushMessageToVen(readValue.getVenPushUrl(), readValue.isXmlSignature(),
-								unmarshal);
+						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
+								readValue.isXmlSignature(), unmarshal);
 					} else {
 						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
 						venPollService.create(findOneByUsername, readValue.getPayload());

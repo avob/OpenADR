@@ -8,6 +8,10 @@ import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.avob.openadr.client.http.OadrHttpClientBuilder;
 import com.avob.openadr.client.http.oadr20b.OadrHttpClient20b;
 import com.avob.openadr.client.http.oadr20b.vtn.OadrHttpVtnClient20b;
+import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bInitializationException;
@@ -32,6 +37,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.security.exception.OadrSecurityException;
@@ -42,6 +48,7 @@ import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiRegisterPartyService;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
+import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppUplinkClient;
 
 @Service
 public class Oadr20bPushService {
@@ -67,10 +74,15 @@ public class Oadr20bPushService {
 	@Resource
 	private DemandResponseEventService demandResponseEventService;
 
+	@Resource
+	private XmppUplinkClient xmppUplinkClient;
+
+	@Resource
+	private Oadr20bJAXBContext jaxbContext;
+
 	private OadrHttpVtnClient20b oadrHttpVtnClient20b;
 
 	private OadrHttpVtnClient20b securedOadrHttpVtnClient20b;
-	
 
 	@PostConstruct
 	public void init() {
@@ -98,7 +110,7 @@ public class Oadr20bPushService {
 	}
 
 	@Async
-	public void pushMessageToVen(String venPushUrl, Boolean xmlSignatureRequired, Object payload) {
+	public void pushMessageToVen(String transport, String venPushUrl, Boolean xmlSignatureRequired, Object payload) {
 		try {
 			URI uri = new URI(venPushUrl);
 
@@ -114,71 +126,116 @@ public class Oadr20bPushService {
 
 			if (payload instanceof OadrDistributeEventType) {
 				OadrDistributeEventType val = (OadrDistributeEventType) payload;
-				OadrResponseType response = requestClient.oadrDistributeEvent(venPushUrl, val);
-				String eiResponseCode = response.getEiResponse().getResponseCode();
-				if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
-					LOGGER.error("OadrDistributeEventType - Application Layer Error[" + eiResponseCode + "]");
+				if (OadrTransportType.SIMPLE_HTTP.value().equals(transport)) {
+
+					OadrResponseType response = requestClient.oadrDistributeEvent(venPushUrl, val);
+					String eiResponseCode = response.getEiResponse().getResponseCode();
+					if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
+						LOGGER.error("OadrDistributeEventType - Application Layer Error[" + eiResponseCode + "]");
+					}
+
+				} else if (OadrTransportType.XMPP.value().equals(transport)) {
+					Jid from = JidCreate.from(venPushUrl);
+					xmppUplinkClient.getUplinkClient().sendMessage(from, jaxbContext.marshalRoot(val));
 				}
 
 			} else if (payload instanceof OadrCancelReportType) {
 				OadrCancelReportType val = (OadrCancelReportType) payload;
-				OadrCanceledReportType oadrCancelReport = requestClient.oadrCancelReport(venPushUrl, val);
-				String eiResponseCode = oadrCancelReport.getEiResponse().getResponseCode();
-				if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
-					LOGGER.error("OadrCancelReportType - Application Layer Error[" + eiResponseCode + "]");
-					return;
-				}
+				if (OadrTransportType.SIMPLE_HTTP.value().equals(transport)) {
 
-				oadr20bVTNEiReportService.otherOadrCancelReport(val);
+					OadrCanceledReportType oadrCancelReport = requestClient.oadrCancelReport(venPushUrl, val);
+					String eiResponseCode = oadrCancelReport.getEiResponse().getResponseCode();
+					if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
+						LOGGER.error("OadrCancelReportType - Application Layer Error[" + eiResponseCode + "]");
+						return;
+					}
+
+					oadr20bVTNEiReportService.otherOadrCancelReport(val);
+				} else if (OadrTransportType.XMPP.value().equals(transport)) {
+					Jid from = JidCreate.from(venPushUrl);
+					xmppUplinkClient.getUplinkClient().sendMessage(from, jaxbContext.marshalRoot(val));
+				}
 
 			} else if (payload instanceof OadrCreateReportType) {
 				OadrCreateReportType val = (OadrCreateReportType) payload;
-				OadrCreatedReportType oadrCreateReport = requestClient.oadrCreateReport(venPushUrl, val);
-				String eiResponseCode = oadrCreateReport.getEiResponse().getResponseCode();
-				if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
-					LOGGER.error("OadrCreateReportType - Application Layer Error[" + eiResponseCode + "]");
-				}
+				if (OadrTransportType.SIMPLE_HTTP.value().equals(transport)) {
 
-				oadr20bVTNEiReportService.oadrCreatedReport(oadrCreateReport, xmlSignatureRequired);
+					OadrCreatedReportType oadrCreateReport = requestClient.oadrCreateReport(venPushUrl, val);
+					String eiResponseCode = oadrCreateReport.getEiResponse().getResponseCode();
+					if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
+						LOGGER.error("OadrCreateReportType - Application Layer Error[" + eiResponseCode + "]");
+					}
+
+					oadr20bVTNEiReportService.oadrCreatedReport(oadrCreateReport, xmlSignatureRequired);
+				} else if (OadrTransportType.XMPP.value().equals(transport)) {
+					Jid from = JidCreate.from(venPushUrl);
+					xmppUplinkClient.getUplinkClient().sendMessage(from, jaxbContext.marshalRoot(val));
+				}
 
 			} else if (payload instanceof OadrRegisterReportType) {
 				OadrRegisterReportType val = (OadrRegisterReportType) payload;
-				requestClient.oadrRegisterReport(venPushUrl, val);
+				if (OadrTransportType.SIMPLE_HTTP.value().equals(transport)) {
+
+					requestClient.oadrRegisterReport(venPushUrl, val);
+
+				} else if (OadrTransportType.XMPP.value().equals(transport)) {
+					Jid from = JidCreate.from(venPushUrl);
+					xmppUplinkClient.getUplinkClient().sendMessage(from, jaxbContext.marshalRoot(val));
+				}
 
 			} else if (payload instanceof OadrUpdateReportType) {
 				OadrUpdateReportType val = (OadrUpdateReportType) payload;
-				OadrUpdatedReportType oadrUpdateReport = requestClient.oadrUpdateReport(venPushUrl, val);
-				String eiResponseCode = oadrUpdateReport.getEiResponse().getResponseCode();
-				if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
-					LOGGER.error("OadrUpdateReportType - Application Layer Error[" + eiResponseCode + "]");
+				if (OadrTransportType.SIMPLE_HTTP.value().equals(transport)) {
+
+					OadrUpdatedReportType oadrUpdateReport = requestClient.oadrUpdateReport(venPushUrl, val);
+					String eiResponseCode = oadrUpdateReport.getEiResponse().getResponseCode();
+					if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
+						LOGGER.error("OadrUpdateReportType - Application Layer Error[" + eiResponseCode + "]");
+					}
+				} else if (OadrTransportType.XMPP.value().equals(transport)) {
+					Jid from = JidCreate.from(venPushUrl);
+					xmppUplinkClient.getUplinkClient().sendMessage(from, jaxbContext.marshalRoot(val));
 				}
 
 			} else if (payload instanceof OadrCancelPartyRegistrationType) {
 				OadrCancelPartyRegistrationType val = (OadrCancelPartyRegistrationType) payload;
-				OadrCanceledPartyRegistrationType oadrCancelPartyRegistrationType = requestClient
-						.oadrCancelPartyRegistrationType(venPushUrl, val);
+				if (OadrTransportType.SIMPLE_HTTP.value().equals(transport)) {
 
-				String eiResponseCode = oadrCancelPartyRegistrationType.getEiResponse().getResponseCode();
-				if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
-					LOGGER.error("OadrCancelPartyRegistrationType - Application Layer Error[" + eiResponseCode + "]");
-					return;
-				}
+					OadrCanceledPartyRegistrationType oadrCancelPartyRegistrationType = requestClient
+							.oadrCancelPartyRegistrationType(venPushUrl, val);
 
-				// remove ven registration
-//				oadr20bVTNEiRegisterPartyService.oadrCancelPartyRegistrationType(val, xmlSignatureRequired);
-				Ven findOneByUsername = venService.findOneByUsername(oadrCancelPartyRegistrationType.getVenID());
+					String eiResponseCode = oadrCancelPartyRegistrationType.getEiResponse().getResponseCode();
+					if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
+						LOGGER.error(
+								"OadrCancelPartyRegistrationType - Application Layer Error[" + eiResponseCode + "]");
+						return;
+					}
 
-				if (findOneByUsername != null) {
-					venService.cleanRegistration(findOneByUsername);
+					// remove ven registration
+//					oadr20bVTNEiRegisterPartyService.oadrCancelPartyRegistrationType(val, xmlSignatureRequired);
+					Ven findOneByUsername = venService.findOneByUsername(oadrCancelPartyRegistrationType.getVenID());
+
+					if (findOneByUsername != null) {
+						venService.cleanRegistration(findOneByUsername);
+					}
+				} else if (OadrTransportType.XMPP.value().equals(transport)) {
+					Jid from = JidCreate.from(venPushUrl);
+					xmppUplinkClient.getUplinkClient().sendMessage(from, jaxbContext.marshalRoot(val));
 				}
 
 			} else if (payload instanceof OadrRequestReregistrationType) {
 				OadrRequestReregistrationType val = (OadrRequestReregistrationType) payload;
-				OadrResponseType oadrRequestReregistrationType = requestClient.oadrRequestReregistrationType(venPushUrl,
-						val);
-				String eiResponseCode = oadrRequestReregistrationType.getEiResponse().getResponseCode();
-				if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
-					LOGGER.error("OadrDistributeEventType - Application Layer Error[" + eiResponseCode + "]");
+				if (OadrTransportType.SIMPLE_HTTP.value().equals(transport)) {
+
+					OadrResponseType oadrRequestReregistrationType = requestClient
+							.oadrRequestReregistrationType(venPushUrl, val);
+					String eiResponseCode = oadrRequestReregistrationType.getEiResponse().getResponseCode();
+					if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
+						LOGGER.error("OadrDistributeEventType - Application Layer Error[" + eiResponseCode + "]");
+					}
+				} else if (OadrTransportType.XMPP.value().equals(transport)) {
+					Jid from = JidCreate.from(venPushUrl);
+					xmppUplinkClient.getUplinkClient().sendMessage(from, jaxbContext.marshalRoot(val));
 				}
 
 			} else {
@@ -201,6 +258,12 @@ public class Oadr20bPushService {
 			LOGGER.error("Fail to sign request payload", e);
 		} catch (Oadr20bXMLSignatureValidationException e) {
 			LOGGER.error("Fail to validate response xml signature", e);
+		} catch (XmppStringprepException e) {
+			LOGGER.error("Fail to read ven JID", e);
+		} catch (NotConnectedException e) {
+			LOGGER.error("Fail to connect to Xmpp server", e);
+		} catch (InterruptedException e) {
+			LOGGER.error("Fail to connect to Xmpp server", e);
 		}
 	}
 
