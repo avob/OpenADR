@@ -20,6 +20,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
+import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCancelPartyRegistrationTypeApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bCanceledPartyRegistrationTypeApplicationLayerException;
@@ -52,8 +53,6 @@ public class XmppRegisterPartyMessageListener implements StanzaListener {
 
 		Resourcepart resourceOrThrow = from.getResourceOrThrow();
 
-		
-
 		String username = localpartOrThrow.asUnescapedString().toLowerCase();
 
 		String body = message.getBody();
@@ -70,8 +69,8 @@ public class XmppRegisterPartyMessageListener implements StanzaListener {
 //
 //			Jid jid = JidCreate.from(findOneByUsername.getPushUrl());
 
-			 from = JidCreate.from(resourceOrThrow + "@" + from.getDomain().toString() + "/" + resourceOrThrow);
-			
+			from = JidCreate.from(resourceOrThrow + "@" + from.getDomain().toString() + "/" + resourceOrThrow);
+
 			xmppUplinkClient.getUplinkClient().sendMessage(from, response);
 
 		} catch (Oadr20bUnmarshalException e) {

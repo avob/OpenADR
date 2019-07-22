@@ -30,6 +30,7 @@ import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCancelRepor
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCreateReportApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCreatedReportApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bRegisterReportApplicationLayerException;
+import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bRegisteredReportApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bUpdateReportApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
 
@@ -105,6 +106,8 @@ public class XmppReportMessageListener implements StanzaListener {
 		} catch (Oadr20bCreateReportApplicationLayerException e) {
 			LOGGER.error(e.getMessage(), e);
 		} catch (Oadr20bCreatedReportApplicationLayerException e) {
+			LOGGER.error(e.getMessage(), e);
+		} catch (Oadr20bRegisteredReportApplicationLayerException e) {
 			LOGGER.error(e.getMessage(), e);
 		}
 

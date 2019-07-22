@@ -23,12 +23,15 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCanceledOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRegisteredReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.security.exception.OadrSecurityException;
@@ -59,6 +62,13 @@ public class XmppVenListener implements StanzaListener {
 	@Resource
 	private Oadr20bVENEiReportService reportService;
 
+	private void failIfPayloadNeedToBeSigned(VtnSessionConfiguration multiConfig)
+			throws Oadr20bApplicationLayerException {
+		if (multiConfig.getVenSessionConfig().getXmlSignature()) {
+			throw new Oadr20bApplicationLayerException("VTN payload is supposed to be signed");
+		}
+	}
+
 	@Override
 	public void processStanza(Stanza packet) throws NotConnectedException, InterruptedException, NotLoggedInException {
 
@@ -81,6 +91,10 @@ public class XmppVenListener implements StanzaListener {
 			unmarshal = payloadHandler.stringToObject(payload);
 
 			VtnSessionConfiguration multiConfig = multiVtnConfig.getMultiConfig(username);
+			if (multiConfig == null) {
+				LOGGER.error("Unknown vtnId:" + username);
+				LOGGER.error(payload);
+			}
 			OadrXmppVenClient20b multiXmppClientConfig = multiVtnConfig.getMultiXmppClientConfig(multiConfig);
 
 			String response = null;
@@ -103,6 +117,12 @@ public class XmppVenListener implements StanzaListener {
 
 					multiXmppClientConfig.sendRegisterPartyMessage(response);
 
+				} else if (oadrPayload.getOadrSignedObject().getOadrCreatedPartyRegistration() != null) {
+
+					multiXmppClientConfig.validate(payload, oadrPayload);
+					oadr20bVENEiRegisterPartyService.oadrCreatedPartyRegistration(multiConfig,
+							oadrPayload.getOadrSignedObject().getOadrCreatedPartyRegistration());
+
 				} else if (oadrPayload.getOadrSignedObject().getOadrUpdateReport() != null
 						|| oadrPayload.getOadrSignedObject().getOadrCreateReport() != null
 						|| oadrPayload.getOadrSignedObject().getOadrRegisterReport() != null
@@ -113,125 +133,151 @@ public class XmppVenListener implements StanzaListener {
 
 					multiXmppClientConfig.sendReportMessage(response);
 
-				} else if (oadrPayload.getOadrSignedObject().getOadrCreatedPartyRegistration() != null) {
-					LOGGER.info(multiConfig.getVtnId() + " - getOadrCreatedPartyRegistration signed");
-					multiXmppClientConfig.validate(payload, oadrPayload);
-					oadr20bVENEiRegisterPartyService.register(multiConfig,
-							oadrPayload.getOadrSignedObject().getOadrCreatedPartyRegistration());
+				} else if (oadrPayload.getOadrSignedObject().getOadrCanceledOpt() != null
+						|| oadrPayload.getOadrSignedObject().getOadrCreatedOpt() != null) {
+
+				} else if (oadrPayload.getOadrSignedObject().getOadrRegisteredReport() != null
+						|| oadrPayload.getOadrSignedObject().getOadrCreatedReport() != null
+						|| oadrPayload.getOadrSignedObject().getOadrCanceledReport() != null) {
+
 				}
 
-			} else if (unmarshal instanceof OadrDistributeEventType) {
+			} else {
+				failIfPayloadNeedToBeSigned(multiConfig);
 
-				OadrDistributeEventType oadrDistributeEvent = (OadrDistributeEventType) unmarshal;
+				if (unmarshal instanceof OadrDistributeEventType) {
 
-				LOGGER.info(username + " - OadrDistributeEventType");
+					OadrDistributeEventType oadrDistributeEvent = (OadrDistributeEventType) unmarshal;
 
-				Object handle = oadr20bVENEiEventService.oadrDistributeEvent(multiConfig, oadrDistributeEvent);
-				response = payloadHandler.payloadToString(multiConfig, handle, false);
+					LOGGER.info(username + " - OadrDistributeEventType");
 
-				multiXmppClientConfig.sendEventMessage(response);
+					Object handle = oadr20bVENEiEventService.oadrDistributeEvent(multiConfig, oadrDistributeEvent);
+					response = payloadHandler.payloadToString(multiConfig, handle, false);
 
-			} else if (unmarshal instanceof OadrCreatedPartyRegistrationType) {
+					multiXmppClientConfig.sendEventMessage(response);
 
-				OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType = (OadrCreatedPartyRegistrationType) unmarshal;
+				} else if (unmarshal instanceof OadrCreatedPartyRegistrationType) {
 
-				LOGGER.info(username + " - OadrCreatedPartyRegistrationType");
+					OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType = (OadrCreatedPartyRegistrationType) unmarshal;
 
-				oadr20bVENEiRegisterPartyService.oadrCreatedPartyRegistration(multiConfig,
-						oadrCreatedPartyRegistrationType);
+					LOGGER.info(username + " - OadrCreatedPartyRegistrationType");
 
-			} else if (unmarshal instanceof OadrRequestReregistrationType) {
+					oadr20bVENEiRegisterPartyService.oadrCreatedPartyRegistration(multiConfig,
+							oadrCreatedPartyRegistrationType);
 
-				OadrRequestReregistrationType oadrRequestReregistrationType = (OadrRequestReregistrationType) unmarshal;
+				} else if (unmarshal instanceof OadrRequestReregistrationType) {
 
-				LOGGER.info(username + " - OadrRequestReregistrationType");
+					OadrRequestReregistrationType oadrRequestReregistrationType = (OadrRequestReregistrationType) unmarshal;
 
-				Object handle = oadr20bVENEiRegisterPartyService.oadrRequestReregistration(multiConfig,
-						oadrRequestReregistrationType);
-				response = payloadHandler.payloadToString(multiConfig, handle, false);
+					LOGGER.info(username + " - OadrRequestReregistrationType");
 
-				multiXmppClientConfig.sendRegisterPartyMessage(response);
+					Object handle = oadr20bVENEiRegisterPartyService.oadrRequestReregistration(multiConfig,
+							oadrRequestReregistrationType);
+					response = payloadHandler.payloadToString(multiConfig, handle, false);
 
-			} else if (unmarshal instanceof OadrCancelPartyRegistrationType) {
+					multiXmppClientConfig.sendRegisterPartyMessage(response);
 
-				OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType = (OadrCancelPartyRegistrationType) unmarshal;
+				} else if (unmarshal instanceof OadrCancelPartyRegistrationType) {
 
-				LOGGER.info(username + " - OadrCancelPartyRegistrationType");
+					OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType = (OadrCancelPartyRegistrationType) unmarshal;
 
-				Object handle = oadr20bVENEiRegisterPartyService.oadrCancelPartyRegistration(multiConfig,
-						oadrCancelPartyRegistrationType);
-				response = payloadHandler.payloadToString(multiConfig, handle, false);
+					LOGGER.info(username + " - OadrCancelPartyRegistrationType");
 
-				multiXmppClientConfig.sendRegisterPartyMessage(response);
+					Object handle = oadr20bVENEiRegisterPartyService.oadrCancelPartyRegistration(multiConfig,
+							oadrCancelPartyRegistrationType);
+					response = payloadHandler.payloadToString(multiConfig, handle, false);
 
-			} else if (unmarshal instanceof OadrCancelReportType) {
+					multiXmppClientConfig.sendRegisterPartyMessage(response);
 
-				OadrCancelReportType oadrCancelReportType = (OadrCancelReportType) unmarshal;
+				} else if (unmarshal instanceof OadrCancelReportType) {
 
-				LOGGER.info(username + " - OadrCancelReport");
+					OadrCancelReportType oadrCancelReportType = (OadrCancelReportType) unmarshal;
 
-				Object handle = reportService.oadrCancelReport(multiConfig, oadrCancelReportType);
-				response = payloadHandler.payloadToString(multiConfig, handle, false);
+					LOGGER.info(username + " - OadrCancelReport");
 
-				multiXmppClientConfig.sendReportMessage(response);
+					Object handle = reportService.oadrCancelReport(multiConfig, oadrCancelReportType);
+					response = payloadHandler.payloadToString(multiConfig, handle, false);
 
-			} else if (unmarshal instanceof OadrCreateReportType) {
+					multiXmppClientConfig.sendReportMessage(response);
 
-				OadrCreateReportType oadrCreateReportType = (OadrCreateReportType) unmarshal;
+				} else if (unmarshal instanceof OadrCreateReportType) {
 
-				LOGGER.info(username + " - OadrCreateReport");
+					OadrCreateReportType oadrCreateReportType = (OadrCreateReportType) unmarshal;
 
-				Object handle = reportService.oadrCreateReport(multiConfig, oadrCreateReportType);
-				response = payloadHandler.payloadToString(multiConfig, handle, false);
+					LOGGER.info(username + " - OadrCreateReport");
 
-				multiXmppClientConfig.sendReportMessage(response);
+					Object handle = reportService.oadrCreateReport(multiConfig, oadrCreateReportType);
+					response = payloadHandler.payloadToString(multiConfig, handle, false);
 
-			} else if (unmarshal instanceof OadrCreatedReportType) {
+					multiXmppClientConfig.sendReportMessage(response);
 
-				OadrCreatedReportType oadrCreatedReportType = (OadrCreatedReportType) unmarshal;
+				} else if (unmarshal instanceof OadrCreatedReportType) {
 
-				LOGGER.info(username + " - OadrCreateReport");
+					OadrCreatedReportType oadrCreatedReportType = (OadrCreatedReportType) unmarshal;
 
-				reportService.oadrCreatedReport(multiConfig, oadrCreatedReportType);
+					LOGGER.info(username + " - OadrCreatedReport");
 
-			} else if (unmarshal instanceof OadrRegisterReportType) {
+					reportService.oadrCreatedReport(multiConfig, oadrCreatedReportType);
 
-				OadrRegisterReportType oadrRegisterReportType = (OadrRegisterReportType) unmarshal;
+				} else if (unmarshal instanceof OadrRegisterReportType) {
 
-				LOGGER.info(username + " - OadrRegisterReport");
+					OadrRegisterReportType oadrRegisterReportType = (OadrRegisterReportType) unmarshal;
 
-				Object handle = reportService.oadrRegisterReport(multiConfig, oadrRegisterReportType);
-				response = payloadHandler.payloadToString(multiConfig, handle, false);
+					LOGGER.info(username + " - OadrRegisterReport");
 
-				multiXmppClientConfig.sendReportMessage(response);
+					Object handle = reportService.oadrRegisterReport(multiConfig, oadrRegisterReportType);
+					response = payloadHandler.payloadToString(multiConfig, handle, false);
 
-			} else if (unmarshal instanceof OadrUpdateReportType) {
+					multiXmppClientConfig.sendReportMessage(response);
 
-				OadrUpdateReportType oadrUpdateReportType = (OadrUpdateReportType) unmarshal;
+				} else if (unmarshal instanceof OadrUpdateReportType) {
 
-				LOGGER.info(username + " - OadrUpdateReport");
+					OadrUpdateReportType oadrUpdateReportType = (OadrUpdateReportType) unmarshal;
 
-				Object handle = reportService.oadrUpdateReport(multiConfig, oadrUpdateReportType);
-				response = payloadHandler.payloadToString(multiConfig, handle, false);
+					LOGGER.info(username + " - OadrUpdateReport");
 
-				multiXmppClientConfig.sendReportMessage(response);
+					Object handle = reportService.oadrUpdateReport(multiConfig, oadrUpdateReportType);
+					response = payloadHandler.payloadToString(multiConfig, handle, false);
+
+					multiXmppClientConfig.sendReportMessage(response);
+
+				} else if (unmarshal instanceof OadrRegisteredReportType) {
+
+					LOGGER.info(username + " - OadrRegisteredReport");
+
+				} else if (unmarshal instanceof OadrCreatedOptType) {
+
+					LOGGER.info(username + " - OadrCreatedOpt");
+
+				} else if (unmarshal instanceof OadrCanceledOptType) {
+
+					LOGGER.info(username + " - OadrCanceledOp");
+
+				}
 
 			}
 
 		} catch (Oadr20bUnmarshalException e) {
 			LOGGER.error(e.getMessage(), e);
+			LOGGER.error(payload);
 		} catch (Oadr20bApplicationLayerException e) {
 			LOGGER.error(e.getMessage(), e);
+			LOGGER.error(payload);
 		} catch (Oadr20bXMLSignatureValidationException e) {
 			LOGGER.error(e.getMessage(), e);
+			LOGGER.error(payload);
 		} catch (Oadr20bMarshalException e) {
 			LOGGER.error(e.getMessage(), e);
+			LOGGER.error(payload);
 		} catch (Oadr20bXMLSignatureException e) {
 			LOGGER.error(e.getMessage(), e);
+			LOGGER.error(payload);
 		} catch (OadrSecurityException e) {
 			LOGGER.error(e.getMessage());
+			LOGGER.error(payload);
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage(), e);
+			LOGGER.error(payload);
 		}
 
 	}

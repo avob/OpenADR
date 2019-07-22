@@ -291,11 +291,11 @@ public class DemandResponseEventService {
 			List<Ven> vens = findVenForTarget(event, toAdd);
 			List<VenDemandResponseEvent> list = new ArrayList<VenDemandResponseEvent>();
 			for (Ven ven : vens) {
-				if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
+//				if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
 					if (dto.isPublished()) {
 						pushAsync(Arrays.asList(ven), event.getDescriptor().getOadrProfile());
 					}
-				}
+//				}
 				list.add(new VenDemandResponseEvent(event, ven));
 			}
 			venDemandResponseEventDao.saveAll(list);
@@ -317,9 +317,11 @@ public class DemandResponseEventService {
 	public void distributeEventToPushVen(DemandResponseEvent event) {
 		List<Ven> vens = findVenForTarget(event, event.getTargets());
 		for (Ven ven : vens) {
-			if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
+//			if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
 				pushAsync(Arrays.asList(ven), event.getDescriptor().getOadrProfile());
-			}
+//			} else {
+//				
+//			}
 		}
 	}
 

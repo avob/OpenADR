@@ -64,7 +64,8 @@ public class Oadr20bVENEiReportService {
 		String requestID = oadrRegisterReportType.getRequestID();
 		String venID = oadrRegisterReportType.getVenID();
 
-		return Oadr20bEiReportBuilders.newOadr20bRegisteredReportBuilder(requestID, HttpStatus.OK_200, venID).build();
+		return Oadr20bEiReportBuilders.newOadr20bRegisteredReportBuilder(requestID, HttpStatus.OK_200,
+				vtnConfig.getVenSessionConfig().getVenId()).build();
 
 	}
 
@@ -182,7 +183,7 @@ public class Oadr20bVENEiReportService {
 		if (response != null) {
 
 			return payloadHandler.payloadToString(multiConfig, response, sign);
-			
+
 		}
 
 		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiReport");

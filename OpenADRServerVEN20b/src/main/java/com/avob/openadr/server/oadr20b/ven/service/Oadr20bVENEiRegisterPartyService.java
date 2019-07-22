@@ -77,6 +77,8 @@ public class Oadr20bVENEiRegisterPartyService {
 		String venID = oadrRequestReregistrationType.getVenID();
 		int responseCode = HttpStatus.OK_200;
 		reinitRegistration(vtnConfiguration);
+		
+		oadrPollService.reinitPoll(vtnConfiguration);
 
 		return Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestId, responseCode, venID).build();
 	}

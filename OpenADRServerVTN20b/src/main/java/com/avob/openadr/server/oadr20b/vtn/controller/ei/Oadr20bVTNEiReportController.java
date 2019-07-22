@@ -26,6 +26,7 @@ import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCancelRepor
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCreateReportApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bCreatedReportApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bRegisterReportApplicationLayerException;
+import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bRegisteredReportApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.exception.eireport.Oadr20bUpdateReportApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
@@ -56,7 +57,8 @@ public class Oadr20bVTNEiReportController {
 			Oadr20bQueryRegistrationTypeApplicationLayerException, Oadr20bRegisterReportApplicationLayerException,
 			Oadr20bUpdateReportApplicationLayerException, Oadr20bCancelReportApplicationLayerException,
 			Oadr20bCreateReportApplicationLayerException, Oadr20bCreatedReportApplicationLayerException,
-			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException {
+			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException,
+			Oadr20bRegisteredReportApplicationLayerException {
 
 		return reportService.request(principal.getName(), payload);
 	}

@@ -5,16 +5,12 @@ import java.io.IOException;
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
-import org.jivesoftware.smack.SmackException.NotConnectedException;
-import org.jxmpp.jid.Jid;
-import org.jxmpp.jid.impl.JidCreate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
@@ -165,8 +161,11 @@ public class Oadr20bPushListener {
 					// protocol)
 				}
 			} else if (OadrTransportType.XMPP.value().equals(readValue.getVenTransport())) {
-				Jid from = JidCreate.from(readValue.getVenPushUrl());
-				xmppUplinkClient.getUplinkClient().sendMessage(from, readValue.getPayload());
+
+				Object unmarshal = jaxbContext.unmarshal(readValue.getPayload());
+				oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
+						readValue.isXmlSignature(), unmarshal);
+
 			}
 
 		} catch (JsonParseException e) {
@@ -176,12 +175,6 @@ public class Oadr20bPushListener {
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage());
 		} catch (Oadr20bUnmarshalException e) {
-			LOGGER.error(e.getMessage());
-		} catch (NotConnectedException e) {
-			LOGGER.error(e.getMessage());
-		} catch (Oadr20bMarshalException e) {
-			LOGGER.error(e.getMessage());
-		} catch (InterruptedException e) {
 			LOGGER.error(e.getMessage());
 		}
 	}

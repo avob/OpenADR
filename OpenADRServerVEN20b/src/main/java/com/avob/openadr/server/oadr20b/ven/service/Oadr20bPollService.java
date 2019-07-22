@@ -108,10 +108,7 @@ public class Oadr20bPollService {
 				OadrRequestReregistrationType val = (OadrRequestReregistrationType) payload;
 
 				OadrResponseType oadrRequestReregistration = oadr20bVENEiRegisterPartyService
-						.oadrRequestReregistration(vtnSession, val);
-				
-				reinitPoll(vtnSession);
-				
+						.oadrRequestReregistration(vtnSession, val);				
 				
 				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
 						.oadrResponseReregisterParty(oadrRequestReregistration);
@@ -179,9 +176,9 @@ public class Oadr20bPollService {
 		@Override
 		public void run() {
 
-			if (oadr20bVENEiRegisterPartyService.getRegistration(vtnSession) == null) {
-				cancelHttpScheduledPullRequestTask(vtnSession, false);
-			}
+//			if (oadr20bVENEiRegisterPartyService.getRegistration(vtnSession) == null) {
+//				cancelHttpScheduledPullRequestTask(vtnSession, true);
+//			}
 
 			OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(vtnSession.getVenSessionConfig().getVenId())
 					.build();
@@ -216,12 +213,13 @@ public class Oadr20bPollService {
 	public void cancelHttpScheduledPullRequestTask(VtnSessionConfiguration vtnConfiguration,
 			boolean mayInterruptIfRunning) {
 		if (httpScheduledPullRequestTask.get(vtnConfiguration.getVtnId()) != null) {
-			httpScheduledPullRequestTask.get(vtnConfiguration.getVtnId()).cancel(mayInterruptIfRunning);
+			httpScheduledPullRequestTask.get(vtnConfiguration.getVtnId()).cancel(true);
+			httpScheduledPullRequestTask.remove(vtnConfiguration.getVtnId());
 		}
 	}
 
 	public void reinitPoll(VtnSessionConfiguration vtnConfiguration) {
-		cancelHttpScheduledPullRequestTask(vtnConfiguration, false);
+		cancelHttpScheduledPullRequestTask(vtnConfiguration, true);
 		initPoll(vtnConfiguration);
 	}
 
