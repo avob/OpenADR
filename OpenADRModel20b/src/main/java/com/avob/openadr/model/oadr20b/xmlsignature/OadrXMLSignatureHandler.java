@@ -8,7 +8,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -281,8 +280,6 @@ public class OadrXMLSignatureHandler {
 		// doc)
 //		dsc.setIdAttributeNS(signedObjectNode, "http://openadr.org/oadr-2.0b/2012/07", "Id");
 
-		PublicKey publicKey = certificate.getPublicKey();
-
 		XMLSignatureFactory fac = null;
 		SignedInfo si = null;
 		try {
@@ -364,11 +361,11 @@ public class OadrXMLSignatureHandler {
 //		ASN1ObjectIdentifier alg = subPubKeyInfo.getAlgorithm().getAlgorithm();
 //		
 		KeyInfoFactory kif = fac.getKeyInfoFactory();
-        List<Object> x509Content = new ArrayList<Object>();
-        x509Content.add(certificate.getSubjectX500Principal().getName());
-        x509Content.add(certificate);
-        X509Data xd = kif.newX509Data(x509Content);
-         ki = kif.newKeyInfo(Collections.singletonList(xd));
+		List<Object> x509Content = new ArrayList<Object>();
+		x509Content.add(certificate.getSubjectX500Principal().getName());
+		x509Content.add(certificate);
+		X509Data xd = kif.newX509Data(x509Content);
+		ki = kif.newKeyInfo(Collections.singletonList(xd));
 
 //		try {
 //			KeyInfoFactory kif = fac.getKeyInfoFactory();

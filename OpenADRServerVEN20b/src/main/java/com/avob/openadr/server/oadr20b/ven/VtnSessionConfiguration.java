@@ -18,6 +18,7 @@ public class VtnSessionConfiguration {
 
 	private static final String VTN_XMPP_HOST = "oadr.vtn.xmpp.host";
 	private static final String VTN_XMPP_PORT = "oadr.vtn.xmpp.port";
+	private static final String VTN_XMPP_DOMAIN = "oadr.vtn.xmpp.domain";
 
 	private static final String AUTHENTIFICATION_BASIC_USER = "oadr.vtn.security.authentication.basic.username";
 	private static final String AUTHENTIFICATION_BASIC_PASS = "oadr.vtn.security.authentication.basic.password";
@@ -32,10 +33,10 @@ public class VtnSessionConfiguration {
 	private String vtnUrl;
 	private String vtnXmppHost;
 	private Integer vtnXmppPort;
+	private String vtnXmppDomain;
 	private String vtnXmppUser;
 	private String vtnXmppPass;
 	private VenConfig venSessionConfig;
-	
 
 	public VtnSessionConfiguration(Properties properties, VenConfig defaultVenSessionConfig) {
 		setVenSessionConfig(defaultVenSessionConfig.clone());
@@ -74,6 +75,8 @@ public class VtnSessionConfiguration {
 				this.setVtnXmppHost(prop);
 			} else if (VTN_XMPP_PORT.equals(keyStr)) {
 				this.setVtnXmppPort(Integer.parseInt(prop));
+			} else if (VTN_XMPP_DOMAIN.equals(keyStr)) {
+				this.setVtnXmppDomain(prop);
 			} else if (AUTHENTIFICATION_BASIC_USER.equals(keyStr)) {
 				getVenSessionConfig().setBasicUsername(prop);
 			} else if (AUTHENTIFICATION_BASIC_PASS.equals(keyStr)) {
@@ -156,6 +159,14 @@ public class VtnSessionConfiguration {
 
 	public void setVtnXmppPass(String vtnXmppPass) {
 		this.vtnXmppPass = vtnXmppPass;
+	}
+
+	public String getVtnXmppDomain() {
+		return vtnXmppDomain;
+	}
+
+	public void setVtnXmppDomain(String vtnXmppDomain) {
+		this.vtnXmppDomain = vtnXmppDomain;
 	}
 
 }

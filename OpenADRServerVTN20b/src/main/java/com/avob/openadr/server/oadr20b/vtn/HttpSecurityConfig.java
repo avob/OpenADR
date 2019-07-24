@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,7 +50,9 @@ import com.avob.openadr.server.common.vtn.security.DigestUserDetailsService;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Value("${vtn.cors:http://vtn.oadr.com:3000,http://testlocal:3000}")
+	private static final Logger LOGGER = LoggerFactory.getLogger(HttpSecurityConfig.class);
+
+	@Value("${vtn.cors:@null}}")
 	private String corsStr;
 
 	private List<String> cors = null;
@@ -101,6 +105,8 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		http.authorizeRequests().regexMatchers(HttpMethod.POST, ".*/auth/.*").permitAll();
 
+		http.authorizeRequests().antMatchers("/testvtn/").permitAll();
+
 		http.authorizeRequests().anyRequest().authenticated().and().x509().subjectPrincipalRegex("CN=(.*?)(?:,|$)")
 				.authenticationUserDetailsService(oadr20bX509AuthenticatedUserDetailsService);
 
@@ -115,9 +121,11 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 				if (arg0.getServletPath().contains("/Ven") || arg0.getServletPath().contains("swagger")
 						|| arg0.getServletPath().contains("swagger-resources") || arg0.getServletPath().contains("v2")
 						|| arg0.getServletPath().contains("swagger-ui")) {
+					LOGGER.error(arg0.getServletPath(), arg2);
 					arg1.setStatus(HttpStatus.UNAUTHORIZED_401);
 //					arg1.addHeader("WWW-Authenticate", "Basic");
 				} else {
+					LOGGER.error(arg0.getServletPath(), arg2);
 					arg1.setStatus(HttpStatus.FORBIDDEN_403);
 
 				}
@@ -131,7 +139,6 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring()
-
 				.regexMatchers("/health");
 
 	}

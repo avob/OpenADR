@@ -69,8 +69,8 @@ public class OadrXmppClient20b {
 
 	private Map<String, Jid> discoveredXmppOadrServices;
 
-	private static XMPPTCPConnectionConfiguration anonymousConnection(String host, int port, String resource,
-			SSLContext context) throws OadrXmppException {
+	private static XMPPTCPConnectionConfiguration anonymousConnection(String host, int port, String domain,
+			String resource, SSLContext context) throws OadrXmppException {
 		try {
 			return XMPPTCPConnectionConfiguration.builder()
 //				.setHostAddress(address)
@@ -85,14 +85,14 @@ public class OadrXmppClient20b {
 //				.setUsernameAndPassword("admin", "mouaiccool")
 //				.addEnabledSaslMechanism("EXTERNAL")
 //				.addEnabledSaslMechanism("ANONYMOUS")
-					.setResource(resource).setXmppDomain(host).setCustomSSLContext(context).build();
+					.setResource(resource).setXmppDomain(domain).setCustomSSLContext(context).build();
 		} catch (XmppStringprepException e) {
 			throw new OadrXmppException(e);
 		}
 	}
 
-	private static XMPPTCPConnectionConfiguration passwordConnection(String host, int port, String resource,
-			SSLContext context, String username, String password) throws OadrXmppException {
+	private static XMPPTCPConnectionConfiguration passwordConnection(String host, int port, String domain,
+			String resource, SSLContext context, String username, String password) throws OadrXmppException {
 		try {
 			return XMPPTCPConnectionConfiguration.builder()
 //				.setHostAddress(address)
@@ -108,15 +108,13 @@ public class OadrXmppClient20b {
 //					.addEnabledSaslMechanism("EXTERNAL")
 //				.addEnabledSaslMechanism("ANONYMOUS"
 //					.performSaslExternalAuthentication(context)
-					.setResource(resource).setXmppDomain(host)
-					.setCustomSSLContext(context)
-					.build();
+					.setResource(resource).setXmppDomain(domain).setCustomSSLContext(context).build();
 		} catch (XmppStringprepException e) {
 			throw new OadrXmppException(e);
 		}
 	}
 
-	private OadrXmppClient20b(XMPPTCPConnectionConfiguration config, String venId, String host, int port,
+	private OadrXmppClient20b(XMPPTCPConnectionConfiguration config, String venId, String host, int port, String domain,
 			String resource, SSLContext context, StanzaListener onMessageListener) throws OadrXmppException {
 		try {
 			SASLAnonymous mechanism = new SASLAnonymous();
@@ -131,8 +129,8 @@ public class OadrXmppClient20b {
 
 			connection = new XMPPTCPConnection(config);
 
-			setDomainJid(JidCreate.domainBareFrom(XMPP_OADR_SUBDOMAIN + "." + host));
-			setClientJid(JidCreate.entityFullFrom(venId, XMPP_OADR_SUBDOMAIN + "." + host, resource));
+			setDomainJid(JidCreate.domainBareFrom(XMPP_OADR_SUBDOMAIN + "." + domain));
+			setClientJid(JidCreate.entityFullFrom(venId, XMPP_OADR_SUBDOMAIN + "." + domain, resource));
 
 			chatManager = ChatManager.getInstanceFor(connection);
 
@@ -179,17 +177,17 @@ public class OadrXmppClient20b {
 
 	}
 
-	public OadrXmppClient20b(String venId, String host, int port, String resource, SSLContext context,
+	public OadrXmppClient20b(String venId, String host, int port, String domain, String resource, SSLContext context,
 			StanzaListener onMessageListener) throws OadrXmppException {
-		this(OadrXmppClient20b.anonymousConnection(host, port, resource, context), venId, host, port, resource, context,
-				onMessageListener);
+		this(OadrXmppClient20b.anonymousConnection(host, port, domain, resource, context), venId, host, port, domain,
+				resource, context, onMessageListener);
 
 	}
 
-	public OadrXmppClient20b(String venId, String host, int port, String resource, SSLContext context, String password,
-			StanzaListener onMessageListener) throws OadrXmppException {
-		this(OadrXmppClient20b.passwordConnection(host, port, resource, context, venId, password), venId, host, port,
-				resource, context, onMessageListener);
+	public OadrXmppClient20b(String venId, String host, int port, String domain, String resource, SSLContext context,
+			String password, StanzaListener onMessageListener) throws OadrXmppException {
+		this(OadrXmppClient20b.passwordConnection(host, port, domain, resource, context, venId, password), venId, host,
+				port, domain, resource, context, onMessageListener);
 
 	}
 

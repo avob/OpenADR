@@ -149,6 +149,10 @@ public class MultiVtnConfig {
 						.withVenID(session.getVtnId()).withResource("client").withSSLContext(sslContext)
 						.withListener(xmppVenListeners);
 
+				if (session.getVtnXmppDomain() != null) {
+					builder.withDomain(session.getVtnXmppDomain());
+				}
+
 				if (session.getVtnXmppUser() != null && session.getVtnXmppPass() != null) {
 					builder.withPassword(session.getVtnXmppPass());
 				}

@@ -62,7 +62,6 @@ public class Oadr20bVENEiReportService {
 			OadrRegisterReportType oadrRegisterReportType) {
 
 		String requestID = oadrRegisterReportType.getRequestID();
-		String venID = oadrRegisterReportType.getVenID();
 
 		return Oadr20bEiReportBuilders.newOadr20bRegisteredReportBuilder(requestID, HttpStatus.OK_200,
 				vtnConfig.getVenSessionConfig().getVenId()).build();

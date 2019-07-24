@@ -274,12 +274,13 @@ public class Oadr20bVTNEiEventControllerTest {
 				OadrDataBaseSetup.VEN_SECURITY_SESSION, poll, HttpStatus.OK_200, OadrDistributeEventType.class);
 		assertEquals(String.valueOf(HttpStatus.OK_200), oadrDistributeEventType.getEiResponse().getResponseCode());
 
+		venPollService.deleteAll();
+		assertEquals(new Long(0), venPollService.countAll());
 	}
 
 	@Test
 	public void testOadrCreatedEventTypeSuccessCase() throws Exception {
 
-		venPollService.deleteAll();
 		OadrCreatedEventType build = Oadr20bEiEventBuilders.newCreatedEventBuilder(OadrDataBaseSetup.VEN, "0", 123)
 				.addEventResponse(Oadr20bEiEventBuilders
 						.newOadr20bCreatedEventEventResponseBuilder("1", 0L, "0", 123, OptTypeType.OPT_IN).build())
@@ -288,6 +289,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		oadrMockMvc.postEiEventAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, build, HttpStatus.OK_200,
 				OadrResponseType.class);
 
+		venPollService.deleteAll();
 		assertEquals(new Long(0), venPollService.countAll());
 
 	}
@@ -341,7 +343,6 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Test
 	public void testScenario1() throws Exception {
 
-		assertEquals(new Long(0), venPollService.countAll());
 		// create and send DR Event to DemandResponseEvent API
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
@@ -487,6 +488,9 @@ public class Oadr20bVTNEiEventControllerTest {
 		assertEquals(DemandResponseEventOptEnum.OPT_OUT, venOpt);
 
 		demandResponseEventService.delete(eventId);
+
+		venPollService.deleteAll();
+		assertEquals(new Long(0), venPollService.countAll());
 
 	}
 
@@ -808,6 +812,9 @@ public class Oadr20bVTNEiEventControllerTest {
 		for (DemandResponseEventReadDto e : created) {
 			demandResponseEventService.delete(e.getId());
 		}
+
+		venPollService.deleteAll();
+		assertEquals(new Long(0), venPollService.countAll());
 
 	}
 

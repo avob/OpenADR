@@ -55,7 +55,6 @@ public class VTNJettyServerCustomizer implements JettyServerCustomizer {
 		config.setSendXPoweredBy(false);
 		config.setSendServerVersion(false);
 		config.addCustomizer(new SecureRequestCustomizer());
-
 		return config;
 	}
 
@@ -83,7 +82,7 @@ public class VTNJettyServerCustomizer implements JettyServerCustomizer {
 		sslContextFactory.setIncludeCipherSuites(this.ciphers);
 
 		// require client certificate authentication
-		sslContextFactory.setWantClientAuth(true);
+//		sslContextFactory.setWantClientAuth(true);
 
 		sslContextFactory.addLifeCycleListener(new Listener() {
 

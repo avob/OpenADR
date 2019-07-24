@@ -9,6 +9,7 @@ public class OadrXmppClient20bBuilder {
 	private String venId;
 	private String host;
 	private Integer port;
+	private String domain;
 	private SSLContext sslContext;
 	private String password;
 	private String resource;
@@ -45,12 +46,22 @@ public class OadrXmppClient20bBuilder {
 		return this;
 	}
 
+	public OadrXmppClient20bBuilder withDomain(String domain) {
+		this.domain = domain;
+		return this;
+	}
+
 	public OadrXmppClient20b build() throws OadrXmppException {
+		String domain = this.domain;
+		if (domain == null) {
+			domain = host;
+		}
+
 		if (this.password != null) {
-			return new OadrXmppClient20b(this.venId, this.host, this.port, this.resource, this.sslContext,
+			return new OadrXmppClient20b(this.venId, this.host, this.port, domain, this.resource, this.sslContext,
 					this.password, this.listener);
 		} else {
-			return new OadrXmppClient20b(this.venId, this.host, this.port, this.resource, this.sslContext,
+			return new OadrXmppClient20b(this.venId, this.host, this.port, domain, this.resource, this.sslContext,
 					this.listener);
 		}
 

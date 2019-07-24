@@ -72,18 +72,20 @@ public class XmppConnector {
 				String vtnId = vtnConfig.getVtnId();
 				String host = vtnConfig.getXmppHost();
 				int port = vtnConfig.getXmppPort();
+				String domain = (vtnConfig.getXmppDomain() != null) ? vtnConfig.getXmppDomain()
+						: vtnConfig.getXmppHost();
 
-				perOadrServiceDownlinkClient.put(REGISTERPARTY_SERVICE, new OadrXmppClient20b(vtnId, host, port,
+				perOadrServiceDownlinkClient.put(REGISTERPARTY_SERVICE, new OadrXmppClient20b(vtnId, host, port, domain,
 						REGISTERPARTY_SERVICE, sslContext, xmppRegisterPartyMessageListener));
 
-				perOadrServiceDownlinkClient.put(EVENT_SERVICE,
-						new OadrXmppClient20b(vtnId, host, port, EVENT_SERVICE, sslContext, xmppEventMessageListener));
+				perOadrServiceDownlinkClient.put(EVENT_SERVICE, new OadrXmppClient20b(vtnId, host, port, domain,
+						EVENT_SERVICE, sslContext, xmppEventMessageListener));
 
-				perOadrServiceDownlinkClient.put(REPORT_SERVICE, new OadrXmppClient20b(vtnId, host, port,
+				perOadrServiceDownlinkClient.put(REPORT_SERVICE, new OadrXmppClient20b(vtnId, host, port, domain,
 						REPORT_SERVICE, sslContext, xmppReportMessageListener));
 
-				perOadrServiceDownlinkClient.put(OPT_SERVICE,
-						new OadrXmppClient20b(vtnId, host, port, OPT_SERVICE, sslContext, xmppOptMessageListener));
+				perOadrServiceDownlinkClient.put(OPT_SERVICE, new OadrXmppClient20b(vtnId, host, port, domain,
+						OPT_SERVICE, sslContext, xmppOptMessageListener));
 
 				LOGGER.info("Xmpp VTN connector successfully initialized");
 

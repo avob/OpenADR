@@ -50,7 +50,9 @@ public class XmppUplinkClient {
 				String vtnId = vtnConfig.getOadr20bFingerprint();
 				String host = vtnConfig.getXmppHost();
 				int port = vtnConfig.getXmppPort();
-				setUplinkClient(new OadrXmppClient20b(vtnId, host, port, "uplink", sslContext, null));
+				String domain = (vtnConfig.getXmppDomain() != null) ? vtnConfig.getXmppDomain()
+						: vtnConfig.getXmppHost();
+				setUplinkClient(new OadrXmppClient20b(vtnId, host, port, domain, "uplink", sslContext, null));
 
 				LOGGER.info("Xmpp VTN uplink client successfully initialized");
 

@@ -56,6 +56,7 @@ public class VtnConfig {
 
 	public static final String XMPP_HOST_CONF = "oadr.xmpp.host";
 	public static final String XMPP_PORT_CONF = "oadr.xmpp.port";
+	public static final String XMPP_DOMAIN_CONF = "oadr.xmpp.domain";
 
 	@Value("${" + CONTEXT_PATH_CONF + ":#{null}}")
 	private String contextPath;
@@ -124,6 +125,9 @@ public class VtnConfig {
 
 	@Value("${" + XMPP_PORT_CONF + ":#{null}}")
 	private Integer xmppPort;
+	
+	@Value("${" + XMPP_DOMAIN_CONF + ":#{null}}")
+	private String xmppDomain;
 
 	@Autowired
 	private ConfigurableEnvironment env;
@@ -401,6 +405,14 @@ public class VtnConfig {
 
 	private void setOadr20bFingerprint(String oadr20bFingerprint) {
 		this.oadr20bFingerprint = oadr20bFingerprint;
+	}
+
+	public String getXmppDomain() {
+		return xmppDomain;
+	}
+
+	public void setXmppDomain(String xmppDomain) {
+		this.xmppDomain = xmppDomain;
 	}
 
 }
