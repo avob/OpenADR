@@ -29,7 +29,7 @@ public class VTN20aSecurityApplicationTest {
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(VTN20aApplication.class, args);
+		SpringApplication.run(VTN20aSecurityApplicationTest.class, args);
 	}
 
 }

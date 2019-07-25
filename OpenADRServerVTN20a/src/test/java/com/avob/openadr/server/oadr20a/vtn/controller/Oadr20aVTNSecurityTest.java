@@ -94,9 +94,9 @@ public class Oadr20aVTNSecurityTest {
 	@Resource
 	private DigestAuthenticationProvider digestAuthenticationProvider;
 
-	private static final String eiEventEndpointUrl = "https://localhost:8181/testvtn";
+	private static final String eiEventEndpointUrl = "https://localhost:8182/testvtn";
 
-	private static final String demandResponseEnpointUrl = "https://localhost:8181/testvtn/DemandResponseEvent/";
+	private static final String demandResponseEnpointUrl = "https://localhost:8182/testvtn/DemandResponseEvent/";
 
 	private static final String MARKET_CONTEXT_NAME = "http://oadr.avob.com";
 
