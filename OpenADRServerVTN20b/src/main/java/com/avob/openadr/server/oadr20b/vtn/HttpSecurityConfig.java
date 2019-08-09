@@ -105,7 +105,7 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		http.authorizeRequests().regexMatchers(HttpMethod.POST, ".*/auth/.*").permitAll();
 
-		http.authorizeRequests().antMatchers("/testvtn/").permitAll();
+//		http.authorizeRequests().antMatchers("/testvtn/").permitAll();
 
 		http.authorizeRequests().anyRequest().authenticated().and().x509().subjectPrincipalRegex("CN=(.*?)(?:,|$)")
 				.authenticationUserDetailsService(oadr20bX509AuthenticatedUserDetailsService);

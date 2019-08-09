@@ -16,8 +16,8 @@ const connectRouterHistory = connectRouter( history );
 
 export var config = {
 //		vtnSwaggerUrl: 'https://192.168.1.11:8181/testvtn/v2/api-docs',
-  vtnSwaggerUrl: 'https://192.168.10.42:8181/testvtn/v2/api-docs',
-//  vtnSwaggerUrl: 'https://vtn.oadr.com:8181/testvtn/v2/api-docs',
+//  vtnSwaggerUrl: 'https://192.168.10.42:8181/testvtn/v2/api-docs',
+  vtnSwaggerUrl: 'https://vtn.oadr.com:8181/testvtn/v2/api-docs',
   isConnectionPending: true,
   isConnected: false
 };
