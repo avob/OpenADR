@@ -450,6 +450,8 @@ public class Oadr20bVTNEiReportService {
 		}
 
 		if (hasMetadataReport) {
+			otherReportRequestSpecifierDao
+					.deleteByOtherReportCapabilityDescriptionOtherReportCapabilitySource(ven);
 			otherReportRequestService.deleteByOtherReportCapabilitySource(ven);
 		}
 

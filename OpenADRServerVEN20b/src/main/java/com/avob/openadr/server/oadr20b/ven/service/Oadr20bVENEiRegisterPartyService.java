@@ -124,6 +124,7 @@ public class Oadr20bVENEiRegisterPartyService {
 		String requestId = "0";
 		OadrQueryRegistrationType queryRegistration = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bQueryRegistrationBuilder(requestId)
+				
 				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value()).build();
 
 		try {
@@ -254,6 +255,7 @@ public class Oadr20bVENEiRegisterPartyService {
 
 			builder.withOadrHttpPullModel(pullModel).withOadrTransportAddress(transportAddress)
 					.withOadrReportOnly(reportOnly).withOadrTransportName(transportType).withOadrVenName(venName)
+				
 					.withOadrXmlSignature(xmlSignature);
 
 		} else if (vtnConfig.getVtnXmppHost() != null && vtnConfig.getVtnXmppPort() != null) {
