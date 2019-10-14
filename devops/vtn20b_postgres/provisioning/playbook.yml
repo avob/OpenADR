@@ -40,6 +40,7 @@
 
   roles:
     - geerlingguy.postgresql
+    - geerlingguy.apache
     - remyma.ansible-springboot
     - ../../roles/common
     - ../../roles/nodejs

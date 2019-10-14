@@ -31,3 +31,17 @@ springboot_propertyfile_template: templates/application.properties
 springboot_configuration_template: templates/oadr-vtn20b.conf
 springboot_user: oadr-vtn20b
 springboot_group: oadr-vtn20b
+
+# APACHE2
+apache_listen_ip: "*"
+apache_listen_port_ssl: 443
+apache_mods_enabled:
+  - proxy.load
+  - ssl.load
+apache_vhosts_ssl:
+  - servername: "vtn.oadr.com"
+    documentroot: "/var/www/html"
+    certificate_file: "/opt/oadr-vtn20b/cert/vtn.oadr.com-rsa.crt"
+    certificate_key_file: "/opt/oadr-vtn20b/cert/vtn.oadr.com-rsa.key"
+    extra_parameters: |
+      ProxyPassMatch "/testvtn/(.*)$"  https://localhost:8181/testvtn/$1
