@@ -4,12 +4,12 @@
       path: /etc/openfire
     register: openfire_installed
 
-  - name: download openfire_4.3.2_all.deb
-    raw: wget -O openfire_4.3.2_all.deb https://www.igniterealtime.org/downloadServlet?filename=openfire/openfire_4.3.2_all.deb
+  - name: download openfire_4.4.1_all.deb
+    raw: wget -O openfire_4.4.1_all.deb https://www.igniterealtime.org/downloadServlet?filename=openfire/openfire_4.4.1_all.deb
     when: openfire_installed.stat.exists == false
 
-  - name: install openfire_4.3.2_all.deb
-    raw: sudo dpkg -i openfire_4.3.2_all.deb
+  - name: install openfire_4.4.1_all.deb
+    raw: sudo dpkg -i openfire_4.4.1_all.deb
     when: openfire_installed.stat.exists == false
 
   - name: Install openfire.xml
@@ -42,7 +42,12 @@
       group: openfire
     when: openfire_installed.stat.exists == false
 
-  - name: Init openfire system proeprties table
+  - name: Install OpenfireOadrPlugin
+    become: true
+    command: chdir=/usr/share/openfire/plugins wget -O OpenfireOadrPlugin-openfire-plugin-assembly.jar https://github.com/avob/openfire-oadr-plugin/releases/download/0.0.1/OpenfireOadrPlugin-openfire-plugin-assembly.jar 
+    when: openfire_installed.stat.exists == false
+
+  - name: Init openfire system properties table
     shell: psql -h localhost -U oadr-openfire -d oadr-openfire -f /tmp/ofproperty.sql; 
     environment:
       PGPASSWORD: 'supersecure'
@@ -107,6 +112,8 @@
   - name: Import CA certificate
     command: chdir=/usr/share/openfire/resources/security keytool -v -import -alias OadrCA -file /opt/oadr-vtn20b/cert/oadr.com.crt -deststorepass changeme -destkeystore client.truststore -deststoretype JKS -noprompt
 
+
+   
 
   # - name: Copy cert folder
   #   copy:

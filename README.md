@@ -36,6 +36,7 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 - VTN Control Swagger UI: https://vtn.oadr.com:8181/testvtn/swagger-ui.html
 - VTN Control UI: https://vtn.oadr.com:8181/testvtn/
 - VTN RabbitMQ Management UI: http://192.168.33.2:15672
+- VTN Openfire Management UI: http://192.168.33.2:9090
 - Nodered Terminal: http://192.168.33.2:1880 
 - Ven1 Nodered Dashboard: http://192.168.33.2:1880/ui/#!/0
 

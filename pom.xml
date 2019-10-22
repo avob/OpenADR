@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.avob</groupId>
 	<artifactId>OpenADR</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0-SNAPSHOT</version>
 	<name>OpenADR</name>
 	<description>OpenADR</description>
 	<packaging>pom</packaging>
@@ -13,7 +14,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<sonar.sources>src/main/java</sonar.sources>
-		<project.version>0.0.1-SNAPSHOT</project.version>
+		<project.version>0.1.0-SNAPSHOT</project.version>
 	</properties>
 
 
@@ -108,4 +109,17 @@
 		<module>./OpenADRServerVTN20b</module>
 
 	</modules>
+	<scm>
+		<url>https://github.com/avob/OpenADR</url>
+		<connection>scm:git:git://github.com/avob/OpenADR</connection>
+		<developerConnection>scm:git:git@github.com/avob/OpenADR</developerConnection>
+	</scm>
+	<developers>
+		<developer>
+			<email>zanni.bertrand@gmail.com</email>
+			<name>Bertrand Zanni</name>
+			<url>https://github.com/zanni</url>
+			<id>zanni</id>
+		</developer>
+	</developers>
 </project>

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 
+import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NoResponseException;
@@ -74,12 +75,14 @@ public class OadrXmppClient20b {
 		try {
 			return XMPPTCPConnectionConfiguration.builder()
 //				.setHostAddress(address)
+
 					.setHost(host).setPort(port)
 //				.allowEmptyOrNullUsernames()
 //				.setUsernameAndPassword(resource,resource)
 //				.setAuthzid(authzid)
 //				.setAuthzid(authzid)
-					.performSaslAnonymousAuthentication()
+					.performSaslAnonymousAuthentication().setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
+					.setCompressionEnabled(false)
 //				.addEnabledSaslMechanism("ANONYMOUS")
 //				.performSaslExternalAuthentication(context)
 //				.setUsernameAndPassword("admin", "mouaiccool")
@@ -99,6 +102,8 @@ public class OadrXmppClient20b {
 					.setHost(host).setPort(port)
 //				.allowEmptyOrNullUsernames()
 					.setUsernameAndPassword(username, password)
+					.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled).setCompressionEnabled(false)
+
 //				.setAuthzid(authzid)
 //				.setAuthzid(authzid)
 //					.performSaslAnonymousAuthentication()
@@ -128,6 +133,9 @@ public class OadrXmppClient20b {
 			EntityBareJid authzid = JidCreate.entityBareFrom(resource + "@" + host);
 
 			connection = new XMPPTCPConnection(config);
+			connection.setUseStreamManagement(false);
+			connection.setUseStreamManagementResumption(false);
+			connection.setReplyTimeout(20000);
 
 			setDomainJid(JidCreate.domainBareFrom(XMPP_OADR_SUBDOMAIN + "." + domain));
 			setClientJid(JidCreate.entityFullFrom(venId, XMPP_OADR_SUBDOMAIN + "." + domain, resource));

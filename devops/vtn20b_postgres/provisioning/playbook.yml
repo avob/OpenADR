@@ -46,6 +46,6 @@
     - ../../roles/nodejs
     - ../../roles/nodered
     - ../../roles/nodered-oadr-ven
-    - ../../roles/oadr-vtn20b
     - ../../roles/oadr-rabbitmq
     - ../../roles/oadr-openfire
+    - ../../roles/oadr-vtn20b

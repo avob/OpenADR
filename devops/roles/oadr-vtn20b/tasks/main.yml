@@ -75,7 +75,7 @@
 
   - name: Install oadr-vtn20b.jar 
     copy:
-      src: ../../../OpenADRServerVTN20b/target/OpenADRServerVTN20b-0.0.1-SNAPSHOT.jar
+      src: ../../../OpenADRServerVTN20b/target/OpenADRServerVTN20b-0.1.0-SNAPSHOT.jar
       dest: /opt/oadr-vtn20b/oadr-vtn20b.jar
 
   - name: Set oadr-vtn20b.jar permission 
