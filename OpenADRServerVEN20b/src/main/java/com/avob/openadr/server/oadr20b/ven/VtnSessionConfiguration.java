@@ -39,7 +39,7 @@ public class VtnSessionConfiguration {
 	private VenConfig venSessionConfig;
 
 	public VtnSessionConfiguration(Properties properties, VenConfig defaultVenSessionConfig) {
-		setVenSessionConfig(defaultVenSessionConfig.clone());
+		setVenSessionConfig(new VenConfig(defaultVenSessionConfig));
 		for (Map.Entry<Object, Object> e : properties.entrySet()) {
 			String keyStr = (String) e.getKey();
 			String prop = (String) e.getValue();
@@ -99,6 +99,10 @@ public class VtnSessionConfiguration {
 
 	public String getVtnId() {
 		return vtnId;
+	}
+	
+	public String getSlugifiedVtnId() {
+		return vtnId.replace("\\.", "").replace(":", "");
 	}
 
 	public void setVtnId(String vtnId) {

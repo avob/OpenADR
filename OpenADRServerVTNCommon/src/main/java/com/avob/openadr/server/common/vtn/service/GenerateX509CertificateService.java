@@ -51,7 +51,10 @@ public class GenerateX509CertificateService {
 		File file = path.toFile();
 
 		if (file.exists()) {
-			file.delete();
+			boolean delete = file.delete();
+			if (!delete) {
+				throw new IOException("file can't be deleted");
+			}
 		}
 
 		try (FileOutputStream outputStream = new FileOutputStream(file, true)) {

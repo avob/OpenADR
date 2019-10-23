@@ -132,7 +132,7 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 			return currentLine.trim().replaceAll(":", "").toLowerCase();
 
 		} catch (IOException ex) {
-			ex.printStackTrace(); // handle an exception here
+			LOGGER.error("", ex);
 		}
 		return null;
 	}

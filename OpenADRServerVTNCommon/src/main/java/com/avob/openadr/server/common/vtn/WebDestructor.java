@@ -34,7 +34,8 @@ public class WebDestructor implements ApplicationListener<ContextClosedEvent> {
 							+ executor.getActiveCount() + " work. Retry count is " + retryCount);
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					LOGGER.error("", e);
+					Thread.currentThread().interrupt();
 				}
 			}
 			if (!(retryCount < maxRetry))

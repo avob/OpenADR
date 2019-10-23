@@ -146,7 +146,7 @@ public class MultiVtnConfig {
 
 				OadrXmppClient20bBuilder builder = new OadrXmppClient20bBuilder()
 						.withHostAndPort(session.getVtnXmppHost(), session.getVtnXmppPort())
-						.withVenID(session.getVtnId()).withResource("client").withSSLContext(sslContext)
+						.withVenID(session.getSlugifiedVtnId()).withResource("client").withSSLContext(sslContext)
 						.withListener(xmppVenListeners);
 
 				if (session.getVtnXmppDomain() != null) {
@@ -168,7 +168,7 @@ public class MultiVtnConfig {
 				} else {
 					venClient = new OadrXmppVenClient20b(oadrXmppClient20b);
 				}
-				getMultiXmppClientConfig().put(session.getVtnId(), venClient);
+				putMultiXmppClientConfig(session, venClient);
 
 			} catch (KeyStoreException e) {
 				throw new OadrVTNInitializationException(e);
@@ -329,11 +329,11 @@ public class MultiVtnConfig {
 	}
 
 	public OadrXmppVenClient20b getMultiXmppClientConfig(VtnSessionConfiguration vtnConfiguration) {
-		return multiXmppClientConfig.get(vtnConfiguration.getVtnId());
+		return multiXmppClientConfig.get(vtnConfiguration.getSlugifiedVtnId());
 	}
 
-	public Map<String, OadrXmppVenClient20b> getMultiXmppClientConfig() {
-		return multiXmppClientConfig;
+	public void putMultiXmppClientConfig(VtnSessionConfiguration vtnConfiguration, OadrXmppVenClient20b venClient) {
+		multiXmppClientConfig.put(vtnConfiguration.getVtnId(), venClient);
 	}
 
 	public void setMultiXmppClientConfig(Map<String, OadrXmppVenClient20b> multiXmppClientConfig) {

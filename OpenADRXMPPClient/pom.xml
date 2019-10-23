@@ -2,10 +2,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.avob.openadr.client.xmpp</groupId>
 	<artifactId>OpenADRXMPPClient</artifactId>
+	<name>OpenADRXMPPClient</name>
+	<description>Oadr2.0b XMPP client framework</description>
 	<parent>
-		<groupId>com.avob</groupId>
+		<groupId>com.avob.openadr</groupId>
 		<artifactId>OpenADR</artifactId>
 		<version>0.1.0-SNAPSHOT</version>
 		<relativePath>../</relativePath>
@@ -38,12 +39,12 @@
 			<version>${smack.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.avob.openadr.security</groupId>
+			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRSecurity</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.avob.openadr.model</groupId>
+			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRModel20b</artifactId>
 			<version>${project.version}</version>
 		</dependency>

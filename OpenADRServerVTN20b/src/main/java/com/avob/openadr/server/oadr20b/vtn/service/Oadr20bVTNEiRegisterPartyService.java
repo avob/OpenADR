@@ -58,7 +58,7 @@ public class Oadr20bVTNEiRegisterPartyService {
 	public static final List<OadrProfile> supportedProfiles;
 
 	static {
-		supportedProfiles = new ArrayList<OadrProfile>();
+		supportedProfiles = new ArrayList<>();
 		supportedProfiles.add(profile20a);
 		supportedProfiles.add(profile20b);
 	}

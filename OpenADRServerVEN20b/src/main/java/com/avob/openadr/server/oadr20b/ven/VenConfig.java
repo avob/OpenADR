@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class VenConfig implements Cloneable {
+public class VenConfig {
 
 	@Value("${oadr.venid:#{null}}")
 	private String venId;
@@ -70,13 +70,36 @@ public class VenConfig implements Cloneable {
 	@Value("${oadr.security.replayProtectAcceptedDelaySecond}")
 	private Long replayProtectAcceptedDelaySecond;
 
+	public VenConfig() {
+	}
+
+	public VenConfig(VenConfig clone) {
+		this.basicPassword = clone.getBasicPassword();
+		this.basicUsername = clone.getBasicUsername();
+		this.digestPassword = clone.getDigestPassword();
+		this.digestRealm = clone.getDigestRealm();
+		this.digestUsername = clone.getDigestUsername();
+		this.pullFrequencySeconds = clone.getPullFrequencySeconds();
+		this.pullModel = clone.getPullModel();
+		this.replayProtectAcceptedDelaySecond = clone.getReplayProtectAcceptedDelaySecond();
+		this.reportOnly = clone.getReportOnly();
+		this.trustCertificates = clone.getTrustCertificates();
+		this.venCertificatePath = clone.getVenCertificatePath();
+		this.venId = clone.getVenId();
+		this.venIdFile = clone.getVenIdFile();
+		this.venName = clone.getVenName();
+		this.venPrivateKeyPath = clone.getVenPrivateKeyPath();
+		this.venUrl = clone.getVenUrl();
+		this.xmlSignature = clone.getXmlSignature();
+	}
+
 	@PostConstruct
 	public void init() {
-		if (venId == null && venIdFile == null || venId != null && venIdFile != null) {
+		if (venId == null && getVenIdFile() == null || venId != null && getVenIdFile() != null) {
 			throw new IllegalArgumentException("oadr.venid or oadr.venid.file must be configured");
-		} else if (venIdFile != null) {
+		} else if (getVenIdFile() != null) {
 			// set venId by reading venIdFile path first line
-			Path path = Paths.get(venIdFile);
+			Path path = Paths.get(getVenIdFile());
 			File file = path.toFile();
 			if (!file.exists()) {
 				throw new IllegalArgumentException(
@@ -129,7 +152,7 @@ public class VenConfig implements Cloneable {
 	public Map<String, String> getVtnTrustCertificate() {
 		Map<String, String> trustedCertificates = new HashMap<String, String>();
 		int i = 0;
-		for (String path : trustCertificates) {
+		for (String path : getTrustCertificates()) {
 			trustedCertificates.put("cert_" + (i++), path);
 		}
 		return trustedCertificates;
@@ -179,22 +202,20 @@ public class VenConfig implements Cloneable {
 		this.digestPassword = digestPassword;
 	}
 
-	public VenConfig clone() {
-		VenConfig o = null;
-		try {
-			o = (VenConfig) super.clone();
-		} catch (CloneNotSupportedException cnse) {
-			cnse.printStackTrace(System.err);
-		}
-		return o;
-	}
-
 	public String getDigestRealm() {
 		return digestRealm;
 	}
 
 	public void setDigestRealm(String digestRealm) {
 		this.digestRealm = digestRealm;
+	}
+
+	public List<String> getTrustCertificates() {
+		return trustCertificates;
+	}
+
+	public String getVenIdFile() {
+		return venIdFile;
 	}
 
 }

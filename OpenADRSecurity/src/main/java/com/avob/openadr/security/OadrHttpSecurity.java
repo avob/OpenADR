@@ -116,11 +116,7 @@ public class OadrHttpSecurity {
 			throw e;
 		} finally {
 			if (pemReader != null) {
-				try {
-					pemReader.close();
-				} catch (IOException e) {
-					throw e;
-				}
+				pemReader.close();
 			}
 		}
 

@@ -2,13 +2,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.avob</groupId>
+	<groupId>com.avob.openadr</groupId>
 	<artifactId>OpenADR</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
 	<name>OpenADR</name>
-	<description>OpenADR</description>
+	<description>OpenADR VEN/VTN implementation</description>
 	<packaging>pom</packaging>
-
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -130,6 +129,6 @@
 			<id>zanni</id>
 		</developer>
 	</developers>
-	
-	
+
+
 </project>

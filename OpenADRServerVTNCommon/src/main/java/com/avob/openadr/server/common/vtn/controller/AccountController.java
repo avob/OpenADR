@@ -42,6 +42,8 @@ import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 @RequestMapping("/Account")
 public class AccountController {
 
+	private static final MediaType OCTET_STREAM_MEDIA_TYPE = MediaType.parseMediaType("application/octet-stream");
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(AccountController.class);
 
 	@Resource
@@ -89,7 +91,7 @@ public class AccountController {
 		if (findOneByUsername != null) {
 			LOGGER.warn("User: " + dto.getUsername() + " already exists");
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE_406)
-					.contentType(MediaType.parseMediaType("application/octet-stream")).body(null);
+					.contentType(OCTET_STREAM_MEDIA_TYPE).body(null);
 		}
 		OadrUser prepare = oadrUserService.prepare(dto);
 		ResponseEntity<InputStreamResource> body = null;
@@ -103,7 +105,7 @@ public class AccountController {
 						.header("Content-Disposition", "attachment; filename=\"archive.tar\"")
 						.header("x-Username", prepare.getUsername())
 						.contentLength(generateCertificateIfRequired.get().length())
-						.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+						.contentType(OCTET_STREAM_MEDIA_TYPE).body(resource);
 			} else {
 				body = ResponseEntity.status(HttpStatus.CREATED_201).header("x-username", prepare.getUsername())
 						.body(null);
@@ -157,7 +159,7 @@ public class AccountController {
 		if (findOneByUsername != null) {
 			LOGGER.warn("App: " + dto.getUsername() + " already exists");
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE_406)
-					.contentType(MediaType.parseMediaType("application/octet-stream")).body(null);
+					.contentType(OCTET_STREAM_MEDIA_TYPE).body(null);
 		}
 		OadrApp prepare = oadrAppService.prepare(dto);
 		ResponseEntity<InputStreamResource> body = null;
@@ -171,7 +173,7 @@ public class AccountController {
 						.header("Content-Disposition", "attachment; filename=\"archive.tar\"")
 						.header("x-Username", prepare.getUsername())
 						.contentLength(generateCertificateIfRequired.get().length())
-						.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+						.contentType(OCTET_STREAM_MEDIA_TYPE).body(resource);
 			} else {
 				body = ResponseEntity.status(HttpStatus.CREATED_201).header("x-username", prepare.getUsername())
 						.body(null);

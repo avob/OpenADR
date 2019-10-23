@@ -2,11 +2,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.avob.openadr.model</groupId>
 	<artifactId>OpenADRModel20b</artifactId>
-
+	<name>OpenADRModel20b</name>
+	<description>Oadr2.0b model framework</description>
 	<parent>
-		<groupId>com.avob</groupId>
+		<groupId>com.avob.openadr</groupId>
 		<artifactId>OpenADR</artifactId>
 		<version>0.1.0-SNAPSHOT</version>
 		<relativePath>../</relativePath>
@@ -14,7 +14,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.avob.openadr.security</groupId>
+			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRSecurity</artifactId>
 			<version>${project.version}</version>
 		</dependency>
