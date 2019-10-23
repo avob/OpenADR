@@ -69,7 +69,7 @@
 				<version>1.6.0</version>
 				<configuration>
 					<resourceBundles>
-						<resourceBundle>com.avob.openadr:OpenADRModel20a:0.0.1-SNAPSHOT</resourceBundle>
+						<resourceBundle>com.avob.openadr:OpenADRModel20a:${project.version}</resourceBundle>
 					</resourceBundles>
 				</configuration>
 				<executions>
@@ -142,20 +142,4 @@
 			</dependencies>
 		</profile>
 	</profiles>
-
-	<scm>
-		<url>https://github.com/avob/OpenADR</url>
-		<connection>scm:git:git://github.com/avob/OpenADR</connection>
-		<developerConnection>scm:git:git@github.com/avob/OpenADR</developerConnection>
-	</scm>
-	<developers>
-		<developer>
-			<email>zanni.bertrand@gmail.com</email>
-			<name>Bertrand Zanni</name>
-			<url>https://github.com/zanni</url>
-			<id>zanni</id>
-		</developer>
-	</developers>
-
-
 </project>

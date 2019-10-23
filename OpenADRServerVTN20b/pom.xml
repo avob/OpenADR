@@ -277,37 +277,4 @@
 			</dependencies>
 		</profile>
 	</profiles>
-
-
-	<reporting>
-		<plugins>
-			<!-- Normally, we take off the dependency report, saves time. -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.7</version>
-				<configuration>
-					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-				</configuration>
-			</plugin>
-
-
-		</plugins>
-	</reporting>
-
-	<scm>
-		<url>https://github.com/avob/OpenADR</url>
-		<connection>scm:git:git://github.com/avob/OpenADR</connection>
-		<developerConnection>scm:git:git@github.com/avob/OpenADR</developerConnection>
-	</scm>
-	<developers>
-		<developer>
-			<email>zanni.bertrand@gmail.com</email>
-			<name>Bertrand Zanni</name>
-			<url>https://github.com/zanni</url>
-			<id>zanni</id>
-		</developer>
-	</developers>
-
-
 </project>
