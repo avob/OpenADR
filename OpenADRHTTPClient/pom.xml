@@ -17,6 +17,11 @@
 			<artifactId>httpclient</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.2</version>
+		</dependency>
+		<dependency>
 			<groupId>com.avob.openadr.security</groupId>
 			<artifactId>OpenADRSecurity</artifactId>
 			<version>${project.version}</version>
