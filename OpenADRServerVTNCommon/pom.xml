@@ -4,22 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.avob.openadr.server.common.vtn</groupId>
 	<artifactId>OpenADRServerVTNCommon</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.2.RELEASE</version>
+		<groupId>com.avob</groupId>
+		<artifactId>OpenADR</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+		<relativePath>../</relativePath>
 	</parent>
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
-		<project.version>0.1.0-SNAPSHOT</project.version>
-		<amq.version>5.7.0</amq.version>
-		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
-	</properties>
-
 
 	<dependencies>
 		<dependency>

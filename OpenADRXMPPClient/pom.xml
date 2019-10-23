@@ -10,10 +10,6 @@
 		<version>0.1.0-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
-	<properties>
-		<smack.version>4.3.4</smack.version>
-	</properties>
-
 	<dependencies>
 
 		<dependency>

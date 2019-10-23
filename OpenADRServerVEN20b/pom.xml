@@ -4,21 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.avob.openadr.server.oadr20b.ven</groupId>
 	<artifactId>OpenADRServerVEN20b</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.2.RELEASE</version>
+		<groupId>com.avob</groupId>
+		<artifactId>OpenADR</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+		<relativePath>../</relativePath>
 	</parent>
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
-		<amq.version>5.7.0</amq.version>
-		<project.version>0.1.0-SNAPSHOT</project.version>
-		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
-	</properties>
 
 	<dependencies>
 		<dependency>
@@ -101,14 +92,6 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-remote-resources-plugin</artifactId>
 				<version>1.6.0</version>
 				<configuration>
@@ -154,29 +137,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.7</version>
-			</plugin>
-		</plugins>
-	</reporting>
-
-	<scm>
-		<url>https://github.com/avob/OpenADR</url>
-		<connection>scm:git:git://github.com/avob/OpenADR</connection>
-		<developerConnection>scm:git:git@github.com/avob/OpenADR</developerConnection>
-	</scm>
-	<developers>
-		<developer>
-			<email>zanni.bertrand@gmail.com</email>
-			<name>Bertrand Zanni</name>
-			<url>https://github.com/zanni</url>
-			<id>zanni</id>
-		</developer>
-	</developers>
-
 </project>
