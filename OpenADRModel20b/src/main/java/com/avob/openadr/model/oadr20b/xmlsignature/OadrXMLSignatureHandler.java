@@ -230,6 +230,10 @@ public class OadrXMLSignatureHandler {
 
 	public static String sign(Object oadrObject, PrivateKey privateKey, X509Certificate certificate, String nonce,
 			Long createdtimestamp) throws Oadr20bXMLSignatureException {
+		if (createdtimestamp < 0) {
+			throw new Oadr20bXMLSignatureException("createdtimestamp must be positive");
+		}
+
 		return sign(Oadr20bFactory.createOadrPayload(SIGNEDOBJECT_PAYLOAD_ID, oadrObject), privateKey, certificate,
 				nonce, createdtimestamp);
 	}

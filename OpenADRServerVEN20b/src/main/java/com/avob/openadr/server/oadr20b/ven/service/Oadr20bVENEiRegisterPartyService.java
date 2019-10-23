@@ -77,7 +77,7 @@ public class Oadr20bVENEiRegisterPartyService {
 		String venID = oadrRequestReregistrationType.getVenID();
 		int responseCode = HttpStatus.OK_200;
 		reinitRegistration(vtnConfiguration);
-		
+
 		oadrPollService.reinitPoll(vtnConfiguration);
 
 		return Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestId, responseCode, venID).build();
@@ -124,7 +124,7 @@ public class Oadr20bVENEiRegisterPartyService {
 		String requestId = "0";
 		OadrQueryRegistrationType queryRegistration = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bQueryRegistrationBuilder(requestId)
-				
+
 				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value()).build();
 
 		try {
@@ -152,6 +152,7 @@ public class Oadr20bVENEiRegisterPartyService {
 			LOGGER.error("Fail to query registration", e);
 		} catch (InterruptedException e) {
 			LOGGER.error("Fail to query registration", e);
+			Thread.currentThread().interrupt();
 		} catch (OadrSecurityException e) {
 			LOGGER.error("Fail to query registration", e);
 		} catch (IOException e) {
@@ -255,7 +256,7 @@ public class Oadr20bVENEiRegisterPartyService {
 
 			builder.withOadrHttpPullModel(pullModel).withOadrTransportAddress(transportAddress)
 					.withOadrReportOnly(reportOnly).withOadrTransportName(transportType).withOadrVenName(venName)
-				
+
 					.withOadrXmlSignature(xmlSignature);
 
 		} else if (vtnConfig.getVtnXmppHost() != null && vtnConfig.getVtnXmppPort() != null) {
@@ -294,6 +295,7 @@ public class Oadr20bVENEiRegisterPartyService {
 			LOGGER.error("", e);
 		} catch (InterruptedException e) {
 			LOGGER.error("", e);
+			Thread.currentThread().interrupt();
 		}
 
 	}

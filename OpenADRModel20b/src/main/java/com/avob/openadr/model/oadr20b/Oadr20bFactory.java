@@ -1,7 +1,6 @@
 package com.avob.openadr.model.oadr20b;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -136,7 +135,6 @@ public class Oadr20bFactory {
 
 	private static final String UNLIMITED_DURATION_TAG = "0";
 
-	private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	private static DatatypeFactory datatypeFactory;
 	static {
 		try {
@@ -145,7 +143,6 @@ public class Oadr20bFactory {
 			throw new Oadr20bInitializationException(e);
 		}
 
-		simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 	private static final com.avob.openadr.model.oadr20b.oadr.ObjectFactory factory = new com.avob.openadr.model.oadr20b.oadr.ObjectFactory();
 
@@ -179,7 +176,7 @@ public class Oadr20bFactory {
 		cal.setTimeZone(utc);
 		cal.setTimeInMillis(timestamp);
 		XMLGregorianCalendar newXMLGregorianCalendar = datatypeFactory
-				.newXMLGregorianCalendar(simpleDateFormat.format(cal.getTime()));
+				.newXMLGregorianCalendar(cal.getTime().toInstant().toString());
 		newXMLGregorianCalendar.setTimezone(0);
 		return newXMLGregorianCalendar;
 	}

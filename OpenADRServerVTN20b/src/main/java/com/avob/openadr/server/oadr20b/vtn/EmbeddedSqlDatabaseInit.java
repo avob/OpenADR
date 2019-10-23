@@ -65,7 +65,7 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedSqlDatabaseInit.class);
 
-	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+	private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
 	protected static final String VEN_FILE_PREFIX = "ven";
 	protected static final String ADMIN_FILE_PREFIX = "admin";

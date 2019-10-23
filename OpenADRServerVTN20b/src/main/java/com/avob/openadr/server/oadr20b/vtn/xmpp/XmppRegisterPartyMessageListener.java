@@ -98,6 +98,7 @@ public class XmppRegisterPartyMessageListener implements StanzaListener {
 			LOGGER.error(e.getMessage());
 		} catch (InterruptedException e) {
 			LOGGER.error(e.getMessage());
+			Thread.currentThread().interrupt();
 		}
 
 	}

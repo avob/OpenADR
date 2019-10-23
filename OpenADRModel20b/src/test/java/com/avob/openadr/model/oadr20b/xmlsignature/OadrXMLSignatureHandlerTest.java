@@ -94,16 +94,37 @@ public class OadrXMLSignatureHandlerTest {
 	}
 
 	@Test
-	public void testInvalidReplayProtectTimestamp() {
+	public void testInvalidCreatedTimestamp() {
 		OadrResponseType response = Oadr20bResponseBuilders.newOadr20bResponseBuilder("REQ_12345", 200, "venId")
 				.build();
 		boolean exception = false;
 		try {
 			validate(OadrXMLSignatureHandler.sign(response, privateKey, certificate, "nonce", -10L));
 		} catch (Oadr20bUnmarshalException e) {
+			exception = false;
+		} catch (Oadr20bXMLSignatureValidationException e) {
+			exception = false;
+		} catch (Oadr20bXMLSignatureException e) {
+			exception = true;
+		}
+		assertTrue(exception);
+	}
+
+	@Test
+	public void testInvalidReplayProtectTimestamp() {
+		OadrResponseType response = Oadr20bResponseBuilders.newOadr20bResponseBuilder("REQ_12345", 200, "venId")
+				.build();
+		boolean exception = false;
+		try {
+			String sign = OadrXMLSignatureHandler.sign(response, privateKey, certificate, "nonce", 0L);
+			OadrPayload unmarshal = jaxbContext.unmarshal(sign, OadrPayload.class, true);
+			OadrXMLSignatureHandler.validate(sign, unmarshal, 0, -10);
+		} catch (Oadr20bUnmarshalException e) {
+			exception = false;
 		} catch (Oadr20bXMLSignatureValidationException e) {
 			exception = true;
 		} catch (Oadr20bXMLSignatureException e) {
+			exception = false;
 		}
 		assertTrue(exception);
 	}

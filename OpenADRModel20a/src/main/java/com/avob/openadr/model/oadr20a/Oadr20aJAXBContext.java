@@ -52,28 +52,25 @@ public class Oadr20aJAXBContext {
 		return Oadr20aJAXBContext.getInstance(null);
 	}
 
-	public static Oadr20aJAXBContext getInstance(Schema schema) throws JAXBException {
+	public synchronized static Oadr20aJAXBContext getInstance(Schema schema) throws JAXBException {
 		if (instance == null) {
-			synchronized (Oadr20aJAXBContext.class) {
-				Schema loadedSchema = schema;
-				if (schema == null) {
-					SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			Schema loadedSchema = schema;
+			if (schema == null) {
+				SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-					URL url = Oadr20aJAXBContext.class.getResource(XSD_PATH);
-					File xsdFile = new File(url.getPath());
+				URL url = Oadr20aJAXBContext.class.getResource(XSD_PATH);
+				File xsdFile = new File(url.getPath());
 
-					if (xsdFile.exists()) {
-						try {
-							loadedSchema = sf.newSchema(new Source[] { new StreamSource(xsdFile) });
-						} catch (SAXException e) {
-							loadedSchema = null;
-						}
+				if (xsdFile.exists()) {
+					try {
+						loadedSchema = sf.newSchema(new Source[] { new StreamSource(xsdFile) });
+					} catch (SAXException e) {
+						loadedSchema = null;
 					}
 				}
-				if (instance == null) {
-					instance = new Oadr20aJAXBContext(loadedSchema);
-				}
 			}
+			instance = new Oadr20aJAXBContext(loadedSchema);
+
 		}
 		return instance;
 	}

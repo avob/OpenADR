@@ -537,7 +537,7 @@ public class DemandResponseControllerTest {
 		assertEquals(1, dto.getSignals().size());
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
-		assertEquals(new Long(modificationNumber), dto.getDescriptor().getModificationNumber());
+		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 
 		// update and publish
 		DemandResponseEventSignalDto signalNormal = new DemandResponseEventSignalDto();
@@ -566,7 +566,8 @@ public class DemandResponseControllerTest {
 		assertEquals(1, dto.getSignals().size());
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_NORMAL.getValue());
-		assertEquals(new Long(modificationNumber + 1L), dto.getDescriptor().getModificationNumber());
+		modificationNumber++;
+		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 
 		// update id not Long
 		this.mockMvc
@@ -624,7 +625,7 @@ public class DemandResponseControllerTest {
 		assertEquals(1, dto.getSignals().size());
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
-		assertEquals(new Long(modificationNumber), dto.getDescriptor().getModificationNumber());
+		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 
 		// publish unknown
 		this.mockMvc
@@ -656,7 +657,7 @@ public class DemandResponseControllerTest {
 		assertEquals(1, dto.getSignals().size());
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
-		assertEquals(new Long(modificationNumber), dto.getDescriptor().getModificationNumber());
+		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 
 		// publish already published event
 		this.mockMvc
@@ -675,7 +676,7 @@ public class DemandResponseControllerTest {
 		assertEquals(1, dto.getSignals().size());
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
-		assertEquals(new Long(modificationNumber), dto.getDescriptor().getModificationNumber());
+		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 	}
 
 	@Test
@@ -722,7 +723,7 @@ public class DemandResponseControllerTest {
 		assertEquals(1, dto.getSignals().size());
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
-		assertEquals(new Long(modificationNumber), dto.getDescriptor().getModificationNumber());
+		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 
 		// activate an already activated event does nothing
 		this.mockMvc
@@ -741,7 +742,7 @@ public class DemandResponseControllerTest {
 		assertEquals(1, dto.getSignals().size());
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
-		assertEquals(new Long(modificationNumber), dto.getDescriptor().getModificationNumber());
+		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 		assertEquals(DemandResponseEventStateEnum.ACTIVE, dto.getDescriptor().getState());
 
 		// cancel
@@ -763,7 +764,7 @@ public class DemandResponseControllerTest {
 		assertEquals(1, dto.getSignals().size());
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
-		assertEquals(new Long(modificationNumber), dto.getDescriptor().getModificationNumber());
+		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 		assertEquals(DemandResponseEventStateEnum.CANCELLED, dto.getDescriptor().getState());
 
 		// cancel an already canceled event does nothing
@@ -783,7 +784,7 @@ public class DemandResponseControllerTest {
 		assertEquals(1, dto.getSignals().size());
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
-		assertEquals(new Long(modificationNumber), dto.getDescriptor().getModificationNumber());
+		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 		assertEquals(DemandResponseEventStateEnum.CANCELLED, dto.getDescriptor().getState());
 
 		// activate
@@ -805,7 +806,7 @@ public class DemandResponseControllerTest {
 		assertEquals(1, dto.getSignals().size());
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
-		assertEquals(new Long(modificationNumber), dto.getDescriptor().getModificationNumber());
+		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 		assertEquals(DemandResponseEventStateEnum.ACTIVE, dto.getDescriptor().getState());
 
 		// activate id not long
@@ -1023,9 +1024,9 @@ public class DemandResponseControllerTest {
 		this.mockMvc.perform(
 				MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL + "mouaiccool/venResponse").with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
-		
-		this.mockMvc.perform(
-				MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL + "12/venResponse").with(adminSession))
+
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL + "12/venResponse").with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 		MvcResult andReturn = this.mockMvc

@@ -97,6 +97,7 @@ public class XmppReportMessageListener implements StanzaListener {
 			LOGGER.error(e.getMessage(), e);
 		} catch (InterruptedException e) {
 			LOGGER.error(e.getMessage(), e);
+			Thread.currentThread().interrupt();
 		} catch (Oadr20bRegisterReportApplicationLayerException e) {
 			LOGGER.error(e.getMessage(), e);
 		} catch (Oadr20bUpdateReportApplicationLayerException e) {

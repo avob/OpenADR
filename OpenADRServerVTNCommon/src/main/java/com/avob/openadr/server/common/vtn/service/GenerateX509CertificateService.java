@@ -53,11 +53,11 @@ public class GenerateX509CertificateService {
 		if (file.exists()) {
 			file.delete();
 		}
-		FileOutputStream outputStream = new FileOutputStream(file, true);
-		byte[] strToBytes = content.getBytes();
-		outputStream.write(strToBytes);
 
-		outputStream.close();
+		try (FileOutputStream outputStream = new FileOutputStream(file, true)) {
+			byte[] strToBytes = content.getBytes();
+			outputStream.write(strToBytes);
+		}
 
 		return file;
 	}
@@ -70,9 +70,9 @@ public class GenerateX509CertificateService {
 		}
 		return caKeyPair;
 	}
-	
 
-	public File generateCredentials(AbstractUserCreateDto dto, AbstractUser abstractUser) throws GenerateX509VenException {
+	public File generateCredentials(AbstractUserCreateDto dto, AbstractUser abstractUser)
+			throws GenerateX509VenException {
 		try {
 
 			long now = System.currentTimeMillis();

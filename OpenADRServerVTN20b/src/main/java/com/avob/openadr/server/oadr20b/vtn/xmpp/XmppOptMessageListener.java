@@ -87,6 +87,7 @@ public class XmppOptMessageListener implements StanzaListener {
 			LOGGER.error(e.getMessage());
 		} catch (InterruptedException e) {
 			LOGGER.error(e.getMessage());
+			Thread.currentThread().interrupt();
 		} catch (Oadr20bCancelOptApplicationLayerException e) {
 			LOGGER.error(e.getMessage());
 		} catch (Oadr20bCreateOptApplicationLayerException e) {

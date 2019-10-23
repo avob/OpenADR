@@ -7,8 +7,6 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -641,9 +639,7 @@ public class Oadr20bVTNEiReportControllerTest {
 
 		// xml date do not support millisecond therefore I floor timestamp to
 		// suppress millisecond
-		NumberFormat formatter = new DecimalFormat("#0.00");
-		assertEquals(formatter.format(new Double(Math.floor(new Long(start) / 1000) * 1000)),
-				formatter.format(new Double(reportDataList.get(0).getStart())));
+		assertEquals(new Long(start), reportDataList.get(0).getStart());
 		assertEquals(confidence, reportDataList.get(0).getConfidence());
 		assertEquals(value, reportDataList.get(0).getValue());
 
@@ -694,8 +690,7 @@ public class Oadr20bVTNEiReportControllerTest {
 				HttpStatus.OK_200, OtherReportDataPayloadResourceStatusDto.class);
 		assertEquals(1, reportDataList.size());
 
-		assertEquals(new Double(Math.floor(new Long(start) / 1000) * 1000),
-				new Double(reportDataResourceStatusList.get(0).getStart()));
+		assertEquals(new Long(start), reportDataResourceStatusList.get(0).getStart());
 		assertEquals(confidence, reportDataResourceStatusList.get(0).getConfidence());
 
 		assertEquals(new Float(0), reportDataResourceStatusList.get(0).getOadrCapacityCurrent());
@@ -743,8 +738,7 @@ public class Oadr20bVTNEiReportControllerTest {
 				HttpStatus.OK_200, OtherReportDataKeyTokenDto.class);
 		assertEquals(1, restJsonControllerAndExpectList2.size());
 
-		assertEquals(new Double(Math.floor(new Long(start) / 1000) * 1000),
-				new Double(restJsonControllerAndExpectList2.get(0).getStart()));
+		assertEquals(new Long(start), restJsonControllerAndExpectList2.get(0).getStart());
 		assertEquals(confidence, restJsonControllerAndExpectList2.get(0).getConfidence());
 		assertEquals(1, restJsonControllerAndExpectList2.get(0).getTokens().size());
 		assertEquals("mouaiccool", restJsonControllerAndExpectList2.get(0).getTokens().get(0).getKey());

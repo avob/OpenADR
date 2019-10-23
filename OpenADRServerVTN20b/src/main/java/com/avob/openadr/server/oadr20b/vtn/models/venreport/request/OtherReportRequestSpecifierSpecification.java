@@ -44,7 +44,7 @@ public class OtherReportRequestSpecifierSpecification {
 		if (criteria.getReportRequestId() != null && !criteria.getReportRequestId().isEmpty()) {
 			Specification<OtherReportRequestSpecifier> hasReportRequestIdIn = OtherReportRequestSpecifierSpecification
 					.hasReportRequestIdIn(criteria.getReportRequestId());
-			spec = (spec == null) ? hasReportRequestIdIn : spec.and(hasReportRequestIdIn);
+			spec = hasReportRequestIdIn;
 		}
 		if (criteria.getReportSpecifierId() != null && !criteria.getReportSpecifierId().isEmpty()) {
 			Specification<OtherReportRequestSpecifier> hasReportRpecifierIdIn = OtherReportRequestSpecifierSpecification

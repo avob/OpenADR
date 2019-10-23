@@ -92,6 +92,7 @@ public class XmppEventMessageListener implements StanzaListener {
 			LOGGER.error(e.getMessage());
 		} catch (InterruptedException e) {
 			LOGGER.error(e.getMessage());
+			Thread.currentThread().interrupt();
 		} catch (Oadr20bCreatedEventApplicationLayerException e) {
 			LOGGER.error(e.getMessage());
 		} catch (Oadr20bRequestEventApplicationLayerException e) {

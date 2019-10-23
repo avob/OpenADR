@@ -85,6 +85,6 @@ public class Oadr20bDemandResponseEventCreateListener {
 
 			}
 		}
-		LOGGER.warn("Received unpushable ven message: " + ven.toString());
+		LOGGER.warn("Received unpushable message from venId:" + venUsername);
 	}
 }

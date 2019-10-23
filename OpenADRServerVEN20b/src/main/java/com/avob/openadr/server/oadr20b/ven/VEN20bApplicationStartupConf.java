@@ -92,6 +92,7 @@ public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartySe
 			LOGGER.error("", e);
 		} catch (InterruptedException e) {
 			LOGGER.error("", e);
+			Thread.currentThread().interrupt();
 		}
 	}
 

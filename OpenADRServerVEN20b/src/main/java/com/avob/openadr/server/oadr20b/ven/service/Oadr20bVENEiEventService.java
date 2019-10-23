@@ -187,6 +187,7 @@ public class Oadr20bVENEiEventService {
 				LOGGER.error("", e);
 			} catch (InterruptedException e) {
 				LOGGER.error("", e);
+				Thread.currentThread().interrupt();
 			}
 		}
 

@@ -152,7 +152,7 @@ public class DemandResponseEventSpecification {
 					}
 				} else if ("NOT_SENDABLE".equals(demandResponseEventFilter.getValue().toUpperCase())) {
 					if (isSendablePredicates != null) {
-						isSendablePredicates = isPublishedPredicates
+						isSendablePredicates = isSendablePredicates
 								.or(DemandResponseEventSpecification.isSendable(false));
 					} else {
 						isSendablePredicates = DemandResponseEventSpecification.isSendable(false);

@@ -73,22 +73,10 @@ public class OadrXmppClient20b {
 	private static XMPPTCPConnectionConfiguration anonymousConnection(String host, int port, String domain,
 			String resource, SSLContext context) throws OadrXmppException {
 		try {
-			return XMPPTCPConnectionConfiguration.builder()
-//				.setHostAddress(address)
-
-					.setHost(host).setPort(port)
-//				.allowEmptyOrNullUsernames()
-//				.setUsernameAndPassword(resource,resource)
-//				.setAuthzid(authzid)
-//				.setAuthzid(authzid)
+			return XMPPTCPConnectionConfiguration.builder().setHost(host).setPort(port)
 					.performSaslAnonymousAuthentication().setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
-					.setCompressionEnabled(false)
-//				.addEnabledSaslMechanism("ANONYMOUS")
-//				.performSaslExternalAuthentication(context)
-//				.setUsernameAndPassword("admin", "mouaiccool")
-//				.addEnabledSaslMechanism("EXTERNAL")
-//				.addEnabledSaslMechanism("ANONYMOUS")
-					.setResource(resource).setXmppDomain(domain).setCustomSSLContext(context).build();
+					.setCompressionEnabled(false).setResource(resource).setXmppDomain(domain)
+					.setCustomSSLContext(context).build();
 		} catch (XmppStringprepException e) {
 			throw new OadrXmppException(e);
 		}
@@ -97,22 +85,9 @@ public class OadrXmppClient20b {
 	private static XMPPTCPConnectionConfiguration passwordConnection(String host, int port, String domain,
 			String resource, SSLContext context, String username, String password) throws OadrXmppException {
 		try {
-			return XMPPTCPConnectionConfiguration.builder()
-//				.setHostAddress(address)
-					.setHost(host).setPort(port)
-//				.allowEmptyOrNullUsernames()
+			return XMPPTCPConnectionConfiguration.builder().setHost(host).setPort(port)
 					.setUsernameAndPassword(username, password)
 					.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled).setCompressionEnabled(false)
-
-//				.setAuthzid(authzid)
-//				.setAuthzid(authzid)
-//					.performSaslAnonymousAuthentication()
-//				.addEnabledSaslMechanism("ANONYMOUS")
-//				.performSaslExternalAuthentication(context)
-//				.setUsernameAndPassword("admin", "mouaiccool")
-//					.addEnabledSaslMechanism("EXTERNAL")
-//				.addEnabledSaslMechanism("ANONYMOUS"
-//					.performSaslExternalAuthentication(context)
 					.setResource(resource).setXmppDomain(domain).setCustomSSLContext(context).build();
 		} catch (XmppStringprepException e) {
 			throw new OadrXmppException(e);
@@ -180,6 +155,7 @@ public class OadrXmppClient20b {
 		} catch (IOException e) {
 			throw new OadrXmppException(e);
 		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 			throw new OadrXmppException(e);
 		}
 

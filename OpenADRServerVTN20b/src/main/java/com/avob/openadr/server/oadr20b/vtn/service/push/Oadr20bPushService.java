@@ -243,6 +243,7 @@ public class Oadr20bPushService {
 			LOGGER.error("Fail to connect to Xmpp server", e);
 		} catch (InterruptedException e) {
 			LOGGER.error("Fail to connect to Xmpp server", e);
+			Thread.currentThread().interrupt();
 		}
 	}
 

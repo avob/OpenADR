@@ -94,31 +94,26 @@ public class Oadr20bJAXBContext {
 		return Oadr20bJAXBContext.getInstance(null);
 	}
 
-	public static Oadr20bJAXBContext getInstance(Schema schema) throws JAXBException {
+	public synchronized static Oadr20bJAXBContext getInstance(Schema schema) throws JAXBException {
 		if (instance == null) {
-			synchronized (Oadr20bJAXBContext.class) {
-				Schema loadedSchema = schema;
-				if (schema == null) {
-					SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			Schema loadedSchema = schema;
+			if (schema == null) {
+				SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-					URL url = Oadr20bJAXBContext.class.getResource(XSD_PATH);
-					File xsdFile = new File(url.getPath());
-					url = Oadr20bJAXBContext.class.getResource(XSD_AVOB_PATH);
-					File xsdAvobFile = new File(url.getPath());
-					if (xsdFile.exists() && xsdAvobFile.exists()) {
-						try {
-							loadedSchema = sf.newSchema(
-									new Source[] { new StreamSource(xsdFile), new StreamSource(xsdAvobFile) });
-						} catch (SAXException e) {
-							loadedSchema = null;
-						}
+				URL url = Oadr20bJAXBContext.class.getResource(XSD_PATH);
+				File xsdFile = new File(url.getPath());
+				url = Oadr20bJAXBContext.class.getResource(XSD_AVOB_PATH);
+				File xsdAvobFile = new File(url.getPath());
+				if (xsdFile.exists() && xsdAvobFile.exists()) {
+					try {
+						loadedSchema = sf
+								.newSchema(new Source[] { new StreamSource(xsdFile), new StreamSource(xsdAvobFile) });
+					} catch (SAXException e) {
+						loadedSchema = null;
 					}
 				}
-
-				if (instance == null) {
-					instance = new Oadr20bJAXBContext(loadedSchema);
-				}
 			}
+			instance = new Oadr20bJAXBContext(loadedSchema);
 		}
 		return instance;
 	}
@@ -157,9 +152,8 @@ public class Oadr20bJAXBContext {
 		try {
 			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 			if (!OadrPayload.class.equals(responseKlass) && validate) {
-				if (validate) {
-					unmarshaller.setSchema(schema);
-				}
+				unmarshaller.setSchema(schema);
+
 			}
 			unmarshal = unmarshaller.unmarshal(payload);
 		} catch (JAXBException e) {
@@ -328,9 +322,6 @@ public class Oadr20bJAXBContext {
 			OadrPollType value = (OadrPollType) payload;
 			el = Oadr20bFactory.createOadrPoll(value);
 
-		} else if (payload instanceof OadrResponseType) {
-			OadrResponseType value = (OadrResponseType) payload;
-			el = Oadr20bFactory.createResponseType(value);
 		} else {
 			throw new Oadr20bMarshalException("payload have to be an Oadr20b root element");
 		}
