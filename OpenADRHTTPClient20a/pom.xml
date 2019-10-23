@@ -38,7 +38,7 @@
 				<version>1.6.0</version>
 				<configuration>
 					<resourceBundles>
-						<resourceBundle>com.avob.openadr.model:OpenADRModel20a:0.0.1-SNAPSHOT</resourceBundle>
+						<resourceBundle>com.avob.openadr:OpenADRModel20a:0.0.1-SNAPSHOT</resourceBundle>
 					</resourceBundles>
 				</configuration>
 				<executions>

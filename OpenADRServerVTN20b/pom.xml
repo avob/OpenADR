@@ -112,7 +112,7 @@
 				<version>1.6.0</version>
 				<configuration>
 					<resourceBundles>
-						<resourceBundle>com.avob.openadr.model:OpenADRModel20b:${project.version}</resourceBundle>
+						<resourceBundle>com.avob.openadr:OpenADRModel20b:${project.version}</resourceBundle>
 					</resourceBundles>
 				</configuration>
 				<executions>
