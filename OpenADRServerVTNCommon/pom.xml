@@ -9,7 +9,6 @@
 		<groupId>com.avob.openadr</groupId>
 		<artifactId>OpenADR</artifactId>
 		<version>0.1.0-SNAPSHOT</version>
-		<relativePath>../</relativePath>
 	</parent>
 	<dependencies>
 		<dependency>
@@ -47,8 +46,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-
-
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jms</artifactId>
@@ -57,7 +54,6 @@
 			<groupId>javax.jms</groupId>
 			<artifactId>javax.jms-api</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-broker</artifactId>
@@ -74,8 +70,6 @@
 			<version>1.11.2</version>
 			<scope>provided</scope>
 		</dependency>
-
-
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
@@ -149,7 +143,6 @@
 		<profile>
 			<id>external</id>
 			<dependencies>
-
 				<dependency>
 					<groupId>com.rabbitmq.jms</groupId>
 					<artifactId>rabbitmq-jms</artifactId>
