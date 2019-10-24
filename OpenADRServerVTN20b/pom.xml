@@ -27,7 +27,7 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.avob.openadr.server.oadr20a</groupId>
+			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRServerVTN20a</artifactId>
 			<version>${project.version}</version>
 		</dependency>
