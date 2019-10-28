@@ -39,13 +39,13 @@
   handlers:
 
   roles:
-    - geerlingguy.postgresql
-    - geerlingguy.apache
-    - remyma.ansible-springboot
     - ../../roles/common
-    - ../../roles/nodejs
-    - ../../roles/nodered
-    - ../../roles/nodered-oadr-ven
+    # - geerlingguy.apache
+    # - ../../roles/nodejs
+    # - ../../roles/nodered
+    # - ../../roles/nodered-oadr-ven
+    - ../../roles/oadr-common
+    - ../../roles/oadr-postgresql
     - ../../roles/oadr-rabbitmq
     - ../../roles/oadr-openfire
     - ../../roles/oadr-vtn20b

@@ -1,0 +1,3 @@
+---
+  - name: restart oadr-vtn20b
+    service: name=oadr-vtn20b state=restarted

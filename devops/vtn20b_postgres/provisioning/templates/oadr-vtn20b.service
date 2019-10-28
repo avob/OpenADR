@@ -4,7 +4,7 @@ After=syslog.target
 
 [Service]
 User=oadr-vtn20b
-ExecStart=/opt/oadr-vtn20b/oadr-vtn20b.jar --logging.config=/opt/oadr-vtn20b/log4j2.xml --spring.profiles.active=fake-data,rabbitmq-broker,external
+ExecStart="/opt/oadr-vtn20b/oadr-vtn20b.jar"
 SuccessExitStatus=143
 
 [Install]

@@ -37,4 +37,4 @@ INSERT INTO ofproperty(name,propvalue) VALUES('xmpp.auth.external','true');
 INSERT INTO ofproperty(name,propvalue) VALUES('xmpp.client.cert.policy','wanted');
 INSERT INTO ofproperty(name,propvalue) VALUES('xmpp.client.tls.policy','required');
 INSERT INTO ofproperty(name,propvalue) VALUES('xmpp.oadr.vtnAuthEndpoint','https://vtn.oadr.com:8181/testvtn/Role');
-INSERT INTO ofproperty(name,propvalue) VALUES('xmpp.oadr.vtnId','e625af15028d075f9bea');
+INSERT INTO ofproperty(name,propvalue) VALUES('xmpp.oadr.vtnId','9bf3f51607f5a213db08');
