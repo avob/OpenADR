@@ -134,8 +134,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 @Service
-public class Oadr20bVTNEiReportService {
+public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
+	private static final String EI_SERVICE_NAME = "EiReport";
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiReportService.class);
 
 	protected static final String METADATA_REPORT_SPECIFIER_ID = "METADATA";
@@ -450,8 +452,7 @@ public class Oadr20bVTNEiReportService {
 		}
 
 		if (hasMetadataReport) {
-			otherReportRequestSpecifierDao
-					.deleteByOtherReportCapabilityDescriptionOtherReportCapabilitySource(ven);
+			otherReportRequestSpecifierDao.deleteByOtherReportCapabilityDescriptionOtherReportCapabilitySource(ven);
 			otherReportRequestService.deleteByOtherReportCapabilitySource(ven);
 		}
 
@@ -1441,76 +1442,105 @@ public class Oadr20bVTNEiReportService {
 
 	}
 
-	public String request(String username, String payload) throws Oadr20bUnmarshalException, Oadr20bMarshalException,
-			Oadr20bApplicationLayerException, Oadr20bCreatePartyRegistrationTypeApplicationLayerException,
-			Oadr20bCancelPartyRegistrationTypeApplicationLayerException,
-			Oadr20bQueryRegistrationTypeApplicationLayerException, Oadr20bRegisterReportApplicationLayerException,
-			Oadr20bUpdateReportApplicationLayerException, Oadr20bCancelReportApplicationLayerException,
-			Oadr20bCreateReportApplicationLayerException, Oadr20bCreatedReportApplicationLayerException,
-			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException,
-			Oadr20bRegisteredReportApplicationLayerException {
+	@Override
+	public String request(String username, String payload) throws Oadr20bApplicationLayerException {
 
-		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
+		Object unmarshal;
+		try {
 
-		if (unmarshal instanceof OadrPayload) {
+			unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
 
-			OadrPayload obj = (OadrPayload) unmarshal;
+			if (unmarshal instanceof OadrPayload) {
 
-			xmlSignatureService.validate(payload, obj);
+				OadrPayload obj = (OadrPayload) unmarshal;
 
-			return handle(username, obj);
+				xmlSignatureService.validate(payload, obj);
 
-		} else if (unmarshal instanceof OadrRegisterReportType) {
+				return handle(username, obj);
 
-			LOGGER.info(username + " - OadrRegisterReport");
+			} else if (unmarshal instanceof OadrRegisterReportType) {
 
-			OadrRegisterReportType obj = (OadrRegisterReportType) unmarshal;
+				LOGGER.info(username + " - OadrRegisterReport");
 
-			return handle(username, obj, false);
+				OadrRegisterReportType obj = (OadrRegisterReportType) unmarshal;
 
-		} else if (unmarshal instanceof OadrRegisteredReportType) {
+				return handle(username, obj, false);
 
-			LOGGER.info(username + " - OadrRegisteredReport");
+			} else if (unmarshal instanceof OadrRegisteredReportType) {
 
-			OadrRegisteredReportType obj = (OadrRegisteredReportType) unmarshal;
+				LOGGER.info(username + " - OadrRegisteredReport");
 
-			return handle(username, obj, false);
+				OadrRegisteredReportType obj = (OadrRegisteredReportType) unmarshal;
 
-		} else if (unmarshal instanceof OadrUpdateReportType) {
+				return handle(username, obj, false);
 
-			LOGGER.info(username + " - OadrUpdateReport");
+			} else if (unmarshal instanceof OadrUpdateReportType) {
 
-			OadrUpdateReportType obj = (OadrUpdateReportType) unmarshal;
+				LOGGER.info(username + " - OadrUpdateReport");
 
-			return handle(username, obj, false);
+				OadrUpdateReportType obj = (OadrUpdateReportType) unmarshal;
 
-		} else if (unmarshal instanceof OadrCreatedReportType) {
+				return handle(username, obj, false);
 
-			LOGGER.info(username + " - OadrCreatedReport");
+			} else if (unmarshal instanceof OadrCreatedReportType) {
 
-			OadrCreatedReportType obj = (OadrCreatedReportType) unmarshal;
+				LOGGER.info(username + " - OadrCreatedReport");
 
-			return handle(username, obj, false);
+				OadrCreatedReportType obj = (OadrCreatedReportType) unmarshal;
 
-		} else if (unmarshal instanceof OadrCreateReportType) {
+				return handle(username, obj, false);
 
-			LOGGER.info(username + " - OadrCreateReport");
+			} else if (unmarshal instanceof OadrCreateReportType) {
 
-			OadrCreateReportType obj = (OadrCreateReportType) unmarshal;
+				LOGGER.info(username + " - OadrCreateReport");
 
-			return handle(username, obj, false);
+				OadrCreateReportType obj = (OadrCreateReportType) unmarshal;
 
-		} else if (unmarshal instanceof OadrCancelReportType) {
+				return handle(username, obj, false);
 
-			LOGGER.info(username + " - OadrCancelReport");
+			} else if (unmarshal instanceof OadrCancelReportType) {
 
-			OadrCancelReportType obj = (OadrCancelReportType) unmarshal;
+				LOGGER.info(username + " - OadrCancelReport");
 
-			return handle(username, obj, false);
+				OadrCancelReportType obj = (OadrCancelReportType) unmarshal;
 
+				return handle(username, obj, false);
+
+			} else {
+				throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiReport");
+			}
+		} catch (Oadr20bUnmarshalException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bXMLSignatureValidationException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bCreatePartyRegistrationTypeApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bCancelPartyRegistrationTypeApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bQueryRegistrationTypeApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bRegisterReportApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bUpdateReportApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bCancelReportApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bCreateReportApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bCreatedReportApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bRegisteredReportApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bMarshalException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bXMLSignatureException e) {
+			throw new Oadr20bApplicationLayerException(e);
 		}
-
-		return null;
 	}
 
+	@Override
+	public String getServiceName() {
+		return EI_SERVICE_NAME;
+	}
+	
 }

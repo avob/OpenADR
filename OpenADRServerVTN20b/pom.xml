@@ -78,6 +78,9 @@
 				<directory>${project.build.directory}/maven-shared-archive-resources/oadr20b_schema/*</directory>
 			</resource>
 			<resource>
+				<directory>${project.build.directory}/classes/public/*</directory>
+			</resource>
+			<resource>
 				<directory>src/main/resources</directory>
 			</resource>
 			<resource>
@@ -152,7 +155,7 @@
 					<plugin>
 						<groupId>com.github.eirslett</groupId>
 						<artifactId>frontend-maven-plugin</artifactId>
-						<version>1.7.6</version>
+						<version>1.8.0</version>
 						<configuration>
 							<workingDirectory>frontend</workingDirectory>
 							<installDirectory>target</installDirectory>
@@ -201,7 +204,10 @@
 								<phase>generate-resources</phase>
 								<configuration>
 									<target>
-										<copy todir="${project.build.directory}/classes/public">
+										<!-- <copy todir="${project.build.directory}/classes/public"> -->
+										<!-- <fileset dir="${project.basedir}/frontend/build" /> -->
+										<!-- </copy> -->
+										<copy todir="${project.basedir}/src/main/resources/public">
 											<fileset dir="${project.basedir}/frontend/build" />
 										</copy>
 									</target>

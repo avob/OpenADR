@@ -49,7 +49,9 @@ import com.avob.openadr.server.oadr20b.vtn.exception.eiopt.Oadr20bCreateOptAppli
 import com.google.common.collect.Lists;
 
 @Service
-public class Oadr20bVTNEiOptService {
+public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
+
+	private static final String EI_SERVICE_NAME = "EiOpt";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiOptService.class);
 
@@ -318,38 +320,57 @@ public class Oadr20bVTNEiOptService {
 
 	}
 
-	public String request(String username, String payload)
-			throws Oadr20bUnmarshalException, Oadr20bApplicationLayerException,
-			Oadr20bCancelOptApplicationLayerException, Oadr20bCreateOptApplicationLayerException,
-			Oadr20bMarshalException, Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException {
+	@Override
+	public String request(String username, String payload) throws Oadr20bApplicationLayerException {
 
-		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
+		Object unmarshal;
+		try {
+			unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
 
-		if (unmarshal instanceof OadrPayload) {
+			if (unmarshal instanceof OadrPayload) {
 
-			OadrPayload oadrPayload = (OadrPayload) unmarshal;
+				OadrPayload oadrPayload = (OadrPayload) unmarshal;
 
-			return handle(username, payload, oadrPayload);
+				return handle(username, payload, oadrPayload);
 
-		} else if (unmarshal instanceof OadrCreateOptType) {
+			} else if (unmarshal instanceof OadrCreateOptType) {
 
-			LOGGER.info(username + " - OadrCreateOptType");
+				LOGGER.info(username + " - OadrCreateOptType");
 
-			OadrCreateOptType oadrCreateOptType = (OadrCreateOptType) unmarshal;
+				OadrCreateOptType oadrCreateOptType = (OadrCreateOptType) unmarshal;
 
-			return handle(username, oadrCreateOptType, false);
+				return handle(username, oadrCreateOptType, false);
 
-		} else if (unmarshal instanceof OadrCancelOptType) {
+			} else if (unmarshal instanceof OadrCancelOptType) {
 
-			LOGGER.info(username + " - OadrCancelOptType");
+				LOGGER.info(username + " - OadrCancelOptType");
 
-			OadrCancelOptType oadrCancelOptType = (OadrCancelOptType) unmarshal;
+				OadrCancelOptType oadrCancelOptType = (OadrCancelOptType) unmarshal;
 
-			return handle(username, oadrCancelOptType, false);
+				return handle(username, oadrCancelOptType, false);
 
+			} else {
+				throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiOpt");
+			}
+		} catch (Oadr20bUnmarshalException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bCancelOptApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bCreateOptApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bMarshalException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bXMLSignatureValidationException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bXMLSignatureException e) {
+			throw new Oadr20bApplicationLayerException(e);
 		}
 
-		throw new Oadr20bApplicationLayerException("Unacceptable request payload for OadrPoll");
+	}
+
+	@Override
+	public String getServiceName() {
+		return EI_SERVICE_NAME;
 	}
 
 }

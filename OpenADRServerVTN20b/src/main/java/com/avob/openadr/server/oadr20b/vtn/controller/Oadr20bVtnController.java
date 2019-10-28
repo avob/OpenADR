@@ -9,6 +9,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,6 +30,7 @@ import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportCapabilityDe
 import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportCapabilityService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportRequestService;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/Vtn")
 @PreAuthorize("hasRole('ROLE_ADMIN')")

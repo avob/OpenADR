@@ -43,7 +43,9 @@ import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bResp
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bAppNotificationPublisher;
 
 @Service
-public class Oadr20bVTNEiRegisterPartyService {
+public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
+
+	private static final String EI_SERVICE_NAME = "EiRegisterParty";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiRegisterPartyService.class);
 
@@ -452,84 +454,89 @@ public class Oadr20bVTNEiRegisterPartyService {
 
 	}
 
-	/**
-	 * 
-	 * @param username
-	 * @param payload
-	 * @param transport
-	 * @return
-	 * @throws Oadr20bUnmarshalException
-	 * @throws Oadr20bMarshalException
-	 * @throws Oadr20bXMLSignatureValidationException
-	 * @throws Oadr20bApplicationLayerException
-	 * @throws Oadr20bCreatePartyRegistrationTypeApplicationLayerException
-	 * @throws Oadr20bCancelPartyRegistrationTypeApplicationLayerException
-	 * @throws Oadr20bQueryRegistrationTypeApplicationLayerException
-	 * @throws Oadr20bCanceledPartyRegistrationTypeApplicationLayerException
-	 * @throws Oadr20bXMLSignatureException
-	 * @throws Oadr20bResponsePartyReregistrationApplicationLayerException
-	 */
-	public String request(String username, String payload)
-			throws Oadr20bUnmarshalException, Oadr20bMarshalException, Oadr20bXMLSignatureValidationException,
-			Oadr20bApplicationLayerException, Oadr20bCreatePartyRegistrationTypeApplicationLayerException,
-			Oadr20bCancelPartyRegistrationTypeApplicationLayerException,
-			Oadr20bQueryRegistrationTypeApplicationLayerException,
-			Oadr20bCanceledPartyRegistrationTypeApplicationLayerException, Oadr20bXMLSignatureException,
-			Oadr20bResponsePartyReregistrationApplicationLayerException {
+	@Override
+	public String request(String username, String payload) throws Oadr20bApplicationLayerException {
 
-		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
+		Object unmarshal;
+		try {
+			unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
 
-		if (unmarshal instanceof OadrPayload) {
+			if (unmarshal instanceof OadrPayload) {
 
-			OadrPayload oadrPayload = (OadrPayload) unmarshal;
+				OadrPayload oadrPayload = (OadrPayload) unmarshal;
 
-			xmlSignatureService.validate(payload, oadrPayload);
+				xmlSignatureService.validate(payload, oadrPayload);
 
-			return handle(username, oadrPayload);
+				return handle(username, oadrPayload);
 
-		} else if (unmarshal instanceof OadrCreatePartyRegistrationType) {
+			} else if (unmarshal instanceof OadrCreatePartyRegistrationType) {
 
-			LOGGER.info(username + " - OadrCreatePartyRegistration");
+				LOGGER.info(username + " - OadrCreatePartyRegistration");
 
-			OadrCreatePartyRegistrationType oadrCreatePartyRegistration = (OadrCreatePartyRegistrationType) unmarshal;
+				OadrCreatePartyRegistrationType oadrCreatePartyRegistration = (OadrCreatePartyRegistrationType) unmarshal;
 
-			return handle(username, oadrCreatePartyRegistration, false);
+				return handle(username, oadrCreatePartyRegistration, false);
 
-		} else if (unmarshal instanceof OadrCancelPartyRegistrationType) {
+			} else if (unmarshal instanceof OadrCancelPartyRegistrationType) {
 
-			LOGGER.info(username + " - OadrCancelPartyRegistration");
+				LOGGER.info(username + " - OadrCancelPartyRegistration");
 
-			OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType = (OadrCancelPartyRegistrationType) unmarshal;
+				OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType = (OadrCancelPartyRegistrationType) unmarshal;
 
-			return handle(username, oadrCancelPartyRegistrationType, false);
+				return handle(username, oadrCancelPartyRegistrationType, false);
 
-		} else if (unmarshal instanceof OadrCanceledPartyRegistrationType) {
+			} else if (unmarshal instanceof OadrCanceledPartyRegistrationType) {
 
-			LOGGER.info(username + " - OadrCanceledPartyRegistrationType");
+				LOGGER.info(username + " - OadrCanceledPartyRegistrationType");
 
-			OadrCanceledPartyRegistrationType oadrCanceledPartyRegistrationType = (OadrCanceledPartyRegistrationType) unmarshal;
+				OadrCanceledPartyRegistrationType oadrCanceledPartyRegistrationType = (OadrCanceledPartyRegistrationType) unmarshal;
 
-			return handle(username, oadrCanceledPartyRegistrationType, false);
+				return handle(username, oadrCanceledPartyRegistrationType, false);
 
-		} else if (unmarshal instanceof OadrQueryRegistrationType) {
+			} else if (unmarshal instanceof OadrQueryRegistrationType) {
 
-			LOGGER.info(username + " - OadrQueryRegistration");
+				LOGGER.info(username + " - OadrQueryRegistration");
 
-			OadrQueryRegistrationType oadrQueryRegistrationType = (OadrQueryRegistrationType) unmarshal;
+				OadrQueryRegistrationType oadrQueryRegistrationType = (OadrQueryRegistrationType) unmarshal;
 
-			return handle(username, oadrQueryRegistrationType, false);
+				return handle(username, oadrQueryRegistrationType, false);
 
-		} else if (unmarshal instanceof OadrResponseType) {
+			} else if (unmarshal instanceof OadrResponseType) {
 
-			LOGGER.info(username + " - OadrResponseType");
+				LOGGER.info(username + " - OadrResponseType");
 
-			OadrResponseType oadrResponseType = (OadrResponseType) unmarshal;
+				OadrResponseType oadrResponseType = (OadrResponseType) unmarshal;
 
-			return handle(username, oadrResponseType, false);
+				return handle(username, oadrResponseType, false);
 
+			} else {
+				throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiRegisterParty");
+			}
+		} catch (Oadr20bUnmarshalException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bXMLSignatureValidationException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bQueryRegistrationTypeApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bMarshalException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bXMLSignatureException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bCreatePartyRegistrationTypeApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bCancelPartyRegistrationTypeApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bCanceledPartyRegistrationTypeApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bResponsePartyReregistrationApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
 		}
 
-		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiRegisterParty");
+	}
+
+	@Override
+	public String getServiceName() {
+		return EI_SERVICE_NAME;
 	}
 
 }

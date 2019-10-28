@@ -9,7 +9,7 @@
 		<Logger level="info" name="com.avob" additivity="false">
 			<AppenderRef ref="Console" />
 		</Logger>
-		<Logger level="debug" name="org.springframework" additivity="false">
+		<Logger level="info" name="org.springframework" additivity="false">
 			<AppenderRef ref="Console" />
 		</Logger>
 		<Root level="warn">

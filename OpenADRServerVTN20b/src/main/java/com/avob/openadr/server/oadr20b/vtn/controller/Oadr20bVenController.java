@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -77,6 +78,7 @@ import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportDataPayload
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportRequestService;
 import com.google.common.collect.Lists;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/Ven")
 @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEVICE_MANAGER')")

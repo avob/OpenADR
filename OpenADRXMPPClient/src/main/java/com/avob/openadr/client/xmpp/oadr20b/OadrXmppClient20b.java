@@ -74,8 +74,7 @@ public class OadrXmppClient20b {
 			String resource, SSLContext context) throws OadrXmppException {
 		try {
 			return XMPPTCPConnectionConfiguration.builder().setHost(host).setPort(port)
-					.performSaslAnonymousAuthentication().setSecurityMode(ConnectionConfiguration.SecurityMode.disabled)
-					.setCompressionEnabled(false).setResource(resource).setXmppDomain(domain)
+					.performSaslAnonymousAuthentication().setResource(resource).setXmppDomain(domain)
 					.setCustomSSLContext(context).build();
 		} catch (XmppStringprepException e) {
 			throw new OadrXmppException(e);
@@ -108,9 +107,9 @@ public class OadrXmppClient20b {
 			EntityBareJid authzid = JidCreate.entityBareFrom(resource + "@" + host);
 
 			connection = new XMPPTCPConnection(config);
-			connection.setUseStreamManagement(false);
-			connection.setUseStreamManagementResumption(false);
-			connection.setReplyTimeout(20000);
+//			connection.setUseStreamManagement(false);
+//			connection.setUseStreamManagementResumption(false);
+//			connection.setReplyTimeout(20000);
 
 			setDomainJid(JidCreate.domainBareFrom(XMPP_OADR_SUBDOMAIN + "." + domain));
 			setClientJid(JidCreate.entityFullFrom(venId, XMPP_OADR_SUBDOMAIN + "." + domain, resource));

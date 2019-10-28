@@ -51,10 +51,7 @@ public class Oadr20bVTNEiEventController {
 	@PreAuthorize("hasRole('ROLE_VEN') AND hasRole('ROLE_REGISTERED')")
 	@RequestMapping(value = Oadr20bUrlPath.EI_EVENT_SERVICE, method = RequestMethod.POST)
 	@ResponseBody
-	public String request(@RequestBody String payload, Principal principal)
-			throws Oadr20bUnmarshalException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
-			Oadr20bXMLSignatureValidationException, Oadr20bCreatedEventApplicationLayerException,
-			Oadr20bRequestEventApplicationLayerException, Oadr20bXMLSignatureException {
+	public String request(@RequestBody String payload, Principal principal) throws Oadr20bApplicationLayerException {
 
 		return oadr20aVtnEiEventService.request(principal.getName(), payload);
 

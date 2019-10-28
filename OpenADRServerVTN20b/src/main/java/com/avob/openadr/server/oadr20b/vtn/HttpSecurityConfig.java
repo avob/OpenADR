@@ -52,7 +52,7 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(HttpSecurityConfig.class);
 
-	@Value("${vtn.cors:@null}}")
+	@Value("${vtn.cors:@null}")
 	private String corsStr;
 
 	private List<String> cors = null;

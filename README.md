@@ -43,7 +43,7 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 ### Build apps and start VM
 ```shell
 	# build backend with external profile
-	mvn clean package install -P external -DskipTests=true
+	mvn clean package install -P external,frontend -DskipTests=true
 	# create and provision VM
 	cd devops/vtn20b_postgres
 	vagrant up

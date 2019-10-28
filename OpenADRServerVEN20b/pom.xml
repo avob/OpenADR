@@ -11,13 +11,11 @@
 		<version>0.1.0-SNAPSHOT</version>
 	</parent>
 	<dependencies>
-
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRHTTPClient20b</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRXMPPClient</artifactId>

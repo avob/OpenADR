@@ -62,7 +62,9 @@ import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bCreatedEvent
 import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bRequestEventApplicationLayerException;
 
 @Service
-public class Oadr20bVTNEiEventService {
+public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
+
+	private static final String EI_SERVICE_NAME = "EiEvent";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiEventService.class);
 
@@ -519,48 +521,66 @@ public class Oadr20bVTNEiEventService {
 
 	}
 
-	public String request(String username, String payload)
-			throws Oadr20bUnmarshalException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
-			Oadr20bXMLSignatureValidationException, Oadr20bCreatedEventApplicationLayerException,
-			Oadr20bRequestEventApplicationLayerException, Oadr20bXMLSignatureException {
+	@Override
+	public String request(String username, String payload) throws Oadr20bApplicationLayerException {
 
-		Object unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
+		Object unmarshal;
+		try {
+			unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
 
-		if (unmarshal instanceof OadrPayload) {
+			if (unmarshal instanceof OadrPayload) {
 
-			OadrPayload oadrPayload = (OadrPayload) unmarshal;
+				OadrPayload oadrPayload = (OadrPayload) unmarshal;
 
-			xmlSignatureService.validate(payload, oadrPayload);
+				xmlSignatureService.validate(payload, oadrPayload);
 
-			return handle(username, oadrPayload);
+				return handle(username, oadrPayload);
 
-		} else if (unmarshal instanceof OadrCreatedEventType) {
+			} else if (unmarshal instanceof OadrCreatedEventType) {
 
-			LOGGER.info(username + " - OadrCreatedEvent");
+				LOGGER.info(username + " - OadrCreatedEvent");
 
-			OadrCreatedEventType oadrCreatedEvent = (OadrCreatedEventType) unmarshal;
+				OadrCreatedEventType oadrCreatedEvent = (OadrCreatedEventType) unmarshal;
 
-			return handle(username, oadrCreatedEvent, false);
+				return handle(username, oadrCreatedEvent, false);
 
-		} else if (unmarshal instanceof OadrRequestEventType) {
+			} else if (unmarshal instanceof OadrRequestEventType) {
 
-			LOGGER.info(username + " - OadrRequestEvent");
+				LOGGER.info(username + " - OadrRequestEvent");
 
-			OadrRequestEventType oadrRequestEvent = (OadrRequestEventType) unmarshal;
+				OadrRequestEventType oadrRequestEvent = (OadrRequestEventType) unmarshal;
 
-			return handle(username, oadrRequestEvent, false);
+				return handle(username, oadrRequestEvent, false);
 
-		} else if (unmarshal instanceof OadrResponseType) {
+			} else if (unmarshal instanceof OadrResponseType) {
 
-			LOGGER.info(username + " - OadrResponseType");
+				LOGGER.info(username + " - OadrResponseType");
 
-//			OadrResponseType oadrRequestEvent = (OadrResponseType) unmarshal;
+//				OadrResponseType oadrRequestEvent = (OadrResponseType) unmarshal;
 
-			return null;
+				return null;
 
+			} else {
+				throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
+			}
+		} catch (Oadr20bUnmarshalException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bXMLSignatureValidationException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bCreatedEventApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bRequestEventApplicationLayerException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bMarshalException e) {
+			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bXMLSignatureException e) {
+			throw new Oadr20bApplicationLayerException(e);
 		}
 
-		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
 	}
 
+	@Override
+	public String getServiceName() {
+		return EI_SERVICE_NAME;
+	}
 }

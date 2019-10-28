@@ -2,6 +2,7 @@ package com.avob.openadr.server.oadr20b.vtn;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -9,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.avob.openadr.server.oadr20b.vtn.converter.InstantConverter;
 
 @Configuration
+@EnableWebMvc
 public class MvcConfig implements WebMvcConfigurer {
 
 	@Override
@@ -31,5 +33,9 @@ public class MvcConfig implements WebMvcConfigurer {
 		registry.addResourceHandler("/api/swagger-ui.html**")
 				.addResourceLocations("classpath:/META-INF/resources/swagger-ui.html");
 		registry.addResourceHandler("/api/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+
+		registry.addResourceHandler("/**").addResourceLocations("classpath:/public/");
+
 	}
+
 }

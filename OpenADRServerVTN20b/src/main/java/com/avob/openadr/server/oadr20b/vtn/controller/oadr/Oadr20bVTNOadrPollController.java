@@ -98,11 +98,7 @@ public class Oadr20bVTNOadrPollController {
 
 		oadr20bVTNOadrPollService.checkMatchUsernameWithRequestVenId(username, oadrPollType);
 
-		String oadrPoll = oadr20bVTNOadrPollService.oadrPoll(oadrPollType, signed);
-
-		// LOGGER.debug(oadrPoll);
-
-		return oadrPoll;
+		return oadr20bVTNOadrPollService.oadrPoll(oadrPollType, signed);
 
 	}
 

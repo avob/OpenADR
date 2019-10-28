@@ -22,34 +22,33 @@ import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20b;
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.exception.Oadr20bXmppException;
+import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
+import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiOptService;
+import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiRegisterPartyService;
+import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
 
 @Service
 public class XmppConnector {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(XmppConnector.class);
 
-	private static final String EVENT_SERVICE = "EiEvent";
-
-	private static final String REPORT_SERVICE = "EiReport";
-
-	private static final String REGISTERPARTY_SERVICE = "EiRegisterParty";
-
-	private static final String OPT_SERVICE = "EiOpt";
-
 	@Resource
 	private VtnConfig vtnConfig;
 
 	@Resource
-	private XmppRegisterPartyMessageListener xmppRegisterPartyMessageListener;
+	private XmppUplinkClient xmppUplinkClient;
 
 	@Resource
-	private XmppReportMessageListener xmppReportMessageListener;
+	private Oadr20bVTNEiRegisterPartyService oadr20bVTNEiRegisterPartyService;
 
 	@Resource
-	private XmppEventMessageListener xmppEventMessageListener;
+	private Oadr20bVTNEiReportService oadr20bVTNEiReportService;
 
 	@Resource
-	private XmppOptMessageListener xmppOptMessageListener;
+	private Oadr20bVTNEiEventService oadr20bVTNEiEventService;
+
+	@Resource
+	private Oadr20bVTNEiOptService oadr20bVTNEiOptService;
 
 	private Map<String, OadrXmppClient20b> perOadrServiceDownlinkClient = new HashMap<>();
 
@@ -75,17 +74,22 @@ public class XmppConnector {
 				String domain = (vtnConfig.getXmppDomain() != null) ? vtnConfig.getXmppDomain()
 						: vtnConfig.getXmppHost();
 
-				perOadrServiceDownlinkClient.put(REGISTERPARTY_SERVICE, new OadrXmppClient20b(vtnId, host, port, domain,
-						REGISTERPARTY_SERVICE, sslContext, xmppRegisterPartyMessageListener));
+				perOadrServiceDownlinkClient.put(oadr20bVTNEiRegisterPartyService.getServiceName(),
+						new OadrXmppClient20b(vtnId, host, port, domain,
+								oadr20bVTNEiRegisterPartyService.getServiceName(), sslContext,
+								new XmppListener(oadr20bVTNEiRegisterPartyService, xmppUplinkClient)));
 
-				perOadrServiceDownlinkClient.put(EVENT_SERVICE, new OadrXmppClient20b(vtnId, host, port, domain,
-						EVENT_SERVICE, sslContext, xmppEventMessageListener));
+				perOadrServiceDownlinkClient.put(oadr20bVTNEiEventService.getServiceName(),
+						new OadrXmppClient20b(vtnId, host, port, domain, oadr20bVTNEiEventService.getServiceName(),
+								sslContext, new XmppListener(oadr20bVTNEiEventService, xmppUplinkClient)));
 
-				perOadrServiceDownlinkClient.put(REPORT_SERVICE, new OadrXmppClient20b(vtnId, host, port, domain,
-						REPORT_SERVICE, sslContext, xmppReportMessageListener));
+				perOadrServiceDownlinkClient.put(oadr20bVTNEiReportService.getServiceName(),
+						new OadrXmppClient20b(vtnId, host, port, domain, oadr20bVTNEiReportService.getServiceName(),
+								sslContext, new XmppListener(oadr20bVTNEiReportService, xmppUplinkClient)));
 
-				perOadrServiceDownlinkClient.put(OPT_SERVICE, new OadrXmppClient20b(vtnId, host, port, domain,
-						OPT_SERVICE, sslContext, xmppOptMessageListener));
+				perOadrServiceDownlinkClient.put(oadr20bVTNEiOptService.getServiceName(),
+						new OadrXmppClient20b(vtnId, host, port, domain, oadr20bVTNEiOptService.getServiceName(),
+								sslContext, new XmppListener(oadr20bVTNEiOptService, xmppUplinkClient)));
 
 				LOGGER.info("Xmpp VTN connector successfully initialized");
 
