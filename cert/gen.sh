@@ -106,7 +106,7 @@ gen_oadr20a_fingerprint()
 gen_selfsigned_key_crt()
 {
 	openssl req -nodes -new -x509  -keyout $1.key -out $1.crt \
-		-subj "/C=$COUNTRY/ST=$STATE/L=$LOCALITY/O=$ORGANIZATION/OU=$ORGANIZATION/CN=$1"
+		-subj "/C=$COUNTRY/ST=$STATE/L=$LOCALITY/O=$ORGANIZATION/OU=$ORGANIZATION/CN=$1" -days 365
 }
 ###################################
 # CA
