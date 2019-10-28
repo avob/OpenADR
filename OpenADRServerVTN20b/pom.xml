@@ -78,9 +78,6 @@
 				<directory>${project.build.directory}/maven-shared-archive-resources/oadr20b_schema/*</directory>
 			</resource>
 			<resource>
-				<directory>${project.build.directory}/classes/public/*</directory>
-			</resource>
-			<resource>
 				<directory>src/main/resources</directory>
 			</resource>
 			<resource>
@@ -148,7 +145,7 @@
 		<profile>
 			<id>frontend</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
+				<activeByDefault>false</activeByDefault>
 			</activation>
 			<build>
 				<plugins>
@@ -168,8 +165,8 @@
 									<goal>install-node-and-npm</goal>
 								</goals>
 								<configuration>
-									<nodeVersion>v8.9.4</nodeVersion>
-									<npmVersion>5.6.0</npmVersion>
+									<nodeVersion>v12.13.0</nodeVersion>
+									<npmVersion>6.12.0</npmVersion>
 								</configuration>
 							</execution>
 							<execution>
