@@ -42,8 +42,7 @@ public class Oadr20bVENEiReportService {
 	@Resource
 	private MultiVtnConfig multiVtnConfig;
 
-	public OadrRegisterReportType selfOadrRegisterReport(String requestId, String venId, String vtnSource,
-			String reportRequestId) {
+	public OadrRegisterReportType selfOadrRegisterReport(String requestId, String venId, String reportRequestId) {
 		return Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder(requestId, venId, reportRequestId).build();
 	}
 
@@ -51,10 +50,9 @@ public class Oadr20bVENEiReportService {
 			OadrUpdateReportType oadrUpdateReportType) {
 
 		String requestID = oadrUpdateReportType.getRequestID();
-		String venID = oadrUpdateReportType.getVenID();
 
-		return Oadr20bEiReportBuilders
-				.newOadr20bUpdatedReportBuilder(requestID, Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, venID)
+		return Oadr20bEiReportBuilders.newOadr20bUpdatedReportBuilder(requestID,
+				Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, vtnConfig.getVenSessionConfig().getVenId())
 				.build();
 	}
 
@@ -72,10 +70,9 @@ public class Oadr20bVENEiReportService {
 			OadrCreateReportType oadrCreateReportType) {
 
 		String requestID = oadrCreateReportType.getRequestID();
-		String venID = oadrCreateReportType.getVenID();
 
-		return Oadr20bEiReportBuilders
-				.newOadr20bCreatedReportBuilder(requestID, Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, venID)
+		return Oadr20bEiReportBuilders.newOadr20bCreatedReportBuilder(requestID,
+				Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, vtnConfig.getVenSessionConfig().getVenId())
 				.build();
 	}
 
@@ -87,14 +84,13 @@ public class Oadr20bVENEiReportService {
 			OadrCancelReportType oadrCancelReportType) {
 
 		String requestID = oadrCancelReportType.getRequestID();
-		String venID = oadrCancelReportType.getVenID();
 
-		return Oadr20bEiReportBuilders
-				.newOadr20bCanceledReportBuilder(requestID, Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, venID)
+		return Oadr20bEiReportBuilders.newOadr20bCanceledReportBuilder(requestID,
+				Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, vtnConfig.getVenSessionConfig().getVenId())
 				.build();
 	}
 
-	public Object handle(VtnSessionConfiguration multiConfig, String raw, OadrPayload oadrPayload)
+	public Object handle(VtnSessionConfiguration multiConfig, OadrPayload oadrPayload)
 			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureException, OadrSecurityException {
 
@@ -133,7 +129,7 @@ public class Oadr20bVENEiReportService {
 
 			payloadHandler.validate(multiConfig, payload, oadrPayload);
 
-			response = handle(multiConfig, payload, oadrPayload);
+			response = handle(multiConfig, oadrPayload);
 
 			sign = true;
 

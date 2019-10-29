@@ -56,6 +56,8 @@ public class DemandResponseEventService {
 
 	private static final Integer DEFAULT_SEARCH_SIZE = 20;
 
+	private static final Sort SORT_ASC_ACTIVEPERIOD = Sort.by(Sort.Direction.ASC, "activePeriod.start");
+
 	@Value("${oadr.supportPush:#{false}}")
 	private Boolean supportPush;
 
@@ -106,11 +108,11 @@ public class DemandResponseEventService {
 			limit = PageRequest.of(0, i);
 		}
 
-		Iterable<DemandResponseEvent> events = new ArrayList<DemandResponseEvent>();
+		Iterable<DemandResponseEvent> events = new ArrayList<>();
 
 		if (venUsername == null && state == null && limit == null) {
 			events = demandResponseEventDao.findAll();
-		} else if (venUsername == null && state == null && limit != null) {
+		} else if (venUsername == null && state == null) {
 			events = demandResponseEventDao.findAll(limit);
 
 		} else if (venUsername != null && state == null && limit == null) {
@@ -208,13 +210,10 @@ public class DemandResponseEventService {
 		// link targets
 		List<Ven> findByUsernameIn = findVenForTarget(event, dto.getTargets());
 
-		List<VenDemandResponseEvent> list = new ArrayList<VenDemandResponseEvent>();
+		List<VenDemandResponseEvent> list = new ArrayList<>();
 		for (Ven ven : findByUsernameIn) {
-//			if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
-			if (demandResponseEventPublisher != null) {
-				if (event.isPublished()) {
-					pushAsync(Arrays.asList(ven), dto.getDescriptor().getOadrProfile());
-				}
+			if (demandResponseEventPublisher != null && event.isPublished()) {
+				pushAsync(Arrays.asList(ven), dto.getDescriptor().getOadrProfile());
 			}
 			list.add(new VenDemandResponseEvent(event, ven));
 		}
@@ -275,9 +274,7 @@ public class DemandResponseEventService {
 		DemandResponseEvent partialUpdate = dtoMapper.map(dto, DemandResponseEvent.class);
 		// link signals
 		demandResponseEventSignalDao.deleteAll(event.getSignals());
-		partialUpdate.getSignals().forEach(sig -> {
-			sig.setEvent(event);
-		});
+		partialUpdate.getSignals().forEach(sig -> sig.setEvent(event));
 		demandResponseEventSignalDao.saveAll(partialUpdate.getSignals());
 		// update event
 		event.setSignals(partialUpdate.getSignals());
@@ -287,22 +284,20 @@ public class DemandResponseEventService {
 		DemandResponseEvent save = demandResponseEventDao.save(event);
 
 		// link added targets
-		if (toAdd.size() > 0) {
+		if (!toAdd.isEmpty()) {
 			List<Ven> vens = findVenForTarget(event, toAdd);
 			List<VenDemandResponseEvent> list = new ArrayList<VenDemandResponseEvent>();
 			for (Ven ven : vens) {
-//				if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
-					if (dto.isPublished()) {
-						pushAsync(Arrays.asList(ven), event.getDescriptor().getOadrProfile());
-					}
-//				}
+				if (dto.isPublished()) {
+					pushAsync(Arrays.asList(ven), event.getDescriptor().getOadrProfile());
+				}
 				list.add(new VenDemandResponseEvent(event, ven));
 			}
 			venDemandResponseEventDao.saveAll(list);
 		}
 
 		// unlink removed target
-		if (toRemove.size() > 0) {
+		if (!toRemove.isEmpty()) {
 			List<Ven> vens = findVenForTarget(event, toRemove);
 			venDemandResponseEventDao.deleteByEventIdAndVenIn(event.getId(), vens);
 		}
@@ -317,11 +312,7 @@ public class DemandResponseEventService {
 	public void distributeEventToPushVen(DemandResponseEvent event) {
 		List<Ven> vens = findVenForTarget(event, event.getTargets());
 		for (Ven ven : vens) {
-//			if (supportPush && ven.getPushUrl() != null && demandResponseEventPublisher != null) {
-				pushAsync(Arrays.asList(ven), event.getDescriptor().getOadrProfile());
-//			} else {
-//				
-//			}
+			pushAsync(Arrays.asList(ven), event.getDescriptor().getOadrProfile());
 		}
 	}
 
@@ -365,31 +356,6 @@ public class DemandResponseEventService {
 	}
 
 	private void pushAsync(List<Ven> vens, DemandResponseEventOadrProfileEnum profile) {
-//		Runnable run = new Runnable() {
-//
-//			@Override
-//			public void run() {
-//				for (Ven ven : vens) {
-//					// the receiver check if ven is a push ven and how it
-//					// does
-//					// make
-//					// event available if not
-////					if (DemandResponseEventOadrProfileEnum.OADR20B.equals(profile)
-////							&& DemandResponseEventOadrProfileEnum.OADR20B.getCode().equals(ven.getOadrProfil())) {
-////						
-////					} else 
-//					if (DemandResponseEventOadrProfileEnum.OADR20A.equals(profile)) {
-//						demandResponseEventPublisher.publish20a(ven);
-//					} else {
-//						demandResponseEventPublisher.publish20b(ven);
-//					}
-//				}
-//			}
-//
-//		};
-//
-//		executor.execute(run);
-		
 		for (Ven ven : vens) {
 
 			if (DemandResponseEventOadrProfileEnum.OADR20A.equals(profile)) {
@@ -487,7 +453,7 @@ public class DemandResponseEventService {
 		if (size != null && size > 0) {
 			Pageable limit = null;
 			int i = (int) (long) size;
-			limit = PageRequest.of(0, i, Sort.by(Sort.Direction.ASC, "activePeriod.start"));
+			limit = PageRequest.of(0, i, SORT_ASC_ACTIVEPERIOD);
 
 			Page<DemandResponseEvent> findAll = demandResponseEventDao
 					.findAll(DemandResponseEventSpecification.toSentByVenUsername(username), limit);
@@ -495,7 +461,7 @@ public class DemandResponseEventService {
 
 		} else {
 			return demandResponseEventDao.findAll(DemandResponseEventSpecification.toSentByVenUsername(username),
-					Sort.by(Sort.Direction.ASC, "activePeriod.start"));
+					SORT_ASC_ACTIVEPERIOD);
 		}
 	}
 
@@ -531,8 +497,7 @@ public class DemandResponseEventService {
 			spec = spec.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrBefore(end));
 		}
 
-		return demandResponseEventDao.findAll(spec,
-				PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "activePeriod.start")));
+		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size, SORT_ASC_ACTIVEPERIOD));
 	}
 
 }

@@ -149,21 +149,10 @@ public class Oadr20bFactory {
 	private static final com.avob.openadr.model.oadr20b.ei.ObjectFactory eiFactory = new com.avob.openadr.model.oadr20b.ei.ObjectFactory();
 	private static final com.avob.openadr.model.oadr20b.strm.ObjectFactory strmFactory = new com.avob.openadr.model.oadr20b.strm.ObjectFactory();
 	private static final com.avob.openadr.model.oadr20b.xcal.ObjectFactory xcalFactory = new com.avob.openadr.model.oadr20b.xcal.ObjectFactory();
-	// private static final com.avob.openadr.model.oadr20b.atom.ObjectFactory
-	// atomFactory = new com.avob.openadr.model.oadr20b.atom.ObjectFactory();
 	private static final com.avob.openadr.model.oadr20b.emix.ObjectFactory emixFactory = new com.avob.openadr.model.oadr20b.emix.ObjectFactory();
 	private static final com.avob.openadr.model.oadr20b.gml.ObjectFactory gmlFactory = new com.avob.openadr.model.oadr20b.gml.ObjectFactory();
-	// private static final
-	// com.avob.openadr.model.oadr20b.greenbutton.ObjectFactory
-	// greenbuttonFactory = new
-	// com.avob.openadr.model.oadr20b.greenbutton.ObjectFactory();
-	// private static final com.avob.openadr.model.oadr20b.iso.ObjectFactory
-	// isoFactory = new com.avob.openadr.model.oadr20b.iso.ObjectFactory();
 	private static final com.avob.openadr.model.oadr20b.power.ObjectFactory powerFactory = new com.avob.openadr.model.oadr20b.power.ObjectFactory();
 	private static final com.avob.openadr.model.oadr20b.pyld.ObjectFactory pyldFactory = new com.avob.openadr.model.oadr20b.pyld.ObjectFactory();
-	// private static final com.avob.openadr.model.oadr20b.siscale.ObjectFactory
-	// siscaleFactory = new
-	// com.avob.openadr.model.oadr20b.siscale.ObjectFactory();
 	private static final com.avob.openadr.model.oadr20b.xmldsig.properties.ObjectFactory xmldsigPropertiesFactory = new com.avob.openadr.model.oadr20b.xmldsig.properties.ObjectFactory();
 	private static final com.avob.openadr.model.oadr20b.avob.ObjectFactory avobFactory = new com.avob.openadr.model.oadr20b.avob.ObjectFactory();
 
@@ -182,8 +171,6 @@ public class Oadr20bFactory {
 	}
 
 	public static Long xmlCalendarToTimestamp(XMLGregorianCalendar calendar) {
-		// calendar.setTimezone(0);
-
 		GregorianCalendar gregorianCalendar = calendar.toGregorianCalendar();
 		gregorianCalendar.setTimeZone(TimeZone.getTimeZone("UTC"));
 		return gregorianCalendar.getTimeInMillis();

@@ -106,8 +106,8 @@ public class OadrPKISecurityTest {
 
 	@Test
 	public void generateCredentialsTest()
-			throws NoSuchAlgorithmException, OperatorCreationException, IOException, CertificateException,
-			NoSuchProviderException, OadrSecurityException, InvalidKeyException, SignatureException {
+			throws NoSuchAlgorithmException, IOException, CertificateException, NoSuchProviderException,
+			OadrSecurityException, InvalidKeyException, SignatureException, OperatorCreationException {
 		KeyPair ca = OadrPKISecurity.generateRsaKeyPair();
 		SubjectPublicKeyInfo subPubKeyInfo = SubjectPublicKeyInfo.getInstance(ca.getPublic().getEncoded());
 		AlgorithmIdentifier sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find("SHA256withRSA");

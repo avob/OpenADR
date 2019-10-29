@@ -14,25 +14,28 @@ import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
 
 public class VenSpecification {
 
-	static public Specification<Ven> hasMarketContext(String marketContextName) {
+	private VenSpecification() {
+	}
+
+	public static Specification<Ven> hasMarketContext(String marketContextName) {
 		return (ven, cq, cb) -> {
 			Join<Ven, VenGroup> join = ven.join("venMarketContexts", JoinType.INNER);
 			return cb.equal(join.get("name"), marketContextName);
 		};
 	}
 
-	static public Specification<Ven> hasGroup(String groupName) {
+	public static Specification<Ven> hasGroup(String groupName) {
 		return (ven, cq, cb) -> {
 			Join<Ven, VenGroup> join = ven.join("venGroups", JoinType.INNER);
 			return cb.equal(join.get("name"), groupName);
 		};
 	}
 
-	static public Specification<Ven> isRegistered() {
+	public static Specification<Ven> isRegistered() {
 		return (ven, cq, cb) -> cb.isNotNull(ven.get("registrationId"));
 	}
 
-	static public Specification<Ven> isRegistered(Boolean reg) {
+	public static Specification<Ven> isRegistered(Boolean reg) {
 		if (reg) {
 			return VenSpecification.isRegistered();
 		} else {
@@ -40,34 +43,34 @@ public class VenSpecification {
 		}
 	}
 
-	static public Specification<Ven> isNotRegistered() {
+	public static Specification<Ven> isNotRegistered() {
 		return (ven, cq, cb) -> Specification.not(VenSpecification.isRegistered()).toPredicate(ven, cq, cb);
 	}
 
-	static public Specification<Ven> hasEventId(String eventId) {
+	public static Specification<Ven> hasEventId(String eventId) {
 		return (ven, cq, cb) -> {
 			ListJoin<Ven, VenDemandResponseEvent> joinList = ven.joinList("venDemandResponseEvent", JoinType.INNER);
 			return cb.equal(joinList.get("event").get("id"), eventId);
 		};
 	}
 
-	static public Specification<Ven> hasVenIdEquals(String str) {
+	public static Specification<Ven> hasVenIdEquals(String str) {
 		return (event, cq, cb) -> cb.equal(event.get("username"), str);
 	}
 
-	static public Specification<Ven> hasVenIdContains(String str) {
+	public static Specification<Ven> hasVenIdContains(String str) {
 		return (event, cq, cb) -> cb.like(event.get("username"), "%" + str + "%");
 	}
 
-	static public Specification<Ven> hasVenCommonNameContains(String str) {
+	public static Specification<Ven> hasVenCommonNameContains(String str) {
 		return (event, cq, cb) -> cb.like(event.get("commonName"), "%" + str + "%");
 	}
 
-	static public Specification<Ven> hasVenOadrNameContains(String str) {
+	public static Specification<Ven> hasVenOadrNameContains(String str) {
 		return (event, cq, cb) -> cb.like(event.get("oadrName"), "%" + str + "%");
 	}
 
-	static public Specification<Ven> search(List<VenFilter> filters) {
+	public static Specification<Ven> search(List<VenFilter> filters) {
 		Specification<Ven> eventIdPredicates = null;
 		Specification<Ven> groupPredicates = null;
 		Specification<Ven> marketContextPredicates = null;

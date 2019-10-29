@@ -70,12 +70,9 @@ public class Oadr20bVENEiEventService {
 	/**
 	 * threadsafe repository
 	 */
-	private Map<String, Map<String, OadrEvent>> oadrEvents = new ConcurrentHashMap<String, Map<String, OadrEvent>>();
+	private Map<String, Map<String, OadrEvent>> oadrEvents = new ConcurrentHashMap<>();
 
-	/**
-	 * Map<vtnconf , Map<eventId, List<ScheduledFuture<?>>>>
-	 */
-	private Map<String, Map<String, List<ScheduledFuture<?>>>> scheduledTask = new ConcurrentHashMap<String, Map<String, List<ScheduledFuture<?>>>>();
+	private Map<String, Map<String, List<ScheduledFuture<?>>>> scheduledTask = new ConcurrentHashMap<>();
 
 	public interface Oadr20bVENEiEventServiceListener {
 		public void onCreateEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event);
@@ -171,19 +168,9 @@ public class Oadr20bVENEiEventService {
 					xmppClient.oadrCreatedEvent(payload);
 				}
 
-			} catch (Oadr20bException e) {
-				LOGGER.error("", e);
-			} catch (Oadr20bHttpLayerException e) {
-				LOGGER.error("", e);
-			} catch (Oadr20bXMLSignatureException e) {
-				LOGGER.error("", e);
-			} catch (Oadr20bXMLSignatureValidationException e) {
-				LOGGER.error("", e);
-			} catch (XmppStringprepException e) {
-				LOGGER.error("", e);
-			} catch (NotConnectedException e) {
-				LOGGER.error("", e);
-			} catch (Oadr20bMarshalException e) {
+			} catch (Oadr20bException | Oadr20bHttpLayerException | Oadr20bXMLSignatureException
+					| Oadr20bXMLSignatureValidationException | XmppStringprepException | NotConnectedException
+					| Oadr20bMarshalException e) {
 				LOGGER.error("", e);
 			} catch (InterruptedException e) {
 				LOGGER.error("", e);
@@ -329,12 +316,11 @@ public class Oadr20bVENEiEventService {
 	public OadrResponseType oadrDistributeEvent(VtnSessionConfiguration vtnConfiguration, OadrDistributeEventType event)
 			throws Oadr20bDistributeEventApplicationLayerException {
 
-		// String vtnID = event.getVtnID();
 		String vtnRequestID = event.getRequestID();
 
 		int responseCode = HttpStatus.OK_200;
-		List<String> retrievedEventIdList = new ArrayList<String>();
-		List<EventResponse> eventResponses = new ArrayList<EventResponse>();
+		List<String> retrievedEventIdList = new ArrayList<>();
+		List<EventResponse> eventResponses = new ArrayList<>();
 		for (Iterator<OadrEvent> iterator = event.getOadrEvent().iterator(); iterator.hasNext();) {
 			OadrEvent next = iterator.next();
 			String eventID = next.getEiEvent().getEventDescriptor().getEventID();
@@ -445,7 +431,7 @@ public class Oadr20bVENEiEventService {
 	public Map<String, OadrEvent> getOadrEvents(VtnSessionConfiguration vtnConfiguration) {
 		Map<String, OadrEvent> map = oadrEvents.get(vtnConfiguration.getVtnId());
 		if (map == null) {
-			map = new ConcurrentHashMap<String, OadrEvent>();
+			map = new ConcurrentHashMap<>();
 		}
 		return map;
 	}
@@ -453,7 +439,7 @@ public class Oadr20bVENEiEventService {
 	public void putOadrEvents(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
 		Map<String, OadrEvent> map = oadrEvents.get(vtnConfiguration.getVtnId());
 		if (map == null) {
-			map = new ConcurrentHashMap<String, OadrEvent>();
+			map = new ConcurrentHashMap<>();
 		}
 		map.put(event.getEiEvent().getEventDescriptor().getEventID(), event);
 		oadrEvents.put(vtnConfiguration.getVtnId(), map);
@@ -475,12 +461,12 @@ public class Oadr20bVENEiEventService {
 		Map<String, List<ScheduledFuture<?>>> map = scheduledTask.get(vtnConfiguration.getVtnId());
 		List<ScheduledFuture<?>> list = null;
 		if (map == null) {
-			map = new ConcurrentHashMap<String, List<ScheduledFuture<?>>>();
+			map = new ConcurrentHashMap<>();
 		} else {
 			list = map.get(eventId);
 		}
 		if (list == null) {
-			list = new ArrayList<ScheduledFuture<?>>();
+			list = new ArrayList<>();
 		}
 		list.add(task);
 		map.put(eventId, list);
@@ -507,7 +493,7 @@ public class Oadr20bVENEiEventService {
 	public List<String> findMissingEventID(VtnSessionConfiguration vtnConfiguration, List<String> retrievedIdList) {
 		Map<String, OadrEvent> map = oadrEvents.get(vtnConfiguration.getVtnId());
 		if (map != null) {
-			List<String> keys = new ArrayList<String>(map.keySet());
+			List<String> keys = new ArrayList<>(map.keySet());
 			keys.removeAll(retrievedIdList);
 			return keys;
 		}
@@ -520,7 +506,7 @@ public class Oadr20bVENEiEventService {
 
 	public void addListener(Oadr20bVENEiEventServiceListener listener) {
 		if (listeners == null) {
-			listeners = new ArrayList<Oadr20bVENEiEventServiceListener>();
+			listeners = new ArrayList<>();
 		}
 		listeners.add(listener);
 	}

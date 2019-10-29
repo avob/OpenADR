@@ -10,7 +10,6 @@ import javax.annotation.Resource;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
-import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -107,19 +106,12 @@ public class Oadr20bVENEiRegisterPartyService {
 		setRegistration(vtnConfiguration, null);
 	}
 
-	public void initRegistration(VtnSessionConfiguration vtnConfiguration) {
-		this.initRegistration(vtnConfiguration, null);
-	}
-
 	public void reinitRegistration(VtnSessionConfiguration vtnConfiguration) {
-		String registrationId = (getRegistration(vtnConfiguration) != null)
-				? getRegistration(vtnConfiguration).getRegistrationID()
-				: null;
 		clearRegistration(vtnConfiguration);
-		this.initRegistration(vtnConfiguration, registrationId);
+		this.initRegistration(vtnConfiguration);
 	}
 
-	private void initRegistration(VtnSessionConfiguration vtnConfiguration, String registrationId) {
+	public void initRegistration(VtnSessionConfiguration vtnConfiguration) {
 
 		String requestId = "0";
 		OadrQueryRegistrationType queryRegistration = Oadr20bEiRegisterPartyBuilders
@@ -136,27 +128,13 @@ public class Oadr20bVENEiRegisterPartyService {
 				multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).oadrQueryRegistrationType(queryRegistration);
 			}
 
-		} catch (XmppStringprepException e) {
-			LOGGER.error("Fail to query registration", e);
-		} catch (NotConnectedException e) {
-			LOGGER.error("Fail to query registration", e);
-		} catch (Oadr20bException e) {
-			LOGGER.error("Fail to query registration", e);
-		} catch (Oadr20bHttpLayerException e) {
-			LOGGER.error("Fail to query registration", e);
-		} catch (Oadr20bXMLSignatureException e) {
-			LOGGER.error("Fail to query registration", e);
-		} catch (Oadr20bXMLSignatureValidationException e) {
-			LOGGER.error("Fail to query registration", e);
-		} catch (Oadr20bMarshalException e) {
+		} catch (Oadr20bException | Oadr20bHttpLayerException | Oadr20bXMLSignatureException
+				| Oadr20bXMLSignatureValidationException | Oadr20bMarshalException | OadrSecurityException | IOException
+				| NotConnectedException e) {
 			LOGGER.error("Fail to query registration", e);
 		} catch (InterruptedException e) {
 			LOGGER.error("Fail to query registration", e);
 			Thread.currentThread().interrupt();
-		} catch (OadrSecurityException e) {
-			LOGGER.error("Fail to query registration", e);
-		} catch (IOException e) {
-			LOGGER.error("Fail to query registration", e);
 		}
 
 	}
@@ -200,7 +178,7 @@ public class Oadr20bVENEiRegisterPartyService {
 
 	}
 
-	public Object handle(VtnSessionConfiguration vtnConfig, String raw, OadrPayload oadrPayload)
+	public Object handle(VtnSessionConfiguration vtnConfig, OadrPayload oadrPayload)
 			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureException, OadrSecurityException, IOException {
 
@@ -285,13 +263,8 @@ public class Oadr20bVENEiRegisterPartyService {
 				multiVtnConfig.getMultiXmppClientConfig(vtnConfig).oadrCreatePartyRegistration(createPartyRegistration);
 			}
 
-		} catch (NotConnectedException e) {
-			LOGGER.error("", e);
-		} catch (Oadr20bException e) {
-			LOGGER.error("", e);
-		} catch (Oadr20bHttpLayerException e) {
-			LOGGER.error("", e);
-		} catch (Oadr20bXMLSignatureValidationException e) {
+		} catch (NotConnectedException | Oadr20bException | Oadr20bHttpLayerException
+				| Oadr20bXMLSignatureValidationException e) {
 			LOGGER.error("", e);
 		} catch (InterruptedException e) {
 			LOGGER.error("", e);
@@ -318,7 +291,7 @@ public class Oadr20bVENEiRegisterPartyService {
 
 			payloadHandler.validate(vtnConfig, payload, oadrPayload);
 
-			response = handle(vtnConfig, payload, oadrPayload);
+			response = handle(vtnConfig, oadrPayload);
 
 			sign = true;
 

@@ -38,6 +38,13 @@ import com.avob.openadr.model.oadr20b.xcal.DurationPropType;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 
+/**
+ * VEN Poll service - make poll request to VTN at a given frequency and process
+ * response
+ * 
+ * @author bzanni
+ *
+ */
 @Service
 public class Oadr20bPollService {
 
@@ -58,7 +65,7 @@ public class Oadr20bPollService {
 	@Resource
 	private ScheduledExecutorService scheduledExecutorService;
 
-	private Map<String, ScheduledFuture<?>> httpScheduledPullRequestTask = new ConcurrentHashMap<String, ScheduledFuture<?>>();
+	private Map<String, ScheduledFuture<?>> httpScheduledPullRequestTask = new ConcurrentHashMap<>();
 
 	private class OadrPollTask implements Runnable {
 
@@ -108,8 +115,8 @@ public class Oadr20bPollService {
 				OadrRequestReregistrationType val = (OadrRequestReregistrationType) payload;
 
 				OadrResponseType oadrRequestReregistration = oadr20bVENEiRegisterPartyService
-						.oadrRequestReregistration(vtnSession, val);				
-				
+						.oadrRequestReregistration(vtnSession, val);
+
 				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
 						.oadrResponseReregisterParty(oadrRequestReregistration);
 
@@ -168,17 +175,13 @@ public class Oadr20bPollService {
 
 			} else if (payload != null) {
 				LOGGER.warn("Unknown retrieved payload: " + payload.getClass().toString());
-			} else if (payload == null) {
+			} else {
 				LOGGER.warn("Null payload");
 			}
 		}
 
 		@Override
 		public void run() {
-
-//			if (oadr20bVENEiRegisterPartyService.getRegistration(vtnSession) == null) {
-//				cancelHttpScheduledPullRequestTask(vtnSession, true);
-//			}
 
 			OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(vtnSession.getVenSessionConfig().getVenId())
 					.build();
@@ -202,43 +205,56 @@ public class Oadr20bPollService {
 				LOGGER.error("Fail to sign request payload", e);
 			} catch (Oadr20bXMLSignatureValidationException e) {
 				LOGGER.error("Fail to validate response xml signature", e);
-			} catch (Exception e) {
-				LOGGER.error("", e);
 			}
 
 		}
 
 	}
 
+	/**
+	 * Cancel planned poll request
+	 * 
+	 * @param vtnConfiguration
+	 * @param mayInterruptIfRunning
+	 */
 	public void cancelHttpScheduledPullRequestTask(VtnSessionConfiguration vtnConfiguration,
 			boolean mayInterruptIfRunning) {
 		if (httpScheduledPullRequestTask.get(vtnConfiguration.getVtnId()) != null) {
-			httpScheduledPullRequestTask.get(vtnConfiguration.getVtnId()).cancel(true);
+			httpScheduledPullRequestTask.get(vtnConfiguration.getVtnId()).cancel(mayInterruptIfRunning);
 			httpScheduledPullRequestTask.remove(vtnConfiguration.getVtnId());
 		}
 	}
 
+	/**
+	 * Reinit poll service
+	 * 
+	 * @param vtnConfiguration
+	 */
 	public void reinitPoll(VtnSessionConfiguration vtnConfiguration) {
 		cancelHttpScheduledPullRequestTask(vtnConfiguration, true);
 		initPoll(vtnConfiguration);
 	}
 
+	/**
+	 * Init poll service if VEN has been successfully registerd to VTN
+	 * 
+	 * @param vtnSession
+	 */
 	public void initPoll(VtnSessionConfiguration vtnSession) {
-		if (oadr20bVENEiRegisterPartyService.getRegistration(vtnSession) != null) {
-			if (vtnSession.getVenSessionConfig().getPullModel()) {
-				Long xmlDurationToMillisecond = vtnSession.getVenSessionConfig().getPullFrequencySeconds() * 1000;
-				DurationPropType oadrRequestedOadrPollFreq = oadr20bVENEiRegisterPartyService
-						.getRegistration(vtnSession).getOadrRequestedOadrPollFreq();
-				if (oadrRequestedOadrPollFreq != null) {
-					xmlDurationToMillisecond = Oadr20bFactory
-							.xmlDurationToMillisecond(oadrRequestedOadrPollFreq.getDuration());
-				}
-				LOGGER.debug("        pullFreq(ms): " + xmlDurationToMillisecond);
-				ScheduledFuture<?> scheduleWithFixedDelay = scheduledExecutorService.scheduleWithFixedDelay(
-						new OadrPollTask(vtnSession), xmlDurationToMillisecond, xmlDurationToMillisecond,
-						TimeUnit.MILLISECONDS);
-				httpScheduledPullRequestTask.put(vtnSession.getVtnId(), scheduleWithFixedDelay);
+		if (oadr20bVENEiRegisterPartyService.getRegistration(vtnSession) != null
+				&& vtnSession.getVenSessionConfig().getPullModel()) {
+			Long xmlDurationToMillisecond = vtnSession.getVenSessionConfig().getPullFrequencySeconds() * 1000;
+			DurationPropType oadrRequestedOadrPollFreq = oadr20bVENEiRegisterPartyService.getRegistration(vtnSession)
+					.getOadrRequestedOadrPollFreq();
+			if (oadrRequestedOadrPollFreq != null) {
+				xmlDurationToMillisecond = Oadr20bFactory
+						.xmlDurationToMillisecond(oadrRequestedOadrPollFreq.getDuration());
 			}
+			LOGGER.debug("        pullFreq(ms): " + xmlDurationToMillisecond);
+			ScheduledFuture<?> scheduleWithFixedDelay = scheduledExecutorService.scheduleWithFixedDelay(
+					new OadrPollTask(vtnSession), xmlDurationToMillisecond, xmlDurationToMillisecond,
+					TimeUnit.MILLISECONDS);
+			httpScheduledPullRequestTask.put(vtnSession.getVtnId(), scheduleWithFixedDelay);
 		}
 	}
 

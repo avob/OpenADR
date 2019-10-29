@@ -12,53 +12,73 @@ import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDeman
 
 public class DemandResponseEventSpecification {
 
-	static public Specification<DemandResponseEvent> isPublished() {
-		return (event, cq, cb) -> cb.isTrue(event.get("published"));
+	private static final String FILTER_NOT_SENDABLE = "NOT_SENDABLE";
+	private static final String FILTER_SENDABLE = "SENDABLE";
+	private static final String FILTER_EVENT_NOT_PUBLISHED = "NOT_PUBLISHED";
+	private static final String FILTER_EVENT_PUBLISHED = "PUBLISHED";
+	private static final String FIELD_END = "end";
+	private static final String FIELD_VEN_DEMAND_RESPONSE_EVENT = "venDemandResponseEvent";
+	private static final String FIELD_START = "start";
+	private static final String FIELD_ACTIVE_PERIOD = "activePeriod";
+	private static final String FIELD_USERNAME = "username";
+	private static final String FIELD_VEN = "ven";
+	private static final String FIELD_NAME = "name";
+	private static final String FIELD_MARKET_CONTEXT = "marketContext";
+	private static final String FIELD_STATE = "state";
+	private static final String FIELD_DESCRIPTOR = "descriptor";
+	private static final String FIELD_PUBLISHED = "published";
+
+	private DemandResponseEventSpecification() {
 	}
 
-	static public Specification<DemandResponseEvent> isPublished(Boolean published) {
-		return (event, cq, cb) -> cb.equal(event.get("published"), published);
+	public static Specification<DemandResponseEvent> isPublished() {
+		return (event, cq, cb) -> cb.isTrue(event.get(FIELD_PUBLISHED));
 	}
 
-	static public Specification<DemandResponseEvent> hasDescriptorState(DemandResponseEventStateEnum state) {
-		return (event, cq, cb) -> cb.equal(event.get("descriptor").get("state"), state);
+	public static Specification<DemandResponseEvent> isPublished(Boolean published) {
+		return (event, cq, cb) -> cb.equal(event.get(FIELD_PUBLISHED), published);
 	}
 
-	static public Specification<DemandResponseEvent> hasDescriptorMarketContext(String marketContextName) {
-		return (event, cq, cb) -> cb.equal(event.get("descriptor").get("marketContext").get("name"), marketContextName);
+	public static Specification<DemandResponseEvent> hasDescriptorState(DemandResponseEventStateEnum state) {
+		return (event, cq, cb) -> cb.equal(event.get(FIELD_DESCRIPTOR).get(FIELD_STATE), state);
 	}
 
-	static public Specification<DemandResponseEvent> hasVenUsername(String username) {
+	public static Specification<DemandResponseEvent> hasDescriptorMarketContext(String marketContextName) {
+		return (event, cq, cb) -> cb.equal(event.get(FIELD_DESCRIPTOR).get(FIELD_MARKET_CONTEXT).get(FIELD_NAME),
+				marketContextName);
+	}
+
+	public static Specification<DemandResponseEvent> hasVenUsername(String username) {
 		return (event, cq, cb) -> {
-			ListJoin<DemandResponseEvent, VenDemandResponseEvent> joinList = event.joinList("venDemandResponseEvent",
-					JoinType.INNER);
-			return cb.equal(joinList.get("ven").get("username"), username);
+			ListJoin<DemandResponseEvent, VenDemandResponseEvent> joinList = event
+					.joinList(FIELD_VEN_DEMAND_RESPONSE_EVENT, JoinType.INNER);
+			return cb.equal(joinList.get(FIELD_VEN).get(FIELD_USERNAME), username);
 		};
 	}
 
-	static public Specification<DemandResponseEvent> hasActivePeriodStartAfter(Long timestamp) {
-		return (event, cq, cb) -> cb.ge(event.get("activePeriod").get("start"), timestamp);
+	public static Specification<DemandResponseEvent> hasActivePeriodStartAfter(Long timestamp) {
+		return (event, cq, cb) -> cb.ge(event.get(FIELD_ACTIVE_PERIOD).get(FIELD_START), timestamp);
 	}
 
-	static public Specification<DemandResponseEvent> hasActivePeriodEndNullOrBefore(Long timestamp) {
+	public static Specification<DemandResponseEvent> hasActivePeriodEndNullOrBefore(Long timestamp) {
 		return (event, cq, cb) -> {
-			return cb.or(cb.isNull(event.get("activePeriod").get("end")),
-					cb.lt(event.get("activePeriod").get("end"), timestamp));
+			return cb.or(cb.isNull(event.get(FIELD_ACTIVE_PERIOD).get(FIELD_END)),
+					cb.lt(event.get(FIELD_ACTIVE_PERIOD).get(FIELD_END), timestamp));
 		};
 	}
 
-	static public Specification<DemandResponseEvent> hasActivePeriodNotificationStartBefore(Long timestamp) {
-		return (event, cq, cb) -> cb.le(event.get("activePeriod").get("startNotification"), timestamp);
+	public static Specification<DemandResponseEvent> hasActivePeriodNotificationStartBefore(Long timestamp) {
+		return (event, cq, cb) -> cb.le(event.get(FIELD_ACTIVE_PERIOD).get("startNotification"), timestamp);
 	}
 
-	static public Specification<DemandResponseEvent> hasActivePeriodEndNullOrAfter(Long timestamp) {
+	public static Specification<DemandResponseEvent> hasActivePeriodEndNullOrAfter(Long timestamp) {
 		return (event, cq, cb) -> {
-			return cb.or(cb.isNull(event.get("activePeriod").get("end")),
-					cb.gt(event.get("activePeriod").get("end"), timestamp));
+			return cb.or(cb.isNull(event.get(FIELD_ACTIVE_PERIOD).get(FIELD_END)),
+					cb.gt(event.get(FIELD_ACTIVE_PERIOD).get(FIELD_END), timestamp));
 		};
 	}
 
-	static public Specification<DemandResponseEvent> isSendable(boolean sendable) {
+	public static Specification<DemandResponseEvent> isSendable(boolean sendable) {
 		return (event, cq, cb) -> {
 			long now = System.currentTimeMillis();
 			Specification<DemandResponseEvent> and = DemandResponseEventSpecification.isPublished()
@@ -74,7 +94,7 @@ public class DemandResponseEventSpecification {
 		};
 	}
 
-	static public Specification<DemandResponseEvent> toSentByVenUsername(String venUsername) {
+	public static Specification<DemandResponseEvent> toSentByVenUsername(String venUsername) {
 		return (event, cq, cb) -> {
 			long now = System.currentTimeMillis();
 			Specification<DemandResponseEvent> and = DemandResponseEventSpecification.isPublished()
@@ -87,7 +107,7 @@ public class DemandResponseEventSpecification {
 		};
 	}
 
-	static public Specification<DemandResponseEvent> search(List<DemandResponseEventFilter> filters) {
+	public static Specification<DemandResponseEvent> search(List<DemandResponseEventFilter> filters) {
 		Specification<DemandResponseEvent> marketContextPredicates = null;
 		Specification<DemandResponseEvent> venPredicates = null;
 		Specification<DemandResponseEvent> statePredicates = null;
@@ -124,14 +144,14 @@ public class DemandResponseEventSpecification {
 				}
 				break;
 			case EVENT_PUBLISHED:
-				if ("PUBLISHED".equals(demandResponseEventFilter.getValue().toUpperCase())) {
+				if (FILTER_EVENT_PUBLISHED.equalsIgnoreCase(demandResponseEventFilter.getValue())) {
 					if (isPublishedPredicates != null) {
 						isPublishedPredicates = isPublishedPredicates
 								.or(DemandResponseEventSpecification.isPublished(true));
 					} else {
 						isPublishedPredicates = DemandResponseEventSpecification.isPublished(true);
 					}
-				} else if ("NOT_PUBLISHED".equals(demandResponseEventFilter.getValue().toUpperCase())) {
+				} else if (FILTER_EVENT_NOT_PUBLISHED.equalsIgnoreCase(demandResponseEventFilter.getValue())) {
 					if (isPublishedPredicates != null) {
 						isPublishedPredicates = isPublishedPredicates
 								.or(DemandResponseEventSpecification.isPublished(false));
@@ -143,14 +163,14 @@ public class DemandResponseEventSpecification {
 				break;
 
 			case EVENT_SENDABLE:
-				if ("SENDABLE".equals(demandResponseEventFilter.getValue().toUpperCase())) {
+				if (FILTER_SENDABLE.equalsIgnoreCase(demandResponseEventFilter.getValue())) {
 					if (isSendablePredicates != null) {
 						isSendablePredicates = isSendablePredicates
 								.or(DemandResponseEventSpecification.isSendable(true));
 					} else {
 						isSendablePredicates = DemandResponseEventSpecification.isSendable(true);
 					}
-				} else if ("NOT_SENDABLE".equals(demandResponseEventFilter.getValue().toUpperCase())) {
+				} else if (FILTER_NOT_SENDABLE.equalsIgnoreCase(demandResponseEventFilter.getValue())) {
 					if (isSendablePredicates != null) {
 						isSendablePredicates = isSendablePredicates
 								.or(DemandResponseEventSpecification.isSendable(false));

@@ -104,7 +104,7 @@ public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartySe
 		String requestId = "0";
 		String reportRequestId = "0";
 		OadrRegisterReportType payload = reportService.selfOadrRegisterReport(requestId, venConfig.getVenId(),
-				vtnConfiguration.getVtnId(), reportRequestId);
+				reportRequestId);
 
 		multiVtnConfig.oadrRegisterReport(vtnConfiguration, payload);
 

@@ -109,7 +109,7 @@ public class OadrPKISecurity {
 				throw new OadrSecurityException("private key file does not have good format");
 			}
 		} catch (IOException e) {
-			throw new OadrSecurityException("private key file cannot be read", e);
+			throw new OadrSecurityException(e);
 		}
 	}
 
@@ -141,7 +141,7 @@ public class OadrPKISecurity {
 				throw new OadrSecurityException("certificate file does not have good format");
 			}
 		} catch (CertificateException e) {
-			throw new OadrSecurityException("certificate holder cannot be read convert to X509 certificate", e);
+			throw new OadrSecurityException(e);
 		}
 	}
 
@@ -186,7 +186,7 @@ public class OadrPKISecurity {
 		try {
 			KeyStore ks = OadrPKISecurity.createKeyStore(clientPrivateKeyPemFilePath, clientCertificatePemFilePath,
 					password);
-			
+
 			kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 			kmf.init(ks, password.toCharArray());
 			return kmf;
@@ -230,7 +230,6 @@ public class OadrPKISecurity {
 	public static TrustManagerFactory createTrustManagerFactory(List<String> trustedCertificateFilePath)
 			throws OadrSecurityException {
 		TrustManagerFactory tmf = null;
-		String exceptionMsg = "certificates can't be inserted into truststore";
 		try {
 			KeyStore ts = KeyStore.getInstance(KeyStore.getDefaultType());
 			ts.load(null, null);
@@ -242,7 +241,7 @@ public class OadrPKISecurity {
 			tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 			tmf.init(ts);
 		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
-			throw new OadrSecurityException(exceptionMsg, e);
+			throw new OadrSecurityException(e);
 		}
 		return tmf;
 	}
@@ -329,18 +328,15 @@ public class OadrPKISecurity {
 
 			KeyPair venCred = null;
 			String csrAlgo = "";
-			switch (algo) {
-			case SHA256_DSA:
 
+			if (OadrPKIAlgorithm.SHA256_DSA.equals(algo)) {
 				venCred = OadrPKISecurity.generateEccKeyPair();
-
 				csrAlgo = "SHA256withDSA";
-				break;
-			case SHA256_RSA:
+			} else if (OadrPKIAlgorithm.SHA256_RSA.equals(algo)) {
 				venCred = OadrPKISecurity.generateRsaKeyPair();
 				csrAlgo = "SHA256withRSA";
-				break;
-
+			} else {
+				throw new OadrSecurityException("Undefined OadrPKIAlgorithm algo");
 			}
 
 			String x509PrincipalName = "C=FR, ST=Paris, L=Paris, O=Avob, OU=Avob, CN=" + venCN;

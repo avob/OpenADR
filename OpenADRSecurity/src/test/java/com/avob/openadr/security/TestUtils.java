@@ -9,6 +9,9 @@ import com.avob.openadr.security.exception.OadrSecurityException;
 
 public class TestUtils {
 
+	private TestUtils() {
+	}
+
 	public static final String TEST = "src/test/resources/cert/test";
 	public static final String TEST_CRT = TEST + ".crt";
 	public static final String TEST_KEY = TEST + ".key";

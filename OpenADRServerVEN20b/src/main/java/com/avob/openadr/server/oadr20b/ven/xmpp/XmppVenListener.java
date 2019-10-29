@@ -112,7 +112,7 @@ public class XmppVenListener implements StanzaListener {
 				} else if (oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration() != null
 						|| oadrPayload.getOadrSignedObject().getOadrRequestReregistration() != null) {
 
-					Object handle = oadr20bVENEiRegisterPartyService.handle(multiConfig, payload, oadrPayload);
+					Object handle = oadr20bVENEiRegisterPartyService.handle(multiConfig, oadrPayload);
 					response = payloadHandler.payloadToString(multiConfig, handle, true);
 
 					multiXmppClientConfig.sendRegisterPartyMessage(response);
@@ -128,7 +128,7 @@ public class XmppVenListener implements StanzaListener {
 						|| oadrPayload.getOadrSignedObject().getOadrRegisterReport() != null
 						|| oadrPayload.getOadrSignedObject().getOadrCancelReport() != null) {
 
-					Object handle = reportService.handle(multiConfig, payload, oadrPayload);
+					Object handle = reportService.handle(multiConfig, oadrPayload);
 					response = payloadHandler.payloadToString(multiConfig, handle, true);
 
 					multiXmppClientConfig.sendReportMessage(response);
