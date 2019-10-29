@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrFingerprintSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.security.OadrSecurityRoleService;
 
@@ -24,23 +24,22 @@ import com.avob.openadr.server.common.vtn.security.OadrSecurityRoleService;
  */
 @Service
 public class Oadr20bX509AuthenticatedUserDetailsService
-        implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
+		implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
 
-	
-    @Resource
-    private OadrSecurityRoleService oadrSecurityRoleService;
+	@Resource
+	private OadrSecurityRoleService oadrSecurityRoleService;
 
-    @Override
-    public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) {
-        X509Certificate certificate = (X509Certificate) token.getCredentials();
-        String fingerprint = "";
-        try {
-            fingerprint = OadrHttpSecurity.getOadr20bFingerprint(certificate);
-        } catch (OadrSecurityException e) {
-            throw new UsernameNotFoundException("", e);
-        }
+	@Override
+	public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) {
+		X509Certificate certificate = (X509Certificate) token.getCredentials();
+		String fingerprint = "";
+		try {
+			fingerprint = OadrFingerprintSecurity.getOadr20bFingerprint(certificate);
+		} catch (OadrSecurityException e) {
+			throw new UsernameNotFoundException("", e);
+		}
 
-        return oadrSecurityRoleService.grantX509Role(fingerprint);
+		return oadrSecurityRoleService.grantX509Role(fingerprint);
 
-    }
+	}
 }

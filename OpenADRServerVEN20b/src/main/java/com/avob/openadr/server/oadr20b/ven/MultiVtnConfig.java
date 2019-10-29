@@ -53,7 +53,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.oadr20b.ven.exception.OadrVTNInitializationException;
 import com.avob.openadr.server.oadr20b.ven.xmpp.XmppVenListener;
@@ -122,9 +122,9 @@ public class MultiVtnConfig {
 
 			KeyStore keystore;
 			try {
-				keystore = OadrHttpSecurity.createKeyStore(session.getVenSessionConfig().getVenPrivateKeyPath(),
+				keystore = OadrPKISecurity.createKeyStore(session.getVenSessionConfig().getVenPrivateKeyPath(),
 						session.getVenSessionConfig().getVenCertificatePath(), keystorePassword);
-				KeyStore truststore = OadrHttpSecurity
+				KeyStore truststore = OadrPKISecurity
 						.createTrustStore(session.getVenSessionConfig().getVtnTrustCertificate());
 
 				// init key manager factory

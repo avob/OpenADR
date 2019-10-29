@@ -65,7 +65,7 @@ import com.avob.openadr.model.oadr20b.oadr.TemperatureType;
 import com.avob.openadr.model.oadr20b.oadr.TemperatureUnitType;
 import com.avob.openadr.model.oadr20b.siscale.SiScaleCodeType;
 import com.avob.openadr.model.oadr20b.xcal.WsCalendarIntervalType;
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 
 public class OadrXMLSignatureHandlerTest {
@@ -78,8 +78,8 @@ public class OadrXMLSignatureHandlerTest {
 	private Oadr20bJAXBContext jaxbContext;
 
 	public OadrXMLSignatureHandlerTest() throws OadrSecurityException {
-		privateKey = OadrHttpSecurity.parsePrivateKey(privateKeyFilePath);
-		certificate = OadrHttpSecurity.parseCertificate(certificateFilePath);
+		privateKey = OadrPKISecurity.parsePrivateKey(privateKeyFilePath);
+		certificate = OadrPKISecurity.parseCertificate(certificateFilePath);
 		try {
 			jaxbContext = Oadr20bJAXBContext.getInstance();
 		} catch (JAXBException e) {

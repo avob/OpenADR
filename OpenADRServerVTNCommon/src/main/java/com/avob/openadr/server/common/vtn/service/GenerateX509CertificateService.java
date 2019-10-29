@@ -5,30 +5,26 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrPKISecurity;
+import com.avob.openadr.security.OadrUserX509Credential;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
@@ -36,6 +32,12 @@ import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.user.AbstractUserCreateDto;
 import com.google.common.collect.Maps;
 
+/**
+ * Service to generate VEN/User/App PKI credentials if valid CA key/cert provided
+ * 
+ * @author bzanni
+ *
+ */
 @ConditionalOnProperty(value = VtnConfig.CA_KEY_CONF)
 @Service
 public class GenerateX509CertificateService {
@@ -46,69 +48,35 @@ public class GenerateX509CertificateService {
 	private KeyPair caKeyPair = null;
 	private X509Certificate caCert = null;
 
-	private File writeToFile(String fileName, String fileExtension, String content) throws IOException {
-		Path path = Files.createTempFile(fileName + "-", "." + fileExtension);
-		File file = path.toFile();
-
-		if (file.exists()) {
-			boolean delete = file.delete();
-			if (!delete) {
-				throw new IOException("file can't be deleted");
-			}
-		}
-
-		try (FileOutputStream outputStream = new FileOutputStream(file, true)) {
-			byte[] strToBytes = content.getBytes();
-			outputStream.write(strToBytes);
-		}
-
-		return file;
-	}
-
-	private KeyPair loadCaKeyPair() throws OadrSecurityException {
-		if (caKeyPair == null) {
-			PrivateKey caKey = OadrHttpSecurity.parsePrivateKey(vtnConfig.getCaKey());
-			caCert = OadrHttpSecurity.parseCertificate(vtnConfig.getCaCert());
-			caKeyPair = new KeyPair(caCert.getPublicKey(), caKey);
-		}
-		return caKeyPair;
+	@PostConstruct
+	public void init() throws OadrSecurityException {
+		PrivateKey caKey = OadrPKISecurity.parsePrivateKey(vtnConfig.getCaKey());
+		caCert = OadrPKISecurity.parseCertificate(vtnConfig.getCaCert());
+		caKeyPair = new KeyPair(caCert.getPublicKey(), caKey);
 	}
 
 	public File generateCredentials(AbstractUserCreateDto dto, AbstractUser abstractUser)
 			throws GenerateX509VenException {
+		long now = System.currentTimeMillis();
+		String commonName = dto.getCommonName();
 		try {
-
-			long now = System.currentTimeMillis();
-			String venCN = dto.getCommonName();
-			BigInteger serialNumber = BigInteger.valueOf(now);
-
-			String algoCsr = null;
-			KeyPair venCred = null;
+			String algo = null;
 			if (dto.getNeedCertificateGeneration().toLowerCase().equals("ecc")) {
-				algoCsr = "SHA256withDSA";
-				venCred = OadrHttpSecurity.generateEccKeyPair();
+				algo = "SHA256withDSA";
 			} else if (dto.getNeedCertificateGeneration().toLowerCase().equals("rsa")) {
-				algoCsr = "SHA256withRSA";
-				venCred = OadrHttpSecurity.generateRsaKeyPair();
+				algo = "SHA256withRSA";
 			}
-			KeyPair loadCaKeyPair = loadCaKeyPair();
-			PKCS10CertificationRequest csr = OadrHttpSecurity.generateCsr(venCred, venCN, algoCsr);
-			X509Certificate crt = OadrHttpSecurity.signCsr(csr, loadCaKeyPair, caCert, serialNumber);
+			OadrUserX509Credential generateCredentials = OadrPKISecurity.generateCredentials(caKeyPair, caCert,
+					commonName, algo);
 
-			String fingerprint = OadrHttpSecurity.getOadr20bFingerprint(crt);
-			abstractUser.setUsername(fingerprint);
-
-			File crtFile = writeToFile(venCN, "crt", OadrHttpSecurity.writeCrtToString(crt));
-			File caCrtFile = writeToFile("ca", "crt", OadrHttpSecurity.writeCrtToString(caCert));
-			File keyPairFile = writeToFile(venCN, "key", OadrHttpSecurity.writeKeyToString(venCred));
-			File fingerprintFile = writeToFile(venCN, "fingerprint", fingerprint);
+			abstractUser.setUsername(generateCredentials.getFingerprint());
 
 			HashMap<String, File> fileMap = Maps.newHashMap();
-			fileMap.put(venCN + ".crt", crtFile);
-			fileMap.put("ca.crt", caCrtFile);
-			fileMap.put(venCN + ".key", keyPairFile);
-			fileMap.put(venCN + ".fingerprint", fingerprintFile);
-			String archiveName = now + "-" + venCN + "-credentials.tar.gz";
+			fileMap.put(commonName + ".crt", generateCredentials.getCertificateFile());
+			fileMap.put("ca.crt", generateCredentials.getCaCertificateFile());
+			fileMap.put(commonName + ".key", generateCredentials.getPrivateKeyFile());
+			fileMap.put(commonName + ".fingerprint", generateCredentials.getFingerprintFile());
+			String archiveName = now + "-" + commonName + "-credentials.tar.gz";
 			Path path = Files.createTempFile(archiveName, "");
 			File outFile = path.toFile();
 			FileOutputStream out = new FileOutputStream(outFile);
@@ -129,18 +97,12 @@ public class GenerateX509CertificateService {
 
 			return outFile;
 
-		} catch (NoSuchAlgorithmException e) {
-			throw new GenerateX509VenException(e);
 		} catch (OadrSecurityException e) {
-			throw new GenerateX509VenException(e);
-		} catch (OperatorCreationException e) {
-			throw new GenerateX509VenException(e);
-		} catch (CertificateException e) {
-			throw new GenerateX509VenException(e);
-		} catch (NoSuchProviderException e) {
 			throw new GenerateX509VenException(e);
 		} catch (IOException e) {
 			throw new GenerateX509VenException(e);
 		}
+
 	}
+
 }

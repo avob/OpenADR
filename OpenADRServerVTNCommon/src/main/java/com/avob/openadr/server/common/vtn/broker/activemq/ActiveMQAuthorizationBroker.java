@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrFingerprintSecurity;
 import com.avob.openadr.server.common.vtn.security.OadrSecurityRoleService;
 import com.google.common.collect.Sets;
 
@@ -52,7 +52,7 @@ public class ActiveMQAuthorizationBroker extends BrokerFilter {
 			if (transportContext != null) {
 				X509Certificate[] certs = (X509Certificate[]) info.getTransportContext();
 				for (X509Certificate certificate : certs) {
-					String fingerprint = OadrHttpSecurity.getOadr20bFingerprint(certificate);
+					String fingerprint = OadrFingerprintSecurity.getOadr20bFingerprint(certificate);
 					User grantX509Role = oadrSecurityRoleService.grantX509Role(fingerprint);
 					for (GrantedAuthority grantedAuthority : grantX509Role.getAuthorities()) {
 						if (grantedAuthority.getAuthority().equals("ROLE_VTN")

@@ -1,14 +1,6 @@
 package com.avob.openadr.server.oadr20b.vtn;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -30,6 +22,8 @@ import org.springframework.stereotype.Component;
 
 import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
+import com.avob.openadr.security.OadrFingerprintSecurity;
+import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VTNRoleEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
@@ -65,8 +59,6 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedSqlDatabaseInit.class);
 
-	private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
 	protected static final String VEN_FILE_PREFIX = "ven";
 	protected static final String ADMIN_FILE_PREFIX = "admin";
 	protected static final String USER_FILE_PREFIX = "user";
@@ -95,12 +87,7 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 
 	private List<String> getFilename(String type) {
 		File file = new File(customCertFolder);
-		String[] directories = file.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File current, String name) {
-				return name.contains(type) && name.endsWith(".key");
-			}
-		});
+		String[] directories = file.list((current, name) -> name.contains(type) && name.endsWith(".key"));
 		if (directories == null) {
 			return new ArrayList<>();
 		}
@@ -121,20 +108,6 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 
 	private List<String> getVenFilename() {
 		return getFilename(VEN_FILE_PREFIX);
-	}
-
-	private String getFingerprint(String filename) {
-		Path path = Paths.get(customCertFolder + "/" + filename + ".fingerprint");
-		try (BufferedReader reader = Files.newBufferedReader(path, Charset.forName("UTF-8"))) {
-
-			String currentLine = reader.readLine();
-
-			return currentLine.trim().replaceAll(":", "").toLowerCase();
-
-		} catch (IOException ex) {
-			LOGGER.error("", ex);
-		}
-		return null;
 	}
 
 	private VenMarketContext saveMarketContextIfMissing(VenMarketContextDto dto) {
@@ -232,7 +205,7 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 		return new DemandResponseEventTargetDto("group", group.getName());
 	}
 
-	private static DemandResponseEventDescriptorDto getDescriptor(String eventId, String marketcontextName) {
+	private static DemandResponseEventDescriptorDto getDescriptor(String marketcontextName) {
 		DemandResponseEventDescriptorDto demandResponseEventDescriptorDto = new DemandResponseEventDescriptorDto();
 		demandResponseEventDescriptorDto.setState(DemandResponseEventStateEnum.ACTIVE);
 		demandResponseEventDescriptorDto.setMarketContext(marketcontextName);
@@ -263,10 +236,8 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 		Date temp = generator.next(start);
 
 		while (temp.before(end)) {
-			String eventId = eventPrefix + "_" + format.format(temp);
-
 			DemandResponseEventCreateDto eventDto = new DemandResponseEventCreateDto();
-			eventDto.setDescriptor(EmbeddedSqlDatabaseInit.getDescriptor(eventId, marketcontextName));
+			eventDto.setDescriptor(EmbeddedSqlDatabaseInit.getDescriptor(marketcontextName));
 			eventDto.setActivePeriod(
 					EmbeddedSqlDatabaseInit.getActivePeriod(temp.getTime(), duration, notificationDuration));
 
@@ -293,10 +264,8 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 		Date temp = generator.next(start);
 
 		while (temp.before(end)) {
-			String eventId = eventPrefix + "_" + format.format(temp);
-
 			DemandResponseEventCreateDto eventDto = new DemandResponseEventCreateDto();
-			eventDto.setDescriptor(EmbeddedSqlDatabaseInit.getDescriptor(eventId, marketcontextName));
+			eventDto.setDescriptor(EmbeddedSqlDatabaseInit.getDescriptor(marketcontextName));
 			eventDto.setActivePeriod(
 					EmbeddedSqlDatabaseInit.getActivePeriod(temp.getTime(), duration, notificationDuration));
 
@@ -337,27 +306,33 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 			for (String filename : venFilename) {
 				String[] split = filename.split("\\.");
 				String commonName = filename.replace("." + split[split.length - 1], "");
-				String fingerprintForVen = getFingerprint(commonName);
-				VenCreateDto dto = new VenCreateDto();
-				String ven1Username = fingerprintForVen;
-				dto.setUsername(ven1Username);
-				if (commonName.contains("login")) {
-					dto.setAuthenticationType("login");
-					dto.setPassword(commonName);
-				} else {
-					dto.setAuthenticationType("x509");
-				}
+				try {
+					String fingerprintForVen = OadrFingerprintSecurity
+							.getOadr20bFingerprint(customCertFolder + "/" + commonName + ".crt");
 
-				dto.setCommonName(commonName);
-				dto.setOadrProfil("20b");
-				HashSet<VenGroup> groups = Sets.newHashSet(customCaCert);
-				DemandResponseEventTargetDto venTarget = getVenTarget(fingerprintForVen);
-				venTargets.add(venTarget);
-				if (i == 0) {
-					groups.add(group1);
-					i++;
+					VenCreateDto dto = new VenCreateDto();
+					String ven1Username = fingerprintForVen;
+					dto.setUsername(ven1Username);
+					if (commonName.contains("login")) {
+						dto.setAuthenticationType("login");
+						dto.setPassword(commonName);
+					} else {
+						dto.setAuthenticationType("x509");
+					}
+
+					dto.setCommonName(commonName);
+					dto.setOadrProfil("20b");
+					HashSet<VenGroup> groups = Sets.newHashSet(customCaCert);
+					DemandResponseEventTargetDto venTarget = getVenTarget(fingerprintForVen);
+					venTargets.add(venTarget);
+					if (i == 0) {
+						groups.add(group1);
+						i++;
+					}
+					saveVenIfMissing(dto, Sets.newHashSet(oadrMarketContext, marketContext), groups);
+				} catch (OadrSecurityException e) {
+					LOGGER.error("Ven " + commonName + " can't be created");
 				}
-				saveVenIfMissing(dto, Sets.newHashSet(oadrMarketContext, marketContext), groups);
 
 			}
 
@@ -379,13 +354,20 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 			for (String filename : filenames) {
 				String[] split = filename.split("\\.");
 				String commonName = filename.replace("." + split[split.length - 1], "");
-				String fingerprint = getFingerprint(commonName);
-				OadrUserCreateDto dto = new OadrUserCreateDto();
-				dto.setUsername(fingerprint);
-				dto.setAuthenticationType("x509");
-				dto.setCommonName(commonName);
-				dto.setRoles(Arrays.asList(VTNRoleEnum.ROLE_ADMIN.name()));
-				saveUserIfMissing(dto);
+				String fingerprint;
+				try {
+					fingerprint = OadrFingerprintSecurity
+							.getOadr20bFingerprint(customCertFolder + "/" + commonName + ".crt");
+					OadrUserCreateDto dto = new OadrUserCreateDto();
+					dto.setUsername(fingerprint);
+					dto.setAuthenticationType("x509");
+					dto.setCommonName(commonName);
+					dto.setRoles(Arrays.asList(VTNRoleEnum.ROLE_ADMIN.name()));
+					saveUserIfMissing(dto);
+				} catch (OadrSecurityException e) {
+					LOGGER.error("Admin  " + commonName + " can't be created");
+				}
+
 			}
 		}
 		filenames = getUserFilename();
@@ -393,13 +375,21 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 			for (String filename : filenames) {
 				String[] split = filename.split("\\.");
 				String commonName = filename.replace("." + split[split.length - 1], "");
-				String fingerprint = getFingerprint(commonName);
-				OadrUserCreateDto dto = new OadrUserCreateDto();
-				dto.setAuthenticationType("x509");
-				dto.setCommonName(commonName);
-				dto.setUsername(fingerprint);
-				dto.setRoles(Arrays.asList(VTNRoleEnum.ROLE_DEVICE_MANAGER.name(), VTNRoleEnum.ROLE_DRPROGRAM.name()));
-				saveUserIfMissing(dto);
+				String fingerprint;
+				try {
+					fingerprint = OadrFingerprintSecurity
+							.getOadr20bFingerprint(customCertFolder + "/" + commonName + ".crt");
+					OadrUserCreateDto dto = new OadrUserCreateDto();
+					dto.setAuthenticationType("x509");
+					dto.setCommonName(commonName);
+					dto.setUsername(fingerprint);
+					dto.setRoles(
+							Arrays.asList(VTNRoleEnum.ROLE_DEVICE_MANAGER.name(), VTNRoleEnum.ROLE_DRPROGRAM.name()));
+					saveUserIfMissing(dto);
+				} catch (OadrSecurityException e) {
+					LOGGER.error("User  " + commonName + " can't be created");
+				}
+
 			}
 		}
 
@@ -434,14 +424,21 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 			for (String filename : filenames) {
 				String[] split = filename.split("\\.");
 				String commonName = filename.replace("." + split[split.length - 1], "");
-				String fingerprint = getFingerprint(commonName);
-				OadrAppCreateDto appDto = new OadrAppCreateDto();
-				appDto.setAuthenticationType("x509");
-				appDto.setCommonName(commonName);
-				appDto.setUsername(fingerprint);
-				appDto.setRoles(
-						Arrays.asList(VTNRoleEnum.ROLE_DEVICE_MANAGER.name(), VTNRoleEnum.ROLE_DRPROGRAM.name()));
-				saveAppIfMissing(appDto);
+				String fingerprint;
+				try {
+					fingerprint = OadrFingerprintSecurity
+							.getOadr20bFingerprint(customCertFolder + "/" + commonName + ".crt");
+					OadrAppCreateDto appDto = new OadrAppCreateDto();
+					appDto.setAuthenticationType("x509");
+					appDto.setCommonName(commonName);
+					appDto.setUsername(fingerprint);
+					appDto.setRoles(
+							Arrays.asList(VTNRoleEnum.ROLE_DEVICE_MANAGER.name(), VTNRoleEnum.ROLE_DRPROGRAM.name()));
+					saveAppIfMissing(appDto);
+				} catch (OadrSecurityException e) {
+					LOGGER.error("User  " + commonName + " can't be created");
+				}
+
 			}
 		}
 

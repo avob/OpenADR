@@ -279,20 +279,14 @@ public class OadrXMLSignatureHandler {
 		DOMSignContext dsc = new DOMSignContext(privateKey, oadrPayloadNode);
 		// manipulate java signature generation to conform to oadr expectation
 		dsc.setDefaultNamespacePrefix("xmldsig");
-//		dsc.putNamespacePrefix("http://openadr.org/oadr-2.0b/2012/07/xmldsig-properties", "properties");
-		// set id of signedObjectNode (required for URI reference/sign a part of
-		// doc)
-//		dsc.setIdAttributeNS(signedObjectNode, "http://openadr.org/oadr-2.0b/2012/07", "Id");
 
 		XMLSignatureFactory fac = null;
 		SignedInfo si = null;
 		try {
 			fac = XMLSignatureFactory.getInstance("DOM");
-//			fac = XMLSignatureFactory.getInstance("DES", "BC");
-			// require digest signedObjectNode
+
 			Reference ref = fac.newReference("", fac.newDigestMethod(DigestMethod.SHA256, null),
 					Collections.singletonList(fac.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null)),
-					// null,
 					null, null);
 
 			// require digest replayProtect
@@ -322,9 +316,6 @@ public class OadrXMLSignatureHandler {
 		} catch (InvalidAlgorithmParameterException e) {
 			throw new Oadr20bXMLSignatureException(e);
 		}
-//		catch (NoSuchProviderException e) {
-//			throw new Oadr20bXMLSignatureException(e);
-//		}
 
 		List<XMLStructure> lstruct = null;
 		try {
@@ -361,29 +352,12 @@ public class OadrXMLSignatureHandler {
 
 		KeyInfo ki = null;
 
-//		SubjectPublicKeyInfo subPubKeyInfo = SubjectPublicKeyInfo.getInstance(certificate.getPublicKey().getEncoded());
-//		ASN1ObjectIdentifier alg = subPubKeyInfo.getAlgorithm().getAlgorithm();
-//		
 		KeyInfoFactory kif = fac.getKeyInfoFactory();
 		List<Object> x509Content = new ArrayList<Object>();
 		x509Content.add(certificate.getSubjectX500Principal().getName());
 		x509Content.add(certificate);
 		X509Data xd = kif.newX509Data(x509Content);
 		ki = kif.newKeyInfo(Collections.singletonList(xd));
-
-//		try {
-//			KeyInfoFactory kif = fac.getKeyInfoFactory();
-//			KeyValue kv = kif.newKeyValue(publicKey);
-//			List<KeyValue> keyInfoItems = new ArrayList<KeyValue>();
-//			keyInfoItems.add(kv);
-//
-//			ki = kif.newKeyInfo(keyInfoItems);			
-//		} catch (KeyException e) {
-//			throw new Oadr20bXMLSignatureException(e);
-//		}
-
-//		KeyInfoFactory kif = fac.getKeyInfoFactory();
-//		ki = kif.newKeyInfo(Collections.singletonList(kif.newKeyName("key123")));
 
 		// sign payload
 		XMLSignature signature = fac.newXMLSignature(si, ki, lstruct, null, null);

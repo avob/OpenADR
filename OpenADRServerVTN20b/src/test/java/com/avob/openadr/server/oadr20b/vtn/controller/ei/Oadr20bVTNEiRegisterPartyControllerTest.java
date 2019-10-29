@@ -45,7 +45,7 @@ import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenResourceService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiRegisterPartyService;
+import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNSupportedProfileService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenOptService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
@@ -88,6 +88,9 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 	@Resource
 	private OadrMockMvc oadrMockMvc;
 
+	@Resource
+	private Oadr20bVTNSupportedProfileService oadr20bVTNSupportedProfileService;
+
 	private UserRequestPostProcessor venSession = SecurityMockMvcRequestPostProcessors.user(VEN_ID).roles("VEN");
 	private UserRequestPostProcessor anotherVenSession = SecurityMockMvcRequestPostProcessors.user("anotherVenId")
 			.roles("VEN");
@@ -127,13 +130,13 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
 		assertEquals(vtnId, oadrCreatedPartyRegistrationType.getVtnID());
 		assertNull(oadrCreatedPartyRegistrationType.getRegistrationID());
-		assertEquals(Oadr20bVTNEiRegisterPartyService.supportedProfiles.size(),
+		assertEquals(oadr20bVTNSupportedProfileService.getSupportedProfiles().size(),
 				oadrCreatedPartyRegistrationType.getOadrProfiles().getOadrProfile().size());
 		for (OadrProfile profile : oadrCreatedPartyRegistrationType.getOadrProfiles().getOadrProfile()) {
 			assertTrue(profile.getOadrProfileName()
-					.equals(Oadr20bVTNEiRegisterPartyService.profile20a.getOadrProfileName())
+					.equals(oadr20bVTNSupportedProfileService.getProfileA().getOadrProfileName())
 					|| profile.getOadrProfileName()
-							.equals(Oadr20bVTNEiRegisterPartyService.profile20b.getOadrProfileName()));
+							.equals(oadr20bVTNSupportedProfileService.getProfileB().getOadrProfileName()));
 		}
 
 		// test signedoadrQueryRegistration
@@ -146,13 +149,13 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
 		assertEquals(vtnId, oadrCreatedPartyRegistrationType.getVtnID());
 		assertNull(oadrCreatedPartyRegistrationType.getRegistrationID());
-		assertEquals(Oadr20bVTNEiRegisterPartyService.supportedProfiles.size(),
+		assertEquals(oadr20bVTNSupportedProfileService.getSupportedProfiles().size(),
 				oadrCreatedPartyRegistrationType.getOadrProfiles().getOadrProfile().size());
 		for (OadrProfile profile : oadrCreatedPartyRegistrationType.getOadrProfiles().getOadrProfile()) {
 			assertTrue(profile.getOadrProfileName()
-					.equals(Oadr20bVTNEiRegisterPartyService.profile20a.getOadrProfileName())
+					.equals(oadr20bVTNSupportedProfileService.getProfileA().getOadrProfileName())
 					|| profile.getOadrProfileName()
-							.equals(Oadr20bVTNEiRegisterPartyService.profile20b.getOadrProfileName()));
+							.equals(oadr20bVTNSupportedProfileService.getProfileB().getOadrProfileName()));
 		}
 
 		// test ven is still not registred

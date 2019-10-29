@@ -12,7 +12,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandler;
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 
@@ -25,7 +25,7 @@ public class XmlSignatureService {
 	private X509Certificate loadCert(String path) throws OadrSecurityException {
 		X509Certificate cert = null;
 		if (!cachedCert.containsKey(path)) {
-			cert = OadrHttpSecurity.parseCertificate(path);
+			cert = OadrPKISecurity.parseCertificate(path);
 			cachedCert.put(path, cert);
 		} else {
 			cert = cachedCert.get(path);
@@ -36,7 +36,7 @@ public class XmlSignatureService {
 	private PrivateKey loadKey(String path) throws OadrSecurityException {
 		PrivateKey cert = null;
 		if (!cachedKey.containsKey(path)) {
-			cert = OadrHttpSecurity.parsePrivateKey(path);
+			cert = OadrPKISecurity.parsePrivateKey(path);
 			cachedKey.put(path, cert);
 		} else {
 			cert = cachedKey.get(path);

@@ -16,19 +16,30 @@ import javax.annotation.PostConstruct;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.SocketUtils;
 
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrFingerprintSecurity;
+import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
 import com.google.common.collect.Maps;
 
+/**
+ * Load vtn configuration from application.properties file
+ * 
+ * @author bzanni
+ *
+ */
 @Configuration
 public class VtnConfig {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(VtnConfig.class);
 
 	public static final String CONTEXT_PATH_CONF = "oadr.server.context_path";
 	public static final String PORT_CONF = "oadr.server.port";
@@ -125,7 +136,7 @@ public class VtnConfig {
 
 	@Value("${" + XMPP_PORT_CONF + ":#{null}}")
 	private Integer xmppPort;
-	
+
 	@Value("${" + XMPP_DOMAIN_CONF + ":#{null}}")
 	private String xmppDomain;
 
@@ -141,6 +152,7 @@ public class VtnConfig {
 	@PostConstruct
 	public void init() {
 
+		// load coma separated trust certificate list
 		if (trustCertificatesStr != null) {
 			trustCertificates = Arrays.asList(trustCertificatesStr.split(","));
 		} else {
@@ -152,15 +164,22 @@ public class VtnConfig {
 			trustedCertificates.put("cert_" + (i++), path);
 		}
 
-		if (this.getCert() != null) {
+		// no VTN key/cert conf might be given when using HTTP only transport
+		if (this.getCert() != null && this.getKey() != null) {
 			String keystorePassword = UUID.randomUUID().toString();
 
 			KeyStore keystore;
+			KeyStore truststore;
 			try {
-				setOadr20bFingerprint(OadrHttpSecurity.getOadr20bFingerprint(this.getCert()));
 
-				keystore = OadrHttpSecurity.createKeyStore(this.getKey(), this.getCert(), keystorePassword);
-				KeyStore truststore = OadrHttpSecurity.createTrustStore(trustedCertificates);
+				// get VTN oadr20b fingerprint
+				setOadr20bFingerprint(OadrFingerprintSecurity.getOadr20bFingerprint(this.getCert()));
+
+				// get VTN private key as java Keystore
+				keystore = OadrPKISecurity.createKeyStore(this.getKey(), this.getCert(), keystorePassword);
+
+				// get VTN certificate as java Truststore
+				truststore = OadrPKISecurity.createTrustStore(trustedCertificates);
 
 				// init key manager factory
 				KeyStore createKeyStore = keystore;
@@ -184,6 +203,9 @@ public class VtnConfig {
 			} catch (UnrecoverableKeyException e) {
 				throw new OadrVTNInitializationException(e);
 			}
+		} else {
+			LOGGER.warn(
+					"VTN " + PRIVATE_KEY_CONF + " or " + CERTIFICATE_CONF + " not given - no SSL transport supported");
 		}
 
 		if (getBrokerPort() == null) {

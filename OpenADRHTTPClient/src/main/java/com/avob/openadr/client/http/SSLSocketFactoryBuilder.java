@@ -19,7 +19,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 
 public class SSLSocketFactoryBuilder {
@@ -81,8 +81,8 @@ public class SSLSocketFactoryBuilder {
 		String exceptionMsg = "private key/client certificate can't be inserted into keystore";
 		try {
 
-			PrivateKey parsePrivateKey = OadrHttpSecurity.parsePrivateKey(clientPrivateKeyPemFilePath);
-			X509Certificate parseCertificate = OadrHttpSecurity.parseCertificate(clientCertificatePemFilePath);
+			PrivateKey parsePrivateKey = OadrPKISecurity.parsePrivateKey(clientPrivateKeyPemFilePath);
+			X509Certificate parseCertificate = OadrPKISecurity.parseCertificate(clientCertificatePemFilePath);
 			Certificate[] certs = { parseCertificate };
 			KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 			ks.load(null, null);
@@ -111,7 +111,7 @@ public class SSLSocketFactoryBuilder {
 			KeyStore ts = KeyStore.getInstance(KeyStore.getDefaultType());
 			ts.load(null, null);
 			for (String certPath : trustedCertificateFilePath) {
-				X509Certificate cert = OadrHttpSecurity.parseCertificate(certPath);
+				X509Certificate cert = OadrPKISecurity.parseCertificate(certPath);
 				File file = new File(certPath);
 				ts.setCertificateEntry(file.getName(), cert);
 			}

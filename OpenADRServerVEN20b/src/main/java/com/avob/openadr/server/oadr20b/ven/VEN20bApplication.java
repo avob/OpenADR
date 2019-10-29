@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.Oadr20bSecurity;
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 
 @Configuration
@@ -95,9 +95,9 @@ public class VEN20bApplication {
 		try {
 			String password = UUID.randomUUID().toString();
 			return new VENEmbeddedServletContainerCustomizer(port, contextPath,
-					OadrHttpSecurity.createKeyStore(venConfig.getVenPrivateKeyPath(), venConfig.getVenCertificatePath(),
+					OadrPKISecurity.createKeyStore(venConfig.getVenPrivateKeyPath(), venConfig.getVenCertificatePath(),
 							password),
-					password, OadrHttpSecurity.createTrustStore(venConfig.getVtnTrustCertificate()),
+					password, OadrPKISecurity.createTrustStore(venConfig.getVtnTrustCertificate()),
 					Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers());
 		} catch (KeyStoreException e) {
 			LOGGER.error("", e);

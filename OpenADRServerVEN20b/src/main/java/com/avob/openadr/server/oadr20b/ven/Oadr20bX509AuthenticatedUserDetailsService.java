@@ -16,7 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrFingerprintSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 
 /**
@@ -29,33 +29,33 @@ import com.avob.openadr.security.exception.OadrSecurityException;
  */
 @Service
 public class Oadr20bX509AuthenticatedUserDetailsService
-        implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
+		implements AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bX509AuthenticatedUserDetailsService.class);
-    
-    private static final List<SimpleGrantedAuthority> VTN_AUTHORITY = Arrays
-            .asList(new SimpleGrantedAuthority("ROLE_VTN"));
+	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bX509AuthenticatedUserDetailsService.class);
 
-    @Resource
-    private MultiVtnConfig multiConfig;
+	private static final List<SimpleGrantedAuthority> VTN_AUTHORITY = Arrays
+			.asList(new SimpleGrantedAuthority("ROLE_VTN"));
 
-    @Override
-    public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) {
-        X509Certificate certificate = (X509Certificate) token.getCredentials();
-        String fingerprint = "";
-        try {
-            fingerprint = OadrHttpSecurity.getOadr20bFingerprint(certificate);
-        } catch (OadrSecurityException e) {
-            throw new UsernameNotFoundException("", e);
-        }
+	@Resource
+	private MultiVtnConfig multiConfig;
 
-        VtnSessionConfiguration venSessionConfiguration = multiConfig.getMultiConfig(fingerprint);
-        if (venSessionConfiguration != null) {
-            return new User(fingerprint, "", VTN_AUTHORITY);
-        }
-        
-        LOGGER.warn("Undefined VTN communication received - fingerprint: "+fingerprint);
-        throw new UsernameNotFoundException("");
+	@Override
+	public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) {
+		X509Certificate certificate = (X509Certificate) token.getCredentials();
+		String fingerprint = "";
+		try {
+			fingerprint = OadrFingerprintSecurity.getOadr20bFingerprint(certificate);
+		} catch (OadrSecurityException e) {
+			throw new UsernameNotFoundException("", e);
+		}
 
-    }
+		VtnSessionConfiguration venSessionConfiguration = multiConfig.getMultiConfig(fingerprint);
+		if (venSessionConfiguration != null) {
+			return new User(fingerprint, "", VTN_AUTHORITY);
+		}
+
+		LOGGER.warn("Undefined VTN communication received - fingerprint: " + fingerprint);
+		throw new UsernameNotFoundException("");
+
+	}
 }

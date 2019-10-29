@@ -37,7 +37,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandler;
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 
 public class OadrXmppVenClient20b {
@@ -64,8 +64,8 @@ public class OadrXmppVenClient20b {
 		this.jaxbContext = Oadr20bJAXBContext.getInstance();
 		this.client = client;
 
-		this.privateKey = OadrHttpSecurity.parsePrivateKey(privateKeyPath);
-		this.clientCertificate = OadrHttpSecurity.parseCertificate(clientCertificatePath);
+		this.privateKey = OadrPKISecurity.parsePrivateKey(privateKeyPath);
+		this.clientCertificate = OadrPKISecurity.parseCertificate(clientCertificatePath);
 
 		this.replayProtectAcceptedDelaySecond = replayProtectAcceptedDelaySecond;
 

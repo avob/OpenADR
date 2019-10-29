@@ -13,7 +13,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandler;
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 
@@ -29,8 +29,8 @@ public class XmlSignatureService {
 
 	@PostConstruct
 	public void init() throws OadrSecurityException {
-		parsePrivateKey = OadrHttpSecurity.parsePrivateKey(vtnConfig.getKey());
-		parseCertificate = OadrHttpSecurity.parseCertificate(vtnConfig.getCert());
+		parsePrivateKey = OadrPKISecurity.parsePrivateKey(vtnConfig.getKey());
+		parseCertificate = OadrPKISecurity.parseCertificate(vtnConfig.getCert());
 	}
 
 	public String sign(Object object) throws Oadr20bXMLSignatureException {

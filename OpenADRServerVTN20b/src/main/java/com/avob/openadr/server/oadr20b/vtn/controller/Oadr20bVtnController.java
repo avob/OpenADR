@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrFingerprintSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDescriptionDto;
@@ -60,7 +60,7 @@ public class Oadr20bVtnController {
 		VtnConfigurationDto dto = oadr20bDtoMapper.map(vtnConfig, VtnConfigurationDto.class);
 		String oadr20bFingerprint;
 		try {
-			oadr20bFingerprint = OadrHttpSecurity.getOadr20bFingerprint(vtnConfig.getCert());
+			oadr20bFingerprint = OadrFingerprintSecurity.getOadr20bFingerprint(vtnConfig.getCert());
 			dto.setVtnId(oadr20bFingerprint);
 		} catch (OadrSecurityException e) {
 			LOGGER.error("", e);

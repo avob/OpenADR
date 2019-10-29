@@ -1,7 +1,5 @@
 package com.avob.openadr.server.oadr20b.vtn.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -16,7 +14,6 @@ import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.builders.eiregisterparty.Oadr20bCreatedPartyRegistrationBuilder;
 import com.avob.openadr.model.oadr20b.ei.EiResponseType;
-import com.avob.openadr.model.oadr20b.ei.SchemaVersionEnumeratedType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
@@ -42,28 +39,18 @@ import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bQuer
 import com.avob.openadr.server.oadr20b.vtn.exception.eiregisterparty.Oadr20bResponsePartyReregistrationApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bAppNotificationPublisher;
 
+/**
+ * EiRegisterParty service
+ * 
+ * @author bzanni
+ *
+ */
 @Service
 public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 
 	private static final String EI_SERVICE_NAME = "EiRegisterParty";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiRegisterPartyService.class);
-
-	public static final OadrProfile profile20a = Oadr20bEiRegisterPartyBuilders
-			.newOadr20bOadrProfileBuilder(SchemaVersionEnumeratedType.OADR_20A.value())
-			.addTransport(OadrTransportType.SIMPLE_HTTP).build();
-
-	public static final OadrProfile profile20b = Oadr20bEiRegisterPartyBuilders
-			.newOadr20bOadrProfileBuilder(SchemaVersionEnumeratedType.OADR_20B.value())
-			.addTransport(OadrTransportType.SIMPLE_HTTP).addTransport(OadrTransportType.XMPP).build();
-
-	public static final List<OadrProfile> supportedProfiles;
-
-	static {
-		supportedProfiles = new ArrayList<>();
-		supportedProfiles.add(profile20a);
-		supportedProfiles.add(profile20b);
-	}
 
 	@Resource
 	private Oadr20bJAXBContext jaxbContext;
@@ -80,12 +67,15 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 	@Resource
 	private Oadr20bAppNotificationPublisher oadr20bAppNotificationPublisher;
 
+	@Resource
+	private Oadr20bVTNSupportedProfileService oadr20bVTNSupportedProfileService;
+
 	private Oadr20bCreatePartyRegistrationTypeApplicationLayerException invalidRegistrationId(String requestId,
 			String venId) {
 		Oadr20bCreatedPartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatedPartyRegistrationBuilder(requestId, Oadr20bApplicationLayerErrorCode.INVALID_ID_452,
 						venId, vtnConfig.getVtnId());
-		for (OadrProfile profile : supportedProfiles) {
+		for (OadrProfile profile : oadr20bVTNSupportedProfileService.getSupportedProfiles()) {
 			builder.addOadrProfile(profile);
 		}
 
@@ -260,7 +250,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 		OadrCreatedPartyRegistrationType response = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatedPartyRegistrationBuilder(payload.getRequestID(), HttpStatus.OK_200, ven.getUsername(),
 						vtnConfig.getVtnId())
-				.addOadrProfile(Oadr20bVTNEiRegisterPartyService.supportedProfiles)
+				.addOadrProfile(oadr20bVTNSupportedProfileService.getSupportedProfiles())
 				.withOadrRequestedOadrPollFreq(duration).withRegistrationId(ven.getRegistrationId()).build();
 
 		if (signed) {
@@ -308,7 +298,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 							.newOadr20bCreatedPartyRegistrationBuilder(requestID,
 									Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID,
 									vtnConfig.getVtnId())
-							.addOadrProfile(Oadr20bVTNEiRegisterPartyService.supportedProfiles).build());
+							.addOadrProfile(oadr20bVTNSupportedProfileService.getSupportedProfiles()).build());
 		}
 	}
 

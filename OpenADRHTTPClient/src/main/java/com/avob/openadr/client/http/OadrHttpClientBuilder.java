@@ -30,7 +30,7 @@ import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 
-import com.avob.openadr.security.OadrHttpSecurity;
+import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 
 public class OadrHttpClientBuilder {
@@ -111,7 +111,7 @@ public class OadrHttpClientBuilder {
 	public static String buildNonce(String key) {
 		// expirationTime + ":" + md5Hex(expirationTime + ":" + key)
 		String dateTimeString = Long.toString(new Date().getTime());
-		String nonce = dateTimeString + ":" + OadrHttpSecurity.md5Hex(dateTimeString + ":" + key);
+		String nonce = dateTimeString + ":" + OadrPKISecurity.md5Hex(dateTimeString + ":" + key);
 		return Base64.getEncoder().encodeToString(nonce.getBytes());
 	}
 
