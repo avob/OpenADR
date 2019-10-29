@@ -15,6 +15,8 @@ import com.avob.openadr.security.exception.OadrSecurityException;
  */
 public class OadrFingerprintSecurity {
 
+	private static final String SHA_256 = "SHA-256";
+	private static final String SHA1 = "SHA1";
 	private static final int OADR_FINGER_LENGTH = 29;
 
 	private OadrFingerprintSecurity() {
@@ -26,7 +28,7 @@ public class OadrFingerprintSecurity {
 	}
 
 	public static String getOadr20aFingerprint(X509Certificate cert) throws OadrSecurityException {
-		return OadrFingerprintSecurity.format(OadrFingerprintSecurity.truncate(getFingerprint(cert, "SHA1")));
+		return OadrFingerprintSecurity.format(OadrFingerprintSecurity.truncate(getFingerprint(cert, SHA1)));
 	}
 
 	public static String getOadr20bFingerprint(String pemFilePath) throws OadrSecurityException {
@@ -35,7 +37,7 @@ public class OadrFingerprintSecurity {
 	}
 
 	public static String getOadr20bFingerprint(X509Certificate cert) throws OadrSecurityException {
-		return OadrFingerprintSecurity.format(OadrFingerprintSecurity.truncate(getFingerprint(cert, "SHA-256")));
+		return OadrFingerprintSecurity.format(OadrFingerprintSecurity.truncate(getFingerprint(cert, SHA_256)));
 	}
 
 	private static String truncate(String fingerprint) throws OadrSecurityException {

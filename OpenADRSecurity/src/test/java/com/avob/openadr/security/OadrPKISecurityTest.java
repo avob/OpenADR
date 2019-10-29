@@ -2,12 +2,14 @@ package com.avob.openadr.security;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -16,14 +18,18 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -44,30 +50,45 @@ public class OadrPKISecurityTest {
 
 	@Test
 	public void parseCertificateTest() throws OadrSecurityException {
-		X509Certificate parseCertificate = OadrPKISecurity.parseCertificate("src/test/resources/cert/test.crt");
+		X509Certificate parseCertificate = OadrPKISecurity.parseCertificate(TestUtils.TEST_CRT);
 		assertNotNull(parseCertificate);
+
+		boolean exception = false;
+		try {
+			OadrPKISecurity.parseCertificate("mouaiccool");
+		} catch (OadrSecurityException e) {
+			exception = true;
+		}
+		assertTrue(exception);
 	}
 
 	@Test
 	public void parsePrivateKeyTest() throws OadrSecurityException {
-		PrivateKey parsePrivateKey = OadrPKISecurity.parsePrivateKey("src/test/resources/cert/test.key");
+		PrivateKey parsePrivateKey = OadrPKISecurity.parsePrivateKey(TestUtils.TEST_KEY);
 		assertNotNull(parsePrivateKey);
+
+		boolean exception = false;
+		try {
+			OadrPKISecurity.parsePrivateKey("mouaiccool");
+		} catch (OadrSecurityException e) {
+			exception = true;
+		}
+		assertTrue(exception);
 	}
 
 	@Test
 	public void createKeyStoreTest() throws OadrSecurityException, KeyStoreException, NoSuchAlgorithmException,
 			CertificateException, IOException {
-		String password = "mysuperstrongpassword";
-		KeyStore createKeyStore = OadrPKISecurity.createKeyStore("src/test/resources/cert/test.key",
-				"src/test/resources/cert/test.crt", password);
+		String password = UUID.randomUUID().toString();
+		KeyStore createKeyStore = OadrPKISecurity.createKeyStore(TestUtils.TEST_KEY, TestUtils.TEST_CRT, password);
 		assertNotNull(createKeyStore);
 	}
 
 	@Test
 	public void createTrustStoreTest() throws OadrSecurityException, KeyStoreException, NoSuchAlgorithmException,
 			CertificateException, IOException {
-		Map<String, String> certificates = new HashMap<>();
-		certificates.put("test", "src/test/resources/cert/test.crt");
+		List<String> certificates = new ArrayList<>();
+		certificates.add(TestUtils.TEST_CRT);
 		KeyStore createTrustStore = OadrPKISecurity.createTrustStore(certificates);
 		assertNotNull(createTrustStore);
 	}
@@ -84,8 +105,9 @@ public class OadrPKISecurityTest {
 	}
 
 	@Test
-	public void generateCredentialsTest() throws NoSuchAlgorithmException, OperatorCreationException, IOException,
-			CertificateException, NoSuchProviderException, OadrSecurityException {
+	public void generateCredentialsTest()
+			throws NoSuchAlgorithmException, OperatorCreationException, IOException, CertificateException,
+			NoSuchProviderException, OadrSecurityException, InvalidKeyException, SignatureException {
 		KeyPair ca = OadrPKISecurity.generateRsaKeyPair();
 		SubjectPublicKeyInfo subPubKeyInfo = SubjectPublicKeyInfo.getInstance(ca.getPublic().getEncoded());
 		AlgorithmIdentifier sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find("SHA256withRSA");
@@ -115,22 +137,51 @@ public class OadrPKISecurityTest {
 		X509Certificate caCert = (X509Certificate) certificateFactory
 				.generateCertificate(new ByteArrayInputStream(holder.toASN1Structure().getEncoded()));
 
-		String algo = "SHA256withRSA";
 		String commonName = "test.oadr.com";
-		OadrUserX509Credential generateCredentials = OadrPKISecurity.generateCredentials(ca, caCert, commonName, algo);
+
+		// TEST RSA
+		OadrUserX509Credential generateCredentials = OadrPKISecurity.generateCredentials(ca, caCert, commonName,
+				OadrPKIAlgorithm.SHA256_RSA);
+		testGeneratedCredential(generateCredentials, "SHA256withRSA");
+
+		// TEST DSA
+		generateCredentials = OadrPKISecurity.generateCredentials(ca, caCert, commonName, OadrPKIAlgorithm.SHA256_DSA);
+		testGeneratedCredential(generateCredentials, "SHA256withDSA");
+
+	}
+
+	private void testGeneratedCredential(OadrUserX509Credential generateCredentials, String sigAlgo)
+			throws OadrSecurityException, FileNotFoundException, NoSuchAlgorithmException, InvalidKeyException,
+			SignatureException {
 		assertNotNull(generateCredentials);
 		assertNotNull(generateCredentials.getCaCertificateFile());
 		assertNotNull(generateCredentials.getCertificateFile());
 		assertNotNull(generateCredentials.getFingerprint());
 		assertNotNull(generateCredentials.getFingerprintFile());
 		assertNotNull(generateCredentials.getPrivateKeyFile());
-		try (BufferedReader reader = new BufferedReader(new FileReader(generateCredentials.getFingerprintFile()))) {
-			String currentLine = reader.readLine();
-			assertEquals(currentLine, generateCredentials.getFingerprint());
-		} catch (IOException ex) {
-			throw new OadrSecurityException("Can't read generated fingerprint file");
-		}
+		String readFile = TestUtils.readFile(generateCredentials.getFingerprintFile());
+		assertEquals(readFile, generateCredentials.getFingerprint());
 
+		X509Certificate cert = OadrPKISecurity
+				.parseCertificate(new FileReader(generateCredentials.getCertificateFile()));
+		PrivateKey key = OadrPKISecurity.parsePrivateKey(new FileReader(generateCredentials.getPrivateKeyFile()));
+
+		// create a challenge
+		byte[] challenge = new byte[10000];
+		ThreadLocalRandom.current().nextBytes(challenge);
+
+		// sign using the private key
+		Signature sig = Signature.getInstance(sigAlgo);
+		sig.initSign(key);
+		sig.update(challenge);
+		byte[] signature = sig.sign();
+
+		// verify signature using the public key
+		sig.initVerify(cert);
+		sig.update(challenge);
+
+		boolean keyPairMatches = sig.verify(signature);
+		assertTrue(keyPairMatches);
 	}
 
 }

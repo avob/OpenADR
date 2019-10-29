@@ -23,6 +23,7 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import com.avob.openadr.security.OadrPKIAlgorithm;
 import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.OadrUserX509Credential;
 import com.avob.openadr.security.exception.OadrSecurityException;
@@ -33,7 +34,8 @@ import com.avob.openadr.server.common.vtn.models.user.AbstractUserCreateDto;
 import com.google.common.collect.Maps;
 
 /**
- * Service to generate VEN/User/App PKI credentials if valid CA key/cert provided
+ * Service to generate VEN/User/App PKI credentials if valid CA key/cert
+ * provided
  * 
  * @author bzanni
  *
@@ -60,11 +62,11 @@ public class GenerateX509CertificateService {
 		long now = System.currentTimeMillis();
 		String commonName = dto.getCommonName();
 		try {
-			String algo = null;
+			OadrPKIAlgorithm algo = null;
 			if (dto.getNeedCertificateGeneration().toLowerCase().equals("ecc")) {
-				algo = "SHA256withDSA";
+				algo = OadrPKIAlgorithm.SHA256_DSA;
 			} else if (dto.getNeedCertificateGeneration().toLowerCase().equals("rsa")) {
-				algo = "SHA256withRSA";
+				algo = OadrPKIAlgorithm.SHA256_RSA;
 			}
 			OadrUserX509Credential generateCredentials = OadrPKISecurity.generateCredentials(caKeyPair, caCert,
 					commonName, algo);

@@ -33,6 +33,12 @@ import com.avob.openadr.model.oadr20b.xmlsignature.OadrXMLSignatureHandler;
 import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 
+/**
+ * Oadr 2.0b profile HTTP client
+ * 
+ * @author bzanni
+ *
+ */
 public class OadrHttpClient20b {
 
 	private OadrHttpClient client;
@@ -48,14 +54,13 @@ public class OadrHttpClient20b {
 
 	private boolean validateXmlPayload = false;
 
-	public OadrHttpClient20b(OadrHttpClient client) throws JAXBException {
-		this.jaxbContext = Oadr20bJAXBContext.getInstance();
-		this.client = client;
+	public OadrHttpClient20b(OadrHttpClient client) throws JAXBException, OadrSecurityException {
+		this(client, null, null, null);
 	}
 
-	public OadrHttpClient20b(OadrHttpClient client, boolean validateXmlPayload) throws JAXBException {
-		this.jaxbContext = Oadr20bJAXBContext.getInstance();
-		this.client = client;
+	public OadrHttpClient20b(OadrHttpClient client, boolean validateXmlPayload)
+			throws JAXBException, OadrSecurityException {
+		this(client, null, null, null);
 		this.validateXmlPayload = validateXmlPayload;
 	}
 
@@ -64,8 +69,10 @@ public class OadrHttpClient20b {
 		this.jaxbContext = Oadr20bJAXBContext.getInstance();
 		this.client = client;
 
-		this.privateKey = OadrPKISecurity.parsePrivateKey(privateKeyPath);
-		this.clientCertificate = OadrPKISecurity.parseCertificate(clientCertificatePath);
+		if (privateKeyPath != null && clientCertificatePath != null) {
+			this.privateKey = OadrPKISecurity.parsePrivateKey(privateKeyPath);
+			this.clientCertificate = OadrPKISecurity.parseCertificate(clientCertificatePath);
+		}
 
 		this.replayProtectAcceptedDelaySecond = replayProtectAcceptedDelaySecond;
 	}
@@ -89,17 +96,6 @@ public class OadrHttpClient20b {
 	public <T, I extends JAXBElement<?>> T post(I payload, String path, Class<T> responseKlass) throws Oadr20bException,
 			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 		return this.post(null, path, null, payload, responseKlass);
-	}
-
-	private String sign(Object object) throws Oadr20bXMLSignatureException {
-		String nonce = UUID.randomUUID().toString();
-		Long createdtimestamp = System.currentTimeMillis();
-		return OadrXMLSignatureHandler.sign(object, this.privateKey, this.clientCertificate, nonce, createdtimestamp);
-	}
-
-	private void validate(String raw, OadrPayload payload) throws Oadr20bXMLSignatureValidationException {
-		long nowDate = System.currentTimeMillis();
-		OadrXMLSignatureHandler.validate(raw, payload, nowDate, replayProtectAcceptedDelaySecond * 1000L);
 	}
 
 	/**
@@ -126,39 +122,40 @@ public class OadrHttpClient20b {
 				marshal = jaxbContext.marshal(payload, validateXmlPayload);
 			}
 
-		
 			StringEntity stringEntity = new StringEntity(marshal);
 			post.setEntity(stringEntity);
 			HttpResponse response = client.execute(post, host, Oadr20bUrlPath.OADR_BASE_PATH + path, context);
 
+			// if request did not result in 200 http code throw exception
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 				EntityUtils.consumeQuietly(response.getEntity());
 				throw new Oadr20bHttpLayerException(response.getStatusLine().getStatusCode(),
 						response.getStatusLine().getStatusCode() + "");
 
-			} else {
-				if (isXmlSignatureEnabled()) {
-					try {
-						String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
-						OadrPayload unmarshal = jaxbContext.unmarshal(entity, OadrPayload.class, validateXmlPayload);
-						this.validate(entity, unmarshal);
-						EntityUtils.consumeQuietly(response.getEntity());
-						if (Object.class.equals(responseKlass)) {
-							Object signedObjectFromOadrPayload = Oadr20bFactory
-									.getSignedObjectFromOadrPayload(unmarshal);
+			}
 
-							return responseKlass.cast(signedObjectFromOadrPayload);
-						} else {
-							return Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, responseKlass);
-						}
+			// if request was a success, validate xml signature if required and then
+			// unmarshall response
+			if (isXmlSignatureEnabled()) {
+				try {
+					String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
+					OadrPayload unmarshal = jaxbContext.unmarshal(entity, OadrPayload.class, validateXmlPayload);
+					this.validate(entity, unmarshal);
+					EntityUtils.consumeQuietly(response.getEntity());
+					if (Object.class.equals(responseKlass)) {
+						Object signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal);
 
-					} catch (Oadr20bUnmarshalException e) {
-						throw new Oadr20bApplicationLayerException("Signed payload expected in response");
+						return responseKlass.cast(signedObjectFromOadrPayload);
+					} else {
+						return Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, responseKlass);
 					}
-				} else {
-					String resp = EntityUtils.toString(response.getEntity(), "UTF-8");
-					return jaxbContext.unmarshal(resp, responseKlass, validateXmlPayload);
+
+				} catch (Oadr20bUnmarshalException e) {
+					throw new Oadr20bApplicationLayerException("Signed payload expected in response");
 				}
+			} else {
+				String resp = EntityUtils.toString(response.getEntity(), "UTF-8");
+				return jaxbContext.unmarshal(resp, responseKlass, validateXmlPayload);
 			}
 
 		} catch (ClientProtocolException e) {
@@ -172,6 +169,17 @@ public class OadrHttpClient20b {
 		} catch (URISyntaxException e) {
 			throw new Oadr20bException("Host is not a valid URI", e);
 		}
+	}
+
+	private String sign(Object object) throws Oadr20bXMLSignatureException {
+		String nonce = UUID.randomUUID().toString();
+		Long createdtimestamp = System.currentTimeMillis();
+		return OadrXMLSignatureHandler.sign(object, this.privateKey, this.clientCertificate, nonce, createdtimestamp);
+	}
+
+	private void validate(String raw, OadrPayload payload) throws Oadr20bXMLSignatureValidationException {
+		long nowDate = System.currentTimeMillis();
+		OadrXMLSignatureHandler.validate(raw, payload, nowDate, replayProtectAcceptedDelaySecond * 1000L);
 	}
 
 }

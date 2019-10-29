@@ -30,6 +30,13 @@ import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 
+
+/**
+ * Oadr 2.0b profile VEN HTTP client
+ * 
+ * @author bzanni
+ *
+ */
 public class OadrHttpVenClient20b {
 
 	private OadrHttpClient20b client;

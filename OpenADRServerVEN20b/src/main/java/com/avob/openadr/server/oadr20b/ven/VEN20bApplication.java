@@ -97,7 +97,7 @@ public class VEN20bApplication {
 			return new VENEmbeddedServletContainerCustomizer(port, contextPath,
 					OadrPKISecurity.createKeyStore(venConfig.getVenPrivateKeyPath(), venConfig.getVenCertificatePath(),
 							password),
-					password, OadrPKISecurity.createTrustStore(venConfig.getVtnTrustCertificate()),
+					password, OadrPKISecurity.createTrustStore(venConfig.getTrustCertificates()),
 					Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers());
 		} catch (KeyStoreException e) {
 			LOGGER.error("", e);

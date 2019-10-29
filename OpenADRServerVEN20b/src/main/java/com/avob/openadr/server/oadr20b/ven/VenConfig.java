@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -147,15 +145,6 @@ public class VenConfig {
 
 	public String getVenUrl() {
 		return venUrl;
-	}
-
-	public Map<String, String> getVtnTrustCertificate() {
-		Map<String, String> trustedCertificates = new HashMap<String, String>();
-		int i = 0;
-		for (String path : getTrustCertificates()) {
-			trustedCertificates.put("cert_" + (i++), path);
-		}
-		return trustedCertificates;
 	}
 
 	public String getBasicUsername() {

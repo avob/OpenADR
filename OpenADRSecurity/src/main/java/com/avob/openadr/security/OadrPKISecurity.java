@@ -11,6 +11,7 @@ import java.io.OutputStreamWriter;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.KeyManagementException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -19,7 +20,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.SecureRandom;
 import java.security.Security;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -28,10 +31,12 @@ import java.security.cert.X509Certificate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
+import java.util.UUID;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -52,7 +57,6 @@ import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
-import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
@@ -68,6 +72,9 @@ import com.avob.openadr.security.exception.OadrSecurityException;
  */
 public class OadrPKISecurity {
 
+	private OadrPKISecurity() {
+	}
+
 	/**
 	 * Parse PEM formatted private key
 	 * 
@@ -76,18 +83,30 @@ public class OadrPKISecurity {
 	 * @throws OadrSecurityException
 	 */
 	public static PrivateKey parsePrivateKey(String privateKeyFilePath) throws OadrSecurityException {
+		try {
+			return parsePrivateKey(new FileReader(privateKeyFilePath));
+		} catch (FileNotFoundException e) {
+			throw new OadrSecurityException(e);
+		}
+	}
+
+	/**
+	 * Parse PEM formatted private key
+	 * 
+	 * @param fileReader
+	 * @return
+	 * @throws OadrSecurityException
+	 */
+	public static PrivateKey parsePrivateKey(FileReader fileReader) throws OadrSecurityException {
 		Object readObject;
 		try {
-			readObject = parsePem(privateKeyFilePath);
+			readObject = parsePem(fileReader);
 			if (readObject instanceof PrivateKeyInfo) {
 				PrivateKeyInfo privateKeyInfo = (PrivateKeyInfo) readObject;
 				return new JcaPEMKeyConverter().setProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider())
 						.getPrivateKey(privateKeyInfo);
-			} else if (readObject instanceof PKCS8EncryptedPrivateKeyInfo) {
-				throw new OadrSecurityException(
-						"PKCS8 Encrypted PrivateKeys are not supported. Only unencrypted private keys");
 			} else {
-				throw new OadrSecurityException("private key file does not have good format: " + privateKeyFilePath);
+				throw new OadrSecurityException("private key file does not have good format");
 			}
 		} catch (IOException e) {
 			throw new OadrSecurityException("private key file cannot be read", e);
@@ -102,27 +121,32 @@ public class OadrPKISecurity {
 	 * @throws OadrSecurityException
 	 */
 	public static X509Certificate parseCertificate(String certificateFilePath) throws OadrSecurityException {
+		try {
+			return parseCertificate(new FileReader(certificateFilePath));
+		} catch (FileNotFoundException e) {
+			throw new OadrSecurityException(e);
+		}
+	}
+
+	public static X509Certificate parseCertificate(FileReader fileReader) throws OadrSecurityException {
 		Object readObject;
 		try {
-			readObject = parsePem(certificateFilePath);
+			readObject = parsePem(fileReader);
 			if (readObject instanceof X509CertificateHolder) {
 				X509CertificateHolder certHolder = (X509CertificateHolder) readObject;
 				return new JcaX509CertificateConverter()
 						.setProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider())
 						.getCertificate(certHolder);
 			} else {
-				throw new OadrSecurityException("certificate file does not have good format: " + certificateFilePath);
+				throw new OadrSecurityException("certificate file does not have good format");
 			}
-		} catch (IOException e) {
-			throw new OadrSecurityException("certificate file cannot be read: " + certificateFilePath, e);
 		} catch (CertificateException e) {
-			throw new OadrSecurityException(
-					"certificate holder cannot be read convert to X509 certificate: " + certificateFilePath, e);
+			throw new OadrSecurityException("certificate holder cannot be read convert to X509 certificate", e);
 		}
 	}
 
 	/**
-	 * Create java Keystore from PEM formatted key/cert
+	 * Create passwordless java Keystore from PEM formatted key/cert
 	 * 
 	 * @param privateKeyFilePath
 	 * @param clientCertificatefilePath
@@ -148,6 +172,31 @@ public class OadrPKISecurity {
 	}
 
 	/**
+	 * Create passwordless java KeyManagerFactory from PEM formatted key/cert
+	 * 
+	 * @param clientPrivateKeyPemFilePath
+	 * @param clientCertificatePemFilePath
+	 * @param password
+	 * @return
+	 * @throws OadrSecurityException
+	 */
+	public static KeyManagerFactory createKeyManagerFactory(String clientPrivateKeyPemFilePath,
+			String clientCertificatePemFilePath, String password) throws OadrSecurityException {
+		KeyManagerFactory kmf = null;
+		try {
+			KeyStore ks = OadrPKISecurity.createKeyStore(clientPrivateKeyPemFilePath, clientCertificatePemFilePath,
+					password);
+			
+			kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+			kmf.init(ks, password.toCharArray());
+			return kmf;
+		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException
+				| UnrecoverableKeyException e) {
+			throw new OadrSecurityException(e);
+		}
+	}
+
+	/**
 	 * Create java Truststore from PEM formatted x509 certificates
 	 * 
 	 * @param certificates
@@ -158,18 +207,76 @@ public class OadrPKISecurity {
 	 * @throws IOException
 	 * @throws OadrSecurityException
 	 */
-	public static KeyStore createTrustStore(Map<String, String> certificates) throws KeyStoreException,
+	public static KeyStore createTrustStore(List<String> certificates) throws KeyStoreException,
 			NoSuchAlgorithmException, CertificateException, IOException, OadrSecurityException {
-
 		KeyStore ts = KeyStore.getInstance(KeyStore.getDefaultType());
 		ts.load(null, null);
-
-		Iterator<Entry<String, String>> iterator = certificates.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Entry<String, String> next = iterator.next();
-			ts.setCertificateEntry(next.getKey(), OadrPKISecurity.parseCertificate(next.getValue()));
+		String keyEntryPrefix = "trust_";
+		int i = 1;
+		for (String certPath : certificates) {
+			ts.setCertificateEntry(keyEntryPrefix + i, OadrPKISecurity.parseCertificate(certPath));
+			i++;
 		}
 		return ts;
+	}
+
+	/**
+	 * Create java TrustManagerFactory from PEM formatted x509 certificates
+	 * 
+	 * @param trustedCertificateFilePath
+	 * @return
+	 * @throws OadrSecurityException
+	 */
+	public static TrustManagerFactory createTrustManagerFactory(List<String> trustedCertificateFilePath)
+			throws OadrSecurityException {
+		TrustManagerFactory tmf = null;
+		String exceptionMsg = "certificates can't be inserted into truststore";
+		try {
+			KeyStore ts = KeyStore.getInstance(KeyStore.getDefaultType());
+			ts.load(null, null);
+			for (String certPath : trustedCertificateFilePath) {
+				X509Certificate cert = OadrPKISecurity.parseCertificate(certPath);
+				File file = new File(certPath);
+				ts.setCertificateEntry(file.getName(), cert);
+			}
+			tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+			tmf.init(ts);
+		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
+			throw new OadrSecurityException(exceptionMsg, e);
+		}
+		return tmf;
+	}
+
+	/**
+	 * Create java SSLContext from PEM formatted private key and x509 certificates
+	 * 
+	 * @param clientPrivateKeyPemFilePath
+	 * @param clientCertificatePemFilePath
+	 * @param trustCertificates
+	 * @return
+	 * @throws OadrSecurityException
+	 */
+	public static SSLContext createSSLContext(String clientPrivateKeyPemFilePath, String clientCertificatePemFilePath,
+			List<String> trustCertificates, String password) throws OadrSecurityException {
+		SSLContext sslContext;
+		try {
+			KeyManagerFactory kmf = OadrPKISecurity.createKeyManagerFactory(clientPrivateKeyPemFilePath,
+					clientCertificatePemFilePath, password);
+			TrustManagerFactory tmf = OadrPKISecurity.createTrustManagerFactory(trustCertificates);
+			// SSL Context Factory
+
+			sslContext = SSLContext.getInstance("TLS");
+
+			// init ssl context
+			String seed = UUID.randomUUID().toString();
+
+			sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom(seed.getBytes()));
+
+			return sslContext;
+
+		} catch (NoSuchAlgorithmException | KeyManagementException e) {
+			throw new OadrSecurityException(e);
+		}
 	}
 
 	public static String md5Hex(String data) {
@@ -214,26 +321,30 @@ public class OadrPKISecurity {
 	 * @throws OadrSecurityException
 	 */
 	public static OadrUserX509Credential generateCredentials(KeyPair caKeyPair, X509Certificate caCert,
-			String commonName, String algo) throws OadrSecurityException {
+			String commonName, OadrPKIAlgorithm algo) throws OadrSecurityException {
 		try {
 			long now = System.currentTimeMillis();
 			String venCN = commonName;
 			BigInteger serialNumber = BigInteger.valueOf(now);
 
 			KeyPair venCred = null;
-
-			if ("SHA256withDSA".equals(algo)) {
+			String csrAlgo = "";
+			switch (algo) {
+			case SHA256_DSA:
 
 				venCred = OadrPKISecurity.generateEccKeyPair();
 
-			} else if ("SHA256withRSA".equals(algo)) {
+				csrAlgo = "SHA256withDSA";
+				break;
+			case SHA256_RSA:
 				venCred = OadrPKISecurity.generateRsaKeyPair();
-			} else {
-				throw new OadrSecurityException("Can't generate credentials using algo: " + algo);
+				csrAlgo = "SHA256withRSA";
+				break;
+
 			}
 
 			String x509PrincipalName = "C=FR, ST=Paris, L=Paris, O=Avob, OU=Avob, CN=" + venCN;
-			PKCS10CertificationRequest csr = OadrPKISecurity.generateCsr(venCred, x509PrincipalName, algo);
+			PKCS10CertificationRequest csr = OadrPKISecurity.generateCsr(venCred, x509PrincipalName, csrAlgo);
 			X509Certificate crt = OadrPKISecurity.signCsr(csr, caKeyPair, caCert, serialNumber);
 
 			String fingerprint = OadrFingerprintSecurity.getOadr20bFingerprint(crt);
@@ -244,17 +355,8 @@ public class OadrPKISecurity {
 			File fingerprintFile = writeToFile(venCN, "fingerprint", fingerprint);
 
 			return new OadrUserX509Credential(fingerprint, caCrtFile, crtFile, keyFile, fingerprintFile);
-		} catch (NoSuchAlgorithmException e) {
-			throw new OadrSecurityException(e);
-		} catch (OperatorCreationException e) {
-			throw new OadrSecurityException(e);
-		} catch (CertificateException e) {
-			throw new OadrSecurityException(e);
-		} catch (NoSuchProviderException e) {
-			throw new OadrSecurityException(e);
-		} catch (IOException e) {
-			throw new OadrSecurityException(e);
-		} catch (OadrSecurityException e) {
+		} catch (NoSuchAlgorithmException | OperatorCreationException | CertificateException | NoSuchProviderException
+				| IOException e) {
 			throw new OadrSecurityException(e);
 		}
 
@@ -301,20 +403,20 @@ public class OadrPKISecurity {
 	}
 
 	private static String writeCrtToString(X509Certificate certificate)
-			throws IOException, CertificateEncodingException {
+			throws CertificateEncodingException, OadrSecurityException {
 		return writePemToString("CERTIFICATE", certificate.getEncoded());
 	}
 
-	private static String writeKeyToString(KeyPair pair) throws IOException, CertificateEncodingException {
+	private static String writeKeyToString(KeyPair pair) throws OadrSecurityException {
 		return writePemToString("PRIVATE KEY", pair.getPrivate().getEncoded());
 	}
 
-	private static String writePemToString(String type, byte[] content) {
+	private static String writePemToString(String type, byte[] content) throws OadrSecurityException {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		try (PemWriter pemWriter = new PemWriter(new OutputStreamWriter(outputStream))) {
 			pemWriter.writeObject(new PemObject(type, content));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new OadrSecurityException(e);
 		}
 		return new String(outputStream.toByteArray());
 	}
@@ -324,7 +426,7 @@ public class OadrPKISecurity {
 		File file = path.toFile();
 
 		if (file.exists()) {
-			boolean delete = file.delete();
+			boolean delete = Files.deleteIfExists(file.toPath());
 			if (!delete) {
 				throw new IOException("file can't be deleted");
 			}
@@ -338,7 +440,8 @@ public class OadrPKISecurity {
 		return file;
 	}
 
-	private static PKCS10CertificationRequest generateCsr(KeyPair pair, String x509PrincipalName, String algo) {
+	private static PKCS10CertificationRequest generateCsr(KeyPair pair, String x509PrincipalName, String algo)
+			throws OadrSecurityException {
 		PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(
 				new X500Principal(x509PrincipalName), pair.getPublic());
 		JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(algo);
@@ -346,26 +449,16 @@ public class OadrPKISecurity {
 		try {
 			signer = csBuilder.build(pair.getPrivate());
 		} catch (OperatorCreationException e) {
-			throw new RuntimeException(e);
+			throw new OadrSecurityException(e);
 		}
 		return p10Builder.build(signer);
 	}
 
-	private static Object parsePem(String filePath) throws IOException {
-		PEMParser pemReader = null;
-		FileReader fileReader;
-		try {
-			fileReader = new FileReader(filePath);
-			pemReader = new PEMParser(fileReader);
+	private static Object parsePem(FileReader fileReader) throws OadrSecurityException {
+		try (PEMParser pemReader = new PEMParser(fileReader)) {
 			return pemReader.readObject();
-		} catch (FileNotFoundException e) {
-			throw e;
 		} catch (IOException e) {
-			throw e;
-		} finally {
-			if (pemReader != null) {
-				pemReader.close();
-			}
+			throw new OadrSecurityException(e);
 		}
 
 	}

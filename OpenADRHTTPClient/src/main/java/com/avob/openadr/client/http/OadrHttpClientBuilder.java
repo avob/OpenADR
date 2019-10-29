@@ -219,6 +219,8 @@ public class OadrHttpClientBuilder {
 
 	public OadrHttpClient build() throws OadrSecurityException {
 
+		
+		
 		SSLConnectionSocketFactory createSSLSocketFactory = SSLSocketFactoryBuilder.createSSLSocketFactory(
 				clientPrivateKeyPemFilePath, clientCertificatePemFilePath, trustedCertificateFilePath, protocols,
 				ciphers);

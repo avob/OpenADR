@@ -1,11 +1,5 @@
 package com.avob.openadr.server.common.vtn;
 
-import java.io.IOException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -146,6 +140,7 @@ public class VtnConfig {
 	private KeyManagerFactory keyManagerFactory;
 	private TrustManagerFactory trustManagerFactory;
 	private String oadr20bFingerprint;
+	private String oadr20aFingerprint;
 	private String brokerUrl;
 	private String sslBrokerUrl;
 
@@ -166,41 +161,18 @@ public class VtnConfig {
 
 		// no VTN key/cert conf might be given when using HTTP only transport
 		if (this.getCert() != null && this.getKey() != null) {
+
 			String keystorePassword = UUID.randomUUID().toString();
 
-			KeyStore keystore;
-			KeyStore truststore;
 			try {
-
-				// get VTN oadr20b fingerprint
+				// get VTN fingerprints
+				setOadr20aFingerprint(OadrFingerprintSecurity.getOadr20aFingerprint(this.getCert()));
 				setOadr20bFingerprint(OadrFingerprintSecurity.getOadr20bFingerprint(this.getCert()));
-
-				// get VTN private key as java Keystore
-				keystore = OadrPKISecurity.createKeyStore(this.getKey(), this.getCert(), keystorePassword);
-
-				// get VTN certificate as java Truststore
-				truststore = OadrPKISecurity.createTrustStore(trustedCertificates);
-
-				// init key manager factory
-				KeyStore createKeyStore = keystore;
-				setKeyManagerFactory(KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm()));
-				getKeyManagerFactory().init(createKeyStore, keystorePassword.toCharArray());
-
-				// init trust manager factory
-				setTrustManagerFactory(TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()));
-				getTrustManagerFactory().init(truststore);
+				setTrustManagerFactory(OadrPKISecurity.createTrustManagerFactory(trustCertificates));
+				setKeyManagerFactory(
+						OadrPKISecurity.createKeyManagerFactory(this.getKey(), this.getCert(), keystorePassword));
 				// init ssl context
-			} catch (KeyStoreException e) {
-				throw new OadrVTNInitializationException(e);
-			} catch (NoSuchAlgorithmException e) {
-				throw new OadrVTNInitializationException(e);
-			} catch (CertificateException e) {
-				throw new OadrVTNInitializationException(e);
-			} catch (IOException e) {
-				throw new OadrVTNInitializationException(e);
 			} catch (OadrSecurityException e) {
-				throw new OadrVTNInitializationException(e);
-			} catch (UnrecoverableKeyException e) {
 				throw new OadrVTNInitializationException(e);
 			}
 		} else {
@@ -361,6 +333,10 @@ public class VtnConfig {
 		return oadr20bFingerprint;
 	}
 
+	public String getOadr20aFingerprint() {
+		return oadr20aFingerprint;
+	}
+
 	public String getBrokerUrl() {
 		return brokerUrl;
 	}
@@ -427,6 +403,10 @@ public class VtnConfig {
 
 	private void setOadr20bFingerprint(String oadr20bFingerprint) {
 		this.oadr20bFingerprint = oadr20bFingerprint;
+	}
+
+	private void setOadr20aFingerprint(String oadr20aFingerprint) {
+		this.oadr20aFingerprint = oadr20aFingerprint;
 	}
 
 	public String getXmppDomain() {

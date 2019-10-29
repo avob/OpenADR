@@ -1,13 +1,5 @@
 package com.avob.openadr.server.oadr20b.ven;
 
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,9 +11,7 @@ import java.util.stream.StreamSupport;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 import javax.xml.bind.JAXBException;
 
 import org.jivesoftware.smack.SmackException.NotConnectedException;
@@ -84,7 +74,7 @@ public class MultiVtnConfig {
 		if (session.getVtnUrl() != null) {
 			OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(session.getVtnUrl())
 					.withTrustedCertificate(
-							new ArrayList<String>(session.getVenSessionConfig().getVtnTrustCertificate().values()))
+							new ArrayList<String>(session.getVenSessionConfig().getTrustCertificates()))
 					.withPooling(1, 1).withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers());
 
 			if (session.isBasicAuthenticationConfigured()) {
@@ -118,31 +108,12 @@ public class MultiVtnConfig {
 			getMultiHttpClientConfig().put(session.getVtnId(), client);
 		} else if (session.getVtnXmppHost() != null && session.getVtnXmppPort() != null) {
 
-			String keystorePassword = UUID.randomUUID().toString();
-
-			KeyStore keystore;
 			try {
-				keystore = OadrPKISecurity.createKeyStore(session.getVenSessionConfig().getVenPrivateKeyPath(),
-						session.getVenSessionConfig().getVenCertificatePath(), keystorePassword);
-				KeyStore truststore = OadrPKISecurity
-						.createTrustStore(session.getVenSessionConfig().getVtnTrustCertificate());
-
-				// init key manager factory
-				KeyStore createKeyStore = keystore;
-				KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-				kmf.init(createKeyStore, keystorePassword.toCharArray());
-
-				// init trust manager factory
-				TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-				tmf.init(truststore);
-
-				// SSL Context Factory
-				SSLContext sslContext = SSLContext.getInstance("TLS");
-
-				// init ssl context
-				String seed = UUID.randomUUID().toString();
-
-				sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom(seed.getBytes()));
+				String password = UUID.randomUUID().toString();
+				SSLContext sslContext = OadrPKISecurity.createSSLContext(
+						session.getVenSessionConfig().getVenPrivateKeyPath(),
+						session.getVenSessionConfig().getVenCertificatePath(),
+						session.getVenSessionConfig().getTrustCertificates(), password);
 
 				OadrXmppClient20bBuilder builder = new OadrXmppClient20bBuilder()
 						.withHostAndPort(session.getVtnXmppHost(), session.getVtnXmppPort())
@@ -170,21 +141,7 @@ public class MultiVtnConfig {
 				}
 				putMultiXmppClientConfig(session, venClient);
 
-			} catch (KeyStoreException e) {
-				throw new OadrVTNInitializationException(e);
-			} catch (NoSuchAlgorithmException e) {
-				throw new OadrVTNInitializationException(e);
-			} catch (CertificateException e) {
-				throw new OadrVTNInitializationException(e);
-			} catch (IOException e) {
-				throw new OadrVTNInitializationException(e);
-			} catch (OadrSecurityException e) {
-				throw new OadrVTNInitializationException(e);
-			} catch (UnrecoverableKeyException e) {
-				throw new OadrVTNInitializationException(e);
-			} catch (OadrXmppException e) {
-				throw new OadrVTNInitializationException(e);
-			} catch (KeyManagementException e) {
+			} catch (OadrSecurityException | OadrXmppException e) {
 				throw new OadrVTNInitializationException(e);
 			}
 

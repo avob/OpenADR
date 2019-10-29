@@ -38,6 +38,7 @@ import com.avob.openadr.model.oadr20b.ei.EiTargetType;
 import com.avob.openadr.model.oadr20b.ei.EventDescriptorType;
 import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
@@ -46,6 +47,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationExc
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.security.exception.OadrSecurityException;
 
 public class OadrHttpClient20bTest {
 
@@ -103,7 +105,7 @@ public class OadrHttpClient20bTest {
 	@Test
 	public void validPostTest() throws ClientProtocolException, IOException, JAXBException, Oadr20bException,
 			Oadr20bMarshalException, URISyntaxException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException {
+			Oadr20bXMLSignatureValidationException, OadrSecurityException {
 
 		OadrHttpClient oadrHttpClient = Mockito.mock(OadrHttpClient.class);
 		int scOk = HttpStatus.SC_OK;
@@ -125,9 +127,38 @@ public class OadrHttpClient20bTest {
 	}
 
 	@Test
+	public void xmldsigRequiredErrorPostTest() throws ClientProtocolException, IOException, JAXBException,
+			Oadr20bException, Oadr20bMarshalException, URISyntaxException, Oadr20bHttpLayerException,
+			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, OadrSecurityException {
+
+		OadrHttpClient oadrHttpClient = Mockito.mock(OadrHttpClient.class);
+		int scOk = HttpStatus.SC_OK;
+
+		OadrResponseType mockOadrResponseType = Oadr20bResponseBuilders.newOadr20bResponseBuilder("", scOk, "venId")
+				.build();
+		String marshal = Oadr20bJAXBContext.getInstance().marshalRoot(mockOadrResponseType);
+
+		HttpResponse response = this.createHttpResponse(scOk, marshal);
+		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
+
+		String certPath = "src/test/resources/cert/test";
+		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient, certPath + ".key", certPath + ".crt", 1200L);
+
+		OadrDistributeEventType mockDistributeEvent = this.createOadrDistributeEvent();
+		boolean exception = false;
+		try {
+			client.post(Oadr20bFactory.createOadrDistributeEvent(mockDistributeEvent),
+					Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.EI_EVENT_SERVICE, OadrResponseType.class);
+		} catch (Oadr20bApplicationLayerException e) {
+			exception = true;
+		}
+		assertTrue(exception);
+	}
+
+	@Test
 	public void httpLayerErrorPostTest() throws ClientProtocolException, IOException, JAXBException, Oadr20bException,
 			Oadr20bMarshalException, URISyntaxException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException {
+			Oadr20bXMLSignatureValidationException, OadrSecurityException {
 
 		// HTTP layer error
 		OadrHttpClient oadrHttpClient = Mockito.mock(OadrHttpClient.class);
@@ -158,7 +189,7 @@ public class OadrHttpClient20bTest {
 	@Test
 	public void requestMarshallingErrorPostTest() throws ClientProtocolException, IOException, JAXBException,
 			Oadr20bException, Oadr20bMarshalException, URISyntaxException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
+			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, OadrSecurityException {
 
 		OadrHttpClient oadrHttpClient = Mockito.mock(OadrHttpClient.class);
 		int scOk = HttpStatus.SC_OK;
@@ -188,7 +219,7 @@ public class OadrHttpClient20bTest {
 	@Test
 	public void responseUnmarshallingErrorPostTest() throws ClientProtocolException, IOException, JAXBException,
 			Oadr20bException, Oadr20bMarshalException, URISyntaxException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
+			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, OadrSecurityException {
 
 		OadrHttpClient oadrHttpClient = Mockito.mock(OadrHttpClient.class);
 		int scOk = HttpStatus.SC_OK;
