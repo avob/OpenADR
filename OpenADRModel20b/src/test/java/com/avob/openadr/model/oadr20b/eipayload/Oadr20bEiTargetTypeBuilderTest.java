@@ -25,83 +25,77 @@ import com.avob.openadr.model.oadr20b.power.TransportInterfaceType;
 
 public class Oadr20bEiTargetTypeBuilderTest {
 
-    private Oadr20bJAXBContext jaxbContext;
+	private Oadr20bJAXBContext jaxbContext;
 
-    public Oadr20bEiTargetTypeBuilderTest() {
-        try {
-            jaxbContext = Oadr20bJAXBContext.getInstance();
-        } catch (JAXBException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	public Oadr20bEiTargetTypeBuilderTest() throws JAXBException {
+		jaxbContext = Oadr20bJAXBContext.getInstance();
+	}
 
-    private void checkMarshalling(EiTargetType build) throws Oadr20bMarshalException {
-        jaxbContext.marshal(Oadr20bFactory.createEiTarget(build));
-    }
+	private void checkMarshalling(EiTargetType build) throws Oadr20bMarshalException {
+		jaxbContext.marshal(Oadr20bFactory.createEiTarget(build));
+	}
 
-    @Test
-    public void test() throws Oadr20bMarshalException {
-        EiTargetType build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().build();
-        checkMarshalling(build);
+	@Test
+	public void test() throws Oadr20bMarshalException {
+		EiTargetType build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().build();
+		checkMarshalling(build);
 
-        AggregatedPnodeType aggregatedPnode = Oadr20bFactory.createAggregatedPnodeType("aggregatedPnode");
-        build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addAggregatedPnode(aggregatedPnode).build();
-        checkMarshalling(build);
+		AggregatedPnodeType aggregatedPnode = Oadr20bFactory.createAggregatedPnodeType("aggregatedPnode");
+		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addAggregatedPnode(aggregatedPnode).build();
+		checkMarshalling(build);
 
-        EndDeviceAssetType endDeviceAsset = Oadr20bFactory
-                .createEndDeviceAssetType(EndDeviceAssertMridType.EXTERIOR_LIGHTING);
-        build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addEndDeviceAsset(endDeviceAsset).build();
-        checkMarshalling(build);
+		EndDeviceAssetType endDeviceAsset = Oadr20bFactory
+				.createEndDeviceAssetType(EndDeviceAssertMridType.EXTERIOR_LIGHTING);
+		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addEndDeviceAsset(endDeviceAsset).build();
+		checkMarshalling(build);
 
-        String groupName = "group";
-        build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addGroupName(groupName).build();
-        checkMarshalling(build);
+		String groupName = "group";
+		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addGroupName(groupName).build();
+		checkMarshalling(build);
 
-        String groupId = "groupId";
-        build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addGroupId(groupId).build();
-        checkMarshalling(build);
+		String groupId = "groupId";
+		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addGroupId(groupId).build();
+		checkMarshalling(build);
 
-        MeterAssetType meterAssetType = Oadr20bFactory.createMeterAssetType("mrid");
-        build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addMeterAsset(meterAssetType).build();
-        checkMarshalling(build);
+		MeterAssetType meterAssetType = Oadr20bFactory.createMeterAssetType("mrid");
+		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addMeterAsset(meterAssetType).build();
+		checkMarshalling(build);
 
-        String party = "party";
-        build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addPartyId(party).build();
-        checkMarshalling(build);
+		String party = "party";
+		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addPartyId(party).build();
+		checkMarshalling(build);
 
-        PnodeType pnode = Oadr20bFactory.createPnodeType("pnode");
-        build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addPnode(pnode).build();
-        checkMarshalling(build);
+		PnodeType pnode = Oadr20bFactory.createPnodeType("pnode");
+		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addPnode(pnode).build();
+		checkMarshalling(build);
 
-        String resource = "resourceId";
-        build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addResourceId(resource).build();
-        checkMarshalling(build);
+		String resource = "resourceId";
+		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addResourceId(resource).build();
+		checkMarshalling(build);
 
-        List<Double> pos = new ArrayList<Double>();
-        pos.add(new Double(12));
-        ServiceAreaType serviceAreaType = Oadr20bFactory.createServiceAreaType("featureCollectionId", "locationId",
-                pos);
-        build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addServiceArea(serviceAreaType).build();
-        checkMarshalling(build);
+		List<Double> pos = new ArrayList<Double>();
+		pos.add(new Double(12));
+		ServiceAreaType serviceAreaType = Oadr20bFactory.createServiceAreaType("featureCollectionId", "locationId",
+				pos);
+		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addServiceArea(serviceAreaType).build();
+		checkMarshalling(build);
 
-        ServiceDeliveryPointType serviceDeliveryPointType = Oadr20bFactory.createServiceDeliveryPointType("node");
-        build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder()
-                .addServiceDeliveryPoint(serviceDeliveryPointType).build();
-        checkMarshalling(build);
+		ServiceDeliveryPointType serviceDeliveryPointType = Oadr20bFactory.createServiceDeliveryPointType("node");
+		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addServiceDeliveryPoint(serviceDeliveryPointType)
+				.build();
+		checkMarshalling(build);
 
-        ServiceLocationType serviceLocationType = Oadr20bFactory.createServiceLocationType("featureCollectionId",
-                "locationId", Arrays.asList(12D, 14D, 16D, 18D));
-        build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addServiceLocation(serviceLocationType).build();
-        checkMarshalling(build);
+		ServiceLocationType serviceLocationType = Oadr20bFactory.createServiceLocationType("featureCollectionId",
+				"locationId", Arrays.asList(12D, 14D, 16D, 18D));
+		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addServiceLocation(serviceLocationType).build();
+		checkMarshalling(build);
 
-        TransportInterfaceType transportInterfaceType = Oadr20bFactory.createTransportInterfaceType("receiptPointId",
-                "deliveryPointId");
-        build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addTransportInterface(transportInterfaceType)
-                .build();
-        checkMarshalling(build);
+		TransportInterfaceType transportInterfaceType = Oadr20bFactory.createTransportInterfaceType("receiptPointId",
+				"deliveryPointId");
+		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addTransportInterface(transportInterfaceType).build();
+		checkMarshalling(build);
 
-        build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addVenId("venId").build();
-        checkMarshalling(build);
-    }
+		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addVenId("venId").build();
+		checkMarshalling(build);
+	}
 }

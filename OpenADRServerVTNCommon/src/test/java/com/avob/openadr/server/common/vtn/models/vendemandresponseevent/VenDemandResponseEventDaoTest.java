@@ -56,8 +56,7 @@ public class VenDemandResponseEventDaoTest {
 		String transport = "http";
 
 		String username = "username";
-		String password = "myuberplaintextpassword";
-		Ven ven = venService.prepare(username, password);
+		Ven ven = venService.prepare(username, "myuberplaintextpassword");
 
 		ven.setOadrName(name);
 		ven.setOadrProfil(oadrProfil);

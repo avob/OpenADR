@@ -142,16 +142,16 @@ public class Oadr20bVTNSecurityTest {
 
 		// valid request
 		OadrRequestEventType event = Oadr20bEiEventBuilders.newOadrRequestEventBuilder(ven.getUsername(), "0").build();
-		OadrDistributeEventType OadrRequestEventType = client.oadrRequestEvent(event);
-		assertEquals(String.valueOf(HttpStatus.OK_200), OadrRequestEventType.getEiResponse().getResponseCode());
-		assertEquals(0, OadrRequestEventType.getOadrEvent().size());
+		OadrDistributeEventType oadrRequestEventType = client.oadrRequestEvent(event);
+		assertEquals(String.valueOf(HttpStatus.OK_200), oadrRequestEventType.getEiResponse().getResponseCode());
+		assertEquals(0, oadrRequestEventType.getOadrEvent().size());
 
 		// mismatch request venId and username
 		event = Oadr20bEiEventBuilders.newOadrRequestEventBuilder(ven.getUsername() + "2", "0").build();
-		OadrRequestEventType = client.oadrRequestEvent(event);
+		oadrRequestEventType = client.oadrRequestEvent(event);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
-				OadrRequestEventType.getEiResponse().getResponseCode());
-		assertEquals(0, OadrRequestEventType.getOadrEvent().size());
+				oadrRequestEventType.getEiResponse().getResponseCode());
+		assertEquals(0, oadrRequestEventType.getOadrEvent().size());
 
 	}
 
@@ -210,18 +210,17 @@ public class Oadr20bVTNSecurityTest {
 		String[] allCerts = { oadrRsaRootCertificate };
 
 		String username = "securityVen1";
-		String password = "securityVen1";
 		String realm = digestAuthenticationProvider.getRealm();
 		String key = DigestAuthenticationProvider.DIGEST_KEY;
 
 		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
 				.withTrustedCertificate(Arrays.asList(allCerts))
 				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers())
-				.withDefaultDigestAuthentication(eiEventEndpointUrl, realm, key, username, password);
+				.withDefaultDigestAuthentication(eiEventEndpointUrl, realm, key, username, "securityVen1");
 
 		OadrHttpVenClient20b digestHttpClient = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
 
-		Ven ven = venService.prepare(username, password);
+		Ven ven = venService.prepare(username, "securityVen1");
 		ven.setRegistrationId(username);
 		ven.setTransport(OadrTransportType.SIMPLE_HTTP.value());
 		venService.save(ven);
@@ -236,18 +235,17 @@ public class Oadr20bVTNSecurityTest {
 		String[] allCerts = { oadrRsaRootCertificate };
 
 		String venUsername = "securityVen1";
-		String venPassword = "securityVen1";
 		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
 				.withTrustedCertificate(Arrays.asList(allCerts))
 				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers())
-				.withDefaultBasicAuthentication(eiEventEndpointUrl, venUsername, venPassword);
+				.withDefaultBasicAuthentication(eiEventEndpointUrl, venUsername, "securityVen1");
 
 		OadrHttpVenClient20b venBasicHttpClient = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
 
 		VenMarketContext marketContext = venMarketContextService.prepare(new VenMarketContextDto(MARKET_CONTEXT_NAME));
 		venMarketContextService.save(marketContext);
 
-		Ven ven = venService.prepare(venUsername, venPassword);
+		Ven ven = venService.prepare(venUsername, "securityVen1");
 		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
 		ven.setPushUrl("http://localhost");
 		ven.setRegistrationId(venUsername);
@@ -257,22 +255,20 @@ public class Oadr20bVTNSecurityTest {
 		genericTest(venBasicHttpClient, ven);
 
 		String venUsername2 = "securityVen2";
-		String venPassword2 = "securityVen2";
-		Ven ven2 = venService.prepare(venUsername2, venPassword2);
+		Ven ven2 = venService.prepare(venUsername2, "securityVen2");
 		ven2.setVenMarketContexts(Sets.newHashSet(marketContext));
 		ven2.setRegistrationId(venUsername2);
 		ven2.setTransport(OadrTransportType.SIMPLE_HTTP.value());
 		venService.save(ven2);
 
 		String userUsername = "securityUser1";
-		String userPassword = "securityUser1";
 
-		OadrUser user = oadrUserService.prepare(userUsername, userPassword);
+		OadrUser user = oadrUserService.prepare(userUsername, "securityUser1");
 		user.setRoles(Arrays.asList("ROLE_ADMIN"));
 		oadrUserService.save(user);
 
 		OadrHttpClient userBasicHttpClient = new OadrHttpClientBuilder()
-				.withDefaultBasicAuthentication(demandResponseEnpointUrl, userUsername, userPassword)
+				.withDefaultBasicAuthentication(demandResponseEnpointUrl, userUsername, "securityUser1")
 				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers())
 				.withTrustedCertificate(Arrays.asList(allCerts))
 				.withHeader(HttpHeaders.CONTENT_TYPE, "application/json").build();
@@ -307,9 +303,9 @@ public class Oadr20bVTNSecurityTest {
 		assertNotNull(readdto.getId());
 
 		OadrRequestEventType event = Oadr20bEiEventBuilders.newOadrRequestEventBuilder(ven.getUsername(), "0").build();
-		OadrDistributeEventType OadrRequestEventType = venBasicHttpClient.oadrRequestEvent(event);
-		assertEquals(String.valueOf(HttpStatus.OK_200), OadrRequestEventType.getEiResponse().getResponseCode());
-		assertEquals(1, OadrRequestEventType.getOadrEvent().size());
+		OadrDistributeEventType oadrRequestEventType = venBasicHttpClient.oadrRequestEvent(event);
+		assertEquals(String.valueOf(HttpStatus.OK_200), oadrRequestEventType.getEiResponse().getResponseCode());
+		assertEquals(1, oadrRequestEventType.getOadrEvent().size());
 
 		demandResponseEventService.delete(readdto.getId());
 

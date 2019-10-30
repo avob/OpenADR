@@ -77,15 +77,10 @@ public class OadrXMLSignatureHandlerTest {
 	private X509Certificate certificate;
 	private Oadr20bJAXBContext jaxbContext;
 
-	public OadrXMLSignatureHandlerTest() throws OadrSecurityException {
+	public OadrXMLSignatureHandlerTest() throws OadrSecurityException, JAXBException {
 		privateKey = OadrPKISecurity.parsePrivateKey(privateKeyFilePath);
 		certificate = OadrPKISecurity.parseCertificate(certificateFilePath);
-		try {
-			jaxbContext = Oadr20bJAXBContext.getInstance();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		jaxbContext = Oadr20bJAXBContext.getInstance();
 	}
 
 	private void validate(String payload) throws Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {

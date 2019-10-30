@@ -8,6 +8,7 @@ import java.io.File;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
+import org.assertj.core.util.Files;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -21,13 +22,8 @@ public class Oadr20bCancelReportTest {
 
 	private Oadr20bJAXBContext jaxbContext;
 
-	public Oadr20bCancelReportTest() {
-		try {
-			jaxbContext = Oadr20bJAXBContext.getInstance();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public Oadr20bCancelReportTest() throws JAXBException {
+		jaxbContext = Oadr20bJAXBContext.getInstance();
 	}
 
 	@Test
@@ -73,7 +69,7 @@ public class Oadr20bCancelReportTest {
 		File file2 = new File("src/test/resources/eireport/genOadrCancelReport.xml");
 		jaxbContext.marshal(Oadr20bFactory.createOadrCancelReport(unmarshal), file2);
 		assertTrue(file2.exists());
-		file2.delete();
+		Files.delete(file2);
 
 	}
 }

@@ -8,6 +8,7 @@ import java.io.File;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
+import org.assertj.core.util.Files;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -20,13 +21,8 @@ import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
 public class OadrPollTest {
 	private Oadr20bJAXBContext jaxbContext;
 
-	public OadrPollTest() {
-		try {
-			jaxbContext = Oadr20bJAXBContext.getInstance();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public OadrPollTest() throws JAXBException {
+		jaxbContext = Oadr20bJAXBContext.getInstance();
 	}
 
 	@Test
@@ -64,7 +60,7 @@ public class OadrPollTest {
 		File file2 = new File("src/test/resources/poll/genOadrPoll.xml");
 		jaxbContext.marshal(Oadr20bFactory.createOadrPoll(unmarshal), file2);
 		assertTrue(file2.exists());
-		file2.delete();
+		Files.delete(file2);
 
 	}
 }

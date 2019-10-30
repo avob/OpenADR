@@ -25,50 +25,47 @@ import com.google.common.collect.Lists;
 @ActiveProfiles("test")
 public class VenResourceDaoTest {
 
-    @Resource
-    private VenService venService;
+	@Resource
+	private VenService venService;
 
-    @Resource
-    private VenResourceDao venResourceDao;
+	@Resource
+	private VenResourceDao venResourceDao;
 
-    @Test
-    public void crudTest() {
-        String username = "ven1";
-        String password = "";
-        Ven ven = venService.prepare(username, password);
-        venService.save(ven);
+	@Test
+	public void crudTest() {
+		String username = "ven1";
+		Ven ven = venService.prepare(username, "myuberplaintextpassword");
+		venService.save(ven);
 
-        VenResource a = new VenResource("a", ven);
-        venResourceDao.save(a);
-        VenResource b = new VenResource("b", ven);
-        venResourceDao.save(b);
-        
-        List<VenResource> findByVenId = venResourceDao.findByVenId(ven.getId());
-        assertNotNull(findByVenId);
-        assertEquals(2, findByVenId.size());
+		VenResource a = new VenResource("a", ven);
+		venResourceDao.save(a);
+		VenResource b = new VenResource("b", ven);
+		venResourceDao.save(b);
 
-        VenResource findOneByVenAndName = venResourceDao.findOneByVenAndName(ven, "a");
-        assertNotNull(findOneByVenAndName);
-        assertEquals("a", findOneByVenAndName.getName());
+		List<VenResource> findByVenId = venResourceDao.findByVenId(ven.getId());
+		assertNotNull(findByVenId);
+		assertEquals(2, findByVenId.size());
 
-        List<VenResource> findByVenIdAndName = venResourceDao.findByVenIdAndName(Lists.newArrayList("ven1"),
-                Lists.newArrayList("b"));
-        assertNotNull(findByVenIdAndName);
-        assertEquals("b", findByVenIdAndName.get(0).getName());
+		VenResource findOneByVenAndName = venResourceDao.findOneByVenAndName(ven, "a");
+		assertNotNull(findOneByVenAndName);
+		assertEquals("a", findOneByVenAndName.getName());
 
+		List<VenResource> findByVenIdAndName = venResourceDao.findByVenIdAndName(Lists.newArrayList("ven1"),
+				Lists.newArrayList("b"));
+		assertNotNull(findByVenIdAndName);
+		assertEquals("b", findByVenIdAndName.get(0).getName());
 
-        long countByVen_Id = venResourceDao.countByVenId(ven.getId());
-        assertEquals(2, countByVen_Id);
+		long countByVen_Id = venResourceDao.countByVenId(ven.getId());
+		assertEquals(2, countByVen_Id);
 
-        venResourceDao.delete(a);
+		venResourceDao.delete(a);
 
-        countByVen_Id = venResourceDao.countByVenId(ven.getId());
-        assertEquals(1, countByVen_Id);
+		countByVen_Id = venResourceDao.countByVenId(ven.getId());
+		assertEquals(1, countByVen_Id);
 
-       
-        venService.delete(ven);
+		venService.delete(ven);
 
-        long count = venResourceDao.count();
-        assertEquals(0, count);
-    }
+		long count = venResourceDao.count();
+		assertEquals(0, count);
+	}
 }

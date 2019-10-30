@@ -8,6 +8,7 @@ import java.io.File;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
+import org.assertj.core.util.Files;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -20,13 +21,8 @@ import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 public class Oadr20bQueryRegistrationTest {
 	private Oadr20bJAXBContext jaxbContext;
 
-	public Oadr20bQueryRegistrationTest() {
-		try {
-			jaxbContext = Oadr20bJAXBContext.getInstance();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public Oadr20bQueryRegistrationTest() throws JAXBException {
+		jaxbContext = Oadr20bJAXBContext.getInstance();
 	}
 
 	@Test
@@ -66,7 +62,7 @@ public class Oadr20bQueryRegistrationTest {
 		File file2 = new File("src/test/resources/eiregisterparty/genOadrQueryRegistration.xml");
 		jaxbContext.marshal(Oadr20bFactory.createOadrQueryRegistration(unmarshal), file2);
 		assertTrue(file2.exists());
-		file2.delete();
+		Files.delete(file2);
 
 	}
 

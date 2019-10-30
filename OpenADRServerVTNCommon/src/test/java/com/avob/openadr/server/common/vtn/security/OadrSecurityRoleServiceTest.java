@@ -61,7 +61,7 @@ public class OadrSecurityRoleServiceTest {
 		adminUser.setRoles(Lists.newArrayList("ROLE_ADMIN"));
 		oadrUserService.save(adminUser);
 
-		username = "password";
+		username = "passUser";
 		passwordUser = oadrUserService.prepare(username, username);
 		oadrUserService.save(passwordUser);
 
@@ -86,20 +86,20 @@ public class OadrSecurityRoleServiceTest {
 	@Test
 	public void digestUserDetailTest() {
 
-		String encodeDigest = oadrUserService.encodeDigest("password", "password",
+		String encodeDigest = oadrUserService.encodeDigest("passUser", "passUser",
 				digestAuthenticationProvider.getRealm());
 
-		User digestUserDetail = oadrSecurityRoleService.digestUserDetail("password");
+		User digestUserDetail = oadrSecurityRoleService.digestUserDetail("passUser");
 
 		assertEquals(digestUserDetail.getPassword(), encodeDigest);
 
-		User grantDigestRole = oadrSecurityRoleService.grantDigestRole("password", encodeDigest);
+		User grantDigestRole = oadrSecurityRoleService.grantDigestRole("passUser", encodeDigest);
 
 		assertEquals(grantDigestRole.getPassword(), encodeDigest);
 
 		boolean exception = false;
 		try {
-			oadrSecurityRoleService.grantDigestRole("password", "mouaiccool");
+			oadrSecurityRoleService.grantDigestRole("passUser", "passUser");
 		} catch (Exception e) {
 			exception = true;
 		}
@@ -109,11 +109,11 @@ public class OadrSecurityRoleServiceTest {
 	@Test
 	public void basicUserDetailTest() {
 
-		oadrSecurityRoleService.grantBasicRole("password", "password");
+		oadrSecurityRoleService.grantBasicRole("passUser", "passUser");
 
 		boolean exception = false;
 		try {
-			oadrSecurityRoleService.grantBasicRole("password", "mouaiccool");
+			oadrSecurityRoleService.grantBasicRole("passUser", "mouaiccool");
 		} catch (Exception e) {
 			exception = true;
 		}

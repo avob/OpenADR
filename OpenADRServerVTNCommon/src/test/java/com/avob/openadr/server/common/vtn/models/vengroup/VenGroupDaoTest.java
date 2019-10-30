@@ -26,71 +26,70 @@ import com.google.common.collect.Sets;
 @ActiveProfiles("test")
 public class VenGroupDaoTest {
 
-    @Resource
-    private VenService venService;
+	@Resource
+	private VenService venService;
 
-    @Resource
-    private VenGroupDao venGroupDao;
+	@Resource
+	private VenGroupDao venGroupDao;
 
-    @Test
-    public void crudTest() {
-        String username = "ven1";
-        String password = "";
-        Ven ven = venService.prepare(username, password);
-        Ven ven2 = venService.prepare(username + "2", password);
+	@Test
+	public void crudTest() {
+		String username = "ven1";
+		Ven ven = venService.prepare(username, "myuberplaintextpassword");
+		Ven ven2 = venService.prepare(username + "2", "myuberplaintextpassword");
 
-        venService.save(ven);
-        venService.save(ven2);
+		venService.save(ven);
+		venService.save(ven2);
 
-        String groupName = "myubergroup";
-        VenGroup venGroup = new VenGroup(groupName);
+		String groupName = "myubergroup";
+		VenGroup venGroup = new VenGroup(groupName);
 
-        VenGroup venGroup2 = new VenGroup(groupName + "2");
+		VenGroup venGroup2 = new VenGroup(groupName + "2");
 
-        venGroupDao.save(venGroup);
-        venGroupDao.save(venGroup2);
+		venGroupDao.save(venGroup);
+		venGroupDao.save(venGroup2);
 
-        ven.setVenGroup(Sets.newHashSet(venGroup));
-        venService.save(ven);
+		ven.setVenGroup(Sets.newHashSet(venGroup));
+		venService.save(ven);
 
-        ven2.setVenGroup(Sets.newHashSet(venGroup, venGroup2));
-        venService.save(ven2);
+		ven2.setVenGroup(Sets.newHashSet(venGroup, venGroup2));
+		venService.save(ven2);
 
-        venGroup = venGroupDao.findById(venGroup.getId()).get();
-        venGroup2 = venGroupDao.findById(venGroup2.getId()).get();
+		venGroup = venGroupDao.findById(venGroup.getId()).get();
+		venGroup2 = venGroupDao.findById(venGroup2.getId()).get();
 
-        Iterable<Ven> findByVenGroupIterable = venService.findAll();
-        List<Ven> findByVenGroup = Lists.newArrayList(findByVenGroupIterable);
-        assertNotNull(findByVenGroup);
-        assertEquals(2, findByVenGroup.size());
-        assertEquals(username, findByVenGroup.get(0).getUsername());
-        //
-        findByVenGroup = venService.findByGroupName(Lists.newArrayList(venGroup.getName()));
-        assertNotNull(findByVenGroup);
-        assertEquals(2, findByVenGroup.size());
+		Iterable<Ven> findByVenGroupIterable = venService.findAll();
+		List<Ven> findByVenGroup = Lists.newArrayList(findByVenGroupIterable);
+		assertNotNull(findByVenGroup);
+		assertEquals(2, findByVenGroup.size());
+		assertEquals(username, findByVenGroup.get(0).getUsername());
+		//
+		findByVenGroup = venService.findByGroupName(Lists.newArrayList(venGroup.getName()));
+		assertNotNull(findByVenGroup);
+		assertEquals(2, findByVenGroup.size());
 
-        findByVenGroup = venService.findByGroupName(Lists.newArrayList(venGroup2.getName()));
-        assertNotNull(findByVenGroup);
-        assertEquals(1, findByVenGroup.size());
+		findByVenGroup = venService.findByGroupName(Lists.newArrayList(venGroup2.getName()));
+		assertNotNull(findByVenGroup);
+		assertEquals(1, findByVenGroup.size());
 
-        long count = venGroupDao.count();
-        assertEquals(2, count);
+		long count = venGroupDao.count();
+		assertEquals(2, count);
 
-        venService.delete(ven);
+		venService.delete(ven);
 
-        count = venGroupDao.count();
-        assertEquals(2, count);
+		count = venGroupDao.count();
+		assertEquals(2, count);
 
-        venGroupDao.delete(venGroup);
+		venGroupDao.delete(venGroup);
 
-        findByVenGroupIterable = venService.findAll();
-        findByVenGroup = Lists.newArrayList(findByVenGroupIterable);
-        assertNotNull(findByVenGroup);
-        assertEquals(1, findByVenGroup.size());
+		findByVenGroupIterable = venService.findAll();
+		findByVenGroup = Lists.newArrayList(findByVenGroupIterable);
+		assertNotNull(findByVenGroup);
+		assertEquals(1, findByVenGroup.size());
 
-        ven2 = venService.findOne(ven2.getId());
-        venService.delete(ven2);
-        venGroupDao.delete(venGroup2);
+		ven2 = venService.findOne(ven2.getId());
+		venService.delete(ven2);
+		venGroupDao.delete(venGroup2);
 
-    }
+	}
 }

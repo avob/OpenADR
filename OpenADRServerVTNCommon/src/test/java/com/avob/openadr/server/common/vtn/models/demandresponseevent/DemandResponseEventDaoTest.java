@@ -154,9 +154,8 @@ public class DemandResponseEventDaoTest {
 		String pushUrl = "http://localhost/";
 
 		String username = "username";
-		String password = "myuberplaintextpassword";
 
-		Ven ven = venService.prepare(username, password);
+		Ven ven = venService.prepare(username, "myuberplaintextpassword");
 		ven.setOadrName(name);
 		ven.setOadrProfil(oadrProfil);
 		ven.setTransport(transport);
@@ -164,7 +163,7 @@ public class DemandResponseEventDaoTest {
 
 		Ven savedVen = venService.save(ven);
 
-		Ven ven2 = venService.prepare(username + "3", password);
+		Ven ven2 = venService.prepare(username + "3", "myuberplaintextpassword");
 		ven2.setOadrName(name);
 		ven2.setOadrProfil(oadrProfil);
 		ven2.setTransport(transport);

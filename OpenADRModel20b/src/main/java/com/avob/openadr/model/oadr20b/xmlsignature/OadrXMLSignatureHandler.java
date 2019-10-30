@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -94,13 +93,11 @@ public class OadrXMLSignatureHandler {
 		}
 	}
 
-	private OadrXMLSignatureHandler()
-			throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-
+	private OadrXMLSignatureHandler() {
 	}
 
 	private static <T> List<T> asElement(List<Object> list, Class<T> klass) {
-		List<T> res = new ArrayList<T>();
+		List<T> res = new ArrayList<>();
 		if (list != null) {
 			for (Object obj : list) {
 				if (obj instanceof JAXBElement) {
@@ -125,12 +122,12 @@ public class OadrXMLSignatureHandler {
 			throw new Oadr20bXMLSignatureValidationException("XML Signature must include ReplayProtect payload");
 		}
 		ReplayProtectType replayProtect = null;
-		List<SignaturePropertiesType> propertiesList = new ArrayList<SignaturePropertiesType>();
+		List<SignaturePropertiesType> propertiesList = new ArrayList<>();
 		for (ObjectType objectType : objects) {
 			propertiesList.addAll(OadrXMLSignatureHandler.<SignaturePropertiesType>asElement(objectType.getContent(),
 					SignaturePropertiesType.class));
 		}
-		List<SignaturePropertyType> propertyList = new ArrayList<SignaturePropertyType>();
+		List<SignaturePropertyType> propertyList = new ArrayList<>();
 		for (SignaturePropertiesType properties : propertiesList) {
 			propertyList.addAll(properties.getSignatureProperty());
 		}
@@ -149,9 +146,6 @@ public class OadrXMLSignatureHandler {
 			}
 		}
 
-//		if (replayProtect == null) {
-//			throw new Oadr20bXMLSignatureValidationException("XML Signature must include ReplayProtect payload");
-//		}
 		if (replayProtect != null) {
 			XMLGregorianCalendar timestamp = replayProtect.getTimestamp();
 
@@ -182,12 +176,7 @@ public class OadrXMLSignatureHandler {
 		try {
 			builder = dbf.newDocumentBuilder();
 			doc = builder.parse(new InputSource(new StringReader(raw)));
-		} catch (ParserConfigurationException e) {
-			throw new Oadr20bXMLSignatureValidationException(e);
-
-		} catch (SAXException e) {
-			throw new Oadr20bXMLSignatureValidationException(e);
-		} catch (IOException e) {
+		} catch (ParserConfigurationException | SAXException | IOException e) {
 			throw new Oadr20bXMLSignatureValidationException(e);
 		}
 
@@ -296,7 +285,7 @@ public class OadrXMLSignatureHandler {
 							fac.newTransform(CanonicalizationMethod.INCLUSIVE, (TransformParameterSpec) null)),
 					null, null);
 
-			List<Reference> refs = new ArrayList<Reference>();
+			List<Reference> refs = new ArrayList<>();
 			refs.add(ref);
 			refs.add(refProp);
 
@@ -311,9 +300,7 @@ public class OadrXMLSignatureHandler {
 						fac.newSignatureMethod(ECDSA_SHA256_ALGORITHM, null), refs);
 			}
 
-		} catch (NoSuchAlgorithmException e) {
-			throw new Oadr20bXMLSignatureException(e);
-		} catch (InvalidAlgorithmParameterException e) {
+		} catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
 			throw new Oadr20bXMLSignatureException(e);
 		}
 
@@ -324,7 +311,7 @@ public class OadrXMLSignatureHandler {
 			DocumentBuilderFactory newInstance = DocumentBuilderFactory.newInstance();
 			newInstance.setNamespaceAware(true);
 
-			List<DOMStructure> list = new ArrayList<DOMStructure>();
+			List<DOMStructure> list = new ArrayList<>();
 			JAXBElement<ReplayProtectType> createReplayProtect = Oadr20bFactory.createReplayProtect(replayProtect);
 			DOMResult replayRes;
 			replayRes = new DOMResult(dbf.newDocumentBuilder().newDocument());
@@ -334,26 +321,24 @@ public class OadrXMLSignatureHandler {
 			Element documentElement = replay.getDocumentElement();
 			list.add(new DOMStructure(documentElement));
 
-			List<XMLStructure> objectContent = new ArrayList<XMLStructure>();
+			List<XMLStructure> objectContent = new ArrayList<>();
 			SignatureProperty newSignatureProperty = fac.newSignatureProperty(list, "", null);
-			List<SignatureProperty> listSignatureProperty = new ArrayList<SignatureProperty>();
+			List<SignatureProperty> listSignatureProperty = new ArrayList<>();
 			listSignatureProperty.add(newSignatureProperty);
 			SignatureProperties newSignatureProperties = fac.newSignatureProperties(listSignatureProperty, null);
 			objectContent.add(newSignatureProperties);
 			XMLObject newXMLObject = fac.newXMLObject(objectContent, SIGNATUREOBJECT_PAYLOAD_ID, null, null);
 
-			lstruct = new ArrayList<XMLStructure>();
+			lstruct = new ArrayList<>();
 			lstruct.add(newXMLObject);
-		} catch (ParserConfigurationException e) {
-			throw new Oadr20bXMLSignatureException(e);
-		} catch (JAXBException e) {
+		} catch (ParserConfigurationException | JAXBException e) {
 			throw new Oadr20bXMLSignatureException(e);
 		}
 
 		KeyInfo ki = null;
 
 		KeyInfoFactory kif = fac.getKeyInfoFactory();
-		List<Object> x509Content = new ArrayList<Object>();
+		List<Object> x509Content = new ArrayList<>();
 		x509Content.add(certificate.getSubjectX500Principal().getName());
 		x509Content.add(certificate);
 		X509Data xd = kif.newX509Data(x509Content);
@@ -363,9 +348,7 @@ public class OadrXMLSignatureHandler {
 		XMLSignature signature = fac.newXMLSignature(si, ki, lstruct, null, null);
 		try {
 			signature.sign(dsc);
-		} catch (MarshalException e) {
-			throw new Oadr20bXMLSignatureException(e);
-		} catch (XMLSignatureException e) {
+		} catch (MarshalException | XMLSignatureException e) {
 			throw new Oadr20bXMLSignatureException(e);
 		}
 

@@ -35,9 +35,8 @@ public class VenMarketContextDaoTest {
 	@Test
 	public void crudTest() {
 		String username = "ven1";
-		String password = "";
-		Ven ven = venService.prepare(username, password);
-		Ven ven2 = venService.prepare(username + "2", password);
+		Ven ven = venService.prepare(username, "myuberplaintextpassword");
+		Ven ven2 = venService.prepare(username + "2", "myuberplaintextpassword");
 
 		venService.save(ven);
 		venService.save(ven2);

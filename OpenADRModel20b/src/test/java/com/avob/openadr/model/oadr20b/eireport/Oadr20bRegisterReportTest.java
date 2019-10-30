@@ -11,6 +11,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
+import org.assertj.core.util.Files;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -36,13 +37,8 @@ import com.avob.openadr.model.oadr20b.siscale.SiScaleCodeType;
 public class Oadr20bRegisterReportTest {
 	private Oadr20bJAXBContext jaxbContext;
 
-	public Oadr20bRegisterReportTest() {
-		try {
-			jaxbContext = Oadr20bJAXBContext.getInstance();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public Oadr20bRegisterReportTest() throws JAXBException {
+		jaxbContext = Oadr20bJAXBContext.getInstance();
 	}
 
 	@Test
@@ -122,7 +118,7 @@ public class Oadr20bRegisterReportTest {
 		File file2 = new File("src/test/resources/eireport/genOadrRegisterReport.xml");
 		jaxbContext.marshal(Oadr20bFactory.createOadrRegisterReport(unmarshal), file2);
 		assertTrue(file2.exists());
-		file2.delete();
+		Files.delete(file2);
 	}
 
 	@Test

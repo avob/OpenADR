@@ -9,6 +9,7 @@ import java.io.File;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
+import org.assertj.core.util.Files;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -23,13 +24,8 @@ public class Oadr20bCreatePartyRegistrationTest {
 
 	private Oadr20bJAXBContext jaxbContext;
 
-	public Oadr20bCreatePartyRegistrationTest() {
-		try {
-			jaxbContext = Oadr20bJAXBContext.getInstance();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public Oadr20bCreatePartyRegistrationTest() throws JAXBException {
+		jaxbContext = Oadr20bJAXBContext.getInstance();
 	}
 
 	@Test
@@ -76,7 +72,7 @@ public class Oadr20bCreatePartyRegistrationTest {
 		File file2 = new File("src/test/resources/eiregisterparty/genOadrCreatePartyRegistration.xml");
 		jaxbContext.marshal(Oadr20bFactory.createOadrCreatePartyRegistration(unmarshal), file2);
 		assertTrue(file2.exists());
-		file2.delete();
+		Files.delete(file2);
 
 	}
 

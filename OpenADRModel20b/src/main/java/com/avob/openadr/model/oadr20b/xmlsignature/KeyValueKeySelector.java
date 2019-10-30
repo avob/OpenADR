@@ -81,7 +81,6 @@ public class KeyValueKeySelector extends KeySelector {
 		throw new KeySelectorException("No KeyValue element found!");
 	}
 
-	// TODO bertrand: this should also work for key types other than DSA/RSA
 	static boolean algEquals(String algURI, String algName) {
 		boolean equals = false;
 		if ("DSA".equalsIgnoreCase(algName) && algURI.equalsIgnoreCase(SignatureMethod.DSA_SHA1)) {

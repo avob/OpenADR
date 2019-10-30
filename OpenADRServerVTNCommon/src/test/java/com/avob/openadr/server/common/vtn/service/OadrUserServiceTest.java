@@ -43,8 +43,7 @@ public class OadrUserServiceTest {
 		findByUsername = oadrUserService.findByUsername(username);
 		assertNull(findByUsername);
 
-		String password = "password";
-		user = oadrUserService.prepare(username, password);
+		user = oadrUserService.prepare(username, "mouaiccool");
 		oadrUserService.save(user);
 
 		findByUsername = oadrUserService.findByUsername(username);

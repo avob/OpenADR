@@ -45,16 +45,6 @@ import com.google.common.collect.Sets;
 public class VenServiceTest {
 
 	private Long start = System.currentTimeMillis();
-	private List<Ven> vens = new ArrayList<Ven>();
-	private List<DemandResponseEvent> events = new ArrayList<DemandResponseEvent>();
-	private VenMarketContext marketContext = null;
-	private DemandResponseEvent event1 = null;
-	private DemandResponseEvent event2 = null;
-	private DemandResponseEvent event3 = null;
-
-	private Ven ven1;
-	private Ven ven2;
-	private Ven ven3;
 
 	@Resource
 	private VenService venService;
@@ -90,8 +80,7 @@ public class VenServiceTest {
 
 		venService.delete(prepare);
 
-		String password = "ven1";
-		prepare = venService.prepare(username, password);
+		prepare = venService.prepare(username, "ven1");
 		assertNotNull(prepare);
 		assertNull(prepare.getId());
 		assertNotNull(prepare.getBasicPassword());
@@ -102,7 +91,7 @@ public class VenServiceTest {
 		String transport = "http";
 		VenCreateDto dto = new VenCreateDto();
 		dto.setUsername(username);
-		dto.setPassword(password);
+		dto.setPassword("ven1");
 		dto.setOadrProfil(profil);
 		dto.setTransport(transport);
 
@@ -189,6 +178,16 @@ public class VenServiceTest {
 
 	@Test
 	public void searchTest() {
+		List<Ven> vens = new ArrayList<>();
+		List<DemandResponseEvent> events = new ArrayList<>();
+		VenMarketContext marketContext = null;
+		Ven ven1;
+		Ven ven2;
+		Ven ven3;
+		DemandResponseEvent event1 = null;
+		DemandResponseEvent event2 = null;
+		DemandResponseEvent event3 = null;
+
 		String marketContextName = "http://oadr.avob.com";
 		marketContext = venMarketContextService.prepare(new VenMarketContextDto(marketContextName));
 		venMarketContextService.save(marketContext);
