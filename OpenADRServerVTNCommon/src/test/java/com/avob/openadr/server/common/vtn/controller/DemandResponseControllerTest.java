@@ -67,7 +67,23 @@ import com.google.common.collect.Sets;
 @ActiveProfiles("test")
 public class DemandResponseControllerTest {
 
+	private static final String APPLICATION_JSON_HEADER_VALUE = "application/json";
+	private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
+	private static final String STATE_PARAM = "state";
+	private static final String VEN_PARAM = "ven";
+	private static final String LEVEL_SIGNAL_TYPE = "level";
+	private static final String SIMPLE_SIGNAL_NAME = "SIMPLE";
 	private static final String DEMAND_RESPONSE_EVENT_URL = "/DemandResponseEvent/";
+	private static final String DURATION = "PT1H";
+	private static final String NOTIFICATION_DURATION = "P1D";
+	private static final String TOLERANCE_DURATION = "PT5M";
+	private static final Long MODIFICATION = -1L;
+	private static final Long START = 0L;
+	private static final String VEN1 = "ven1";
+	private static final String VEN2 = "ven2";
+
+	private static final String UNKNOWN_MARKETCONTEXT_NAME = "mouaiccool";
+	private static final String MARKETCONTEXT_NAME = "http://oadr.avob.com";
 
 	@Autowired
 	private WebApplicationContext wac;
@@ -88,28 +104,17 @@ public class DemandResponseControllerTest {
 	private DtoMapper dozerMapper;
 
 	private UserRequestPostProcessor adminSession = SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN");
-	private UserRequestPostProcessor venSession = SecurityMockMvcRequestPostProcessors.user("ven1").roles("VEN");
-	private UserRequestPostProcessor userSession = SecurityMockMvcRequestPostProcessors.user("ven1").roles("USER");
+	private UserRequestPostProcessor venSession = SecurityMockMvcRequestPostProcessors.user(VEN1).roles("VEN");
+	private UserRequestPostProcessor userSession = SecurityMockMvcRequestPostProcessors.user(VEN1).roles("USER");
 
 	private List<Ven> vens = new ArrayList<>();
 	private List<Long> events = new ArrayList<>();
 	private DemandResponseEvent event1 = null;
-	private DemandResponseEvent event2 = null;
 	private VenMarketContext marketContext = null;
 
 	private MockMvc mockMvc;
 
 	private ObjectMapper mapper = new ObjectMapper();
-
-	private static final String duration = "PT1H";
-	private static final String notificationDuration = "P1D";
-	private static final String toleranceDuration = "PT5M";
-	private static final Long modification = -1L;
-	private static final Long start = 0L;
-	private static final String ven1 = "ven1";
-	private static final String ven2 = "ven2";
-
-	private static final String marketContextName = "http://oadr.avob.com";
 
 	@After
 	public void after() {
@@ -120,37 +125,37 @@ public class DemandResponseControllerTest {
 
 	@Before
 	public void before() {
-
+		DemandResponseEvent event2 = null;
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilters(springSecurityFilterChain).build();
 
-		marketContext = venMarketContextService.prepare(new VenMarketContextDto(marketContextName));
+		marketContext = venMarketContextService.prepare(new VenMarketContextDto(MARKETCONTEXT_NAME));
 		venMarketContextService.save(marketContext);
 
-		Ven ven = venService.prepare(ven1);
+		Ven ven = venService.prepare(VEN1);
 		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
 		venService.save(ven);
 		vens.add(ven);
 
-		ven = venService.prepare(ven2);
+		ven = venService.prepare(VEN2);
 		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
 		venService.save(ven);
 		vens.add(ven);
 
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
-		signal.setSignalName("SIMPLE");
-		signal.setSignalType("level");
+		signal.setSignalName(SIMPLE_SIGNAL_NAME);
+		signal.setSignalType(LEVEL_SIGNAL_TYPE);
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
-		dto.getActivePeriod().setStart(start);
+		dto.getActivePeriod().setStart(START);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
-		dto.getActivePeriod().setDuration(duration);
-		dto.getActivePeriod().setToleranceDuration(toleranceDuration);
-		dto.getActivePeriod().setNotificationDuration(notificationDuration);
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", "ven1"));
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", "ven2"));
+		dto.getActivePeriod().setDuration(DURATION);
+		dto.getActivePeriod().setToleranceDuration(TOLERANCE_DURATION);
+		dto.getActivePeriod().setNotificationDuration(NOTIFICATION_DURATION);
+		dto.getTargets().add(new DemandResponseEventTargetDto(VEN_PARAM, VEN1));
+		dto.getTargets().add(new DemandResponseEventTargetDto(VEN_PARAM, VEN2));
 		dto.getSignals().add(signal);
 
 		event1 = demandResponseEventService.create(dto);
@@ -159,12 +164,12 @@ public class DemandResponseControllerTest {
 		dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
-		dto.getActivePeriod().setStart(start);
+		dto.getActivePeriod().setStart(START);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
-		dto.getActivePeriod().setDuration(duration);
-		dto.getActivePeriod().setToleranceDuration(toleranceDuration);
-		dto.getActivePeriod().setNotificationDuration(notificationDuration);
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", "ven2"));
+		dto.getActivePeriod().setDuration(DURATION);
+		dto.getActivePeriod().setToleranceDuration(TOLERANCE_DURATION);
+		dto.getActivePeriod().setNotificationDuration(NOTIFICATION_DURATION);
+		dto.getTargets().add(new DemandResponseEventTargetDto(VEN_PARAM, VEN2));
 		dto.getSignals().add(signal);
 		event2 = demandResponseEventService.create(dto);
 		events.add(event2.getId());
@@ -192,11 +197,11 @@ public class DemandResponseControllerTest {
 		assertEquals(2, readValue.size());
 
 		for (DemandResponseEventReadDto dto : readValue) {
-			assertEquals(DemandResponseControllerTest.modification, dto.getDescriptor().getModificationNumber());
+			assertEquals(DemandResponseControllerTest.MODIFICATION, dto.getDescriptor().getModificationNumber());
 			assertNotNull(dto.getCreatedTimestamp());
-			assertEquals(DemandResponseControllerTest.duration, dto.getActivePeriod().getDuration());
-			assertEquals(DemandResponseControllerTest.marketContextName, dto.getDescriptor().getMarketContext());
-			assertEquals(DemandResponseControllerTest.start, dto.getActivePeriod().getStart());
+			assertEquals(DemandResponseControllerTest.DURATION, dto.getActivePeriod().getDuration());
+			assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, dto.getDescriptor().getMarketContext());
+			assertEquals(DemandResponseControllerTest.START, dto.getActivePeriod().getStart());
 			assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
 					dto.getSignals().get(0).getCurrentValue());
 
@@ -207,7 +212,7 @@ public class DemandResponseControllerTest {
 		// find by ven username
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param("ven", DemandResponseControllerTest.ven1).with(adminSession))
+						.param(VEN_PARAM, DemandResponseControllerTest.VEN1).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
 		readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -215,11 +220,11 @@ public class DemandResponseControllerTest {
 		assertEquals(1, readValue.size());
 
 		for (DemandResponseEventReadDto dto : readValue) {
-			assertEquals(DemandResponseControllerTest.modification, dto.getDescriptor().getModificationNumber());
+			assertEquals(DemandResponseControllerTest.MODIFICATION, dto.getDescriptor().getModificationNumber());
 			assertNotNull(dto.getCreatedTimestamp());
-			assertEquals(DemandResponseControllerTest.duration, dto.getActivePeriod().getDuration());
-			assertEquals(DemandResponseControllerTest.marketContextName, dto.getDescriptor().getMarketContext());
-			assertEquals(DemandResponseControllerTest.start, dto.getActivePeriod().getStart());
+			assertEquals(DemandResponseControllerTest.DURATION, dto.getActivePeriod().getDuration());
+			assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, dto.getDescriptor().getMarketContext());
+			assertEquals(DemandResponseControllerTest.START, dto.getActivePeriod().getStart());
 			assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
 					dto.getSignals().get(0).getCurrentValue());
 			assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getDescriptor().getState()));
@@ -227,7 +232,7 @@ public class DemandResponseControllerTest {
 
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param("ven", DemandResponseControllerTest.ven2).with(adminSession))
+						.param(VEN_PARAM, DemandResponseControllerTest.VEN2).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
 		readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -235,11 +240,11 @@ public class DemandResponseControllerTest {
 		assertEquals(2, readValue.size());
 
 		for (DemandResponseEventReadDto dto : readValue) {
-			assertEquals(DemandResponseControllerTest.modification, dto.getDescriptor().getModificationNumber());
+			assertEquals(DemandResponseControllerTest.MODIFICATION, dto.getDescriptor().getModificationNumber());
 			assertNotNull(dto.getCreatedTimestamp());
-			assertEquals(DemandResponseControllerTest.duration, dto.getActivePeriod().getDuration());
-			assertEquals(DemandResponseControllerTest.marketContextName, dto.getDescriptor().getMarketContext());
-			assertEquals(DemandResponseControllerTest.start, dto.getActivePeriod().getStart());
+			assertEquals(DemandResponseControllerTest.DURATION, dto.getActivePeriod().getDuration());
+			assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, dto.getDescriptor().getMarketContext());
+			assertEquals(DemandResponseControllerTest.START, dto.getActivePeriod().getStart());
 			assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
 					dto.getSignals().get(0).getCurrentValue());
 
@@ -250,7 +255,7 @@ public class DemandResponseControllerTest {
 		// find by state
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param("state", DemandResponseEventStateEnum.ACTIVE.toString()).with(adminSession))
+						.param(STATE_PARAM, DemandResponseEventStateEnum.ACTIVE.toString()).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
 		readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -258,11 +263,11 @@ public class DemandResponseControllerTest {
 		assertEquals(1, readValue.size());
 
 		for (DemandResponseEventReadDto dto : readValue) {
-			assertEquals(DemandResponseControllerTest.modification, dto.getDescriptor().getModificationNumber());
+			assertEquals(DemandResponseControllerTest.MODIFICATION, dto.getDescriptor().getModificationNumber());
 			assertNotNull(dto.getCreatedTimestamp());
-			assertEquals(DemandResponseControllerTest.duration, dto.getActivePeriod().getDuration());
-			assertEquals(DemandResponseControllerTest.marketContextName, dto.getDescriptor().getMarketContext());
-			assertEquals(DemandResponseControllerTest.start, dto.getActivePeriod().getStart());
+			assertEquals(DemandResponseControllerTest.DURATION, dto.getActivePeriod().getDuration());
+			assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, dto.getDescriptor().getMarketContext());
+			assertEquals(DemandResponseControllerTest.START, dto.getActivePeriod().getStart());
 			assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
 					dto.getSignals().get(0).getCurrentValue());
 			assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getDescriptor().getState()));
@@ -271,8 +276,8 @@ public class DemandResponseControllerTest {
 		// find by ven and state
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param("ven", DemandResponseControllerTest.ven2)
-						.param("state", DemandResponseEventStateEnum.CANCELLED.toString()).with(adminSession))
+						.param(VEN_PARAM, DemandResponseControllerTest.VEN2)
+						.param(STATE_PARAM, DemandResponseEventStateEnum.CANCELLED.toString()).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
 		readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -280,19 +285,21 @@ public class DemandResponseControllerTest {
 		assertEquals(1, readValue.size());
 
 		for (DemandResponseEventReadDto dto : readValue) {
-			assertEquals(DemandResponseControllerTest.modification, dto.getDescriptor().getModificationNumber());
+			assertEquals(DemandResponseControllerTest.MODIFICATION, dto.getDescriptor().getModificationNumber());
 			assertNotNull(dto.getCreatedTimestamp());
-			assertEquals(DemandResponseControllerTest.duration, dto.getActivePeriod().getDuration());
-			assertEquals(DemandResponseControllerTest.marketContextName, dto.getDescriptor().getMarketContext());
-			assertEquals(DemandResponseControllerTest.start, dto.getActivePeriod().getStart());
+			assertEquals(DemandResponseControllerTest.DURATION, dto.getActivePeriod().getDuration());
+			assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, dto.getDescriptor().getMarketContext());
+			assertEquals(DemandResponseControllerTest.START, dto.getActivePeriod().getStart());
 			assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
 					dto.getSignals().get(0).getCurrentValue());
 			assertTrue(DemandResponseEventStateEnum.CANCELLED.equals(dto.getDescriptor().getState()));
 		}
 
 		// find non existing ven
-		andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-				.param("ven", DemandResponseControllerTest.ven2).param("ven", "idonotexists").with(adminSession))
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
+						.param(VEN_PARAM, DemandResponseControllerTest.VEN2).param(VEN_PARAM, "idonotexists")
+						.with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
 		readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -300,30 +307,29 @@ public class DemandResponseControllerTest {
 		assertEquals(0, readValue.size());
 
 		// find non existing state
-		andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-				.param("ven", DemandResponseControllerTest.ven2).param("state", "idonotexists").with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400)).andReturn();
+		this.mockMvc.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
+				.param(VEN_PARAM, DemandResponseControllerTest.VEN2).param(STATE_PARAM, "idonotexists")
+				.with(adminSession)).andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 	}
 
-	private DemandResponseEventCreateDto createValidEvent(String eventId) {
+	private DemandResponseEventCreateDto createValidEvent() {
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
-		signal.setSignalName("SIMPLE");
-		signal.setSignalType("level");
+		signal.setSignalName(SIMPLE_SIGNAL_NAME);
+		signal.setSignalType(LEVEL_SIGNAL_TYPE);
 		// perform create (copy event1)
 		DemandResponseEventCreateDto toCreate = new DemandResponseEventCreateDto();
 		toCreate.getSignals().add(signal);
 		toCreate.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
-
 		toCreate.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
-		toCreate.getActivePeriod().setStart(start);
+		toCreate.getActivePeriod().setStart(START);
 		toCreate.getDescriptor().setMarketContext(marketContext.getName());
 		toCreate.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-		toCreate.getActivePeriod().setDuration(duration);
-		toCreate.getActivePeriod().setToleranceDuration(toleranceDuration);
-		toCreate.getActivePeriod().setNotificationDuration(notificationDuration);
-		toCreate.getTargets().add(new DemandResponseEventTargetDto("ven", "ven1"));
+		toCreate.getActivePeriod().setDuration(DURATION);
+		toCreate.getActivePeriod().setToleranceDuration(TOLERANCE_DURATION);
+		toCreate.getActivePeriod().setNotificationDuration(NOTIFICATION_DURATION);
+		toCreate.getTargets().add(new DemandResponseEventTargetDto(VEN_PARAM, VEN1));
 		return toCreate;
 	}
 
@@ -333,7 +339,7 @@ public class DemandResponseControllerTest {
 		// perform check
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param("ven", DemandResponseControllerTest.ven1).with(adminSession))
+						.param(VEN_PARAM, DemandResponseControllerTest.VEN1).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
 		List<DemandResponseEventReadDto> readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -341,21 +347,21 @@ public class DemandResponseControllerTest {
 		assertEquals(1, readValue.size());
 
 		for (DemandResponseEventReadDto dto : readValue) {
-			assertEquals(DemandResponseControllerTest.modification, dto.getDescriptor().getModificationNumber());
+			assertEquals(DemandResponseControllerTest.MODIFICATION, dto.getDescriptor().getModificationNumber());
 			assertNotNull(dto.getCreatedTimestamp());
-			assertEquals(DemandResponseControllerTest.duration, dto.getActivePeriod().getDuration());
-			assertEquals(DemandResponseControllerTest.marketContextName, dto.getDescriptor().getMarketContext());
-			assertEquals(DemandResponseControllerTest.start, dto.getActivePeriod().getStart());
+			assertEquals(DemandResponseControllerTest.DURATION, dto.getActivePeriod().getDuration());
+			assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, dto.getDescriptor().getMarketContext());
+			assertEquals(DemandResponseControllerTest.START, dto.getActivePeriod().getStart());
 			assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
 					dto.getSignals().get(0).getCurrentValue());
 			assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getDescriptor().getState()));
 		}
 		// create and don't publish
-		DemandResponseEventCreateDto toCreate = createValidEvent("testEventCreate-1");
+		DemandResponseEventCreateDto toCreate = createValidEvent();
 		byte[] content = mapper.writeValueAsBytes(toCreate);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(content)
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 
 		DemandResponseEventReadDto res = convertMvcResultToDemandResponseDto(andReturn);
@@ -363,12 +369,12 @@ public class DemandResponseControllerTest {
 		assertNotNull(res);
 		assertNotNull(res.getId());
 		Long toDeleteId = res.getId();
-		assertEquals(DemandResponseControllerTest.modification, res.getDescriptor().getModificationNumber());
+		assertEquals(DemandResponseControllerTest.MODIFICATION, res.getDescriptor().getModificationNumber());
 		assertNotNull(res.getCreatedTimestamp());
 		assertNotNull(res.getLastUpdateTimestamp());
-		assertEquals(DemandResponseControllerTest.duration, res.getActivePeriod().getDuration());
-		assertEquals(DemandResponseControllerTest.marketContextName, res.getDescriptor().getMarketContext());
-		assertEquals(DemandResponseControllerTest.start, res.getActivePeriod().getStart());
+		assertEquals(DemandResponseControllerTest.DURATION, res.getActivePeriod().getDuration());
+		assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, res.getDescriptor().getMarketContext());
+		assertEquals(DemandResponseControllerTest.START, res.getActivePeriod().getStart());
 		assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
 				res.getSignals().get(0).getCurrentValue());
 		assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(res.getDescriptor().getState()));
@@ -376,7 +382,7 @@ public class DemandResponseControllerTest {
 		// perform check
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param("ven", DemandResponseControllerTest.ven1).with(adminSession))
+						.param(VEN_PARAM, DemandResponseControllerTest.VEN1).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
 		readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -384,50 +390,50 @@ public class DemandResponseControllerTest {
 		assertEquals(2, readValue.size());
 
 		for (DemandResponseEventReadDto dto : readValue) {
-			assertEquals(DemandResponseControllerTest.modification, dto.getDescriptor().getModificationNumber());
+			assertEquals(DemandResponseControllerTest.MODIFICATION, dto.getDescriptor().getModificationNumber());
 			assertNotNull(dto.getCreatedTimestamp());
-			assertEquals(DemandResponseControllerTest.duration, dto.getActivePeriod().getDuration());
-			assertEquals(DemandResponseControllerTest.marketContextName, dto.getDescriptor().getMarketContext());
-			assertEquals(DemandResponseControllerTest.start, dto.getActivePeriod().getStart());
+			assertEquals(DemandResponseControllerTest.DURATION, dto.getActivePeriod().getDuration());
+			assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, dto.getDescriptor().getMarketContext());
+			assertEquals(DemandResponseControllerTest.START, dto.getActivePeriod().getStart());
 			assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
 					dto.getSignals().get(0).getCurrentValue());
 			assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getDescriptor().getState()));
 		}
 
 		// perform invalid create: unknown market context
-		toCreate = createValidEvent("testEventCreate-2");
-		toCreate.getDescriptor().setMarketContext("mouaiccool");
+		toCreate = createValidEvent();
+		toCreate.getDescriptor().setMarketContext(UNKNOWN_MARKETCONTEXT_NAME);
 		String contentStr = mapper.writeValueAsString(toCreate);
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(contentStr)
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// perform invalid create: start MUST be set
-		toCreate = createValidEvent("testEventCreate-2");
+		toCreate = createValidEvent();
 		toCreate.getActivePeriod().setStart(null);
 		contentStr = mapper.writeValueAsString(toCreate);
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(contentStr)
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// perform invalid create: duration MUST be set
-		toCreate = createValidEvent("testEventCreate-2");
+		toCreate = createValidEvent();
 		toCreate.getActivePeriod().setDuration(null);
 		contentStr = mapper.writeValueAsString(toCreate);
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(contentStr)
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// perform invalid create: duration MUST be a valid xml duration
-		toCreate = createValidEvent("testEventCreate-2");
+		toCreate = createValidEvent();
 		toCreate.getActivePeriod().setDuration("1h");
 		contentStr = mapper.writeValueAsString(toCreate);
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(contentStr)
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// clean
@@ -436,12 +442,12 @@ public class DemandResponseControllerTest {
 
 		// create and publish
 		// expect modificationNumber = 0 because event published
-		toCreate = createValidEvent("testEventCreate-2");
+		toCreate = createValidEvent();
 		toCreate.setPublished(true);
 		content = mapper.writeValueAsBytes(toCreate);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(content)
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
 
 		res = convertMvcResultToDemandResponseDto(andReturn);
@@ -451,13 +457,13 @@ public class DemandResponseControllerTest {
 		toDeleteId = res.getId();
 		assertNotNull(res.getCreatedTimestamp());
 		assertNotNull(res.getLastUpdateTimestamp());
-		assertEquals(DemandResponseControllerTest.duration, res.getActivePeriod().getDuration());
-		assertEquals(DemandResponseControllerTest.marketContextName, res.getDescriptor().getMarketContext());
-		assertEquals(DemandResponseControllerTest.start, res.getActivePeriod().getStart());
+		assertEquals(DemandResponseControllerTest.DURATION, res.getActivePeriod().getDuration());
+		assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, res.getDescriptor().getMarketContext());
+		assertEquals(DemandResponseControllerTest.START, res.getActivePeriod().getStart());
 		assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
 				res.getSignals().get(0).getCurrentValue());
 		assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(res.getDescriptor().getState()));
-		assertEquals(new Long(0L), res.getDescriptor().getModificationNumber());
+		assertTrue(res.getDescriptor().getModificationNumber().equals(0L));
 
 		// clean
 		this.mockMvc.perform(MockMvcRequestBuilders.delete(DEMAND_RESPONSE_EVENT_URL + toDeleteId).with(adminSession))
@@ -475,11 +481,11 @@ public class DemandResponseControllerTest {
 		DemandResponseEventReadDto dto = convertMvcResultToDemandResponseDto(andReturn);
 		assertNotNull(dto);
 
-		assertEquals(DemandResponseControllerTest.modification, dto.getDescriptor().getModificationNumber());
+		assertEquals(DemandResponseControllerTest.MODIFICATION, dto.getDescriptor().getModificationNumber());
 		assertNotNull(dto.getCreatedTimestamp());
-		assertEquals(DemandResponseControllerTest.duration, dto.getActivePeriod().getDuration());
-		assertEquals(DemandResponseControllerTest.marketContextName, dto.getDescriptor().getMarketContext());
-		assertEquals(DemandResponseControllerTest.start, dto.getActivePeriod().getStart());
+		assertEquals(DemandResponseControllerTest.DURATION, dto.getActivePeriod().getDuration());
+		assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, dto.getDescriptor().getMarketContext());
+		assertEquals(DemandResponseControllerTest.START, dto.getActivePeriod().getStart());
 		assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
 				dto.getSignals().get(0).getCurrentValue());
 		assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getDescriptor().getState()));
@@ -512,8 +518,8 @@ public class DemandResponseControllerTest {
 
 		DemandResponseEventSignalDto signalModerate = new DemandResponseEventSignalDto();
 		signalModerate.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
-		signalModerate.setSignalName("SIMPLE");
-		signalModerate.setSignalType("level");
+		signalModerate.setSignalName(SIMPLE_SIGNAL_NAME);
+		signalModerate.setSignalType(LEVEL_SIGNAL_TYPE);
 		// update but don't publish
 		DemandResponseEventUpdateDto updateDto = new DemandResponseEventUpdateDto();
 		updateDto.setPublished(false);
@@ -521,9 +527,8 @@ public class DemandResponseControllerTest {
 		updateDto.setTargets(dto.getTargets());
 
 		String contentStr = mapper.writeValueAsString(updateDto);
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + event1.getId())
-						.header("Content-Type", "application/json").content(contentStr).with(adminSession))
+		this.mockMvc.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + event1.getId())
+				.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).content(contentStr).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		andReturn = this.mockMvc
@@ -542,17 +547,16 @@ public class DemandResponseControllerTest {
 		// update and publish
 		DemandResponseEventSignalDto signalNormal = new DemandResponseEventSignalDto();
 		signalNormal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_NORMAL.getValue());
-		signalNormal.setSignalName("SIMPLE");
-		signalNormal.setSignalType("level");
+		signalNormal.setSignalName(SIMPLE_SIGNAL_NAME);
+		signalNormal.setSignalType(LEVEL_SIGNAL_TYPE);
 		updateDto = new DemandResponseEventUpdateDto();
 		updateDto.setPublished(true);
 		updateDto.getSignals().add(signalNormal);
 		updateDto.setTargets(updateDto.getTargets());
 
 		contentStr = mapper.writeValueAsString(updateDto);
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + event1.getId())
-						.header("Content-Type", "application/json").content(contentStr).with(adminSession))
+		this.mockMvc.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + event1.getId())
+				.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).content(contentStr).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		andReturn = this.mockMvc
@@ -570,15 +574,13 @@ public class DemandResponseControllerTest {
 		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 
 		// update id not Long
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + "mouaiccool")
-						.header("Content-Type", "application/json").content(contentStr).with(adminSession))
+		this.mockMvc.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + UNKNOWN_MARKETCONTEXT_NAME)
+				.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).content(contentStr).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// update unknown
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + "999")
-						.header("Content-Type", "application/json").content(contentStr).with(adminSession))
+		this.mockMvc.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + "999")
+				.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).content(contentStr).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 	}
@@ -600,8 +602,8 @@ public class DemandResponseControllerTest {
 
 		DemandResponseEventSignalDto signalModerate = new DemandResponseEventSignalDto();
 		signalModerate.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
-		signalModerate.setSignalName("SIMPLE");
-		signalModerate.setSignalType("level");
+		signalModerate.setSignalName(SIMPLE_SIGNAL_NAME);
+		signalModerate.setSignalType(LEVEL_SIGNAL_TYPE);
 		// update but don't publish
 		DemandResponseEventUpdateDto updateDto = new DemandResponseEventUpdateDto();
 		updateDto.setPublished(false);
@@ -609,9 +611,8 @@ public class DemandResponseControllerTest {
 		updateDto.setTargets(dto.getTargets());
 
 		String contentStr = mapper.writeValueAsString(updateDto);
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + event1.getId())
-						.header("Content-Type", "application/json").content(contentStr).with(adminSession))
+		this.mockMvc.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + event1.getId())
+				.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).content(contentStr).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		andReturn = this.mockMvc
@@ -630,12 +631,12 @@ public class DemandResponseControllerTest {
 		// publish unknown
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "12/publish")
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "mouaiccool/publish")
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// publish
@@ -643,7 +644,7 @@ public class DemandResponseControllerTest {
 		modificationNumber = modificationNumber + 1;
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + event1.getId() + "/publish")
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		andReturn = this.mockMvc
@@ -662,7 +663,7 @@ public class DemandResponseControllerTest {
 		// publish already published event
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + event1.getId() + "/publish")
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		andReturn = this.mockMvc
@@ -697,8 +698,8 @@ public class DemandResponseControllerTest {
 		// update but don't publish
 		DemandResponseEventSignalDto signalModerate = new DemandResponseEventSignalDto();
 		signalModerate.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
-		signalModerate.setSignalName("SIMPLE");
-		signalModerate.setSignalType("level");
+		signalModerate.setSignalName(SIMPLE_SIGNAL_NAME);
+		signalModerate.setSignalType(LEVEL_SIGNAL_TYPE);
 
 		DemandResponseEventUpdateDto updateDto = new DemandResponseEventUpdateDto();
 		updateDto.setPublished(false);
@@ -706,9 +707,8 @@ public class DemandResponseControllerTest {
 		updateDto.setTargets(dto.getTargets());
 
 		String contentStr = mapper.writeValueAsString(updateDto);
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + event1.getId())
-						.header("Content-Type", "application/json").content(contentStr).with(adminSession))
+		this.mockMvc.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + event1.getId())
+				.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).content(contentStr).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		// check update but don't published
@@ -728,7 +728,7 @@ public class DemandResponseControllerTest {
 		// activate an already activated event does nothing
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + event1.getId() + "/active")
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		andReturn = this.mockMvc
@@ -750,7 +750,7 @@ public class DemandResponseControllerTest {
 		modificationNumber = modificationNumber + 1;
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + event1.getId() + "/cancel")
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		andReturn = this.mockMvc
@@ -770,7 +770,7 @@ public class DemandResponseControllerTest {
 		// cancel an already canceled event does nothing
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + event1.getId() + "/cancel")
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		andReturn = this.mockMvc
@@ -792,7 +792,7 @@ public class DemandResponseControllerTest {
 		modificationNumber = modificationNumber + 1;
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + event1.getId() + "/active")
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		andReturn = this.mockMvc
@@ -812,25 +812,25 @@ public class DemandResponseControllerTest {
 		// activate id not long
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "mouaiccool/active")
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// activate unknown
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "999/active")
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 		// cancel id not long
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "mouaiccool/cancel")
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// cancel unknown
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "999/cancel")
-						.header("Content-Type", "application/json").with(adminSession))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
 
 	}
@@ -876,8 +876,8 @@ public class DemandResponseControllerTest {
 		filters.add(filter);
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
-						.with(adminSession))
+						.content(mapper.writeValueAsString(filters))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		List<DemandResponseEventReadDto> list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(0, list.size());
@@ -889,8 +889,8 @@ public class DemandResponseControllerTest {
 		filters.add(filter);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
-						.with(adminSession))
+						.content(mapper.writeValueAsString(filters))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(2, list.size());
@@ -903,8 +903,8 @@ public class DemandResponseControllerTest {
 		filters.add(filter);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
-						.with(adminSession))
+						.content(mapper.writeValueAsString(filters))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(2, list.size());
@@ -912,12 +912,12 @@ public class DemandResponseControllerTest {
 		filters = new ArrayList<>();
 		filter = new DemandResponseEventFilter();
 		filter.setType(DemandResponseEventFilterType.MARKET_CONTEXT);
-		filter.setValue("mouaiccool");
+		filter.setValue(UNKNOWN_MARKETCONTEXT_NAME);
 		filters.add(filter);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
-						.with(adminSession))
+						.content(mapper.writeValueAsString(filters))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(0, list.size());
@@ -926,12 +926,12 @@ public class DemandResponseControllerTest {
 		filters = new ArrayList<>();
 		filter = new DemandResponseEventFilter();
 		filter.setType(DemandResponseEventFilterType.VEN);
-		filter.setValue(ven1);
+		filter.setValue(VEN1);
 		filters.add(filter);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
-						.with(adminSession))
+						.content(mapper.writeValueAsString(filters))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(1, list.size());
@@ -939,12 +939,12 @@ public class DemandResponseControllerTest {
 		filters = new ArrayList<>();
 		filter = new DemandResponseEventFilter();
 		filter.setType(DemandResponseEventFilterType.VEN);
-		filter.setValue(ven2);
+		filter.setValue(VEN2);
 		filters.add(filter);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
-						.with(adminSession))
+						.content(mapper.writeValueAsString(filters))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(2, list.size());
@@ -952,12 +952,12 @@ public class DemandResponseControllerTest {
 		filters = new ArrayList<>();
 		filter = new DemandResponseEventFilter();
 		filter.setType(DemandResponseEventFilterType.VEN);
-		filter.setValue("mouaiccool");
+		filter.setValue(UNKNOWN_MARKETCONTEXT_NAME);
 		filters.add(filter);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
-						.with(adminSession))
+						.content(mapper.writeValueAsString(filters))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(0, list.size());
@@ -970,8 +970,8 @@ public class DemandResponseControllerTest {
 		filters.add(filter);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
-						.with(adminSession))
+						.content(mapper.writeValueAsString(filters))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(1, list.size());
@@ -983,8 +983,8 @@ public class DemandResponseControllerTest {
 		filters.add(filter);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
-						.with(adminSession))
+						.content(mapper.writeValueAsString(filters))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(1, list.size());
@@ -997,8 +997,8 @@ public class DemandResponseControllerTest {
 		filters.add(filter);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
-						.with(adminSession))
+						.content(mapper.writeValueAsString(filters))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(0, list.size());
@@ -1010,8 +1010,8 @@ public class DemandResponseControllerTest {
 		filters.add(filter);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json")
-						.with(adminSession))
+						.content(mapper.writeValueAsString(filters))
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(2, list.size());
@@ -1042,17 +1042,17 @@ public class DemandResponseControllerTest {
 	public void securityTest() throws Exception {
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param("ven", DemandResponseControllerTest.ven1).with(adminSession))
+						.param(VEN_PARAM, DemandResponseControllerTest.VEN1).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param("ven", DemandResponseControllerTest.ven1).with(userSession))
+						.param(VEN_PARAM, DemandResponseControllerTest.VEN1).with(userSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param("ven", DemandResponseControllerTest.ven1).with(venSession))
+						.param(VEN_PARAM, DemandResponseControllerTest.VEN1).with(venSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 	}
 

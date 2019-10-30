@@ -64,8 +64,6 @@ public class OadrHttpVenClient20bTest {
 			OadrSecurityException, JAXBException, URISyntaxException, Oadr20bException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
-
 		long timestampStart = 0L;
 		String eventXmlDuration = "PT1H";
 		String toleranceXmlDuration = "PT5M";
@@ -99,16 +97,16 @@ public class OadrHttpVenClient20bTest {
 		OadrDistributeEventType mockDistributeEvent = Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder("", "")
 				.addOadrEvent(oadrEvent).build();
 
-		OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
-		OadrHttpVenClient20b OadrHttpVenClient20b = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20b = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrDistributeEventType, JAXBElement<OadrRequestEventType>>post(
+		when(oadrHttpClient20b.<OadrDistributeEventType, JAXBElement<OadrRequestEventType>>post(
 				Matchers.<JAXBElement<OadrRequestEventType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(mockDistributeEvent);
 
 		OadrRequestEventType requestEvent = new OadrRequestEventType();
-		OadrHttpVenClient20b.oadrRequestEvent(requestEvent);
+		oadrHttpVenClient20b.oadrRequestEvent(requestEvent);
 	}
 
 	@Test
@@ -116,19 +114,19 @@ public class OadrHttpVenClient20bTest {
 			NoSuchAlgorithmException, KeyStoreException, URISyntaxException, Oadr20bException,
 			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrResponseType mockOadrResponseType = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("", HttpStatus.SC_OK, "venId").build();
 
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrResponseType, JAXBElement<OadrCreatedEventType>>post(
+		when(oadrHttpClient20b.<OadrResponseType, JAXBElement<OadrCreatedEventType>>post(
 				Matchers.<JAXBElement<OadrCreatedEventType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(mockOadrResponseType);
 
 		OadrCreatedEventType createdEvent = new OadrCreatedEventType();
-		OadrHttpVenClient20bTestClass.oadrCreatedEvent(createdEvent);
+		oadrHttpVenClient20bTestClass.oadrCreatedEvent(createdEvent);
 
 	}
 
@@ -136,287 +134,287 @@ public class OadrHttpVenClient20bTest {
 	public void oadrCreatedReportTest() throws Oadr20bException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrResponseType mockOadrResponseType = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("", HttpStatus.SC_OK, "venId").build();
 
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrResponseType, JAXBElement<OadrResponseType>>post(
+		when(oadrHttpClient20b.<OadrResponseType, JAXBElement<OadrResponseType>>post(
 				Matchers.<JAXBElement<OadrResponseType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(mockOadrResponseType);
 
 		OadrCreatedReportType payload = new OadrCreatedReportType();
-		OadrHttpVenClient20bTestClass.oadrCreatedReport(payload);
+		oadrHttpVenClient20bTestClass.oadrCreatedReport(payload);
 	}
 
 	@Test
 	public void oadrCreateReportTest() throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
 			Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrCreatedReportType build = Oadr20bEiReportBuilders
 				.newOadr20bCreatedReportBuilder("", HttpStatus.SC_OK, "venId").build();
 
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrCreatedReportType, JAXBElement<OadrCreatedReportType>>post(
+		when(oadrHttpClient20b.<OadrCreatedReportType, JAXBElement<OadrCreatedReportType>>post(
 				Matchers.<JAXBElement<OadrCreatedReportType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(build);
 
 		OadrCreateReportType payload = new OadrCreateReportType();
-		OadrHttpVenClient20bTestClass.oadrCreateReport(payload);
+		oadrHttpVenClient20bTestClass.oadrCreateReport(payload);
 	}
 
 	@Test
 	public void oadrUpdateReportTest() throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
 			Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrUpdatedReportType build = Oadr20bEiReportBuilders
 				.newOadr20bUpdatedReportBuilder("", HttpStatus.SC_OK, "venId").build();
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrUpdatedReportType, JAXBElement<OadrUpdatedReportType>>post(
+		when(oadrHttpClient20b.<OadrUpdatedReportType, JAXBElement<OadrUpdatedReportType>>post(
 				Matchers.<JAXBElement<OadrUpdatedReportType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(build);
 
 		OadrUpdateReportType payload = new OadrUpdateReportType();
-		OadrHttpVenClient20bTestClass.oadrUpdateReport(payload);
+		oadrHttpVenClient20bTestClass.oadrUpdateReport(payload);
 	}
 
 	@Test
 	public void oadrRegisterReportTest() throws Oadr20bException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrRegisteredReportType build = Oadr20bEiReportBuilders
 				.newOadr20bRegisteredReportBuilder("", HttpStatus.SC_OK, "venId").build();
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrRegisteredReportType, JAXBElement<OadrRegisteredReportType>>post(
+		when(oadrHttpClient20b.<OadrRegisteredReportType, JAXBElement<OadrRegisteredReportType>>post(
 				Matchers.<JAXBElement<OadrRegisteredReportType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(build);
 
 		OadrRegisterReportType payload = new OadrRegisterReportType();
-		OadrHttpVenClient20bTestClass.oadrRegisterReport(payload);
+		oadrHttpVenClient20bTestClass.oadrRegisterReport(payload);
 	}
 
 	@Test
 	public void oadrUpdatedReportTest() throws Oadr20bException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrResponseType mockOadrResponseType = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("", HttpStatus.SC_OK, "venId").build();
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrResponseType, JAXBElement<OadrResponseType>>post(
+		when(oadrHttpClient20b.<OadrResponseType, JAXBElement<OadrResponseType>>post(
 				Matchers.<JAXBElement<OadrResponseType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(mockOadrResponseType);
 
 		OadrUpdatedReportType payload = new OadrUpdatedReportType();
-		OadrHttpVenClient20bTestClass.oadrUpdatedReport(payload);
+		oadrHttpVenClient20bTestClass.oadrUpdatedReport(payload);
 	}
 
 	@Test
 	public void oadrRegisteredReportTest() throws Oadr20bException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrResponseType mockOadrResponseType = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("", HttpStatus.SC_OK, "venId").build();
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrResponseType, JAXBElement<OadrResponseType>>post(
+		when(oadrHttpClient20b.<OadrResponseType, JAXBElement<OadrResponseType>>post(
 				Matchers.<JAXBElement<OadrResponseType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(mockOadrResponseType);
 
 		OadrRegisteredReportType payload = new OadrRegisteredReportType();
-		OadrHttpVenClient20bTestClass.oadrRegisteredReport(payload);
+		oadrHttpVenClient20bTestClass.oadrRegisteredReport(payload);
 	}
 
 	@Test
 	public void oadrCancelReportTest() throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
 			Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrCanceledReportType build = Oadr20bEiReportBuilders
 				.newOadr20bCanceledReportBuilder("", HttpStatus.SC_OK, "venId").build();
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrCanceledReportType, JAXBElement<OadrCanceledReportType>>post(
+		when(oadrHttpClient20b.<OadrCanceledReportType, JAXBElement<OadrCanceledReportType>>post(
 				Matchers.<JAXBElement<OadrCanceledReportType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(build);
 
 		OadrCancelReportType payload = new OadrCancelReportType();
-		OadrHttpVenClient20bTestClass.oadrCancelReport(payload);
+		oadrHttpVenClient20bTestClass.oadrCancelReport(payload);
 	}
 
 	@Test
 	public void oadrCanceledReportTest() throws Oadr20bException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrResponseType mockOadrResponseType = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("", HttpStatus.SC_OK, "venId").build();
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrResponseType, JAXBElement<OadrResponseType>>post(
+		when(oadrHttpClient20b.<OadrResponseType, JAXBElement<OadrResponseType>>post(
 				Matchers.<JAXBElement<OadrResponseType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(mockOadrResponseType);
 
 		OadrCanceledReportType payload = new OadrCanceledReportType();
-		OadrHttpVenClient20bTestClass.oadrCanceledReport(payload);
+		oadrHttpVenClient20bTestClass.oadrCanceledReport(payload);
 	}
 
 	@Test
 	public void oadrPollTest() throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
 			Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b adrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<Object, JAXBElement<Object>>post(Matchers.<JAXBElement<Object>>anyObject(),
+		when(oadrHttpClient20b.<Object, JAXBElement<Object>>post(Matchers.<JAXBElement<Object>>anyObject(),
 				Matchers.any(), Matchers.any())).thenReturn(new Object());
 
 		OadrPollType payload = new OadrPollType();
-		OadrHttpVenClient20bTestClass.oadrPoll(payload);
+		adrHttpVenClient20bTestClass.oadrPoll(payload);
 	}
 
 	@Test
 	public void oadrCreatePartyRegistrationTest() throws Oadr20bException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrCreatedPartyRegistrationType build = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatedPartyRegistrationBuilder("", HttpStatus.SC_OK, "venId", "vtnId").build();
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrCreatedPartyRegistrationType, JAXBElement<OadrCreatedPartyRegistrationType>>post(
+		when(oadrHttpClient20b.<OadrCreatedPartyRegistrationType, JAXBElement<OadrCreatedPartyRegistrationType>>post(
 				Matchers.<JAXBElement<OadrCreatedPartyRegistrationType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(build);
 
 		OadrCreatePartyRegistrationType payload = new OadrCreatePartyRegistrationType();
-		OadrHttpVenClient20bTestClass.oadrCreatePartyRegistration(payload);
+		oadrHttpVenClient20bTestClass.oadrCreatePartyRegistration(payload);
 	}
 
 	@Test
 	public void oadrCancelPartyRegistrationTest() throws Oadr20bException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrCanceledPartyRegistrationType build = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCanceledPartyRegistrationBuilder("", HttpStatus.SC_OK, "venId", "vtnId").build();
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrCanceledPartyRegistrationType, JAXBElement<OadrCanceledPartyRegistrationType>>post(
+		when(oadrHttpClient20b.<OadrCanceledPartyRegistrationType, JAXBElement<OadrCanceledPartyRegistrationType>>post(
 				Matchers.<JAXBElement<OadrCanceledPartyRegistrationType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(build);
 
 		OadrCancelPartyRegistrationType payload = new OadrCancelPartyRegistrationType();
-		OadrHttpVenClient20bTestClass.oadrCancelPartyRegistration(payload);
+		oadrHttpVenClient20bTestClass.oadrCancelPartyRegistration(payload);
 	}
 
 	@Test
 	public void oadrResponseReregisterPartyTest() throws Oadr20bException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrResponseType mockOadrResponseType = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("", HttpStatus.SC_OK, "venId").build();
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrResponseType, JAXBElement<OadrResponseType>>post(
+		when(oadrHttpClient20b.<OadrResponseType, JAXBElement<OadrResponseType>>post(
 				Matchers.<JAXBElement<OadrResponseType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(mockOadrResponseType);
 
 		OadrResponseType payload = new OadrResponseType();
-		OadrHttpVenClient20bTestClass.oadrResponseReregisterParty(payload);
+		oadrHttpVenClient20bTestClass.oadrResponseReregisterParty(payload);
 	}
 
 	@Test
 	public void oadrCanceledPartyRegistrationTypeTest() throws Oadr20bException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrResponseType mockOadrResponseType = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("", HttpStatus.SC_OK, "venId").build();
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrResponseType, JAXBElement<OadrResponseType>>post(
+		when(oadrHttpClient20b.<OadrResponseType, JAXBElement<OadrResponseType>>post(
 				Matchers.<JAXBElement<OadrResponseType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(mockOadrResponseType);
 
 		OadrCanceledPartyRegistrationType payload = new OadrCanceledPartyRegistrationType();
-		OadrHttpVenClient20bTestClass.oadrCanceledPartyRegistrationType(payload);
+		oadrHttpVenClient20bTestClass.oadrCanceledPartyRegistrationType(payload);
 	}
 
 	@Test
 	public void oadrQueryRegistrationTypeTest() throws Oadr20bException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrCreatedPartyRegistrationType build = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatedPartyRegistrationBuilder("", HttpStatus.SC_OK, "venId", "vtnId").build();
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrCreatedPartyRegistrationType, JAXBElement<OadrCreatedPartyRegistrationType>>post(
+		when(oadrHttpClient20b.<OadrCreatedPartyRegistrationType, JAXBElement<OadrCreatedPartyRegistrationType>>post(
 				Matchers.<JAXBElement<OadrCreatedPartyRegistrationType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(build);
 
 		OadrQueryRegistrationType payload = new OadrQueryRegistrationType();
-		OadrHttpVenClient20bTestClass.oadrQueryRegistrationType(payload);
+		oadrHttpVenClient20bTestClass.oadrQueryRegistrationType(payload);
 	}
 
 	@Test
 	public void oadrCreateOptTest() throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
 			Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrCreatedOptType build = Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder("", HttpStatus.SC_OK, "OPT_IN")
 				.build();
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrCreatedOptType, JAXBElement<OadrCreatedOptType>>post(
+		when(oadrHttpClient20b.<OadrCreatedOptType, JAXBElement<OadrCreatedOptType>>post(
 				Matchers.<JAXBElement<OadrCreatedOptType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(build);
 
 		OadrCreateOptType payload = new OadrCreateOptType();
-		OadrHttpVenClient20bTestClass.oadrCreateOpt(payload);
+		oadrHttpVenClient20bTestClass.oadrCreateOpt(payload);
 	}
 
 	@Test
 	public void oadrCancelOptTypeTest() throws Oadr20bException, Oadr20bHttpLayerException,
 			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 
-		OadrHttpClient20b OadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
+		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrCanceledOptType build = Oadr20bEiOptBuilders.newOadr20bCanceledOptBuilder("", HttpStatus.SC_OK, "OPT_IN")
 				.build();
-		OadrHttpVenClient20b OadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(OadrHttpClient20b);
+		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
-		when(OadrHttpClient20b.<OadrCanceledOptType, JAXBElement<OadrCanceledOptType>>post(
+		when(oadrHttpClient20b.<OadrCanceledOptType, JAXBElement<OadrCanceledOptType>>post(
 				Matchers.<JAXBElement<OadrCanceledOptType>>anyObject(), Matchers.any(), Matchers.any()))
 						.thenReturn(build);
 
 		OadrCancelOptType payload = new OadrCancelOptType();
-		OadrHttpVenClient20bTestClass.oadrCancelOptType(payload);
+		oadrHttpVenClient20bTestClass.oadrCancelOptType(payload);
 	}
 
 }

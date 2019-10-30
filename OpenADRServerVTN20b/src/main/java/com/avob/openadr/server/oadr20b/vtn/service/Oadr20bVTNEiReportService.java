@@ -259,7 +259,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 			String reportName = oadrReportType.getReportName();
 			String reportRequestID = oadrReportType.getReportRequestID();
 			String reportSpecifierID = oadrReportType.getReportSpecifierID();
-			if ("METADATA".equals(reportSpecifierID)) {
+			if (METADATA_REPORT_SPECIFIER_ID.equals(reportSpecifierID)) {
 				hasMetadataReport = true;
 			}
 			DurationPropType duration = oadrReportType.getDuration();
@@ -290,7 +290,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 					VenReportCapabilityDto.class);
 			List<ReportCapabilityDescriptionDto> descriptionDto = new ArrayList<>();
 			capabilities.add(otherReportCapability);
-			List<OtherReportCapabilityDescription> capabilityDescription = new ArrayList<OtherReportCapabilityDescription>();
+			List<OtherReportCapabilityDescription> capabilityDescription = new ArrayList<>();
 			for (OadrReportDescriptionType oadrReportDescriptionType : oadrReportType.getOadrReportDescription()) {
 				String rid = oadrReportDescriptionType.getRID();
 				OtherReportCapabilityDescription description = currentVenCapabilityDescriptionMap
@@ -604,7 +604,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 				for (SpecifierPayloadType specifierPayloadType : reportSpecifier.getSpecifierPayload()) {
 					String rid = specifierPayloadType.getRID();
-//					String readingType = specifierPayloadType.getReadingType();
 
 					SelfReportCapabilityDescription selfReportCapabilityDescription = selfReportCapabilityDescriptionService
 							.findBySelfReportCapabilityAndRid(selfReportCapability, rid);
@@ -890,7 +889,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 								}
 
 							} catch (JsonProcessingException e) {
-//								LOGGER.err
+								LOGGER.error("Can't marshall token to string", e);
 							}
 
 						} else if (payloadBase.getDeclaredType().equals(OadrPayloadResourceStatusType.class)) {
@@ -1066,7 +1065,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 				.collect(Collectors.groupingBy(spec -> spec.getRequest().getReportRequestId(), Collectors.toSet()));
 
 		Map<String, OtherReportRequest> collect = request.stream()
-				.collect(Collectors.toMap(r -> r.getReportRequestId(), r -> r));
+				.collect(Collectors.toMap(OtherReportRequest::getReportRequestId, r -> r));
 
 		for (Entry<String, Set<OtherReportRequestSpecifier>> entry : groupByReportRequestIdSpecifiers.entrySet()) {
 

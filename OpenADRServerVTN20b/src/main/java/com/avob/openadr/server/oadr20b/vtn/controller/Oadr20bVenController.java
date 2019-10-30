@@ -282,7 +282,7 @@ public class Oadr20bVenController {
 			findBySource = otherReportRequestService.findBySource(ven);
 		} else if (reportSpecifierId != null) {
 			findBySource = otherReportRequestService.findBySourceAndReportSpecifierId(ven, reportSpecifierId);
-		} else if (reportRequestId != null) {
+		} else {
 			findBySource = otherReportRequestService.findBySourceAndReportRequestId(ven, reportRequestId);
 		}
 
@@ -373,11 +373,10 @@ public class Oadr20bVenController {
 
 		Long startTimestamp = (start != null) ? start.toEpochMilli() : null;
 		Long endTimestamp = (end != null) ? end.toEpochMilli() : null;
-		List<VenOptDto> mapList = oadr20bDtoMapper.mapList(
+		return oadr20bDtoMapper.mapList(
 				venOptService.findScheduledOpt(ven.getUsername(), marketContextName, startTimestamp, endTimestamp),
 				VenOptDto.class);
 
-		return mapList;
 	}
 
 	@RequestMapping(value = "/{venID}/opt/resource/{resourceName}", method = RequestMethod.GET)
