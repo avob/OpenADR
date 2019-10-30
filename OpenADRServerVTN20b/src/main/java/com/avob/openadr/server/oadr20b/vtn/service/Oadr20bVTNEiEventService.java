@@ -7,14 +7,13 @@ import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
@@ -46,7 +45,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.pyld.EiCreatedEvent;
 import com.avob.openadr.server.common.vtn.VtnConfig;
-import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignal;
@@ -82,19 +80,6 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 
 	@Resource
 	private XmlSignatureService xmlSignatureService;
-
-	/**
-	 * xml date/duration factory
-	 */
-	private static DatatypeFactory datatypeFactory;
-
-	static {
-		try {
-			datatypeFactory = DatatypeFactory.newInstance();
-		} catch (DatatypeConfigurationException e) {
-			throw new OadrVTNInitializationException(e);
-		}
-	}
 
 	@Resource
 	private Oadr20bJAXBContext jaxbContext;
@@ -396,8 +381,7 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 		Date dateStartNear = new Date();
 		dateStartNear.setTime(start);
 		if (rampUpDuration != null) {
-			Duration newDuration = datatypeFactory.newDuration(rampUpDuration);
-			long timeInMillis = newDuration.getTimeInMillis(dateStart);
+			long timeInMillis = Oadr20bFactory.xmlDurationToMillisecond(rampUpDuration);
 			dateStartNear.setTime(start - timeInMillis);
 		}
 
@@ -563,17 +547,9 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 			} else {
 				throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
 			}
-		} catch (Oadr20bUnmarshalException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bXMLSignatureValidationException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bCreatedEventApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bRequestEventApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bMarshalException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bXMLSignatureException e) {
+		} catch (Oadr20bUnmarshalException | Oadr20bRequestEventApplicationLayerException | Oadr20bMarshalException
+				| Oadr20bXMLSignatureException | Oadr20bCreatedEventApplicationLayerException
+				| Oadr20bXMLSignatureValidationException e) {
 			throw new Oadr20bApplicationLayerException(e);
 		}
 

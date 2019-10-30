@@ -352,17 +352,9 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 			} else {
 				throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiOpt");
 			}
-		} catch (Oadr20bUnmarshalException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bCancelOptApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bCreateOptApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bMarshalException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bXMLSignatureValidationException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bXMLSignatureException e) {
+		} catch (Oadr20bUnmarshalException | Oadr20bCancelOptApplicationLayerException | Oadr20bMarshalException
+				| Oadr20bXMLSignatureException | Oadr20bCreateOptApplicationLayerException
+				| Oadr20bXMLSignatureValidationException e) {
 			throw new Oadr20bApplicationLayerException(e);
 		}
 

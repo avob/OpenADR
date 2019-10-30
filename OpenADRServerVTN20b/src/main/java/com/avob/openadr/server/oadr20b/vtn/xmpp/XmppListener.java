@@ -53,13 +53,8 @@ public class XmppListener implements StanzaListener {
 
 			xmppUplinkClient.getUplinkClient().sendMessage(from, response);
 
-		} catch (Oadr20bApplicationLayerException e) {
-			LOGGER.error(oadr20bVTNEiService.getServiceName() + " - " + e.getMessage());
-		} catch (Oadr20bMarshalException e) {
-			LOGGER.error(oadr20bVTNEiService.getServiceName() + " - " + e.getMessage());
-		} catch (XmppStringprepException e) {
-			LOGGER.error(oadr20bVTNEiService.getServiceName() + " - " + e.getMessage());
-		} catch (NotConnectedException e) {
+		} catch (Oadr20bApplicationLayerException | XmppStringprepException | NotConnectedException
+				| Oadr20bMarshalException e) {
 			LOGGER.error(oadr20bVTNEiService.getServiceName() + " - " + e.getMessage());
 		} catch (InterruptedException e) {
 			LOGGER.error(oadr20bVTNEiService.getServiceName() + " - " + e.getMessage());

@@ -502,23 +502,12 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 			} else {
 				throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiRegisterParty");
 			}
-		} catch (Oadr20bUnmarshalException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bXMLSignatureValidationException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bQueryRegistrationTypeApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bMarshalException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bXMLSignatureException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bCreatePartyRegistrationTypeApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bCancelPartyRegistrationTypeApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bCanceledPartyRegistrationTypeApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bResponsePartyReregistrationApplicationLayerException e) {
+		} catch (Oadr20bUnmarshalException | Oadr20bQueryRegistrationTypeApplicationLayerException
+				| Oadr20bResponsePartyReregistrationApplicationLayerException | Oadr20bMarshalException
+				| Oadr20bXMLSignatureException | Oadr20bCanceledPartyRegistrationTypeApplicationLayerException
+				| Oadr20bCancelPartyRegistrationTypeApplicationLayerException
+				| Oadr20bCreatePartyRegistrationTypeApplicationLayerException
+				| Oadr20bXMLSignatureValidationException e) {
 			throw new Oadr20bApplicationLayerException(e);
 		}
 

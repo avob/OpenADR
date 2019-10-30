@@ -1508,31 +1508,13 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 			} else {
 				throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiReport");
 			}
-		} catch (Oadr20bUnmarshalException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bXMLSignatureValidationException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bCreatePartyRegistrationTypeApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bCancelPartyRegistrationTypeApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bQueryRegistrationTypeApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bRegisterReportApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bUpdateReportApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bCancelReportApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bCreateReportApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bCreatedReportApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bRegisteredReportApplicationLayerException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bMarshalException e) {
-			throw new Oadr20bApplicationLayerException(e);
-		} catch (Oadr20bXMLSignatureException e) {
+		} catch (Oadr20bUnmarshalException | Oadr20bCancelReportApplicationLayerException | Oadr20bMarshalException
+				| Oadr20bXMLSignatureException | Oadr20bCreateReportApplicationLayerException
+				| Oadr20bCreatedReportApplicationLayerException | Oadr20bUpdateReportApplicationLayerException
+				| Oadr20bRegisteredReportApplicationLayerException | Oadr20bRegisterReportApplicationLayerException
+				| Oadr20bCreatePartyRegistrationTypeApplicationLayerException
+				| Oadr20bCancelPartyRegistrationTypeApplicationLayerException
+				| Oadr20bQueryRegistrationTypeApplicationLayerException | Oadr20bXMLSignatureValidationException e) {
 			throw new Oadr20bApplicationLayerException(e);
 		}
 	}

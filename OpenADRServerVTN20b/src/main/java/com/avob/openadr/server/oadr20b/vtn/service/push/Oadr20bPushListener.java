@@ -11,6 +11,7 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
@@ -26,8 +27,6 @@ import com.avob.openadr.server.common.vtn.service.push.VenCommandDto;
 import com.avob.openadr.server.common.vtn.service.push.VenCommandPublisher;
 import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppUplinkClient;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -156,9 +155,7 @@ public class Oadr20bPushListener {
 					}
 
 				} else {
-					// TODO bzanni: exception cannot be pushed payload (outside
-					// Oadr20b
-					// protocol)
+					throw new Oadr20bException("Can't push unknown payload");
 				}
 			} else if (OadrTransportType.XMPP.value().equals(readValue.getVenTransport())) {
 
@@ -168,14 +165,8 @@ public class Oadr20bPushListener {
 
 			}
 
-		} catch (JsonParseException e) {
-			LOGGER.error(e.getMessage());
-		} catch (JsonMappingException e) {
-			LOGGER.error(e.getMessage());
-		} catch (IOException e) {
-			LOGGER.error(e.getMessage());
-		} catch (Oadr20bUnmarshalException e) {
-			LOGGER.error(e.getMessage());
+		} catch (Oadr20bUnmarshalException | IOException | Oadr20bException e) {
+			LOGGER.error(e.getMessage(), e);
 		}
 	}
 

@@ -133,7 +133,7 @@ public class XmppVenListener implements StanzaListener {
 
 					multiXmppClientConfig.sendReportMessage(response);
 
-				} 
+				}
 
 			} else {
 				failIfPayloadNeedToBeSigned(multiConfig);
@@ -250,25 +250,9 @@ public class XmppVenListener implements StanzaListener {
 
 			}
 
-		} catch (Oadr20bUnmarshalException e) {
-			LOGGER.error(e.getMessage(), e);
-			LOGGER.error(payload);
-		} catch (Oadr20bApplicationLayerException e) {
-			LOGGER.error(e.getMessage(), e);
-			LOGGER.error(payload);
-		} catch (Oadr20bXMLSignatureValidationException e) {
-			LOGGER.error(e.getMessage(), e);
-			LOGGER.error(payload);
-		} catch (Oadr20bMarshalException e) {
-			LOGGER.error(e.getMessage(), e);
-			LOGGER.error(payload);
-		} catch (Oadr20bXMLSignatureException e) {
-			LOGGER.error(e.getMessage(), e);
-			LOGGER.error(payload);
-		} catch (OadrSecurityException e) {
-			LOGGER.error(e.getMessage());
-			LOGGER.error(payload);
-		} catch (IOException e) {
+		} catch (Oadr20bUnmarshalException | Oadr20bMarshalException | Oadr20bXMLSignatureException
+				| OadrSecurityException | IOException | Oadr20bXMLSignatureValidationException
+				| Oadr20bApplicationLayerException e) {
 			LOGGER.error(e.getMessage(), e);
 			LOGGER.error(payload);
 		}
