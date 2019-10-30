@@ -63,23 +63,9 @@ public class VtnConfigEmbeddedBroker {
 		return activeMQConnectionFactory;
 	}
 
-//	@Bean
-//	public ActiveMQSslConnectionFactory activeMQSslConnectionFactory() throws Exception {
-//		ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory();
-//		if (getKeyManagerFactory() != null) {
-//			activeMQConnectionFactory.setBrokerURL(sslBrokerUrlClient);
-////			activeMQConnectionFactory.
-//			activeMQConnectionFactory.setKeyAndTrustManagers(getKeyManagerFactory().getKeyManagers(),
-//					getTrustManagerFactory().getTrustManagers(), new SecureRandom());
-//		}
-//
-//		return activeMQConnectionFactory;
-//	}
-
 	@Bean
 	public JmsTemplate jmsTemplate() throws Exception {
-		JmsTemplate jmsTemplate = new JmsTemplate(activeMQConnectionFactory());
-		return jmsTemplate;
+		return new JmsTemplate(activeMQConnectionFactory());
 	}
 
 	@Bean

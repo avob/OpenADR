@@ -79,7 +79,7 @@ public class OadrHttpClientBuilder {
 	/**
 	 * default http headers
 	 */
-	private List<Header> headers = new ArrayList<Header>();
+	private List<Header> headers = new ArrayList<>();
 
 	/**
 	 * enable http

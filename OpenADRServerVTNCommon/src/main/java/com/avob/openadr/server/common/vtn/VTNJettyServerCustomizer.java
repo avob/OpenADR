@@ -138,19 +138,8 @@ public class VTNJettyServerCustomizer implements JettyServerCustomizer {
 			Connector[] connectors = { connector };
 			server.setConnectors(connectors);
 
-		} catch (OadrSecurityException e) {
-			throw new IllegalArgumentException(e);
-		} catch (NoSuchAlgorithmException e) {
-			throw new IllegalArgumentException(e);
-		} catch (CertificateException e) {
-			throw new IllegalArgumentException(e);
-		} catch (IOException e) {
-			throw new IllegalArgumentException(e);
-		} catch (KeyStoreException e) {
-			throw new IllegalArgumentException(e);
-		} catch (KeyManagementException e) {
-			throw new IllegalArgumentException(e);
-		} catch (UnrecoverableKeyException e) {
+		} catch (OadrSecurityException | UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException
+				| KeyStoreException | CertificateException | IOException e) {
 			throw new IllegalArgumentException(e);
 		}
 

@@ -19,51 +19,46 @@ import com.avob.openadr.model.oadr20a.oadr.OadrRequestEvent;
 
 public class Oadr20aRequestEventTest {
 
-    private Oadr20aJAXBContext jaxbContext;
+	private Oadr20aJAXBContext jaxbContext;
 
-    public Oadr20aRequestEventTest() {
-        try {
-            jaxbContext = Oadr20aJAXBContext.getInstance();
-        } catch (JAXBException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	public Oadr20aRequestEventTest() throws JAXBException {
+		jaxbContext = Oadr20aJAXBContext.getInstance();
+	}
 
-    @Test
-    public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException, FileNotFoundException {
+	@Test
+	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException, FileNotFoundException {
 
-        OadrRequestEvent request = Oadr20aBuilders.newOadrRequestEventBuilder(null, null).build();
+		OadrRequestEvent request = Oadr20aBuilders.newOadrRequestEventBuilder(null, null).build();
 
-        boolean assertion = false;
-        try {
-            jaxbContext.marshal(request);
-        } catch (Oadr20aMarshalException e) {
-            assertion = true;
-        }
+		boolean assertion = false;
+		try {
+			jaxbContext.marshal(request);
+		} catch (Oadr20aMarshalException e) {
+			assertion = true;
+		}
 
-        assertTrue(assertion);
+		assertTrue(assertion);
 
-        File file = new File("src/test/resources/unvalidatingOadrRequestEvent.xml");
-        assertion = false;
-        try {
-            jaxbContext.unmarshal(new FileInputStream(file), OadrRequestEvent.class);
-        } catch (Oadr20aUnmarshalException e) {
-            assertion = true;
-        }
-        assertTrue(assertion);
+		File file = new File("src/test/resources/unvalidatingOadrRequestEvent.xml");
+		assertion = false;
+		try {
+			jaxbContext.unmarshal(new FileInputStream(file), OadrRequestEvent.class);
+		} catch (Oadr20aUnmarshalException e) {
+			assertion = true;
+		}
+		assertTrue(assertion);
 
-    }
+	}
 
-    @Test
-    public void unmarshalMarshalValidatingTest()
-            throws Oadr20aUnmarshalException, Oadr20aMarshalException, FileNotFoundException {
-        File file = new File("src/test/resources/oadrRequestEvent.xml");
-        OadrRequestEvent unmarshal = jaxbContext.unmarshal(new FileInputStream(file), OadrRequestEvent.class);
-        assertEquals("pyld:requestID", unmarshal.getEiRequestEvent().getRequestID());
-        assertEquals("ei:venID", unmarshal.getEiRequestEvent().getVenID());
-        assertEquals(new Long(0), unmarshal.getEiRequestEvent().getReplyLimit());
+	@Test
+	public void unmarshalMarshalValidatingTest()
+			throws Oadr20aUnmarshalException, Oadr20aMarshalException, FileNotFoundException {
+		File file = new File("src/test/resources/oadrRequestEvent.xml");
+		OadrRequestEvent unmarshal = jaxbContext.unmarshal(new FileInputStream(file), OadrRequestEvent.class);
+		assertEquals("pyld:requestID", unmarshal.getEiRequestEvent().getRequestID());
+		assertEquals("ei:venID", unmarshal.getEiRequestEvent().getVenID());
+		assertEquals(new Long(0), unmarshal.getEiRequestEvent().getReplyLimit());
 
-        jaxbContext.marshal(unmarshal);
-    }
+		jaxbContext.marshal(unmarshal);
+	}
 }

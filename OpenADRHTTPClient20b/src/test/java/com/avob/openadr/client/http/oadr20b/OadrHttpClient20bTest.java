@@ -38,7 +38,6 @@ import com.avob.openadr.model.oadr20b.ei.EiTargetType;
 import com.avob.openadr.model.oadr20b.ei.EventDescriptorType;
 import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
@@ -149,7 +148,7 @@ public class OadrHttpClient20bTest {
 		try {
 			client.post(Oadr20bFactory.createOadrDistributeEvent(mockDistributeEvent),
 					Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.EI_EVENT_SERVICE, OadrResponseType.class);
-		} catch (Oadr20bApplicationLayerException e) {
+		} catch (Oadr20bException e) {
 			exception = true;
 		}
 		assertTrue(exception);

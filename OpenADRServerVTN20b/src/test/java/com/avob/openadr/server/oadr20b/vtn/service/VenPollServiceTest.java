@@ -40,13 +40,8 @@ public class VenPollServiceTest {
 
 	private Oadr20bJAXBContext jaxbContext;
 
-	public VenPollServiceTest() {
-		try {
-			jaxbContext = Oadr20bJAXBContext.getInstance();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public VenPollServiceTest() throws JAXBException {
+		jaxbContext = Oadr20bJAXBContext.getInstance();
 	}
 
 	@Test

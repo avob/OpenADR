@@ -23,13 +23,8 @@ public class Oadr20aCreatedEventTest {
 
 	private Oadr20aJAXBContext jaxbContext;
 
-	public Oadr20aCreatedEventTest() {
-		try {
-			jaxbContext = Oadr20aJAXBContext.getInstance();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public Oadr20aCreatedEventTest() throws JAXBException {
+		jaxbContext = Oadr20aJAXBContext.getInstance();
 	}
 
 	@Test

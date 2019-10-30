@@ -75,7 +75,6 @@ public class OadrHttpClient20a {
             post.setEntity(stringEntity);
             HttpResponse response = client.execute(post, host, Oadr20aUrlPath.OADR_BASE_PATH + path, context);
             HttpEntity entity = response.getEntity();
-            // EntityUtils.consumeQuietly(response.getEntity());
             if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 throw new Oadr20aHttpLayerException(response.getStatusLine().getStatusCode(),
                         response.getStatusLine().getReasonPhrase());

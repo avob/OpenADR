@@ -27,100 +27,95 @@ import com.avob.openadr.model.oadr20a.oadr.OadrDistributeEvent.OadrEvent;
 
 public class Oadr20aDistributeEventTest {
 
-    private Oadr20aJAXBContext jaxbContext;
+	private Oadr20aJAXBContext jaxbContext;
 
-    public Oadr20aDistributeEventTest() {
-        try {
-            jaxbContext = Oadr20aJAXBContext.getInstance();
-        } catch (JAXBException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+	public Oadr20aDistributeEventTest() throws JAXBException {
+		jaxbContext = Oadr20aJAXBContext.getInstance();
+	}
 
-    @Test
-    public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException, FileNotFoundException {
+	@Test
+	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException, FileNotFoundException {
 
-        long timestampStart = 0L;
-        String eventXmlDuration = "PT1H";
-        String toleranceXmlDuration = "PT5M";
-        String notificationXmlDuration = "P1D";
-        String rampUpXmlDuration = "P1D";
-        String recoveryXmlDuration = "P1D";
-        EiActivePeriodType period = Oadr20aBuilders
-                .newOadr20aEiActivePeriodTypeBuilder(timestampStart, eventXmlDuration, toleranceXmlDuration,
-                        notificationXmlDuration)
-                .withRampUp(rampUpXmlDuration).withRecovery(recoveryXmlDuration).build();
+		long timestampStart = 0L;
+		String eventXmlDuration = "PT1H";
+		String toleranceXmlDuration = "PT5M";
+		String notificationXmlDuration = "P1D";
+		String rampUpXmlDuration = "P1D";
+		String recoveryXmlDuration = "P1D";
+		EiActivePeriodType period = Oadr20aBuilders
+				.newOadr20aEiActivePeriodTypeBuilder(timestampStart, eventXmlDuration, toleranceXmlDuration,
+						notificationXmlDuration)
+				.withRampUp(rampUpXmlDuration).withRecovery(recoveryXmlDuration).build();
 
-        float currentValue = 3f;
-        String xmlDuration = "";
-        String signalId = "";
-        String signalName = "";
-        SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
-        String intervalId = "";
-        EiEventSignalType eiEventSignal = Oadr20aBuilders
-                .newOadr20aEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue)
-                .addInterval(
-                        Oadr20aBuilders.newOadr20aIntervalTypeBuilder(intervalId, xmlDuration, currentValue).build())
-                .build();
+		float currentValue = 3f;
+		String xmlDuration = "";
+		String signalId = "";
+		String signalName = "";
+		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
+		String intervalId = "";
+		EiEventSignalType eiEventSignal = Oadr20aBuilders
+				.newOadr20aEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue)
+				.addInterval(
+						Oadr20aBuilders.newOadr20aIntervalTypeBuilder(intervalId, xmlDuration, currentValue).build())
+				.build();
 
-        String[] list = { "a", "b", "c" };
-        EiTargetType target = Oadr20aBuilders.newOadr20aEiTargetTypeBuilder().addGroupId("groupId")
-                .addGroupId(Arrays.asList(list)).addPartyId("partyId").addPartyId(Arrays.asList(list))
-                .addResourceId("resourceId").addResourceId(Arrays.asList(list)).addVenId("venId")
-                .addVenId(Arrays.asList(list)).build();
+		String[] list = { "a", "b", "c" };
+		EiTargetType target = Oadr20aBuilders.newOadr20aEiTargetTypeBuilder().addGroupId("groupId")
+				.addGroupId(Arrays.asList(list)).addPartyId("partyId").addPartyId(Arrays.asList(list))
+				.addResourceId("resourceId").addResourceId(Arrays.asList(list)).addVenId("venId")
+				.addVenId(Arrays.asList(list)).build();
 
-        long datetime = System.currentTimeMillis();
-        String marketContextValue = "";
-        String eventId = "";
-        long modificationNumber = 0L;
-        Long priority = 0L;
-        EventStatusEnumeratedType status = EventStatusEnumeratedType.ACTIVE;
-        String comment = "";
-        EventDescriptorType descriptor = Oadr20aBuilders
-                .newOadr20aEventDescriptorTypeBuilder(datetime, eventId, modificationNumber, marketContextValue, status)
-                .withPriority(priority).withVtnComment(comment).build();
+		long datetime = System.currentTimeMillis();
+		String marketContextValue = "";
+		String eventId = "";
+		long modificationNumber = 0L;
+		Long priority = 0L;
+		EventStatusEnumeratedType status = EventStatusEnumeratedType.ACTIVE;
+		String comment = "";
+		EventDescriptorType descriptor = Oadr20aBuilders
+				.newOadr20aEventDescriptorTypeBuilder(datetime, eventId, modificationNumber, marketContextValue, status)
+				.withPriority(priority).withVtnComment(comment).build();
 
-        OadrEvent event = Oadr20aBuilders.newOadr20aDistributeEventOadrEventBuilder().withActivePeriod(period)
-                .withEiTarget(target).withEventDescriptor(descriptor).addEiEventSignal(eiEventSignal)
-                .withResponseRequired(true).build();
+		OadrEvent event = Oadr20aBuilders.newOadr20aDistributeEventOadrEventBuilder().withActivePeriod(period)
+				.withEiTarget(target).withEventDescriptor(descriptor).addEiEventSignal(eiEventSignal)
+				.withResponseRequired(true).build();
 
-        String requestId = "";
-        String vtnId = "";
+		String requestId = "";
+		String vtnId = "";
 
-        OadrDistributeEvent createOadrDistributeEvent = Oadr20aBuilders
-                .newOadr20aDistributeEventBuilder(vtnId, requestId).addOadrEvent(event).build();
+		OadrDistributeEvent createOadrDistributeEvent = Oadr20aBuilders
+				.newOadr20aDistributeEventBuilder(vtnId, requestId).addOadrEvent(event).build();
 
-        createOadrDistributeEvent.getOadrEvent().add(event);
+		createOadrDistributeEvent.getOadrEvent().add(event);
 
-        boolean assertion = false;
-        try {
-            jaxbContext.marshal(createOadrDistributeEvent);
-        } catch (Oadr20aMarshalException e) {
-            assertion = true;
-        }
+		boolean assertion = false;
+		try {
+			jaxbContext.marshal(createOadrDistributeEvent);
+		} catch (Oadr20aMarshalException e) {
+			assertion = true;
+		}
 
-        assertTrue(assertion);
+		assertTrue(assertion);
 
-        File file = new File("src/test/resources/unvalidatingOadrDistributeEvent.xml");
-        assertion = false;
-        try {
-            jaxbContext.unmarshal(new FileInputStream(file), OadrDistributeEvent.class);
-        } catch (Oadr20aUnmarshalException e) {
-            assertion = true;
-        }
-        assertTrue(assertion);
+		File file = new File("src/test/resources/unvalidatingOadrDistributeEvent.xml");
+		assertion = false;
+		try {
+			jaxbContext.unmarshal(new FileInputStream(file), OadrDistributeEvent.class);
+		} catch (Oadr20aUnmarshalException e) {
+			assertion = true;
+		}
+		assertTrue(assertion);
 
-    }
+	}
 
-    @Test
-    public void unmarshalMarshalValidatingTest()
-            throws Oadr20aUnmarshalException, Oadr20aMarshalException, FileNotFoundException {
-        File file = new File("src/test/resources/oadrDistributeEvent.xml");
-        OadrDistributeEvent unmarshal = jaxbContext.unmarshal(new FileInputStream(file), OadrDistributeEvent.class);
-        assertEquals("pyld:requestID", unmarshal.getRequestID());
-        assertEquals("ei:vtnID", unmarshal.getVtnID());
+	@Test
+	public void unmarshalMarshalValidatingTest()
+			throws Oadr20aUnmarshalException, Oadr20aMarshalException, FileNotFoundException {
+		File file = new File("src/test/resources/oadrDistributeEvent.xml");
+		OadrDistributeEvent unmarshal = jaxbContext.unmarshal(new FileInputStream(file), OadrDistributeEvent.class);
+		assertEquals("pyld:requestID", unmarshal.getRequestID());
+		assertEquals("ei:vtnID", unmarshal.getVtnID());
 
-        jaxbContext.marshal(unmarshal);
-    }
+		jaxbContext.marshal(unmarshal);
+	}
 }

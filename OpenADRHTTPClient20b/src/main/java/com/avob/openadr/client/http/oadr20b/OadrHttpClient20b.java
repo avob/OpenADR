@@ -137,7 +137,6 @@ public class OadrHttpClient20b {
 			// if request was a success, validate xml signature if required and then
 			// unmarshall response
 			if (isXmlSignatureEnabled()) {
-				try {
 					String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
 					OadrPayload unmarshal = jaxbContext.unmarshal(entity, OadrPayload.class, validateXmlPayload);
 					this.validate(entity, unmarshal);
@@ -150,9 +149,7 @@ public class OadrHttpClient20b {
 						return Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, responseKlass);
 					}
 
-				} catch (Oadr20bUnmarshalException e) {
-					throw new Oadr20bApplicationLayerException("Signed payload expected in response");
-				}
+
 			} else {
 				String resp = EntityUtils.toString(response.getEntity(), "UTF-8");
 				return jaxbContext.unmarshal(resp, responseKlass, validateXmlPayload);

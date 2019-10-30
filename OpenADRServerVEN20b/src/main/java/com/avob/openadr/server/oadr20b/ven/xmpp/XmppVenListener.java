@@ -133,14 +133,7 @@ public class XmppVenListener implements StanzaListener {
 
 					multiXmppClientConfig.sendReportMessage(response);
 
-				} else if (oadrPayload.getOadrSignedObject().getOadrCanceledOpt() != null
-						|| oadrPayload.getOadrSignedObject().getOadrCreatedOpt() != null) {
-
-				} else if (oadrPayload.getOadrSignedObject().getOadrRegisteredReport() != null
-						|| oadrPayload.getOadrSignedObject().getOadrCreatedReport() != null
-						|| oadrPayload.getOadrSignedObject().getOadrCanceledReport() != null) {
-
-				}
+				} 
 
 			} else {
 				failIfPayloadNeedToBeSigned(multiConfig);

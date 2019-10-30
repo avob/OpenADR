@@ -2,11 +2,7 @@ package com.avob.openadr.server.oadr20b.vtn;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBException;
@@ -35,7 +31,6 @@ import org.xml.sax.SAXException;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.Oadr20bSecurity;
-import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VTNEmbeddedServletContainerCustomizer;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 
@@ -54,12 +49,6 @@ public class VTN20bApplication {
 	private VtnConfig vtnConfig;
 
 	private VTNEmbeddedServletContainerCustomizer vtnEmbeddedServletContainerCustomizer;
-
-	@PostConstruct
-	public void init() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException,
-			OadrSecurityException {
-
-	}
 
 	@Bean
 	public WebServerFactoryCustomizer<JettyServletWebServerFactory> servletContainerCustomizer() {

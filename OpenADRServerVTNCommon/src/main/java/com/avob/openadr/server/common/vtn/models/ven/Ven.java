@@ -93,9 +93,6 @@ public class Ven extends AbstractUser {
 
 	private Long lastUpdateDatetime;
 
-	public Ven() {
-	}
-
 	public String getOadrName() {
 		return oadrName;
 	}

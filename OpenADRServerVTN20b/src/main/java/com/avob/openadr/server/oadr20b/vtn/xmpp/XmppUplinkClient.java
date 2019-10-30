@@ -56,11 +56,7 @@ public class XmppUplinkClient {
 
 				LOGGER.info("Xmpp VTN uplink client successfully initialized");
 
-			} catch (NoSuchAlgorithmException e) {
-				throw new Oadr20bXmppException(e);
-			} catch (KeyManagementException e) {
-				throw new Oadr20bXmppException(e);
-			} catch (OadrXmppException e) {
+			} catch (NoSuchAlgorithmException | KeyManagementException | OadrXmppException e) {
 				throw new Oadr20bXmppException(e);
 			}
 		}

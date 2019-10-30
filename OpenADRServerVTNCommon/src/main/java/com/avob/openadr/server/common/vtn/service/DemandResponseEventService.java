@@ -286,7 +286,7 @@ public class DemandResponseEventService {
 		// link added targets
 		if (!toAdd.isEmpty()) {
 			List<Ven> vens = findVenForTarget(event, toAdd);
-			List<VenDemandResponseEvent> list = new ArrayList<VenDemandResponseEvent>();
+			List<VenDemandResponseEvent> list = new ArrayList<>();
 			for (Ven ven : vens) {
 				if (dto.isPublished()) {
 					pushAsync(Arrays.asList(ven), event.getDescriptor().getOadrProfile());

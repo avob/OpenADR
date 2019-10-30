@@ -51,7 +51,7 @@ public class DtoMapper {
 	@PostConstruct
 	public void init() {
 		mapper = new DozerBeanMapper();
-		Map<String, CustomConverter> customConvertersWithId = new HashMap<String, CustomConverter>();
+		Map<String, CustomConverter> customConvertersWithId = new HashMap<>();
 		customConvertersWithId.put(MARKET_CONTEXT_CONVERTER_ID, marketContextConverter);
 		customConvertersWithId.put(VEN_CONVERTER_ID, venConverter);
 		customConvertersWithId.put(DEMAND_RESPONSE_CONVERTER_ID, demandResponseEventConverter);

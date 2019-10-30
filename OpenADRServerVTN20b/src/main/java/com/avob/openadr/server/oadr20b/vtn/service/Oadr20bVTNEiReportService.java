@@ -41,6 +41,7 @@ import com.avob.openadr.model.oadr20b.ei.ReportSpecifierType;
 import com.avob.openadr.model.oadr20b.ei.SpecifierPayloadType;
 import com.avob.openadr.model.oadr20b.emix.ItemBaseType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
@@ -137,7 +138,7 @@ import com.google.common.collect.Lists;
 public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 	private static final String EI_SERVICE_NAME = "EiReport";
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNEiReportService.class);
 
 	protected static final String METADATA_REPORT_SPECIFIER_ID = "METADATA";
@@ -218,7 +219,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	@Transactional(readOnly = false)
 	public String oadrRegisterReport(OadrRegisterReportType payload, boolean signed)
 			throws Oadr20bRegisterReportApplicationLayerException, Oadr20bXMLSignatureException,
-			Oadr20bMarshalException {
+			Oadr20bMarshalException, Oadr20bApplicationLayerException {
 
 		String requestID = payload.getRequestID();
 		String venID = payload.getVenID();
@@ -499,7 +500,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		try {
 			venDistributeService.distribute(ven, build);
-		} catch (Oadr20bMarshalException e) {
+		} catch (Oadr20bException e) {
 			LOGGER.error("Cannot distribute OadrRegisterReportType after self METADATA payload generation", e);
 		}
 	}
@@ -541,7 +542,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		try {
 			venDistributeService.distribute(ven, oadrRegisterReportType);
-		} catch (Oadr20bMarshalException e) {
+		} catch (Oadr20bException e) {
 			LOGGER.error("Cannot distribute OadrRegisterReportType after self METADATA payload generation", e);
 		}
 	}
@@ -889,8 +890,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 								}
 
 							} catch (JsonProcessingException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+//								LOGGER.err
 							}
 
 						} else if (payloadBase.getDeclaredType().equals(OadrPayloadResourceStatusType.class)) {
@@ -1014,7 +1014,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		}
 	}
 
-	public void distributeSubscriptionOadrCreatedReportPayload(Ven ven) throws Oadr20bMarshalException {
+	public void distributeSubscriptionOadrCreatedReportPayload(Ven ven) throws Oadr20bApplicationLayerException {
 
 		boolean send = false;
 		String requestId = "";
@@ -1055,7 +1055,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	}
 
 	public void distributeRequestOadrCreatedReportPayload(Ven ven, List<OtherReportRequest> request,
-			List<OtherReportRequestSpecifier> specifiers) throws Oadr20bMarshalException {
+			List<OtherReportRequestSpecifier> specifiers) throws Oadr20bApplicationLayerException {
 
 		boolean send = false;
 		String requestId = "";
@@ -1116,10 +1116,10 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	 * @param requestor
 	 * @param ven
 	 * @param subscriptions
-	 * @throws Oadr20bMarshalException
+	 * @throws Oadr20bException
 	 */
 	public void subscribe(AbstractUser requestor, Ven ven,
-			List<OtherReportRequestDtoCreateSubscriptionDto> subscriptions) throws Oadr20bMarshalException {
+			List<OtherReportRequestDtoCreateSubscriptionDto> subscriptions) throws Oadr20bApplicationLayerException {
 
 		List<OtherReportRequest> requests = new ArrayList<>();
 		List<OtherReportRequestSpecifier> specifiers = new ArrayList<>();
@@ -1179,10 +1179,10 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	 * @param requestor
 	 * @param ven
 	 * @param dto
-	 * @throws Oadr20bMarshalException
+	 * @throws Oadr20bException
 	 */
 	public void request(AbstractUser requestor, Ven ven, List<OtherReportRequestDtoCreateRequestDto> dto)
-			throws Oadr20bMarshalException {
+			throws Oadr20bApplicationLayerException {
 		List<OtherReportRequest> requests = new ArrayList<>();
 		List<OtherReportRequestSpecifier> specifiers = new ArrayList<>();
 		for (OtherReportRequestDtoCreateRequestDto request : dto) {
@@ -1225,7 +1225,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	}
 
 	public void unsubscribe(Ven ven, String reportRequestID)
-			throws OadrElementNotFoundException, Oadr20bMarshalException {
+			throws OadrElementNotFoundException, Oadr20bApplicationLayerException {
 
 		Iterable<OtherReportCapability> findByPayloadReportRequestId2 = otherReportCapabilityService
 				.findByReportRequestId(Arrays.asList(reportRequestID));
@@ -1389,7 +1389,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 	private String handle(String username, OadrRegisterReportType oadrRegisterReport, boolean signed)
 			throws Oadr20bRegisterReportApplicationLayerException, Oadr20bMarshalException,
-			Oadr20bXMLSignatureException {
+			Oadr20bXMLSignatureException, Oadr20bApplicationLayerException {
 
 		this.checkMatchUsernameWithRequestVenId(username, oadrRegisterReport);
 
@@ -1542,5 +1542,5 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	public String getServiceName() {
 		return EI_SERVICE_NAME;
 	}
-	
+
 }

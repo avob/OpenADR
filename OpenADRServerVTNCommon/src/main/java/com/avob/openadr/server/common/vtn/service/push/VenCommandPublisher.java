@@ -1,7 +1,6 @@
 package com.avob.openadr.server.common.vtn.service.push;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
@@ -28,14 +27,6 @@ public class VenCommandPublisher {
 		command.setPayload(payload);
 		command.setPayloadClass(klass);
 
-		try {
-			jmsTemplate.convertAndSend(OADR20B_QUEUE, mapper.writeValueAsString(command));
-		} catch (JmsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		jmsTemplate.convertAndSend(OADR20B_QUEUE, mapper.writeValueAsString(command));
 	}
 }

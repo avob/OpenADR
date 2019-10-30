@@ -60,8 +60,6 @@ public class OadrXmppClient20b {
 
 	private XMPPTCPConnection connection;
 
-//	private Oadr20bJAXBContext jaxbContext;
-
 	private DomainBareJid domainJid;
 	private EntityFullJid clientJid;
 	private EntityFullJid connectionJid;
@@ -93,7 +91,7 @@ public class OadrXmppClient20b {
 		}
 	}
 
-	private OadrXmppClient20b(XMPPTCPConnectionConfiguration config, String venId, String host, int port, String domain,
+	private OadrXmppClient20b(XMPPTCPConnectionConfiguration config, String venId, String host, String domain,
 			String resource, SSLContext context, StanzaListener onMessageListener) throws OadrXmppException {
 		try {
 			SASLAnonymous mechanism = new SASLAnonymous();
@@ -107,9 +105,6 @@ public class OadrXmppClient20b {
 			EntityBareJid authzid = JidCreate.entityBareFrom(resource + "@" + host);
 
 			connection = new XMPPTCPConnection(config);
-//			connection.setUseStreamManagement(false);
-//			connection.setUseStreamManagementResumption(false);
-//			connection.setReplyTimeout(20000);
 
 			setDomainJid(JidCreate.domainBareFrom(XMPP_OADR_SUBDOMAIN + "." + domain));
 			setClientJid(JidCreate.entityFullFrom(venId, XMPP_OADR_SUBDOMAIN + "." + domain, resource));
@@ -145,13 +140,7 @@ public class OadrXmppClient20b {
 				throw new OadrXmppException("Connection refused by Xmpp server ");
 			}
 
-		} catch (XmppStringprepException e) {
-			throw new OadrXmppException(e);
-		} catch (XMPPException e) {
-			throw new OadrXmppException(e);
-		} catch (SmackException e) {
-			throw new OadrXmppException(e);
-		} catch (IOException e) {
+		} catch (XMPPException | SmackException | IOException e) {
 			throw new OadrXmppException(e);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
@@ -162,7 +151,7 @@ public class OadrXmppClient20b {
 
 	public OadrXmppClient20b(String venId, String host, int port, String domain, String resource, SSLContext context,
 			StanzaListener onMessageListener) throws OadrXmppException {
-		this(OadrXmppClient20b.anonymousConnection(host, port, domain, resource, context), venId, host, port, domain,
+		this(OadrXmppClient20b.anonymousConnection(host, port, domain, resource, context), venId, host, domain,
 				resource, context, onMessageListener);
 
 	}
@@ -170,7 +159,7 @@ public class OadrXmppClient20b {
 	public OadrXmppClient20b(String venId, String host, int port, String domain, String resource, SSLContext context,
 			String password, StanzaListener onMessageListener) throws OadrXmppException {
 		this(OadrXmppClient20b.passwordConnection(host, port, domain, resource, context, venId, password), venId, host,
-				port, domain, resource, context, onMessageListener);
+				domain, resource, context, onMessageListener);
 
 	}
 

@@ -63,9 +63,9 @@ public class GenerateX509CertificateService {
 		String commonName = dto.getCommonName();
 		try {
 			OadrPKIAlgorithm algo = null;
-			if (dto.getNeedCertificateGeneration().toLowerCase().equals("ecc")) {
+			if (dto.getNeedCertificateGeneration().equalsIgnoreCase("ecc")) {
 				algo = OadrPKIAlgorithm.SHA256_DSA;
-			} else if (dto.getNeedCertificateGeneration().toLowerCase().equals("rsa")) {
+			} else if (dto.getNeedCertificateGeneration().equalsIgnoreCase("rsa")) {
 				algo = OadrPKIAlgorithm.SHA256_RSA;
 			}
 			OadrUserX509Credential generateCredentials = OadrPKISecurity.generateCredentials(caKeyPair, caCert,
@@ -99,9 +99,7 @@ public class GenerateX509CertificateService {
 
 			return outFile;
 
-		} catch (OadrSecurityException e) {
-			throw new GenerateX509VenException(e);
-		} catch (IOException e) {
+		} catch (OadrSecurityException | IOException e) {
 			throw new GenerateX509VenException(e);
 		}
 

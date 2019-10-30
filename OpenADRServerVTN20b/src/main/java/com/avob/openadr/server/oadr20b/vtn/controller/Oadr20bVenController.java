@@ -30,6 +30,8 @@ import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
 import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
@@ -144,7 +146,7 @@ public class Oadr20bVenController {
 	@RequestMapping(value = "/{venID}/registerparty/requestReregistration", method = RequestMethod.POST)
 	@ResponseBody
 	public void registerPartyRequestReregistration(@PathVariable("venID") String venID)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
+			throws Oadr20bException, OadrElementNotFoundException {
 
 		LOGGER.debug("Request Reregistration VEN: " + venID);
 
@@ -163,7 +165,7 @@ public class Oadr20bVenController {
 	@RequestMapping(value = "/{venID}/registerparty/cancelPartyRegistration", method = RequestMethod.POST)
 	@ResponseBody
 	public void registerPartyCancelPartyRegistration(@PathVariable("venID") String venID)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
+			throws Oadr20bException, OadrElementNotFoundException {
 
 		LOGGER.debug("Cancel registration VEN: " + venID);
 
@@ -234,7 +236,7 @@ public class Oadr20bVenController {
 	@ResponseBody
 	public void subscribeOtherReportCapabilityDescriptionRid(@PathVariable("venID") String venID,
 			@RequestBody List<OtherReportRequestDtoCreateSubscriptionDto> subscriptions, HttpServletRequest r)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
+			throws Oadr20bMarshalException, OadrElementNotFoundException, Oadr20bApplicationLayerException {
 		Ven ven = checkVen(venID);
 		AbstractUser requestor = abstractUserDao.findOneByUsername(r.getUserPrincipal().getName());
 		reportService.subscribe(requestor, ven, subscriptions);
@@ -253,7 +255,7 @@ public class Oadr20bVenController {
 	@ResponseBody
 	public void requestOtherReportCapabilityDescriptionRid(@PathVariable("venID") String venID,
 			@RequestBody List<OtherReportRequestDtoCreateRequestDto> requests, HttpServletRequest r)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
+			throws Oadr20bMarshalException, OadrElementNotFoundException, Oadr20bApplicationLayerException {
 		Ven ven = checkVen(venID);
 		AbstractUser requestor = abstractUserDao.findOneByUsername(r.getUserPrincipal().getName());
 		reportService.request(requestor, ven, requests);
@@ -309,7 +311,7 @@ public class Oadr20bVenController {
 	@ResponseBody
 	public void cancelSubscriptionReportRequest(@PathVariable("venID") String venID,
 			@RequestParam("reportRequestId") String reportRequestId)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
+			throws Oadr20bApplicationLayerException, OadrElementNotFoundException {
 
 		Ven ven = checkVen(venID);
 
@@ -346,7 +348,7 @@ public class Oadr20bVenController {
 	@ResponseBody
 	public void cancelReport(@PathVariable("venID") String venID,
 			@RequestParam("reportRequestId") String reportRequestId)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
+			throws Oadr20bException, OadrElementNotFoundException {
 
 		Ven ven = checkVen(venID);
 		boolean reportToFollow = false;
@@ -429,7 +431,7 @@ public class Oadr20bVenController {
 	@ResponseBody
 	public void postFloatReportData(@PathVariable("venID") String venID,
 			@PathVariable("reportSpecifierId") String reportSpecifierId, @PathVariable("rid") String rid,
-			@RequestBody Float value) throws OadrElementNotFoundException, Oadr20bMarshalException {
+			@RequestBody Float value) throws OadrElementNotFoundException, Oadr20bException {
 
 		Ven checkVen = checkVen(venID);
 //		checkOtherReportCapabilityDescription(venID, reportSpecifierId, rid);
@@ -480,7 +482,6 @@ public class Oadr20bVenController {
 				OtherReportDataPayloadResourceStatusDto.class);
 	}
 
-
 	@RequestMapping(value = "/{venID}/report/data/keytoken/{reportSpecifierId}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<OtherReportDataKeyTokenDto> viewsKeyTokenReportData(@PathVariable("venID") String venID,
@@ -513,10 +514,10 @@ public class Oadr20bVenController {
 	@ResponseBody
 	public void postKeyTokenReportData(@PathVariable("venID") String venID,
 			@PathVariable("reportSpecifierId") String reportSpecifierId, @PathVariable("rid") String rid,
-			@RequestBody List<KeyTokenType> tokens) throws OadrElementNotFoundException, Oadr20bMarshalException {
+			@RequestBody List<KeyTokenType> tokens) throws OadrElementNotFoundException, Oadr20bException {
 
 		Ven checkVen = checkVen(venID);
-//		checkOtherReportCapabilityDescription(reportSpecifierId, rid);
+//		checkOtherReportCapabilityDescription(venID, reportSpecifierId, rid);
 
 		String intervalId = "intervalId";
 

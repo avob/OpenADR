@@ -180,18 +180,17 @@ public class Oadr20aVTNSecurityTest {
 		String[] allCerts = { oadrRsaRootCertificate };
 
 		String username = "ven1";
-		String password = "ven1";
 		String realm = digestAuthenticationProvider.getRealm();
 		String key = DigestAuthenticationProvider.DIGEST_KEY;
 
 		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
 				.withTrustedCertificate(Arrays.asList(allCerts))
 				.withProtocol(Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers())
-				.withDefaultDigestAuthentication(eiEventEndpointUrl, realm, key, username, password);
+				.withDefaultDigestAuthentication(eiEventEndpointUrl, realm, key, username, "ven1");
 
 		OadrHttpVenClient20a digestHttpClient = new OadrHttpVenClient20a(new OadrHttpClient20a(builder.build()));
 
-		Ven ven = venService.prepare(username, password);
+		Ven ven = venService.prepare(username, "ven1");
 		venService.save(ven);
 		genericTest(digestHttpClient, ven);
 		venService.delete(ven);
@@ -205,19 +204,18 @@ public class Oadr20aVTNSecurityTest {
 		String[] allCerts = { oadrRsaRootCertificate };
 
 		String venUsername = "ven1";
-		String venPassword = "ven1";
 
 		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(eiEventEndpointUrl)
 				.withTrustedCertificate(Arrays.asList(allCerts))
 				.withProtocol(Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers())
-				.withDefaultBasicAuthentication(eiEventEndpointUrl, venUsername, venPassword);
+				.withDefaultBasicAuthentication(eiEventEndpointUrl, venUsername, "ven1");
 
 		OadrHttpVenClient20a venBasicHttpClient = new OadrHttpVenClient20a(new OadrHttpClient20a(builder.build()));
 
 		VenMarketContext marketContext = venMarketContextService.prepare(new VenMarketContextDto(MARKET_CONTEXT_NAME));
 		venMarketContextService.save(marketContext);
 
-		Ven ven = venService.prepare(venUsername, venPassword);
+		Ven ven = venService.prepare(venUsername, "ven1");
 		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
 		ven.setPushUrl("http://localhost");
 		venService.save(ven);
@@ -225,21 +223,19 @@ public class Oadr20aVTNSecurityTest {
 		genericTest(venBasicHttpClient, ven);
 
 		String venUsername2 = "ven2";
-		String venPassword2 = "ven2";
-		Ven ven2 = venService.prepare(venUsername2, venPassword2);
+		Ven ven2 = venService.prepare(venUsername2, "ven2");
 		ven2.setVenMarketContexts(Sets.newHashSet(marketContext));
 		ven2.setPushUrl("http://localhost");
 		venService.save(ven2);
 
 		String userUsername = "bof";
-		String userPassword = "bof";
 
-		OadrUser user = oadrUserService.prepare(userUsername, userPassword);
+		OadrUser user = oadrUserService.prepare(userUsername, "bof");
 		user.setRoles(Arrays.asList("ROLE_ADMIN"));
 		oadrUserService.save(user);
 
 		OadrHttpClient userBasicHttpClient = new OadrHttpClientBuilder()
-				.withDefaultBasicAuthentication(demandResponseEnpointUrl, userUsername, userPassword)
+				.withDefaultBasicAuthentication(demandResponseEnpointUrl, userUsername, "bof")
 				.withProtocol(Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers())
 				.withTrustedCertificate(Arrays.asList(allCerts))
 				.withHeader(HttpHeaders.CONTENT_TYPE, "application/json").build();

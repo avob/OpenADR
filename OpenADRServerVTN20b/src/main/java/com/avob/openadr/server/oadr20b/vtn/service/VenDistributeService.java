@@ -5,6 +5,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
@@ -26,7 +27,7 @@ public class VenDistributeService {
 	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
-	public void distribute(Ven ven, Object payload) throws Oadr20bMarshalException {
+	public void distribute(Ven ven, Object payload) throws Oadr20bApplicationLayerException {
 		try {
 			String marshalRoot = jaxbContext.marshalRoot(payload);
 			if (payload instanceof OadrDistributeEventType) {
@@ -58,13 +59,10 @@ public class VenDistributeService {
 				venCommandPublisher.publish(ven, marshalRoot, OadrRequestReregistrationType.class);
 
 			} else {
-				// TODO bzanni: exception cannot be pushed payload (outside
-				// Oadr20b
-				// protocol)
+				throw new Oadr20bApplicationLayerException("Can't distribute an unknown payload type");
 			}
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (JsonProcessingException | Oadr20bMarshalException e) {
+			throw new Oadr20bApplicationLayerException(e);
 		}
 	}
 

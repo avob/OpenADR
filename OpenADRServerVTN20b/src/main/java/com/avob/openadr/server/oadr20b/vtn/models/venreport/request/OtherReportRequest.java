@@ -25,9 +25,6 @@ public class OtherReportRequest extends ReportRequest {
 	@JoinColumn(name = "requestor_id")
 	private AbstractUser requestor;
 
-	public OtherReportRequest() {
-	}
-
 	public OtherReportCapability getOtherReportCapability() {
 		return otherReportCapability;
 	}

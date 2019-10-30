@@ -13,9 +13,6 @@ public class DemandResponseEventActivePeriodDto {
 	private String rampUpDuration;
 
 	private String recoveryDuration;
-	
-	public DemandResponseEventActivePeriodDto() {}
-	
 
 	public Long getStart() {
 		return start;

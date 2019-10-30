@@ -29,8 +29,7 @@ public class VtnConfigRabbitmqBroker {
 
 	@Bean
 	public JmsTemplate externalJmsTemplate() throws Exception {
-		JmsTemplate jmsTemplate = new JmsTemplate(externalConnectionFactory());
-		return jmsTemplate;
+		return new JmsTemplate(externalConnectionFactory());
 	}
 
 }
