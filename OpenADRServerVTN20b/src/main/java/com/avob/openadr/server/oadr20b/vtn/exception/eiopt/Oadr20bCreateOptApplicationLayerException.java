@@ -12,15 +12,22 @@ public class Oadr20bCreateOptApplicationLayerException extends Oadr20bException 
 	private static final long serialVersionUID = -2260781873450824384L;
 
 	private final transient OadrCreatedOptType response;
+	private final transient boolean signed;
 
-	public Oadr20bCreateOptApplicationLayerException(String message, OadrCreatedOptType response) {
+	public Oadr20bCreateOptApplicationLayerException(String message, OadrCreatedOptType response, boolean signed) {
 		super(message);
 		this.response = response;
+		this.signed = signed;
 	}
 
 	@Override
 	public OadrCreatedOptType getResponse() {
 		return response;
+	}
+
+	@Override
+	public boolean isSigned() {
+		return signed;
 	}
 
 }

@@ -18,11 +18,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -40,7 +38,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.ResponseRequiredType;
 import com.avob.openadr.model.oadr20b.pyld.EiRequestEvent;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
@@ -50,12 +47,11 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandR
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
-import com.avob.openadr.server.common.vtn.models.ven.Ven;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
+import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
-import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
-import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
@@ -81,9 +77,6 @@ public class Oadr20bVTNEiEventControllerTest {
 	private String vtnId;
 
 	@Resource
-	private DemandResponseEventService demandResponseEventService;
-
-	@Resource
 	private VenPollService venPollService;
 
 	@Resource
@@ -97,9 +90,6 @@ public class Oadr20bVTNEiEventControllerTest {
 
 	@Resource
 	private OadrMockHttpDemandResponseEventMvc oadrMockHttpDemandResponseEventMvc;
-
-	@Resource
-	private VenService venService;
 
 	@Resource
 	private XmlSignatureService xmlSignatureService;
@@ -139,7 +129,8 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Test
 	public void testPullOadrRequestEventTypeEmptySuccessCase() throws Exception {
 
-		Ven ven = venService.findOneByUsername(OadrDataBaseSetup.VEN);
+		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+				HttpStatus.OK_200);
 		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_SECURITY_SESSION, oadrMockEiHttpMvc,
 				xmlSignatureService);
 
@@ -158,10 +149,6 @@ public class Oadr20bVTNEiEventControllerTest {
 		assertEquals(vtnId, event.getVtnID());
 		assertNotNull(event.getOadrEvent());
 		assertTrue(event.getOadrEvent().isEmpty());
-
-		venPollService.deleteAll();
-		assertEquals(new Long(0), venPollService.countAll());
-
 	}
 
 	/**
@@ -183,26 +170,26 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Test
 	public void testPullOadrRequestEventTypeActiveSuccessCase() throws Exception {
 
-		Ven ven = venService.findOneByUsername(OadrDataBaseSetup.VEN);
+		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+				HttpStatus.OK_200);
 		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_SECURITY_SESSION, oadrMockEiHttpMvc,
 				xmlSignatureService);
 
 		VenMarketContext marketContext = venMarketContextService.findOneByName(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 
-		// OADR POLL CONTROLLER - first poll supposed to be 'empty'
-		OadrResponseType firstPoll = mockVen.poll(HttpStatus.OK_200, OadrResponseType.class);
-		assertEquals(String.valueOf(HttpStatus.OK_200), firstPoll.getEiResponse().getResponseCode());
+		// OADR POLL CONTROLLER - poll for OadrResponseType
+		mockVen.pollForValidOadrResponse();
 
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
 		signal.setSignalName("SIMPLE");
 		signal.setSignalType("level");
-
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setMarketContext(marketContext.getName());
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
+		dto.getActivePeriod().setToleranceDuration("P1D");
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		// ensure event status is "active"
@@ -210,19 +197,15 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getTargets().add(new DemandResponseEventTargetDto(OadrDataBaseSetup.VEN, OadrDataBaseSetup.VEN));
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.setPublished(true);
-		DemandResponseEvent eventActive = demandResponseEventService.create(dto);
+		DemandResponseEventReadDto eventActive = oadrMockHttpDemandResponseEventMvc
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 
-		// OADR POLL CONTROLLER - second poll supposed to be contains previously created
-		// event - sleep because demandResponseEventService.create (which create poll)
-		// is async
-//				Thread.sleep(1000);
-		OadrDistributeEventType secondPoll = mockVen.poll(HttpStatus.OK_200, OadrDistributeEventType.class);
-		assertEquals(String.valueOf(HttpStatus.OK_200), secondPoll.getEiResponse().getResponseCode());
-		// TODO bertrand: test OadrDistributeEventType secondPoll
-
-		// OADR POLL CONTROLLER - third poll supposed to be 'empty'
-		OadrResponseType thirdPoll = mockVen.poll(HttpStatus.OK_200, OadrResponseType.class);
-		assertEquals(String.valueOf(HttpStatus.OK_200), thirdPoll.getEiResponse().getResponseCode());
+		// OADR POLL CONTROLLER - poll for OadrDistributeEventType
+		OadrDistributeEventType oadrDistributeEventPoll = mockVen.pollForValidOadrDistributeEvent();
+		assertNotNull(oadrDistributeEventPoll);
+		// TODO bertrand: test OadrDistributeEventType
+		// OADR POLL CONTROLLER - poll for OadrResponseType
+		mockVen.pollForValidOadrResponse();
 
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
 
@@ -232,24 +215,21 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
+		dto.getActivePeriod().setToleranceDuration("P1D");
 		dto.getSignals().add(signal);
 		dto.getActivePeriod().setStart(System.currentTimeMillis() - 10);
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
+		dto.getTargets().add(new DemandResponseEventTargetDto(OadrDataBaseSetup.VEN, OadrDataBaseSetup.VEN));
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
-		DemandResponseEvent eventCanceled = demandResponseEventService.create(dto);
+		DemandResponseEventReadDto eventCanceled = oadrMockHttpDemandResponseEventMvc
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 
-		// OADR POLL CONTROLLER - fourth poll supposed to be contains previously created
-		// event - sleep because demandResponseEventService.create (which create poll)
-		// is async
-//		Thread.sleep(100);
-		OadrDistributeEventType fourthPoll = mockVen.poll(HttpStatus.OK_200, OadrDistributeEventType.class);
-		assertEquals(String.valueOf(HttpStatus.OK_200), fourthPoll.getEiResponse().getResponseCode());
-		// TODO bertrand: test OadrDistributeEventType secondPoll
-
-		// OADR POLL CONTROLLER - fifth poll supposed to be 'empty'
-		OadrResponseType fifthPoll = mockVen.poll(HttpStatus.OK_200, OadrResponseType.class);
-		assertEquals(String.valueOf(HttpStatus.OK_200), fifthPoll.getEiResponse().getResponseCode());
+		// OADR POLL CONTROLLER - poll for OadrDistributeEventType
+		oadrDistributeEventPoll = mockVen.pollForValidOadrDistributeEvent();
+		assertNotNull(oadrDistributeEventPoll);
+		// TODO bertrand: test OadrDistributeEventType
+		// OADR POLL CONTROLLER - poll for OadrResponseType
+		mockVen.pollForValidOadrResponse();
 
 		String requestId = "0";
 		long replyLimit = 2L;
@@ -317,7 +297,8 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		// VEN CONTROLLER - check venDemandResponseEvent has been created but no opt set
 		List<VenDemandResponseEventDto> venDemandResponseEventDto = oadrMockHttpDemandResponseEventMvc
-				.getDemandResponseEventVenResponse(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventCanceled.getId());
+				.getDemandResponseEventVenResponse(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventCanceled.getId(),
+						HttpStatus.OK_200);
 		assertEquals(1, venDemandResponseEventDto.size());
 		assertNull(venDemandResponseEventDto.get(0).getVenOpt());
 		assertEquals(OadrDataBaseSetup.VEN, venDemandResponseEventDto.get(0).getVenId());
@@ -333,24 +314,33 @@ public class Oadr20bVTNEiEventControllerTest {
 		assertEquals(String.valueOf(HttpStatus.OK_200), response.getEiResponse().getResponseCode());
 
 		// VEN CONTROLLER - check venDemandResponseEvent opt has been set
-		venDemandResponseEventDto = oadrMockHttpDemandResponseEventMvc
-				.getDemandResponseEventVenResponse(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventCanceled.getId());
+		venDemandResponseEventDto = oadrMockHttpDemandResponseEventMvc.getDemandResponseEventVenResponse(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventCanceled.getId(), HttpStatus.OK_200);
 		assertEquals(1, venDemandResponseEventDto.size());
 		assertNotNull(venDemandResponseEventDto.get(0).getVenOpt());
 		assertEquals(DemandResponseEventOptEnum.OPT_IN, venDemandResponseEventDto.get(0).getVenOpt());
 		assertEquals(OadrDataBaseSetup.VEN, venDemandResponseEventDto.get(0).getVenId());
 
-		demandResponseEventService.delete(eventCanceled.getId());
-		demandResponseEventService.delete(eventActive.getId());
+		oadrMockHttpDemandResponseEventMvc.get(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventCanceled.getId(),
+				HttpStatus.OK_200);
+		oadrMockHttpDemandResponseEventMvc.get(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventActive.getId(),
+				HttpStatus.OK_200);
+		oadrMockHttpDemandResponseEventMvc.delete(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventCanceled.getId(),
+				HttpStatus.OK_200);
+		oadrMockHttpDemandResponseEventMvc.delete(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventActive.getId(),
+				HttpStatus.OK_200);
+		oadrMockHttpDemandResponseEventMvc.get(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventCanceled.getId(),
+				HttpStatus.NOT_FOUND_404);
+		oadrMockHttpDemandResponseEventMvc.get(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventActive.getId(),
+				HttpStatus.NOT_FOUND_404);
 
-		venPollService.deleteAll();
-		assertEquals(new Long(0), venPollService.countAll());
 	}
 
 	@Test
 	public void testOadrCreatedEventType_MissingDREvent() throws Exception {
 
-		Ven ven = venService.findOneByUsername(OadrDataBaseSetup.VEN);
+		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+				HttpStatus.OK_200);
 		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_SECURITY_SESSION, oadrMockEiHttpMvc,
 				xmlSignatureService);
 
@@ -361,9 +351,6 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		OadrResponseType event = mockVen.event(build, HttpStatus.OK_200, OadrResponseType.class);
 		assertEquals(String.valueOf(HttpStatus.NOT_ACCEPTABLE_406), event.getEiResponse().getResponseCode());
-
-		venPollService.deleteAll();
-		assertEquals(new Long(0), venPollService.countAll());
 
 	}
 
@@ -416,7 +403,8 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Test
 	public void testScenario1() throws Exception {
 
-		Ven ven = venService.findOneByUsername(OadrDataBaseSetup.VEN);
+		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+				HttpStatus.OK_200);
 		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_SECURITY_SESSION, oadrMockEiHttpMvc,
 				xmlSignatureService);
 
@@ -447,20 +435,28 @@ public class Oadr20bVTNEiEventControllerTest {
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
+		// DEMANDRESPONSEEVENT CONTROLLER - create DREvent
 		DemandResponseEventReadDto create = oadrMockHttpDemandResponseEventMvc
-				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto);
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		assertNotNull(create);
 		assertNotNull(create.getId());
 		assertNotNull(create.getCreatedTimestamp());
 		assertNotNull(create.getLastUpdateTimestamp());
 
+		// OADR POLL CONTROLLER - poll for OadrDistributeEventType
+		OadrDistributeEventType oadrDistributeEventPoll = mockVen.pollForValidOadrDistributeEvent();
+		assertNotNull(oadrDistributeEventPoll);
+		// TODO bertrand: test OadrDistributeEventType
+		// OADR POLL CONTROLLER - poll for OadrResponseType
+		mockVen.pollForValidOadrResponse();
+
 		Long eventId = create.getId();
 
-		// create and send OadrRequestEventType to EiEvent API
-		OadrRequestEventType OadrRequestEventType = Oadr20bEiEventBuilders
+		OadrRequestEventType oadrRequestEventType = Oadr20bEiEventBuilders
 				.newOadrRequestEventBuilder(OadrDataBaseSetup.VEN, "0").withReplyLimit(1L).build();
 
-		OadrDistributeEventType event = mockVen.event(OadrRequestEventType, HttpStatus.OK_200,
+		// EI EVENT CONTROLLER - send OadrRequestEventType
+		OadrDistributeEventType event = mockVen.event(oadrRequestEventType, HttpStatus.OK_200,
 				OadrDistributeEventType.class);
 		assertEquals(1, event.getOadrEvent().size());
 
@@ -471,95 +467,89 @@ public class Oadr20bVTNEiEventControllerTest {
 		assertEquals(0, modificationNumber);
 
 		// check no opt-in is configured
-		DemandResponseEventOptEnum venOpt = demandResponseEventService.getVenOpt(eventId, OadrDataBaseSetup.VEN);
-		assertNull(venOpt);
+		VenDemandResponseEventDto demandResponseEventVenResponse = oadrMockHttpDemandResponseEventMvc
+				.getDemandResponseEventVenResponse(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventId,
+						OadrDataBaseSetup.VEN, HttpStatus.OK_200);
+		assertNull(demandResponseEventVenResponse.getVenOpt());
 
 		// create and send OadrCreatedEventType to EiEvent API
-		OadrCreatedEventType OadrCreatedEventType = Oadr20bEiEventBuilders
+		OadrCreatedEventType oadrCreatedEventType = Oadr20bEiEventBuilders
 				.newCreatedEventBuilder(OadrDataBaseSetup.VEN, "", 200)
 				.addEventResponse(Oadr20bEiEventBuilders.newOadr20bCreatedEventEventResponseBuilder(eventId.toString(),
 						modificationNumber, "", 200, OptTypeType.OPT_IN).build())
 				.build();
 
-		OadrResponseType response = oadrMockEiHttpMvc.postEiEventAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION,
-				OadrCreatedEventType, HttpStatus.OK_200, OadrResponseType.class);
-
+		OadrResponseType response = mockVen.event(oadrCreatedEventType, HttpStatus.OK_200, OadrResponseType.class);
 		assertNotNull(response);
 		assertEquals("200", response.getEiResponse().getResponseCode());
 
 		// check opt-in is configured
-		venOpt = demandResponseEventService.getVenOpt(eventId, OadrDataBaseSetup.VEN);
-		assertNotNull(venOpt);
-		assertEquals(DemandResponseEventOptEnum.OPT_IN, venOpt);
+		demandResponseEventVenResponse = oadrMockHttpDemandResponseEventMvc.getDemandResponseEventVenResponse(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventId, OadrDataBaseSetup.VEN, HttpStatus.OK_200);
+		assertEquals(DemandResponseEventOptEnum.OPT_IN, demandResponseEventVenResponse.getVenOpt());
 
 		// update DR event
-		MvcResult andReturn = this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/" + eventId.toString() + "/cancel")
-						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		DemandResponseEventReadDto cancel = oadrMockHttpDemandResponseEventMvc
+				.cancel(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventId, HttpStatus.OK_200);
+		assertNotNull(cancel);
+		assertEquals(DemandResponseEventStateEnum.CANCELLED, cancel.getDescriptor().getState());
 
-		DemandResponseEventReadDto readValue = mapper.readValue(andReturn.getResponse().getContentAsString(),
-				DemandResponseEventReadDto.class);
+		// OADR POLL CONTROLLER - poll for OadrDistributeEventType
+		oadrDistributeEventPoll = mockVen.pollForValidOadrDistributeEvent();
+		assertNotNull(oadrDistributeEventPoll);
+		// TODO bertrand: test OadrDistributeEventType
+		// OADR POLL CONTROLLER - poll for OadrResponseType
+		mockVen.pollForValidOadrResponse();
 
 		// check DR event is sent
-		OadrDistributeEventType unmarshal = oadrMockEiHttpMvc.postEiEventAndExpect(
-				OadrDataBaseSetup.VEN_SECURITY_SESSION, OadrRequestEventType, HttpStatus.OK_200,
+		OadrDistributeEventType distributeEventResponse = mockVen.event(oadrRequestEventType, HttpStatus.OK_200,
 				OadrDistributeEventType.class);
+		assertNotNull(distributeEventResponse);
+		assertEquals(1, distributeEventResponse.getOadrEvent().size());
+		assertEquals(modificationNumber + 1, distributeEventResponse.getOadrEvent().get(0).getEiEvent()
+				.getEventDescriptor().getModificationNumber());
 
-		assertNotNull(unmarshal);
-		assertEquals(1, unmarshal.getOadrEvent().size());
-		assertEquals(modificationNumber + 1,
-				unmarshal.getOadrEvent().get(0).getEiEvent().getEventDescriptor().getModificationNumber());
-
-		// send invalid opt-out: mismatch between ven/vtn event modification
+		// EI EVENT CONTROLLER - send invalid opt-out: mismatch between ven/vtn event modification
 		// number
-		OadrCreatedEventType.getEiCreatedEvent().getEventResponses().getEventResponse().get(0)
+		oadrCreatedEventType.getEiCreatedEvent().getEventResponses().getEventResponse().get(0)
 				.setOptType(OptTypeType.OPT_OUT);
-
-		response = oadrMockEiHttpMvc.postEiEventAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, OadrCreatedEventType,
-				HttpStatus.OK_200, OadrResponseType.class);
-
+		response = mockVen.event(oadrCreatedEventType, HttpStatus.OK_200, OadrResponseType.class);
 		assertNotNull(response);
 		assertEquals(String.valueOf(HttpStatus.NOT_ACCEPTABLE_406), response.getEiResponse().getResponseCode());
-		venOpt = demandResponseEventService.getVenOpt(eventId, OadrDataBaseSetup.VEN);
-		assertNotNull(venOpt);
-		assertEquals(DemandResponseEventOptEnum.OPT_IN, venOpt);
+		demandResponseEventVenResponse = oadrMockHttpDemandResponseEventMvc.getDemandResponseEventVenResponse(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventId, OadrDataBaseSetup.VEN, HttpStatus.OK_200);
+		assertEquals(DemandResponseEventOptEnum.OPT_IN, demandResponseEventVenResponse.getVenOpt());
 
 		// send invalid opt-out: mismatch venid with authentication credentials
-		OadrCreatedEventType.getEiCreatedEvent().setVenID("unknown");
-		OadrCreatedEventType.getEiCreatedEvent().getEventResponses().getEventResponse().get(0)
+		oadrCreatedEventType.getEiCreatedEvent().setVenID("unknown");
+		oadrCreatedEventType.getEiCreatedEvent().getEventResponses().getEventResponse().get(0)
 				.setOptType(OptTypeType.OPT_OUT);
-		response = oadrMockEiHttpMvc.postEiEventAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, OadrCreatedEventType,
+		response = oadrMockEiHttpMvc.postEiEventAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, oadrCreatedEventType,
 				HttpStatus.OK_200, OadrResponseType.class);
-
 		assertNotNull(response);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
 				response.getEiResponse().getResponseCode());
-		venOpt = demandResponseEventService.getVenOpt(eventId, OadrDataBaseSetup.VEN);
-		assertNotNull(venOpt);
-		assertEquals(DemandResponseEventOptEnum.OPT_IN, venOpt);
+		demandResponseEventVenResponse = oadrMockHttpDemandResponseEventMvc.getDemandResponseEventVenResponse(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventId, OadrDataBaseSetup.VEN, HttpStatus.OK_200);
+		assertEquals(DemandResponseEventOptEnum.OPT_IN, demandResponseEventVenResponse.getVenOpt());
 
 		// send valid opt-out
-		OadrCreatedEventType.getEiCreatedEvent().setVenID(OadrDataBaseSetup.VEN);
-		OadrCreatedEventType.getEiCreatedEvent().getEventResponses().getEventResponse().get(0).getQualifiedEventID()
-				.setModificationNumber(OadrCreatedEventType.getEiCreatedEvent().getEventResponses().getEventResponse()
+		oadrCreatedEventType.getEiCreatedEvent().setVenID(OadrDataBaseSetup.VEN);
+		oadrCreatedEventType.getEiCreatedEvent().getEventResponses().getEventResponse().get(0).getQualifiedEventID()
+				.setModificationNumber(oadrCreatedEventType.getEiCreatedEvent().getEventResponses().getEventResponse()
 						.get(0).getQualifiedEventID().getModificationNumber() + 1);
-		OadrCreatedEventType.getEiCreatedEvent().getEventResponses().getEventResponse().get(0)
+		oadrCreatedEventType.getEiCreatedEvent().getEventResponses().getEventResponse().get(0)
 				.setOptType(OptTypeType.OPT_OUT);
-		response = oadrMockEiHttpMvc.postEiEventAndExpect(OadrDataBaseSetup.VEN_SECURITY_SESSION, OadrCreatedEventType,
-				HttpStatus.OK_200, OadrResponseType.class);
+		response = mockVen.event(oadrCreatedEventType, HttpStatus.OK_200, OadrResponseType.class);
 		assertNotNull(response);
 		assertEquals(String.valueOf(HttpStatus.OK_200), response.getEiResponse().getResponseCode());
 
 		// check opt-out
-		venOpt = demandResponseEventService.getVenOpt(eventId, OadrDataBaseSetup.VEN);
-		assertNotNull(venOpt);
-		assertEquals(DemandResponseEventOptEnum.OPT_OUT, venOpt);
+		demandResponseEventVenResponse = oadrMockHttpDemandResponseEventMvc.getDemandResponseEventVenResponse(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventId, OadrDataBaseSetup.VEN, HttpStatus.OK_200);
+		assertEquals(DemandResponseEventOptEnum.OPT_OUT, demandResponseEventVenResponse.getVenOpt());
 
-		demandResponseEventService.delete(eventId);
-
-		venPollService.deleteAll();
-		assertEquals(new Long(0), venPollService.countAll());
+		oadrMockHttpDemandResponseEventMvc.delete(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventId, HttpStatus.OK_200);
 
 	}
 
@@ -591,6 +581,11 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Test
 	public void testScenario2() throws JsonProcessingException, Exception {
 
+		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+				HttpStatus.OK_200);
+		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_SECURITY_SESSION, oadrMockEiHttpMvc,
+				xmlSignatureService);
+
 		List<DemandResponseEventReadDto> created = new ArrayList<DemandResponseEventReadDto>();
 
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
@@ -604,6 +599,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
+		dto.getActivePeriod().setToleranceDuration("P1D");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DATE, 5);
@@ -621,26 +617,14 @@ public class Oadr20bVTNEiEventControllerTest {
 						.header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-		MvcResult andReturn = this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
-						.header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
-		MockHttpServletResponse mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventReadDto event1 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventReadDto.class);
+		DemandResponseEventReadDto event1 = oadrMockHttpDemandResponseEventMvc
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event1);
 
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
-		andReturn = this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
-						.header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
-		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventReadDto event2 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventReadDto.class);
+		DemandResponseEventReadDto event2 = oadrMockHttpDemandResponseEventMvc
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event2);
 
 		// create 'far' and send DR Event to DemandResponseEvent API
@@ -657,30 +641,16 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getActivePeriod().setStart(cal.getTimeInMillis());
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);
-
 		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-
-		andReturn = this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
-						.header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
-		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventReadDto event3 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventReadDto.class);
+		DemandResponseEventReadDto event3 = oadrMockHttpDemandResponseEventMvc
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event3);
 
 		dto.setPublished(true);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
-		andReturn = this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
-						.header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
-		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventReadDto event4 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventReadDto.class);
+		DemandResponseEventReadDto event4 = oadrMockHttpDemandResponseEventMvc
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event4);
 
 		// create 'near' and send DR Event to DemandResponseEvent API
@@ -699,27 +669,14 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-
-		andReturn = this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
-						.header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
-		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventReadDto event5 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventReadDto.class);
+		DemandResponseEventReadDto event5 = oadrMockHttpDemandResponseEventMvc
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event5);
 
 		dto.setPublished(true);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
-		andReturn = this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
-						.header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
-		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventReadDto event6 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventReadDto.class);
+		DemandResponseEventReadDto event6 = oadrMockHttpDemandResponseEventMvc
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event6);
 
 		// create 'active' and send DR Event to DemandResponseEvent API
@@ -736,27 +693,14 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-
-		andReturn = this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
-						.header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
-		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventReadDto event7 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventReadDto.class);
+		DemandResponseEventReadDto event7 = oadrMockHttpDemandResponseEventMvc
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event7);
 
 		dto.setPublished(true);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
-		andReturn = this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
-						.header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
-		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventReadDto event8 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventReadDto.class);
+		DemandResponseEventReadDto event8 = oadrMockHttpDemandResponseEventMvc
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event8);
 
 		// create 'completed' and send DR Event to DemandResponseEvent API
@@ -774,27 +718,14 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-
-		andReturn = this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
-						.header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
-		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventReadDto event9 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventReadDto.class);
+		DemandResponseEventReadDto event9 = oadrMockHttpDemandResponseEventMvc
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event9);
 
 		dto.setPublished(true);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
-		andReturn = this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
-						.header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
-		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventReadDto event10 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventReadDto.class);
+		DemandResponseEventReadDto event10 = oadrMockHttpDemandResponseEventMvc
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event10);
 
 		// unpublished event are not send to ven
@@ -812,32 +743,27 @@ public class Oadr20bVTNEiEventControllerTest {
 		dto.getSignals().add(signal);
 		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-
-		andReturn = this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.post("/DemandResponseEvent/")
-						.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION).content(mapper.writeValueAsBytes(dto))
-						.header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
-		mockHttpServletResponse = andReturn.getResponse();
-		DemandResponseEventReadDto event11 = mapper.readValue(mockHttpServletResponse.getContentAsString(),
-				DemandResponseEventReadDto.class);
+		DemandResponseEventReadDto event11 = oadrMockHttpDemandResponseEventMvc
+				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event11);
 
 		// create and send OadrRequestEventType to EiEvent API
-		OadrRequestEventType OadrRequestEventType = new OadrRequestEventType();
+		OadrRequestEventType oadrRequestEventType = new OadrRequestEventType();
 		EiRequestEvent eiRequestEvent = new EiRequestEvent();
 		eiRequestEvent.setRequestID("0");
 		eiRequestEvent.setVenID(OadrDataBaseSetup.VEN);
-		OadrRequestEventType.setEiRequestEvent(eiRequestEvent);
+		oadrRequestEventType.setEiRequestEvent(eiRequestEvent);
 
-		OadrDistributeEventType unmarshal = oadrMockEiHttpMvc.postEiEventAndExpect(
-				OadrDataBaseSetup.VEN_SECURITY_SESSION, OadrRequestEventType, HttpStatus.OK_200,
+		OadrDistributeEventType event = mockVen.event(oadrRequestEventType, HttpStatus.OK_200,
 				OadrDistributeEventType.class);
 
-		List<DemandResponseEvent> find = demandResponseEventService.find(OadrDataBaseSetup.VEN, null);
+		List<DemandResponseEventFilter> filters = DemandResponseEventFilter.builder().addVenId(OadrDataBaseSetup.VEN)
+				.build();
+		List<DemandResponseEventReadDto> find = oadrMockHttpDemandResponseEventMvc
+				.search(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, filters, HttpStatus.OK_200);
 		assertEquals(11, find.size());
-		assertEquals(6, unmarshal.getOadrEvent().size());
-		List<OadrEvent> oadrEvent = unmarshal.getOadrEvent();
+		assertEquals(6, event.getOadrEvent().size());
+		List<OadrEvent> oadrEvent = event.getOadrEvent();
 		int countFar = 0;
 		int countNear = 0;
 		int countActive = 0;
@@ -880,7 +806,8 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		// clean bdd
 		for (DemandResponseEventReadDto e : created) {
-			demandResponseEventService.delete(e.getId());
+			oadrMockHttpDemandResponseEventMvc.delete(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, e.getId(),
+					HttpStatus.OK_200);
 		}
 
 		venPollService.deleteAll();

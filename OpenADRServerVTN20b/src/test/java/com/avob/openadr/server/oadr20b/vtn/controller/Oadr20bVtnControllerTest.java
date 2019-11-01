@@ -14,14 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
-import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
-import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpVtnMvc;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VTN20bSecurityApplicationTest.class })
@@ -29,13 +26,8 @@ import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpMvc;
 @ActiveProfiles("test")
 public class Oadr20bVtnControllerTest {
 
-	private static final String VTN_URL = "/Vtn";
-
 	@Resource
-	private OadrMockEiHttpMvc oadrMockMvc;
-
-	@Resource
-	private OadrMockHttpMvc oadrMockHttpMvc;
+	private OadrMockHttpVtnMvc oadrMockHttpVtnMvc;
 
 	@Resource
 	private VtnConfig vtnConfig;
@@ -43,9 +35,8 @@ public class Oadr20bVtnControllerTest {
 	@Test
 	public void test() throws Exception {
 
-		VtnConfigurationDto conf = oadrMockHttpMvc.getRestJsonControllerAndExpect(
-				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, VTN_URL + "/configuration", HttpStatus.OK_200,
-				VtnConfigurationDto.class);
+		VtnConfigurationDto conf = oadrMockHttpVtnMvc.getConfiguration(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				HttpStatus.OK_200);
 
 		assertNotNull(conf);
 
@@ -57,15 +48,8 @@ public class Oadr20bVtnControllerTest {
 		assertEquals(vtnConfig.getSupportUnsecuredHttpPush(), conf.getSupportUnsecuredHttpPush());
 		assertEquals(vtnConfig.getReplayProtectAcceptedDelaySecond(), conf.getXmlSignatureReplayProtectSecond());
 
-		oadrMockMvc
-				.perform(MockMvcRequestBuilders.get(VTN_URL + "/configuration")
-						.with(OadrDataBaseSetup.USER_SECURITY_SESSION).header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
-
-		oadrMockMvc
-				.perform(MockMvcRequestBuilders.get(VTN_URL + "/configuration")
-						.with(OadrDataBaseSetup.VEN_SECURITY_SESSION).header("Content-Type", "application/json"))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+		oadrMockHttpVtnMvc.getConfiguration(OadrDataBaseSetup.USER_SECURITY_SESSION, HttpStatus.FORBIDDEN_403);
+		oadrMockHttpVtnMvc.getConfiguration(OadrDataBaseSetup.VEN_SECURITY_SESSION, HttpStatus.FORBIDDEN_403);
 
 	}
 

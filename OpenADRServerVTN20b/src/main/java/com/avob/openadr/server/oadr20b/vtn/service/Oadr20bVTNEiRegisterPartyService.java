@@ -71,7 +71,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 	private Oadr20bVTNSupportedProfileService oadr20bVTNSupportedProfileService;
 
 	private Oadr20bCreatePartyRegistrationTypeApplicationLayerException invalidRegistrationId(String requestId,
-			String venId) {
+			String venId, boolean signed) {
 		Oadr20bCreatedPartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatedPartyRegistrationBuilder(requestId, Oadr20bApplicationLayerErrorCode.INVALID_ID_452,
 						venId, vtnConfig.getVtnId());
@@ -80,7 +80,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 		}
 
 		return new Oadr20bCreatePartyRegistrationTypeApplicationLayerException("Invalid registrationID",
-				builder.build());
+				builder.build(), signed);
 	}
 
 	public String oadrCreatePartyRegistration(String venID, OadrCreatePartyRegistrationType payload, boolean signed)
@@ -105,18 +105,19 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 					xmlSignatureRequiredButAbsent.getResponseDescription(),
 					Oadr20bEiRegisterPartyBuilders.newOadr20bCreatedPartyRegistrationBuilder(requestID,
 							Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID,
-							vtnConfig.getVtnId()).build());
+							vtnConfig.getVtnId()).build(),
+					signed);
 		}
 
 		if (ven.getRegistrationId() == null && registrationID == null) {
 			registrationID = venID + UUID.randomUUID().toString();
 		} else if (ven.getRegistrationId() != null && registrationID == null) {
-			throw invalidRegistrationId(requestID, venID);
+			throw invalidRegistrationId(requestID, venID, signed);
 		} else if (ven.getRegistrationId() == null && registrationID != null) {
-			throw invalidRegistrationId(requestID, venID);
+			throw invalidRegistrationId(requestID, venID, signed);
 		} else if (ven.getRegistrationId() != null && registrationID != null
 				&& !ven.getRegistrationId().equals(registrationID)) {
-			throw invalidRegistrationId(requestID, venID);
+			throw invalidRegistrationId(requestID, venID, signed);
 		}
 
 		ven.setOadrName(oadrVenName);
@@ -165,14 +166,16 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
 			throw new Oadr20bCanceledPartyRegistrationTypeApplicationLayerException(
 					xmlSignatureRequiredButAbsent.getResponseDescription(),
-					Oadr20bResponseBuilders.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build());
+					Oadr20bResponseBuilders.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build(),
+					signed);
 		}
 
 		if (ven.getRegistrationId() == null || !ven.getRegistrationId().equals(registrationID)) {
 			throw new Oadr20bCanceledPartyRegistrationTypeApplicationLayerException(
 					"Mismatch between known and sent registrationID",
 					Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID,
-							Oadr20bApplicationLayerErrorCode.INVALID_ID_452, venID).build());
+							Oadr20bApplicationLayerErrorCode.INVALID_ID_452, venID).build(),
+					signed);
 		}
 
 		clearRegistration(ven);
@@ -201,14 +204,16 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 					xmlSignatureRequiredButAbsent.getResponseDescription(),
 					Oadr20bEiRegisterPartyBuilders.newOadr20bCanceledPartyRegistrationBuilder(requestID,
 							Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID,
-							vtnConfig.getVtnId()).build());
+							vtnConfig.getVtnId()).build(),
+					signed);
 		}
 
 		if (ven.getRegistrationId() == null || !ven.getRegistrationId().equals(registrationID)) {
 			throw new Oadr20bCancelPartyRegistrationTypeApplicationLayerException(
 					"Mismatch between known and sent registrationID",
 					Oadr20bEiRegisterPartyBuilders.newOadr20bCanceledPartyRegistrationBuilder(requestID,
-							Oadr20bApplicationLayerErrorCode.INVALID_ID_452, null, ven.getUsername()).build());
+							Oadr20bApplicationLayerErrorCode.INVALID_ID_452, null, ven.getUsername()).build(),
+					signed);
 		}
 
 		clearRegistration(ven);
@@ -272,7 +277,8 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
 			throw new Oadr20bResponsePartyReregistrationApplicationLayerException(
 					xmlSignatureRequiredButAbsent.getResponseDescription(),
-					Oadr20bResponseBuilders.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build());
+					Oadr20bResponseBuilders.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build(),
+					signed);
 		}
 
 		OadrResponseType response = Oadr20bResponseBuilders
@@ -285,7 +291,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 	}
 
 	public void checkMatchUsernameWithRequestVenId(String username,
-			OadrCreatePartyRegistrationType oadrCreatePartyRegistrationType)
+			OadrCreatePartyRegistrationType oadrCreatePartyRegistrationType, boolean signed)
 			throws Oadr20bCreatePartyRegistrationTypeApplicationLayerException {
 		String venID = oadrCreatePartyRegistrationType.getVenID();
 		String requestID = oadrCreatePartyRegistrationType.getRequestID();
@@ -298,12 +304,13 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 							.newOadr20bCreatedPartyRegistrationBuilder(requestID,
 									Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID,
 									vtnConfig.getVtnId())
-							.addOadrProfile(oadr20bVTNSupportedProfileService.getSupportedProfiles()).build());
+							.addOadrProfile(oadr20bVTNSupportedProfileService.getSupportedProfiles()).build(),
+					signed);
 		}
 	}
 
 	public void checkMatchUsernameWithRequestVenId(String username,
-			OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType)
+			OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType, boolean signed)
 			throws Oadr20bCancelPartyRegistrationTypeApplicationLayerException {
 		String venID = oadrCancelPartyRegistrationType.getVenID();
 		String requestID = oadrCancelPartyRegistrationType.getRequestID();
@@ -315,12 +322,13 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 					Oadr20bEiRegisterPartyBuilders
 							.newOadr20bCanceledPartyRegistrationBuilder(requestID,
 									Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), null, venID)
-							.build());
+							.build(),
+					signed);
 		}
 	}
 
 	public void checkMatchUsernameWithRequestVenId(String username,
-			OadrCanceledPartyRegistrationType oadrCanceledPartyRegistrationType)
+			OadrCanceledPartyRegistrationType oadrCanceledPartyRegistrationType, boolean signed)
 			throws Oadr20bCanceledPartyRegistrationTypeApplicationLayerException {
 		String venID = oadrCanceledPartyRegistrationType.getVenID();
 		String requestID = oadrCanceledPartyRegistrationType.getEiResponse().getRequestID();
@@ -329,15 +337,14 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();
 			throw new Oadr20bCanceledPartyRegistrationTypeApplicationLayerException(
 					mismatchCredentialsVenIdResponse.getResponseDescription(),
-					Oadr20bResponseBuilders
-							.newOadr20bResponseBuilder(requestID,
-									Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID)
-							.build());
+					Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID,
+							Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build(),
+					signed);
 		}
 
 	}
 
-	public void checkMatchUsernameWithRequestVenId(String username, OadrResponseType oadrResponseType)
+	public void checkMatchUsernameWithRequestVenId(String username, OadrResponseType oadrResponseType, boolean signed)
 			throws Oadr20bResponsePartyReregistrationApplicationLayerException {
 		String venID = oadrResponseType.getVenID();
 		String requestID = oadrResponseType.getEiResponse().getRequestID();
@@ -346,10 +353,9 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();
 			throw new Oadr20bResponsePartyReregistrationApplicationLayerException(
 					mismatchCredentialsVenIdResponse.getResponseDescription(),
-					Oadr20bResponseBuilders
-							.newOadr20bResponseBuilder(requestID,
-									Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID)
-							.build());
+					Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID,
+							Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build(),
+					signed);
 		}
 
 	}
@@ -401,7 +407,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 			throws Oadr20bMarshalException, Oadr20bCreatePartyRegistrationTypeApplicationLayerException,
 			Oadr20bXMLSignatureException {
 
-		checkMatchUsernameWithRequestVenId(venId, oadrCreatePartyRegistrationType);
+		checkMatchUsernameWithRequestVenId(venId, oadrCreatePartyRegistrationType, signed);
 		return oadrCreatePartyRegistration(venId, oadrCreatePartyRegistrationType, signed);
 
 	}
@@ -410,7 +416,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 			boolean signed) throws Oadr20bMarshalException, Oadr20bCancelPartyRegistrationTypeApplicationLayerException,
 			Oadr20bXMLSignatureException {
 
-		checkMatchUsernameWithRequestVenId(username, oadrCancelPartyRegistrationType);
+		checkMatchUsernameWithRequestVenId(username, oadrCancelPartyRegistrationType, signed);
 
 		return oadrCancelPartyRegistrationType(oadrCancelPartyRegistrationType, signed);
 
@@ -420,7 +426,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 			boolean signed) throws Oadr20bMarshalException,
 			Oadr20bCanceledPartyRegistrationTypeApplicationLayerException, Oadr20bXMLSignatureException {
 
-		checkMatchUsernameWithRequestVenId(username, oadrCanceledPartyRegistrationType);
+		checkMatchUsernameWithRequestVenId(username, oadrCanceledPartyRegistrationType, signed);
 
 		return oadrCanceledPartyRegistrationType(oadrCanceledPartyRegistrationType, signed);
 
@@ -438,7 +444,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 			throws Oadr20bMarshalException, Oadr20bQueryRegistrationTypeApplicationLayerException,
 			Oadr20bXMLSignatureException, Oadr20bResponsePartyReregistrationApplicationLayerException {
 
-		checkMatchUsernameWithRequestVenId(username, oadrResponseType);
+		checkMatchUsernameWithRequestVenId(username, oadrResponseType, signed);
 
 		return oadrResponsePartyReregistration(oadrResponseType, signed);
 

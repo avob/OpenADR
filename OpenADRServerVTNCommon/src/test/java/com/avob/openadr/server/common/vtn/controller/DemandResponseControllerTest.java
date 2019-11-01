@@ -46,7 +46,6 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandR
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilterType;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
@@ -869,11 +868,7 @@ public class DemandResponseControllerTest {
 	public void searchTest() throws Exception {
 
 		// search published state
-		List<DemandResponseEventFilter> filters = new ArrayList<>();
-		DemandResponseEventFilter filter = new DemandResponseEventFilter();
-		filter.setType(DemandResponseEventFilterType.EVENT_PUBLISHED);
-		filter.setValue("PUBLISHED");
-		filters.add(filter);
+		List<DemandResponseEventFilter> filters = DemandResponseEventFilter.builder().isPublished().build();
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
 						.content(mapper.writeValueAsString(filters))
@@ -882,11 +877,7 @@ public class DemandResponseControllerTest {
 		List<DemandResponseEventReadDto> list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(0, list.size());
 
-		filters = new ArrayList<>();
-		filter = new DemandResponseEventFilter();
-		filter.setType(DemandResponseEventFilterType.EVENT_PUBLISHED);
-		filter.setValue("NOT_PUBLISHED");
-		filters.add(filter);
+		filters = DemandResponseEventFilter.builder().isNotPublished().build();
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
 						.content(mapper.writeValueAsString(filters))
@@ -896,11 +887,7 @@ public class DemandResponseControllerTest {
 		assertEquals(2, list.size());
 
 		// search by marketcontext
-		filters = new ArrayList<>();
-		filter = new DemandResponseEventFilter();
-		filter.setType(DemandResponseEventFilterType.MARKET_CONTEXT);
-		filter.setValue(marketContext.getName());
-		filters.add(filter);
+		filters = DemandResponseEventFilter.builder().addMarketContext(marketContext.getName()).build();
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
 						.content(mapper.writeValueAsString(filters))
@@ -909,11 +896,7 @@ public class DemandResponseControllerTest {
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(2, list.size());
 
-		filters = new ArrayList<>();
-		filter = new DemandResponseEventFilter();
-		filter.setType(DemandResponseEventFilterType.MARKET_CONTEXT);
-		filter.setValue(UNKNOWN_MARKETCONTEXT_NAME);
-		filters.add(filter);
+		filters = DemandResponseEventFilter.builder().addMarketContext(UNKNOWN_MARKETCONTEXT_NAME).build();
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
 						.content(mapper.writeValueAsString(filters))
@@ -923,11 +906,7 @@ public class DemandResponseControllerTest {
 		assertEquals(0, list.size());
 
 		// search by ven
-		filters = new ArrayList<>();
-		filter = new DemandResponseEventFilter();
-		filter.setType(DemandResponseEventFilterType.VEN);
-		filter.setValue(VEN1);
-		filters.add(filter);
+		filters = DemandResponseEventFilter.builder().addVenId(VEN1).build();
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
 						.content(mapper.writeValueAsString(filters))
@@ -936,11 +915,7 @@ public class DemandResponseControllerTest {
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(1, list.size());
 
-		filters = new ArrayList<>();
-		filter = new DemandResponseEventFilter();
-		filter.setType(DemandResponseEventFilterType.VEN);
-		filter.setValue(VEN2);
-		filters.add(filter);
+		filters = DemandResponseEventFilter.builder().addVenId(VEN2).build();
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
 						.content(mapper.writeValueAsString(filters))
@@ -949,11 +924,7 @@ public class DemandResponseControllerTest {
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(2, list.size());
 
-		filters = new ArrayList<>();
-		filter = new DemandResponseEventFilter();
-		filter.setType(DemandResponseEventFilterType.VEN);
-		filter.setValue(UNKNOWN_MARKETCONTEXT_NAME);
-		filters.add(filter);
+		filters = DemandResponseEventFilter.builder().addVenId("mouaiccool").build();
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
 						.content(mapper.writeValueAsString(filters))
@@ -963,11 +934,7 @@ public class DemandResponseControllerTest {
 		assertEquals(0, list.size());
 
 		// search by state
-		filters = new ArrayList<>();
-		filter = new DemandResponseEventFilter();
-		filter.setType(DemandResponseEventFilterType.EVENT_STATE);
-		filter.setValue(DemandResponseEventStateEnum.ACTIVE.toString());
-		filters.add(filter);
+		filters = DemandResponseEventFilter.builder().addState(DemandResponseEventStateEnum.ACTIVE).build();
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
 						.content(mapper.writeValueAsString(filters))
@@ -976,11 +943,7 @@ public class DemandResponseControllerTest {
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(1, list.size());
 
-		filters = new ArrayList<>();
-		filter = new DemandResponseEventFilter();
-		filter.setType(DemandResponseEventFilterType.EVENT_STATE);
-		filter.setValue(DemandResponseEventStateEnum.CANCELLED.toString());
-		filters.add(filter);
+		filters = DemandResponseEventFilter.builder().addState(DemandResponseEventStateEnum.CANCELLED).build();
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
 						.content(mapper.writeValueAsString(filters))
@@ -990,11 +953,7 @@ public class DemandResponseControllerTest {
 		assertEquals(1, list.size());
 
 		// search sendable
-		filters = new ArrayList<>();
-		filter = new DemandResponseEventFilter();
-		filter.setType(DemandResponseEventFilterType.EVENT_SENDABLE);
-		filter.setValue("SENDABLE");
-		filters.add(filter);
+		filters = DemandResponseEventFilter.builder().isSendable().build();
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
 						.content(mapper.writeValueAsString(filters))
@@ -1003,11 +962,7 @@ public class DemandResponseControllerTest {
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(0, list.size());
 
-		filters = new ArrayList<>();
-		filter = new DemandResponseEventFilter();
-		filter.setType(DemandResponseEventFilterType.EVENT_SENDABLE);
-		filter.setValue("NOT_SENDABLE");
-		filters.add(filter);
+		filters = DemandResponseEventFilter.builder().isNotSendable().build();
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
 						.content(mapper.writeValueAsString(filters))

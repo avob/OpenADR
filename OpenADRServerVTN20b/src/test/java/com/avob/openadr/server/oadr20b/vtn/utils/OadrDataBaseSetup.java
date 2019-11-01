@@ -91,7 +91,7 @@ public class OadrDataBaseSetup {
 		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
 		ven.setVenGroup(Sets.newHashSet(group));
 		ven.setTransport(OadrTransportType.SIMPLE_HTTP.value());
-//		ven.setXmlSignature(true);
+		ven.setXmlSignature(true);
 		venService.save(ven);
 
 		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));

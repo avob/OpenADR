@@ -13,6 +13,9 @@ public class OadrParamBuilder {
 	private static final String PARAM_REPORT_TYPE = "reportType";
 	private static final String PARAM_READING_TYPE = "readingType";
 	private static final String PARAM_REPORT_REQUEST_ID = "reportRequestId";
+	private static final String PARAM_START = "start";
+	private static final String PARAM_END = "end";
+	private static final String PARAM_MARKETCONTEXT = "marketContext";
 
 	private LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 
@@ -42,6 +45,21 @@ public class OadrParamBuilder {
 
 	public OadrParamBuilder addReadingType(ReadingTypeEnumeratedType readingType) {
 		params.add(PARAM_READING_TYPE, readingType.toString());
+		return this;
+	}
+
+	public OadrParamBuilder addStart(Long datetime) {
+		params.add(PARAM_START, String.valueOf(datetime));
+		return this;
+	}
+
+	public OadrParamBuilder addEnd(Long datetime) {
+		params.add(PARAM_END, String.valueOf(datetime));
+		return this;
+	}
+
+	public OadrParamBuilder addMarketContext(String name) {
+		params.add(PARAM_MARKETCONTEXT, name);
 		return this;
 	}
 

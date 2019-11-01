@@ -13,15 +13,23 @@ public class Oadr20bRegisterReportApplicationLayerException extends Oadr20bExcep
 	private static final long serialVersionUID = 1468896185130868972L;
 
 	private final transient OadrRegisteredReportType response;
+	private final transient boolean signed;
 
-	public Oadr20bRegisterReportApplicationLayerException(String message, OadrRegisteredReportType response) {
+	public Oadr20bRegisterReportApplicationLayerException(String message, OadrRegisteredReportType response,
+			boolean signed) {
 		super(message);
 		this.response = response;
+		this.signed = signed;
 	}
 
 	@Override
 	public OadrRegisteredReportType getResponse() {
 		return response;
+	}
+
+	@Override
+	public boolean isSigned() {
+		return signed;
 	}
 
 }

@@ -19,9 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
-import com.avob.openadr.model.oadr20b.builders.Oadr20bPollBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.ei.SchemaVersionEnumeratedType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
@@ -29,8 +27,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatePartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
-import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
-import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
 import com.avob.openadr.model.oadr20b.oadr.OadrProfiles.OadrProfile;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
@@ -50,7 +46,10 @@ import com.avob.openadr.server.oadr20b.vtn.service.VenOptService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpDemandResponseEventMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpVenMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockVen;
 import com.google.common.collect.Sets;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -59,17 +58,12 @@ import com.google.common.collect.Sets;
 @ActiveProfiles("test")
 public class Oadr20bVTNEiRegisterPartyControllerTest {
 
-	private static final String VEN_URL = "/Ven/";
-
 	private static final String VEN_ID = "registerPartyVen1";
 
 	private static final String marketContextName = "http://register-party-oadr.avob.com";
 
 	@Value("${oadr.vtnid}")
 	private String vtnId;
-
-	@Resource
-	private VenService venService;
 
 	@Resource
 	private VenMarketContextService marketContextService;
@@ -81,27 +75,35 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 	private VenOptService venOptService;
 
 	@Resource
-	private DemandResponseEventService demandResponseEventService;
+	private VenService venService;
 
 	@Resource
 	private XmlSignatureService xmlSignatureService;
 
 	@Resource
-	private OadrMockEiHttpMvc oadrMockMvc;
+	private DemandResponseEventService demandResponseEventService;
+
+	@Resource
+	private OadrMockEiHttpMvc oadrMockEiHttpMvc;
 
 	@Resource
 	private OadrMockHttpMvc oadrMockHttpMvc;
 
 	@Resource
+	private OadrMockHttpVenMvc oadrMockHttpVenMvc;
+
+	@Resource
+	private OadrMockHttpDemandResponseEventMvc oadrMockHttpDemandResponseEventMvc;
+
+	@Resource
 	private Oadr20bVTNSupportedProfileService oadr20bVTNSupportedProfileService;
 
 	private UserRequestPostProcessor venSession = SecurityMockMvcRequestPostProcessors.user(VEN_ID).roles("VEN");
-	private UserRequestPostProcessor anotherVenSession = SecurityMockMvcRequestPostProcessors.user("anotherVenId")
-			.roles("VEN");
 	private UserRequestPostProcessor adminSession = SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN");
 
 	@Test
 	public void test() throws Exception {
+
 		VenMarketContext marketContext = marketContextService.prepare(new VenMarketContextDto(marketContextName));
 		marketContextService.save(marketContext);
 
@@ -112,8 +114,7 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		venService.save(ven);
 
 		// test ven is not registred
-		VenDto venDto = oadrMockHttpMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID,
-				HttpStatus.OK_200, VenDto.class);
+		VenDto venDto = oadrMockHttpVenMvc.getVen(adminSession, VEN_ID, HttpStatus.OK_200);
 
 		assertEquals(String.valueOf(ven.getId()), venDto.getId());
 		assertEquals(ven.getUsername(), venDto.getUsername());
@@ -122,13 +123,16 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		assertNull(venDto.getPushUrl());
 		assertNotNull(venDto.getTransport());
 
+		OadrMockVen mockVen = new OadrMockVen(venDto, venSession, oadrMockEiHttpMvc, xmlSignatureService);
+
 		// test oadrQueryRegistration
 		String requestId = "requestId";
 		OadrQueryRegistrationType build = Oadr20bEiRegisterPartyBuilders.newOadr20bQueryRegistrationBuilder(requestId)
 				.build();
-		OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType = oadrMockMvc.postEiRegisterPartyAndExpect(
-				venSession, build, HttpStatus.OK_200, OadrCreatedPartyRegistrationType.class);
 
+		// EI REGISTER PARTY CONTROLLER - send OadrQueryRegistrationType
+		OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType = mockVen.register(build, HttpStatus.OK_200,
+				OadrCreatedPartyRegistrationType.class);
 		assertNotNull(oadrCreatedPartyRegistrationType);
 		assertEquals(String.valueOf(HttpStatus.OK_200),
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
@@ -143,29 +147,8 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 							.equals(oadr20bVTNSupportedProfileService.getProfileB().getOadrProfileName()));
 		}
 
-		// test signedoadrQueryRegistration
-		OadrPayload payload = oadrMockMvc.postEiRegisterPartyAndExpect(venSession, xmlSignatureService.sign(build),
-				HttpStatus.OK_200, OadrPayload.class);
-
-		oadrCreatedPartyRegistrationType = payload.getOadrSignedObject().getOadrCreatedPartyRegistration();
-		assertNotNull(oadrCreatedPartyRegistrationType);
-		assertEquals(String.valueOf(HttpStatus.OK_200),
-				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
-		assertEquals(vtnId, oadrCreatedPartyRegistrationType.getVtnID());
-		assertNull(oadrCreatedPartyRegistrationType.getRegistrationID());
-		assertEquals(oadr20bVTNSupportedProfileService.getSupportedProfiles().size(),
-				oadrCreatedPartyRegistrationType.getOadrProfiles().getOadrProfile().size());
-		for (OadrProfile profile : oadrCreatedPartyRegistrationType.getOadrProfiles().getOadrProfile()) {
-			assertTrue(profile.getOadrProfileName()
-					.equals(oadr20bVTNSupportedProfileService.getProfileA().getOadrProfileName())
-					|| profile.getOadrProfileName()
-							.equals(oadr20bVTNSupportedProfileService.getProfileB().getOadrProfileName()));
-		}
-
-		// test ven is still not registred
-		venDto = oadrMockHttpMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
-				VenDto.class);
-
+		// VEN CONTROLLER - test ven is still not registred
+		venDto = oadrMockHttpVenMvc.getVen(adminSession, VEN_ID, HttpStatus.OK_200);
 		assertEquals(String.valueOf(ven.getId()), venDto.getId());
 		assertEquals(ven.getUsername(), venDto.getUsername());
 		assertTrue(venDto.getHttpPullModel());
@@ -180,42 +163,44 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		Boolean pullModel = false;
 		boolean reportOnly = false;
 		OadrTransportType transport = OadrTransportType.SIMPLE_HTTP;
+
+		// EI REGISTER PARTY CONTROLLER - invalid mismatch payload venID and username
+		// auth session
 		OadrCreatePartyRegistrationType oadrCreatePartyRegistrationType = Oadr20bEiRegisterPartyBuilders
+				.newOadr20bCreatePartyRegistrationBuilder(requestId, "mouaiccool",
+						SchemaVersionEnumeratedType.OADR_20B.value())
+				.withOadrVenName(venName).withOadrHttpPullModel(pullModel).withOadrTransportAddress(transportAddress)
+				.withOadrTransportName(transport).withOadrXmlSignature(xmlSignature).withOadrReportOnly(reportOnly)
+				.build();
+		oadrCreatedPartyRegistrationType = mockVen.register(oadrCreatePartyRegistrationType, HttpStatus.OK_200,
+				OadrCreatedPartyRegistrationType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
+				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
+
+		// EI REGISTER PARTY CONTROLLER - send OadrCreatePartyRegistrationType
+		oadrCreatePartyRegistrationType = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatePartyRegistrationBuilder(requestId, VEN_ID,
 						SchemaVersionEnumeratedType.OADR_20B.value())
 				.withOadrVenName(venName).withOadrHttpPullModel(pullModel).withOadrTransportAddress(transportAddress)
 				.withOadrTransportName(transport).withOadrXmlSignature(xmlSignature).withOadrReportOnly(reportOnly)
 				.build();
-
-		// invalid mismatch payload venID and username auth session
-		oadrCreatedPartyRegistrationType = oadrMockMvc.postEiRegisterPartyAndExpect(anotherVenSession,
-				xmlSignatureService.sign(oadrCreatePartyRegistrationType), HttpStatus.OK_200,
+		oadrCreatedPartyRegistrationType = mockVen.register(oadrCreatePartyRegistrationType, HttpStatus.OK_200,
 				OadrCreatedPartyRegistrationType.class);
-		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
-				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
-
-		// push signed oadrCreateRegitration to VTN
-		String str = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
-				xmlSignatureService.sign(oadrCreatePartyRegistrationType), HttpStatus.OK_200, String.class);
-		payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
-		xmlSignatureService.validate(str, payload);
-		oadrCreatedPartyRegistrationType = payload.getOadrSignedObject().getOadrCreatedPartyRegistration();
 		String registrationId = oadrCreatedPartyRegistrationType.getRegistrationID();
 		assertNotNull(oadrCreatedPartyRegistrationType);
 		assertEquals(String.valueOf(HttpStatus.OK_200),
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
 
-		// test VEN can't create a registration while already registered
-		oadrCreatedPartyRegistrationType = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
-				oadrCreatePartyRegistrationType, HttpStatus.OK_200, OadrCreatedPartyRegistrationType.class);
-
+		// EI REGISTER PARTY CONTROLLER - test VEN can't create a registration while
+		// already registered
+		oadrCreatedPartyRegistrationType = mockVen.register(oadrCreatePartyRegistrationType, HttpStatus.OK_200,
+				OadrCreatedPartyRegistrationType.class);
 		assertNotNull(oadrCreatedPartyRegistrationType);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.INVALID_ID_452),
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
 
-		// test ven is registred
-		venDto = oadrMockHttpMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
-				VenDto.class);
+		// VEN CONTROLLER - test ven is registred
+		venDto = oadrMockHttpVenMvc.getVen(adminSession, VEN_ID, HttpStatus.OK_200);
 		assertEquals(String.valueOf(ven.getId()), venDto.getId());
 		assertEquals(VEN_ID, venDto.getUsername());
 		assertEquals(venName, venDto.getOadrName());
@@ -224,8 +209,8 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		assertEquals(transportAddress, venDto.getPushUrl());
 		assertEquals(transport.value(), venDto.getTransport());
 
-		// test invalid create oadrCreateRegistration because already registered
-		// and not specifying registrationId
+		// EI REGISTER PARTY CONTROLLER - test invalid create oadrCreateRegistration
+		// because already registered and not specifying registrationId
 		Boolean newPullModel = true;
 		oadrCreatePartyRegistrationType = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatePartyRegistrationBuilder(requestId, VEN_ID,
@@ -233,65 +218,54 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 				.withOadrVenName(venName).withOadrHttpPullModel(newPullModel).withOadrTransportAddress(transportAddress)
 				.withOadrTransportName(transport).withOadrXmlSignature(xmlSignature).withOadrReportOnly(reportOnly)
 				.build();
-
-		oadrCreatedPartyRegistrationType = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
-				oadrCreatePartyRegistrationType, HttpStatus.OK_200, OadrCreatedPartyRegistrationType.class);
-
+		oadrCreatedPartyRegistrationType = mockVen.register(oadrCreatePartyRegistrationType, HttpStatus.OK_200,
+				OadrCreatedPartyRegistrationType.class);
 		assertNotNull(oadrCreatedPartyRegistrationType);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.INVALID_ID_452),
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
 
-		// test ven registration not changed
-		venDto = oadrMockHttpMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
-				VenDto.class);
+		// VEN CONTROLLER - test ven registration not changed
+		venDto = oadrMockHttpVenMvc.getVen(adminSession, VEN_ID, HttpStatus.OK_200);
 		assertEquals(pullModel, venDto.getHttpPullModel());
 
-		// test update oadrCreateRegistration
+		// EI REGISTER PARTY CONTROLLER - test update oadrCreateRegistration
 		oadrCreatePartyRegistrationType = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatePartyRegistrationBuilder(requestId, VEN_ID,
 						SchemaVersionEnumeratedType.OADR_20B.value())
 				.withOadrVenName(venName).withOadrHttpPullModel(newPullModel).withOadrTransportAddress(transportAddress)
 				.withOadrTransportName(transport).withOadrXmlSignature(xmlSignature).withOadrReportOnly(reportOnly)
 				.withRegistrationId(registrationId).build();
-
-		oadrCreatedPartyRegistrationType = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
-				oadrCreatePartyRegistrationType, HttpStatus.OK_200, OadrCreatedPartyRegistrationType.class);
-
+		oadrCreatedPartyRegistrationType = mockVen.register(oadrCreatePartyRegistrationType, HttpStatus.OK_200,
+				OadrCreatedPartyRegistrationType.class);
 		assertNotNull(oadrCreatedPartyRegistrationType);
 		assertEquals(String.valueOf(HttpStatus.OK_200),
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
 
-		// test ven registration changed
-		venDto = oadrMockHttpMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
-				VenDto.class);
+		// VEN CONTROLLER - test ven registration changed
+		venDto = oadrMockHttpVenMvc.getVen(adminSession, VEN_ID, HttpStatus.OK_200);
 		assertEquals(newPullModel, venDto.getHttpPullModel());
 
-		// create oadrcancelregistration payload
+		// EI REGISTER PARTY CONTROLLER - invalid mismatch payload venID and username
+		// auth session
 		OadrCancelPartyRegistrationType oadrCancelPartyRegistration = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCancelPartyRegistrationBuilder(requestId, registrationId, VEN_ID).build();
+				.newOadr20bCancelPartyRegistrationBuilder(requestId, registrationId, "mouaiccool").build();
 
-		// invalid mismatch payload venID and username auth session
-		OadrCanceledPartyRegistrationType oadrCanceledPartyRegistration = oadrMockMvc.postEiRegisterPartyAndExpect(
-				anotherVenSession, xmlSignatureService.sign(oadrCancelPartyRegistration), HttpStatus.OK_200,
-				OadrCanceledPartyRegistrationType.class);
+		OadrCanceledPartyRegistrationType oadrCanceledPartyRegistration = mockVen.register(oadrCancelPartyRegistration,
+				HttpStatus.OK_200, OadrCanceledPartyRegistrationType.class);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
 				oadrCanceledPartyRegistration.getEiResponse().getResponseCode());
 
-		// test signed create oadrcancelRegistration
-		str = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
-				xmlSignatureService.sign(oadrCancelPartyRegistration), HttpStatus.OK_200, String.class);
-		payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
-		xmlSignatureService.validate(str, payload);
-
-		oadrCanceledPartyRegistration = payload.getOadrSignedObject().getOadrCanceledPartyRegistration();
-
+		// EI REGISTER PARTY CONTROLLER - send OadrCancelPartyRegistrationType
+		oadrCancelPartyRegistration = Oadr20bEiRegisterPartyBuilders
+				.newOadr20bCancelPartyRegistrationBuilder(requestId, registrationId, VEN_ID).build();
+		oadrCanceledPartyRegistration = mockVen.register(oadrCancelPartyRegistration, HttpStatus.OK_200,
+				OadrCanceledPartyRegistrationType.class);
 		assertNotNull(oadrCanceledPartyRegistration);
 		assertEquals(String.valueOf(HttpStatus.OK_200),
 				oadrCanceledPartyRegistration.getEiResponse().getResponseCode());
 
-		// test ven is not registred
-		venDto = oadrMockHttpMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
-				VenDto.class);
+		// VEN CONTROLLER - test ven is not registred
+		venDto = oadrMockHttpVenMvc.getVen(adminSession, VEN_ID, HttpStatus.OK_200);
 		assertEquals(String.valueOf(ven.getId()), venDto.getId());
 		assertEquals(ven.getUsername(), venDto.getUsername());
 		assertNull(venDto.getHttpPullModel());
@@ -302,11 +276,8 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		assertNull(venDto.getRegistrationId());
 
 		// test invalid create oadrcancelRegistration
-		oadrCancelPartyRegistration = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCancelPartyRegistrationBuilder(requestId, registrationId, VEN_ID).build();
-		oadrCanceledPartyRegistration = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
-				oadrCancelPartyRegistration, HttpStatus.OK_200, OadrCanceledPartyRegistrationType.class);
-
+		oadrCanceledPartyRegistration = mockVen.register(oadrCancelPartyRegistration, HttpStatus.OK_200,
+				OadrCanceledPartyRegistrationType.class);
 		assertNotNull(oadrCanceledPartyRegistration);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.INVALID_ID_452),
 				oadrCanceledPartyRegistration.getEiResponse().getResponseCode());
@@ -318,20 +289,16 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 				.withOadrVenName(venName).withOadrHttpPullModel(true).withOadrTransportName(transport)
 				.withOadrXmlSignature(xmlSignature).withOadrReportOnly(reportOnly).build();
 
-		// push signed oadrCreateRegitration to VTN
-		str = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
-				xmlSignatureService.sign(oadrCreatePartyRegistrationType), HttpStatus.OK_200, String.class);
-		payload = Oadr20bJAXBContext.getInstance().unmarshal(str, OadrPayload.class);
-		xmlSignatureService.validate(str, payload);
-		oadrCreatedPartyRegistrationType = payload.getOadrSignedObject().getOadrCreatedPartyRegistration();
+		// VEN CONTROLLER - send OadrCreatePartyRegistrationType
+		oadrCreatedPartyRegistrationType = mockVen.register(oadrCreatePartyRegistrationType, HttpStatus.OK_200,
+				OadrCreatedPartyRegistrationType.class);
 		registrationId = oadrCreatedPartyRegistrationType.getRegistrationID();
 		assertNotNull(oadrCreatedPartyRegistrationType);
 		assertEquals(String.valueOf(HttpStatus.OK_200),
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
 
-		// test ven is registred
-		venDto = oadrMockHttpMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
-				VenDto.class);
+		// VEN CONTROLLER - test ven is registred
+		venDto = oadrMockHttpVenMvc.getVen(adminSession, VEN_ID, HttpStatus.OK_200);
 		assertEquals(String.valueOf(ven.getId()), venDto.getId());
 		assertEquals(VEN_ID, venDto.getUsername());
 		assertEquals(venName, venDto.getOadrName());
@@ -341,49 +308,42 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		assertEquals(transport.value(), venDto.getTransport());
 		assertNotNull(venDto.getRegistrationId());
 
-		// request reregistration
-		oadrMockHttpMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				VEN_URL + VEN_ID + "/registerparty/requestReregistration", HttpStatus.OK_200);
-		Thread.sleep(200);
+		// VEN CONTROLLER - request reregistration
+		oadrMockHttpVenMvc.reregister(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, VEN_ID, HttpStatus.OK_200);
 
-		// poll and expect for OadrRequestReregistrationType
-		OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(VEN_ID).build();
-		OadrRequestReregistrationType oadrRequestReregistrationType = oadrMockMvc.postOadrPollAndExpect(venSession,
-				poll, HttpStatus.OK_200, OadrRequestReregistrationType.class);
+		// OADR POLL CONTROLLER - poll and expect for OadrRequestReregistrationType
+		OadrRequestReregistrationType oadrRequestReregistrationType = mockVen.poll(HttpStatus.OK_200,
+				OadrRequestReregistrationType.class);
 		assertNotNull(oadrRequestReregistrationType);
 
-		// ven response reregistration request
+		// EI REGISTER PARTY CONTROLLER - ven response reregistration request
 		OadrResponseType respReregistration = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("0", HttpStatus.OK_200, VEN_ID).build();
-
-		OadrResponseType postEiRegisterPartyAndExpect = oadrMockMvc.postEiRegisterPartyAndExpect(venSession,
-				respReregistration, HttpStatus.OK_200, OadrResponseType.class);
+		OadrResponseType postEiRegisterPartyAndExpect = mockVen.register(respReregistration, HttpStatus.OK_200,
+				OadrResponseType.class);
 		assertEquals(String.valueOf(HttpStatus.OK_200), postEiRegisterPartyAndExpect.getEiResponse().getResponseCode());
 
-		// request cancelregistration
-		oadrMockHttpMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				VEN_URL + VEN_ID + "/registerparty/cancelPartyRegistration", HttpStatus.OK_200);
-		Thread.sleep(200);
+		// VEN CONTROLLER - request cancelregistration
+		oadrMockHttpVenMvc.cancelRegistration(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, VEN_ID, HttpStatus.OK_200);
 
-		// poll and expect for OadrRequestReregistrationType
-		poll = Oadr20bPollBuilders.newOadr20bPollBuilder(VEN_ID).build();
-		OadrCancelPartyRegistrationType cancelPartyRegistration = oadrMockMvc.postOadrPollAndExpect(venSession, poll,
-				HttpStatus.OK_200, OadrCancelPartyRegistrationType.class);
+		// OADR POLL CONTROLLER - poll and expect for OadrRequestReregistrationType
+		OadrCancelPartyRegistrationType cancelPartyRegistration = mockVen.poll(HttpStatus.OK_200,
+				OadrCancelPartyRegistrationType.class);
+
 		assertNotNull(cancelPartyRegistration);
 
-		// ven response reregistration request
+		// EI REGISTER PARTY CONTROLLER - ven response reregistration request
 		OadrCanceledPartyRegistrationType canceledPartyRegistration = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCanceledPartyRegistrationBuilder(cancelPartyRegistration.getRequestID(), HttpStatus.OK_200,
 						venDto.getRegistrationId(), venDto.getUsername())
 				.build();
 
-		postEiRegisterPartyAndExpect = oadrMockMvc.postEiRegisterPartyAndExpect(venSession, canceledPartyRegistration,
-				HttpStatus.OK_200, OadrResponseType.class);
+		postEiRegisterPartyAndExpect = mockVen.register(canceledPartyRegistration, HttpStatus.OK_200,
+				OadrResponseType.class);
 		assertEquals(String.valueOf(HttpStatus.OK_200), postEiRegisterPartyAndExpect.getEiResponse().getResponseCode());
 
-		// test ven is not registred
-		venDto = oadrMockHttpMvc.getRestJsonControllerAndExpect(adminSession, VEN_URL + VEN_ID, HttpStatus.OK_200,
-				VenDto.class);
+		// VEN CONTROLLER - test ven is not registred
+		venDto = oadrMockHttpVenMvc.getVen(adminSession, VEN_ID, HttpStatus.OK_200);
 		assertEquals(String.valueOf(ven.getId()), venDto.getId());
 		assertEquals(ven.getUsername(), venDto.getUsername());
 		assertNull(venDto.getHttpPullModel());

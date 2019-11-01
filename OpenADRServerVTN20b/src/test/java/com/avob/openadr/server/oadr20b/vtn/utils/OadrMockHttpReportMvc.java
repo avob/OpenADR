@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.eclipse.jetty.http.HttpStatus;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -21,16 +20,17 @@ public class OadrMockHttpReportMvc {
 	private OadrMockHttpMvc oadrMockHttpMvc;
 
 	public List<OtherReportCapabilityDto> searchReportAvailable(UserRequestPostProcessor authSession,
-			LinkedMultiValueMap<String, String> params) throws Exception {
+			LinkedMultiValueMap<String, String> params, int status) throws Exception {
 		return oadrMockHttpMvc.getRestJsonControllerAndExpectList(authSession, REPORT_ENDPOINT + "/available/search",
-				HttpStatus.OK_200, OtherReportCapabilityDto.class, params);
+				status, OtherReportCapabilityDto.class, params);
 	}
 
 	public List<OtherReportCapabilityDescriptionDto> searchReportAvailabledescription(
-			UserRequestPostProcessor authSession, LinkedMultiValueMap<String, String> params) throws Exception {
+			UserRequestPostProcessor authSession, LinkedMultiValueMap<String, String> params, int status)
+			throws Exception {
 		return oadrMockHttpMvc.getRestJsonControllerAndExpectList(authSession,
-				REPORT_ENDPOINT + "/available/description/search", HttpStatus.OK_200,
-				OtherReportCapabilityDescriptionDto.class, params);
+				REPORT_ENDPOINT + "/available/description/search", status, OtherReportCapabilityDescriptionDto.class,
+				params);
 	}
 
 }

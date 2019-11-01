@@ -42,7 +42,8 @@ public class Oadr20bVTNOadrPollService {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
 					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
 			throw new Oadr20bPollApplicationLayerException(xmlSignatureRequiredButAbsent.getResponseDescription(),
-					Oadr20bResponseBuilders.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build());
+					Oadr20bResponseBuilders.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build(),
+					signed);
 		}
 
 		String responseStr = venPollService.retrievePollForVenUsername(venID);
@@ -68,7 +69,7 @@ public class Oadr20bVTNOadrPollService {
 		return null;
 	}
 
-	public void checkMatchUsernameWithRequestVenId(String username, OadrPollType oadrPollType)
+	public void checkMatchUsernameWithRequestVenId(String username, OadrPollType oadrPollType, boolean signed)
 			throws Oadr20bPollApplicationLayerException {
 		String venID = oadrPollType.getVenID();
 		String requestID = "";
@@ -76,7 +77,8 @@ public class Oadr20bVTNOadrPollService {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
 					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();
 			throw new Oadr20bPollApplicationLayerException(mismatchCredentialsVenIdResponse.getResponseDescription(),
-					Oadr20bResponseBuilders.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, venID).build());
+					Oadr20bResponseBuilders.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, venID).build(),
+					signed);
 		}
 	}
 

@@ -22,22 +22,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
-import com.avob.openadr.model.oadr20b.avob.KeyTokenType;
-import com.avob.openadr.model.oadr20b.builders.Oadr20bEiBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
-import com.avob.openadr.model.oadr20b.ei.IntervalType;
-import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
-import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.user.AbstractUserDao;
@@ -428,33 +421,6 @@ public class Oadr20bVenController {
 				OtherReportDataFloatDto.class);
 	}
 
-	@RequestMapping(value = "/{venID}/report/data/float/{reportSpecifierId}/rid/{rid}", method = RequestMethod.POST)
-	@ResponseBody
-	public void postFloatReportData(@PathVariable("venID") String venID,
-			@PathVariable("reportSpecifierId") String reportSpecifierId, @PathVariable("rid") String rid,
-			@RequestBody Float value) throws OadrElementNotFoundException, Oadr20bException {
-
-		Ven checkVen = checkVen(venID);
-//		checkOtherReportCapabilityDescription(venID, reportSpecifierId, rid);
-
-		String intervalId = "intervalId";
-		IntervalType build = Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, null, null, rid, null,
-				null, Oadr20bFactory.createPayloadFloat(value)).build();
-		String reportId = "reportId";
-		String reportrequestId = "reportrequestId";
-		ReportNameEnumeratedType reportName = ReportNameEnumeratedType.TELEMETRY_STATUS;
-		long createdTimestamp = System.currentTimeMillis();
-		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(reportId,
-				reportrequestId, reportSpecifierId, reportName, createdTimestamp, null, null).addInterval(build)
-				.build();
-		String requestId = "requestId";
-		String venId = "venId";
-		OadrUpdateReportType request = Oadr20bEiReportBuilders.newOadr20bUpdateReportBuilder(requestId, venId)
-				.addReport(report).build();
-		venDistributeService.distribute(checkVen, request);
-
-	}
-
 	@RequestMapping(value = "/{venID}/report/data/resourcestatus/{reportSpecifierId}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<OtherReportDataPayloadResourceStatusDto> viewsResourceStatusReportData(
@@ -509,37 +475,6 @@ public class Oadr20bVenController {
 		return oadr20bDtoMapper.mapList(
 				otherReportDataKeyTokenService.findByReportSpecifierIdAndRid(reportSpecifierId, rid),
 				OtherReportDataKeyTokenDto.class);
-	}
-
-	@RequestMapping(value = "/{venID}/report/data/keytoken/{reportSpecifierId}/rid/{rid}", method = RequestMethod.POST)
-	@ResponseBody
-	public void postKeyTokenReportData(@PathVariable("venID") String venID,
-			@PathVariable("reportSpecifierId") String reportSpecifierId, @PathVariable("rid") String rid,
-			@RequestBody List<KeyTokenType> tokens) throws OadrElementNotFoundException, Oadr20bException {
-
-		Ven checkVen = checkVen(venID);
-//		checkOtherReportCapabilityDescription(venID, reportSpecifierId, rid);
-
-		String intervalId = "intervalId";
-
-		IntervalType build = Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, null, null, rid, null,
-				null, Oadr20bFactory.createPayloadKeyTokenType(tokens)).build();
-		String reportId = "reportId";
-		String reportrequestId = "reportrequestId";
-		ReportNameEnumeratedType reportName = ReportNameEnumeratedType.TELEMETRY_STATUS;
-		long createdTimestamp = System.currentTimeMillis();
-
-		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(reportId,
-				reportrequestId, reportSpecifierId, reportName, createdTimestamp, null, null).addInterval(build)
-				.build();
-
-		String requestId = "requestId";
-		String venId = "venId";
-		OadrUpdateReportType request = Oadr20bEiReportBuilders.newOadr20bUpdateReportBuilder(requestId, venId)
-				.addReport(report).build();
-
-		venDistributeService.distribute(checkVen, request);
-
 	}
 
 	@RequestMapping(value = "/{venID}/report/available/search", method = RequestMethod.GET)

@@ -12,15 +12,22 @@ public class Oadr20bPollApplicationLayerException extends Oadr20bException imple
 	private static final long serialVersionUID = -3275011454047455797L;
 
 	private final transient OadrResponseType response;
+	private final transient boolean signed;
 
-	public Oadr20bPollApplicationLayerException(String message, OadrResponseType response) {
+	public Oadr20bPollApplicationLayerException(String message, OadrResponseType response, boolean signed) {
 		super(message);
 		this.response = response;
+		this.signed = signed;
 	}
 
 	@Override
 	public OadrResponseType getResponse() {
 		return response;
+	}
+
+	@Override
+	public boolean isSigned() {
+		return signed;
 	}
 
 }

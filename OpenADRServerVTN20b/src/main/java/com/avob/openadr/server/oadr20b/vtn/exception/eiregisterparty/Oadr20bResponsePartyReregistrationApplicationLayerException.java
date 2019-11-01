@@ -12,15 +12,23 @@ public class Oadr20bResponsePartyReregistrationApplicationLayerException extends
 	 */
 	private static final long serialVersionUID = 3493089269293585027L;
 	private final transient OadrResponseType response;
+	private final transient boolean signed;
 
-	public Oadr20bResponsePartyReregistrationApplicationLayerException(String message, OadrResponseType response) {
+	public Oadr20bResponsePartyReregistrationApplicationLayerException(String message, OadrResponseType response,
+			boolean signed) {
 		super(message);
 		this.response = response;
+		this.signed = signed;
 	}
 
 	@Override
 	public OadrResponseType getResponse() {
 		return response;
+	}
+
+	@Override
+	public boolean isSigned() {
+		return signed;
 	}
 
 }

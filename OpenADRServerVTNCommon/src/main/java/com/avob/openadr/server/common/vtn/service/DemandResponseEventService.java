@@ -433,21 +433,39 @@ public class DemandResponseEventService {
 	}
 
 	/**
+	 * get ven response for a specific event
+	 * 
+	 * @param demandResponseEvent
+	 * @param ven
+	 * @param venOpt
+	 * @throws OadrElementNotFoundException
+	 */
+	public VenDemandResponseEvent getVenDemandResponseEvent(Long demandResponseEventId, String venUsername)
+			throws OadrElementNotFoundException {
+		VenDemandResponseEvent findOneByEventIdAndVenUsername = venDemandResponseEventDao
+				.findOneByEventIdAndVenUsername(demandResponseEventId, venUsername);
+		if (findOneByEventIdAndVenUsername == null) {
+			throw new OadrElementNotFoundException("Missing VenDemandResponseEvent for event: " + demandResponseEventId
+					+ " and venID: " + venUsername);
+		}
+		return findOneByEventIdAndVenUsername;
+
+	}
+
+	/**
 	 * get ven optin for a specific event
 	 * 
 	 * @param demandResponseEvent
 	 * @param ven
 	 * @param venOpt
+	 * @throws OadrElementNotFoundException
 	 */
-	public DemandResponseEventOptEnum getVenOpt(Long demandResponseEventId, String venUsername) {
+	public DemandResponseEventOptEnum getVenDemandResponseEventOpt(Long demandResponseEventId, String venUsername)
+			throws OadrElementNotFoundException {
 
-		VenDemandResponseEvent findOneByEventIdAndVenId = venDemandResponseEventDao
-				.findOneByEventIdAndVenUsername(demandResponseEventId, venUsername);
-
-		if (findOneByEventIdAndVenId != null) {
-			return findOneByEventIdAndVenId.getVenOpt();
-		}
-		return null;
+		VenDemandResponseEvent findOneByEventIdAndVenId = this.getVenDemandResponseEvent(demandResponseEventId,
+				venUsername);
+		return findOneByEventIdAndVenId.getVenOpt();
 	}
 
 	public List<DemandResponseEvent> findToSentEventByVenUsername(String username) {

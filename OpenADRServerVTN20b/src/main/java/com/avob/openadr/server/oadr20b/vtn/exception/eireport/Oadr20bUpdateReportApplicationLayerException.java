@@ -12,14 +12,22 @@ public class Oadr20bUpdateReportApplicationLayerException extends Oadr20bExcepti
 	private static final long serialVersionUID = 1468896185130868972L;
 
 	private final transient OadrUpdatedReportType response;
+	private final transient boolean signed;
 
-	public Oadr20bUpdateReportApplicationLayerException(String message, OadrUpdatedReportType response) {
+	public Oadr20bUpdateReportApplicationLayerException(String message, OadrUpdatedReportType response,
+			boolean signed) {
 		super(message);
 		this.response = response;
+		this.signed = signed;
 	}
 
 	@Override
 	public OadrUpdatedReportType getResponse() {
 		return response;
+	}
+
+	@Override
+	public boolean isSigned() {
+		return signed;
 	}
 }

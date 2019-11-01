@@ -225,4 +225,22 @@ public class DemandResponseController {
 
 	}
 
+	@RequestMapping(value = "/{id}/venResponse/{username}", method = RequestMethod.GET)
+	@ResponseBody
+	public VenDemandResponseEventDto readVenDemandResponseEvent(@PathVariable(value = "id") Long id,
+			@PathVariable(value = "username") String username, HttpServletResponse response) {
+
+		try {
+			VenDemandResponseEvent venDemandResponseEvent = demandResponseEventService.getVenDemandResponseEvent(id,
+					username);
+
+			return dtoMapper.map(venDemandResponseEvent, VenDemandResponseEventDto.class);
+
+		} catch (OadrElementNotFoundException e) {
+			response.setStatus(HttpStatus.NOT_FOUND_404);
+			return null;
+		}
+
+	}
+
 }

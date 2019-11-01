@@ -96,7 +96,7 @@ public class Oadr20bVTNOadrPollController {
 	private String handle(String username, OadrPollType oadrPollType, boolean signed) throws Oadr20bMarshalException,
 			Oadr20bPollApplicationLayerException, Oadr20bXMLSignatureException, Oadr20bUnmarshalException {
 
-		oadr20bVTNOadrPollService.checkMatchUsernameWithRequestVenId(username, oadrPollType);
+		oadr20bVTNOadrPollService.checkMatchUsernameWithRequestVenId(username, oadrPollType, signed);
 
 		return oadr20bVTNOadrPollService.oadrPoll(oadrPollType, signed);
 

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -63,12 +61,10 @@ import com.avob.openadr.model.oadr20b.oadr.TemperatureType;
 import com.avob.openadr.model.oadr20b.oadr.TemperatureUnitType;
 import com.avob.openadr.model.oadr20b.siscale.SiScaleCodeType;
 import com.avob.openadr.model.oadr20b.xcal.WsCalendarIntervalType;
-import com.avob.openadr.server.common.vtn.models.ven.Ven;
+import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenGroupService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
-import com.avob.openadr.server.common.vtn.service.VenResourceService;
-import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
@@ -113,27 +109,17 @@ import com.google.common.collect.Lists;
 @ActiveProfiles("test")
 public class Oadr20bVTNEiReportControllerTest {
 
-	private static final String APPLICATION_JSON_HEADER_VALUE = "application/json";
-	private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
 	private static final String MOUAICCOOL = "mouaiccool";
 	private static final String RID_ID = "rid";
 	private static final String REPORT_REQUEST_ID = "reportRequestId";
 	private static final String REPORT_SPECIFIER_ID = "reportSpecifierId";
 	private static final String REQUEST_ID = "requestId";
-	private static final String REPORT_ENDPOINT = "/Report/";
-	private static final String VEN_ENDPOINT = "/Ven/";
-
-	@Resource
-	private VenService venService;
 
 	@Resource
 	private VenGroupService venGroupService;
 
 	@Resource
 	private VenMarketContextService venMarketContextService;
-
-	@Resource
-	private VenResourceService venReourceService;
 
 	@Resource
 	private DemandResponseEventService demandResponseEventService;
@@ -196,7 +182,8 @@ public class Oadr20bVTNEiReportControllerTest {
 	@Test
 	public void testVENSourceVTNTarget() throws Exception {
 		LinkedMultiValueMap<String, String> params;
-		Ven ven = venService.findOneByUsername(OadrDataBaseSetup.VEN);
+		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+				HttpStatus.OK_200);
 		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_SECURITY_SESSION, oadrMockEiHttpMvc,
 				xmlSignatureService);
 
@@ -285,17 +272,19 @@ public class Oadr20bVTNEiReportControllerTest {
 						.build())
 				.build();
 
+		// EI REPORT CONTROLLER - invalid mismatch payload venID and username auth
+		// session
 		OadrRegisterReportType oadrRegisterReportType = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportBuilder(REQUEST_ID, OadrDataBaseSetup.VEN, null).addOadrReport(report).build();
+				.newOadr20bRegisterReportBuilder(REQUEST_ID, "mouaiccool", null).addOadrReport(report).build();
 
-		// invalid mismatch payload venID and username auth session
-		OadrRegisteredReportType oadrRegisteredReportType = oadrMockEiHttpMvc.postEiReportAndExpect(
-				OadrDataBaseSetup.ANOTHER_VEN_SECURITY_SESSION, xmlSignatureService.sign(oadrRegisterReportType),
-				HttpStatus.OK_200, OadrRegisteredReportType.class);
+		OadrRegisteredReportType oadrRegisteredReportType = mockVen.report(oadrRegisterReportType, HttpStatus.OK_200,
+				OadrRegisteredReportType.class);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
 				oadrRegisteredReportType.getEiResponse().getResponseCode());
 
 		// EI REPORT CONTROLLER - send OadrRegisteredReportType
+		oadrRegisterReportType = Oadr20bEiReportBuilders
+				.newOadr20bRegisterReportBuilder(REQUEST_ID, OadrDataBaseSetup.VEN, null).addOadrReport(report).build();
 		oadrRegisteredReportType = mockVen.report(oadrRegisterReportType, HttpStatus.OK_200,
 				OadrRegisteredReportType.class);
 
@@ -306,8 +295,8 @@ public class Oadr20bVTNEiReportControllerTest {
 
 		// VEN CONTROLLER - get available report
 		params = new LinkedMultiValueMap<>();
-		List<ReportCapabilityDto> reportcapabilityList = oadrMockHttpVenMvc
-				.getVenReportAvailable(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params);
+		List<ReportCapabilityDto> reportcapabilityList = oadrMockHttpVenMvc.getVenReportAvailable(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params, HttpStatus.OK_200);
 		assertEquals(1, reportcapabilityList.size());
 		assertEquals(REPORT_SPECIFIER_ID, reportcapabilityList.get(0).getReportSpecifierId());
 		assertEquals(reportName, reportcapabilityList.get(0).getReportName());
@@ -318,7 +307,7 @@ public class Oadr20bVTNEiReportControllerTest {
 		params = OadrParamBuilder.builder().addReportSpecifierId(REPORT_SPECIFIER_ID).build();
 		List<ReportCapabilityDescriptionDto> reportcapabilityDescriptionList = oadrMockHttpVenMvc
 				.getVenReportAvailableDescription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
-						params);
+						params, HttpStatus.OK_200);
 
 		assertEquals(15, reportcapabilityDescriptionList.size());
 		assertEquals(rid, reportcapabilityDescriptionList.get(0).getRid());
@@ -357,7 +346,7 @@ public class Oadr20bVTNEiReportControllerTest {
 		// VEN CONTROLLER - get available description by reportSpecifierId
 		params = OadrParamBuilder.builder().addReportSpecifierId(REPORT_SPECIFIER_ID).build();
 		reportcapabilityDescriptionList = oadrMockHttpVenMvc.getVenReportAvailableDescription(
-				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params);
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params, HttpStatus.OK_200);
 
 		assertEquals(1, reportcapabilityDescriptionList.size());
 		assertEquals(rid, reportcapabilityDescriptionList.get(0).getRid());
@@ -370,71 +359,65 @@ public class Oadr20bVTNEiReportControllerTest {
 				.findOne(reportCapabilityDescriptionPrivateId);
 
 		// VEN CONTROLLER - search ven other report capability by reportSpecifierId
-		params = OadrParamBuilder.builder().addReportSpecifierId(REPORT_SPECIFIER_ID).build();
-		List<OtherReportCapabilityDto> venReportCapability = oadrMockHttpVenMvc
-				.searchVenReportAvailable(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params);
+		List<OtherReportCapabilityDto> venReportCapability = oadrMockHttpVenMvc.searchVenReportAvailable(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, HttpStatus.OK_200);
 		assertEquals(1, venReportCapability.size());
 		assertEquals(REPORT_SPECIFIER_ID, venReportCapability.get(0).getReportSpecifierId());
-
-		// search other report capability - Invalid no params provided
-		oadrMockEiHttpMvc.perform(MockMvcRequestBuilders.get(REPORT_ENDPOINT + "/available/search")
-				.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE)
-				.with(OadrDataBaseSetup.ADMIN_SECURITY_SESSION)).andExpect(status().is(HttpStatus.BAD_REQUEST_400));
 
 		// REPORT CONTROLLER - search other report capability by venId/reportSpecifierId
 		params = OadrParamBuilder.builder().addVenId(OadrDataBaseSetup.VEN).build();
 		List<OtherReportCapabilityDto> searchReportAvailable = oadrMockHttpReportMvc
-				.searchReportAvailable(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, params);
+				.searchReportAvailable(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, params, HttpStatus.OK_200);
 		assertEquals(1, searchReportAvailable.size());
 		assertEquals(REPORT_SPECIFIER_ID, searchReportAvailable.get(0).getReportSpecifierId());
 
 		params = OadrParamBuilder.builder().addVenId(OadrDataBaseSetup.VEN).build();
 		searchReportAvailable = oadrMockHttpReportMvc.searchReportAvailable(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				params);
+				params, HttpStatus.OK_200);
 		assertEquals(1, searchReportAvailable.size());
 		assertEquals(REPORT_SPECIFIER_ID, searchReportAvailable.get(0).getReportSpecifierId());
 
 		params = OadrParamBuilder.builder().addVenId("mouaiccool").build();
 		searchReportAvailable = oadrMockHttpReportMvc.searchReportAvailable(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				params);
+				params, HttpStatus.OK_200);
 		assertEquals(0, searchReportAvailable.size());
 
 		params = OadrParamBuilder.builder().addReportSpecifierId(REPORT_SPECIFIER_ID).build();
 		searchReportAvailable = oadrMockHttpReportMvc.searchReportAvailable(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				params);
+				params, HttpStatus.OK_200);
 		assertEquals(1, searchReportAvailable.size());
 		assertEquals(REPORT_SPECIFIER_ID, searchReportAvailable.get(0).getReportSpecifierId());
 
 		params = OadrParamBuilder.builder().addReportSpecifierId("mouaiccool").build();
 		searchReportAvailable = oadrMockHttpReportMvc.searchReportAvailable(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				params);
+				params, HttpStatus.OK_200);
 		assertEquals(0, searchReportAvailable.size());
 
 		// REPORT CONTROLLER - search other report capability description by venId
 		params = OadrParamBuilder.builder().addReportSpecifierId(REPORT_SPECIFIER_ID).build();
 		List<OtherReportCapabilityDescriptionDto> searchReportAvailabledescription = oadrMockHttpReportMvc
-				.searchReportAvailabledescription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, params);
+				.searchReportAvailabledescription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, params, HttpStatus.OK_200);
 		assertEquals(1, searchReportAvailabledescription.size());
 		assertEquals(REPORT_SPECIFIER_ID, searchReportAvailabledescription.get(0).getReportSpecifierId());
 		assertEquals(rid, searchReportAvailabledescription.get(0).getRid());
 
 		params = OadrParamBuilder.builder().addReportName(reportCapability.getReportName()).build();
 		searchReportAvailabledescription = oadrMockHttpReportMvc
-				.searchReportAvailabledescription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, params);
+				.searchReportAvailabledescription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, params, HttpStatus.OK_200);
 		assertEquals(1, searchReportAvailabledescription.size());
 		assertEquals(REPORT_SPECIFIER_ID, searchReportAvailabledescription.get(0).getReportSpecifierId());
 		assertEquals(rid, searchReportAvailabledescription.get(0).getRid());
 
 		params = OadrParamBuilder.builder().addReportType(reportCapabilityDescription.getReportType()).build();
 		searchReportAvailabledescription = oadrMockHttpReportMvc
-				.searchReportAvailabledescription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, params);
+				.searchReportAvailabledescription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, params, HttpStatus.OK_200);
 		assertEquals(1, searchReportAvailabledescription.size());
 		assertEquals(REPORT_SPECIFIER_ID, searchReportAvailabledescription.get(0).getReportSpecifierId());
 		assertEquals(rid, searchReportAvailabledescription.get(0).getRid());
 
 		params = OadrParamBuilder.builder().addReadingType(reportCapabilityDescription.getReadingType()).build();
 		searchReportAvailabledescription = oadrMockHttpReportMvc
-				.searchReportAvailabledescription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, params);
+				.searchReportAvailabledescription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, params, HttpStatus.OK_200);
 		assertEquals(1, searchReportAvailabledescription.size());
 		assertEquals(REPORT_SPECIFIER_ID, searchReportAvailabledescription.get(0).getReportSpecifierId());
 		assertEquals(rid, searchReportAvailabledescription.get(0).getRid());
@@ -449,31 +432,32 @@ public class Oadr20bVTNEiReportControllerTest {
 		ridMap.put(reportCapabilityDescription.getRid(), true);
 		subscription.setRid(ridMap);
 		subscriptions.add(subscription);
-		oadrMockHttpVenMvc.subscribe(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, subscriptions);
+		oadrMockHttpVenMvc.subscribe(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, subscriptions,
+				HttpStatus.OK_200);
 
 		// VEN CONTROLLER - get ven requested report
 		params = OadrParamBuilder.builder().build();
-		List<OtherReportRequestDto> venReportRequested = oadrMockHttpVenMvc
-				.getVenReportRequested(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params);
+		List<OtherReportRequestDto> venReportRequested = oadrMockHttpVenMvc.getVenReportRequested(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params, HttpStatus.OK_200);
 		assertNotNull(venReportRequested);
 		assertEquals(1, venReportRequested.size());
 
 		params = OadrParamBuilder.builder().build();
 		venReportRequested = oadrMockHttpVenMvc.getVenReportRequested(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				OadrDataBaseSetup.VEN, params);
+				OadrDataBaseSetup.VEN, params, HttpStatus.OK_200);
 		assertNotNull(venReportRequested);
 		assertEquals(1, venReportRequested.size());
 
 		params = OadrParamBuilder.builder().addReportSpecifierId(REPORT_SPECIFIER_ID).build();
 		venReportRequested = oadrMockHttpVenMvc.getVenReportRequested(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				OadrDataBaseSetup.VEN, params);
+				OadrDataBaseSetup.VEN, params, HttpStatus.OK_200);
 		assertNotNull(venReportRequested);
 		assertEquals(1, venReportRequested.size());
 
 		String reportRequestId = venReportRequested.get(0).getReportRequestId();
 		params = OadrParamBuilder.builder().addReportRequestId(reportRequestId).build();
 		venReportRequested = oadrMockHttpVenMvc.getVenReportRequested(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				OadrDataBaseSetup.VEN, params);
+				OadrDataBaseSetup.VEN, params, HttpStatus.OK_200);
 		assertNotNull(venReportRequested);
 		assertEquals(1, venReportRequested.size());
 
@@ -482,7 +466,7 @@ public class Oadr20bVTNEiReportControllerTest {
 		criteria.setReportSpecifierId(Lists.newArrayList(reportCapability.getReportSpecifierId()));
 		List<OtherReportRequestSpecifierDto> searchVenReportRequestedSpecifier = oadrMockHttpVenMvc
 				.searchVenReportRequestedSpecifier(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
-						criteria);
+						criteria, HttpStatus.OK_200);
 		assertNotNull(searchVenReportRequestedSpecifier);
 		assertEquals(1, searchVenReportRequestedSpecifier.size());
 		assertEquals(reportCapabilityDescription.getRid(), searchVenReportRequestedSpecifier.get(0).getRid());
@@ -490,7 +474,7 @@ public class Oadr20bVTNEiReportControllerTest {
 		criteria = new OtherReportRequestSpecifierSearchCriteria();
 		criteria.setRid(Lists.newArrayList(reportCapabilityDescription.getRid()));
 		searchVenReportRequestedSpecifier = oadrMockHttpVenMvc.searchVenReportRequestedSpecifier(
-				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, criteria);
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, criteria, HttpStatus.OK_200);
 		assertNotNull(searchVenReportRequestedSpecifier);
 		assertEquals(1, searchVenReportRequestedSpecifier.size());
 		assertEquals(reportCapabilityDescription.getRid(), searchVenReportRequestedSpecifier.get(0).getRid());
@@ -498,15 +482,15 @@ public class Oadr20bVTNEiReportControllerTest {
 		criteria = new OtherReportRequestSpecifierSearchCriteria();
 		criteria.setReportRequestId(Lists.newArrayList(reportRequestId));
 		searchVenReportRequestedSpecifier = oadrMockHttpVenMvc.searchVenReportRequestedSpecifier(
-				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, criteria);
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, criteria, HttpStatus.OK_200);
 		assertNotNull(searchVenReportRequestedSpecifier);
 		assertEquals(1, searchVenReportRequestedSpecifier.size());
 		assertEquals(reportCapabilityDescription.getRid(), searchVenReportRequestedSpecifier.get(0).getRid());
 
 		// VEN CONTROLLER - search other report request
 		params = OadrParamBuilder.builder().build();
-		List<OtherReportRequestDto> searchVenReportRequested = oadrMockHttpVenMvc
-				.searchVenReportRequested(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params);
+		List<OtherReportRequestDto> searchVenReportRequested = oadrMockHttpVenMvc.searchVenReportRequested(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params, HttpStatus.OK_200);
 		assertEquals(1, searchVenReportRequested.size());
 		assertEquals(REPORT_SPECIFIER_ID, searchVenReportRequested.get(0).getReportSpecifierId());
 
@@ -525,18 +509,19 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(reportCapabilityDescription.getRid(),
 				secondPoll.getOadrReportRequest().get(0).getReportSpecifier().getSpecifierPayload().get(0).getRID());
 
-		// create OadrCreatedReportType payload
+		// EI REPORT CONTROLLER - invalid mismatch payload venID and username auth
+		// session
 		OadrCreatedReportType oadrCreatedReportType = Oadr20bEiReportBuilders
-				.newOadr20bCreatedReportBuilder(reportRequestId, HttpStatus.OK_200, OadrDataBaseSetup.VEN)
+				.newOadr20bCreatedReportBuilder(reportRequestId, HttpStatus.OK_200, "mouaiccool")
 				.addPendingReportRequestId(reportRequestId).build();
-
-		// invalid mismatch payload venID and username auth session
-		OadrResponseType response = oadrMockEiHttpMvc.postEiReportAndExpect(OadrDataBaseSetup.ANOTHER_VEN_SECURITY_SESSION,
-				xmlSignatureService.sign(oadrCreatedReportType), HttpStatus.OK_200, OadrResponseType.class);
+		OadrResponseType response = mockVen.report(oadrCreatedReportType, HttpStatus.OK_200, OadrResponseType.class);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
 				response.getEiResponse().getResponseCode());
 
 		// EI REPORT CONTROLLER - send OadrCreatedReportType
+		oadrCreatedReportType = Oadr20bEiReportBuilders
+				.newOadr20bCreatedReportBuilder(reportRequestId, HttpStatus.OK_200, OadrDataBaseSetup.VEN)
+				.addPendingReportRequestId(reportRequestId).build();
 		response = mockVen.report(oadrCreatedReportType, HttpStatus.OK_200, OadrResponseType.class);
 		assertNotNull(response);
 		assertEquals(String.valueOf(HttpStatus.OK_200), response.getEiResponse().getResponseCode());
@@ -544,8 +529,8 @@ public class Oadr20bVTNEiReportControllerTest {
 
 		// VEN CONTROLLER - test previous payload has successfully acked requestreport
 		params = OadrParamBuilder.builder().build();
-		List<OtherReportRequestDto> reportRequestList = oadrMockHttpVenMvc
-				.getVenReportRequested(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params);
+		List<OtherReportRequestDto> reportRequestList = oadrMockHttpVenMvc.getVenReportRequested(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params, HttpStatus.OK_200);
 		assertEquals(1, reportRequestList.size());
 		assertTrue(reportRequestList.get(0).isAcked());
 		assertEquals(minPeriod, reportRequestList.get(0).getGranularity());
@@ -566,18 +551,19 @@ public class Oadr20bVTNEiReportControllerTest {
 				.addInterval(Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration, rid,
 						confidence, accuracy, value).build())
 				.build();
+
+		// EI REPORT CONTROLLER - invalid mismatch payload venID and username auth
+		// session
 		OadrUpdateReportType oadrUpdateReportType = Oadr20bEiReportBuilders
-				.newOadr20bUpdateReportBuilder("", OadrDataBaseSetup.VEN).addReport(reportUpdate).build();
-
-		// invalid mismatch payload venID and username auth session
-		OadrUpdatedReportType oadrUpdatedReportType = oadrMockEiHttpMvc.postEiReportAndExpect(
-				OadrDataBaseSetup.ANOTHER_VEN_SECURITY_SESSION, xmlSignatureService.sign(oadrUpdateReportType),
-				HttpStatus.OK_200, OadrUpdatedReportType.class);
-
+				.newOadr20bUpdateReportBuilder("", "mouaiccool").addReport(reportUpdate).build();
+		OadrUpdatedReportType oadrUpdatedReportType = mockVen.report(oadrUpdateReportType, HttpStatus.OK_200,
+				OadrUpdatedReportType.class);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
 				oadrUpdatedReportType.getEiResponse().getResponseCode());
 
 		// EI REPORT CONTROLLER - send OadrUpdateReportType Float data
+		oadrUpdateReportType = Oadr20bEiReportBuilders.newOadr20bUpdateReportBuilder("", OadrDataBaseSetup.VEN)
+				.addReport(reportUpdate).build();
 		oadrUpdatedReportType = mockVen.report(oadrUpdateReportType, HttpStatus.OK_200, OadrUpdatedReportType.class);
 		assertNotNull(oadrUpdatedReportType);
 		assertEquals(String.valueOf(HttpStatus.OK_200), oadrUpdatedReportType.getEiResponse().getResponseCode());
@@ -587,23 +573,23 @@ public class Oadr20bVTNEiReportControllerTest {
 		// in
 		// database
 		List<OtherReportDataFloatDto> reportDataList = oadrMockHttpVenMvc.getVenReportRequestedFloatData(
-				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, REPORT_SPECIFIER_ID);
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, REPORT_SPECIFIER_ID,
+				HttpStatus.OK_200);
 		assertEquals(1, reportDataList.size());
 
-		oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/float/fakeReportSpecifierId",
-				HttpStatus.NOT_ACCEPTABLE_406, null);
+		oadrMockHttpVenMvc.getVenReportRequestedFloatData(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				OadrDataBaseSetup.VEN, "fakeReportSpecifierId", HttpStatus.NOT_ACCEPTABLE_406);
 
 		reportDataList = oadrMockHttpVenMvc.getVenReportRequestedSpecifierFloatData(
-				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, REPORT_SPECIFIER_ID, rid);
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, REPORT_SPECIFIER_ID, rid,
+				HttpStatus.OK_200);
 		assertEquals(1, reportDataList.size());
 		assertTrue(reportDataList.get(0).getStart().equals(start));
 		assertEquals(confidence, reportDataList.get(0).getConfidence());
 		assertEquals(value, reportDataList.get(0).getValue());
 
-		oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report/data/float/" + REPORT_SPECIFIER_ID + "/rid/fakeRid",
-				HttpStatus.NOT_ACCEPTABLE_406, null);
+		oadrMockHttpVenMvc.getVenReportRequestedSpecifierFloatData(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				OadrDataBaseSetup.VEN, REPORT_SPECIFIER_ID, "fakeRid", HttpStatus.NOT_ACCEPTABLE_406);
 
 		Long reportDataPrivateId = reportDataList.get(0).getId();
 
@@ -642,11 +628,12 @@ public class Oadr20bVTNEiReportControllerTest {
 		// in database
 		List<OtherReportDataPayloadResourceStatusDto> reportDataResourceStatusList = oadrMockHttpVenMvc
 				.getVenReportRequestedResourceStatusData(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-						OadrDataBaseSetup.VEN, REPORT_SPECIFIER_ID);
+						OadrDataBaseSetup.VEN, REPORT_SPECIFIER_ID, HttpStatus.OK_200);
 		assertEquals(1, reportDataResourceStatusList.size());
 
 		reportDataResourceStatusList = oadrMockHttpVenMvc.getVenReportRequestedSpecifierResourceStatusData(
-				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, REPORT_SPECIFIER_ID, rid);
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, REPORT_SPECIFIER_ID, rid,
+				HttpStatus.OK_200);
 		assertEquals(1, reportDataResourceStatusList.size());
 
 		assertTrue(reportDataResourceStatusList.get(0).getStart().equals(start));
@@ -683,11 +670,12 @@ public class Oadr20bVTNEiReportControllerTest {
 		// in database
 		List<OtherReportDataKeyTokenDto> venReportRequestedKeyTokenData = oadrMockHttpVenMvc
 				.getVenReportRequestedKeyTokenData(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
-						REPORT_SPECIFIER_ID);
+						REPORT_SPECIFIER_ID, HttpStatus.OK_200);
 		assertEquals(1, venReportRequestedKeyTokenData.size());
 
 		venReportRequestedKeyTokenData = oadrMockHttpVenMvc.getVenReportRequestedSpecifierKeyTokenData(
-				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, REPORT_SPECIFIER_ID, rid);
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, REPORT_SPECIFIER_ID, rid,
+				HttpStatus.OK_200);
 		assertEquals(1, venReportRequestedKeyTokenData.size());
 
 		assertTrue(venReportRequestedKeyTokenData.get(0).getStart().equals(start));
@@ -702,13 +690,13 @@ public class Oadr20bVTNEiReportControllerTest {
 		// VEN CONTROLLER - cancel subscription
 		String reportRequestIdToDelete = searchVenReportRequestedSpecifier.get(0).getReportRequestId();
 		oadrMockHttpVenMvc.cancelSubscription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
-				reportRequestIdToDelete);
+				reportRequestIdToDelete, HttpStatus.OK_200);
 
 		// VEN CONTROLLER - test other report request has been deleted
 		params = OadrParamBuilder.builder().build();
 
 		venReportRequested = oadrMockHttpVenMvc.getVenReportRequested(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				OadrDataBaseSetup.VEN, params);
+				OadrDataBaseSetup.VEN, params, HttpStatus.OK_200);
 		assertNotNull(venReportRequested);
 		assertEquals(0, venReportRequested.size());
 
@@ -716,7 +704,7 @@ public class Oadr20bVTNEiReportControllerTest {
 		criteria = new OtherReportRequestSpecifierSearchCriteria();
 		criteria.setReportSpecifierId(Lists.newArrayList(reportCapability.getReportSpecifierId()));
 		searchVenReportRequestedSpecifier = oadrMockHttpVenMvc.searchVenReportRequestedSpecifier(
-				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, criteria);
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, criteria, HttpStatus.OK_200);
 		assertNotNull(searchVenReportRequestedSpecifier);
 		assertEquals(0, searchVenReportRequestedSpecifier.size());
 
@@ -736,20 +724,21 @@ public class Oadr20bVTNEiReportControllerTest {
 		ridMap.put(reportCapabilityDescription.getRid(), true);
 		request.setRid(new ArrayList<>(ridMap.keySet()));
 		requests.add(request);
-		oadrMockHttpVenMvc.request(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, requests);
+		oadrMockHttpVenMvc.request(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, requests,
+				HttpStatus.OK_200);
 
 		// VEN CONTROLLER - test requests has NOT been stored
 		// (subscriptions are stored in database, requests are not)
 		params = OadrParamBuilder.builder().build();
 		venReportRequested = oadrMockHttpVenMvc.getVenReportRequested(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				OadrDataBaseSetup.VEN, params);
+				OadrDataBaseSetup.VEN, params, HttpStatus.OK_200);
 		assertNotNull(venReportRequested);
 		assertEquals(0, venReportRequested.size());
 
 		criteria = new OtherReportRequestSpecifierSearchCriteria();
 		criteria.setReportSpecifierId(Lists.newArrayList(reportCapability.getReportSpecifierId()));
 		searchVenReportRequestedSpecifier = oadrMockHttpVenMvc.searchVenReportRequestedSpecifier(
-				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, criteria);
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, criteria, HttpStatus.OK_200);
 		assertNotNull(searchVenReportRequestedSpecifier);
 		assertEquals(0, searchVenReportRequestedSpecifier.size());
 
@@ -786,7 +775,8 @@ public class Oadr20bVTNEiReportControllerTest {
 	@Test
 	public void testVENTargetVTNSource() throws Oadr20bMarshalException, Exception {
 
-		Ven ven = venService.findOneByUsername(OadrDataBaseSetup.VEN);
+		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+				HttpStatus.OK_200);
 		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_SECURITY_SESSION, oadrMockEiHttpMvc,
 				xmlSignatureService);
 
@@ -851,12 +841,13 @@ public class Oadr20bVTNEiReportControllerTest {
 
 		// VTN CONTROLLER - test previous objects are saved inj bdd
 		List<ReportCapabilityDto> vtnReportAvailable = oadrMockHttpVtnMvc
-				.getVtnReportAvailable(OadrDataBaseSetup.ADMIN_SECURITY_SESSION);
+				.getVtnReportAvailable(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, HttpStatus.OK_200);
 		assertEquals(1, vtnReportAvailable.size());
 		Long selfCapPrivateId = vtnReportAvailable.get(0).getId();
 
 		List<ReportCapabilityDescriptionDto> vtnReportAvailableDescription = oadrMockHttpVtnMvc
-				.getVtnReportAvailableDescription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, selfReportSpecifierId);
+				.getVtnReportAvailableDescription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, selfReportSpecifierId,
+						HttpStatus.OK_200);
 		assertEquals(1, vtnReportAvailableDescription.size());
 		Long selfCapDescriptionPrivateId = vtnReportAvailableDescription.get(0).getId();
 
@@ -907,8 +898,8 @@ public class Oadr20bVTNEiReportControllerTest {
 				.build();
 
 		// invalid mismatch payload venID and username auth session
-		oadrCreatedReportType = oadrMockEiHttpMvc.postEiReportAndExpect(OadrDataBaseSetup.ANOTHER_VEN_SECURITY_SESSION, build,
-				HttpStatus.OK_200, OadrCreatedReportType.class);
+		oadrCreatedReportType = oadrMockEiHttpMvc.postEiReportAndExpect(OadrDataBaseSetup.ANOTHER_VEN_SECURITY_SESSION,
+				build, HttpStatus.OK_200, OadrCreatedReportType.class);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
 				oadrCreatedReportType.getEiResponse().getResponseCode());
 
@@ -919,7 +910,7 @@ public class Oadr20bVTNEiReportControllerTest {
 		// request Vtn controller and check previously created report has been
 		// saved in selfReportRequest database
 		List<OtherReportRequestDto> vtnReportRequested = oadrMockHttpVtnMvc
-				.getVtnReportRequested(OadrDataBaseSetup.ADMIN_SECURITY_SESSION);
+				.getVtnReportRequested(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, HttpStatus.OK_200);
 		assertEquals(1, vtnReportRequested.size());
 
 		// create oadrCancelReport payload
@@ -940,7 +931,8 @@ public class Oadr20bVTNEiReportControllerTest {
 
 		// VTN CONTROLLER - request Vtn controller and check previously created report
 		// has been removed from selfReportRequest database
-		vtnReportRequested = oadrMockHttpVtnMvc.getVtnReportRequested(OadrDataBaseSetup.ADMIN_SECURITY_SESSION);
+		vtnReportRequested = oadrMockHttpVtnMvc.getVtnReportRequested(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				HttpStatus.OK_200);
 		assertEquals(0, vtnReportRequested.size());
 
 		selfReportCapabilityDescriptionService.delete(selfCapDescriptionPrivateId);

@@ -12,15 +12,21 @@ public class Oadr20bCreatedEventApplicationLayerException extends Oadr20bExcepti
 	private static final long serialVersionUID = -6388593598870112862L;
 
 	private final transient OadrResponseType response;
-
-	public Oadr20bCreatedEventApplicationLayerException(String message, OadrResponseType response) {
+	private final transient boolean signed;
+	public Oadr20bCreatedEventApplicationLayerException(String message, OadrResponseType response, boolean signed) {
 		super(message);
 		this.response = response;
+		this.signed = signed;
 	}
 
 	@Override
 	public OadrResponseType getResponse() {
 		return response;
+	}
+	
+	@Override
+	public boolean isSigned() {
+		return signed;
 	}
 
 }

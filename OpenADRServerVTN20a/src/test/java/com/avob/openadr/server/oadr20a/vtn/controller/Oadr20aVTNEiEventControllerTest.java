@@ -508,7 +508,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		assertEquals(0, modificationNumber);
 
 		// check no opt-in is configured
-		DemandResponseEventOptEnum venOpt = demandResponseEventService.getVenOpt(eventId, venId);
+		DemandResponseEventOptEnum venOpt = demandResponseEventService.getVenDemandResponseEventOpt(eventId, venId);
 		assertNull(venOpt);
 
 		// create and send OadrCreatedEvent to EiEvent API
@@ -527,7 +527,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		assertEquals("200", response.getEiResponse().getResponseCode());
 
 		// check opt-in is configured
-		venOpt = demandResponseEventService.getVenOpt(eventId, venId);
+		venOpt = demandResponseEventService.getVenDemandResponseEventOpt(eventId, venId);
 		assertNotNull(venOpt);
 		assertEquals(DemandResponseEventOptEnum.OPT_IN, venOpt);
 
@@ -565,7 +565,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		response = jaxbContext.unmarshal(contentAsString, OadrResponse.class);
 		assertNotNull(response);
 		assertEquals(String.valueOf(HttpStatus.NOT_ACCEPTABLE_406), response.getEiResponse().getResponseCode());
-		venOpt = demandResponseEventService.getVenOpt(eventId, venId);
+		venOpt = demandResponseEventService.getVenDemandResponseEventOpt(eventId, venId);
 		assertNotNull(venOpt);
 		assertEquals(DemandResponseEventOptEnum.OPT_IN, venOpt);
 
@@ -582,7 +582,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		response = jaxbContext.unmarshal(contentAsString, OadrResponse.class);
 		assertNotNull(response);
 		assertEquals(String.valueOf(HttpStatus.UNAUTHORIZED_401), response.getEiResponse().getResponseCode());
-		venOpt = demandResponseEventService.getVenOpt(eventId, venId);
+		venOpt = demandResponseEventService.getVenDemandResponseEventOpt(eventId, venId);
 		assertNotNull(venOpt);
 		assertEquals(DemandResponseEventOptEnum.OPT_IN, venOpt);
 
@@ -603,7 +603,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		assertEquals(String.valueOf(HttpStatus.OK_200), response.getEiResponse().getResponseCode());
 
 		// check opt-out
-		venOpt = demandResponseEventService.getVenOpt(eventId, venId);
+		venOpt = demandResponseEventService.getVenDemandResponseEventOpt(eventId, venId);
 		assertNotNull(venOpt);
 		assertEquals(DemandResponseEventOptEnum.OPT_OUT, venOpt);
 
