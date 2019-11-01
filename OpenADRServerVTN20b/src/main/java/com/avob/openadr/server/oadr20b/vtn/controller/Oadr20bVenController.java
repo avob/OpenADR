@@ -369,7 +369,9 @@ public class Oadr20bVenController {
 			throws Oadr20bMarshalException, OadrElementNotFoundException {
 
 		Ven ven = checkVen(venID);
-		checkMarketContextExists(marketContextName);
+		if (marketContextName != null) {
+			checkMarketContextExists(marketContextName);
+		}
 
 		Long startTimestamp = (start != null) ? start.toEpochMilli() : null;
 		Long endTimestamp = (end != null) ? end.toEpochMilli() : null;

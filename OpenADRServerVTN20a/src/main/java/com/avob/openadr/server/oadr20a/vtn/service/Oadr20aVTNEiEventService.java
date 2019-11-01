@@ -38,6 +38,7 @@ import com.avob.openadr.model.oadr20a.oadr.OadrDistributeEvent;
 import com.avob.openadr.model.oadr20a.oadr.OadrRequestEvent;
 import com.avob.openadr.model.oadr20a.oadr.OadrResponse;
 import com.avob.openadr.model.oadr20a.pyld.EiCreatedEvent;
+import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignal;
@@ -152,7 +153,7 @@ public class Oadr20aVTNEiEventService {
 
 		if (HttpStatus.OK_200 == responseCode) {
 			OptTypeType optType = response.getOptType();
-			demandResponseEventService.updateVenOpt(Long.parseLong(eventID), modificationNumber, ven.getUsername(),
+			demandResponseEventService.updateVenDemandResponseEvent(Long.parseLong(eventID), modificationNumber, ven.getUsername(),
 					OptConverter.convert(optType));
 		}
 		// TODO bertrand: if responseCode is not OK, that's mean VEN somehow
@@ -227,7 +228,8 @@ public class Oadr20aVTNEiEventService {
 							.withEiResponse(venNotFoundResponse(venRequestID, venID)).build());
 		}
 
-		List<DemandResponseEvent> findByVenId = demandResponseEventService.findToSentEventByVenUsername(ven.getUsername(), replyLimit);
+		List<DemandResponseEvent> findByVenId = demandResponseEventService
+				.findToSentEventByVenUsername(ven.getUsername(), replyLimit);
 
 		// oadr events
 		if (findByVenId == null || findByVenId.isEmpty()) {

@@ -66,7 +66,7 @@ import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bPushService;
-import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Sets;
@@ -125,7 +125,7 @@ public class Oadr20bVTNSecurityTest {
 	private DigestAuthenticationProvider digestAuthenticationProvider;
 
 	@Resource
-	private OadrMockMvc oadrMockMvc;
+	private OadrMockEiHttpMvc oadrMockMvc;
 
 	private String eiEventEndpointUrl = null;
 

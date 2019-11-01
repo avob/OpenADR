@@ -412,19 +412,24 @@ public class DemandResponseEventService {
 	 * @param demandResponseEvent
 	 * @param ven
 	 * @param venOpt
+	 * @throws OadrElementNotFoundException
 	 */
-	public void updateVenOpt(Long demandResponseEventId, Long modificationNumber, String venUsername,
+	public void updateVenDemandResponseEvent(Long demandResponseEventId, Long modificationNumber, String venUsername,
 			DemandResponseEventOptEnum venOpt) {
 
 		VenDemandResponseEvent findOneByEventIdAndVenId = venDemandResponseEventDao
 				.findOneByEventIdAndVenUsername(demandResponseEventId, venUsername);
 
-		if (findOneByEventIdAndVenId != null) {
-			findOneByEventIdAndVenId.setVenOpt(venOpt);
-			findOneByEventIdAndVenId.setLastSentModificationNumber(modificationNumber);
-			findOneByEventIdAndVenId.setLastUpdateDatetime(System.currentTimeMillis());
-			venDemandResponseEventDao.save(findOneByEventIdAndVenId);
+		if (findOneByEventIdAndVenId == null) {
+			LOGGER.warn("Missing VenDemandResponseEvent for ven: " + venUsername + " and eventId: "
+					+ demandResponseEventId);
+			return;
 		}
+
+		findOneByEventIdAndVenId.setVenOpt(venOpt);
+		findOneByEventIdAndVenId.setLastSentModificationNumber(modificationNumber);
+		findOneByEventIdAndVenId.setLastUpdateDatetime(System.currentTimeMillis());
+		venDemandResponseEventDao.save(findOneByEventIdAndVenId);
 	}
 
 	/**

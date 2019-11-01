@@ -20,7 +20,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
-import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpMvc;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VTN20bSecurityApplicationTest.class })
@@ -31,7 +32,10 @@ public class Oadr20bVtnControllerTest {
 	private static final String VTN_URL = "/Vtn";
 
 	@Resource
-	private OadrMockMvc oadrMockMvc;
+	private OadrMockEiHttpMvc oadrMockMvc;
+
+	@Resource
+	private OadrMockHttpMvc oadrMockHttpMvc;
 
 	@Resource
 	private VtnConfig vtnConfig;
@@ -39,8 +43,9 @@ public class Oadr20bVtnControllerTest {
 	@Test
 	public void test() throws Exception {
 
-		VtnConfigurationDto conf = oadrMockMvc.getRestJsonControllerAndExpect(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				VTN_URL + "/configuration", HttpStatus.OK_200, VtnConfigurationDto.class);
+		VtnConfigurationDto conf = oadrMockHttpMvc.getRestJsonControllerAndExpect(
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, VTN_URL + "/configuration", HttpStatus.OK_200,
+				VtnConfigurationDto.class);
 
 		assertNotNull(conf);
 

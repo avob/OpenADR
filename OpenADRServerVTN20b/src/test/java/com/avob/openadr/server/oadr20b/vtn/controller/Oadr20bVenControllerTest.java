@@ -44,7 +44,8 @@ import com.avob.openadr.server.oadr20b.vtn.models.venpoll.VenPollDao;
 import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
-import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpMvc;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -66,7 +67,10 @@ public class Oadr20bVenControllerTest {
 	private XmlSignatureService xmlSignatureService;
 
 	@Resource
-	private OadrMockMvc oadrMockMvc;
+	private OadrMockEiHttpMvc oadrMockMvc;
+	
+	@Resource
+	private OadrMockHttpMvc oadrMockHttpMvc;
 
 	@Resource
 	private Oadr20bJAXBContext jaxbContext;
@@ -85,7 +89,7 @@ public class Oadr20bVenControllerTest {
 		assertEquals(String.valueOf(HttpStatus.OK_200), oadrResponseType.getEiResponse().getResponseCode());
 
 		// send register party requestReregistration action
-		oadrMockMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		oadrMockHttpMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/registerparty/requestReregistration", HttpStatus.OK_200);
 
 		Thread.sleep(200);
@@ -95,7 +99,7 @@ public class Oadr20bVenControllerTest {
 				OadrRequestReregistrationType.class);
 
 		// send register party requestReregistration action
-		oadrMockMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		oadrMockHttpMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/registerparty/cancelPartyRegistration", HttpStatus.OK_200);
 
 		Thread.sleep(200);
@@ -105,7 +109,7 @@ public class Oadr20bVenControllerTest {
 				OadrCancelPartyRegistrationType.class);
 
 		// send request register report action
-		oadrMockMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		oadrMockHttpMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report_action/requestRegister", HttpStatus.OK_200);
 
 		Thread.sleep(200);
@@ -115,7 +119,7 @@ public class Oadr20bVenControllerTest {
 				OadrCreateReportType.class);
 
 		// send own register report action
-		oadrMockMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		oadrMockHttpMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report_action/sendRegister", HttpStatus.OK_200);
 
 		Thread.sleep(200);
@@ -128,7 +132,7 @@ public class Oadr20bVenControllerTest {
 		String reportRequestId = "reportRequestId";
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
 		params.add("reportRequestId", reportRequestId);
-		oadrMockMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		oadrMockHttpMvc.postVenAction(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_ENDPOINT + OadrDataBaseSetup.VEN + "/report_action/cancel", HttpStatus.OK_200, params);
 
 		Thread.sleep(200);

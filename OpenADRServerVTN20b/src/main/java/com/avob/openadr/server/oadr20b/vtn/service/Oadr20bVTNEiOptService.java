@@ -165,8 +165,8 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 
 			// override oadrCreatedEvent message
 			if (resources == null) {
-				demandResponseEventService.updateVenOpt(Long.parseLong(eventID), modificationNumber, venID,
-						convertedOpt);
+				demandResponseEventService.updateVenDemandResponseEvent(Long.parseLong(eventID), modificationNumber,
+						venID, convertedOpt);
 			} else {
 				for (VenResource resource : resources) {
 					venOptService.create(ven, resource, null, event, convertedOpt);

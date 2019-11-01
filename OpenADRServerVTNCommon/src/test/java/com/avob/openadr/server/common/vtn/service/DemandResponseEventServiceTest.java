@@ -23,6 +23,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.avob.openadr.server.common.vtn.ApplicationTest;
+import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
@@ -305,12 +306,12 @@ public class DemandResponseEventServiceTest {
 	}
 
 	@Test
-	public void getUpdateVenOptTest() {
+	public void getUpdateVenOptTest() throws OadrElementNotFoundException {
 
 		DemandResponseEventOptEnum venOpt = demandResponseEventService.getVenOpt(event1.getId(), ven1.getUsername());
 		assertNull(venOpt);
 		assertFalse(demandResponseEventService.hasResponded(ven1.getUsername(), event1));
-		demandResponseEventService.updateVenOpt(event1.getId(), event1.getDescriptor().getModificationNumber(),
+		demandResponseEventService.updateVenDemandResponseEvent(event1.getId(), event1.getDescriptor().getModificationNumber(),
 				ven1.getUsername(), DemandResponseEventOptEnum.OPT_IN);
 		assertTrue(demandResponseEventService.hasResponded(ven1.getUsername(), event1));
 		venOpt = demandResponseEventService.getVenOpt(event1.getId(), ven1.getUsername());
@@ -319,7 +320,7 @@ public class DemandResponseEventServiceTest {
 		venOpt = demandResponseEventService.getVenOpt(event1.getId(), ven2.getUsername());
 		assertNull(venOpt);
 
-		demandResponseEventService.updateVenOpt(event1.getId(), event1.getDescriptor().getModificationNumber(),
+		demandResponseEventService.updateVenDemandResponseEvent(event1.getId(), event1.getDescriptor().getModificationNumber(),
 				ven2.getUsername(), DemandResponseEventOptEnum.OPT_OUT);
 		venOpt = demandResponseEventService.getVenOpt(event1.getId(), ven2.getUsername());
 		assertNotNull(venOpt);

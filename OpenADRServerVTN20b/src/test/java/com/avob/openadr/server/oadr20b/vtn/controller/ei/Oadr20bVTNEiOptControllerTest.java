@@ -46,7 +46,8 @@ import com.avob.openadr.server.oadr20b.vtn.models.venopt.VenOptDto;
 import com.avob.openadr.server.oadr20b.vtn.service.VenOptService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
-import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpMvc;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VTN20bSecurityApplicationTest.class })
@@ -66,7 +67,10 @@ public class Oadr20bVTNEiOptControllerTest {
 	private XmlSignatureService xmlSignatureService;
 
 	@Resource
-	private OadrMockMvc oadrMockMvc;
+	private OadrMockEiHttpMvc oadrMockMvc;
+
+	@Resource
+	private OadrMockHttpMvc oadrMockHttpMvc;
 
 	private MultiValueMap<String, String> createParams(Long start, Long end, String marketContextName) {
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
@@ -95,7 +99,7 @@ public class Oadr20bVTNEiOptControllerTest {
 						.with(OadrDataBaseSetup.USER_SECURITY_SESSION))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
-		List<VenOptDto> findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(
+		List<VenOptDto> findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(
 				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200,
 				VenOptDto.class);
 		assertNotNull(findScheduledOpt);
@@ -124,14 +128,14 @@ public class Oadr20bVTNEiOptControllerTest {
 		assertEquals(optId, oadrPayload.getOadrSignedObject().getOadrCreatedOpt().getOptID());
 
 		// test ven not found
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + "mouaiccool" + "/opt", HttpStatus.NOT_ACCEPTABLE_406, null,
 				createParams(createdDatetime - 1000, createdDatetime + 1000, null));
 
 		// test opt configured
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200, VenOptDto.class,
-				createParams(createdDatetime - 60*1000, createdDatetime + 60*1000, null));
+				createParams(createdDatetime - 60 * 1000, createdDatetime + 60 * 1000, null));
 
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
@@ -139,9 +143,10 @@ public class Oadr20bVTNEiOptControllerTest {
 		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContext());
 
 		// test opt configured on OadrDataBaseSetup.MARKET_CONTEXT_NAME: between
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200, VenOptDto.class,
-				createParams(createdDatetime - 60*1000, createdDatetime + 60*1000, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
+				createParams(createdDatetime - 60 * 1000, createdDatetime + 60 * 1000,
+						OadrDataBaseSetup.MARKET_CONTEXT_NAME));
 
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
@@ -149,27 +154,27 @@ public class Oadr20bVTNEiOptControllerTest {
 		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContext());
 
 		// test opt configured on OadrDataBaseSetup.MARKET_CONTEXT_NAME: after
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200, VenOptDto.class,
-				createParams(createdDatetime - 60*1000, null, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
+				createParams(createdDatetime - 60 * 1000, null, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
 		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenId());
 		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContext());
 
 		// test opt configured: after
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200, VenOptDto.class,
-				createParams(createdDatetime - 60*1000, null, null));
+				createParams(createdDatetime - 60 * 1000, null, null));
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
 		assertEquals(OadrDataBaseSetup.VEN, findScheduledOpt.get(0).getVenId());
 		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContext());
 
 		// test opt configured on OadrDataBaseSetup.MARKET_CONTEXT_NAME: before
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200, VenOptDto.class,
-				createParams(null, createdDatetime + 60*1000, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
+				createParams(null, createdDatetime + 60 * 1000, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
 
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
@@ -177,9 +182,9 @@ public class Oadr20bVTNEiOptControllerTest {
 		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContext());
 
 		// test opt configured: before
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200, VenOptDto.class,
-				createParams(null, createdDatetime + 60*1000, null));
+				createParams(null, createdDatetime + 60 * 1000, null));
 
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
@@ -187,7 +192,7 @@ public class Oadr20bVTNEiOptControllerTest {
 		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, findScheduledOpt.get(0).getMarketContext());
 
 		// test opt configured on OadrDataBaseSetup.MARKET_CONTEXT_NAME
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200, VenOptDto.class,
 				createParams(null, null, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
 
@@ -198,7 +203,7 @@ public class Oadr20bVTNEiOptControllerTest {
 
 		// test opt configured on OadrDataBaseSetup.MARKET_CONTEXT_NAME: outside
 		// opt window frame
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200, VenOptDto.class,
 				createParams(null, createdDatetime - 1000, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
 
@@ -207,7 +212,7 @@ public class Oadr20bVTNEiOptControllerTest {
 
 		// test no opt configured on
 		// OadrDataBaseSetup.ANOTHER_MARKET_CONTEXT_NAME
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200, VenOptDto.class, createParams(
 						createdDatetime - 1000, createdDatetime + 1000, OadrDataBaseSetup.ANOTHER_MARKET_CONTEXT_NAME));
 
@@ -215,7 +220,7 @@ public class Oadr20bVTNEiOptControllerTest {
 		assertEquals(0, findScheduledOpt.size());
 
 		// test unknown marketContext
-		oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.NOT_ACCEPTABLE_406, null,
 				createParams(createdDatetime - 1000, createdDatetime + 1000, "mouaiccool"));
 
@@ -259,64 +264,67 @@ public class Oadr20bVTNEiOptControllerTest {
 		// test that NULL marketContext are grabbed when opt of a specific
 		// marketContext are required (because NULL marketContext opt applied to
 		// every marketContext)
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200, VenOptDto.class,
-				createParams(createdDatetime - 60*1000, createdDatetime + 60*1000, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
+				createParams(createdDatetime - 60 * 1000, createdDatetime + 60 * 1000,
+						OadrDataBaseSetup.MARKET_CONTEXT_NAME));
 
 		assertNotNull(findScheduledOpt);
 		assertEquals(2, findScheduledOpt.size());
 
 		// test previously created opt is linked to resource
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt/resource/fakeResourceName", HttpStatus.NOT_ACCEPTABLE_406, null,
-				createParams(createdDatetime - 60*1000, createdDatetime + 60*1000, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
+				createParams(createdDatetime - 60 * 1000, createdDatetime + 60 * 1000,
+						OadrDataBaseSetup.MARKET_CONTEXT_NAME));
 
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt/resource/" + OadrDataBaseSetup.VEN_RESOURCE_1,
-				HttpStatus.OK_200, VenOptDto.class,
-				createParams(createdDatetime - 60*1000, createdDatetime + 60*1000, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
+				HttpStatus.OK_200, VenOptDto.class, createParams(createdDatetime - 60 * 1000,
+						createdDatetime + 60 * 1000, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
 
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt/resource/" + OadrDataBaseSetup.VEN_RESOURCE_1,
 				HttpStatus.OK_200, VenOptDto.class,
-				createParams(null, createdDatetime + 60*1000, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
+				createParams(null, createdDatetime + 60 * 1000, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
 
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt/resource/" + OadrDataBaseSetup.VEN_RESOURCE_1,
 				HttpStatus.OK_200, VenOptDto.class,
-				createParams(createdDatetime - 60*1000, null, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
+				createParams(createdDatetime - 60 * 1000, null, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
 
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt/resource/" + OadrDataBaseSetup.VEN_RESOURCE_1,
 				HttpStatus.OK_200, VenOptDto.class, createParams(null, null, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
 
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt/resource/" + OadrDataBaseSetup.VEN_RESOURCE_1,
-				HttpStatus.OK_200, VenOptDto.class, createParams(createdDatetime - 60*1000, createdDatetime + 60*1000, null));
+				HttpStatus.OK_200, VenOptDto.class,
+				createParams(createdDatetime - 60 * 1000, createdDatetime + 60 * 1000, null));
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
 
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt/resource/" + OadrDataBaseSetup.VEN_RESOURCE_1,
-				HttpStatus.OK_200, VenOptDto.class, createParams(null, createdDatetime + 60*1000, null));
+				HttpStatus.OK_200, VenOptDto.class, createParams(null, createdDatetime + 60 * 1000, null));
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
 
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt/resource/" + OadrDataBaseSetup.VEN_RESOURCE_1,
-				HttpStatus.OK_200, VenOptDto.class, createParams(createdDatetime - 60*1000, null, null));
+				HttpStatus.OK_200, VenOptDto.class, createParams(createdDatetime - 60 * 1000, null, null));
 		assertNotNull(findScheduledOpt);
 		assertEquals(1, findScheduledOpt.size());
 
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt/resource/" + OadrDataBaseSetup.VEN_RESOURCE_1,
 				HttpStatus.OK_200, VenOptDto.class);
 		assertNotNull(findScheduledOpt);
@@ -367,9 +375,10 @@ public class Oadr20bVTNEiOptControllerTest {
 		assertEquals(eventOptId, oadrCreatedOptType.getOptID());
 
 		// test than last opt is not considered as vavailability opt
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200, VenOptDto.class,
-				createParams(createdDatetime - 60*1000, createdDatetime + 60*1000, OadrDataBaseSetup.MARKET_CONTEXT_NAME));
+				createParams(createdDatetime - 60 * 1000, createdDatetime + 60 * 1000,
+						OadrDataBaseSetup.MARKET_CONTEXT_NAME));
 
 		assertNotNull(findScheduledOpt);
 		assertEquals(2, findScheduledOpt.size());
@@ -378,7 +387,7 @@ public class Oadr20bVTNEiOptControllerTest {
 		// whole ven (without specifying resource), it does not create a VenOpt
 		// but change VenDemandResponseEvent object related to ven and event
 		// (override OadrCreatedEvent ven response)
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200, VenOptDto.class);
 
 		assertNotNull(findScheduledOpt);
@@ -406,9 +415,9 @@ public class Oadr20bVTNEiOptControllerTest {
 		assertEquals(optId, oadrCanceledOptType.getOptID());
 
 		// test no opt configured
-		findScheduledOpt = oadrMockMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+		findScheduledOpt = oadrMockHttpMvc.getRestJsonControllerAndExpectList(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				VEN_URL + OadrDataBaseSetup.VEN + "/opt", HttpStatus.OK_200, VenOptDto.class,
-				createParams(createdDatetime - 60*1000, createdDatetime + 60*1000, null));
+				createParams(createdDatetime - 60 * 1000, createdDatetime + 60 * 1000, null));
 
 		assertNotNull(findScheduledOpt);
 		assertEquals(0, findScheduledOpt.size());

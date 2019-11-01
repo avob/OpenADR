@@ -142,8 +142,8 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 
 		if (HttpStatus.OK_200 == responseCode) {
 			OptTypeType optType = response.getOptType();
-			demandResponseEventService.updateVenOpt(Long.parseLong(eventID), modificationNumber, ven.getUsername(),
-					OptConverter.convert(optType));
+			demandResponseEventService.updateVenDemandResponseEvent(Long.parseLong(eventID), modificationNumber,
+					ven.getUsername(), OptConverter.convert(optType));
 		}
 		// TODO bertrand: if responseCode is not OK, that's mean VEN somehow
 		// could not understand previously sent DREvent. Maybe we should here

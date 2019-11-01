@@ -2,8 +2,6 @@ package com.avob.openadr.server.oadr20b.vtn.utils;
 
 import static org.junit.Assert.assertNotNull;
 
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.servlet.Filter;
 import javax.xml.bind.JAXBElement;
@@ -15,11 +13,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
@@ -27,7 +23,7 @@ import com.avob.openadr.model.oadr20b.ei.EiEventType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 
 @Service
-public class OadrMockMvc {
+public class OadrMockEiHttpMvc {
 
 	private static final String EIEVENT_ENDPOINT = "/OpenADR2/Simple/2.0b/EiEvent";
 	private static final String EIREPORT_ENDPOINT = "/OpenADR2/Simple/2.0b/EiReport";
@@ -76,7 +72,7 @@ public class OadrMockMvc {
 	public <T> T postOadrPollAndExpect(UserRequestPostProcessor authSession, Object payload, int status, Class<T> klass)
 			throws Oadr20bMarshalException, Exception {
 		T postEiAndExpect = this.postEiAndExpect(OADRPOLL_ENDPOINT, authSession, payload, status, klass);
-		
+
 		return postEiAndExpect;
 	}
 
@@ -108,71 +104,17 @@ public class OadrMockMvc {
 		}
 
 		Thread.sleep(200);
-		
+
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(endpoint).content(content).with(authSession))
 				.andExpect(MockMvcResultMatchers.status().is(status)).andReturn();
-		
+
 		if (String.class.equals(klass)) {
 			return (T) andReturn.getResponse().getContentAsString();
 		}
 		T unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), klass);
 		assertNotNull(unmarshal);
 		return unmarshal;
-	}
-
-	public <T> List<T> getRestJsonControllerAndExpectList(UserRequestPostProcessor authSession, String url, int status,
-			Class<T> klass) throws Exception {
-		return this.getRestJsonControllerAndExpectList(authSession, url, status, klass, null);
-	}
-
-	public <T> List<T> getRestJsonControllerAndExpectList(UserRequestPostProcessor authSession, String url, int status,
-			Class<T> klass, MultiValueMap<String, String> params) throws Exception {
-		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(url);
-		if (params != null) {
-			builder.params(params);
-		}
-		builder.with(authSession);
-		MvcResult andReturn = this.mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().is(status))
-				.andReturn();
-		if (klass != null) {
-			return Oadr20bTestUtils.convertMvcResultToDtoList(andReturn, klass);
-		}
-		return null;
-	}
-
-	public <T> T getRestJsonControllerAndExpect(UserRequestPostProcessor authSession, String url, int status,
-			Class<T> klass) throws Exception {
-		return this.getRestJsonControllerAndExpect(authSession, url, status, klass, null);
-	}
-
-	public <T> T getRestJsonControllerAndExpect(UserRequestPostProcessor authSession, String url, int status,
-			Class<T> klass, MultiValueMap<String, String> params) throws Exception {
-		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(url);
-		if (params != null) {
-			builder.params(params);
-		}
-		builder.with(authSession);
-		MvcResult andReturn = this.mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().is(status))
-				.andReturn();
-		if (klass != null) {
-			return Oadr20bTestUtils.convertMvcResultToDto(andReturn, klass);
-		}
-		return null;
-	}
-
-	public void postVenAction(UserRequestPostProcessor authSession, String url, int status) throws Exception {
-		this.postVenAction(authSession, url, status, null);
-	}
-
-	public void postVenAction(UserRequestPostProcessor authSession, String url, int status,
-			MultiValueMap<String, String> params) throws Exception {
-		MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(url);
-		if (params != null) {
-			builder.params(params);
-		}
-		builder.with(authSession);
-		this.mockMvc.perform(builder).andExpect(MockMvcResultMatchers.status().is(status));
 	}
 
 }
