@@ -25,6 +25,9 @@ public class ReportData {
 	private long id;
 
 	@NotNull
+	private String venId;
+
+	@NotNull
 	private String reportSpecifierId;
 
 	@NotNull
@@ -37,8 +40,6 @@ public class ReportData {
 	private Long start;
 
 	private String duration;
-
-	
 
 	public long getId() {
 		return id;
@@ -96,6 +97,12 @@ public class ReportData {
 		this.duration = duration;
 	}
 
+	public String getVenId() {
+		return venId;
+	}
 
+	public void setVenId(String venId) {
+		this.venId = venId;
+	}
 
 }

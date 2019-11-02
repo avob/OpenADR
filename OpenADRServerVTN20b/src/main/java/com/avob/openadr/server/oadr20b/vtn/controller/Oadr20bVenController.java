@@ -403,8 +403,8 @@ public class Oadr20bVenController {
 		checkVen(venID);
 		checkOtherReportCapability(venID, reportSpecifierId);
 
-		List<OtherReportDataFloat> findByReportSpecifierId = otherReportDataService
-				.findByReportSpecifierId(reportSpecifierId);
+		List<OtherReportDataFloat> findByReportSpecifierId = otherReportDataService.findByReportSpecifierId(venID,
+				reportSpecifierId);
 		return oadr20bDtoMapper.mapList(findByReportSpecifierId, OtherReportDataFloatDto.class);
 	}
 
@@ -417,7 +417,8 @@ public class Oadr20bVenController {
 		checkVen(venID);
 		checkOtherReportCapabilityDescription(venID, reportSpecifierId, rid);
 
-		return oadr20bDtoMapper.mapList(otherReportDataService.findByReportSpecifierIdAndRid(reportSpecifierId, rid),
+		return oadr20bDtoMapper.mapList(
+				otherReportDataService.findByReportSpecifierIdAndRid(venID, reportSpecifierId, rid),
 				OtherReportDataFloatDto.class);
 	}
 
@@ -431,7 +432,7 @@ public class Oadr20bVenController {
 		checkOtherReportCapability(venID, reportSpecifierId);
 
 		List<OtherReportDataPayloadResourceStatus> findByReportSpecifierId = otherReportDataPayloadResourceStatusService
-				.findByReportSpecifierId(reportSpecifierId);
+				.findByReportSpecifierId(venID, reportSpecifierId);
 		return oadr20bDtoMapper.mapList(findByReportSpecifierId, OtherReportDataPayloadResourceStatusDto.class);
 	}
 
@@ -444,9 +445,8 @@ public class Oadr20bVenController {
 		checkVen(venID);
 		checkOtherReportCapabilityDescription(venID, reportSpecifierId, rid);
 
-		return oadr20bDtoMapper.mapList(
-				otherReportDataPayloadResourceStatusService.findByReportSpecifierIdAndRid(reportSpecifierId, rid),
-				OtherReportDataPayloadResourceStatusDto.class);
+		return oadr20bDtoMapper.mapList(otherReportDataPayloadResourceStatusService.findByReportSpecifierIdAndRid(venID,
+				reportSpecifierId, rid), OtherReportDataPayloadResourceStatusDto.class);
 	}
 
 	@RequestMapping(value = "/{venID}/report/data/keytoken/{reportSpecifierId}", method = RequestMethod.GET)
@@ -459,7 +459,7 @@ public class Oadr20bVenController {
 		checkOtherReportCapability(venID, reportSpecifierId);
 
 		List<OtherReportDataKeyToken> findByReportSpecifierId = otherReportDataKeyTokenService
-				.findByReportSpecifierId(reportSpecifierId);
+				.findByReportSpecifierId(venID, reportSpecifierId);
 		return oadr20bDtoMapper.mapList(findByReportSpecifierId, OtherReportDataKeyTokenDto.class);
 	}
 
@@ -473,7 +473,7 @@ public class Oadr20bVenController {
 		checkOtherReportCapabilityDescription(venID, reportSpecifierId, rid);
 
 		return oadr20bDtoMapper.mapList(
-				otherReportDataKeyTokenService.findByReportSpecifierIdAndRid(reportSpecifierId, rid),
+				otherReportDataKeyTokenService.findByReportSpecifierIdAndRid(venID, reportSpecifierId, rid),
 				OtherReportDataKeyTokenDto.class);
 	}
 

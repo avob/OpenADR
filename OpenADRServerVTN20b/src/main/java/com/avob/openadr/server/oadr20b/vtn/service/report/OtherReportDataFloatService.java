@@ -17,12 +17,13 @@ public class OtherReportDataFloatService extends GenericService<OtherReportDataF
 	@Resource
 	private OtherReportDataFloatDao otherReportDataDao;
 
-	public List<OtherReportDataFloat> findByReportSpecifierId(String reportSpecifierId) {
-		return otherReportDataDao.findByReportSpecifierId(reportSpecifierId);
+	public List<OtherReportDataFloat> findByReportSpecifierId(String venId, String reportSpecifierId) {
+		return otherReportDataDao.findByVenIdAndReportSpecifierId(venId, reportSpecifierId);
 	}
 
-	public List<OtherReportDataFloat> findByReportSpecifierIdAndRid(String reportSpecifierId, String rid) {
-		return otherReportDataDao.findByReportSpecifierIdAndRid(reportSpecifierId, rid);
+	public List<OtherReportDataFloat> findByReportSpecifierIdAndRid(String venId, String reportSpecifierId,
+			String rid) {
+		return otherReportDataDao.findByVenIdAndReportSpecifierIdAndRid(venId, reportSpecifierId, rid);
 	}
 
 	@Override

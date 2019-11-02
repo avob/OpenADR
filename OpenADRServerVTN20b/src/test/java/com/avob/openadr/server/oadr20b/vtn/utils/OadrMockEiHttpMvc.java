@@ -4,7 +4,6 @@ import static org.junit.Assert.assertNotNull;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.Filter;
-import javax.xml.bind.JAXBElement;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor;
@@ -19,18 +18,18 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
-import com.avob.openadr.model.oadr20b.ei.EiEventType;
+import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 
 @Service
 public class OadrMockEiHttpMvc {
 
-	private static final String EIEVENT_ENDPOINT = "/OpenADR2/Simple/2.0b/EiEvent";
-	private static final String EIREPORT_ENDPOINT = "/OpenADR2/Simple/2.0b/EiReport";
-	private static final String EIOPT_ENDPOINT = "/OpenADR2/Simple/2.0b/EiOpt";
-	private static final String EIREGISTERPARTY_ENDPOINT = "/OpenADR2/Simple/2.0b/EiRegisterParty";
-	private static final String OADRPOLL_ENDPOINT = "/OpenADR2/Simple/2.0b/OadrPoll";
-	private static final String OADR20B_EVENT_URL = "/OadrEvent/";
+	private static final String EIEVENT_ENDPOINT = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.EI_EVENT_SERVICE;
+	private static final String EIREPORT_ENDPOINT = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.EI_REPORT_SERVICE;
+	private static final String EIOPT_ENDPOINT = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.EI_OPT_SERVICE;
+	private static final String EIREGISTERPARTY_ENDPOINT = Oadr20bUrlPath.OADR_BASE_PATH
+			+ Oadr20bUrlPath.EI_REGISTER_PARTY_SERVICE;
+	private static final String OADRPOLL_ENDPOINT = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.OADR_POLL_SERVICE;
 
 	private MockMvc mockMvc;
 
@@ -71,21 +70,7 @@ public class OadrMockEiHttpMvc {
 
 	public <T> T postOadrPollAndExpect(UserRequestPostProcessor authSession, Object payload, int status, Class<T> klass)
 			throws Oadr20bMarshalException, Exception {
-		T postEiAndExpect = this.postEiAndExpect(OADRPOLL_ENDPOINT, authSession, payload, status, klass);
-
-		return postEiAndExpect;
-	}
-
-	public void postOadrEventAndExpect(UserRequestPostProcessor authSession, JAXBElement<EiEventType> payload,
-			int status) throws Oadr20bMarshalException, Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.post(OADR20B_EVENT_URL).content(jaxbContext.marshal(payload, false))
-				.with(authSession)).andExpect(MockMvcResultMatchers.status().is(status));
-	}
-
-	public void postOadrEventAndExpect(UserRequestPostProcessor authSession, String payload, int status)
-			throws Oadr20bMarshalException, Exception {
-		this.mockMvc.perform(MockMvcRequestBuilders.post(OADR20B_EVENT_URL).content(payload).with(authSession))
-				.andExpect(MockMvcResultMatchers.status().is(status));
+		return this.postEiAndExpect(OADRPOLL_ENDPOINT, authSession, payload, status, klass);
 	}
 
 	public ResultActions perform(RequestBuilder requestBuilder) throws Exception {
@@ -102,8 +87,6 @@ public class OadrMockEiHttpMvc {
 		} else {
 			content = jaxbContext.marshalRoot(payload);
 		}
-
-		Thread.sleep(200);
 
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(endpoint).content(content).with(authSession))

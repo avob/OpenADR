@@ -48,6 +48,9 @@ public class OadrMockHttpDemandResponseEventMvc {
 				.perform(MockMvcRequestBuilders.post(DEMANDRESPONSEEVENT_ENDPOINT).with(authSession)
 						.content(mapper.writeValueAsBytes(dto)).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(status)).andReturn();
+		if (HttpStatus.CREATED_201 != status) {
+			return null;
+		}
 		MockHttpServletResponse mockHttpServletResponse = andReturn.getResponse();
 
 		return mapper.readValue(mockHttpServletResponse.getContentAsString(), DemandResponseEventReadDto.class);

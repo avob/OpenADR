@@ -34,6 +34,14 @@ public class OadrMockVen {
 		jaxbcontext = Oadr20bJAXBContext.getInstance();
 	}
 
+	public String getVenId() {
+		return ven.getUsername();
+	}
+
+	public VenDto getVen() {
+		return ven;
+	}
+
 	public <T> T register(Object payload, int status, Class<T> klass) throws Exception {
 		if (ven.getXmlSignature()) {
 			String sign = xmlSignatureService.sign(payload);
@@ -86,8 +94,8 @@ public class OadrMockVen {
 		}
 	}
 
-	public <T> T poll(int status, Class<T> klass) throws Exception {
-		Object payload = Oadr20bPollBuilders.newOadr20bPollBuilder(ven.getUsername()).build();
+	public <T> T poll(Object payload, int status, Class<T> klass) throws Exception {
+		Thread.sleep(200);
 		if (ven.getXmlSignature()) {
 			String sign = xmlSignatureService.sign(payload);
 			String postEiRegisterPartyAndExpect = mockService.postOadrPollAndExpect(authSession, sign, status,
@@ -102,6 +110,11 @@ public class OadrMockVen {
 			assertNotNull(postOadrPollAndExpect);
 			return postOadrPollAndExpect;
 		}
+	}
+
+	public <T> T poll(int status, Class<T> klass) throws Exception {
+		Object payload = Oadr20bPollBuilders.newOadr20bPollBuilder(ven.getUsername()).build();
+		return this.poll(payload, status, klass);
 	}
 
 	public OadrDistributeEventType pollForValidOadrDistributeEvent() throws Exception {

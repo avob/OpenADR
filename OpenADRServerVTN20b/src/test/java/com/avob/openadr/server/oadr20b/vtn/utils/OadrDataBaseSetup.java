@@ -1,5 +1,8 @@
 package com.avob.openadr.server.oadr20b.vtn.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
@@ -56,6 +59,12 @@ public class OadrDataBaseSetup {
 	public static final String GROUP = "group1";
 	public static final String ANOTHER_GROUP = "group2";
 
+	public static Map<String, UserRequestPostProcessor> VEN_TEST_LIST = new HashMap<>();
+	static {
+		VEN_TEST_LIST.put(OadrDataBaseSetup.VEN, VEN_SECURITY_SESSION);
+		VEN_TEST_LIST.put(OadrDataBaseSetup.ANOTHER_VEN, ANOTHER_VEN_SECURITY_SESSION);
+	}
+
 	@Resource
 	private VenService venService;
 
@@ -92,6 +101,18 @@ public class OadrDataBaseSetup {
 		ven.setVenGroup(Sets.newHashSet(group));
 		ven.setTransport(OadrTransportType.SIMPLE_HTTP.value());
 		ven.setXmlSignature(true);
+		ven.setHttpPullModel(true);
+		venService.save(ven);
+
+		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
+		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
+
+		ven = venService.prepare(ANOTHER_VEN);
+		ven.setRegistrationId(ANOTHER_VEN_REGISTRATION_ID);
+		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
+		ven.setVenGroup(Sets.newHashSet(group));
+		ven.setTransport(OadrTransportType.SIMPLE_HTTP.value());
+		ven.setHttpPullModel(true);
 		venService.save(ven);
 
 		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));

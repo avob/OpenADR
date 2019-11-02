@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
@@ -14,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -70,22 +72,27 @@ public class Oadr20bVTNEiOptControllerTest {
 
 	@Test
 	public void test() throws Exception {
-		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
-				HttpStatus.OK_200);
-		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_SECURITY_SESSION, oadrMockEiHttpMvc,
-				xmlSignatureService);
+		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.VEN_TEST_LIST.entrySet()) {
+			VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, entry.getKey(),
+					HttpStatus.OK_200);
+			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, xmlSignatureService);
+			_test(mockVen);
+		}
+	}
+
+	public void _test(OadrMockVen mockVen) throws Exception {
 
 		// test no opt configured
 		LinkedMultiValueMap<String, String> params = OadrParamBuilder.builder().build();
-		oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.VEN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.VEN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.FORBIDDEN_403);
-		oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.USER_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.USER_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.FORBIDDEN_403);
 
 		// VEN CONTROLLER - get ven opt
 		params = OadrParamBuilder.builder().build();
 		List<VenOptDto> venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
-				OadrDataBaseSetup.VEN, params, HttpStatus.OK_200);
+				mockVen.getVenId(), params, HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertTrue(venOpt.isEmpty());
 
@@ -99,10 +106,10 @@ public class Oadr20bVTNEiOptControllerTest {
 		OptTypeType optType = OptTypeType.OPT_OUT;
 		OptReasonEnumeratedType optReason = OptReasonEnumeratedType.NOT_PARTICIPATING;
 		OadrCreateOptType oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId,
-				OadrDataBaseSetup.VEN, createdDatetime, vavailabilityType, optId, optType, optReason)
+				mockVen.getVenId(), createdDatetime, vavailabilityType, optId, optType, optReason)
 				.withMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
 
-		// EI OPT CONTROLLER - send
+		// EI OPT CONTROLLER - send OadrCreateOptType
 		OadrCreatedOptType opt = mockVen.opt(oadrCreateOptType, HttpStatus.OK_200, OadrCreatedOptType.class);
 		assertEquals(String.valueOf(HttpStatus.OK_200), opt.getEiResponse().getResponseCode());
 		assertEquals(requestId, opt.getEiResponse().getRequestID());
@@ -117,71 +124,71 @@ public class Oadr20bVTNEiOptControllerTest {
 		// VEN CONTROLLER - test opt configured
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 60 * 1000).addEnd(createdDatetime + 60 * 1000)
 				.build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, venOpt.get(0).getVenId());
+		assertEquals(mockVen.getVenId(), venOpt.get(0).getVenId());
 		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, venOpt.get(0).getMarketContext());
 
 		// VEN CONTROLLER - test opt configured on
 		// OadrDataBaseSetup.MARKET_CONTEXT_NAME: between
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 60 * 1000).addEnd(createdDatetime + 60 * 1000)
 				.addMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, venOpt.get(0).getVenId());
+		assertEquals(mockVen.getVenId(), venOpt.get(0).getVenId());
 		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, venOpt.get(0).getMarketContext());
 
 		// VEN CONTROLLER - test opt configured on
 		// OadrDataBaseSetup.MARKET_CONTEXT_NAME: after
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 60 * 1000)
 				.addMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, venOpt.get(0).getVenId());
+		assertEquals(mockVen.getVenId(), venOpt.get(0).getVenId());
 		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, venOpt.get(0).getMarketContext());
 
 		// VEN CONTROLLER - test opt configured: after
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 60 * 1000).build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, venOpt.get(0).getVenId());
+		assertEquals(mockVen.getVenId(), venOpt.get(0).getVenId());
 		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, venOpt.get(0).getMarketContext());
 
 		// VEN CONTROLLER - test opt configured on
 		// OadrDataBaseSetup.MARKET_CONTEXT_NAME: before
 		params = OadrParamBuilder.builder().addEnd(createdDatetime + 60 * 1000)
 				.addMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, venOpt.get(0).getVenId());
+		assertEquals(mockVen.getVenId(), venOpt.get(0).getVenId());
 		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, venOpt.get(0).getMarketContext());
 
 		// VEN CONTROLLER - test opt configured: before
 		params = OadrParamBuilder.builder().addEnd(createdDatetime + 60 * 1000).build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, venOpt.get(0).getVenId());
+		assertEquals(mockVen.getVenId(), venOpt.get(0).getVenId());
 		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, venOpt.get(0).getMarketContext());
 
 		// VEN CONTROLLER - test opt configured on OadrDataBaseSetup.MARKET_CONTEXT_NAME
 		params = OadrParamBuilder.builder().addMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
-		assertEquals(OadrDataBaseSetup.VEN, venOpt.get(0).getVenId());
+		assertEquals(mockVen.getVenId(), venOpt.get(0).getVenId());
 		assertEquals(OadrDataBaseSetup.MARKET_CONTEXT_NAME, venOpt.get(0).getMarketContext());
 
 		// VEN CONTROLLER - test opt configured on
@@ -189,7 +196,7 @@ public class Oadr20bVTNEiOptControllerTest {
 		// opt window frame
 		params = OadrParamBuilder.builder().addEnd(createdDatetime - 1000)
 				.addMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(0, venOpt.size());
@@ -198,7 +205,7 @@ public class Oadr20bVTNEiOptControllerTest {
 		// OadrDataBaseSetup.ANOTHER_MARKET_CONTEXT_NAME
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 1000).addEnd(createdDatetime + 1000)
 				.addMarketContext(OadrDataBaseSetup.ANOTHER_MARKET_CONTEXT_NAME).build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(0, venOpt.size());
@@ -206,12 +213,12 @@ public class Oadr20bVTNEiOptControllerTest {
 		// VEN CONTROLLER - test unknown marketContext
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 1000).addEnd(createdDatetime + 1000)
 				.addMarketContext("mouaiccool").build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.NOT_ACCEPTABLE_406);
 
 		// EI OPT CONTROLLER - test cannot set opt message about another VEN
 		oadrCreateOptType = Oadr20bEiOptBuilders
-				.newOadr20bCreateOptBuilder(requestId, OadrDataBaseSetup.ANOTHER_VEN, createdDatetime,
+				.newOadr20bCreateOptBuilder(requestId, "mouaiccool", createdDatetime,
 						vavailabilityType, optId, optType, optReason)
 				.withMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
 
@@ -224,7 +231,7 @@ public class Oadr20bVTNEiOptControllerTest {
 
 		// EI OPT CONTROLLER - test create invalid vavailability opt on unknown ven
 		// resource
-		oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, OadrDataBaseSetup.VEN,
+		oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, mockVen.getVenId(),
 				createdDatetime, vavailabilityType, optId, optType, optReason).addTargetedResource("fakeResource")
 				.build();
 
@@ -235,7 +242,7 @@ public class Oadr20bVTNEiOptControllerTest {
 		// EI OPT CONTROLLER - test create valid vavailability opt on ven resource
 		// without
 		// marketcontext
-		oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, OadrDataBaseSetup.VEN,
+		oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, mockVen.getVenId(),
 				createdDatetime, vavailabilityType, optId, optType, optReason)
 				.addTargetedResource(OadrDataBaseSetup.VEN_RESOURCE_1).build();
 
@@ -250,7 +257,7 @@ public class Oadr20bVTNEiOptControllerTest {
 		// every marketContext)
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 60 * 1000).addEnd(createdDatetime + 60 * 1000)
 				.addMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(2, venOpt.size());
@@ -258,12 +265,12 @@ public class Oadr20bVTNEiOptControllerTest {
 		// VEN CONTROLLER - test previously created opt is linked to resource
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 60 * 1000).addEnd(createdDatetime + 60 * 1000)
 				.addMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
-		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(),
 				"fakeResourceName", params, HttpStatus.NOT_ACCEPTABLE_406);
 
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 60 * 1000).addEnd(createdDatetime + 60 * 1000)
 				.addMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
-		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(),
 				OadrDataBaseSetup.VEN_RESOURCE_1, params, HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
@@ -271,7 +278,7 @@ public class Oadr20bVTNEiOptControllerTest {
 		// VEN CONTROLLER - test previously created opt is linked to resource
 		params = OadrParamBuilder.builder().addEnd(createdDatetime + 60 * 1000)
 				.addMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
-		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(),
 				OadrDataBaseSetup.VEN_RESOURCE_1, params, HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
@@ -279,14 +286,14 @@ public class Oadr20bVTNEiOptControllerTest {
 		// VEN CONTROLLER - test previously created opt is linked to resource
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 60 * 1000)
 				.addMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
-		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(),
 				OadrDataBaseSetup.VEN_RESOURCE_1, params, HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
 
 		// VEN CONTROLLER - test previously created opt is linked to resource
 		params = OadrParamBuilder.builder().addMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
-		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(),
 				OadrDataBaseSetup.VEN_RESOURCE_1, params, HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
@@ -294,28 +301,28 @@ public class Oadr20bVTNEiOptControllerTest {
 		// VEN CONTROLLER - test previously created opt is linked to resource
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 60 * 1000).addEnd(createdDatetime + 60 * 1000)
 				.build();
-		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(),
 				OadrDataBaseSetup.VEN_RESOURCE_1, params, HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
 
 		// VEN CONTROLLER - test previously created opt is linked to resource
 		params = OadrParamBuilder.builder().addEnd(createdDatetime + 60 * 1000).build();
-		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(),
 				OadrDataBaseSetup.VEN_RESOURCE_1, params, HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
 
 		// VEN CONTROLLER - test previously created opt is linked to resource
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 60 * 1000).build();
-		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(),
 				OadrDataBaseSetup.VEN_RESOURCE_1, params, HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
 
 		// VEN CONTROLLER - test previously created opt is linked to resource
 		params = OadrParamBuilder.builder().build();
-		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		venOpt = oadrMockHttpVenMvc.getVenResourceOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(),
 				OadrDataBaseSetup.VEN_RESOURCE_1, params, HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(1, venOpt.size());
@@ -335,7 +342,7 @@ public class Oadr20bVTNEiOptControllerTest {
 		dto.getSignals().add(signal);
 		// ensure event status is "active"
 		dto.getActivePeriod().setStart(System.currentTimeMillis() - 10);
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", OadrDataBaseSetup.VEN));
+		dto.getTargets().add(new DemandResponseEventTargetDto("ven", mockVen.getVenId()));
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.setPublished(true);
 		DemandResponseEventReadDto create = oadrMockHttpDemandResponseEventMvc
@@ -343,7 +350,7 @@ public class Oadr20bVTNEiOptControllerTest {
 		assertNotNull(create);
 
 		// DEMANDE RESPONSE EVENT CONTROLLER - check created event
-		List<DemandResponseEventFilter> filters = DemandResponseEventFilter.builder().addVenId(OadrDataBaseSetup.VEN)
+		List<DemandResponseEventFilter> filters = DemandResponseEventFilter.builder().addVenId(mockVen.getVenId())
 				.addState(DemandResponseEventStateEnum.ACTIVE).build();
 		List<DemandResponseEventReadDto> search = oadrMockHttpDemandResponseEventMvc
 				.search(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, filters, HttpStatus.OK_200);
@@ -361,14 +368,14 @@ public class Oadr20bVTNEiOptControllerTest {
 		// DEMANDE RESPONSE EVENT CONTROLLER - check created event has no opt response
 		VenDemandResponseEventDto demandResponseEventVenResponse = oadrMockHttpDemandResponseEventMvc
 				.getDemandResponseEventVenResponse(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventId,
-						OadrDataBaseSetup.VEN, HttpStatus.OK_200);
+						mockVen.getVenId(), HttpStatus.OK_200);
 		assertNotNull(demandResponseEventVenResponse);
 		assertNull(demandResponseEventVenResponse.getVenOpt());
 
 		// EI OPT CONTROLLER - test create opt related to specific event with different
 		// optId
 		String eventOptId = "eventOptId";
-		oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, OadrDataBaseSetup.VEN,
+		oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, mockVen.getVenId(),
 				createdDatetime, String.valueOf(eventId), modificationNumber, eventOptId, optType, optReason).build();
 		oadrCreatedOptType = mockVen.opt(oadrCreateOptType, HttpStatus.OK_200, OadrCreatedOptType.class);
 		assertEquals(String.valueOf(HttpStatus.OK_200), oadrCreatedOptType.getEiResponse().getResponseCode());
@@ -378,7 +385,7 @@ public class Oadr20bVTNEiOptControllerTest {
 		// VEN CONTROLLER - test than last opt is not considered as vavailability opt
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 60 * 1000).addEnd(createdDatetime + 60 * 1000)
 				.addMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(2, venOpt.size());
@@ -389,28 +396,28 @@ public class Oadr20bVTNEiOptControllerTest {
 		// but change VenDemandResponseEvent object related to ven and event
 		// (override OadrCreatedEvent ven response)
 		params = OadrParamBuilder.builder().build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(2, venOpt.size()); // no VenOpt created
 
 		// DEMANDE RESPONSE EVENT CONTROLLER - check created event
 		demandResponseEventVenResponse = oadrMockHttpDemandResponseEventMvc.getDemandResponseEventVenResponse(
-				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventId, OadrDataBaseSetup.VEN, HttpStatus.OK_200);
+				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, eventId, mockVen.getVenId(), HttpStatus.OK_200);
 		assertNotNull(demandResponseEventVenResponse);
 		assertNotNull(demandResponseEventVenResponse.getVenOpt());
 		assertEquals(DemandResponseEventOptEnum.OPT_OUT, demandResponseEventVenResponse.getVenOpt());
 
-		// invalid mismatch payload venID and username auth session
+		// EI OPT CONTROLLER - invalid mismatch payload venID and username auth session
 		OadrCancelOptType oadrCancelOptType = Oadr20bEiOptBuilders
-				.newOadr20bCancelOptBuilder(requestId, optId, OadrDataBaseSetup.ANOTHER_VEN).build();
+				.newOadr20bCancelOptBuilder(requestId, optId, "mouaiccool").build();
 		OadrCanceledOptType oadrCanceledOptType = mockVen.opt(oadrCancelOptType, HttpStatus.OK_200,
 				OadrCanceledOptType.class);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
 				oadrCanceledOptType.getEiResponse().getResponseCode());
 
 		// EI OPT CONTROLLER - send OadrCancelOptType
-		oadrCancelOptType = Oadr20bEiOptBuilders.newOadr20bCancelOptBuilder(requestId, optId, OadrDataBaseSetup.VEN)
+		oadrCancelOptType = Oadr20bEiOptBuilders.newOadr20bCancelOptBuilder(requestId, optId, mockVen.getVenId())
 				.build();
 		oadrCanceledOptType = mockVen.opt(oadrCancelOptType, HttpStatus.OK_200, OadrCanceledOptType.class);
 		assertEquals(String.valueOf(HttpStatus.OK_200), oadrCanceledOptType.getEiResponse().getResponseCode());
@@ -420,7 +427,7 @@ public class Oadr20bVTNEiOptControllerTest {
 		// VEN CONTROLLER - test no opt configured
 		params = OadrParamBuilder.builder().addStart(createdDatetime - 60 * 1000).addEnd(createdDatetime + 60 * 1000)
 				.build();
-		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		venOpt = oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.OK_200);
 		assertNotNull(venOpt);
 		assertEquals(0, venOpt.size());

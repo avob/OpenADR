@@ -17,13 +17,13 @@ public class OtherReportDataPayloadResourceStatusService extends GenericService<
 	@Resource
 	private OtherReportDataPayloadResourceStatusDao otherReportDataDao;
 
-	public List<OtherReportDataPayloadResourceStatus> findByReportSpecifierId(String reportSpecifierId) {
-		return otherReportDataDao.findByReportSpecifierId(reportSpecifierId);
+	public List<OtherReportDataPayloadResourceStatus> findByReportSpecifierId(String venId, String reportSpecifierId) {
+		return otherReportDataDao.findByVenIdAndReportSpecifierId(venId, reportSpecifierId);
 	}
 
-	public List<OtherReportDataPayloadResourceStatus> findByReportSpecifierIdAndRid(String reportSpecifierId,
-			String rid) {
-		return otherReportDataDao.findByReportSpecifierIdAndRid(reportSpecifierId, rid);
+	public List<OtherReportDataPayloadResourceStatus> findByReportSpecifierIdAndRid(String venId,
+			String reportSpecifierId, String rid) {
+		return otherReportDataDao.findByVenIdAndReportSpecifierIdAndRid(venId, reportSpecifierId, rid);
 	}
 
 	@Override

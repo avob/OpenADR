@@ -830,6 +830,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 							OtherReportDataFloat otherReportData = new OtherReportDataFloat();
 							otherReportData.setStart(start);
 							otherReportData.setDuration(durationInterval);
+							otherReportData.setVenId(venID);
 							otherReportData.setReportSpecifierId(reportSpecifierID);
 							otherReportData.setRid(rid);
 							otherReportData.setConfidence(confidence);
@@ -864,6 +865,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 							OtherReportDataKeyToken otherReportData = new OtherReportDataKeyToken();
 							otherReportData.setStart(start);
 							otherReportData.setDuration(durationInterval);
+							otherReportData.setVenId(venID);
 							otherReportData.setReportSpecifierId(reportSpecifierID);
 							otherReportData.setRid(rid);
 							otherReportData.setConfidence(confidence);
@@ -902,6 +904,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 							OtherReportDataPayloadResourceStatus otherReportData = new OtherReportDataPayloadResourceStatus();
 							otherReportData.setStart(start);
 							otherReportData.setDuration(durationInterval);
+							otherReportData.setVenId(venID);
 							otherReportData.setReportSpecifierId(reportSpecifierID);
 							otherReportData.setRid(rid);
 							otherReportData.setConfidence(confidence);
