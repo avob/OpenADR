@@ -11,14 +11,19 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.xml.bind.JAXBException;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -54,9 +59,13 @@ import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
+import com.avob.openadr.server.common.vtn.service.push.DemandResponseEventPublisher;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
+import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
+import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bDemandResponseEventCreateListener;
+import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bPushListener;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpDemandResponseEventMvc;
@@ -91,7 +100,31 @@ public class Oadr20bVTNEiEventControllerTest {
 	private OadrMockHttpDemandResponseEventMvc oadrMockHttpDemandResponseEventMvc;
 
 	@Resource
+	private JmsTemplate jmsTemplate;
+
+	@Resource
 	private XmlSignatureService xmlSignatureService;
+
+	@Resource
+	private Oadr20bPushListener oadr20bPushListener;
+
+	@Resource
+	private Oadr20bDemandResponseEventCreateListener oadr20bDemandResponseEventCreateListener;
+
+	@PostConstruct
+	public void init() throws JAXBException {
+		Mockito.doAnswer((Answer<?>) invocation -> {
+			oadr20bPushListener.receiveCommand(invocation.getArgument(1));
+
+			return null;
+		}).when(jmsTemplate).convertAndSend(Mockito.eq(VenDistributeService.OADR20B_QUEUE), Mockito.any(String.class));
+
+		Mockito.doAnswer((Answer<?>) invocation -> {
+			oadr20bDemandResponseEventCreateListener.receiveEvent(invocation.getArgument(1));
+			return null;
+		}).when(jmsTemplate).convertAndSend(Mockito.eq(DemandResponseEventPublisher.OADR20B_QUEUE),
+				Mockito.any(String.class));
+	}
 
 	@Test
 	public void testErrorCase() throws Exception {
@@ -172,7 +205,7 @@ public class Oadr20bVTNEiEventControllerTest {
 			VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, entry.getKey(),
 					HttpStatus.OK_200);
 			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, xmlSignatureService);
-			_testScenario2(mockVen);
+			_testPullOadrRequestEventTypeActiveSuccessCase(mockVen);
 		}
 	}
 

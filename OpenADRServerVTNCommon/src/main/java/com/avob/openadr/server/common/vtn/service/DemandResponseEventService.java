@@ -1,7 +1,6 @@
 package com.avob.openadr.server.common.vtn.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -212,9 +211,6 @@ public class DemandResponseEventService {
 
 		List<VenDemandResponseEvent> list = new ArrayList<>();
 		for (Ven ven : findByUsernameIn) {
-			if (demandResponseEventPublisher != null && event.isPublished()) {
-				pushAsync(Arrays.asList(ven), dto.getDescriptor().getOadrProfile());
-			}
 			list.add(new VenDemandResponseEvent(event, ven));
 		}
 		venDemandResponseEventDao.saveAll(list);
@@ -224,6 +220,12 @@ public class DemandResponseEventService {
 			sig.setEvent(save);
 		});
 		demandResponseEventSignalDao.saveAll(event.getSignals());
+
+		for (Ven ven : findByUsernameIn) {
+			if (demandResponseEventPublisher != null && event.isPublished()) {
+				pushAsync(ven, event.getDescriptor().getOadrProfile());
+			}
+		}
 
 		return save;
 	}
@@ -288,9 +290,6 @@ public class DemandResponseEventService {
 			List<Ven> vens = findVenForTarget(event, toAdd);
 			List<VenDemandResponseEvent> list = new ArrayList<>();
 			for (Ven ven : vens) {
-				if (dto.isPublished()) {
-					pushAsync(Arrays.asList(ven), event.getDescriptor().getOadrProfile());
-				}
 				list.add(new VenDemandResponseEvent(event, ven));
 			}
 			venDemandResponseEventDao.saveAll(list);
@@ -312,7 +311,7 @@ public class DemandResponseEventService {
 	public void distributeEventToPushVen(DemandResponseEvent event) {
 		List<Ven> vens = findVenForTarget(event, event.getTargets());
 		for (Ven ven : vens) {
-			pushAsync(Arrays.asList(ven), event.getDescriptor().getOadrProfile());
+			pushAsync(ven, event.getDescriptor().getOadrProfile());
 		}
 	}
 
@@ -355,15 +354,14 @@ public class DemandResponseEventService {
 		return event;
 	}
 
-	private void pushAsync(List<Ven> vens, DemandResponseEventOadrProfileEnum profile) {
-		for (Ven ven : vens) {
+	private void pushAsync(Ven ven, DemandResponseEventOadrProfileEnum profile) {
 
-			if (DemandResponseEventOadrProfileEnum.OADR20A.equals(profile)) {
-				demandResponseEventPublisher.publish20a(ven);
-			} else {
-				demandResponseEventPublisher.publish20b(ven);
-			}
+		if (DemandResponseEventOadrProfileEnum.OADR20A.equals(profile)) {
+			demandResponseEventPublisher.publish20a(ven);
+		} else {
+			demandResponseEventPublisher.publish20b(ven);
 		}
+
 	}
 
 	public Optional<DemandResponseEvent> findById(Long id) {

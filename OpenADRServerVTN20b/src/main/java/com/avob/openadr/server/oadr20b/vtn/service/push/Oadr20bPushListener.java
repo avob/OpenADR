@@ -24,7 +24,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.common.vtn.service.push.VenCommandDto;
-import com.avob.openadr.server.common.vtn.service.push.VenCommandPublisher;
+import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppUplinkClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,7 +54,7 @@ public class Oadr20bPushListener {
 		jaxbContext = Oadr20bJAXBContext.getInstance();
 	}
 
-	@JmsListener(destination = VenCommandPublisher.OADR20B_QUEUE)
+	@JmsListener(destination = VenDistributeService.OADR20B_QUEUE)
 	public void receiveCommand(String command) {
 
 		try {

@@ -95,7 +95,6 @@ public class OadrMockVen {
 	}
 
 	public <T> T poll(Object payload, int status, Class<T> klass) throws Exception {
-		Thread.sleep(400);
 		if (ven.getXmlSignature()) {
 			String sign = xmlSignatureService.sign(payload);
 			String postEiRegisterPartyAndExpect = mockService.postOadrPollAndExpect(authSession, sign, status,

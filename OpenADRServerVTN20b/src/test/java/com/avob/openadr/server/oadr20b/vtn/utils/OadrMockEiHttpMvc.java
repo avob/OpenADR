@@ -1,6 +1,6 @@
 package com.avob.openadr.server.oadr20b.vtn.utils;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.Filter;
@@ -20,6 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 
 @Service
 public class OadrMockEiHttpMvc {
@@ -79,25 +80,42 @@ public class OadrMockEiHttpMvc {
 
 	@SuppressWarnings("unchecked")
 	private <T> T postEiAndExpect(String endpoint, UserRequestPostProcessor authSession, Object payload, int status,
-			Class<T> klass) throws Oadr20bMarshalException, Exception {
-
+			Class<T> klass) {
 		String content = null;
-		if (payload instanceof String) {
-			content = (String) payload;
-		} else {
-			content = jaxbContext.marshalRoot(payload);
-		}
+		try {
 
-		MvcResult andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(endpoint).content(content).with(authSession))
-				.andExpect(MockMvcResultMatchers.status().is(status)).andReturn();
+			if (payload instanceof String) {
+				content = (String) payload;
+			} else {
+				content = jaxbContext.marshalRoot(payload);
+			}
 
-		if (String.class.equals(klass)) {
-			return (T) andReturn.getResponse().getContentAsString();
+		} catch (Oadr20bMarshalException e) {
+			fail("Payload can't be marshalled");
 		}
-		T unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), klass);
-		assertNotNull(unmarshal);
-		return unmarshal;
+		MvcResult andReturn;
+		try {
+
+			andReturn = this.mockMvc.perform(MockMvcRequestBuilders.post(endpoint).content(content).with(authSession))
+					.andExpect(MockMvcResultMatchers.status().is(status)).andReturn();
+
+			if (String.class.equals(klass)) {
+				return (T) andReturn.getResponse().getContentAsString();
+			}
+
+			Object obj = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString());
+			if (!klass.equals(obj.getClass())) {
+				fail("Response payload(" + obj.getClass().getSimpleName() + ") can't be cast to expected class: "
+						+ klass.getSimpleName());
+			}
+			return klass.cast(obj);
+		} catch (Oadr20bUnmarshalException e) {
+
+			fail("Response payload can't be cast to expected class: " + klass.getSimpleName());
+		} catch (Exception e) {
+			fail("Mock can't perform desired request");
+		}
+		return null;
 	}
 
 }

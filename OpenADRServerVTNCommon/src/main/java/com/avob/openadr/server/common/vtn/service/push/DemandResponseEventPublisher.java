@@ -24,7 +24,7 @@ public class DemandResponseEventPublisher {
 
 	public void publish20b(Ven ven) {
 		if (ven.getRegistrationId() != null) {
-			jmsTemplate.convertAndSend(OADR20B_QUEUE, ven.getUsername());
+			jmsTemplate.convertAndSend(DemandResponseEventPublisher.OADR20B_QUEUE, ven.getUsername());
 		}
 	}
 

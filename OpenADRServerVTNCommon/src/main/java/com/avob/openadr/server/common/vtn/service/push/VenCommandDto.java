@@ -1,5 +1,7 @@
 package com.avob.openadr.server.common.vtn.service.push;
 
+import com.avob.openadr.server.common.vtn.models.ven.Ven;
+
 public class VenCommandDto<T> {
 
 	private String venUsername;
@@ -13,6 +15,18 @@ public class VenCommandDto<T> {
 	private String payload;
 
 	private Class<T> payloadClass;
+
+	public VenCommandDto() {
+	}
+
+	public VenCommandDto(Ven ven, String payload, Class<T> klass) {
+		this.setVenUsername(ven.getUsername());
+		this.setVenPushUrl(ven.getPushUrl());
+		this.setVenTransport(ven.getTransport());
+		this.setXmlSignature(ven.getXmlSignature());
+		this.setPayload(payload);
+		this.setPayloadClass(klass);
+	}
 
 	public String getVenPushUrl() {
 		return venPushUrl;

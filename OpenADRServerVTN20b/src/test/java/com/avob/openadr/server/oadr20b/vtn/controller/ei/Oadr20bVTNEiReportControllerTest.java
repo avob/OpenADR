@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
@@ -20,8 +21,11 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -67,6 +71,7 @@ import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenGroupService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
+import com.avob.openadr.server.common.vtn.service.push.DemandResponseEventPublisher;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
@@ -85,7 +90,10 @@ import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportR
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierDao;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierSearchCriteria;
+import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
+import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bDemandResponseEventCreateListener;
+import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bPushListener;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityDescriptionService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportDataFloatService;
@@ -161,9 +169,6 @@ public class Oadr20bVTNEiReportControllerTest {
 	@Resource
 	private OadrMockEiHttpMvc oadrMockEiHttpMvc;
 
-//	@Resource
-//	private OadrMockHttpMvc oadrMockHttpMvc;
-
 	@Resource
 	private OadrMockHttpVenMvc oadrMockHttpVenMvc;
 
@@ -173,11 +178,36 @@ public class Oadr20bVTNEiReportControllerTest {
 	@Resource
 	private OadrMockHttpVtnMvc oadrMockHttpVtnMvc;
 
+	@Resource
+	private JmsTemplate jmsTemplate;
+
+	@Resource
+	private Oadr20bPushListener oadr20bPushListener;
+
+	@Resource
+	private Oadr20bDemandResponseEventCreateListener oadr20bDemandResponseEventCreateListener;
+
 	private Oadr20bJAXBContext jaxbContext;
+
+	@PostConstruct
+	public void init() throws JAXBException {
+		jaxbContext = Oadr20bJAXBContext.getInstance();
+		Mockito.doAnswer((Answer<?>) invocation -> {
+			oadr20bPushListener.receiveCommand(invocation.getArgument(1));
+
+			return null;
+		}).when(jmsTemplate).convertAndSend(Mockito.eq(VenDistributeService.OADR20B_QUEUE), Mockito.any(String.class));
+
+		Mockito.doAnswer((Answer<?>) invocation -> {
+			oadr20bDemandResponseEventCreateListener.receiveEvent(invocation.getArgument(1));
+			return null;
+		}).when(jmsTemplate).convertAndSend(Mockito.eq(DemandResponseEventPublisher.OADR20B_QUEUE),
+				Mockito.any(String.class));
+	}
 
 	@Before
 	public void setup() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
+
 	}
 
 	@Test

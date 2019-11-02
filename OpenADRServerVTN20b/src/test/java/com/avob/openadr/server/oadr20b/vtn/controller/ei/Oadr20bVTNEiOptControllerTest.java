@@ -217,10 +217,9 @@ public class Oadr20bVTNEiOptControllerTest {
 				HttpStatus.NOT_ACCEPTABLE_406);
 
 		// EI OPT CONTROLLER - test cannot set opt message about another VEN
-		oadrCreateOptType = Oadr20bEiOptBuilders
-				.newOadr20bCreateOptBuilder(requestId, "mouaiccool", createdDatetime,
-						vavailabilityType, optId, optType, optReason)
-				.withMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
+		oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, "mouaiccool", createdDatetime,
+				vavailabilityType, optId, optType, optReason).withMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME)
+				.build();
 
 		OadrCreatedOptType oadrCreatedOptType = mockVen.opt(oadrCreateOptType, HttpStatus.OK_200,
 				OadrCreatedOptType.class);

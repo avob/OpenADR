@@ -81,10 +81,13 @@ public class Oadr20bDemandResponseEventCreateListener {
 					} catch (Oadr20bMarshalException e) {
 						LOGGER.error("Cannot marshal event for oadrpoll", e);
 					}
+				} else {
+					LOGGER.warn("Ask to push events to venId:" + venUsername + " but no event has to be pushed");
+					return;
 				}
 
 			}
 		}
-		LOGGER.warn("Received unpushable message from venId:" + venUsername);
+		LOGGER.warn("Can't push events to unknown venId: " + venUsername);
 	}
 }

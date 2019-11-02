@@ -7,14 +7,19 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.xml.bind.JAXBException;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor;
 import org.springframework.test.context.ActiveProfiles;
@@ -39,10 +44,14 @@ import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenResourceService;
 import com.avob.openadr.server.common.vtn.service.VenService;
+import com.avob.openadr.server.common.vtn.service.push.DemandResponseEventPublisher;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNSupportedProfileService;
+import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenOptService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
+import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bDemandResponseEventCreateListener;
+import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bPushListener;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpDemandResponseEventMvc;
@@ -93,6 +102,31 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 	private Oadr20bVTNSupportedProfileService oadr20bVTNSupportedProfileService;
 
 	private UserRequestPostProcessor adminSession = SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN");
+	
+
+	@Resource
+	private JmsTemplate jmsTemplate;
+
+	@Resource
+	private Oadr20bPushListener oadr20bPushListener;
+
+	@Resource
+	private Oadr20bDemandResponseEventCreateListener oadr20bDemandResponseEventCreateListener;
+
+	@PostConstruct
+	public void init() throws JAXBException {
+		Mockito.doAnswer((Answer<?>) invocation -> {
+			oadr20bPushListener.receiveCommand(invocation.getArgument(1));
+
+			return null;
+		}).when(jmsTemplate).convertAndSend(Mockito.eq(VenDistributeService.OADR20B_QUEUE), Mockito.any(String.class));
+
+		Mockito.doAnswer((Answer<?>) invocation -> {
+			oadr20bDemandResponseEventCreateListener.receiveEvent(invocation.getArgument(1));
+			return null;
+		}).when(jmsTemplate).convertAndSend(Mockito.eq(DemandResponseEventPublisher.OADR20B_QUEUE),
+				Mockito.any(String.class));
+	}
 
 	@Test
 	public void test() throws Exception {
