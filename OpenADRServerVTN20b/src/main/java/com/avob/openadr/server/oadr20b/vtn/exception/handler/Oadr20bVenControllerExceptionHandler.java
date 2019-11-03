@@ -12,17 +12,17 @@ import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException
 @ControllerAdvice
 public class Oadr20bVenControllerExceptionHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bEiReportExceptionHandler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVenControllerExceptionHandler.class);
 
-    /**
-     * Handle wrong object in client request
-     * 
-     * @param ex
-     */
-    @ResponseStatus(value = HttpStatus.NOT_ACCEPTABLE, reason = "OadrElementNotFoundException")
-    @ExceptionHandler(OadrElementNotFoundException.class)
-    public void handle(OadrElementNotFoundException ex) {
-        LOGGER.warn(ex.getMessage());
-    }
+	/**
+	 * Handle wrong object in client request
+	 * 
+	 * @param ex
+	 */
+	@ResponseStatus(value = HttpStatus.NOT_ACCEPTABLE, reason = "OadrElementNotFoundException")
+	@ExceptionHandler(OadrElementNotFoundException.class)
+	public void handle(OadrElementNotFoundException ex) {
+		LOGGER.warn(ex.getMessage());
+	}
 
 }
