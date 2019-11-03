@@ -84,6 +84,25 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
+	private String marshall(Object payload, boolean signed) {
+		try {
+			if (signed) {
+				return xmlSignatureService.sign(payload);
+
+			} else {
+				return jaxbContext.marshalRoot(payload);
+			}
+		} catch (Oadr20bXMLSignatureException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		} catch (Oadr20bMarshalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	public void checkMatchUsernameWithRequestVenId(String username, OadrCreatedEventType oadrCreatedEvent,
 			boolean signed) throws Oadr20bCreatedEventApplicationLayerException {
 		if (!username.equals(oadrCreatedEvent.getEiCreatedEvent().getVenID())) {

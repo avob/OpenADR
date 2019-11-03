@@ -11,22 +11,13 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
-import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
-import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.common.vtn.service.push.VenCommandDto;
 import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
-import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppUplinkClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -39,9 +30,6 @@ public class Oadr20bPushListener {
 
 	@Resource
 	private Oadr20bPushService oadr20bPushService;
-
-	@Resource
-	private XmppUplinkClient xmppUplinkClient;
 
 	@Resource
 	private VenPollService venPollService;
@@ -61,111 +49,26 @@ public class Oadr20bPushListener {
 			VenCommandDto<?> readValue = mapper.readValue(command, VenCommandDto.class);
 
 			if (OadrTransportType.SIMPLE_HTTP.value().equals(readValue.getVenTransport())) {
-				if (readValue.getPayloadClass().equals(OadrDistributeEventType.class)) {
 
-					if (readValue.getVenPushUrl() != null) {
-
-						OadrDistributeEventType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
-								OadrDistributeEventType.class);
-
-						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
-								readValue.isXmlSignature(), unmarshal);
-
-					} else {
-						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
-						venPollService.create(findOneByUsername, readValue.getPayload());
-					}
-
-				} else if (readValue.getPayloadClass().equals(OadrCancelReportType.class)) {
-
-					if (readValue.getVenPushUrl() != null) {
-						OadrCancelReportType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
-								OadrCancelReportType.class);
-
-						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
-								readValue.isXmlSignature(), unmarshal);
-					} else {
-						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
-						venPollService.create(findOneByUsername, readValue.getPayload());
-					}
-
-				} else if (readValue.getPayloadClass().equals(OadrCreateReportType.class)) {
-
-					if (readValue.getVenPushUrl() != null) {
-						OadrCreateReportType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
-								OadrCreateReportType.class);
-
-						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
-								readValue.isXmlSignature(), unmarshal);
-					} else {
-						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
-						venPollService.create(findOneByUsername, readValue.getPayload());
-					}
-
-				} else if (readValue.getPayloadClass().equals(OadrRegisterReportType.class)) {
-
-					if (readValue.getVenPushUrl() != null) {
-						OadrRegisterReportType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
-								OadrRegisterReportType.class);
-
-						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
-								readValue.isXmlSignature(), unmarshal);
-					} else {
-						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
-						venPollService.create(findOneByUsername, readValue.getPayload());
-					}
-
-				} else if (readValue.getPayloadClass().equals(OadrUpdateReportType.class)) {
-
-					if (readValue.getVenPushUrl() != null) {
-						OadrUpdateReportType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
-								OadrUpdateReportType.class);
-
-						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
-								readValue.isXmlSignature(), unmarshal);
-					} else {
-						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
-						venPollService.create(findOneByUsername, readValue.getPayload());
-					}
-
-				} else if (readValue.getPayloadClass().equals(OadrCancelPartyRegistrationType.class)) {
-
-					if (readValue.getVenPushUrl() != null) {
-						OadrCancelPartyRegistrationType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
-								OadrCancelPartyRegistrationType.class);
-
-						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
-								readValue.isXmlSignature(), unmarshal);
-					} else {
-						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
-						venPollService.create(findOneByUsername, readValue.getPayload());
-					}
-
-				} else if (readValue.getPayloadClass().equals(OadrRequestReregistrationType.class)) {
-
-					if (readValue.getVenPushUrl() != null) {
-						OadrRequestReregistrationType unmarshal = jaxbContext.unmarshal(readValue.getPayload(),
-								OadrRequestReregistrationType.class);
-
-						oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
-								readValue.isXmlSignature(), unmarshal);
-					} else {
-						Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
-						venPollService.create(findOneByUsername, readValue.getPayload());
-					}
+				if (readValue.getVenPushUrl() != null) {
+					Object unmarshal = jaxbContext.unmarshal(readValue.getPayload());
+					oadr20bPushService.pushMessageToVen(readValue.getVenUsername(), readValue.getVenTransport(),
+							readValue.getVenPushUrl(), readValue.isXmlSignature(), unmarshal);
 
 				} else {
-					throw new Oadr20bException("Can't push unknown payload");
+					Ven findOneByUsername = venService.findOneByUsername(readValue.getVenUsername());
+					venPollService.create(findOneByUsername, readValue.getPayload());
 				}
+
 			} else if (OadrTransportType.XMPP.value().equals(readValue.getVenTransport())) {
 
 				Object unmarshal = jaxbContext.unmarshal(readValue.getPayload());
-				oadr20bPushService.pushMessageToVen(readValue.getVenTransport(), readValue.getVenPushUrl(),
-						readValue.isXmlSignature(), unmarshal);
+				oadr20bPushService.pushMessageToVen(readValue.getVenUsername(), readValue.getVenTransport(),
+						readValue.getVenPushUrl(), readValue.isXmlSignature(), unmarshal);
 
 			}
 
-		} catch (Oadr20bUnmarshalException | IOException | Oadr20bException e) {
+		} catch (Oadr20bUnmarshalException | IOException e) {
 			LOGGER.error(e.getMessage(), e);
 		}
 	}

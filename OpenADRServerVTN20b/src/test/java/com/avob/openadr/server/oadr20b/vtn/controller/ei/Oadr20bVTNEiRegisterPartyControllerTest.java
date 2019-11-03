@@ -54,6 +54,7 @@ import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bDemandResponseEve
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bPushListener;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiXmpp;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpDemandResponseEventMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpVenMvc;
@@ -90,6 +91,9 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 	private OadrMockEiHttpMvc oadrMockEiHttpMvc;
 
 	@Resource
+	private OadrMockEiXmpp oadrMockEiXmpp;
+
+	@Resource
 	private OadrMockHttpMvc oadrMockHttpMvc;
 
 	@Resource
@@ -102,7 +106,6 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 	private Oadr20bVTNSupportedProfileService oadr20bVTNSupportedProfileService;
 
 	private UserRequestPostProcessor adminSession = SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN");
-	
 
 	@Resource
 	private JmsTemplate jmsTemplate;
@@ -133,7 +136,8 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.VEN_TEST_LIST.entrySet()) {
 			VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, entry.getKey(),
 					HttpStatus.OK_200);
-			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, xmlSignatureService);
+			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, oadrMockEiXmpp,
+					xmlSignatureService);
 			_test(mockVen);
 		}
 	}
@@ -147,10 +151,11 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		assertNotNull(venDto.getRegistrationId());
 		assertEquals(String.valueOf(ven.getId()), venDto.getId());
 		assertEquals(ven.getUsername(), venDto.getUsername());
-		assertTrue(venDto.getHttpPullModel());
-		assertNull(venDto.getOadrProfil());
-		assertNull(venDto.getPushUrl());
-		assertNotNull(venDto.getTransport());
+		assertEquals(ven.getHttpPullModel(), venDto.getHttpPullModel());
+		assertEquals(ven.getOadrProfil(), venDto.getOadrProfil());
+		assertEquals(ven.getPushUrl(), venDto.getPushUrl());
+		assertEquals(ven.getTransport(), venDto.getTransport());
+		assertEquals(ven.getOadrName(), venDto.getOadrName());
 
 		// VEN CONTROLLER - request cancelregistration
 		oadrMockHttpVenMvc.cancelRegistration(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(),
@@ -162,13 +167,24 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 
 		assertNotNull(cancelPartyRegistration);
 
-		// EI REGISTER PARTY CONTROLLER - ven response reregistration request
+		// EI REGISTER PARTY CONTROLLER - ven response reregistration request invalid
+		// mismatch payload venID and username auth session
 		OadrCanceledPartyRegistrationType canceledPartyRegistration = Oadr20bEiRegisterPartyBuilders
+				.newOadr20bCanceledPartyRegistrationBuilder(cancelPartyRegistration.getRequestID(), HttpStatus.OK_200,
+						venDto.getRegistrationId(), "mouaiccool")
+				.build();
+		OadrResponseType postEiRegisterPartyAndExpect = mockVen.register(canceledPartyRegistration, HttpStatus.OK_200,
+				OadrResponseType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
+				postEiRegisterPartyAndExpect.getEiResponse().getResponseCode());
+
+		// EI REGISTER PARTY CONTROLLER - ven response reregistration request
+		canceledPartyRegistration = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCanceledPartyRegistrationBuilder(cancelPartyRegistration.getRequestID(), HttpStatus.OK_200,
 						venDto.getRegistrationId(), venDto.getUsername())
 				.build();
 
-		OadrResponseType postEiRegisterPartyAndExpect = mockVen.register(canceledPartyRegistration, HttpStatus.OK_200,
+		postEiRegisterPartyAndExpect = mockVen.register(canceledPartyRegistration, HttpStatus.OK_200,
 				OadrResponseType.class);
 		assertEquals(String.valueOf(HttpStatus.OK_200), postEiRegisterPartyAndExpect.getEiResponse().getResponseCode());
 
@@ -342,10 +358,11 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 
 		// create party registration
 		oadrCreatePartyRegistrationType = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCreatePartyRegistrationBuilder(requestId, mockVen.getVenId(),
-						SchemaVersionEnumeratedType.OADR_20B.value())
-				.withOadrVenName(venName).withOadrHttpPullModel(true).withOadrTransportName(transport)
-				.withOadrXmlSignature(xmlSignature).withOadrReportOnly(reportOnly).build();
+				.newOadr20bCreatePartyRegistrationBuilder(requestId, mockVen.getVenId(), ven.getOadrProfil())
+				.withOadrVenName(ven.getOadrName()).withOadrHttpPullModel(ven.getHttpPullModel())
+				.withOadrTransportName(OadrTransportType.fromValue(ven.getTransport()))
+				.withOadrTransportAddress(ven.getPushUrl()).withOadrXmlSignature(xmlSignature)
+				.withOadrReportOnly(ven.getReportOnly()).build();
 
 		// VEN CONTROLLER - send OadrCreatePartyRegistrationType
 		oadrCreatedPartyRegistrationType = mockVen.register(oadrCreatePartyRegistrationType, HttpStatus.OK_200,
@@ -359,13 +376,12 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		venDto = oadrMockHttpVenMvc.getVen(adminSession, mockVen.getVenId(), HttpStatus.OK_200);
 		assertNotNull(venDto.getRegistrationId());
 		assertEquals(String.valueOf(ven.getId()), venDto.getId());
-		assertEquals(mockVen.getVenId(), venDto.getUsername());
-		assertEquals(venName, venDto.getOadrName());
-		assertEquals(true, venDto.getHttpPullModel());
-		assertEquals(SchemaVersionEnumeratedType.OADR_20B.value(), venDto.getOadrProfil());
-		assertNull(venDto.getPushUrl());
-		assertEquals(transport.value(), venDto.getTransport());
-		assertNotNull(venDto.getRegistrationId());
+		assertEquals(ven.getUsername(), venDto.getUsername());
+		assertEquals(ven.getHttpPullModel(), venDto.getHttpPullModel());
+		assertEquals(ven.getOadrProfil(), venDto.getOadrProfil());
+		assertEquals(ven.getPushUrl(), venDto.getPushUrl());
+		assertEquals(ven.getTransport(), venDto.getTransport());
+		assertEquals(ven.getOadrName(), venDto.getOadrName());
 
 		// VEN CONTROLLER - request reregistration
 		oadrMockHttpVenMvc.reregister(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), HttpStatus.OK_200);
@@ -375,8 +391,16 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 				OadrRequestReregistrationType.class);
 		assertNotNull(oadrRequestReregistrationType);
 
-		// EI REGISTER PARTY CONTROLLER - ven response reregistration request
+		// EI REGISTER PARTY CONTROLLER - ven response reregistration request: mismatch
+		// venid with authentication credentials
 		OadrResponseType respReregistration = Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder("0", HttpStatus.OK_200, "mouaiccool").build();
+		postEiRegisterPartyAndExpect = mockVen.register(respReregistration, HttpStatus.OK_200, OadrResponseType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
+				postEiRegisterPartyAndExpect.getEiResponse().getResponseCode());
+
+		// EI REGISTER PARTY CONTROLLER - ven response reregistration request
+		respReregistration = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("0", HttpStatus.OK_200, mockVen.getVenId()).build();
 		postEiRegisterPartyAndExpect = mockVen.register(respReregistration, HttpStatus.OK_200, OadrResponseType.class);
 		assertEquals(String.valueOf(HttpStatus.OK_200), postEiRegisterPartyAndExpect.getEiResponse().getResponseCode());
@@ -385,13 +409,12 @@ public class Oadr20bVTNEiRegisterPartyControllerTest {
 		venDto = oadrMockHttpVenMvc.getVen(adminSession, mockVen.getVenId(), HttpStatus.OK_200);
 		assertNotNull(venDto.getRegistrationId());
 		assertEquals(String.valueOf(ven.getId()), venDto.getId());
-		assertEquals(mockVen.getVenId(), venDto.getUsername());
-		assertEquals(venName, venDto.getOadrName());
-		assertEquals(true, venDto.getHttpPullModel());
-		assertEquals(SchemaVersionEnumeratedType.OADR_20B.value(), venDto.getOadrProfil());
-		assertNull(venDto.getPushUrl());
-		assertEquals(transport.value(), venDto.getTransport());
-		assertNotNull(venDto.getRegistrationId());
+		assertEquals(ven.getUsername(), venDto.getUsername());
+		assertEquals(ven.getHttpPullModel(), venDto.getHttpPullModel());
+		assertEquals(ven.getOadrProfil(), venDto.getOadrProfil());
+		assertEquals(ven.getPushUrl(), venDto.getPushUrl());
+		assertEquals(ven.getTransport(), venDto.getTransport());
+		assertEquals(ven.getOadrName(), venDto.getOadrName());
 
 	}
 

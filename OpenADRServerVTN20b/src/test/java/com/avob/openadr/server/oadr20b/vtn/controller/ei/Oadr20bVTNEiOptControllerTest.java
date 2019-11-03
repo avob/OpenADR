@@ -47,6 +47,7 @@ import com.avob.openadr.server.oadr20b.vtn.models.venopt.VenOptDto;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiXmpp;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpDemandResponseEventMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpVenMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockVen;
@@ -62,6 +63,9 @@ public class Oadr20bVTNEiOptControllerTest {
 	private OadrMockEiHttpMvc oadrMockEiHttpMvc;
 
 	@Resource
+	private OadrMockEiXmpp oadrMockEiXmpp;
+
+	@Resource
 	private OadrMockHttpVenMvc oadrMockHttpVenMvc;
 
 	@Resource
@@ -75,7 +79,8 @@ public class Oadr20bVTNEiOptControllerTest {
 		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.VEN_TEST_LIST.entrySet()) {
 			VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, entry.getKey(),
 					HttpStatus.OK_200);
-			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, xmlSignatureService);
+			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, oadrMockEiXmpp,
+					xmlSignatureService);
 			_test(mockVen);
 		}
 	}
@@ -84,7 +89,7 @@ public class Oadr20bVTNEiOptControllerTest {
 
 		// test no opt configured
 		LinkedMultiValueMap<String, String> params = OadrParamBuilder.builder().build();
-		oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.VEN_SECURITY_SESSION, mockVen.getVenId(), params,
+		oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.FORBIDDEN_403);
 		oadrMockHttpVenMvc.getVenOpt(OadrDataBaseSetup.USER_SECURITY_SESSION, mockVen.getVenId(), params,
 				HttpStatus.FORBIDDEN_403);

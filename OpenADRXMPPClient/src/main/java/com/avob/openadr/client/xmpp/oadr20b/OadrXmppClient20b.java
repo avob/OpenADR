@@ -62,13 +62,12 @@ public class OadrXmppClient20b {
 
 	private DomainBareJid domainJid;
 	private EntityFullJid clientJid;
-	private EntityFullJid connectionJid;
 
 	private ChatManager chatManager;
 
 	private Map<String, Jid> discoveredXmppOadrServices;
 
-	private static XMPPTCPConnectionConfiguration anonymousConnection(String host, int port, String domain,
+	public static XMPPTCPConnectionConfiguration anonymousConnection(String host, int port, String domain,
 			String resource, SSLContext context) throws OadrXmppException {
 		try {
 			return XMPPTCPConnectionConfiguration.builder().setHost(host).setPort(port)
@@ -79,7 +78,7 @@ public class OadrXmppClient20b {
 		}
 	}
 
-	private static XMPPTCPConnectionConfiguration passwordConnection(String host, int port, String domain,
+	public static XMPPTCPConnectionConfiguration passwordConnection(String host, int port, String domain,
 			String resource, SSLContext context, String username, String password) throws OadrXmppException {
 		try {
 			return XMPPTCPConnectionConfiguration.builder().setHost(host).setPort(port)
@@ -91,8 +90,8 @@ public class OadrXmppClient20b {
 		}
 	}
 
-	private OadrXmppClient20b(XMPPTCPConnectionConfiguration config, String venId, String host, String domain,
-			String resource, SSLContext context, StanzaListener onMessageListener) throws OadrXmppException {
+	public OadrXmppClient20b(String userJid, XMPPTCPConnection connection, String domain, StanzaListener onMessageListener)
+			throws OadrXmppException {
 		try {
 			SASLAnonymous mechanism = new SASLAnonymous();
 			SASLExternalMechanism ext = new SASLExternalMechanism();
@@ -102,12 +101,8 @@ public class OadrXmppClient20b {
 			SASLAuthentication.registerSASLMechanism(plain);
 			SASLAuthentication.unBlacklistSASLMechanism("PLAIN");
 			SASLAuthentication.blacklistSASLMechanism("DIGEST-MD5");
-			EntityBareJid authzid = JidCreate.entityBareFrom(resource + "@" + host);
-
-			connection = new XMPPTCPConnection(config);
-
 			setDomainJid(JidCreate.domainBareFrom(XMPP_OADR_SUBDOMAIN + "." + domain));
-			setClientJid(JidCreate.entityFullFrom(venId, XMPP_OADR_SUBDOMAIN + "." + domain, resource));
+			setClientJid(JidCreate.entityFullFrom(userJid));
 
 			chatManager = ChatManager.getInstanceFor(connection);
 
@@ -115,14 +110,10 @@ public class OadrXmppClient20b {
 				connection.addAsyncStanzaListener(onMessageListener, StanzaTypeFilter.MESSAGE);
 			}
 
-			connection.connect().login(resource, resource); // Establishes a connection to the server
+			connection.connect().login(); // Establishes a connection to the server
 			if (connection.isConnected() && connection.isAuthenticated()) {
 
-				EntityFullJid user = connection.getUser();
-
-				this.setConnectionJid(user);
-
-				IQ request = new Ping(authzid);
+				IQ request = new Ping(this.getClientJid());
 				connection.sendIqRequestAsync(request);
 
 				Presence p = new Presence(Type.available);
@@ -146,20 +137,6 @@ public class OadrXmppClient20b {
 			Thread.currentThread().interrupt();
 			throw new OadrXmppException(e);
 		}
-
-	}
-
-	public OadrXmppClient20b(String venId, String host, int port, String domain, String resource, SSLContext context,
-			StanzaListener onMessageListener) throws OadrXmppException {
-		this(OadrXmppClient20b.anonymousConnection(host, port, domain, resource, context), venId, host, domain,
-				resource, context, onMessageListener);
-
-	}
-
-	public OadrXmppClient20b(String venId, String host, int port, String domain, String resource, SSLContext context,
-			String password, StanzaListener onMessageListener) throws OadrXmppException {
-		this(OadrXmppClient20b.passwordConnection(host, port, domain, resource, context, venId, password), venId, host,
-				domain, resource, context, onMessageListener);
 
 	}
 
@@ -221,14 +198,6 @@ public class OadrXmppClient20b {
 
 	private void setDomainJid(DomainBareJid domainJid) {
 		this.domainJid = domainJid;
-	}
-
-	public EntityFullJid getConnectionJid() {
-		return connectionJid;
-	}
-
-	public void setConnectionJid(EntityFullJid connectionJid) {
-		this.connectionJid = connectionJid;
 	}
 
 }

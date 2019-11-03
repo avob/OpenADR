@@ -68,9 +68,11 @@ import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bDemandResponseEve
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bPushListener;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiXmpp;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpDemandResponseEventMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpVenMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockVen;
+import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppConnector;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -94,6 +96,9 @@ public class Oadr20bVTNEiEventControllerTest {
 	private OadrMockEiHttpMvc oadrMockEiHttpMvc;
 
 	@Resource
+	private OadrMockEiXmpp oadrMockEiXmpp;
+
+	@Resource
 	private OadrMockHttpVenMvc oadrMockHttpVenMvc;
 
 	@Resource
@@ -101,6 +106,9 @@ public class Oadr20bVTNEiEventControllerTest {
 
 	@Resource
 	private JmsTemplate jmsTemplate;
+
+	@Resource
+	private XmppConnector xmppConnector;
 
 	@Resource
 	private XmlSignatureService xmlSignatureService;
@@ -113,9 +121,9 @@ public class Oadr20bVTNEiEventControllerTest {
 
 	@PostConstruct
 	public void init() throws JAXBException {
+
 		Mockito.doAnswer((Answer<?>) invocation -> {
 			oadr20bPushListener.receiveCommand(invocation.getArgument(1));
-
 			return null;
 		}).when(jmsTemplate).convertAndSend(Mockito.eq(VenDistributeService.OADR20B_QUEUE), Mockito.any(String.class));
 
@@ -131,29 +139,29 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		// GET not allowed
 		this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.get(EIEVENT_ENDPOINT).with(OadrDataBaseSetup.VEN_SECURITY_SESSION))
+				.perform(MockMvcRequestBuilders.get(EIEVENT_ENDPOINT).with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// PUT not allowed
 		this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.put(EIEVENT_ENDPOINT).with(OadrDataBaseSetup.VEN_SECURITY_SESSION))
+				.perform(MockMvcRequestBuilders.put(EIEVENT_ENDPOINT).with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// DELETE not allowed
 		this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.delete(EIEVENT_ENDPOINT).with(OadrDataBaseSetup.VEN_SECURITY_SESSION))
+				.perform(MockMvcRequestBuilders.delete(EIEVENT_ENDPOINT).with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// POST without content
 		String content = "";
 		this.oadrMockEiHttpMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT)
-				.with(OadrDataBaseSetup.VEN_SECURITY_SESSION).content(content))
+				.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION).content(content))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// POST without content
 		content = "mouaiccool";
 		this.oadrMockEiHttpMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT)
-				.with(OadrDataBaseSetup.VEN_SECURITY_SESSION).content(content))
+				.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION).content(content))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
 
 	}
@@ -161,15 +169,15 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Test
 	public void testPullOadrRequestEventTypeEmptySuccessCase() throws Exception {
 
-		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG,
 				HttpStatus.OK_200);
-		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_SECURITY_SESSION, oadrMockEiHttpMvc,
-				xmlSignatureService);
+		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION, oadrMockEiHttpMvc,
+				oadrMockEiXmpp, xmlSignatureService);
 
 		String requestId = "0";
 		long replyLimit = 1L;
 		OadrRequestEventType OadrRequestEventType = Oadr20bEiEventBuilders
-				.newOadrRequestEventBuilder(OadrDataBaseSetup.VEN, requestId).withReplyLimit(replyLimit).build();
+				.newOadrRequestEventBuilder(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, requestId).withReplyLimit(replyLimit).build();
 
 		OadrDistributeEventType event = mockVen.event(OadrRequestEventType, HttpStatus.OK_200,
 				OadrDistributeEventType.class);
@@ -204,7 +212,8 @@ public class Oadr20bVTNEiEventControllerTest {
 		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.VEN_TEST_LIST.entrySet()) {
 			VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, entry.getKey(),
 					HttpStatus.OK_200);
-			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, xmlSignatureService);
+			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, oadrMockEiXmpp,
+					xmlSignatureService);
 			_testPullOadrRequestEventTypeActiveSuccessCase(mockVen);
 		}
 	}
@@ -375,12 +384,12 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Test
 	public void testOadrCreatedEventType_MissingDREvent() throws Exception {
 
-		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG,
 				HttpStatus.OK_200);
-		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_SECURITY_SESSION, oadrMockEiHttpMvc,
-				xmlSignatureService);
+		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION, oadrMockEiHttpMvc,
+				oadrMockEiXmpp, xmlSignatureService);
 
-		OadrCreatedEventType build = Oadr20bEiEventBuilders.newCreatedEventBuilder(OadrDataBaseSetup.VEN, "0", 123)
+		OadrCreatedEventType build = Oadr20bEiEventBuilders.newCreatedEventBuilder(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, "0", 123)
 				.addEventResponse(Oadr20bEiEventBuilders
 						.newOadr20bCreatedEventEventResponseBuilder("1", 0L, "0", 123, OptTypeType.OPT_IN).build())
 				.build();
@@ -441,7 +450,8 @@ public class Oadr20bVTNEiEventControllerTest {
 		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.VEN_TEST_LIST.entrySet()) {
 			VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, entry.getKey(),
 					HttpStatus.OK_200);
-			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, xmlSignatureService);
+			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, oadrMockEiXmpp,
+					xmlSignatureService);
 			_testScenario1(mockVen);
 		}
 	}
@@ -621,7 +631,8 @@ public class Oadr20bVTNEiEventControllerTest {
 		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.VEN_TEST_LIST.entrySet()) {
 			VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, entry.getKey(),
 					HttpStatus.OK_200);
-			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, xmlSignatureService);
+			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, oadrMockEiXmpp,
+					xmlSignatureService);
 			_testScenario2(mockVen);
 		}
 	}

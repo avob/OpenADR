@@ -79,6 +79,25 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 	@Resource
 	private Oadr20bJAXBContext jaxbContext;
 
+	private String marshall(Object payload, boolean signed) {
+		try {
+			if (signed) {
+				return xmlSignatureService.sign(payload);
+
+			} else {
+				return jaxbContext.marshalRoot(payload);
+			}
+		} catch (Oadr20bXMLSignatureException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		} catch (Oadr20bMarshalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	/**
 	 * Does a VEN can sent Opt for another VEN or another VEN's resource ?
 	 * 

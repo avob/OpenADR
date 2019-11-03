@@ -7,6 +7,7 @@ import com.avob.openadr.model.oadr20b.builders.eiregisterparty.Oadr20bCreatedPar
 import com.avob.openadr.model.oadr20b.builders.eiregisterparty.Oadr20bOadrProfileBuilder;
 import com.avob.openadr.model.oadr20b.builders.eiregisterparty.Oadr20bQueryRegistrationBuilder;
 import com.avob.openadr.model.oadr20b.builders.eiregisterparty.Oadr20bRequestReregistrationBuilder;
+import com.avob.openadr.model.oadr20b.ei.EiResponseType;
 import com.avob.openadr.model.oadr20b.ei.SchemaVersionEnumeratedType;
 
 public class Oadr20bEiRegisterPartyBuilders {
@@ -17,6 +18,12 @@ public class Oadr20bEiRegisterPartyBuilders {
 	public static Oadr20bCanceledPartyRegistrationBuilder newOadr20bCanceledPartyRegistrationBuilder(String requestId,
 			int responseCode, String registrationId, String venId) {
 		return new Oadr20bCanceledPartyRegistrationBuilder(requestId, responseCode, registrationId, venId)
+				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
+	}
+
+	public static Oadr20bCanceledPartyRegistrationBuilder newOadr20bCanceledPartyRegistrationBuilder(
+			EiResponseType eiresponse, String registrationId, String venId) {
+		return new Oadr20bCanceledPartyRegistrationBuilder(eiresponse, registrationId, venId)
 				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
 	}
 

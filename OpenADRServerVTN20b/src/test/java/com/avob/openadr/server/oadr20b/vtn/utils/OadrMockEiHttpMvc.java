@@ -18,19 +18,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
-import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 
 @Service
 public class OadrMockEiHttpMvc {
-
-	private static final String EIEVENT_ENDPOINT = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.EI_EVENT_SERVICE;
-	private static final String EIREPORT_ENDPOINT = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.EI_REPORT_SERVICE;
-	private static final String EIOPT_ENDPOINT = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.EI_OPT_SERVICE;
-	private static final String EIREGISTERPARTY_ENDPOINT = Oadr20bUrlPath.OADR_BASE_PATH
-			+ Oadr20bUrlPath.EI_REGISTER_PARTY_SERVICE;
-	private static final String OADRPOLL_ENDPOINT = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.OADR_POLL_SERVICE;
 
 	private MockMvc mockMvc;
 
@@ -48,38 +40,12 @@ public class OadrMockEiHttpMvc {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilters(springSecurityFilterChain).build();
 	}
 
-	public <T> T postEiEventAndExpect(UserRequestPostProcessor authSession, Object payload, int status, Class<T> klass)
-			throws Exception {
-
-		return this.postEiAndExpect(EIEVENT_ENDPOINT, authSession, payload, status, klass);
-	}
-
-	public <T> T postEiOptAndExpect(UserRequestPostProcessor authSession, Object payload, int status, Class<T> klass)
-			throws Exception {
-		return this.postEiAndExpect(EIOPT_ENDPOINT, authSession, payload, status, klass);
-	}
-
-	public <T> T postEiReportAndExpect(UserRequestPostProcessor authSession, Object payload, int status, Class<T> klass)
-			throws Exception {
-		return this.postEiAndExpect(EIREPORT_ENDPOINT, authSession, payload, status, klass);
-	}
-
-	public <T> T postEiRegisterPartyAndExpect(UserRequestPostProcessor authSession, Object payload, int status,
-			Class<T> klass) throws Exception {
-		return this.postEiAndExpect(EIREGISTERPARTY_ENDPOINT, authSession, payload, status, klass);
-	}
-
-	public <T> T postOadrPollAndExpect(UserRequestPostProcessor authSession, Object payload, int status, Class<T> klass)
-			throws Oadr20bMarshalException, Exception {
-		return this.postEiAndExpect(OADRPOLL_ENDPOINT, authSession, payload, status, klass);
-	}
-
 	public ResultActions perform(RequestBuilder requestBuilder) throws Exception {
 		return mockMvc.perform(requestBuilder);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> T postEiAndExpect(String endpoint, UserRequestPostProcessor authSession, Object payload, int status,
+	public <T> T postEiAndExpect(String endpoint, UserRequestPostProcessor authSession, Object payload, int status,
 			Class<T> klass) {
 		String content = null;
 		try {

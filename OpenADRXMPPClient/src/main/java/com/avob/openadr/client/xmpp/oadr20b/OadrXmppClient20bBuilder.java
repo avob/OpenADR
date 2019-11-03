@@ -3,6 +3,8 @@ package com.avob.openadr.client.xmpp.oadr20b;
 import javax.net.ssl.SSLContext;
 
 import org.jivesoftware.smack.StanzaListener;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 public class OadrXmppClient20bBuilder {
 
@@ -56,14 +58,19 @@ public class OadrXmppClient20bBuilder {
 		if (domain == null) {
 			domain = host;
 		}
-
+		XMPPTCPConnection xmpptcpConnection = null;
 		if (this.password != null) {
-			return new OadrXmppClient20b(this.venId, this.host, this.port, domain, this.resource, this.sslContext,
-					this.password, this.listener);
+			XMPPTCPConnectionConfiguration anonymousConnection = OadrXmppClient20b.passwordConnection(domain, port,
+					domain, domain, sslContext, venId, this.password);
+			xmpptcpConnection = new XMPPTCPConnection(anonymousConnection);
 		} else {
-			return new OadrXmppClient20b(this.venId, this.host, this.port, domain, this.resource, this.sslContext,
-					this.listener);
+			XMPPTCPConnectionConfiguration anonymousConnection = OadrXmppClient20b.anonymousConnection(host, port,
+					domain, resource, sslContext);
+			xmpptcpConnection = new XMPPTCPConnection(anonymousConnection);
 		}
+
+		String jid = this.venId + "@" + domain + "/" + resource;
+		return new OadrXmppClient20b(jid, xmpptcpConnection, domain, this.listener);
 
 	}
 

@@ -56,8 +56,8 @@ public class Oadr20bDemandResponseEventCreateListener {
 					OadrDistributeEventType createOadrDistributeEventPayload = oadr20bVTNEiEventService
 							.createOadrDistributeEventPayload(venUsername, findToSentEventByVenUsername);
 
-					oadr20bPushService.pushMessageToVen(ven.getTransport(), ven.getPushUrl(), ven.getXmlSignature(),
-							createOadrDistributeEventPayload);
+					oadr20bPushService.pushMessageToVen(ven.getUsername(), ven.getTransport(), ven.getPushUrl(),
+							ven.getXmlSignature(), createOadrDistributeEventPayload);
 				}
 
 				LOGGER.info("pushed event to: " + ven.getUsername() + " at:" + ven.getPushUrl());

@@ -3,22 +3,29 @@ package com.avob.openadr.server.oadr20b.vtn.service;
 import javax.annotation.Resource;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.ei.EiResponseType;
+import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
+import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.VenService;
-import com.avob.openadr.server.oadr20b.vtn.exception.poll.Oadr20bPollApplicationLayerException;
 
 @Service
 public class Oadr20bVTNOadrPollService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNOadrPollService.class);
 
 	@Resource
 	private Oadr20bJAXBContext jaxbContext;
@@ -32,54 +39,134 @@ public class Oadr20bVTNOadrPollService {
 	@Resource
 	private XmlSignatureService xmlSignatureService;
 
-	public String oadrPoll(OadrPollType event, boolean signed) throws Oadr20bPollApplicationLayerException,
-			Oadr20bXMLSignatureException, Oadr20bUnmarshalException, Oadr20bMarshalException {
+	@Resource
+	private VtnConfig vtnConfig;
+
+	private String marshall(Object payload, boolean signed) {
+		try {
+			if (signed) {
+				return xmlSignatureService.sign(payload);
+
+			} else {
+				return jaxbContext.marshalRoot(payload);
+			}
+		} catch (Oadr20bXMLSignatureException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		} catch (Oadr20bMarshalException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	private String oadrPoll(String venID, OadrPollType event, boolean signed) {
 		String requestID = "";
-		String venID = event.getVenID();
+		if (!event.getVenID().equals(venID)) {
+			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, event.getVenID(), venID).build();
+			OadrResponseType build = Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, venID).build();
+			return marshall(build, signed);
+		}
 		Ven ven = venService.findOneByUsername(venID);
 
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
 					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
-			throw new Oadr20bPollApplicationLayerException(xmlSignatureRequiredButAbsent.getResponseDescription(),
-					Oadr20bResponseBuilders.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build(),
-					signed);
+			OadrResponseType build = Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build();
+			return marshall(build, signed);
 		}
 
 		String responseStr = venPollService.retrievePollForVenUsername(venID);
-		OadrResponseType response = null;
 		if (responseStr == null) {
-			response = Oadr20bResponseBuilders.newOadr20bResponseBuilder("", HttpStatus.OK_200, venID).build();
+			OadrResponseType build = Oadr20bResponseBuilders.newOadr20bResponseBuilder("", HttpStatus.OK_200, venID)
+					.build();
+			return marshall(build, signed);
 		}
-		if (signed) {
-			if (response != null) {
-				return xmlSignatureService.sign(response);
-			} else if (responseStr != null) {
-				Object unmarshal = jaxbContext.unmarshal(responseStr);
-				return xmlSignatureService.sign(unmarshal);
-			}
 
-		} else {
-			if (response != null) {
-				return jaxbContext.marshalRoot(response);
-			} else if (responseStr != null) {
-				return responseStr;
-			}
+		Object unmarshal;
+		try {
+			unmarshal = jaxbContext.unmarshal(responseStr);
+			return marshall(unmarshal, signed);
+		} catch (Oadr20bUnmarshalException e) {
+			OadrResponseType build = Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder("", HttpStatus.INTERNAL_SERVER_ERROR_500, venID).build();
+			return marshall(build, signed);
 		}
-		return null;
+
 	}
 
-	public void checkMatchUsernameWithRequestVenId(String username, OadrPollType oadrPollType, boolean signed)
-			throws Oadr20bPollApplicationLayerException {
-		String venID = oadrPollType.getVenID();
-		String requestID = "";
-		if (!username.equals(venID)) {
-			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();
-			throw new Oadr20bPollApplicationLayerException(mismatchCredentialsVenIdResponse.getResponseDescription(),
-					Oadr20bResponseBuilders.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, venID).build(),
-					signed);
+	public String request(String username, String payload) {
+		Object unmarshal;
+		try {
+			unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
+		} catch (Oadr20bUnmarshalException e) {
+			Ven findOneByUsername = venService.findOneByUsername(username);
+			boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
+					? findOneByUsername.getXmlSignature()
+					: false;
+			OadrResponseType response = Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, username)
+					.withDescription("Can't unmarshall payload").build();
+			return marshall(response, signed);
 		}
+
+		if (unmarshal instanceof OadrPayload) {
+
+			OadrPayload oadrPayload = (OadrPayload) unmarshal;
+
+			try {
+				xmlSignatureService.validate(payload, oadrPayload);
+			} catch (Oadr20bXMLSignatureValidationException e) {
+				Ven findOneByUsername = venService.findOneByUsername(username);
+				boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
+						? findOneByUsername.getXmlSignature()
+						: false;
+				OadrResponseType response = Oadr20bResponseBuilders
+						.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.INVALID_DATA_454, username)
+						.withDescription("Can't validate payload xml signature").build();
+				return marshall(response, signed);
+			}
+
+			if (oadrPayload.getOadrSignedObject().getOadrPoll() != null) {
+
+				LOGGER.info(username + " - OadrPoll signed");
+
+				return this.oadrPoll(username, oadrPayload.getOadrSignedObject().getOadrPoll(), true);
+			}
+
+			Ven findOneByUsername = venService.findOneByUsername(username);
+			boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
+					? findOneByUsername.getXmlSignature()
+					: false;
+			OadrResponseType response = Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, username)
+					.withDescription("Unknown payload type for service: OadrPoll").build();
+			return marshall(response, signed);
+
+		} else if (unmarshal instanceof OadrPollType) {
+
+			LOGGER.info(username + " - OadrPoll");
+
+			LOGGER.debug(payload);
+
+			OadrPollType oadrPollType = (OadrPollType) unmarshal;
+
+			return this.oadrPoll(username, oadrPollType, false);
+
+		}
+
+		Ven findOneByUsername = venService.findOneByUsername(username);
+		boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
+				? findOneByUsername.getXmlSignature()
+				: false;
+		OadrResponseType response = Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, username)
+				.withDescription("Unknown payload type for service: OadrPoll").build();
+		return marshall(response, signed);
 	}
 
 }

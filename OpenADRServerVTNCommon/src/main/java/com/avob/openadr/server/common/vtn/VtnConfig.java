@@ -1,5 +1,8 @@
 package com.avob.openadr.server.common.vtn;
 
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,6 +11,7 @@ import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.slf4j.Logger;
@@ -139,6 +143,7 @@ public class VtnConfig {
 
 	private KeyManagerFactory keyManagerFactory;
 	private TrustManagerFactory trustManagerFactory;
+	private SSLContext sslContext;
 	private String oadr20bFingerprint;
 	private String oadr20aFingerprint;
 	private String brokerUrl;
@@ -171,8 +176,16 @@ public class VtnConfig {
 				setTrustManagerFactory(OadrPKISecurity.createTrustManagerFactory(trustCertificates));
 				setKeyManagerFactory(
 						OadrPKISecurity.createKeyManagerFactory(this.getKey(), this.getCert(), keystorePassword));
+
+				// SSL Context Factory
+				setSslContext(SSLContext.getInstance("TLS"));
+
 				// init ssl context
-			} catch (OadrSecurityException e) {
+				String seed = UUID.randomUUID().toString();
+				getSslContext().init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
+						new SecureRandom(seed.getBytes()));
+				// init ssl context
+			} catch (OadrSecurityException | NoSuchAlgorithmException | KeyManagementException e) {
 				throw new OadrVTNInitializationException(e);
 			}
 		} else {
@@ -415,6 +428,14 @@ public class VtnConfig {
 
 	public void setXmppDomain(String xmppDomain) {
 		this.xmppDomain = xmppDomain;
+	}
+
+	public SSLContext getSslContext() {
+		return sslContext;
+	}
+
+	private void setSslContext(SSLContext sslContext) {
+		this.sslContext = sslContext;
 	}
 
 }

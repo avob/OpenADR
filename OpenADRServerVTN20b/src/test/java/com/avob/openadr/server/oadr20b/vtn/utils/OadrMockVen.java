@@ -1,21 +1,31 @@
 package com.avob.openadr.server.oadr20b.vtn.utils;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.jivesoftware.smack.packet.Message;
+import org.jxmpp.jid.EntityFullJid;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
+import org.mockito.invocation.InvocationOnMock;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bPollBuilders;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
+import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppListener;
 
 public class OadrMockVen {
 
@@ -24,12 +34,14 @@ public class OadrMockVen {
 	private OadrMockEiHttpMvc mockService;
 	private XmlSignatureService xmlSignatureService;
 	private Oadr20bJAXBContext jaxbcontext = null;
+	private OadrMockEiXmpp oadrMockEiXmpp;
 
 	public OadrMockVen(VenDto ven, UserRequestPostProcessor authSession, OadrMockEiHttpMvc mockService,
-			XmlSignatureService xmlSignatureService) throws JAXBException {
+			OadrMockEiXmpp oadrMockEiXmpp, XmlSignatureService xmlSignatureService) throws JAXBException {
 		this.ven = ven;
 		this.authSession = authSession;
 		this.mockService = mockService;
+		this.oadrMockEiXmpp = oadrMockEiXmpp;
 		this.xmlSignatureService = xmlSignatureService;
 		jaxbcontext = Oadr20bJAXBContext.getInstance();
 	}
@@ -42,73 +54,137 @@ public class OadrMockVen {
 		return ven;
 	}
 
-	public <T> T register(Object payload, int status, Class<T> klass) throws Exception {
+	public <T> T httpCall(String endpoint, Object payload, int status, Class<T> klass) throws Exception {
 		if (ven.getXmlSignature()) {
 			String sign = xmlSignatureService.sign(payload);
-			String postEiRegisterPartyAndExpect = mockService.postEiRegisterPartyAndExpect(authSession, sign, status,
+			String postEiRegisterPartyAndExpect = mockService.postEiAndExpect(endpoint, authSession, sign, status,
 					String.class);
 			OadrPayload unmarshal = jaxbcontext.unmarshal(postEiRegisterPartyAndExpect, OadrPayload.class);
 			xmlSignatureService.validate(postEiRegisterPartyAndExpect, unmarshal);
 			return Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, klass);
 		} else {
-			return mockService.postEiRegisterPartyAndExpect(authSession, payload, status, klass);
+			return mockService.postEiAndExpect(endpoint, authSession, payload, status, klass);
 		}
+	}
+
+	public <T> T xmppCall(XmppListener listener, Object payload, Class<T> klass) throws Exception {
+		Message msg = new Message();
+
+		EntityFullJid entityFullFrom = JidCreate.entityFullFrom(ven.getPushUrl());
+		msg.setFrom(entityFullFrom);
+		if (ven.getXmlSignature()) {
+			String sign = xmlSignatureService.sign(payload);
+			msg.setBody(sign);
+
+			listener.processStanza(msg);
+
+			Optional<InvocationOnMock> popResponse = oadrMockEiXmpp.popResponse();
+			if (!popResponse.isPresent()) {
+				fail("VEN supposed to have some response from VTN");
+				return null;
+			}
+			InvocationOnMock invocationOnMock = popResponse.get();
+			Jid from = (Jid) invocationOnMock.getArgument(0);
+			String body = (String) invocationOnMock.getArgument(1);
+			assertEquals(entityFullFrom, from);
+			OadrPayload unmarshal = jaxbcontext.unmarshal(body, OadrPayload.class);
+			xmlSignatureService.validate(body, unmarshal);
+			return Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, klass);
+		} else {
+			String content = jaxbcontext.marshalRoot(payload);
+			msg.setBody(content);
+			listener.processStanza(msg);
+
+			Optional<InvocationOnMock> popResponse = oadrMockEiXmpp.popResponse();
+			if (!popResponse.isPresent()) {
+				fail("VEN supposed to have some response from VTN");
+				return null;
+			}
+			InvocationOnMock invocationOnMock = popResponse.get();
+			Jid from = (Jid) invocationOnMock.getArgument(0);
+			String body = (String) invocationOnMock.getArgument(1);
+			assertEquals(entityFullFrom, from);
+			Object unmarshal = jaxbcontext.unmarshal(body);
+			if (!klass.equals(unmarshal.getClass())) {
+				System.out.println(body);
+			}
+			assertEquals(klass, unmarshal.getClass());
+			return klass.cast(unmarshal);
+		}
+	}
+
+	public <T> T register(Object payload, int status, Class<T> klass) throws Exception {
+		String endpoint = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.EI_REGISTER_PARTY_SERVICE;
+		if (OadrTransportType.SIMPLE_HTTP.value().equals(ven.getTransport())) {
+			return httpCall(endpoint, payload, status, klass);
+		} else if (OadrTransportType.XMPP.value().equals(ven.getTransport())) {
+			return xmppCall(oadrMockEiXmpp.getXmppEiRegisterPartyListener(), payload, klass);
+		}
+		fail("venId: " + ven.getUsername() + " has unknown transport: " + ven.getTransport());
+		return null;
+
 	}
 
 	public <T> T report(Object payload, int status, Class<T> klass) throws Exception {
-		if (ven.getXmlSignature()) {
-			String sign = xmlSignatureService.sign(payload);
-			String postEiRegisterPartyAndExpect = mockService.postEiReportAndExpect(authSession, sign, status,
-					String.class);
-			OadrPayload unmarshal = jaxbcontext.unmarshal(postEiRegisterPartyAndExpect, OadrPayload.class);
-			xmlSignatureService.validate(postEiRegisterPartyAndExpect, unmarshal);
-			return Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, klass);
-		} else {
-			return mockService.postEiReportAndExpect(authSession, payload, status, klass);
+		String endpoint = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.EI_REPORT_SERVICE;
+		if (OadrTransportType.SIMPLE_HTTP.value().equals(ven.getTransport())) {
+			return httpCall(endpoint, payload, status, klass);
+		} else if (OadrTransportType.XMPP.value().equals(ven.getTransport())) {
+			return xmppCall(oadrMockEiXmpp.getXmppEiReportListener(), payload, klass);
 		}
+		fail("venId: " + ven.getUsername() + " has unknown transport: " + ven.getTransport());
+		return null;
 	}
 
 	public <T> T event(Object payload, int status, Class<T> klass) throws Exception {
-		if (ven.getXmlSignature()) {
-			String sign = xmlSignatureService.sign(payload);
-			String postEiRegisterPartyAndExpect = mockService.postEiEventAndExpect(authSession, sign, status,
-					String.class);
-			OadrPayload unmarshal = jaxbcontext.unmarshal(postEiRegisterPartyAndExpect, OadrPayload.class);
-			xmlSignatureService.validate(postEiRegisterPartyAndExpect, unmarshal);
-			return Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, klass);
-		} else {
-			return mockService.postEiEventAndExpect(authSession, payload, status, klass);
+		String endpoint = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.EI_EVENT_SERVICE;
+		if (OadrTransportType.SIMPLE_HTTP.value().equals(ven.getTransport())) {
+			return httpCall(endpoint, payload, status, klass);
+		} else if (OadrTransportType.XMPP.value().equals(ven.getTransport())) {
+			return xmppCall(oadrMockEiXmpp.getXmppEiEventListener(), payload, klass);
 		}
+		fail("venId: " + ven.getUsername() + " has unknown transport: " + ven.getTransport());
+		return null;
 	}
 
 	public <T> T opt(Object payload, int status, Class<T> klass) throws Exception {
-		if (ven.getXmlSignature()) {
-			String sign = xmlSignatureService.sign(payload);
-			String postEiRegisterPartyAndExpect = mockService.postEiOptAndExpect(authSession, sign, status,
-					String.class);
-			OadrPayload unmarshal = jaxbcontext.unmarshal(postEiRegisterPartyAndExpect, OadrPayload.class);
-			xmlSignatureService.validate(postEiRegisterPartyAndExpect, unmarshal);
-			return Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, klass);
-		} else {
-			return mockService.postEiOptAndExpect(authSession, payload, status, klass);
+		String endpoint = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.EI_OPT_SERVICE;
+		if (OadrTransportType.SIMPLE_HTTP.value().equals(ven.getTransport())) {
+			return httpCall(endpoint, payload, status, klass);
+		} else if (OadrTransportType.XMPP.value().equals(ven.getTransport())) {
+			return xmppCall(oadrMockEiXmpp.getXmppEiOptListener(), payload, klass);
 		}
+		fail("venId: " + ven.getUsername() + " has unknown transport: " + ven.getTransport());
+		return null;
 	}
 
 	public <T> T poll(Object payload, int status, Class<T> klass) throws Exception {
-		if (ven.getXmlSignature()) {
-			String sign = xmlSignatureService.sign(payload);
-			String postEiRegisterPartyAndExpect = mockService.postOadrPollAndExpect(authSession, sign, status,
-					String.class);
-			OadrPayload unmarshal = jaxbcontext.unmarshal(postEiRegisterPartyAndExpect, OadrPayload.class);
-			xmlSignatureService.validate(postEiRegisterPartyAndExpect, unmarshal);
-			T signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, klass);
-			assertNotNull(signedObjectFromOadrPayload);
-			return signedObjectFromOadrPayload;
-		} else {
-			T postOadrPollAndExpect = mockService.postOadrPollAndExpect(authSession, payload, status, klass);
-			assertNotNull(postOadrPollAndExpect);
-			return postOadrPollAndExpect;
+		String endpoint = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.OADR_POLL_SERVICE;
+		if (OadrTransportType.SIMPLE_HTTP.value().equals(ven.getTransport())) {
+			return httpCall(endpoint, payload, status, klass);
+		} else if (OadrTransportType.XMPP.value().equals(ven.getTransport())) {
+			Optional<InvocationOnMock> popResponse = oadrMockEiXmpp.popResponse();
+			if (!popResponse.isPresent()) {
+				fail("VEN supposed to have some response from VTN");
+				return null;
+			}
+			InvocationOnMock invocationOnMock = popResponse.get();
+			Jid from = (Jid) invocationOnMock.getArgument(0);
+			String body = (String) invocationOnMock.getArgument(1);
+//			assertEquals(entityFullFrom, from);
+			if (ven.getXmlSignature()) {
+				OadrPayload unmarshal = jaxbcontext.unmarshal(body, OadrPayload.class);
+				xmlSignatureService.validate(body, unmarshal);
+				return Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, klass);
+			} else {
+				Object unmarshal = jaxbcontext.unmarshal(body);
+				assertEquals(klass, unmarshal.getClass());
+				return klass.cast(unmarshal);
+			}
+
 		}
+		fail("venId: " + ven.getUsername() + " has unknown transport: " + ven.getTransport());
+		return null;
 	}
 
 	public <T> T poll(int status, Class<T> klass) throws Exception {

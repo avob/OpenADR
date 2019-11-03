@@ -36,6 +36,7 @@ import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bDemandResponseEve
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bPushListener;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiXmpp;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpVenMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockVen;
@@ -51,6 +52,9 @@ public class Oadr20bVenControllerTest {
 
 	@Resource
 	private OadrMockEiHttpMvc oadrMockEiHttpMvc;
+
+	@Resource
+	private OadrMockEiXmpp oadrMockEiXmpp;
 
 	@Resource
 	private OadrMockHttpMvc oadrMockHttpMvc;
@@ -85,13 +89,13 @@ public class Oadr20bVenControllerTest {
 	@Test
 	public void testReportAction() throws Exception {
 
-		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG,
 				HttpStatus.OK_200);
-		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_SECURITY_SESSION, oadrMockEiHttpMvc,
-				xmlSignatureService);
+		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION, oadrMockEiHttpMvc,
+				oadrMockEiXmpp, xmlSignatureService);
 
 		// send register party requestReregistration action
-		oadrMockHttpVenMvc.reregister(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		oadrMockHttpVenMvc.reregister(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG,
 				HttpStatus.OK_200);
 
 		// test register report payload is in poll queue
@@ -100,7 +104,7 @@ public class Oadr20bVenControllerTest {
 		assertNotNull(oadrRequestReregistrationType);
 
 		// send register party requestReregistration action
-		oadrMockHttpVenMvc.cancelRegistration(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		oadrMockHttpVenMvc.cancelRegistration(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG,
 				HttpStatus.OK_200);
 
 		// test register report payload is in poll queue
@@ -109,7 +113,7 @@ public class Oadr20bVenControllerTest {
 		assertNotNull(oadrCancelPartyRegistrationType);
 
 		// send request register report action
-		oadrMockHttpVenMvc.requestRegisterReport(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		oadrMockHttpVenMvc.requestRegisterReport(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG,
 				HttpStatus.OK_200);
 
 		// test register report payload is in poll queue
@@ -117,7 +121,7 @@ public class Oadr20bVenControllerTest {
 		assertNotNull(oadrCreateReportType);
 
 		// send own register report action
-		oadrMockHttpVenMvc.sendRegisterReport(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN,
+		oadrMockHttpVenMvc.sendRegisterReport(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG,
 				HttpStatus.OK_200);
 
 		// test register report payload is in poll queue
@@ -128,7 +132,7 @@ public class Oadr20bVenControllerTest {
 		String reportRequestId = "reportRequestId";
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
 		params.add("reportRequestId", reportRequestId);
-		oadrMockHttpVenMvc.sendCancelReport(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN, params,
+		oadrMockHttpVenMvc.sendCancelReport(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, params,
 				HttpStatus.OK_200);
 
 		// test cancel report payload is in poll queue

@@ -49,7 +49,7 @@ public class Oadr20bVtnControllerTest {
 		assertEquals(vtnConfig.getReplayProtectAcceptedDelaySecond(), conf.getXmlSignatureReplayProtectSecond());
 
 		oadrMockHttpVtnMvc.getConfiguration(OadrDataBaseSetup.USER_SECURITY_SESSION, HttpStatus.FORBIDDEN_403);
-		oadrMockHttpVtnMvc.getConfiguration(OadrDataBaseSetup.VEN_SECURITY_SESSION, HttpStatus.FORBIDDEN_403);
+		oadrMockHttpVtnMvc.getConfiguration(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION, HttpStatus.FORBIDDEN_403);
 
 	}
 

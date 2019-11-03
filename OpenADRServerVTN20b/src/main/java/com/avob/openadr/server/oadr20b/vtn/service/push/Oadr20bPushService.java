@@ -14,7 +14,6 @@ import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.client.http.OadrHttpClientBuilder;
@@ -49,7 +48,7 @@ import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiRegisterPartyService;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
-import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppUplinkClient;
+import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppConnector;
 
 @Service
 public class Oadr20bPushService {
@@ -76,7 +75,7 @@ public class Oadr20bPushService {
 	private DemandResponseEventService demandResponseEventService;
 
 	@Resource
-	private XmppUplinkClient xmppUplinkClient;
+	private XmppConnector xmppConnector;
 
 	@Resource
 	private XmlSignatureService xmlSignatureService;
@@ -113,8 +112,8 @@ public class Oadr20bPushService {
 
 	}
 
-	@Async
-	public void pushMessageToVen(String transport, String venPushUrl, Boolean xmlSignatureRequired, Object payload) {
+	public void pushMessageToVen(String venId, String transport, String venPushUrl, Boolean xmlSignatureRequired,
+			Object payload) {
 		try {
 			URI uri = new URI(venPushUrl);
 
@@ -160,7 +159,7 @@ public class Oadr20bPushService {
 						LOGGER.error("OadrCreateReportType - Application Layer Error[" + eiResponseCode + "]");
 					}
 
-					oadr20bVTNEiReportService.oadrCreatedReport(oadrCreateReport, xmlSignatureRequired);
+					oadr20bVTNEiReportService.oadrCreatedReport(venId, oadrCreateReport, xmlSignatureRequired);
 
 				} else if (payload instanceof OadrRegisterReportType) {
 					OadrRegisterReportType val = (OadrRegisterReportType) payload;
@@ -220,7 +219,7 @@ public class Oadr20bPushService {
 				}
 
 				Jid from = JidCreate.from(venPushUrl);
-				xmppUplinkClient.getUplinkClient().sendMessage(from, msg);
+				xmppConnector.getXmppUplinkClient().sendMessage(from, msg);
 			}
 
 		} catch (Oadr20bException e) {

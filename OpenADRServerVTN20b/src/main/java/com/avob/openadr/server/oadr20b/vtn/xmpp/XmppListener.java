@@ -12,6 +12,7 @@ import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20b;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiService;
@@ -20,11 +21,11 @@ public class XmppListener implements StanzaListener {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(XmppListener.class);
 
-	private XmppUplinkClient xmppUplinkClient;
+	private OadrXmppClient20b xmppUplinkClient;
 
 	private Oadr20bVTNEiService oadr20bVTNEiService;
 
-	public XmppListener(Oadr20bVTNEiService oadr20bVTNEiService, XmppUplinkClient xmppUplinkClient) {
+	public XmppListener(Oadr20bVTNEiService oadr20bVTNEiService, OadrXmppClient20b xmppUplinkClient) {
 		this.oadr20bVTNEiService = oadr20bVTNEiService;
 		this.xmppUplinkClient = xmppUplinkClient;
 	}
@@ -49,16 +50,18 @@ public class XmppListener implements StanzaListener {
 
 			String response = oadr20bVTNEiService.request(username, body);
 
-			from = JidCreate.from(resourceOrThrow + "@" + from.getDomain().toString() + "/" + resourceOrThrow);
+			from = JidCreate.from(username + "@" + from.getDomain().toString() + "/" + resourceOrThrow);
 
-			xmppUplinkClient.getUplinkClient().sendMessage(from, response);
+			xmppUplinkClient.sendMessage(from, response);
 
-		} catch (Oadr20bApplicationLayerException | XmppStringprepException | NotConnectedException
-				| Oadr20bMarshalException e) {
+		} catch (XmppStringprepException | NotConnectedException | Oadr20bMarshalException e) {
 			LOGGER.error(oadr20bVTNEiService.getServiceName() + " - " + e.getMessage());
 		} catch (InterruptedException e) {
 			LOGGER.error(oadr20bVTNEiService.getServiceName() + " - " + e.getMessage());
 			Thread.currentThread().interrupt();
+		} catch (Oadr20bApplicationLayerException e) {
+			LOGGER.error(oadr20bVTNEiService.getServiceName() + " - " + e.getMessage());
+//			e.get
 		}
 
 	}

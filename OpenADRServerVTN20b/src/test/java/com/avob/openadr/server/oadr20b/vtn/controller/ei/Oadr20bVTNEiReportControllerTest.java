@@ -61,6 +61,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrReportDescriptionType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
+import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.TemperatureType;
@@ -105,6 +106,7 @@ import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportCapabilitySe
 import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportRequestService;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrDataBaseSetup;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
+import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiXmpp;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpReportMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpVenMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpVtnMvc;
@@ -170,6 +172,9 @@ public class Oadr20bVTNEiReportControllerTest {
 	private OadrMockEiHttpMvc oadrMockEiHttpMvc;
 
 	@Resource
+	private OadrMockEiXmpp oadrMockEiXmpp;
+
+	@Resource
 	private OadrMockHttpVenMvc oadrMockHttpVenMvc;
 
 	@Resource
@@ -215,7 +220,8 @@ public class Oadr20bVTNEiReportControllerTest {
 		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.VEN_TEST_LIST.entrySet()) {
 			VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, entry.getKey(),
 					HttpStatus.OK_200);
-			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, xmlSignatureService);
+			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, oadrMockEiXmpp,
+					xmlSignatureService);
 			_testVENSourceVTNTarget(mockVen);
 		}
 	}
@@ -224,9 +230,12 @@ public class Oadr20bVTNEiReportControllerTest {
 
 		LinkedMultiValueMap<String, String> params;
 
-		// OADR POLL CONTROLLER - first poll supposed to be 'empty'
-		OadrResponseType firstPoll = mockVen.poll(HttpStatus.OK_200, OadrResponseType.class);
-		assertEquals(String.valueOf(HttpStatus.OK_200), firstPoll.getEiResponse().getResponseCode());
+		// OADR POLL CONTROLLER - poll supposed to be 'empty' - OadrResponseType for
+		// HTTP VEN
+		if (OadrTransportType.SIMPLE_HTTP.value().equals(mockVen.getVen().getTransport())) {
+			OadrResponseType firstPoll = mockVen.poll(HttpStatus.OK_200, OadrResponseType.class);
+			assertEquals(String.valueOf(HttpStatus.OK_200), firstPoll.getEiResponse().getResponseCode());
+		}
 
 		// create VEN METADATA payload with one report capability containing one
 		// description
@@ -813,24 +822,27 @@ public class Oadr20bVTNEiReportControllerTest {
 		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.VEN_TEST_LIST.entrySet()) {
 			VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, entry.getKey(),
 					HttpStatus.OK_200);
-			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, xmlSignatureService);
+			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, oadrMockEiXmpp,
+					xmlSignatureService);
 			_testVENTargetVTNSource(mockVen);
 		}
 	}
 
 	private void _testVENTargetVTNSource(OadrMockVen mockVen) throws Oadr20bMarshalException, Exception {
 
-		// OADR POLL CONTROLLER - invalid mismatch payload venID and username auth
-		// session
-		OadrResponseType postOadrPollAndExpect = mockVen.poll(
-				Oadr20bPollBuilders.newOadr20bPollBuilder("mouaiccool").build(), HttpStatus.OK_200,
-				OadrResponseType.class);
-		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
-				postOadrPollAndExpect.getEiResponse().getResponseCode());
+		if (OadrTransportType.SIMPLE_HTTP.value().equals(mockVen.getVen().getTransport())) {
+			// OADR POLL CONTROLLER - invalid mismatch payload venID and username auth
+			// session
+			OadrResponseType postOadrPollAndExpect = mockVen.poll(
+					Oadr20bPollBuilders.newOadr20bPollBuilder("mouaiccool").build(), HttpStatus.OK_200,
+					OadrResponseType.class);
+			assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
+					postOadrPollAndExpect.getEiResponse().getResponseCode());
 
-		// OADR POLL CONTROLLER - first poll supposed to be 'empty'
-		OadrResponseType firstPoll = mockVen.poll(HttpStatus.OK_200, OadrResponseType.class);
-		assertEquals(String.valueOf(HttpStatus.OK_200), firstPoll.getEiResponse().getResponseCode());
+			// OADR POLL CONTROLLER - first poll supposed to be 'empty'
+			OadrResponseType firstPoll = mockVen.poll(HttpStatus.OK_200, OadrResponseType.class);
+			assertEquals(String.valueOf(HttpStatus.OK_200), firstPoll.getEiResponse().getResponseCode());
+		}
 
 		// create oadrCreateReport payload requesting for METADATA payload
 		OadrCreateReportType oadrCreateReportType = createMetadataRequestPayload(mockVen.getVenId());
