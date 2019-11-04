@@ -11,45 +11,45 @@ import com.avob.openadr.model.oadr20b.oadr.OadrPayloadResourceStatusType;
 
 public class Oadr20bReportIntervalTypeBuilder {
 
-    private IntervalType interval;
+	private IntervalType interval;
 
-    public Oadr20bReportIntervalTypeBuilder(String intervalId, Long start, String xmlDuration, String rid,
-            Long confidence, Float accuracy, Float value) {
+	public Oadr20bReportIntervalTypeBuilder(String intervalId, Long start, String xmlDuration, String rid,
+			Long confidence, Float accuracy, Float value) {
 
-        interval = Oadr20bFactory.createReportIntervalType(intervalId, start, xmlDuration, rid, confidence, accuracy,
-                value);
-    }
+		interval = Oadr20bFactory.createReportIntervalType(intervalId, start, xmlDuration, rid, confidence, accuracy,
+				value);
+	}
 
-    public Oadr20bReportIntervalTypeBuilder(String intervalId, Long start, String xmlDuration, String rid,
-            Long confidence, Float accuracy, OadrPayloadResourceStatusType value) {
+	public Oadr20bReportIntervalTypeBuilder(String intervalId, Long start, String xmlDuration, String rid,
+			Long confidence, Float accuracy, OadrPayloadResourceStatusType value) {
 
-        interval = Oadr20bFactory.createReportIntervalType(intervalId, start, xmlDuration, rid, confidence, accuracy,
-                value);
-    }
+		interval = Oadr20bFactory.createReportIntervalType(intervalId, start, xmlDuration, rid, confidence, accuracy,
+				value);
+	}
 
-    public <T> Oadr20bReportIntervalTypeBuilder(String intervalId, Long start, String xmlDuration, String rid,
-            Long confidence, Float accuracy, PayloadKeyTokenType tokens) {
+	public <T> Oadr20bReportIntervalTypeBuilder(String intervalId, Long start, String xmlDuration, String rid,
+			Long confidence, Float accuracy, PayloadKeyTokenType tokens) {
 
-        interval = Oadr20bFactory.createKeyTokenReportIntervalType(intervalId, start, xmlDuration, rid, confidence,
-                accuracy, tokens);
+		interval = Oadr20bFactory.createKeyTokenReportIntervalType(intervalId, start, xmlDuration, rid, confidence,
+				accuracy, tokens);
 
-    }
+	}
 
-    public Oadr20bReportIntervalTypeBuilder(String intervalId, Long start, String xmlDuration, String rid,
-            Long confidence, Float accuracy, PayloadAvobVenServiceRequestType requests) {
+	public Oadr20bReportIntervalTypeBuilder(String intervalId, Long start, String xmlDuration, String rid,
+			Long confidence, Float accuracy, PayloadAvobVenServiceRequestType requests) {
 
-        interval = Oadr20bFactory.createAvobVenServiceRequestReportIntervalType(intervalId, start, xmlDuration, rid, confidence,
-                accuracy, requests);
-    }
+		interval = Oadr20bFactory.createAvobVenServiceRequestReportIntervalType(intervalId, start, xmlDuration, rid,
+				confidence, accuracy, requests);
+	}
 
-    public Oadr20bReportIntervalTypeBuilder(String intervalId, Long start, String xmlDuration, String rid,
-            Long confidence, Float accuracy, JAXBElement<? extends PayloadBaseType> payloadBase) {
+	public Oadr20bReportIntervalTypeBuilder(String intervalId, Long start, String xmlDuration, String rid,
+			Long confidence, Float accuracy, JAXBElement<? extends PayloadBaseType> payloadBase) {
 
-        interval = Oadr20bFactory.createReportIntervalType(intervalId, start, xmlDuration, rid, confidence, accuracy,
-                payloadBase);
-    }
+		interval = Oadr20bFactory.createReportIntervalType(intervalId, start, xmlDuration, rid, confidence, accuracy,
+				payloadBase);
+	}
 
-    public IntervalType build() {
-        return interval;
-    }
+	public IntervalType build() {
+		return interval;
+	}
 }

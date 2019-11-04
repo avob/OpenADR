@@ -3,11 +3,8 @@ package com.avob.openadr.server.oadr20b.vtn.xmpp;
 import javax.annotation.Resource;
 import javax.net.ssl.SSLContext;
 
-import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
-import org.jxmpp.jid.Jid;
-import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -16,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20b;
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppException;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiOptService;
@@ -45,11 +41,6 @@ public class XmppConnector {
 	private Oadr20bVTNEiOptService oadr20bVTNEiOptService;
 
 	private OadrXmppClient20b xmppUplinkClient;
-
-	public void sendMessage(Jid jid, String payload)
-			throws Oadr20bMarshalException, XmppStringprepException, NotConnectedException, InterruptedException {
-		getXmppUplinkClient().sendMessage(jid, payload);
-	}
 
 	private XMPPTCPConnection getXmppConnection(String domain, Oadr20bVTNEiService service) throws OadrXmppException {
 		String resource = (service != null) ? service.getServiceName() : "uplink";

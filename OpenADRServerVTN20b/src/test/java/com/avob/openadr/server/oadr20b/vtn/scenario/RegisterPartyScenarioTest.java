@@ -251,6 +251,18 @@ public class RegisterPartyScenarioTest {
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
 
+		// EI REGISTER PARTY CONTROLLER - invalid registration id
+		oadrCreatePartyRegistrationType = Oadr20bEiRegisterPartyBuilders
+				.newOadr20bCreatePartyRegistrationBuilder(requestId, mockVen.getVenId(),
+						SchemaVersionEnumeratedType.OADR_20B.value())
+				.withOadrVenName(venName).withOadrHttpPullModel(pullModel).withOadrTransportAddress(transportAddress)
+				.withOadrTransportName(transport).withOadrXmlSignature(xmlSignature).withOadrReportOnly(reportOnly)
+				.withRegistrationId("fake registration id").build();
+		oadrCreatedPartyRegistrationType = mockVen.register(oadrCreatePartyRegistrationType, HttpStatus.OK_200,
+				OadrCreatedPartyRegistrationType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.INVALID_ID_452),
+				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
+
 		// EI REGISTER PARTY CONTROLLER - send OadrCreatePartyRegistrationType
 		oadrCreatePartyRegistrationType = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatePartyRegistrationBuilder(requestId, mockVen.getVenId(),
@@ -265,12 +277,32 @@ public class RegisterPartyScenarioTest {
 		assertEquals(String.valueOf(HttpStatus.OK_200),
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
 
-		// EI REGISTER PARTY CONTROLLER - test VEN can't create a registration while
-		// already registered
+		// EI REGISTER PARTY CONTROLLER - invalid test VEN can't create a registration
+		// while
+		// already registered without providing registrationId
 		oadrCreatedPartyRegistrationType = mockVen.register(oadrCreatePartyRegistrationType, HttpStatus.OK_200,
 				OadrCreatedPartyRegistrationType.class);
 		assertNotNull(oadrCreatedPartyRegistrationType);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.INVALID_ID_452),
+				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
+
+		// EI REGISTER PARTY CONTROLLER - invalid test VEN can't create a registration
+		// while
+		// already registered without providing correct registrationId
+		oadrCreatePartyRegistrationType.setRegistrationID("mouaiccool");
+		oadrCreatedPartyRegistrationType = mockVen.register(oadrCreatePartyRegistrationType, HttpStatus.OK_200,
+				OadrCreatedPartyRegistrationType.class);
+		assertNotNull(oadrCreatedPartyRegistrationType);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.INVALID_ID_452),
+				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
+
+		// EI REGISTER PARTY CONTROLLER - ven can reregister if correct registrationid
+		// provided
+		oadrCreatePartyRegistrationType.setRegistrationID(registrationId);
+		oadrCreatedPartyRegistrationType = mockVen.register(oadrCreatePartyRegistrationType, HttpStatus.OK_200,
+				OadrCreatedPartyRegistrationType.class);
+		assertNotNull(oadrCreatedPartyRegistrationType);
+		assertEquals(String.valueOf(HttpStatus.OK_200),
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
 
 		// VEN CONTROLLER - test ven is registred
@@ -327,6 +359,15 @@ public class RegisterPartyScenarioTest {
 		OadrCanceledPartyRegistrationType oadrCanceledPartyRegistration = mockVen.register(oadrCancelPartyRegistration,
 				HttpStatus.OK_200, OadrCanceledPartyRegistrationType.class);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
+				oadrCanceledPartyRegistration.getEiResponse().getResponseCode());
+
+		// EI REGISTER PARTY CONTROLLER - invalid registration id
+		oadrCancelPartyRegistration = Oadr20bEiRegisterPartyBuilders
+				.newOadr20bCancelPartyRegistrationBuilder(requestId, "mouaiccool", mockVen.getVenId()).build();
+
+		oadrCanceledPartyRegistration = mockVen.register(oadrCancelPartyRegistration, HttpStatus.OK_200,
+				OadrCanceledPartyRegistrationType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.INVALID_ID_452),
 				oadrCanceledPartyRegistration.getEiResponse().getResponseCode());
 
 		// EI REGISTER PARTY CONTROLLER - send OadrCancelPartyRegistrationType

@@ -22,6 +22,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.LinkedMultiValueMap;
 
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiOptBuilders;
+import com.avob.openadr.model.oadr20b.builders.eipayload.Oadr20bEiTargetTypeBuilder;
 import com.avob.openadr.model.oadr20b.ei.OptReasonEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
@@ -110,12 +111,23 @@ public class OptScenarioTest {
 		String optId = "optId";
 		OptTypeType optType = OptTypeType.OPT_OUT;
 		OptReasonEnumeratedType optReason = OptReasonEnumeratedType.NOT_PARTICIPATING;
+
+		// EI OPT CONTROLLER - invalid target another VEN
 		OadrCreateOptType oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId,
 				mockVen.getVenId(), createdDatetime, vavailabilityType, optId, optType, optReason)
 				.withMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
+		oadrCreateOptType.setEiTarget(new Oadr20bEiTargetTypeBuilder().addVenId("mouaiccool").build());
+		OadrCreatedOptType opt = mockVen.opt(oadrCreateOptType, HttpStatus.OK_200, OadrCreatedOptType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.INVALID_ID_452),
+				opt.getEiResponse().getResponseCode());
+		assertEquals(requestId, opt.getEiResponse().getRequestID());
+		assertEquals(optId, opt.getOptID());
 
 		// EI OPT CONTROLLER - send OadrCreateOptType
-		OadrCreatedOptType opt = mockVen.opt(oadrCreateOptType, HttpStatus.OK_200, OadrCreatedOptType.class);
+		oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, mockVen.getVenId(),
+				createdDatetime, vavailabilityType, optId, optType, optReason)
+				.withMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build();
+		opt = mockVen.opt(oadrCreateOptType, HttpStatus.OK_200, OadrCreatedOptType.class);
 		assertEquals(String.valueOf(HttpStatus.OK_200), opt.getEiResponse().getResponseCode());
 		assertEquals(requestId, opt.getEiResponse().getRequestID());
 		assertEquals(optId, opt.getOptID());
@@ -339,7 +351,7 @@ public class OptScenarioTest {
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
-		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.NEVER);
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		dto.getActivePeriod().setToleranceDuration("P1D");
@@ -376,12 +388,34 @@ public class OptScenarioTest {
 		assertNotNull(demandResponseEventVenResponse);
 		assertNull(demandResponseEventVenResponse.getVenOpt());
 
+		String eventOptId = "eventOptId";
+
+		// EI OPT CONTROLLER - invalid not found related event
+		oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, mockVen.getVenId(),
+				createdDatetime, String.valueOf(eventId - 1), modificationNumber, eventOptId, optType, optReason)
+				.build();
+		oadrCreatedOptType = mockVen.opt(oadrCreateOptType, HttpStatus.OK_200, OadrCreatedOptType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.INVALID_ID_452),
+				oadrCreatedOptType.getEiResponse().getResponseCode());
+		assertEquals(requestId, oadrCreatedOptType.getEiResponse().getRequestID());
+		assertEquals(eventOptId, oadrCreatedOptType.getOptID());
+
+		// EI OPT CONTROLLER - invalid modification number don't match
+		oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, mockVen.getVenId(),
+				createdDatetime, String.valueOf(eventId), modificationNumber + 1, eventOptId, optType, optReason)
+				.build();
+		oadrCreatedOptType = mockVen.opt(oadrCreateOptType, HttpStatus.OK_200, OadrCreatedOptType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.INVALID_DATA_454),
+				oadrCreatedOptType.getEiResponse().getResponseCode());
+		assertEquals(requestId, oadrCreatedOptType.getEiResponse().getRequestID());
+		assertEquals(eventOptId, oadrCreatedOptType.getOptID());
+
 		// EI OPT CONTROLLER - test create opt related to specific event with different
 		// optId
-		String eventOptId = "eventOptId";
 		oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, mockVen.getVenId(),
 				createdDatetime, String.valueOf(eventId), modificationNumber, eventOptId, optType, optReason).build();
 		oadrCreatedOptType = mockVen.opt(oadrCreateOptType, HttpStatus.OK_200, OadrCreatedOptType.class);
+
 		assertEquals(String.valueOf(HttpStatus.OK_200), oadrCreatedOptType.getEiResponse().getResponseCode());
 		assertEquals(requestId, oadrCreatedOptType.getEiResponse().getRequestID());
 		assertEquals(eventOptId, oadrCreatedOptType.getOptID());

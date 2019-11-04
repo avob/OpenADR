@@ -246,6 +246,7 @@ public class ReportScenarioTest {
 		OadrReportType report = Oadr20bEiReportBuilders
 				.newOadr20bRegisterReportOadrReportBuilder(REPORT_SPECIFIER_ID, REPORT_REQUEST_ID, reportName,
 						createdTimestamp)
+				.withDuration("PT1H").withStart(System.currentTimeMillis())
 				.addReportDescription(Oadr20bEiReportBuilders
 						.newOadr20bOadrReportDescriptionBuilder(rid, reportType, readingType)
 						.withCurrencyBase(CurrencyItemDescriptionType.CURRENCY, ISO3AlphaCurrencyCodeContentType.EUR,
@@ -260,7 +261,7 @@ public class ReportScenarioTest {
 				.addReportDescription(Oadr20bEiReportBuilders
 						.newOadr20bOadrReportDescriptionBuilder(rid + "2", reportType, readingType)
 						.withVoltageBase(SiScaleCodeType.NONE).withOadrSamplingRate(minPeriod, maxPeriod, false)
-						.build())
+						.withMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME).build())
 				.addReportDescription(Oadr20bEiReportBuilders
 						.newOadr20bOadrReportDescriptionBuilder(rid + "3", reportType, readingType)
 						.withEnergyApparentBase(SiScaleCodeType.NONE).withOadrSamplingRate(minPeriod, maxPeriod, false)
@@ -647,8 +648,11 @@ public class ReportScenarioTest {
 		// create VEN oadrUpdateReport OadrPayloadResourceStatusType payload
 		OadrLoadControlStateTypeType loadControlState = Oadr20bFactory.createOadrLoadControlStateTypeType(0f, 0f, 0f,
 				0f);
+		OadrLoadControlStateTypeType levelOffset = Oadr20bFactory.createOadrLoadControlStateTypeType(0F, 0F, 0F, 0F);
+		OadrLoadControlStateTypeType percentOffset = Oadr20bFactory.createOadrLoadControlStateTypeType(0F, 0F, 0F, 0F);
+		OadrLoadControlStateTypeType setPoint = Oadr20bFactory.createOadrLoadControlStateTypeType(0F, 0F, 0F, 0F);
 		OadrLoadControlStateType createOadrLoadControlStateType = Oadr20bFactory
-				.createOadrLoadControlStateType(loadControlState, null, null, null);
+				.createOadrLoadControlStateType(loadControlState, levelOffset, percentOffset, setPoint);
 
 		boolean manualOverride = true;
 		boolean online = true;
