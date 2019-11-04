@@ -73,7 +73,8 @@ public class OadrMockEiXmpp {
 
 		try {
 			Mockito.doAnswer((Answer<?>) invocation -> {
-				response.add(invocation);
+				response.add(0, invocation);
+//				response.add(invocation);
 				return null;
 			}).when(mockUplinkClient).sendMessage(Mockito.any(Jid.class), Mockito.any(String.class));
 		} catch (XmppStringprepException e) {

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
@@ -37,7 +36,7 @@ public class Oadr20bVTNEiReportController {
 	@PreAuthorize("hasRole('ROLE_VEN') AND hasRole('ROLE_REGISTERED')")
 	@RequestMapping(value = Oadr20bUrlPath.EI_REPORT_SERVICE, method = RequestMethod.POST)
 	@ResponseBody
-	public String request(@RequestBody String payload, Principal principal) throws Oadr20bApplicationLayerException {
+	public String request(@RequestBody String payload, Principal principal) {
 
 		return reportService.request(principal.getName(), payload);
 	}

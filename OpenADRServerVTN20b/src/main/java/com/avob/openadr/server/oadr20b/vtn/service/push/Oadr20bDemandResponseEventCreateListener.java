@@ -13,6 +13,7 @@ import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
@@ -47,7 +48,8 @@ public class Oadr20bDemandResponseEventCreateListener {
 	public void receiveEvent(String venUsername) {
 		Ven ven = venService.findOneByUsername(venUsername);
 		if (ven != null && ven.getUsername() != null) {
-			if (ven.getHttpPullModel() != null && !ven.getHttpPullModel() && ven.getPushUrl() != null) {
+			if (OadrTransportType.XMPP.value().equals(ven.getTransport())
+					|| (ven.getHttpPullModel() != null && !ven.getHttpPullModel() && ven.getPushUrl() != null)) {
 
 				List<DemandResponseEvent> findToSentEventByVenUsername = demandResponseEventService
 						.findToSentEventByVenUsername(venUsername);
@@ -87,6 +89,7 @@ public class Oadr20bDemandResponseEventCreateListener {
 				}
 
 			}
+
 		}
 		LOGGER.warn("Can't push events to unknown venId: " + venUsername);
 	}

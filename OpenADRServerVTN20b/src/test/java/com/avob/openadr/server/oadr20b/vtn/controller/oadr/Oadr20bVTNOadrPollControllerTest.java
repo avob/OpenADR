@@ -3,7 +3,6 @@ package com.avob.openadr.server.oadr20b.vtn.controller.oadr;
 import javax.annotation.Resource;
 
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +14,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
@@ -41,35 +39,32 @@ public class Oadr20bVTNOadrPollControllerTest {
 	@Resource
 	private OadrMockEiHttpMvc oadrMockMvc;
 
-	private Oadr20bJAXBContext jaxbContext;
-
-	@Before
-	public void setup() throws Exception {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
-	}
-
 	@Test
 	public void testErrorCase() throws Exception {
 
 		// GET not allowed
 		this.oadrMockMvc
-				.perform(MockMvcRequestBuilders.get(OADRPOLL_ENDPOINT).with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
+				.perform(MockMvcRequestBuilders.get(OADRPOLL_ENDPOINT)
+						.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// PUT not allowed
 		this.oadrMockMvc
-				.perform(MockMvcRequestBuilders.put(OADRPOLL_ENDPOINT).with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
+				.perform(MockMvcRequestBuilders.put(OADRPOLL_ENDPOINT)
+						.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// DELETE not allowed
 		this.oadrMockMvc
-				.perform(MockMvcRequestBuilders.delete(OADRPOLL_ENDPOINT).with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
+				.perform(MockMvcRequestBuilders.delete(OADRPOLL_ENDPOINT)
+						.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// POST without content
 		String content = "";
-		this.oadrMockMvc.perform(MockMvcRequestBuilders.post(OADRPOLL_ENDPOINT)
-				.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION).content(content))
+		this.oadrMockMvc
+				.perform(MockMvcRequestBuilders.post(OADRPOLL_ENDPOINT)
+						.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION).content(content))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// POST without content

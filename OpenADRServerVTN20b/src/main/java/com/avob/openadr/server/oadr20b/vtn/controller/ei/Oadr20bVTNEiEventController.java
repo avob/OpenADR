@@ -17,8 +17,6 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
-import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bCreatedEventApplicationLayerException;
-import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bRequestEventApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
 
 /**
@@ -51,7 +49,7 @@ public class Oadr20bVTNEiEventController {
 	@PreAuthorize("hasRole('ROLE_VEN') AND hasRole('ROLE_REGISTERED')")
 	@RequestMapping(value = Oadr20bUrlPath.EI_EVENT_SERVICE, method = RequestMethod.POST)
 	@ResponseBody
-	public String request(@RequestBody String payload, Principal principal) throws Oadr20bApplicationLayerException {
+	public String request(@RequestBody String payload, Principal principal) {
 
 		return oadr20aVtnEiEventService.request(principal.getName(), payload);
 

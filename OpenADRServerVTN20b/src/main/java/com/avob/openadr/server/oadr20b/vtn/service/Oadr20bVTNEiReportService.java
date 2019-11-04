@@ -229,6 +229,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	 */
 	@Transactional(readOnly = false)
 	public String oadrRegisterReport(String venID, OadrRegisterReportType payload, boolean signed) {
+
 		String requestID = payload.getRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
@@ -239,6 +240,12 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		}
 
 		Ven ven = venService.findOneByUsername(venID);
+//		List<OtherReportCapability> findBySource = otherReportCapabilityService.findBySource(ven);
+//		List<OtherReportCapabilityDescription> findByOtherReportCapabilityIn = otherReportCapabilityDescriptionService
+//				.findByOtherReportCapabilityIn(findBySource);
+//		otherReportCapabilityDescriptionService.delete(findByOtherReportCapabilityIn);
+//		otherReportCapabilityService.delete(findBySource);
+
 		VenReportDto venReportDto = oadr20bDtoMapper.map(ven, VenReportDto.class);
 		List<VenReportCapabilityDto> capabilitiesDto = new ArrayList<>();
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
@@ -453,16 +460,23 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		}
 		venReportDto.setCapabilities(capabilitiesDto);
 
-		otherReportCapabilityService.save(capabilities);
-		otherReportCapabilityDescriptionService.save(descriptions);
+		
+//		List<OtherReportCapabilityDescription> findByOtherReportCapability = otherReportCapabilityDescriptionService
+//				.findByOtherReportCapability(capabilities.get(0));
 
 		Collection<OtherReportCapabilityDescription> toDeleteDesc = currentVenCapabilityDescriptionMap.values();
 		toDeleteDesc.removeAll(descriptions);
 		if (!toDeleteDesc.isEmpty()) {
 			otherReportRequestSpecifierDao.deleteByOtherReportCapabilityDescriptionIn(toDeleteDesc);
-			otherReportCapabilityDescriptionService.delete(toDeleteDesc);
+
+			for (OtherReportCapabilityDescription desc : toDeleteDesc) {
+				otherReportCapabilityDescriptionService.delete(desc.getId());
+			}
 
 		}
+
+//		findByOtherReportCapability = otherReportCapabilityDescriptionService
+//				.findByOtherReportCapability(capabilities.get(0));
 
 		Collection<OtherReportCapability> toDeleteCap = currentVenCapabilityMap.values();
 		toDeleteCap.removeAll(capabilities);
@@ -476,6 +490,11 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		}
 
 		oadr20bAppNotificationPublisher.notifyRegisterReport(venReportDto, venID);
+
+//		otherReportCapabilityService.de
+
+		otherReportCapabilityService.save(capabilities);
+		otherReportCapabilityDescriptionService.save(descriptions);
 
 		OadrRegisteredReportType response = Oadr20bEiReportBuilders
 				.newOadr20bRegisteredReportBuilder(requestID, responseCode, venID).build();

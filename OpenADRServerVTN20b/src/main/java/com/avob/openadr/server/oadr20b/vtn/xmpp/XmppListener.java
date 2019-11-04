@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20b;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiService;
 
@@ -59,9 +58,6 @@ public class XmppListener implements StanzaListener {
 		} catch (InterruptedException e) {
 			LOGGER.error(oadr20bVTNEiService.getServiceName() + " - " + e.getMessage());
 			Thread.currentThread().interrupt();
-		} catch (Oadr20bApplicationLayerException e) {
-			LOGGER.error(oadr20bVTNEiService.getServiceName() + " - " + e.getMessage());
-//			e.get
 		}
 
 	}

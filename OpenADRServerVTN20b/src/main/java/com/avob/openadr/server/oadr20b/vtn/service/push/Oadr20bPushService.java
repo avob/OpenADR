@@ -219,7 +219,7 @@ public class Oadr20bPushService {
 				}
 
 				Jid from = JidCreate.from(venPushUrl);
-				xmppConnector.getXmppUplinkClient().sendMessage(from, msg);
+				xmppConnector.sendMessage(from, msg);
 			}
 
 		} catch (Oadr20bException e) {

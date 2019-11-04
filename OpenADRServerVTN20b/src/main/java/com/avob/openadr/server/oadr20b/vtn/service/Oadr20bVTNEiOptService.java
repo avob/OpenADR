@@ -21,7 +21,6 @@ import com.avob.openadr.model.oadr20b.ei.EiTargetType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.ei.QualifiedEventIDType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
@@ -31,6 +30,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCanceledOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
+import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.xcal.AvailableType;
 import com.avob.openadr.model.oadr20b.xcal.VavailabilityType;
 import com.avob.openadr.server.common.vtn.VtnConfig;
@@ -44,8 +44,6 @@ import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenResourceService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.converter.OptConverter;
-import com.avob.openadr.server.oadr20b.vtn.exception.eiopt.Oadr20bCancelOptApplicationLayerException;
-import com.avob.openadr.server.oadr20b.vtn.exception.eiopt.Oadr20bCreateOptApplicationLayerException;
 import com.google.common.collect.Lists;
 
 @Service
@@ -112,13 +110,20 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 	 * @throws Oadr20bXMLSignatureException
 	 * @throws Oadr20bMarshalException
 	 */
-	public String oadrCreateOpt(OadrCreateOptType payload, boolean signed)
-			throws Oadr20bCreateOptApplicationLayerException, Oadr20bXMLSignatureException, Oadr20bMarshalException {
+	public String oadrCreateOpt(String venID, OadrCreateOptType payload, boolean signed) {
 		OptTypeType optType = payload.getOptType();
 		DemandResponseEventOptEnum convertedOpt = OptConverter.convert(optType);
-		String venID = payload.getVenID();
 		String requestID = payload.getRequestID();
 		String optID = payload.getOptID();
+
+		if (!payload.getVenID().equals(venID)) {
+			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID).build();
+			OadrCreatedOptType build = Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,
+					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), optID).build();
+			return marshall(build, signed);
+		}
+
 		QualifiedEventIDType qualifiedEventID = payload.getQualifiedEventID();
 		VavailabilityType vavailability = payload.getVavailability();
 		String marketContextName = payload.getMarketContext();
@@ -130,11 +135,11 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 			// sending message
 			if (!eiTarget.getGroupID().isEmpty() || !eiTarget.getPartyID().isEmpty() || eiTarget.getVenID().size() > 1
 					|| (eiTarget.getVenID().size() == 1 && !eiTarget.getVenID().get(0).equals(venID))) {
-				throw new Oadr20bCreateOptApplicationLayerException(
-						"Ven can't deliver an Opt message on another Ven or another resource",
-						Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,
-								Oadr20bApplicationLayerErrorCode.INVALID_ID_452, optID).build(),
-						signed);
+				OadrCreatedOptType build = Oadr20bEiOptBuilders
+						.newOadr20bCreatedOptBuilder(requestID, Oadr20bApplicationLayerErrorCode.INVALID_ID_452, optID)
+						.withResponseDescription("Ven can't deliver an Opt message on another Ven or another resource")
+						.build();
+				return marshall(build, signed);
 			}
 
 			if (eiTarget.getResourceID() != null && !eiTarget.getResourceID().isEmpty()) {
@@ -143,11 +148,14 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 				Set<String> s2 = eiTarget.getResourceID().stream().collect(Collectors.toSet());
 				if (!s1.equals(s2)) {
 					s2.removeAll(s1);
-					throw new Oadr20bCreateOptApplicationLayerException(
-							"Resources: " + s2.toString() + " do not exists or do not belongs to Ven: " + venID,
-							Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,
-									Oadr20bApplicationLayerErrorCode.INVALID_ID_452, optID).build(),
-							signed);
+
+					OadrCreatedOptType build = Oadr20bEiOptBuilders
+							.newOadr20bCreatedOptBuilder(requestID, Oadr20bApplicationLayerErrorCode.INVALID_ID_452,
+									optID)
+							.withResponseDescription(
+									"Resources: " + s2.toString() + " do not exists or do not belongs to Ven: " + venID)
+							.build();
+					return marshall(build, signed);
 				}
 			}
 		}
@@ -157,10 +165,11 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
 					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
-			throw new Oadr20bCreateOptApplicationLayerException(xmlSignatureRequiredButAbsent.getResponseDescription(),
-					Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,
-							Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), optID).build(),
-					signed);
+			OadrCreatedOptType build = Oadr20bEiOptBuilders
+					.newOadr20bCreatedOptBuilder(requestID,
+							Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), optID)
+					.withResponseDescription(xmlSignatureRequiredButAbsent.getResponseDescription()).build();
+			return marshall(build, signed);
 		}
 
 		if (qualifiedEventID != null && vavailability == null && marketContextName == null) {
@@ -171,19 +180,21 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 			Optional<DemandResponseEvent> op = demandResponseEventService.findById(Long.parseLong(eventID));
 
 			if (!op.isPresent()) {
-				throw new Oadr20bCreateOptApplicationLayerException("Unknown eventID: " + eventID, Oadr20bEiOptBuilders
+				OadrCreatedOptType build = Oadr20bEiOptBuilders
 						.newOadr20bCreatedOptBuilder(requestID, Oadr20bApplicationLayerErrorCode.INVALID_ID_452, optID)
-						.build(), signed);
+						.withResponseDescription("Unknown eventID: " + eventID).build();
+				return marshall(build, signed);
 			}
 
 			DemandResponseEvent event = op.get();
 
 			if (modificationNumber != event.getDescriptor().getModificationNumber()) {
-				throw new Oadr20bCreateOptApplicationLayerException(
-						"Modification number do not match known event modification number",
-						Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,
-								Oadr20bApplicationLayerErrorCode.INVALID_DATA_454, optID).build(),
-						signed);
+				OadrCreatedOptType build = Oadr20bEiOptBuilders
+						.newOadr20bCreatedOptBuilder(requestID, Oadr20bApplicationLayerErrorCode.INVALID_DATA_454,
+								optID)
+						.withResponseDescription("Modification number do not match known event modification number")
+						.build();
+				return marshall(build, signed);
 			}
 
 			// override oadrCreatedEvent message
@@ -201,10 +212,10 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 			if (marketContextName != null) {
 				marketContext = venMarketcontextService.findOneByName(marketContextName);
 				if (marketContext == null) {
-					throw new Oadr20bCreateOptApplicationLayerException("Unknown MarketContext: " + marketContext,
-							Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,
-									Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, optID).build(),
-							signed);
+					OadrCreatedOptType build = Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,
+							Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, optID)
+							.withResponseDescription("Unknown MarketContext: " + marketContext).build();
+					return marshall(build, signed);
 				}
 			}
 
@@ -225,90 +236,51 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 			}
 
 		} else {
-			throw new Oadr20bCreateOptApplicationLayerException(
-					"oadrCreateOpt payload MUST specify either qualifiedEventID or vavailability with optional marketContext",
-					Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,
-							Oadr20bApplicationLayerErrorCode.INVALID_DATA_454, optID).build(),
-					signed);
+			OadrCreatedOptType build = Oadr20bEiOptBuilders
+					.newOadr20bCreatedOptBuilder(requestID, Oadr20bApplicationLayerErrorCode.INVALID_DATA_454, optID)
+					.withResponseDescription(
+							"oadrCreateOpt payload MUST specify either qualifiedEventID or vavailability with optional marketContext")
+					.build();
+			return marshall(build, signed);
 		}
 
 		OadrCreatedOptType response = Oadr20bEiOptBuilders
 				.newOadr20bCreatedOptBuilder(requestID, HttpStatus.OK_200, optID).build();
-		if (signed) {
-			return xmlSignatureService.sign(response);
-		} else {
-			return jaxbContext.marshalRoot(response);
-		}
+		return marshall(response, signed);
 	}
 
-	public String oadrCancelOptType(OadrCancelOptType payload, boolean signed)
-			throws Oadr20bCancelOptApplicationLayerException, Oadr20bXMLSignatureException, Oadr20bMarshalException {
+	public String oadrCancelOptType(String venID, OadrCancelOptType payload, boolean signed) {
 		String requestID = payload.getRequestID();
-		String venID = payload.getVenID();
 		String optID = payload.getOptID();
+
+		if (!payload.getVenID().equals(venID)) {
+			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID).build();
+			OadrCanceledOptType build = Oadr20bEiOptBuilders.newOadr20bCanceledOptBuilder(requestID,
+					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), optID).build();
+			return marshall(build, signed);
+		}
 
 		Ven ven = venService.findOneByUsername(venID);
 
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
 					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
-			throw new Oadr20bCancelOptApplicationLayerException(xmlSignatureRequiredButAbsent.getResponseDescription(),
-					Oadr20bEiOptBuilders.newOadr20bCanceledOptBuilder(requestID,
-							Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), optID).build(),
-					signed);
+			OadrCanceledOptType build = Oadr20bEiOptBuilders.newOadr20bCanceledOptBuilder(requestID,
+					Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), optID).build();
+			return marshall(build, signed);
+
 		}
 
 		venOptService.deleteScheduledOpt(ven, optID);
 
 		OadrCanceledOptType response = Oadr20bEiOptBuilders
 				.newOadr20bCanceledOptBuilder(requestID, HttpStatus.OK_200, optID).build();
-
-		if (signed) {
-			return xmlSignatureService.sign(response);
-		} else {
-			return jaxbContext.marshalRoot(response);
-		}
+		return marshall(response, signed);
 	}
 
-	public void checkMatchUsernameWithRequestVenId(String username, OadrCreateOptType oadrCreateOpt, boolean signed)
-			throws Oadr20bCreateOptApplicationLayerException {
-		String venID = oadrCreateOpt.getVenID();
-		String requestID = oadrCreateOpt.getRequestID();
-		String optID = oadrCreateOpt.getOptID();
-		if (!username.equals(venID)) {
-			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();
-			throw new Oadr20bCreateOptApplicationLayerException(
-					mismatchCredentialsVenIdResponse.getResponseDescription(),
-					Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,
-							Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), optID).build(),
-					signed);
-		}
+	private String handle(String username, String raw, OadrPayload oadrPayload) {
 
-	}
-
-	public void checkMatchUsernameWithRequestVenId(String username, OadrCancelOptType oadrCancelOpt, boolean signed)
-			throws Oadr20bCancelOptApplicationLayerException {
-		String venID = oadrCancelOpt.getVenID();
-		String requestID = oadrCancelOpt.getRequestID();
-		String optID = oadrCancelOpt.getOptID();
-		if (!username.equals(venID)) {
-			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();
-			throw new Oadr20bCancelOptApplicationLayerException(
-					mismatchCredentialsVenIdResponse.getResponseDescription(),
-					Oadr20bEiOptBuilders.newOadr20bCanceledOptBuilder(requestID,
-							Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), optID).build(),
-					signed);
-		}
-	}
-
-	private String handle(String username, String raw, OadrPayload oadrPayload)
-			throws Oadr20bMarshalException, Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException,
-			Oadr20bCancelOptApplicationLayerException, Oadr20bCreateOptApplicationLayerException,
-			Oadr20bXMLSignatureException {
-
-		xmlSignatureService.validate(raw, oadrPayload);
 		if (oadrPayload.getOadrSignedObject().getOadrCreateOpt() != null) {
 
 			LOGGER.info(username + " - OadrCreateOptType signed");
@@ -323,64 +295,87 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 
 		}
 
-		throw new Oadr20bApplicationLayerException("Unacceptable request payload for OadrPoll");
+		Ven findOneByUsername = venService.findOneByUsername(username);
+		boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
+				? findOneByUsername.getXmlSignature()
+				: false;
+		OadrResponseType response = Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, username)
+				.withDescription("Unknown payload type for service: " + this.getServiceName()).build();
+		return marshall(response, signed);
 	}
 
-	private String handle(String username, OadrCreateOptType oadrCreateOpt, boolean signed)
-			throws Oadr20bCreateOptApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
-
-		this.checkMatchUsernameWithRequestVenId(username, oadrCreateOpt, signed);
-
-		return this.oadrCreateOpt(oadrCreateOpt, signed);
+	private String handle(String username, OadrCreateOptType oadrCreateOpt, boolean signed) {
+		return this.oadrCreateOpt(username, oadrCreateOpt, signed);
 
 	}
 
-	private String handle(String username, OadrCancelOptType oadrCancelOpt, boolean signed)
-			throws Oadr20bCancelOptApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
-
-		this.checkMatchUsernameWithRequestVenId(username, oadrCancelOpt, signed);
-
-		return this.oadrCancelOptType(oadrCancelOpt, signed);
-
+	private String handle(String username, OadrCancelOptType oadrCancelOpt, boolean signed) {
+		return this.oadrCancelOptType(username, oadrCancelOpt, signed);
 	}
 
 	@Override
-	public String request(String username, String payload) throws Oadr20bApplicationLayerException {
+	public String request(String username, String payload) {
 
 		Object unmarshal;
 		try {
 			unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
+		} catch (Oadr20bUnmarshalException e) {
+			Ven findOneByUsername = venService.findOneByUsername(username);
+			boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
+					? findOneByUsername.getXmlSignature()
+					: false;
+			OadrResponseType response = Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, username)
+					.withDescription("Can't unmarshall payload").build();
+			return marshall(response, signed);
+		}
 
-			if (unmarshal instanceof OadrPayload) {
+		if (unmarshal instanceof OadrPayload) {
 
-				OadrPayload oadrPayload = (OadrPayload) unmarshal;
+			OadrPayload oadrPayload = (OadrPayload) unmarshal;
 
+			try {
+				xmlSignatureService.validate(payload, oadrPayload);
 				return handle(username, payload, oadrPayload);
 
-			} else if (unmarshal instanceof OadrCreateOptType) {
-
-				LOGGER.info(username + " - OadrCreateOptType");
-
-				OadrCreateOptType oadrCreateOptType = (OadrCreateOptType) unmarshal;
-
-				return handle(username, oadrCreateOptType, false);
-
-			} else if (unmarshal instanceof OadrCancelOptType) {
-
-				LOGGER.info(username + " - OadrCancelOptType");
-
-				OadrCancelOptType oadrCancelOptType = (OadrCancelOptType) unmarshal;
-
-				return handle(username, oadrCancelOptType, false);
-
-			} else {
-				throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiOpt");
+			} catch (Oadr20bXMLSignatureValidationException e) {
+				Ven findOneByUsername = venService.findOneByUsername(username);
+				boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
+						? findOneByUsername.getXmlSignature()
+						: false;
+				OadrResponseType response = Oadr20bResponseBuilders
+						.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.INVALID_DATA_454, username)
+						.withDescription("Can't validate payload xml signature").build();
+				return marshall(response, signed);
 			}
-		} catch (Oadr20bUnmarshalException | Oadr20bCancelOptApplicationLayerException | Oadr20bMarshalException
-				| Oadr20bXMLSignatureException | Oadr20bCreateOptApplicationLayerException
-				| Oadr20bXMLSignatureValidationException e) {
-			throw new Oadr20bApplicationLayerException(e);
+
+		} else if (unmarshal instanceof OadrCreateOptType) {
+
+			LOGGER.info(username + " - OadrCreateOptType");
+
+			OadrCreateOptType oadrCreateOptType = (OadrCreateOptType) unmarshal;
+
+			return handle(username, oadrCreateOptType, false);
+
+		} else if (unmarshal instanceof OadrCancelOptType) {
+
+			LOGGER.info(username + " - OadrCancelOptType");
+
+			OadrCancelOptType oadrCancelOptType = (OadrCancelOptType) unmarshal;
+
+			return handle(username, oadrCancelOptType, false);
+
 		}
+
+		Ven findOneByUsername = venService.findOneByUsername(username);
+		boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
+				? findOneByUsername.getXmlSignature()
+				: false;
+		OadrResponseType response = Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, username)
+				.withDescription("Unknown payload type for service: " + this.getServiceName()).build();
+		return marshall(response, signed);
 
 	}
 

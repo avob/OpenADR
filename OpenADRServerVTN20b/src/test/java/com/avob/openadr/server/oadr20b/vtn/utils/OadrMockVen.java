@@ -21,8 +21,10 @@ import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bPollBuilders;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
+import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
+import com.avob.openadr.model.oadr20b.pyld.EiRequestEvent;
 import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppListener;
@@ -147,6 +149,15 @@ public class OadrMockVen {
 		return null;
 	}
 
+	public <T> T requestEvent(Class<T> klass) throws Exception {
+		OadrRequestEventType oadrRequestEventType = new OadrRequestEventType();
+		EiRequestEvent eiRequestEvent = new EiRequestEvent();
+		eiRequestEvent.setRequestID("0");
+		eiRequestEvent.setVenID(this.getVenId());
+		oadrRequestEventType.setEiRequestEvent(eiRequestEvent);
+		return this.event(oadrRequestEventType, HttpStatus.OK_200, klass);
+	}
+
 	public <T> T opt(Object payload, int status, Class<T> klass) throws Exception {
 		String endpoint = Oadr20bUrlPath.OADR_BASE_PATH + Oadr20bUrlPath.EI_OPT_SERVICE;
 		if (OadrTransportType.SIMPLE_HTTP.value().equals(ven.getTransport())) {
@@ -164,6 +175,12 @@ public class OadrMockVen {
 			return httpCall(endpoint, payload, status, klass);
 		} else if (OadrTransportType.XMPP.value().equals(ven.getTransport())) {
 			Optional<InvocationOnMock> popResponse = oadrMockEiXmpp.popResponse();
+			if (klass == null && popResponse.isPresent()) {
+				fail("VEN is not supposed to have some response from VTN");
+				return null;
+			} else if (klass == null && !popResponse.isPresent()) {
+				return null;
+			}
 			if (!popResponse.isPresent()) {
 				fail("VEN supposed to have some response from VTN");
 				return null;
@@ -171,7 +188,7 @@ public class OadrMockVen {
 			InvocationOnMock invocationOnMock = popResponse.get();
 			Jid from = (Jid) invocationOnMock.getArgument(0);
 			String body = (String) invocationOnMock.getArgument(1);
-//			assertEquals(entityFullFrom, from);
+			assertEquals(JidCreate.entityFullFrom(this.getVen().getPushUrl()), from);
 			if (ven.getXmlSignature()) {
 				OadrPayload unmarshal = jaxbcontext.unmarshal(body, OadrPayload.class);
 				xmlSignatureService.validate(body, unmarshal);
@@ -198,9 +215,13 @@ public class OadrMockVen {
 		return poll;
 	}
 
-	public void pollForValidOadrResponse() throws Exception {
-		OadrResponseType poll = this.poll(HttpStatus.OK_200, OadrResponseType.class);
-		assertEquals(String.valueOf(HttpStatus.OK_200), poll.getEiResponse().getResponseCode());
+	public void pollForEmpty() throws Exception {
+		if (OadrTransportType.SIMPLE_HTTP.value().equals(this.getVen().getTransport())) {
+			OadrResponseType poll = this.poll(HttpStatus.OK_200, OadrResponseType.class);
+			assertEquals(String.valueOf(HttpStatus.OK_200), poll.getEiResponse().getResponseCode());
+		} else if (OadrTransportType.XMPP.value().equals(this.getVen().getTransport())) {
+			this.poll(HttpStatus.OK_200, null);
+		}
 	}
 
 }

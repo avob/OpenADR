@@ -3,8 +3,11 @@ package com.avob.openadr.server.oadr20b.vtn.xmpp;
 import javax.annotation.Resource;
 import javax.net.ssl.SSLContext;
 
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20b;
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiOptService;
@@ -42,10 +46,10 @@ public class XmppConnector {
 
 	private OadrXmppClient20b xmppUplinkClient;
 
-	private OadrXmppClient20b xmppEiReportClient;
-	private OadrXmppClient20b xmppEiRegisterPartyClient;
-	private OadrXmppClient20b xmppEiOptClient;
-	private OadrXmppClient20b xmppEiEventClient;
+	public void sendMessage(Jid jid, String payload)
+			throws Oadr20bMarshalException, XmppStringprepException, NotConnectedException, InterruptedException {
+		getXmppUplinkClient().sendMessage(jid, payload);
+	}
 
 	private XMPPTCPConnection getXmppConnection(String domain, Oadr20bVTNEiService service) throws OadrXmppException {
 		String resource = (service != null) ? service.getServiceName() : "uplink";
@@ -84,48 +88,16 @@ public class XmppConnector {
 
 			LOGGER.info("Xmpp VTN uplink client successfully initialized");
 
-			setXmppEiReportClient(getXmppClient(domain, oadr20bVTNEiReportService, getXmppUplinkClient()));
-			setXmppEiRegisterPartyClient(
-					getXmppClient(domain, oadr20bVTNEiRegisterPartyService, getXmppUplinkClient()));
-			setXmppEiOptClient(getXmppClient(domain, oadr20bVTNEiOptService, getXmppUplinkClient()));
-			setXmppEiEventClient(getXmppClient(domain, oadr20bVTNEiEventService, getXmppUplinkClient()));
+			getXmppClient(domain, oadr20bVTNEiReportService, getXmppUplinkClient());
+
+			getXmppClient(domain, oadr20bVTNEiRegisterPartyService, getXmppUplinkClient());
+			getXmppClient(domain, oadr20bVTNEiOptService, getXmppUplinkClient());
+			getXmppClient(domain, oadr20bVTNEiEventService, getXmppUplinkClient());
 
 			LOGGER.info("Xmpp VTN connectors successfully initialized");
 
 		}
 
-	}
-
-	public OadrXmppClient20b getXmppEiReportClient() {
-		return xmppEiReportClient;
-	}
-
-	public void setXmppEiReportClient(OadrXmppClient20b xmppEiReportClient) {
-		this.xmppEiReportClient = xmppEiReportClient;
-	}
-
-	public OadrXmppClient20b getXmppEiRegisterPartyClient() {
-		return xmppEiRegisterPartyClient;
-	}
-
-	public void setXmppEiRegisterPartyClient(OadrXmppClient20b xmppEiRegisterPartyClient) {
-		this.xmppEiRegisterPartyClient = xmppEiRegisterPartyClient;
-	}
-
-	public OadrXmppClient20b getXmppEiOptClient() {
-		return xmppEiOptClient;
-	}
-
-	public void setXmppEiOptClient(OadrXmppClient20b xmppEiOptClient) {
-		this.xmppEiOptClient = xmppEiOptClient;
-	}
-
-	public OadrXmppClient20b getXmppEiEventClient() {
-		return xmppEiEventClient;
-	}
-
-	public void setXmppEiEventClient(OadrXmppClient20b xmppEiEventClient) {
-		this.xmppEiEventClient = xmppEiEventClient;
 	}
 
 	public OadrXmppClient20b getXmppUplinkClient() {

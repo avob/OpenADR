@@ -18,9 +18,12 @@ import com.avob.openadr.server.oadr20b.vtn.utils.MockVenDistributeService;
 @ContextConfiguration(classes = MockVenDistributeService.class)
 @ActiveProfiles("test")
 public class VTN20bSecurityApplicationTest {
-	
+
 	@MockBean
 	JmsTemplate jmsTemplate;
+//
+//	@MockBean
+//	XmppConnector xmppConnector;
 
 	public static void main(String[] args) {
 

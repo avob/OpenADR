@@ -232,10 +232,7 @@ public class Oadr20bVTNEiReportControllerTest {
 
 		// OADR POLL CONTROLLER - poll supposed to be 'empty' - OadrResponseType for
 		// HTTP VEN
-		if (OadrTransportType.SIMPLE_HTTP.value().equals(mockVen.getVen().getTransport())) {
-			OadrResponseType firstPoll = mockVen.poll(HttpStatus.OK_200, OadrResponseType.class);
-			assertEquals(String.valueOf(HttpStatus.OK_200), firstPoll.getEiResponse().getResponseCode());
-		}
+		mockVen.pollForEmpty();
 
 		// create VEN METADATA payload with one report capability containing one
 		// description
@@ -347,8 +344,6 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(REPORT_SPECIFIER_ID, reportcapabilityList.get(0).getReportSpecifierId());
 		assertEquals(reportName, reportcapabilityList.get(0).getReportName());
 
-		Long reportCapabilityPrivateId = reportcapabilityList.get(0).getId();
-
 		// VEN CONTROLLER - get available report description by reportSpecifierId
 		params = OadrParamBuilder.builder().addReportSpecifierId(REPORT_SPECIFIER_ID).build();
 		List<ReportCapabilityDescriptionDto> reportcapabilityDescriptionList = oadrMockHttpVenMvc
@@ -389,6 +384,13 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(mockVen.getVenId(), oadrRegisteredReportType.getVenID());
 		assertNotNull(oadrRegisteredReportType.getOadrReportRequest());
 
+		// VEN CONTROLLER - get available by reportSpecifierId
+		reportcapabilityList = oadrMockHttpVenMvc.getVenReportAvailable(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				mockVen.getVenId(), params, HttpStatus.OK_200);
+		assertEquals(1, reportcapabilityList.size());
+		assertEquals(REPORT_SPECIFIER_ID, reportcapabilityList.get(0).getReportSpecifierId());
+		assertEquals(reportName, reportcapabilityList.get(0).getReportName());
+
 		// VEN CONTROLLER - get available description by reportSpecifierId
 		params = OadrParamBuilder.builder().addReportSpecifierId(REPORT_SPECIFIER_ID).build();
 		reportcapabilityDescriptionList = oadrMockHttpVenMvc.getVenReportAvailableDescription(
@@ -399,6 +401,7 @@ public class Oadr20bVTNEiReportControllerTest {
 		assertEquals(readingType, reportcapabilityDescriptionList.get(0).getReadingType());
 		assertEquals(reportType, reportcapabilityDescriptionList.get(0).getReportType());
 
+		Long reportCapabilityPrivateId = reportcapabilityList.get(0).getId();
 		Long reportCapabilityDescriptionPrivateId = reportcapabilityDescriptionList.get(0).getId();
 		OtherReportCapability reportCapability = otherReportCapabilityService.findOne(reportCapabilityPrivateId);
 		OtherReportCapabilityDescription reportCapabilityDescription = otherReportCapabilityDescriptionService
@@ -839,10 +842,10 @@ public class Oadr20bVTNEiReportControllerTest {
 			assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
 					postOadrPollAndExpect.getEiResponse().getResponseCode());
 
-			// OADR POLL CONTROLLER - first poll supposed to be 'empty'
-			OadrResponseType firstPoll = mockVen.poll(HttpStatus.OK_200, OadrResponseType.class);
-			assertEquals(String.valueOf(HttpStatus.OK_200), firstPoll.getEiResponse().getResponseCode());
 		}
+
+		// OADR POLL CONTROLLER - first poll supposed to be 'empty'
+		mockVen.pollForEmpty();
 
 		// create oadrCreateReport payload requesting for METADATA payload
 		OadrCreateReportType oadrCreateReportType = createMetadataRequestPayload(mockVen.getVenId());

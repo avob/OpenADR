@@ -33,7 +33,9 @@ import com.avob.openadr.model.oadr20b.ei.IntervalType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.ei.QualifiedEventIDType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
+import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
@@ -56,8 +58,6 @@ import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenRequestCountService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.converter.OptConverter;
-import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bCreatedEventApplicationLayerException;
-import com.avob.openadr.server.oadr20b.vtn.exception.eievent.Oadr20bRequestEventApplicationLayerException;
 
 @Service
 public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
@@ -103,40 +103,8 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 		}
 	}
 
-	public void checkMatchUsernameWithRequestVenId(String username, OadrCreatedEventType oadrCreatedEvent,
-			boolean signed) throws Oadr20bCreatedEventApplicationLayerException {
-		if (!username.equals(oadrCreatedEvent.getEiCreatedEvent().getVenID())) {
-			String requestID = oadrCreatedEvent.getEiCreatedEvent().getEiResponse().getRequestID();
-			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username,
-							oadrCreatedEvent.getEiCreatedEvent().getVenID())
-					.build();
-			throw new Oadr20bCreatedEventApplicationLayerException(
-					mismatchCredentialsVenIdResponse.getResponseDescription(), Oadr20bResponseBuilders
-							.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, username).build(),
-					signed);
-		}
-	}
-
-	public void checkMatchUsernameWithRequestVenId(String username, OadrRequestEventType oadrRequestEvent,
-			boolean signed) throws Oadr20bRequestEventApplicationLayerException {
-		String requestID = oadrRequestEvent.getEiRequestEvent().getRequestID();
-		String venID = oadrRequestEvent.getEiRequestEvent().getVenID();
-		if (!username.equals(venID)) {
-			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, username, venID).build();
-			throw new Oadr20bRequestEventApplicationLayerException(
-					mismatchCredentialsVenIdResponse.getResponseDescription(),
-					Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder(vtnConfig.getVtnId(), requestID)
-							.withEiResponse(mismatchCredentialsVenIdResponse).build(),
-					signed);
-		}
-	}
-
 	private void processEventResponseFromOadrCreatedEvent(Ven ven, EventResponse response, boolean signed)
-			throws Oadr20bCreatedEventApplicationLayerException {
-		String requestID = response.getRequestID();
-
+			throws Oadr20bException {
 		QualifiedEventIDType qualifiedEventID = response.getQualifiedEventID();
 		String eventID = qualifiedEventID.getEventID();
 		long modificationNumber = qualifiedEventID.getModificationNumber();
@@ -144,22 +112,14 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 		Optional<DemandResponseEvent> op = demandResponseEventService.findById(Long.parseLong(eventID));
 
 		if (!op.isPresent()) {
-			String description = "eiCreatedEvent:unknown event with id: " + eventID;
-			throw new Oadr20bCreatedEventApplicationLayerException(description,
-					Oadr20bResponseBuilders
-							.newOadr20bResponseBuilder(requestID, HttpStatus.NOT_FOUND_404, ven.getUsername()).build(),
-					signed);
+			throw new Oadr20bException("eiCreatedEvent:unknown event with id: " + eventID);
 
 		}
 
 		DemandResponseEvent findById = op.get();
 
 		if (findById.getDescriptor().getModificationNumber() != modificationNumber) {
-
-			String description = "eiCreatedEvent:mismatch modification number for event with id: " + eventID;
-			throw new Oadr20bCreatedEventApplicationLayerException(description, Oadr20bResponseBuilders
-					.newOadr20bResponseBuilder(requestID, HttpStatus.NOT_ACCEPTABLE_406, ven.getUsername()).build(),
-					signed);
+			throw new Oadr20bException("eiCreatedEvent:mismatch modification number for event with id: " + eventID);
 		}
 
 		int responseCode = Integer.valueOf(response.getResponseCode());
@@ -175,23 +135,29 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 
 	}
 
-	public String oadrCreatedEvent(OadrCreatedEventType event, boolean signed)
-			throws Oadr20bCreatedEventApplicationLayerException, Oadr20bXMLSignatureException, Oadr20bMarshalException {
+	public String oadrCreatedEvent(String venID, OadrCreatedEventType event, boolean signed) {
 		EiCreatedEvent eiCreatedEvent = event.getEiCreatedEvent();
 
 		String requestID = eiCreatedEvent.getEiResponse().getRequestID();
 
-		String venID = eiCreatedEvent.getVenID();
+		if (!venID.equals(event.getEiCreatedEvent().getVenID())) {
+			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, venID,
+							event.getEiCreatedEvent().getVenID())
+					.build();
+			OadrResponseType build = Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, venID).build();
+			return marshall(build, signed);
+		}
 
 		Ven ven = venService.findOneByUsername(venID);
 
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
 					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
-			throw new Oadr20bCreatedEventApplicationLayerException(
-					xmlSignatureRequiredButAbsent.getResponseDescription(),
-					Oadr20bResponseBuilders.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build(),
-					signed);
+			OadrResponseType build = Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build();
+			return marshall(build, signed);
 		}
 
 		int responseCode = HttpStatus.OK_200;
@@ -199,7 +165,7 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 			for (EventResponse response : eiCreatedEvent.getEventResponses().getEventResponse()) {
 				try {
 					processEventResponseFromOadrCreatedEvent(ven, response, signed);
-				} catch (Oadr20bCreatedEventApplicationLayerException e) {
+				} catch (Oadr20bException e) {
 					LOGGER.warn(e.getMessage());
 					responseCode = HttpStatus.NOT_ACCEPTABLE_406;
 				}
@@ -208,32 +174,35 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 
 		OadrResponseType response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID, responseCode, venID)
 				.build();
-		if (signed) {
-			return xmlSignatureService.sign(response);
-		} else {
-			return jaxbContext.marshalRoot(response);
-		}
+		return marshall(response, signed);
 	}
 
-	public String oadrRequestEvent(OadrRequestEventType event, boolean signed)
-			throws Oadr20bRequestEventApplicationLayerException, Oadr20bXMLSignatureException, Oadr20bMarshalException {
+	public String oadrRequestEvent(String venID, OadrRequestEventType event, boolean signed) {
 
-		String venRequestID = event.getEiRequestEvent().getRequestID();
+		String requestID = event.getEiRequestEvent().getRequestID();
+
+		if (!event.getEiRequestEvent().getVenID().equals(venID)) {
+			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, event.getEiRequestEvent().getVenID(),
+							venID)
+					.build();
+			OadrDistributeEventType build = Oadr20bEiEventBuilders
+					.newOadr20bDistributeEventBuilder(vtnConfig.getVtnId(), requestID)
+					.withEiResponse(mismatchCredentialsVenIdResponse).build();
+			return marshall(build, signed);
+		}
 
 		Long replyLimit = event.getEiRequestEvent().getReplyLimit();
-
-		String venID = event.getEiRequestEvent().getVenID();
 
 		Ven ven = venService.findOneByUsername(venID);
 
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(venRequestID, venID).build();
-			throw new Oadr20bRequestEventApplicationLayerException(
-					xmlSignatureRequiredButAbsent.getResponseDescription(),
-					Oadr20bEiEventBuilders.newOadr20bDistributeEventBuilder(vtnConfig.getVtnId(), venRequestID)
-							.withEiResponse(xmlSignatureRequiredButAbsent).build(),
-					signed);
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
+			OadrDistributeEventType build = Oadr20bEiEventBuilders
+					.newOadr20bDistributeEventBuilder(vtnConfig.getVtnId(), requestID)
+					.withEiResponse(xmlSignatureRequiredButAbsent).build();
+			return marshall(build, signed);
 		}
 
 		List<DemandResponseEvent> findByVenId = demandResponseEventService
@@ -244,19 +213,14 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 		if (findByVenId == null || findByVenId.isEmpty()) {
 			Long andIncrease = venRequestCountService.getAndIncrease(venID);
 			EiResponseType eiResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseBuilder(venRequestID, HttpStatus.OK_200).build();
+					.newOadr20bEiResponseBuilder(requestID, HttpStatus.OK_200).build();
 			response = Oadr20bEiEventBuilders
 					.newOadr20bDistributeEventBuilder(vtnConfig.getVtnId(), Long.toString(andIncrease))
 					.withEiResponse(eiResponse).build();
 		} else {
-			response = createOadrDistributeEventPayload(venID, venRequestID, findByVenId);
+			response = createOadrDistributeEventPayload(venID, requestID, findByVenId);
 		}
-		if (signed) {
-			return xmlSignatureService.sign(response);
-		} else {
-			return jaxbContext.marshalRoot(response);
-		}
-
+		return marshall(response, signed);
 	}
 
 	public OadrDistributeEventType createOadrDistributeEventPayload(String venId, List<DemandResponseEvent> events) {
@@ -477,10 +441,7 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 	 * @throws Oadr20bRequestEventApplicationLayerException
 	 * @throws Oadr20bXMLSignatureException
 	 */
-	private String handle(String username, OadrPayload oadrPayload)
-			throws Oadr20bMarshalException, Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException,
-			Oadr20bCreatedEventApplicationLayerException, Oadr20bRequestEventApplicationLayerException,
-			Oadr20bXMLSignatureException {
+	private String handle(String username, OadrPayload oadrPayload) {
 
 		if (oadrPayload.getOadrSignedObject().getOadrCreatedEvent() != null) {
 
@@ -494,7 +455,14 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 
 			return handle(username, oadrPayload.getOadrSignedObject().getOadrRequestEvent(), true);
 		}
-		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
+		Ven findOneByUsername = venService.findOneByUsername(username);
+		boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
+				? findOneByUsername.getXmlSignature()
+				: false;
+		OadrResponseType response = Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, username)
+				.withDescription("Unknown payload type for service: " + this.getServiceName()).build();
+		return marshall(response, signed);
 	}
 
 	/**
@@ -505,12 +473,8 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 	 * @throws Oadr20bMarshalException
 	 * @throws Oadr20bXMLSignatureException
 	 */
-	private String handle(String username, OadrCreatedEventType oadrCreatedEvent, boolean signed)
-			throws Oadr20bCreatedEventApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
-
-		this.checkMatchUsernameWithRequestVenId(username, oadrCreatedEvent, signed);
-
-		return this.oadrCreatedEvent(oadrCreatedEvent, signed);
+	private String handle(String username, OadrCreatedEventType oadrCreatedEvent, boolean signed) {
+		return this.oadrCreatedEvent(username, oadrCreatedEvent, signed);
 
 	}
 
@@ -522,62 +486,76 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 	 * @throws Oadr20bMarshalException
 	 * @throws Oadr20bXMLSignatureException
 	 */
-	private String handle(String username, OadrRequestEventType oadrRequestEvent, boolean signed)
-			throws Oadr20bRequestEventApplicationLayerException, Oadr20bMarshalException, Oadr20bXMLSignatureException {
-
-		this.checkMatchUsernameWithRequestVenId(username, oadrRequestEvent, signed);
-
-		return this.oadrRequestEvent(oadrRequestEvent, signed);
-
+	private String handle(String username, OadrRequestEventType oadrRequestEvent, boolean signed) {
+		return this.oadrRequestEvent(username, oadrRequestEvent, signed);
 	}
 
 	@Override
-	public String request(String username, String payload) throws Oadr20bApplicationLayerException {
+	public String request(String username, String payload) {
 
 		Object unmarshal;
 		try {
 			unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
-
-			if (unmarshal instanceof OadrPayload) {
-
-				OadrPayload oadrPayload = (OadrPayload) unmarshal;
-
-				xmlSignatureService.validate(payload, oadrPayload);
-
-				return handle(username, oadrPayload);
-
-			} else if (unmarshal instanceof OadrCreatedEventType) {
-
-				LOGGER.info(username + " - OadrCreatedEvent");
-
-				OadrCreatedEventType oadrCreatedEvent = (OadrCreatedEventType) unmarshal;
-
-				return handle(username, oadrCreatedEvent, false);
-
-			} else if (unmarshal instanceof OadrRequestEventType) {
-
-				LOGGER.info(username + " - OadrRequestEvent");
-
-				OadrRequestEventType oadrRequestEvent = (OadrRequestEventType) unmarshal;
-
-				return handle(username, oadrRequestEvent, false);
-
-			} else if (unmarshal instanceof OadrResponseType) {
-
-				LOGGER.info(username + " - OadrResponseType");
-
-//				OadrResponseType oadrRequestEvent = (OadrResponseType) unmarshal;
-
-				return null;
-
-			} else {
-				throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
-			}
-		} catch (Oadr20bUnmarshalException | Oadr20bRequestEventApplicationLayerException | Oadr20bMarshalException
-				| Oadr20bXMLSignatureException | Oadr20bCreatedEventApplicationLayerException
-				| Oadr20bXMLSignatureValidationException e) {
-			throw new Oadr20bApplicationLayerException(e);
+		} catch (Oadr20bUnmarshalException e) {
+			Ven findOneByUsername = venService.findOneByUsername(username);
+			boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
+					? findOneByUsername.getXmlSignature()
+					: false;
+			OadrResponseType response = Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, username)
+					.withDescription("Can't unmarshall payload").build();
+			return marshall(response, signed);
 		}
+
+		if (unmarshal instanceof OadrPayload) {
+
+			OadrPayload oadrPayload = (OadrPayload) unmarshal;
+
+			try {
+				xmlSignatureService.validate(payload, oadrPayload);
+				return handle(username, oadrPayload);
+			} catch (Oadr20bXMLSignatureValidationException e) {
+				Ven findOneByUsername = venService.findOneByUsername(username);
+				boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
+						? findOneByUsername.getXmlSignature()
+						: false;
+				OadrResponseType response = Oadr20bResponseBuilders
+						.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.INVALID_DATA_454, username)
+						.withDescription("Can't validate payload xml signature").build();
+				return marshall(response, signed);
+			}
+
+		} else if (unmarshal instanceof OadrCreatedEventType) {
+
+			LOGGER.info(username + " - OadrCreatedEvent");
+
+			OadrCreatedEventType oadrCreatedEvent = (OadrCreatedEventType) unmarshal;
+
+			return handle(username, oadrCreatedEvent, false);
+
+		} else if (unmarshal instanceof OadrRequestEventType) {
+
+			LOGGER.info(username + " - OadrRequestEvent");
+
+			OadrRequestEventType oadrRequestEvent = (OadrRequestEventType) unmarshal;
+
+			return handle(username, oadrRequestEvent, false);
+
+		} else if (unmarshal instanceof OadrResponseType) {
+
+			LOGGER.info(username + " - OadrResponseType");
+
+			return null;
+
+		}
+		Ven findOneByUsername = venService.findOneByUsername(username);
+		boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
+				? findOneByUsername.getXmlSignature()
+				: false;
+		OadrResponseType response = Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, username)
+				.withDescription("Unknown payload type for service: " + this.getServiceName()).build();
+		return marshall(response, signed);
 
 	}
 

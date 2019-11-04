@@ -11,11 +11,11 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map.Entry;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -44,7 +44,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.ResponseRequiredType;
-import com.avob.openadr.model.oadr20b.pyld.EiRequestEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
@@ -119,7 +118,7 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Resource
 	private Oadr20bDemandResponseEventCreateListener oadr20bDemandResponseEventCreateListener;
 
-	@PostConstruct
+	@Before
 	public void init() throws JAXBException {
 
 		Mockito.doAnswer((Answer<?>) invocation -> {
@@ -132,6 +131,8 @@ public class Oadr20bVTNEiEventControllerTest {
 			return null;
 		}).when(jmsTemplate).convertAndSend(Mockito.eq(DemandResponseEventPublisher.OADR20B_QUEUE),
 				Mockito.any(String.class));
+
+		oadrMockEiXmpp.init();
 	}
 
 	@Test
@@ -139,45 +140,50 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		// GET not allowed
 		this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.get(EIEVENT_ENDPOINT).with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
+				.perform(MockMvcRequestBuilders.get(EIEVENT_ENDPOINT)
+						.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// PUT not allowed
 		this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.put(EIEVENT_ENDPOINT).with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
+				.perform(MockMvcRequestBuilders.put(EIEVENT_ENDPOINT)
+						.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// DELETE not allowed
 		this.oadrMockEiHttpMvc
-				.perform(MockMvcRequestBuilders.delete(EIEVENT_ENDPOINT).with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
+				.perform(MockMvcRequestBuilders.delete(EIEVENT_ENDPOINT)
+						.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// POST without content
 		String content = "";
-		this.oadrMockEiHttpMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT)
-				.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION).content(content))
+		this.oadrMockEiHttpMvc
+				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT)
+						.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION).content(content))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// POST without content
-		content = "mouaiccool";
-		this.oadrMockEiHttpMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT)
-				.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION).content(content))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
+//		content = "mouaiccool";
+//		this.oadrMockEiHttpMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT)
+//				.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION).content(content))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
 
 	}
 
 	@Test
 	public void testPullOadrRequestEventTypeEmptySuccessCase() throws Exception {
 
-		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG,
-				HttpStatus.OK_200);
-		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION, oadrMockEiHttpMvc,
-				oadrMockEiXmpp, xmlSignatureService);
+		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, HttpStatus.OK_200);
+		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION,
+				oadrMockEiHttpMvc, oadrMockEiXmpp, xmlSignatureService);
 
 		String requestId = "0";
 		long replyLimit = 1L;
 		OadrRequestEventType OadrRequestEventType = Oadr20bEiEventBuilders
-				.newOadrRequestEventBuilder(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, requestId).withReplyLimit(replyLimit).build();
+				.newOadrRequestEventBuilder(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, requestId).withReplyLimit(replyLimit)
+				.build();
 
 		OadrDistributeEventType event = mockVen.event(OadrRequestEventType, HttpStatus.OK_200,
 				OadrDistributeEventType.class);
@@ -222,8 +228,9 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		VenMarketContext marketContext = venMarketContextService.findOneByName(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
 
-		// OADR POLL CONTROLLER - poll for OadrResponseType
-		mockVen.pollForValidOadrResponse();
+		// OADR POLL CONTROLLER - poll supposed to be 'empty' - OadrResponseType for
+		// HTTP VEN
+		mockVen.pollForEmpty();
 
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
@@ -250,7 +257,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		assertNotNull(oadrDistributeEventPoll);
 		// TODO bertrand: test OadrDistributeEventType
 		// OADR POLL CONTROLLER - poll for OadrResponseType
-		mockVen.pollForValidOadrResponse();
+		mockVen.pollForEmpty();
 
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
 
@@ -274,7 +281,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		assertNotNull(oadrDistributeEventPoll);
 		// TODO bertrand: test OadrDistributeEventType
 		// OADR POLL CONTROLLER - poll for OadrResponseType
-		mockVen.pollForValidOadrResponse();
+		mockVen.pollForEmpty();
 
 		String requestId = "0";
 		long replyLimit = 2L;
@@ -384,12 +391,13 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Test
 	public void testOadrCreatedEventType_MissingDREvent() throws Exception {
 
-		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG,
-				HttpStatus.OK_200);
-		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION, oadrMockEiHttpMvc,
-				oadrMockEiXmpp, xmlSignatureService);
+		VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
+				OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, HttpStatus.OK_200);
+		OadrMockVen mockVen = new OadrMockVen(ven, OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION,
+				oadrMockEiHttpMvc, oadrMockEiXmpp, xmlSignatureService);
 
-		OadrCreatedEventType build = Oadr20bEiEventBuilders.newCreatedEventBuilder(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, "0", 123)
+		OadrCreatedEventType build = Oadr20bEiEventBuilders
+				.newCreatedEventBuilder(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, "0", 123)
 				.addEventResponse(Oadr20bEiEventBuilders
 						.newOadr20bCreatedEventEventResponseBuilder("1", 0L, "0", 123, OptTypeType.OPT_IN).build())
 				.build();
@@ -495,7 +503,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		assertNotNull(oadrDistributeEventPoll);
 		// TODO bertrand: test OadrDistributeEventType
 		// OADR POLL CONTROLLER - poll for OadrResponseType
-		mockVen.pollForValidOadrResponse();
+		mockVen.pollForEmpty();
 
 		Long eventId = create.getId();
 
@@ -546,7 +554,7 @@ public class Oadr20bVTNEiEventControllerTest {
 		assertNotNull(oadrDistributeEventPoll);
 		// TODO bertrand: test OadrDistributeEventType
 		// OADR POLL CONTROLLER - poll for OadrResponseType
-		mockVen.pollForValidOadrResponse();
+		mockVen.pollForEmpty();
 
 		// check DR event is sent
 		OadrDistributeEventType distributeEventResponse = mockVen.event(oadrRequestEventType, HttpStatus.OK_200,
@@ -669,6 +677,9 @@ public class Oadr20bVTNEiEventControllerTest {
 
 		DemandResponseEventReadDto event1 = oadrMockHttpDemandResponseEventMvc
 				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
+
+		mockVen.pollForEmpty();
+
 		created.add(event1);
 
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
@@ -676,6 +687,8 @@ public class Oadr20bVTNEiEventControllerTest {
 		DemandResponseEventReadDto event2 = oadrMockHttpDemandResponseEventMvc
 				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event2);
+
+		mockVen.pollForEmpty();
 
 		// create 'far' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
@@ -703,6 +716,8 @@ public class Oadr20bVTNEiEventControllerTest {
 				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event4);
 
+		mockVen.poll(HttpStatus.OK_200, OadrDistributeEventType.class);
+
 		// create 'near' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
 		dto.setPublished(true);
@@ -729,6 +744,8 @@ public class Oadr20bVTNEiEventControllerTest {
 				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event6);
 
+		mockVen.poll(HttpStatus.OK_200, OadrDistributeEventType.class);
+
 		// create 'active' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
 		dto.setPublished(true);
@@ -747,11 +764,15 @@ public class Oadr20bVTNEiEventControllerTest {
 				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event7);
 
+		mockVen.poll(HttpStatus.OK_200, OadrDistributeEventType.class);
+
 		dto.setPublished(true);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		DemandResponseEventReadDto event8 = oadrMockHttpDemandResponseEventMvc
 				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event8);
+
+		mockVen.poll(HttpStatus.OK_200, OadrDistributeEventType.class);
 
 		// create 'completed' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
@@ -772,11 +793,15 @@ public class Oadr20bVTNEiEventControllerTest {
 				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event9);
 
+		mockVen.poll(HttpStatus.OK_200, OadrDistributeEventType.class);
+
 		dto.setPublished(true);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		DemandResponseEventReadDto event10 = oadrMockHttpDemandResponseEventMvc
 				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event10);
+
+		mockVen.poll(HttpStatus.OK_200, OadrDistributeEventType.class);
 
 		// unpublished event are not send to ven
 		dto = new DemandResponseEventCreateDto();
@@ -797,21 +822,22 @@ public class Oadr20bVTNEiEventControllerTest {
 				.create(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, dto, HttpStatus.CREATED_201);
 		created.add(event11);
 
-		// create and send OadrRequestEventType to EiEvent API
-		OadrRequestEventType oadrRequestEventType = new OadrRequestEventType();
-		EiRequestEvent eiRequestEvent = new EiRequestEvent();
-		eiRequestEvent.setRequestID("0");
-		eiRequestEvent.setVenID(mockVen.getVenId());
-		oadrRequestEventType.setEiRequestEvent(eiRequestEvent);
-
-		OadrDistributeEventType event = mockVen.event(oadrRequestEventType, HttpStatus.OK_200,
-				OadrDistributeEventType.class);
+//		mockVen.pollForEmpty();
+		mockVen.poll(HttpStatus.OK_200, OadrDistributeEventType.class);
 
 		List<DemandResponseEventFilter> filters = DemandResponseEventFilter.builder().addVenId(mockVen.getVenId())
 				.build();
 		List<DemandResponseEventReadDto> find = oadrMockHttpDemandResponseEventMvc
 				.search(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, filters, HttpStatus.OK_200);
+
 		assertEquals(11, find.size());
+
+//		mockVen.pollForEmpty();
+		mockVen.poll(HttpStatus.OK_200, OadrDistributeEventType.class);
+
+		// create and send OadrRequestEventType to EiEvent API
+		OadrDistributeEventType event = mockVen.requestEvent(OadrDistributeEventType.class);
+
 		assertEquals(6, event.getOadrEvent().size());
 		List<OadrEvent> oadrEvent = event.getOadrEvent();
 		int countFar = 0;

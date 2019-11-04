@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiRegisterPartyService;
 
 @Controller
@@ -25,7 +24,7 @@ public class Oadr20bVTNEiRegisterPartyController {
 	@PreAuthorize("hasRole('ROLE_VEN')")
 	@RequestMapping(value = Oadr20bUrlPath.EI_REGISTER_PARTY_SERVICE, method = RequestMethod.POST)
 	@ResponseBody
-	public String request(@RequestBody String payload, Principal principal) throws Oadr20bApplicationLayerException {
+	public String request(@RequestBody String payload, Principal principal) {
 
 		return oadr20bVTNEiRegisterPartyService.request(principal.getName(), payload);
 
