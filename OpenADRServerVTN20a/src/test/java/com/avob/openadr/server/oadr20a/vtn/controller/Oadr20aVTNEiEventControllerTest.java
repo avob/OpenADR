@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.data.domain.Page;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor;
@@ -61,6 +62,7 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandR
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
@@ -882,7 +884,9 @@ public class Oadr20aVTNEiEventControllerTest {
 				OadrDistributeEvent.class);
 		assertNotNull(unmarshal);
 
-		List<DemandResponseEvent> find = demandResponseEventService.find(venId, null);
+		List<DemandResponseEventFilter> filters = DemandResponseEventFilter.builder().addVenId(venId).build();
+		Page<DemandResponseEvent> search = demandResponseEventService.search(filters, null, null);
+		List<DemandResponseEvent> find = search.getContent();
 		assertEquals(11, find.size());
 		assertEquals(6, unmarshal.getOadrEvent().size());
 		List<OadrEvent> oadrEvent = unmarshal.getOadrEvent();

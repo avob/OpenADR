@@ -31,6 +31,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -85,12 +89,41 @@ public class OadrPKISecurityTest {
 	}
 
 	@Test
+	public void createKeyManagerFactoryTest() throws OadrSecurityException {
+		String password = UUID.randomUUID().toString();
+		KeyManagerFactory createKeyManagerFactory = OadrPKISecurity.createKeyManagerFactory(TestUtils.TEST_KEY,
+				TestUtils.TEST_CRT, password);
+		assertNotNull(createKeyManagerFactory);
+	}
+
+	@Test
 	public void createTrustStoreTest() throws OadrSecurityException, KeyStoreException, NoSuchAlgorithmException,
 			CertificateException, IOException {
 		List<String> certificates = new ArrayList<>();
 		certificates.add(TestUtils.TEST_CRT);
 		KeyStore createTrustStore = OadrPKISecurity.createTrustStore(certificates);
 		assertNotNull(createTrustStore);
+	}
+
+	@Test
+	public void createTrustManagerFactoryTest() throws OadrSecurityException, KeyStoreException,
+			NoSuchAlgorithmException, CertificateException, IOException {
+		List<String> certificates = new ArrayList<>();
+		certificates.add(TestUtils.TEST_CRT);
+		TrustManagerFactory createTrustManagerFactory = OadrPKISecurity.createTrustManagerFactory(certificates);
+		assertNotNull(createTrustManagerFactory);
+	}
+
+	@Test
+	public void createSSLContextTest() throws OadrSecurityException, KeyStoreException, NoSuchAlgorithmException,
+			CertificateException, IOException {
+		String password = UUID.randomUUID().toString();
+		List<String> certificates = new ArrayList<>();
+		certificates.add(TestUtils.TEST_CRT);
+		SSLContext createSSLContext = OadrPKISecurity.createSSLContext(TestUtils.TEST_KEY, TestUtils.TEST_CRT,
+				certificates, password);
+		assertNotNull(createSSLContext);
+
 	}
 
 	@Test

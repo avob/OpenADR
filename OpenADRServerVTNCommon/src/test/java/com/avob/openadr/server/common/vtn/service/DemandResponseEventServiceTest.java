@@ -154,51 +154,6 @@ public class DemandResponseEventServiceTest {
 	}
 
 	@Test
-	public void findTest() {
-		List<DemandResponseEvent> find = demandResponseEventService.find(null, null);
-		assertEquals(3, find.size());
-
-		find = demandResponseEventService.find(null, null, 1L);
-		assertEquals(1, find.size());
-
-		find = demandResponseEventService.find("ven2", null);
-		assertEquals(2, find.size());
-
-		find = demandResponseEventService.find("ven2", DemandResponseEventStateEnum.ACTIVE);
-		assertEquals(1, find.size());
-
-		find = demandResponseEventService.find("ven2", DemandResponseEventStateEnum.CANCELLED);
-		assertEquals(1, find.size());
-		assertEquals("PT1H", find.get(0).getActivePeriod().getRampUpDuration());
-		assertEquals("PT1H", find.get(0).getActivePeriod().getRecoveryDuration());
-		assertEquals("comment", find.get(0).getDescriptor().getVtnComment());
-		// duration is 1h long
-		Long end = start + 60 * 60 * 1000;
-		assertEquals(end, find.get(0).getActivePeriod().getEnd());
-
-		find = demandResponseEventService.find(null, DemandResponseEventStateEnum.ACTIVE);
-		assertEquals(2, find.size());
-
-		find = demandResponseEventService.find(null, DemandResponseEventStateEnum.ACTIVE, 1L);
-		assertEquals(1, find.size());
-
-		find = demandResponseEventService.find("ven1", null);
-		assertEquals(1, find.size());
-
-		find = demandResponseEventService.find("ven1", DemandResponseEventStateEnum.ACTIVE);
-		assertEquals(1, find.size());
-
-		find = demandResponseEventService.find("ven1", DemandResponseEventStateEnum.ACTIVE, 2L);
-		assertEquals(1, find.size());
-
-		find = demandResponseEventService.find("ven2", null, 1L);
-		assertEquals(1, find.size());
-
-		find = demandResponseEventService.find("ven3", null, 1L);
-		assertEquals(1, find.size());
-	}
-
-	@Test
 	public void findtoSentEvent() {
 		List<DemandResponseEvent> findToSentEvent = demandResponseEventService
 				.findToSentEventByVenUsername(ven1.getUsername());

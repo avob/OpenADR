@@ -92,52 +92,6 @@ public class DemandResponseEventService {
 		}
 	}
 
-	public Iterable<DemandResponseEvent> findAll() {
-		return demandResponseEventDao.findAll();
-	}
-
-	public List<DemandResponseEvent> find(String venUsername, DemandResponseEventStateEnum state) {
-		return this.find(venUsername, state, null);
-	}
-
-	public List<DemandResponseEvent> find(String venUsername, DemandResponseEventStateEnum state, Long size) {
-		Pageable limit = null;
-		if (size != null) {
-			int i = (int) (long) size;
-			limit = PageRequest.of(0, i);
-		}
-
-		Iterable<DemandResponseEvent> events = new ArrayList<>();
-
-		if (venUsername == null && state == null && limit == null) {
-			events = demandResponseEventDao.findAll();
-		} else if (venUsername == null && state == null) {
-			events = demandResponseEventDao.findAll(limit);
-
-		} else if (venUsername != null && state == null && limit == null) {
-			events = demandResponseEventDao.findAll(DemandResponseEventSpecification.hasVenUsername(venUsername));
-
-		} else if (venUsername != null && state == null && limit != null) {
-			events = demandResponseEventDao.findAll(DemandResponseEventSpecification.hasVenUsername(venUsername),
-					limit);
-		} else if (venUsername == null && state != null && limit == null) {
-			events = demandResponseEventDao.findAll(DemandResponseEventSpecification.hasDescriptorState(state));
-
-		} else if (venUsername == null && state != null && limit != null) {
-			events = demandResponseEventDao.findAll(DemandResponseEventSpecification.hasDescriptorState(state), limit);
-
-		} else if (venUsername != null && state != null && limit == null) {
-			events = demandResponseEventDao.findAll(DemandResponseEventSpecification.hasDescriptorState(state)
-					.and(DemandResponseEventSpecification.hasVenUsername(venUsername)));
-
-		} else if (venUsername != null && state != null && limit != null) {
-			events = demandResponseEventDao.findAll(DemandResponseEventSpecification.hasDescriptorState(state)
-					.and(DemandResponseEventSpecification.hasVenUsername(venUsername)), limit);
-		}
-
-		return Lists.newArrayList(events);
-	}
-
 	private List<Ven> findVenForTarget(DemandResponseEvent event,
 			List<? extends DemandResponseEventTargetInterface> targets) {
 		Specification<Ven> targetedSpecification = null;

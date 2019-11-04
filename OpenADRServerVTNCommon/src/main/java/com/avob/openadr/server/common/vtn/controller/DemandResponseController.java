@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
@@ -68,15 +67,6 @@ public class DemandResponseController {
 	protected void initBinderUpdate(WebDataBinder binder) throws DatatypeConfigurationException {
 		binder.addValidators(demandResponseEventUpdateDtoValidator);
 
-	}
-
-	@RequestMapping(value = "/", method = RequestMethod.GET)
-	@ResponseBody
-	public List<DemandResponseEventReadDto> list(@RequestParam(value = "ven", required = false) String ven,
-			@RequestParam(value = "state", required = false) DemandResponseEventStateEnum state) {
-
-		List<DemandResponseEvent> find = demandResponseEventService.find(ven, state);
-		return dtoMapper.mapList(find, DemandResponseEventReadDto.class);
 	}
 
 	@RequestMapping(value = "/search", method = RequestMethod.POST)

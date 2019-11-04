@@ -183,135 +183,6 @@ public class DemandResponseControllerTest {
 		Assert.assertNotNull(wac.getBean("demandResponseController"));
 	}
 
-	@Test
-	public void findTest() throws Exception {
-
-		// find all
-		MvcResult andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-
-		List<DemandResponseEventReadDto> readValue = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertNotNull(readValue);
-		assertEquals(2, readValue.size());
-
-		for (DemandResponseEventReadDto dto : readValue) {
-			assertEquals(DemandResponseControllerTest.MODIFICATION, dto.getDescriptor().getModificationNumber());
-			assertNotNull(dto.getCreatedTimestamp());
-			assertEquals(DemandResponseControllerTest.DURATION, dto.getActivePeriod().getDuration());
-			assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, dto.getDescriptor().getMarketContext());
-			assertEquals(DemandResponseControllerTest.START, dto.getActivePeriod().getStart());
-			assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
-					dto.getSignals().get(0).getCurrentValue());
-
-			assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getDescriptor().getState())
-					|| DemandResponseEventStateEnum.CANCELLED.equals(dto.getDescriptor().getState()));
-		}
-
-		// find by ven username
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param(VEN_PARAM, DemandResponseControllerTest.VEN1).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-
-		readValue = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertNotNull(readValue);
-		assertEquals(1, readValue.size());
-
-		for (DemandResponseEventReadDto dto : readValue) {
-			assertEquals(DemandResponseControllerTest.MODIFICATION, dto.getDescriptor().getModificationNumber());
-			assertNotNull(dto.getCreatedTimestamp());
-			assertEquals(DemandResponseControllerTest.DURATION, dto.getActivePeriod().getDuration());
-			assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, dto.getDescriptor().getMarketContext());
-			assertEquals(DemandResponseControllerTest.START, dto.getActivePeriod().getStart());
-			assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
-					dto.getSignals().get(0).getCurrentValue());
-			assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getDescriptor().getState()));
-		}
-
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param(VEN_PARAM, DemandResponseControllerTest.VEN2).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-
-		readValue = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertNotNull(readValue);
-		assertEquals(2, readValue.size());
-
-		for (DemandResponseEventReadDto dto : readValue) {
-			assertEquals(DemandResponseControllerTest.MODIFICATION, dto.getDescriptor().getModificationNumber());
-			assertNotNull(dto.getCreatedTimestamp());
-			assertEquals(DemandResponseControllerTest.DURATION, dto.getActivePeriod().getDuration());
-			assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, dto.getDescriptor().getMarketContext());
-			assertEquals(DemandResponseControllerTest.START, dto.getActivePeriod().getStart());
-			assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
-					dto.getSignals().get(0).getCurrentValue());
-
-			assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getDescriptor().getState())
-					|| DemandResponseEventStateEnum.CANCELLED.equals(dto.getDescriptor().getState()));
-		}
-
-		// find by state
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param(STATE_PARAM, DemandResponseEventStateEnum.ACTIVE.toString()).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-
-		readValue = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertNotNull(readValue);
-		assertEquals(1, readValue.size());
-
-		for (DemandResponseEventReadDto dto : readValue) {
-			assertEquals(DemandResponseControllerTest.MODIFICATION, dto.getDescriptor().getModificationNumber());
-			assertNotNull(dto.getCreatedTimestamp());
-			assertEquals(DemandResponseControllerTest.DURATION, dto.getActivePeriod().getDuration());
-			assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, dto.getDescriptor().getMarketContext());
-			assertEquals(DemandResponseControllerTest.START, dto.getActivePeriod().getStart());
-			assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
-					dto.getSignals().get(0).getCurrentValue());
-			assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(dto.getDescriptor().getState()));
-		}
-
-		// find by ven and state
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param(VEN_PARAM, DemandResponseControllerTest.VEN2)
-						.param(STATE_PARAM, DemandResponseEventStateEnum.CANCELLED.toString()).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-
-		readValue = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertNotNull(readValue);
-		assertEquals(1, readValue.size());
-
-		for (DemandResponseEventReadDto dto : readValue) {
-			assertEquals(DemandResponseControllerTest.MODIFICATION, dto.getDescriptor().getModificationNumber());
-			assertNotNull(dto.getCreatedTimestamp());
-			assertEquals(DemandResponseControllerTest.DURATION, dto.getActivePeriod().getDuration());
-			assertEquals(DemandResponseControllerTest.MARKETCONTEXT_NAME, dto.getDescriptor().getMarketContext());
-			assertEquals(DemandResponseControllerTest.START, dto.getActivePeriod().getStart());
-			assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue(),
-					dto.getSignals().get(0).getCurrentValue());
-			assertTrue(DemandResponseEventStateEnum.CANCELLED.equals(dto.getDescriptor().getState()));
-		}
-
-		// find non existing ven
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param(VEN_PARAM, DemandResponseControllerTest.VEN2).param(VEN_PARAM, "idonotexists")
-						.with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-
-		readValue = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertNotNull(readValue);
-		assertEquals(0, readValue.size());
-
-		// find non existing state
-		this.mockMvc.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-				.param(VEN_PARAM, DemandResponseControllerTest.VEN2).param(STATE_PARAM, "idonotexists")
-				.with(adminSession)).andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
-
-	}
-
 	private DemandResponseEventCreateDto createValidEvent() {
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
@@ -337,8 +208,10 @@ public class DemandResponseControllerTest {
 
 		// perform check
 		MvcResult andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param(VEN_PARAM, DemandResponseControllerTest.VEN1).with(adminSession))
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "/search")
+						.content(mapper.writeValueAsString(DemandResponseEventFilter.builder()
+								.addVenId(DemandResponseControllerTest.VEN1).build()))
+						.header("Content-Type", "application/json").with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
 		List<DemandResponseEventReadDto> readValue = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -380,8 +253,10 @@ public class DemandResponseControllerTest {
 
 		// perform check
 		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.get(DEMAND_RESPONSE_EVENT_URL)
-						.param(VEN_PARAM, DemandResponseControllerTest.VEN1).with(adminSession))
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "/search")
+						.content(mapper.writeValueAsString(DemandResponseEventFilter.builder()
+								.addVenId(DemandResponseControllerTest.VEN1).build()))
+						.header("Content-Type", "application/json").with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
 		readValue = convertMvcResultToDemandResponseDtoList(andReturn);
