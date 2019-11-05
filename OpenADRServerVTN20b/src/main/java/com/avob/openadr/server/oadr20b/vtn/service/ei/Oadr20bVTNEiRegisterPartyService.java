@@ -197,7 +197,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 			return marshall(response, signed);
 		}
 
-		clearRegistration(ven);
+		venService.cleanRegistration(ven);
 
 		OadrResponseType response = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder(requestID, HttpStatus.OK_200, venID).build();
@@ -240,25 +240,12 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 			return marshall(build, signed);
 
 		}
-		clearRegistration(ven);
+		venService.cleanRegistration(ven);
 		OadrCanceledPartyRegistrationType response = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCanceledPartyRegistrationBuilder(Oadr20bResponseBuilders.newOadr20bEiResponseOK(requestID),
 						registrationID, ven.getUsername())
 				.build();
 		return marshall(response, signed);
-	}
-
-	private void clearRegistration(Ven ven) {
-		ven.setOadrName(null);
-		ven.setOadrProfil(null);
-		ven.setTransport(null);
-		ven.setPushUrl(null);
-		ven.setRegistrationId(null);
-		ven.setHttpPullModel(null);
-		ven.setReportOnly(null);
-		ven.setXmlSignature(null);
-		ven.setLastUpdateDatetime(null);
-		venService.save(ven);
 	}
 
 	public String oadrQueryRegistrationType(String venID, OadrQueryRegistrationType payload, boolean signed) {

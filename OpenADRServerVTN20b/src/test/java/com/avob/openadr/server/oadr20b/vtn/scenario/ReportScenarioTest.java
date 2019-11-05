@@ -837,7 +837,8 @@ public class ReportScenarioTest {
 
 	private void _testVENTargetVTNSource(OadrMockVen mockVen) throws Oadr20bMarshalException, Exception {
 
-		if (OadrTransportType.SIMPLE_HTTP.value().equals(mockVen.getVen().getTransport())) {
+		if (OadrTransportType.SIMPLE_HTTP.value().equals(mockVen.getVen().getTransport())
+				&& mockVen.getVen().getHttpPullModel()) {
 			// OADR POLL CONTROLLER - invalid mismatch payload venID and username auth
 			// session
 			OadrResponseType postOadrPollAndExpect = mockVen.poll(

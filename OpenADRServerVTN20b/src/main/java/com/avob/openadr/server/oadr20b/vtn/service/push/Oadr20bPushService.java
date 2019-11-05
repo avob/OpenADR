@@ -188,13 +188,16 @@ public class Oadr20bPushService {
 						return;
 					}
 
+					oadr20bVTNEiRegisterPartyService.oadrCanceledPartyRegistrationType(
+							oadrCancelPartyRegistrationType.getVenID(), oadrCancelPartyRegistrationType,
+							xmlSignatureRequired);
 					// remove ven registration
 //					oadr20bVTNEiRegisterPartyService.oadrCancelPartyRegistrationType(val, xmlSignatureRequired);
-					Ven findOneByUsername = venService.findOneByUsername(oadrCancelPartyRegistrationType.getVenID());
-
-					if (findOneByUsername != null) {
-						venService.cleanRegistration(findOneByUsername);
-					}
+//					Ven findOneByUsername = venService.findOneByUsername(oadrCancelPartyRegistrationType.getVenID());
+//
+//					if (findOneByUsername != null) {
+//						venService.cleanRegistration(findOneByUsername);
+//					}
 
 				} else if (payload instanceof OadrRequestReregistrationType) {
 					OadrRequestReregistrationType val = (OadrRequestReregistrationType) payload;

@@ -186,18 +186,13 @@ public class OadrMockVen {
 				return null;
 			}
 			InvocationOnMock invocationOnMock = popResponse.get();
-			Jid from = (Jid) invocationOnMock.getArgument(0);
-			String body = (String) invocationOnMock.getArgument(1);
-			assertEquals(JidCreate.entityFullFrom(this.getVen().getPushUrl()), from);
+			String from = (String) invocationOnMock.getArgument(0);
+			assertEquals(this.getVen().getPushUrl(), from);
 			if (ven.getXmlSignature()) {
-				OadrPayload unmarshal = jaxbcontext.unmarshal(body, OadrPayload.class);
-				xmlSignatureService.validate(body, unmarshal);
-				
+				OadrPayload unmarshal = (OadrPayload) invocationOnMock.getArgument(1);
 				return Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, klass);
 			} else {
-				Object unmarshal = jaxbcontext.unmarshal(body);
-				assertEquals(klass, unmarshal.getClass());
-				return klass.cast(unmarshal);
+				return klass.cast(invocationOnMock.getArgument(1));
 			}
 		} else if (OadrTransportType.XMPP.value().equals(ven.getTransport())) {
 			Optional<InvocationOnMock> popResponse = oadrMockEiXmpp.popResponse();
@@ -242,9 +237,12 @@ public class OadrMockVen {
 	}
 
 	public void pollForEmpty() throws Exception {
-		if (OadrTransportType.SIMPLE_HTTP.value().equals(this.getVen().getTransport())) {
+		if (OadrTransportType.SIMPLE_HTTP.value().equals(this.getVen().getTransport()) && ven.getHttpPullModel()) {
 			OadrResponseType poll = this.poll(HttpStatus.OK_200, OadrResponseType.class);
 			assertEquals(String.valueOf(HttpStatus.OK_200), poll.getEiResponse().getResponseCode());
+		} else if (OadrTransportType.SIMPLE_HTTP.value().equals(this.getVen().getTransport())
+				&& !ven.getHttpPullModel()) {
+			this.poll(HttpStatus.OK_200, null);
 		} else if (OadrTransportType.XMPP.value().equals(this.getVen().getTransport())) {
 			this.poll(HttpStatus.OK_200, null);
 		}

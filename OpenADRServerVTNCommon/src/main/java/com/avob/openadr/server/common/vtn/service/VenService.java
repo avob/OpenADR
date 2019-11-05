@@ -154,7 +154,6 @@ public class VenService extends AbstractUserService<Ven> {
 
 	public void cleanRegistration(Ven ven) {
 		ven.setRegistrationId(null);
-		ven.setXmlSignature(false);
 		this.save(ven);
 	}
 
