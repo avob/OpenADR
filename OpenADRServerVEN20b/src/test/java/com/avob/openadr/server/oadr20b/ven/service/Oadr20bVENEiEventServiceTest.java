@@ -27,6 +27,7 @@ import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
 import com.avob.openadr.model.oadr20b.ei.EiTargetType;
 import com.avob.openadr.model.oadr20b.ei.EventDescriptorType;
 import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
+import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
 import com.avob.openadr.server.oadr20b.ven.VEN20bApplicationTest;
@@ -69,7 +70,7 @@ public class Oadr20bVENEiEventServiceTest {
 		float currentValue = 3f;
 		String xmlDuration = "";
 		String signalId = "";
-		String signalName = "";
+		SignalNameEnumeratedType signalName = SignalNameEnumeratedType.SIMPLE;
 		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
 		String intervalId = "";
 		EiEventSignalType eiEventSignal = Oadr20bEiEventBuilders

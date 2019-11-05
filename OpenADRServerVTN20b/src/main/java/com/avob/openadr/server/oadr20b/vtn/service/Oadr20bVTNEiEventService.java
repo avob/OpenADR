@@ -32,6 +32,7 @@ import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.ei.QualifiedEventIDType;
+import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
@@ -326,7 +327,8 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 			}
 
 			Oadr20bEiEventSignalTypeBuilder newOadr20bEiEventSignalTypeBuilder = Oadr20bEiEventBuilders
-					.newOadr20bEiEventSignalTypeBuilder("" + signalId, demandResponseEventSignal.getSignalName(),
+					.newOadr20bEiEventSignalTypeBuilder("" + signalId,
+							SignalNameEnumeratedType.fromValue(demandResponseEventSignal.getSignalName()),
 							SignalTypeEnumeratedType.fromValue(demandResponseEventSignal.getSignalType()),
 							currentValue);
 

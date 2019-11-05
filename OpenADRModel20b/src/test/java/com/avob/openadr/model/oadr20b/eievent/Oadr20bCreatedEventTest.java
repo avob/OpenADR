@@ -1,6 +1,7 @@
 package com.avob.openadr.model.oadr20b.eievent;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.assertj.core.util.Files;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -29,27 +31,37 @@ public class Oadr20bCreatedEventTest {
 	}
 
 	@Test
-	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
+	public void validatingMarshalUnmarshalTest()
+			throws DatatypeConfigurationException, Oadr20bMarshalException, Oadr20bUnmarshalException {
 
 		String venId = "venId";
 		String requestId = "requestId";
 		int responseCode = 200;
-		String eventId = null;
+		String eventId = "eventId";
 		long modificationNumber = 0L;
-		OadrCreatedEventType request = Oadr20bEiEventBuilders.newCreatedEventBuilder(venId, requestId, responseCode)
-				.addEventResponse(Oadr20bEiEventBuilders.newOadr20bCreatedEventEventResponseBuilder(eventId,
-						modificationNumber, requestId, responseCode, OptTypeType.OPT_IN).build())
+		OadrCreatedEventType request = Oadr20bEiEventBuilders
+				.newCreatedEventBuilder(venId, requestId,
+						responseCode)
+				.addEventResponse(
+						Oadr20bEiEventBuilders.newOadr20bCreatedEventEventResponseBuilder(eventId, modificationNumber,
+								requestId, responseCode, OptTypeType.OPT_IN).withDescription("mouaiccool").build())
+				.addEventResponse(
+						Lists.newArrayList(Oadr20bEiEventBuilders.newOadr20bCreatedEventEventResponseBuilder(eventId,
+								modificationNumber, requestId, responseCode, OptTypeType.OPT_IN).build()))
 				.build();
 
-		boolean assertion = false;
-		try {
-			jaxbContext.marshalRoot(request);
-		} catch (Oadr20bMarshalException e) {
-			assertion = true;
-		}
+		String marshalRoot = jaxbContext.marshalRoot(request, true);
+
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
+
+	}
+
+	@Test
+	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
 
 		File file = new File("src/test/resources/eievent/unvalidatingOadrCreatedEvent.xml");
-		assertion = false;
+		boolean assertion = false;
 		try {
 			jaxbContext.unmarshal(file, OadrRequestEventType.class);
 		} catch (Oadr20bUnmarshalException e) {

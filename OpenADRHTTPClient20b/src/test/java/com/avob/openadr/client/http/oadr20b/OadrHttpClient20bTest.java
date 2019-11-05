@@ -37,6 +37,7 @@ import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
 import com.avob.openadr.model.oadr20b.ei.EiTargetType;
 import com.avob.openadr.model.oadr20b.ei.EventDescriptorType;
 import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
+import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
@@ -59,7 +60,7 @@ public class OadrHttpClient20bTest {
 				eventXmlDuration, toleranceXmlDuration, notificationXmlDuration).build();
 
 		String signalId = "0";
-		String signalName = "simple";
+		SignalNameEnumeratedType signalName = SignalNameEnumeratedType.SIMPLE;
 		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
 		String xmlDuration = "PT1H";
 		float currentValue = 0;

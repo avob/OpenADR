@@ -1,6 +1,7 @@
 package com.avob.openadr.model.oadr20b.eievent;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -10,6 +11,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.assertj.core.util.Files;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -17,15 +19,21 @@ import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
 import com.avob.openadr.model.oadr20b.ei.EiActivePeriodType;
+import com.avob.openadr.model.oadr20b.ei.EiEventBaselineType;
 import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
 import com.avob.openadr.model.oadr20b.ei.EiTargetType;
 import com.avob.openadr.model.oadr20b.ei.EventDescriptorType;
 import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
+import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
+import com.avob.openadr.model.oadr20b.iso.ISO3AlphaCurrencyCodeContentType;
+import com.avob.openadr.model.oadr20b.oadr.CurrencyItemDescriptionType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
+import com.avob.openadr.model.oadr20b.siscale.SiScaleCodeType;
+import com.avob.openadr.model.oadr20b.strm.Intervals;
 
 public class Oadr20bDistributeEventTest {
 
@@ -36,20 +44,23 @@ public class Oadr20bDistributeEventTest {
 	}
 
 	@Test
-	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
+	public void validatingMarshalUnmarshalTest()
+			throws DatatypeConfigurationException, Oadr20bMarshalException, Oadr20bUnmarshalException {
 
 		long timestampStart = 0L;
 		String eventXmlDuration = "PT1H";
-		String toleranceXmlDuration = "PT5M";
+		String toleranceXmlDuration = "PT1H";
 		String notificationXmlDuration = "P1D";
-		EiActivePeriodType period = Oadr20bEiEventBuilders.newOadr20bEiActivePeriodTypeBuilder(timestampStart,
-				eventXmlDuration, toleranceXmlDuration, notificationXmlDuration).build();
+		EiActivePeriodType period = Oadr20bEiEventBuilders
+				.newOadr20bEiActivePeriodTypeBuilder(timestampStart, eventXmlDuration, toleranceXmlDuration,
+						notificationXmlDuration)
+				.withRampUp("PT1H").withRecovery("PT1H").withComponent("mouaiccool").build();
 
 		float currentValue = 3f;
 
-		String xmlDuration = "";
+		String xmlDuration = "PT1H";
 		String signalId = "";
-		String signalName = "";
+		SignalNameEnumeratedType signalName = SignalNameEnumeratedType.BID_PRICE;
 		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
 		String intervalId = "";
 		long start = 12L;
@@ -57,6 +68,13 @@ public class Oadr20bDistributeEventTest {
 				.newOadr20bEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue)
 				.addInterval(Oadr20bEiBuilders
 						.newOadr20bSignalIntervalTypeBuilder(intervalId, start, xmlDuration, currentValue).build())
+				.addInterval(Lists.newArrayList(Oadr20bEiBuilders
+						.newOadr20bSignalIntervalTypeBuilder(intervalId, start, xmlDuration, currentValue).build()))
+				.withEiTarget(
+						Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addVenId(Lists.newArrayList("ven")).build())
+				.withItemBase(Oadr20bFactory
+						.createCurrency(Oadr20bFactory.createCurrencyType(CurrencyItemDescriptionType.CURRENCY,
+								ISO3AlphaCurrencyCodeContentType.EUR, SiScaleCodeType.NONE)))
 				.build();
 
 		String[] list = { "a", "b", "c" };
@@ -74,28 +92,41 @@ public class Oadr20bDistributeEventTest {
 		String comment = "";
 		EventDescriptorType descriptor = Oadr20bEiEventBuilders
 				.newOadr20bEventDescriptorTypeBuilder(datetime, eventId, modificationNumber, marketContextValue, status)
-				.withPriority(priority).withVtnComment(comment).build();
+				.withPriority(priority).withVtnComment(comment).withTestEvent(true).withVtnModificationDateTime(0L)
+				.withVtnModificationReason("mouaiccool").build();
 
+		EiEventBaselineType baseline = new EiEventBaselineType();
+		baseline.setDuration(Oadr20bFactory.createDurationPropType("PT1H"));
+		baseline.setBaselineID("baselineId");
+		baseline.setBaselineName("baselineName");
+		baseline.setDtstart(Oadr20bFactory.createDtstart(0L));
+
+		Intervals baselineIntervals = Oadr20bFactory.createIntervals();
+		baselineIntervals.getInterval().add(Oadr20bEiBuilders
+				.newOadr20bSignalIntervalTypeBuilder(intervalId, start, xmlDuration, currentValue).build());
+		baseline.setIntervals(baselineIntervals);
 		OadrEvent event = Oadr20bEiEventBuilders.newOadr20bDistributeEventOadrEventBuilder().withActivePeriod(period)
-				.withEiTarget(target).withEventDescriptor(descriptor).addEiEventSignal(eiEventSignal).build();
+				.withEiTarget(target).withEventDescriptor(descriptor).addEiEventSignal(eiEventSignal)
+				.withEiEventBaseline(baseline).withResponseRequired(true).build();
 
 		String requestId = "";
 		String vtnId = "";
 
 		OadrDistributeEventType createOadrDistributeEvent = Oadr20bEiEventBuilders
-				.newOadr20bDistributeEventBuilder(vtnId, requestId).addOadrEvent(event).build();
+				.newOadr20bDistributeEventBuilder(vtnId, requestId).addOadrEvent(event)
+				.addOadrEvent(Lists.newArrayList(event)).build();
 
-		boolean assertion = false;
-		try {
-			jaxbContext.marshalRoot(createOadrDistributeEvent, true);
-		} catch (Oadr20bMarshalException e) {
-			assertion = true;
-		}
+		String marshalRoot = jaxbContext.marshalRoot(createOadrDistributeEvent, true);
 
-		assertTrue(assertion);
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
 
+	}
+
+	@Test
+	public void unvalidatingUnmarshalTest() throws DatatypeConfigurationException {
 		File file = new File("src/test/resources/eievent/unvalidatingOadrDistributeEvent.xml");
-		assertion = false;
+		boolean assertion = false;
 		try {
 			jaxbContext.unmarshal(file, OadrDistributeEventType.class);
 		} catch (Oadr20bUnmarshalException e) {

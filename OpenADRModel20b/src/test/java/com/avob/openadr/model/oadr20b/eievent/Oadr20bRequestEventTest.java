@@ -1,6 +1,7 @@
 package com.avob.openadr.model.oadr20b.eievent;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -24,6 +25,20 @@ public class Oadr20bRequestEventTest {
 
 	public Oadr20bRequestEventTest() throws JAXBException {
 		jaxbContext = Oadr20bJAXBContext.getInstance();
+	}
+
+	@Test
+	public void validatingMarshalUnmarshalTest()
+			throws DatatypeConfigurationException, Oadr20bMarshalException, Oadr20bUnmarshalException {
+
+		String venId = "venId";
+		String requestId = "requestId";
+		OadrRequestEventType request = Oadr20bEiEventBuilders.newOadrRequestEventBuilder(venId, requestId)
+				.withReplyLimit(0L).build();
+		String marshalRoot = jaxbContext.marshalRoot(request, true);
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
+
 	}
 
 	@Test

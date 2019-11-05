@@ -33,6 +33,7 @@ import com.avob.openadr.model.oadr20b.ei.OptReasonEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
+import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
@@ -168,7 +169,7 @@ public class OadrXMLSignatureHandlerTest {
 		float currentValue = 3f;
 		String xmlDuration = "PT1H";
 		String signalId = "0";
-		String signalName = "simple";
+		SignalNameEnumeratedType signalName = SignalNameEnumeratedType.SIMPLE;
 		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
 		String intervalId = "";
 		long timestampStartInterval = 3L;
