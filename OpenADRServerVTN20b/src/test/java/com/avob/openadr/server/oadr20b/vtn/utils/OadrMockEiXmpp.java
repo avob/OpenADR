@@ -25,6 +25,7 @@ import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiEventService;
 import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiOptService;
 import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiRegisterPartyService;
 import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiReportService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNPayloadService;
 import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppConnector;
 import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppListener;
 
@@ -33,6 +34,9 @@ public class OadrMockEiXmpp {
 
 	@Resource
 	private XmppConnector xmppConnector;
+
+	@Resource
+	private Oadr20bVTNPayloadService oadr20bVTNPayloadService;
 
 	@Resource
 	private Oadr20bVTNEiRegisterPartyService oadr20bVTNEiRegisterPartyService;
@@ -91,10 +95,11 @@ public class OadrMockEiXmpp {
 			e.printStackTrace();
 		}
 
-		xmppEiRegisterPartyListener = new XmppListener(oadr20bVTNEiRegisterPartyService, mockUplinkClient);
-		xmppEiReportListener = new XmppListener(oadr20bVTNEiReportService, mockUplinkClient);
-		xmppEiEventListener = new XmppListener(oadr20bVTNEiEventService, mockUplinkClient);
-		xmppEiOptListener = new XmppListener(oadr20bVTNEiOptService, mockUplinkClient);
+		xmppEiRegisterPartyListener = new XmppListener(oadr20bVTNEiRegisterPartyService, mockUplinkClient,
+				oadr20bVTNPayloadService);
+		xmppEiReportListener = new XmppListener(oadr20bVTNEiReportService, mockUplinkClient, oadr20bVTNPayloadService);
+		xmppEiEventListener = new XmppListener(oadr20bVTNEiEventService, mockUplinkClient, oadr20bVTNPayloadService);
+		xmppEiOptListener = new XmppListener(oadr20bVTNEiOptService, mockUplinkClient, oadr20bVTNPayloadService);
 	}
 
 	public Optional<InvocationOnMock> popResponse() {

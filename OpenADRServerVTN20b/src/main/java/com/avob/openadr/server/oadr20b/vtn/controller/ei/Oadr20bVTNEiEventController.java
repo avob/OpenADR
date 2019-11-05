@@ -17,7 +17,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
-import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiEventService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNPayloadService;
 
 /**
  * Oadr EiEvent service controller
@@ -30,7 +30,7 @@ import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiEventService;
 public class Oadr20bVTNEiEventController {
 
 	@Resource
-	private Oadr20bVTNEiEventService oadr20aVtnEiEventService;
+	private Oadr20bVTNPayloadService oadr20bVTNPayloadService;
 
 	/**
 	 * Service HTTP Endpoint
@@ -51,7 +51,7 @@ public class Oadr20bVTNEiEventController {
 	@ResponseBody
 	public String request(@RequestBody String payload, Principal principal) {
 
-		return oadr20aVtnEiEventService.request(principal.getName(), payload);
+		return oadr20bVTNPayloadService.event(principal.getName(), payload);
 
 	}
 

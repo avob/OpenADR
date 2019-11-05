@@ -41,6 +41,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
+import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
@@ -158,7 +159,8 @@ public class Oadr20bPushService {
 						LOGGER.error("OadrCreateReportType - Application Layer Error[" + eiResponseCode + "]");
 					}
 
-					oadr20bVTNEiReportService.oadrCreatedReport(venId, oadrCreateReport, xmlSignatureRequired);
+					Ven ven = venService.findOneByUsername(venId);
+					oadr20bVTNEiReportService.oadrCreatedReport(ven, oadrCreateReport);
 
 				} else if (payload instanceof OadrRegisterReportType) {
 					OadrRegisterReportType val = (OadrRegisterReportType) payload;
@@ -187,9 +189,9 @@ public class Oadr20bPushService {
 						return;
 					}
 
-					oadr20bVTNEiRegisterPartyService.oadrCanceledPartyRegistrationType(
-							oadrCancelPartyRegistrationType.getVenID(), oadrCancelPartyRegistrationType,
-							xmlSignatureRequired);
+					Ven ven = venService.findOneByUsername(venId);
+					oadr20bVTNEiRegisterPartyService.oadrCanceledPartyRegistrationType(ven,
+							oadrCancelPartyRegistrationType);
 
 				} else if (payload instanceof OadrRequestReregistrationType) {
 					OadrRequestReregistrationType val = (OadrRequestReregistrationType) payload;

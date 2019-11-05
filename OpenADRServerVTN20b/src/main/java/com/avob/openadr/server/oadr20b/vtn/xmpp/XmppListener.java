@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20b;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNPayloadService;
 
 public class XmppListener implements StanzaListener {
 
@@ -24,9 +25,13 @@ public class XmppListener implements StanzaListener {
 
 	private Oadr20bVTNEiService oadr20bVTNEiService;
 
-	public XmppListener(Oadr20bVTNEiService oadr20bVTNEiService, OadrXmppClient20b xmppUplinkClient) {
+	private Oadr20bVTNPayloadService oadr20bVTNPayloadService;
+
+	public XmppListener(Oadr20bVTNEiService oadr20bVTNEiService, OadrXmppClient20b xmppUplinkClient,
+			Oadr20bVTNPayloadService oadr20bVTNPayloadService) {
 		this.oadr20bVTNEiService = oadr20bVTNEiService;
 		this.xmppUplinkClient = xmppUplinkClient;
+		this.oadr20bVTNPayloadService = oadr20bVTNPayloadService;
 	}
 
 	@Override
@@ -46,8 +51,19 @@ public class XmppListener implements StanzaListener {
 		try {
 
 			LOGGER.debug(body);
-
-			String response = oadr20bVTNEiService.request(username, body);
+			String response;
+			if (oadr20bVTNEiService.getServiceName().equals("EiEvent")) {
+				response = oadr20bVTNPayloadService.event(username, body);
+			} else if (oadr20bVTNEiService.getServiceName().equals("EiOpt")) {
+				response = oadr20bVTNPayloadService.opt(username, body);
+			} else if (oadr20bVTNEiService.getServiceName().equals("EiRegisterParty")) {
+				response = oadr20bVTNPayloadService.registerParty(username, body);
+			} else if (oadr20bVTNEiService.getServiceName().equals("EiReport")) {
+				response = oadr20bVTNPayloadService.report(username, body);
+			} else {
+				LOGGER.error("Not supposed to listen to this service");
+				return;
+			}
 
 			from = JidCreate.from(username + "@" + from.getDomain().toString() + "/" + resourceOrThrow);
 

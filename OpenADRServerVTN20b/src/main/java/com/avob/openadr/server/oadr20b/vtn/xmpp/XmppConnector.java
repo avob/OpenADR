@@ -19,6 +19,7 @@ import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiOptService;
 import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiRegisterPartyService;
 import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiReportService;
 import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNPayloadService;
 
 @Service
 public class XmppConnector {
@@ -27,6 +28,9 @@ public class XmppConnector {
 
 	@Resource
 	private VtnConfig vtnConfig;
+
+	@Resource
+	private Oadr20bVTNPayloadService oadr20bVTNPayloadService;
 
 	@Resource
 	private Oadr20bVTNEiRegisterPartyService oadr20bVTNEiRegisterPartyService;
@@ -56,7 +60,7 @@ public class XmppConnector {
 	private OadrXmppClient20b getXmppClient(String domain, Oadr20bVTNEiService service, OadrXmppClient20b uplinkClient)
 			throws OadrXmppException {
 		String resource = (service != null) ? service.getServiceName() : "uplink";
-		XmppListener xmppListener = new XmppListener(service, uplinkClient);
+		XmppListener xmppListener = new XmppListener(service, uplinkClient, oadr20bVTNPayloadService);
 		XMPPTCPConnection xmppConnection = getXmppConnection(domain, service);
 		String jid = vtnConfig.getVtnId() + "@" + domain + "/" + resource;
 		return new OadrXmppClient20b(jid, xmppConnection, domain, xmppListener);

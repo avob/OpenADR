@@ -46,17 +46,14 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.BaseUnitType;
 import com.avob.openadr.model.oadr20b.oadr.CurrencyType;
 import com.avob.openadr.model.oadr20b.oadr.FrequencyType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCanceledReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrGBItemBase;
 import com.avob.openadr.model.oadr20b.oadr.OadrLoadControlStateTypeType;
-import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayloadResourceStatusType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisteredReportType;
@@ -64,10 +61,8 @@ import com.avob.openadr.model.oadr20b.oadr.OadrReportDescriptionType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportPayloadType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrSamplingRateType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.PulseCountType;
 import com.avob.openadr.model.oadr20b.oadr.TemperatureType;
 import com.avob.openadr.model.oadr20b.oadr.ThermType;
@@ -195,25 +190,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 	private ObjectMapper jsonMapper = new ObjectMapper();
 
-	private String marshall(Object payload, boolean signed) {
-		try {
-			if (signed) {
-				return xmlSignatureService.sign(payload);
-
-			} else {
-				return jaxbContext.marshalRoot(payload);
-			}
-		} catch (Oadr20bXMLSignatureException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		} catch (Oadr20bMarshalException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-	}
-
 	/**
 	 * Register reporting capabilities
 	 * 
@@ -230,34 +206,19 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	 * @throws Oadr20bMarshalException
 	 */
 	@Transactional(readOnly = false)
-	public String oadrRegisterReport(String venID, OadrRegisterReportType payload, boolean signed) {
+	public Object oadrRegisterReport(Ven ven, OadrRegisterReportType payload) {
 
+		String venID = ven.getUsername();
 		String requestID = payload.getRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
 					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
-			OadrRegisteredReportType build = Oadr20bEiReportBuilders.newOadr20bRegisteredReportBuilder(requestID,
+			return Oadr20bEiReportBuilders.newOadr20bRegisteredReportBuilder(requestID,
 					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
-			return marshall(build, signed);
 		}
-
-		Ven ven = venService.findOneByUsername(venID);
-//		List<OtherReportCapability> findBySource = otherReportCapabilityService.findBySource(ven);
-//		List<OtherReportCapabilityDescription> findByOtherReportCapabilityIn = otherReportCapabilityDescriptionService
-//				.findByOtherReportCapabilityIn(findBySource);
-//		otherReportCapabilityDescriptionService.delete(findByOtherReportCapabilityIn);
-//		otherReportCapabilityService.delete(findBySource);
 
 		VenReportDto venReportDto = oadr20bDtoMapper.map(ven, VenReportDto.class);
 		List<VenReportCapabilityDto> capabilitiesDto = new ArrayList<>();
-		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
-			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
-
-			OadrRegisteredReportType build = Oadr20bEiReportBuilders.newOadr20bRegisteredReportBuilder(requestID,
-					Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID).build();
-			return marshall(build, signed);
-		}
 
 		int responseCode = HttpStatus.OK_200;
 
@@ -462,7 +423,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		}
 		venReportDto.setCapabilities(capabilitiesDto);
 
-		
 //		List<OtherReportCapabilityDescription> findByOtherReportCapability = otherReportCapabilityDescriptionService
 //				.findByOtherReportCapability(capabilities.get(0));
 
@@ -498,27 +458,23 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		otherReportCapabilityService.save(capabilities);
 		otherReportCapabilityDescriptionService.save(descriptions);
 
-		OadrRegisteredReportType response = Oadr20bEiReportBuilders
-				.newOadr20bRegisteredReportBuilder(requestID, responseCode, venID).build();
-
-		return marshall(response, signed);
+		return Oadr20bEiReportBuilders.newOadr20bRegisteredReportBuilder(requestID, responseCode, venID).build();
 
 	}
 
-	public String oadrRegisteredReport(String venID, OadrRegisteredReportType payload, boolean signed) {
+	public Object oadrRegisteredReport(Ven ven, OadrRegisteredReportType payload) {
+		String venID = ven.getUsername();
 		String requestID = payload.getEiResponse().getRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
 					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, venID = payload.getVenID(), venID);
-			OadrResponseType build = Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID,
+			return Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID,
 					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
-			return marshall(build, signed);
 
 		}
 
-		OadrResponseType response = Oadr20bResponseBuilders
+		return Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder(payload.getEiResponse().getRequestID(), HttpStatus.OK_200, venID).build();
-		return marshall(response, signed);
 	}
 
 	/**
@@ -593,23 +549,14 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	 * @throws Oadr20bXMLSignatureException
 	 * @throws Oadr20bMarshalException
 	 */
-	public String oadrCreateReport(String venID, OadrCreateReportType payload, boolean signed) {
+	public Object oadrCreateReport(Ven ven, OadrCreateReportType payload) {
+		String venID = ven.getUsername();
 		String requestID = payload.getRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
 					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
-			OadrCreatedReportType build = Oadr20bEiReportBuilders.newOadr20bCreatedReportBuilder(requestID,
+			return Oadr20bEiReportBuilders.newOadr20bCreatedReportBuilder(requestID,
 					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
-			return marshall(build, signed);
-		}
-		Ven ven = venService.findOneByUsername(venID);
-
-		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
-			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
-			OadrCreatedReportType build = Oadr20bEiReportBuilders.newOadr20bCreatedReportBuilder(requestID,
-					Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID).build();
-			return marshall(build, signed);
 		}
 
 		int responseCode = HttpStatus.OK_200;
@@ -669,11 +616,8 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		List<String> pendingReportRequestId = findByTarget.stream().map(SelfReportRequest::getReportRequestId)
 				.collect(Collectors.toList());
 
-		OadrCreatedReportType response = Oadr20bEiReportBuilders
-				.newOadr20bCreatedReportBuilder(requestID, responseCode, venID)
+		return Oadr20bEiReportBuilders.newOadr20bCreatedReportBuilder(requestID, responseCode, venID)
 				.addPendingReportRequestId(pendingReportRequestId).build();
-
-		return marshall(response, signed);
 
 	}
 
@@ -685,26 +629,14 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	 * @throws Oadr20bXMLSignatureException
 	 * @throws Oadr20bMarshalException
 	 */
-	public String oadrCreatedReport(String venID, OadrCreatedReportType payload, boolean signed) {
-
+	public Object oadrCreatedReport(Ven ven, OadrCreatedReportType payload) {
+		String venID = ven.getUsername();
 		EiResponseType eiResponse = payload.getEiResponse();
 		String requestID = eiResponse.getRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
 					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
-			OadrResponseType build = Oadr20bResponseBuilders
-					.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, venID).build();
-			return marshall(build, signed);
-		}
-
-		Ven ven = venService.findOneByUsername(venID);
-
-		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
-			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
-			OadrResponseType build = Oadr20bResponseBuilders
-					.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build();
-			return marshall(build, signed);
+			return Oadr20bResponseBuilders.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, venID).build();
 		}
 
 		List<OtherReportRequest> otherReportRequests = otherReportRequestService.findBySourceAndReportRequestIdIn(ven,
@@ -718,10 +650,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		otherReportRequestService.save(collect);
 
-		OadrResponseType response = Oadr20bResponseBuilders
-				.newOadr20bResponseBuilder(requestID, HttpStatus.OK_200, venID).build();
-
-		return marshall(response, signed);
+		return Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID, HttpStatus.OK_200, venID).build();
 
 	}
 
@@ -733,22 +662,14 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	 * @throws Oadr20bMarshalException
 	 * @throws Oadr20bXMLSignatureException
 	 */
-	public String oadrCancelReport(String venID, OadrCancelReportType payload, boolean signed) {
+	public Object oadrCancelReport(Ven ven, OadrCancelReportType payload) {
+		String venID = ven.getUsername();
 		String requestID = payload.getRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
 					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
-			OadrCanceledReportType build = Oadr20bEiReportBuilders.newOadr20bCanceledReportBuilder(requestID,
+			return Oadr20bEiReportBuilders.newOadr20bCanceledReportBuilder(requestID,
 					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
-			return marshall(build, signed);
-		}
-		Ven ven = venService.findOneByUsername(venID);
-		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
-			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
-			OadrCanceledReportType build = Oadr20bEiReportBuilders.newOadr20bCanceledReportBuilder(requestID,
-					Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID).build();
-			return marshall(build, signed);
 		}
 
 		List<SelfReportRequest> otherReportRequests = selfReportRequestService.findByTargetAndReportRequestId(ven,
@@ -762,11 +683,8 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 				.collect(Collectors.toList());
 
 		int responseCode = HttpStatus.OK_200;
-		OadrCanceledReportType response = Oadr20bEiReportBuilders
-				.newOadr20bCanceledReportBuilder(requestID, responseCode, venID)
+		return Oadr20bEiReportBuilders.newOadr20bCanceledReportBuilder(requestID, responseCode, venID)
 				.addPendingReportRequestId(pendingReportIds).build();
-
-		return marshall(response, signed);
 
 	}
 
@@ -795,27 +713,17 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	 * @throws Oadr20bXMLSignatureException
 	 * @throws Oadr20bMarshalException
 	 */
-	public String oadrUpdateReport(String venID, OadrUpdateReportType payload, boolean signed) {
-
+	public Object oadrUpdateReport(Ven ven, OadrUpdateReportType payload) {
+		String venID = ven.getUsername();
 		String requestID = payload.getRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
 					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
-			OadrUpdatedReportType build = Oadr20bEiReportBuilders.newOadr20bUpdatedReportBuilder(requestID,
+			return Oadr20bEiReportBuilders.newOadr20bUpdatedReportBuilder(requestID,
 					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
-			return marshall(build, signed);
 		}
-		Ven ven = venService.findOneByUsername(venID);
 
 		Long now = System.currentTimeMillis();
-
-		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
-			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
-			OadrUpdatedReportType build = Oadr20bEiReportBuilders.newOadr20bUpdatedReportBuilder(requestID,
-					Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID).build();
-			return marshall(build, signed);
-		}
 
 		int responseCode = HttpStatus.OK_200;
 
@@ -1050,10 +958,8 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		venService.save(ven);
 
-		OadrUpdatedReportType response = Oadr20bEiReportBuilders
-				.newOadr20bUpdatedReportBuilder(requestID, responseCode, venID).build();
+		return Oadr20bEiReportBuilders.newOadr20bUpdatedReportBuilder(requestID, responseCode, venID).build();
 
-		return marshall(response, signed);
 	}
 
 	public void distributeSubscriptionOadrCreatedReportPayload(Ven ven) throws Oadr20bApplicationLayerException {
@@ -1286,177 +1192,89 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		venDistributeService.distribute(ven, build);
 	}
 
-	private String handle(String username, OadrPayload oadrPayload) {
-
-		if (oadrPayload.getOadrSignedObject().getOadrCancelReport() != null) {
-
-			LOGGER.info(username + " - OadrCancelReport signed");
-
-			return handle(username, oadrPayload.getOadrSignedObject().getOadrCancelReport(), true);
-
-		} else if (oadrPayload.getOadrSignedObject().getOadrCreateReport() != null) {
-
-			LOGGER.info(username + " - OadrCreateReport signed");
-
-			return handle(username, oadrPayload.getOadrSignedObject().getOadrCreateReport(), true);
-
-		} else if (oadrPayload.getOadrSignedObject().getOadrCreatedReport() != null) {
-
-			LOGGER.info(username + " - OadrCreatedReport signed");
-
-			return handle(username, oadrPayload.getOadrSignedObject().getOadrCreatedReport(), true);
-
-		} else if (oadrPayload.getOadrSignedObject().getOadrUpdateReport() != null) {
-
-			LOGGER.info(username + " - OadrUpdateReport signed");
-
-			return handle(username, oadrPayload.getOadrSignedObject().getOadrUpdateReport(), true);
-
-		} else if (oadrPayload.getOadrSignedObject().getOadrRegisterReport() != null) {
-
-			LOGGER.info(username + " - OadrRegisterReport signed");
-
-			return handle(username, oadrPayload.getOadrSignedObject().getOadrRegisterReport(), true);
-
-		} else if (oadrPayload.getOadrSignedObject().getOadrRegisteredReport() != null) {
-
-			LOGGER.info(username + " - OadrRegisteredReport signed");
-
-			return handle(username, oadrPayload.getOadrSignedObject().getOadrRegisteredReport(), true);
-
-		}
-
-		Ven findOneByUsername = venService.findOneByUsername(username);
-		boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
-				? findOneByUsername.getXmlSignature()
-				: false;
-		OadrResponseType response = Oadr20bResponseBuilders
-				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, username)
-				.withDescription("Unknown payload type for service: " + this.getServiceName()).build();
-		return marshall(response, signed);
+	private Object handle(Ven ven, OadrRegisterReportType oadrRegisterReport) {
+		return this.oadrRegisterReport(ven, oadrRegisterReport);
 	}
 
-	private String handle(String username, OadrRegisterReportType oadrRegisterReport, boolean signed) {
-		return this.oadrRegisterReport(username, oadrRegisterReport, signed);
+	private Object handle(Ven ven, OadrRegisteredReportType oadrRegisteredReport) {
+		return this.oadrRegisteredReport(ven, oadrRegisteredReport);
 	}
 
-	private String handle(String username, OadrRegisteredReportType oadrRegisteredReport, boolean signed) {
-		return this.oadrRegisteredReport(username, oadrRegisteredReport, signed);
+	private Object handle(Ven ven, OadrUpdateReportType oadrUpdateReport) {
+		return this.oadrUpdateReport(ven, oadrUpdateReport);
 	}
 
-	private String handle(String username, OadrUpdateReportType oadrUpdateReport, boolean signed) {
-		return this.oadrUpdateReport(username, oadrUpdateReport, signed);
-	}
-
-	private String handle(String username, OadrCreatedReportType oadrCreatedReport, boolean signed) {
-		return this.oadrCreatedReport(username, oadrCreatedReport, signed);
+	private Object handle(Ven ven, OadrCreatedReportType oadrCreatedReport) {
+		return this.oadrCreatedReport(ven, oadrCreatedReport);
 
 	}
 
-	private String handle(String username, OadrCreateReportType oadrCreateReport, boolean signed) {
-		return this.oadrCreateReport(username, oadrCreateReport, signed);
+	private Object handle(Ven ven, OadrCreateReportType oadrCreateReport) {
+		return this.oadrCreateReport(ven, oadrCreateReport);
 
 	}
 
-	private String handle(String username, OadrCancelReportType oadrCancelReport, boolean signed) {
-		return this.oadrCancelReport(username, oadrCancelReport, signed);
+	private Object handle(Ven ven, OadrCancelReportType oadrCancelReport) {
+		return this.oadrCancelReport(ven, oadrCancelReport);
 
 	}
 
 	@Override
-	public String request(String username, String payload) {
+	public Object request(Ven ven, Object payload) {
 
-		Object unmarshal;
+		if (payload instanceof OadrRegisterReportType) {
 
-		try {
-			unmarshal = jaxbContext.unmarshal(payload, vtnConfig.getValidateOadrPayloadAgainstXsd());
-		} catch (Oadr20bUnmarshalException e) {
-			Ven findOneByUsername = venService.findOneByUsername(username);
-			boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
-					? findOneByUsername.getXmlSignature()
-					: false;
-			OadrResponseType response = Oadr20bResponseBuilders
-					.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, username)
-					.withDescription("Can't unmarshall payload").build();
-			return marshall(response, signed);
-		}
+			LOGGER.info(ven + " - OadrRegisterReport");
 
-		if (unmarshal instanceof OadrPayload) {
+			OadrRegisterReportType obj = (OadrRegisterReportType) payload;
 
-			OadrPayload obj = (OadrPayload) unmarshal;
+			return handle(ven, obj);
 
-			try {
-				xmlSignatureService.validate(payload, obj);
-			} catch (Oadr20bXMLSignatureValidationException e) {
-				Ven findOneByUsername = venService.findOneByUsername(username);
-				boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
-						? findOneByUsername.getXmlSignature()
-						: false;
-				OadrResponseType response = Oadr20bResponseBuilders
-						.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.INVALID_DATA_454, username)
-						.withDescription("Can't validate payload xml signature").build();
-				return marshall(response, signed);
-			}
+		} else if (payload instanceof OadrRegisteredReportType) {
 
-			return handle(username, obj);
+			LOGGER.info(ven + " - OadrRegisteredReport");
 
-		} else if (unmarshal instanceof OadrRegisterReportType) {
+			OadrRegisteredReportType obj = (OadrRegisteredReportType) payload;
 
-			LOGGER.info(username + " - OadrRegisterReport");
+			return handle(ven, obj);
 
-			OadrRegisterReportType obj = (OadrRegisterReportType) unmarshal;
+		} else if (payload instanceof OadrUpdateReportType) {
 
-			return handle(username, obj, false);
+			LOGGER.info(ven + " - OadrUpdateReport");
 
-		} else if (unmarshal instanceof OadrRegisteredReportType) {
+			OadrUpdateReportType obj = (OadrUpdateReportType) payload;
 
-			LOGGER.info(username + " - OadrRegisteredReport");
+			return handle(ven, obj);
 
-			OadrRegisteredReportType obj = (OadrRegisteredReportType) unmarshal;
+		} else if (payload instanceof OadrCreatedReportType) {
 
-			return handle(username, obj, false);
+			LOGGER.info(ven + " - OadrCreatedReport");
 
-		} else if (unmarshal instanceof OadrUpdateReportType) {
+			OadrCreatedReportType obj = (OadrCreatedReportType) payload;
 
-			LOGGER.info(username + " - OadrUpdateReport");
+			return handle(ven, obj);
 
-			OadrUpdateReportType obj = (OadrUpdateReportType) unmarshal;
+		} else if (payload instanceof OadrCreateReportType) {
 
-			return handle(username, obj, false);
+			LOGGER.info(ven + " - OadrCreateReport");
 
-		} else if (unmarshal instanceof OadrCreatedReportType) {
+			OadrCreateReportType obj = (OadrCreateReportType) payload;
 
-			LOGGER.info(username + " - OadrCreatedReport");
+			return handle(ven, obj);
 
-			OadrCreatedReportType obj = (OadrCreatedReportType) unmarshal;
+		} else if (payload instanceof OadrCancelReportType) {
 
-			return handle(username, obj, false);
+			LOGGER.info(ven + " - OadrCancelReport");
 
-		} else if (unmarshal instanceof OadrCreateReportType) {
+			OadrCancelReportType obj = (OadrCancelReportType) payload;
 
-			LOGGER.info(username + " - OadrCreateReport");
-
-			OadrCreateReportType obj = (OadrCreateReportType) unmarshal;
-
-			return handle(username, obj, false);
-
-		} else if (unmarshal instanceof OadrCancelReportType) {
-
-			LOGGER.info(username + " - OadrCancelReport");
-
-			OadrCancelReportType obj = (OadrCancelReportType) unmarshal;
-
-			return handle(username, obj, false);
+			return handle(ven, obj);
 
 		} else {
-			Ven findOneByUsername = venService.findOneByUsername(username);
-			boolean signed = (findOneByUsername != null && findOneByUsername.getXmlSignature() != null)
-					? findOneByUsername.getXmlSignature()
-					: false;
-			OadrResponseType response = Oadr20bResponseBuilders
-					.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, username)
+			return Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453,
+							ven.getUsername())
 					.withDescription("Unknown payload type for service: " + this.getServiceName()).build();
-			return marshall(response, signed);
 		}
 
 	}

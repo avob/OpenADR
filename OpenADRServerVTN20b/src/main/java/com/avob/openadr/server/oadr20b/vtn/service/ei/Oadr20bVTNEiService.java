@@ -1,8 +1,10 @@
 package com.avob.openadr.server.oadr20b.vtn.service.ei;
 
+import com.avob.openadr.server.common.vtn.models.ven.Ven;
+
 public interface Oadr20bVTNEiService {
 
-	public String request(String username, String payload);
+	public Object request(Ven ven, Object payload);
 
 	public String getServiceName();
 

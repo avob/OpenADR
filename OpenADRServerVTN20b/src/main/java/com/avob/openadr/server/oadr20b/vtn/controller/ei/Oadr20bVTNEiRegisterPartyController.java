@@ -12,21 +12,21 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
-import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiRegisterPartyService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNPayloadService;
 
 @Controller
 @RequestMapping(Oadr20bUrlPath.OADR_BASE_PATH)
 public class Oadr20bVTNEiRegisterPartyController {
 
 	@Resource
-	private Oadr20bVTNEiRegisterPartyService oadr20bVTNEiRegisterPartyService;
+	private Oadr20bVTNPayloadService oadr20bVTNPayloadService;
 
 	@PreAuthorize("hasRole('ROLE_VEN')")
 	@RequestMapping(value = Oadr20bUrlPath.EI_REGISTER_PARTY_SERVICE, method = RequestMethod.POST)
 	@ResponseBody
 	public String request(@RequestBody String payload, Principal principal) {
 
-		return oadr20bVTNEiRegisterPartyService.request(principal.getName(), payload);
+		return oadr20bVTNPayloadService.registerParty(principal.getName(), payload);
 
 	}
 
