@@ -150,6 +150,28 @@ public class Oadr20bRegisterReportTest {
 				.addReportDescription(Oadr20bEiReportBuilders
 						.newOadr20bOadrReportDescriptionBuilder("rid", ReportEnumeratedType.READING,
 								ReadingTypeEnumeratedType.DIRECT_READ)
+						.withCurrencyBase(CurrencyItemDescriptionType.CURRENCY_PER_K_WH,
+								ISO3AlphaCurrencyCodeContentType.EUR, SiScaleCodeType.NONE)
+						.withSubject(Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder()
+								.addEndDeviceAsset(Arrays.asList(Oadr20bFactory
+										.createEndDeviceAssetType(EndDeviceAssertMridType.BASEBOARD_HEATER)))
+								.build())
+						.withDataSource(Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addResourceId("res1").build())
+						.withOadrSamplingRate("PT15M", "PT1H", false).build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder("rid", ReportEnumeratedType.READING,
+								ReadingTypeEnumeratedType.DIRECT_READ)
+						.withCurrencyBase(CurrencyItemDescriptionType.CURRENCY_PER_KW,
+								ISO3AlphaCurrencyCodeContentType.EUR, SiScaleCodeType.NONE)
+						.withSubject(Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder()
+								.addEndDeviceAsset(Arrays.asList(Oadr20bFactory
+										.createEndDeviceAssetType(EndDeviceAssertMridType.BASEBOARD_HEATER)))
+								.build())
+						.withDataSource(Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addResourceId("res1").build())
+						.withOadrSamplingRate("PT15M", "PT1H", false).build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder("rid", ReportEnumeratedType.READING,
+								ReadingTypeEnumeratedType.DIRECT_READ)
 						.withEnergyApparentBase(SiScaleCodeType.CENTI).withOadrSamplingRate("PT15M", "PT1H", false)
 						.build())
 				.addReportDescription(Oadr20bEiReportBuilders

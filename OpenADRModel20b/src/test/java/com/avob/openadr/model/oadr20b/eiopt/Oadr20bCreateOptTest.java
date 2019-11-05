@@ -100,6 +100,7 @@ public class Oadr20bCreateOptTest {
 
 	}
 
+	@Test
 	public void validCreateEventOpt() throws Oadr20bMarshalException {
 		String requestId = "requestId";
 		String optId = "optId";
@@ -121,6 +122,7 @@ public class Oadr20bCreateOptTest {
 		jaxbContext.marshalRoot(request);
 	}
 
+	@Test
 	public void validCreateVavailabilyOpt() throws Oadr20bMarshalException {
 		String requestId = "requestId";
 		String optId = "optId";

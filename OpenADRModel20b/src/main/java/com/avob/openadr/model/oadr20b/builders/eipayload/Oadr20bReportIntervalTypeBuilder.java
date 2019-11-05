@@ -29,10 +29,8 @@ public class Oadr20bReportIntervalTypeBuilder {
 
 	public <T> Oadr20bReportIntervalTypeBuilder(String intervalId, Long start, String xmlDuration, String rid,
 			Long confidence, Float accuracy, PayloadKeyTokenType tokens) {
-
 		interval = Oadr20bFactory.createKeyTokenReportIntervalType(intervalId, start, xmlDuration, rid, confidence,
 				accuracy, tokens);
-
 	}
 
 	public Oadr20bReportIntervalTypeBuilder(String intervalId, Long start, String xmlDuration, String rid,

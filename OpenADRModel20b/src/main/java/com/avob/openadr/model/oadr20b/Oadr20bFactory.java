@@ -334,56 +334,12 @@ public class Oadr20bFactory {
 	}
 
 	public static <T> T getSignedObjectFromOadrPayload(OadrPayload payload, Class<T> klass) {
-		OadrSignedObject createOadrSignedObject = payload.getOadrSignedObject();
-
-		if (klass.equals(OadrDistributeEventType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrDistributeEvent());
-		} else if (klass.equals(OadrCreatedEventType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrCreatedEvent());
-		} else if (klass.equals(OadrRequestEventType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrRequestEvent());
-		} else if (klass.equals(OadrResponseType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrResponse());
-		} else if (klass.equals(OadrCancelOptType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrCancelOpt());
-		} else if (klass.equals(OadrCanceledOptType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrCanceledOpt());
-		} else if (klass.equals(OadrCreateOptType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrCreateOpt());
-		} else if (klass.equals(OadrCreatedOptType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrCreatedOpt());
-		} else if (klass.equals(OadrCancelReportType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrCancelReport());
-		} else if (klass.equals(OadrCanceledReportType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrCanceledReport());
-		} else if (klass.equals(OadrCreateReportType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrCreateReport());
-		} else if (klass.equals(OadrCreatedReportType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrCreatedReport());
-		} else if (klass.equals(OadrRegisterReportType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrRegisterReport());
-		} else if (klass.equals(OadrRegisteredReportType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrRegisteredReport());
-		} else if (klass.equals(OadrUpdateReportType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrUpdateReport());
-		} else if (klass.equals(OadrUpdatedReportType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrUpdatedReport());
-		} else if (klass.equals(OadrCancelPartyRegistrationType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrCancelPartyRegistration());
-		} else if (klass.equals(OadrCanceledPartyRegistrationType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrCanceledPartyRegistration());
-		} else if (klass.equals(OadrCreatePartyRegistrationType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrCreatePartyRegistration());
-		} else if (klass.equals(OadrCreatedPartyRegistrationType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrCreatedPartyRegistration());
-		} else if (klass.equals(OadrRequestReregistrationType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrRequestReregistration());
-		} else if (klass.equals(OadrQueryRegistrationType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrQueryRegistration());
-		} else if (klass.equals(OadrPollType.class)) {
-			return klass.cast(createOadrSignedObject.getOadrPoll());
+		Object signedObjectFromOadrPayload = getSignedObjectFromOadrPayload(payload);
+		if (signedObjectFromOadrPayload == null || !klass.equals(signedObjectFromOadrPayload.getClass())) {
+			return null;
 		}
-		return null;
+		return klass.cast(signedObjectFromOadrPayload);
+
 	}
 
 	public static Object getSignedObjectFromOadrPayload(OadrPayload payload) {

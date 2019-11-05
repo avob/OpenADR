@@ -4,7 +4,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
@@ -12,6 +14,8 @@ import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.avob.KeyTokenType;
+import com.avob.openadr.model.oadr20b.avob.PayloadKeyTokenType;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiOptBuilders;
@@ -48,7 +52,10 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
+import com.avob.openadr.model.oadr20b.oadr.OadrLoadControlStateType;
+import com.avob.openadr.model.oadr20b.oadr.OadrLoadControlStateTypeType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
+import com.avob.openadr.model.oadr20b.oadr.OadrPayloadResourceStatusType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
@@ -418,7 +425,7 @@ public class OadrXMLSignatureHandlerTest {
 	}
 
 	@Test
-	public void testOadrUpdateReportType()
+	public void testOadrUpdateReportTypeFloatPayload()
 			throws Oadr20bXMLSignatureException, Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {
 
 		String intervalId = "intervalId";
@@ -427,6 +434,83 @@ public class OadrXMLSignatureHandlerTest {
 		Float value = 3f;
 		Long confidence = 1L;
 		Float accuracy = 1F;
+		IntervalType interval = Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration,
+				RID_ID, confidence, accuracy, value).build();
+
+		ReportNameEnumeratedType reportName = ReportNameEnumeratedType.TELEMETRY_STATUS;
+		long createdTimestamp = 12L;
+		long startTimestamp = 12L;
+		String duration = "PT1H";
+		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(REPORT_ID,
+				REPORT_REQUEST_ID, REPORT_SPECIFIER_ID, reportName, createdTimestamp, startTimestamp, duration)
+				.addInterval(interval).build();
+
+		String requestId = "requestId";
+		String venId = VEN_ID;
+		OadrUpdateReportType request = Oadr20bEiReportBuilders.newOadr20bUpdateReportBuilder(requestId, venId)
+				.addReport(report).build();
+		validate(OadrXMLSignatureHandler.sign(request, privateKey, certificate, NONCE, 0L));
+	}
+
+	@Test
+	public void testOadrUpdateReportTypeKeyTokenPayload()
+			throws Oadr20bXMLSignatureException, Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {
+
+		String intervalId = "intervalId";
+		long start = 3L;
+		String xmlDuration = "PT1H";
+		Long confidence = 1L;
+		Float accuracy = 1F;
+
+		List<KeyTokenType> tokens = new ArrayList<>();
+		KeyTokenType keyTokenType = new KeyTokenType();
+		keyTokenType.setKey("mouaiccool");
+		keyTokenType.setValue("mouaiccool");
+		tokens.add(keyTokenType);
+		PayloadKeyTokenType value = Oadr20bFactory.createPayloadKeyTokenType(tokens);
+		IntervalType interval = Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration,
+				RID_ID, confidence, accuracy, value).build();
+
+		ReportNameEnumeratedType reportName = ReportNameEnumeratedType.TELEMETRY_STATUS;
+		long createdTimestamp = 12L;
+		long startTimestamp = 12L;
+		String duration = "PT1H";
+		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(REPORT_ID,
+				REPORT_REQUEST_ID, REPORT_SPECIFIER_ID, reportName, createdTimestamp, startTimestamp, duration)
+				.addInterval(interval).build();
+
+		String requestId = "requestId";
+		String venId = VEN_ID;
+		OadrUpdateReportType request = Oadr20bEiReportBuilders.newOadr20bUpdateReportBuilder(requestId, venId)
+				.addReport(report).build();
+		validate(OadrXMLSignatureHandler.sign(request, privateKey, certificate, NONCE, 0L));
+	}
+
+	@Test
+	public void testOadrUpdateReportTypeResourceStatusPayload()
+			throws Oadr20bXMLSignatureException, Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {
+
+		String intervalId = "intervalId";
+		long start = 3L;
+		String xmlDuration = "PT1H";
+		Long confidence = 1L;
+		Float accuracy = 1F;
+
+		List<KeyTokenType> tokens = new ArrayList<>();
+		KeyTokenType keyTokenType = new KeyTokenType();
+		keyTokenType.setKey("mouaiccool");
+		keyTokenType.setValue("mouaiccool");
+		tokens.add(keyTokenType);
+		OadrLoadControlStateTypeType capacity = Oadr20bFactory.createOadrLoadControlStateTypeType(0F, 0F, 0F, 0F);
+		OadrLoadControlStateTypeType levelOffset = Oadr20bFactory.createOadrLoadControlStateTypeType(0F, 0F, 0F, 0F);
+		OadrLoadControlStateTypeType percentOffset = Oadr20bFactory.createOadrLoadControlStateTypeType(0F, 0F, 0F, 0F);
+		OadrLoadControlStateTypeType setPoint = Oadr20bFactory.createOadrLoadControlStateTypeType(0F, 0F, 0F, 0F);
+		OadrLoadControlStateType loadControlState = Oadr20bFactory.createOadrLoadControlStateType(capacity, levelOffset,
+				percentOffset, setPoint);
+		boolean manualOverride = true;
+		boolean online = true;
+		OadrPayloadResourceStatusType value = Oadr20bFactory.createOadrPayloadResourceStatusType(loadControlState,
+				manualOverride, online);
 		IntervalType interval = Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration,
 				RID_ID, confidence, accuracy, value).build();
 

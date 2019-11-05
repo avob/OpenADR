@@ -25,8 +25,6 @@ public class Oadr20bEiBuilders {
 
 	public static Oadr20bReportIntervalTypeBuilder newOadr20bReportIntervalTypeBuilder(String intervalId, Long start,
 			String xmlDuration, String rid, Long confidence, Float accuracy, PayloadKeyTokenType tokens) {
-		
-		
 		return new Oadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration, rid, confidence, accuracy, tokens);
 	}
 
