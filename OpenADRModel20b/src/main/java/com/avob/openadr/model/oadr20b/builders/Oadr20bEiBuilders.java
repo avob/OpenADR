@@ -1,13 +1,10 @@
 package com.avob.openadr.model.oadr20b.builders;
 
-import javax.xml.bind.JAXBElement;
-
 import com.avob.openadr.model.oadr20b.avob.PayloadAvobVenServiceRequestType;
 import com.avob.openadr.model.oadr20b.avob.PayloadKeyTokenType;
 import com.avob.openadr.model.oadr20b.builders.eipayload.Oadr20bEiTargetTypeBuilder;
 import com.avob.openadr.model.oadr20b.builders.eipayload.Oadr20bReportIntervalTypeBuilder;
 import com.avob.openadr.model.oadr20b.builders.eipayload.Oadr20bSignalIntervalTypeBuilder;
-import com.avob.openadr.model.oadr20b.ei.PayloadBaseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayloadResourceStatusType;
 
 public class Oadr20bEiBuilders {
@@ -45,10 +42,4 @@ public class Oadr20bEiBuilders {
 		return new Oadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration, rid, confidence, accuracy, value);
 	}
 
-	public static Oadr20bReportIntervalTypeBuilder newOadr20bReportIntervalTypeBuilder(String intervalId, Long start,
-			String xmlDuration, String rid, Long confidence, Float accuracy,
-			JAXBElement<? extends PayloadBaseType> payloadBase) {
-		return new Oadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration, rid, confidence, accuracy,
-				payloadBase);
-	}
 }
