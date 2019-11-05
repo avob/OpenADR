@@ -41,6 +41,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
+import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bPushService;
 
 @Service
@@ -59,6 +60,9 @@ public class OadrMockEiHttpMvc {
 	@Resource
 	private Oadr20bPushService oadr20bPushService;
 
+	@Resource
+	private XmlSignatureService xmlSignatureService;
+
 	private List<InvocationOnMock> response = new ArrayList<>();
 
 	@PostConstruct
@@ -66,11 +70,9 @@ public class OadrMockEiHttpMvc {
 		jaxbContext = Oadr20bJAXBContext.getInstance();
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilters(springSecurityFilterChain).build();
 
-//		OadrHttpVtnClient20b unsecure = Mockito.mock(OadrHttpVtnClient20b.class);
-		OadrHttpVtnClient20b secure = Mockito.mock(OadrHttpVtnClient20b.class);
-		oadr20bPushService.setOadrHttpVtnClient20b(secure);
-		oadr20bPushService.setSecuredOadrHttpVtnClient20b(secure);
-
+		OadrHttpVtnClient20b unsecure = Mockito.mock(OadrHttpVtnClient20b.class);
+		oadr20bPushService.setOadrHttpVtnClient20b(unsecure);
+		oadr20bPushService.setSecuredOadrHttpVtnClient20b(unsecure);
 		Mockito.doAnswer((Answer<?>) new Answer<Object>() {
 			@Override
 			public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -83,7 +85,7 @@ public class OadrMockEiHttpMvc {
 						.build();
 				return build;
 			}
-		}).when(secure).oadrCancelPartyRegistrationType(Mockito.any(String.class),
+		}).when(unsecure).oadrCancelPartyRegistrationType(Mockito.any(String.class),
 				Mockito.any(OadrCancelPartyRegistrationType.class));
 
 		Mockito.doAnswer((Answer<?>) invocation -> {
@@ -92,7 +94,7 @@ public class OadrMockEiHttpMvc {
 			return Oadr20bEiReportBuilders
 					.newOadr20bCanceledReportBuilder(argument.getRequestID(), HttpStatus.OK_200, argument.getVenID())
 					.build();
-		}).when(secure).oadrCancelReport(Mockito.any(String.class), Mockito.any(OadrCancelReportType.class));
+		}).when(unsecure).oadrCancelReport(Mockito.any(String.class), Mockito.any(OadrCancelReportType.class));
 
 		Mockito.doAnswer((Answer<?>) invocation -> {
 			response.add(0, invocation);
@@ -100,7 +102,7 @@ public class OadrMockEiHttpMvc {
 			return Oadr20bEiReportBuilders
 					.newOadr20bCreatedReportBuilder(argument.getRequestID(), HttpStatus.OK_200, argument.getVenID())
 					.build();
-		}).when(secure).oadrCreateReport(Mockito.any(String.class), Mockito.any(OadrCreateReportType.class));
+		}).when(unsecure).oadrCreateReport(Mockito.any(String.class), Mockito.any(OadrCreateReportType.class));
 
 		Mockito.doAnswer((Answer<?>) invocation -> {
 			response.add(0, invocation);
@@ -111,7 +113,7 @@ public class OadrMockEiHttpMvc {
 									.newOadr20bEiResponseBuilder(argument.getRequestID(), HttpStatus.OK_200).build(),
 							argument.getVtnID())
 					.build();
-		}).when(secure).oadrDistributeEvent(Mockito.any(String.class), Mockito.any(OadrDistributeEventType.class));
+		}).when(unsecure).oadrDistributeEvent(Mockito.any(String.class), Mockito.any(OadrDistributeEventType.class));
 
 		Mockito.doAnswer((Answer<?>) invocation -> {
 			response.add(0, invocation);
@@ -119,7 +121,7 @@ public class OadrMockEiHttpMvc {
 			return Oadr20bEiReportBuilders
 					.newOadr20bRegisteredReportBuilder(argument.getRequestID(), HttpStatus.OK_200, argument.getVenID())
 					.build();
-		}).when(secure).oadrRegisterReport(Mockito.any(String.class), Mockito.any(OadrRegisterReportType.class));
+		}).when(unsecure).oadrRegisterReport(Mockito.any(String.class), Mockito.any(OadrRegisterReportType.class));
 
 		Mockito.doAnswer((Answer<?>) invocation -> {
 			response.add(0, invocation);
@@ -127,7 +129,7 @@ public class OadrMockEiHttpMvc {
 			return Oadr20bResponseBuilders.newOadr20bResponseBuilder(
 					Oadr20bResponseBuilders.newOadr20bEiResponseBuilder("", HttpStatus.OK_200).build(),
 					argument.getVenID()).build();
-		}).when(secure).oadrRequestReregistrationType(Mockito.any(String.class),
+		}).when(unsecure).oadrRequestReregistrationType(Mockito.any(String.class),
 				Mockito.any(OadrRequestReregistrationType.class));
 
 		Mockito.doAnswer((Answer<?>) invocation -> {
@@ -136,7 +138,7 @@ public class OadrMockEiHttpMvc {
 			return Oadr20bEiReportBuilders
 					.newOadr20bUpdatedReportBuilder(argument.getRequestID(), HttpStatus.OK_200, argument.getVenID())
 					.build();
-		}).when(secure).oadrUpdateReport(Mockito.any(String.class), Mockito.any(OadrUpdateReportType.class));
+		}).when(unsecure).oadrUpdateReport(Mockito.any(String.class), Mockito.any(OadrUpdateReportType.class));
 
 	}
 

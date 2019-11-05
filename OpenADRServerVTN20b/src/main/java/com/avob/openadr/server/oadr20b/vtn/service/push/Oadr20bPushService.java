@@ -41,7 +41,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
-import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
@@ -191,13 +190,6 @@ public class Oadr20bPushService {
 					oadr20bVTNEiRegisterPartyService.oadrCanceledPartyRegistrationType(
 							oadrCancelPartyRegistrationType.getVenID(), oadrCancelPartyRegistrationType,
 							xmlSignatureRequired);
-					// remove ven registration
-//					oadr20bVTNEiRegisterPartyService.oadrCancelPartyRegistrationType(val, xmlSignatureRequired);
-//					Ven findOneByUsername = venService.findOneByUsername(oadrCancelPartyRegistrationType.getVenID());
-//
-//					if (findOneByUsername != null) {
-//						venService.cleanRegistration(findOneByUsername);
-//					}
 
 				} else if (payload instanceof OadrRequestReregistrationType) {
 					OadrRequestReregistrationType val = (OadrRequestReregistrationType) payload;

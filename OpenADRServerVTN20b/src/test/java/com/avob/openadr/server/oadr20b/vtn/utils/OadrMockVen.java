@@ -188,12 +188,8 @@ public class OadrMockVen {
 			InvocationOnMock invocationOnMock = popResponse.get();
 			String from = (String) invocationOnMock.getArgument(0);
 			assertEquals(this.getVen().getPushUrl(), from);
-			if (ven.getXmlSignature()) {
-				OadrPayload unmarshal = (OadrPayload) invocationOnMock.getArgument(1);
-				return Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, klass);
-			} else {
-				return klass.cast(invocationOnMock.getArgument(1));
-			}
+			assertEquals(klass, invocationOnMock.getArgument(1).getClass());
+			return klass.cast(invocationOnMock.getArgument(1));
 		} else if (OadrTransportType.XMPP.value().equals(ven.getTransport())) {
 			Optional<InvocationOnMock> popResponse = oadrMockEiXmpp.popResponse();
 			if (klass == null && popResponse.isPresent()) {
