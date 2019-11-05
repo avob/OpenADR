@@ -16,6 +16,7 @@ import org.junit.Test;
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
@@ -57,7 +58,8 @@ public class Oadr20bCreatedPartyRegistrationTest {
 		extension.getOadrInfo().add(info);
 		oadrExtensions.getOadrExtension().add(extension);
 		OadrCreatedPartyRegistrationType request = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCreatedPartyRegistrationBuilder(requestId, responseCode, venId, vtnId)
+				.newOadr20bCreatedPartyRegistrationBuilder(
+						Oadr20bResponseBuilders.newOadr20bEiResponseBuilder(requestId, responseCode).build(), venId, vtnId)
 				.addOadrProfile(Oadr20bEiRegisterPartyBuilders.newOadr20bOadrProfileBuilder("2.0b")
 						.addTransport(OadrTransportType.SIMPLE_HTTP).build())
 				.addOadrProfile(Lists.newArrayList(Oadr20bEiRegisterPartyBuilders.newOadr20bOadrProfileBuilder("2.0b")

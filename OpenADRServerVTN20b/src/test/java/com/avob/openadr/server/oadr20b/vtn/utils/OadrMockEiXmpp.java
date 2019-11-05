@@ -21,10 +21,10 @@ import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20b;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiOptService;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiRegisterPartyService;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiEventService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiOptService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiRegisterPartyService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiReportService;
 import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppConnector;
 import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppListener;
 

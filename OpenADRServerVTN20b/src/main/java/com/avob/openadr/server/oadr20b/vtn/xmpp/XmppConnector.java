@@ -14,11 +14,11 @@ import org.springframework.stereotype.Service;
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20b;
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiOptService;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiRegisterPartyService;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiEventService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiOptService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiRegisterPartyService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiReportService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiService;
 
 @Service
 public class XmppConnector {

@@ -336,10 +336,9 @@ public class Oadr20bVENEiEventService {
 		removeAll(vtnConfiguration, findMissingEventID);
 
 		if (!eventResponses.isEmpty()) {
-			OadrCreatedEventType build = Oadr20bEiEventBuilders
-					.newCreatedEventBuilder(vtnConfiguration.getVenSessionConfig().getVenId(), vtnRequestID,
-							responseCode)
-					.addEventResponse(eventResponses).build();
+			OadrCreatedEventType build = Oadr20bEiEventBuilders.newCreatedEventBuilder(
+					Oadr20bResponseBuilders.newOadr20bEiResponseBuilder(vtnRequestID, responseCode).build(),
+					vtnConfiguration.getVenSessionConfig().getVenId()).addEventResponse(eventResponses).build();
 
 			if (vtnConfiguration.getVtnUrl() != null) {
 

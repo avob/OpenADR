@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20b;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiService;
 
 public class XmppListener implements StanzaListener {
 

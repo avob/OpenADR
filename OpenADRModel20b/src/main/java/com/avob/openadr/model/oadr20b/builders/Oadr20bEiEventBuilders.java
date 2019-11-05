@@ -8,6 +8,7 @@ import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bEiActivePeriodType
 import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bEiEventSignalTypeBuilder;
 import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bEventDescriptorTypeBuilder;
 import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bRequestEventBuilder;
+import com.avob.openadr.model.oadr20b.ei.EiResponseType;
 import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.ei.SchemaVersionEnumeratedType;
@@ -19,8 +20,8 @@ public class Oadr20bEiEventBuilders {
 	private Oadr20bEiEventBuilders() {
 	}
 
-	public static Oadr20bCreatedEventBuilder newCreatedEventBuilder(String venId, String requestId, int responseCode) {
-		return new Oadr20bCreatedEventBuilder(venId, requestId, responseCode)
+	public static Oadr20bCreatedEventBuilder newCreatedEventBuilder(EiResponseType eiresponse, String venId) {
+		return new Oadr20bCreatedEventBuilder(eiresponse, venId)
 				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
 	}
 

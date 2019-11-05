@@ -1,4 +1,4 @@
-package com.avob.openadr.server.oadr20b.vtn.service;
+package com.avob.openadr.server.oadr20b.vtn.service.ei;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,6 +59,7 @@ import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenRequestCountService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.converter.OptConverter;
+import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 
 @Service
 public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
@@ -144,8 +145,7 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 		if (!venID.equals(event.getEiCreatedEvent().getVenID())) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
 					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, venID,
-							event.getEiCreatedEvent().getVenID())
-					.build();
+							event.getEiCreatedEvent().getVenID());
 			OadrResponseType build = Oadr20bResponseBuilders
 					.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, venID).build();
 			return marshall(build, signed);
@@ -155,7 +155,7 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
 			OadrResponseType build = Oadr20bResponseBuilders
 					.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build();
 			return marshall(build, signed);
@@ -185,8 +185,7 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 		if (!event.getEiRequestEvent().getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
 					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, event.getEiRequestEvent().getVenID(),
-							venID)
-					.build();
+							venID);
 			OadrDistributeEventType build = Oadr20bEiEventBuilders
 					.newOadr20bDistributeEventBuilder(vtnConfig.getVtnId(), requestID)
 					.withEiResponse(mismatchCredentialsVenIdResponse).build();
@@ -199,7 +198,7 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
 			OadrDistributeEventType build = Oadr20bEiEventBuilders
 					.newOadr20bDistributeEventBuilder(vtnConfig.getVtnId(), requestID)
 					.withEiResponse(xmlSignatureRequiredButAbsent).build();

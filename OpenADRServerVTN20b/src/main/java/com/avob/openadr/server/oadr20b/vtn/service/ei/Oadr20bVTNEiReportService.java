@@ -1,4 +1,4 @@
-package com.avob.openadr.server.oadr20b.vtn.service;
+package com.avob.openadr.server.oadr20b.vtn.service.ei;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,6 +111,8 @@ import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportR
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifier;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierDao;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.SelfReportRequest;
+import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
+import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.service.dtomapper.Oadr20bDtoMapper;
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bAppNotificationPublisher;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityDescriptionService;
@@ -233,7 +235,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		String requestID = payload.getRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID).build();
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
 			OadrRegisteredReportType build = Oadr20bEiReportBuilders.newOadr20bRegisteredReportBuilder(requestID,
 					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
 			return marshall(build, signed);
@@ -250,7 +252,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		List<VenReportCapabilityDto> capabilitiesDto = new ArrayList<>();
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
 
 			OadrRegisteredReportType build = Oadr20bEiReportBuilders.newOadr20bRegisteredReportBuilder(requestID,
 					Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID).build();
@@ -507,8 +509,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		String requestID = payload.getEiResponse().getRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, venID = payload.getVenID(), venID)
-					.build();
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, venID = payload.getVenID(), venID);
 			OadrResponseType build = Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID,
 					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
 			return marshall(build, signed);
@@ -596,7 +597,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		String requestID = payload.getRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID).build();
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
 			OadrCreatedReportType build = Oadr20bEiReportBuilders.newOadr20bCreatedReportBuilder(requestID,
 					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
 			return marshall(build, signed);
@@ -605,7 +606,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
 			OadrCreatedReportType build = Oadr20bEiReportBuilders.newOadr20bCreatedReportBuilder(requestID,
 					Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID).build();
 			return marshall(build, signed);
@@ -690,7 +691,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		String requestID = eiResponse.getRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID).build();
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
 			OadrResponseType build = Oadr20bResponseBuilders
 					.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, venID).build();
 			return marshall(build, signed);
@@ -700,7 +701,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
 			OadrResponseType build = Oadr20bResponseBuilders
 					.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build();
 			return marshall(build, signed);
@@ -736,7 +737,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		String requestID = payload.getRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID).build();
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
 			OadrCanceledReportType build = Oadr20bEiReportBuilders.newOadr20bCanceledReportBuilder(requestID,
 					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
 			return marshall(build, signed);
@@ -744,7 +745,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		Ven ven = venService.findOneByUsername(venID);
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
 			OadrCanceledReportType build = Oadr20bEiReportBuilders.newOadr20bCanceledReportBuilder(requestID,
 					Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID).build();
 			return marshall(build, signed);
@@ -799,7 +800,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		String requestID = payload.getRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID).build();
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
 			OadrUpdatedReportType build = Oadr20bEiReportBuilders.newOadr20bUpdatedReportBuilder(requestID,
 					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
 			return marshall(build, signed);
@@ -810,7 +811,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
 			OadrUpdatedReportType build = Oadr20bEiReportBuilders.newOadr20bUpdatedReportBuilder(requestID,
 					Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), venID).build();
 			return marshall(build, signed);

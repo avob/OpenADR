@@ -244,12 +244,11 @@ public class Oadr20bFactory {
 		return factory.createOadrTransports();
 	}
 
-	public static OadrCreatedPartyRegistrationType createOadrCreatedPartyRegistrationType(String requestId,
-			int responseCode, String venId, String vtnId) {
+	public static OadrCreatedPartyRegistrationType createOadrCreatedPartyRegistrationType(EiResponseType eiresponse,
+			String venId, String vtnId) {
 		OadrCreatedPartyRegistrationType createOadrCreatedPartyRegistrationType = factory
 				.createOadrCreatedPartyRegistrationType();
-		EiResponseType eiResponse = Oadr20bFactory.createEiResponseType(requestId, responseCode);
-		createOadrCreatedPartyRegistrationType.setEiResponse(eiResponse);
+		createOadrCreatedPartyRegistrationType.setEiResponse(eiresponse);
 		createOadrCreatedPartyRegistrationType.setVenID(venId);
 		createOadrCreatedPartyRegistrationType.setVtnID(vtnId);
 		OadrProfiles createOadrProfiles = Oadr20bFactory.createOadrProfiles();

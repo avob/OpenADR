@@ -157,7 +157,8 @@ public class OadrXMLSignatureHandlerTest {
 		int responseCode = 200;
 		String eventId = EVENT_ID;
 		long modificationNumber = 0L;
-		OadrCreatedEventType request = Oadr20bEiEventBuilders.newCreatedEventBuilder(venId, REQUEST_ID, responseCode)
+		OadrCreatedEventType request = Oadr20bEiEventBuilders
+				.newCreatedEventBuilder(Oadr20bResponseBuilders.newOadr20bEiResponseOK(REQUEST_ID), venId)
 				.addEventResponse(Oadr20bEiEventBuilders.newOadr20bCreatedEventEventResponseBuilder(eventId,
 						modificationNumber, REQUEST_ID, responseCode, OptTypeType.OPT_IN).build())
 				.build();
@@ -329,7 +330,9 @@ public class OadrXMLSignatureHandlerTest {
 			throws Oadr20bXMLSignatureException, Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {
 		int responseCode = 200;
 		OadrCreatedPartyRegistrationType request = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCreatedPartyRegistrationBuilder(REQUEST_ID, responseCode, VEN_ID, VTN_ID)
+				.newOadr20bCreatedPartyRegistrationBuilder(
+						Oadr20bResponseBuilders.newOadr20bEiResponseBuilder(REQUEST_ID, responseCode).build(), VEN_ID,
+						VTN_ID)
 				.addOadrProfile(Oadr20bEiRegisterPartyBuilders.newOadr20bOadrProfileBuilder(OADR20b_PROFILE_NAME)
 						.addTransport(OadrTransportType.SIMPLE_HTTP).build())
 				.withRegistrationId(REGISTRATION_ID).build();

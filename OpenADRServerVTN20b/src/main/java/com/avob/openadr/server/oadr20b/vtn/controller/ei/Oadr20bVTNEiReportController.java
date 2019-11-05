@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
 import com.avob.openadr.server.common.vtn.VtnConfig;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiReportService;
 
 @Controller
 @RequestMapping(Oadr20bUrlPath.OADR_BASE_PATH)

@@ -30,6 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
 import com.avob.openadr.model.oadr20b.ei.EiEventType;
 import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
@@ -289,7 +290,9 @@ public class EventScenarioTest {
 		assertNull(venDemandResponseEventDto.get(0).getVenOpt());
 		assertEquals(mockVen.getVenId(), venDemandResponseEventDto.get(0).getVenId());
 
-		OadrCreatedEventType build = Oadr20bEiEventBuilders.newCreatedEventBuilder(mockVen.getVenId(), "0", 200)
+		OadrCreatedEventType build = Oadr20bEiEventBuilders
+				.newCreatedEventBuilder(Oadr20bResponseBuilders.newOadr20bEiResponseBuilder("0", 200).build(),
+						mockVen.getVenId())
 				.addEventResponse(Oadr20bEiEventBuilders.newOadr20bCreatedEventEventResponseBuilder(
 						oadrEventCanceled.getEiEvent().getEventDescriptor().getEventID(), 0L, "0", 200,
 						OptTypeType.OPT_IN).build())
@@ -331,7 +334,8 @@ public class EventScenarioTest {
 				oadrMockEiHttpMvc, oadrMockEiXmpp, xmlSignatureService);
 
 		OadrCreatedEventType build = Oadr20bEiEventBuilders
-				.newCreatedEventBuilder(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, "0", 123)
+				.newCreatedEventBuilder(Oadr20bResponseBuilders.newOadr20bEiResponseBuilder("0", 123).build(),
+						OadrDataBaseSetup.VEN_HTTP_PULL_DSIG)
 				.addEventResponse(Oadr20bEiEventBuilders
 						.newOadr20bCreatedEventEventResponseBuilder("1", 0L, "0", 123, OptTypeType.OPT_IN).build())
 				.build();
@@ -463,7 +467,8 @@ public class EventScenarioTest {
 
 		// create and send OadrCreatedEventType to EiEvent API
 		OadrCreatedEventType oadrCreatedEventType = Oadr20bEiEventBuilders
-				.newCreatedEventBuilder(mockVen.getVenId(), "", 200)
+				.newCreatedEventBuilder(Oadr20bResponseBuilders.newOadr20bEiResponseBuilder("", 200).build(),
+						mockVen.getVenId())
 				.addEventResponse(Oadr20bEiEventBuilders.newOadr20bCreatedEventEventResponseBuilder(eventId.toString(),
 						modificationNumber, "", 200, OptTypeType.OPT_IN).build())
 				.build();

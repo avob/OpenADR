@@ -19,8 +19,8 @@ import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.common.vtn.service.push.DemandResponseEventPublisher;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiEventService;
 
 @Service
 public class Oadr20bDemandResponseEventCreateListener {

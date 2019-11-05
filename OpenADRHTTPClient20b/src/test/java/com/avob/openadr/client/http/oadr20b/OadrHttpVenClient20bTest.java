@@ -299,7 +299,9 @@ public class OadrHttpVenClient20bTest {
 		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrCreatedPartyRegistrationType build = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCreatedPartyRegistrationBuilder("", HttpStatus.SC_OK, "venId", "vtnId").build();
+				.newOadr20bCreatedPartyRegistrationBuilder(
+						Oadr20bResponseBuilders.newOadr20bEiResponseBuilder("", 200).build(), "venId", "vtnId")
+				.build();
 		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
 		when(oadrHttpClient20b.<OadrCreatedPartyRegistrationType, JAXBElement<OadrCreatedPartyRegistrationType>>post(
@@ -371,7 +373,9 @@ public class OadrHttpVenClient20bTest {
 		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrCreatedPartyRegistrationType build = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCreatedPartyRegistrationBuilder("", HttpStatus.SC_OK, "venId", "vtnId").build();
+				.newOadr20bCreatedPartyRegistrationBuilder(
+						Oadr20bResponseBuilders.newOadr20bEiResponseBuilder("", 200).build(), "venId", "vtnId")
+				.build();
 		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
 		when(oadrHttpClient20b.<OadrCreatedPartyRegistrationType, JAXBElement<OadrCreatedPartyRegistrationType>>post(

@@ -22,6 +22,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.avob.openadr.client.http.oadr20b.ven.OadrHttpVenClient20b;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
@@ -66,7 +67,9 @@ public class Oadr20bVENEiRegisterPartyServiceTest {
 		String registrationId = "registrationId";
 
 		OadrCreatedPartyRegistrationType createdpartyRegistration = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCreatedPartyRegistrationBuilder("0", HttpStatus.OK_200, venConfig.getVenId(), vtnHttpId)
+				.newOadr20bCreatedPartyRegistrationBuilder(
+						Oadr20bResponseBuilders.newOadr20bEiResponseBuilder("0", 200).build(), venConfig.getVenId(),
+						vtnHttpId)
 				.withRegistrationId(registrationId).build();
 
 		OadrCanceledPartyRegistrationType canceledPartyRegistration = Oadr20bEiRegisterPartyBuilders

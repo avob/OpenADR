@@ -44,10 +44,10 @@ import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenService;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiRegisterPartyService;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiEventService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiRegisterPartyService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiReportService;
 import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppConnector;
 
 @Service

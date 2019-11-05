@@ -16,6 +16,7 @@ import org.junit.Test;
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
@@ -40,8 +41,8 @@ public class Oadr20bCreatedEventTest {
 		String eventId = "eventId";
 		long modificationNumber = 0L;
 		OadrCreatedEventType request = Oadr20bEiEventBuilders
-				.newCreatedEventBuilder(venId, requestId,
-						responseCode)
+				.newCreatedEventBuilder(Oadr20bResponseBuilders.newOadr20bEiResponseOK(requestId),
+						venId)
 				.addEventResponse(
 						Oadr20bEiEventBuilders.newOadr20bCreatedEventEventResponseBuilder(eventId, modificationNumber,
 								requestId, responseCode, OptTypeType.OPT_IN).withDescription("mouaiccool").build())

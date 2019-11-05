@@ -17,7 +17,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiEventService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiEventService;
 
 /**
  * Oadr EiEvent service controller

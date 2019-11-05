@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiOptService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiOptService;
 
 @Controller
 @RequestMapping(Oadr20bUrlPath.OADR_BASE_PATH)

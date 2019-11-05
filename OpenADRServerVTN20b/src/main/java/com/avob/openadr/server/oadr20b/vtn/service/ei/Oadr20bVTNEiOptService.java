@@ -1,4 +1,4 @@
-package com.avob.openadr.server.oadr20b.vtn.service;
+package com.avob.openadr.server.oadr20b.vtn.service.ei;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +44,8 @@ import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenResourceService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.converter.OptConverter;
+import com.avob.openadr.server.oadr20b.vtn.service.VenOptService;
+import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.google.common.collect.Lists;
 
 @Service
@@ -118,7 +120,7 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID).build();
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
 			OadrCreatedOptType build = Oadr20bEiOptBuilders.newOadr20bCreatedOptBuilder(requestID,
 					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), optID).build();
 			return marshall(build, signed);
@@ -164,7 +166,7 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
 			OadrCreatedOptType build = Oadr20bEiOptBuilders
 					.newOadr20bCreatedOptBuilder(requestID,
 							Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), optID)
@@ -255,7 +257,7 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID).build();
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
 			OadrCanceledOptType build = Oadr20bEiOptBuilders.newOadr20bCanceledOptBuilder(requestID,
 					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), optID).build();
 			return marshall(build, signed);
@@ -265,7 +267,7 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
 			OadrCanceledOptType build = Oadr20bEiOptBuilders.newOadr20bCanceledOptBuilder(requestID,
 					Integer.valueOf(xmlSignatureRequiredButAbsent.getResponseCode()), optID).build();
 			return marshall(build, signed);

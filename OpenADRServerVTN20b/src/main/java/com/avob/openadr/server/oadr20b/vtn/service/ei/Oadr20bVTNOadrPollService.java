@@ -1,4 +1,4 @@
-package com.avob.openadr.server.oadr20b.vtn.service;
+package com.avob.openadr.server.oadr20b.vtn.service.ei;
 
 import javax.annotation.Resource;
 
@@ -21,6 +21,8 @@ import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.service.VenService;
+import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
+import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 
 @Service
 public class Oadr20bVTNOadrPollService {
@@ -65,7 +67,7 @@ public class Oadr20bVTNOadrPollService {
 		String requestID = "";
 		if (!event.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, event.getVenID(), venID).build();
+					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, event.getVenID(), venID);
 			OadrResponseType build = Oadr20bResponseBuilders
 					.newOadr20bResponseBuilder(mismatchCredentialsVenIdResponse, venID).build();
 			return marshall(build, signed);
@@ -74,7 +76,7 @@ public class Oadr20bVTNOadrPollService {
 
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID).build();
+					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestID, venID);
 			OadrResponseType build = Oadr20bResponseBuilders
 					.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, venID).build();
 			return marshall(build, signed);

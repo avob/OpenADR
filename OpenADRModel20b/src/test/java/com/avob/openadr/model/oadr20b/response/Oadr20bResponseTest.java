@@ -41,15 +41,24 @@ public class Oadr20bResponseTest {
 		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
 		assertNotNull(unmarshal);
 
-		response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(Oadr20bResponseBuilders
-				.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestId, "mouaiccool", venId).build(), venId)
+		response = Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder(Oadr20bResponseBuilders
+						.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestId, "mouaiccool", venId), venId)
 				.build();
 		marshalRoot = jaxbContext.marshalRoot(response, true);
 		unmarshal = jaxbContext.unmarshal(marshalRoot, true);
 		assertNotNull(unmarshal);
 
-		response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(Oadr20bResponseBuilders
-				.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestId, venId).build(), venId).build();
+		response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(
+				Oadr20bResponseBuilders.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestId, venId),
+				venId).build();
+		marshalRoot = jaxbContext.marshalRoot(response, true);
+		unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
+
+		response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(
+				Oadr20bResponseBuilders.newOadr20bEiResponseInvalidRegistrationIdBuilder(requestId, venId), venId)
+				.build();
 		marshalRoot = jaxbContext.marshalRoot(response, true);
 		unmarshal = jaxbContext.unmarshal(marshalRoot, true);
 		assertNotNull(unmarshal);

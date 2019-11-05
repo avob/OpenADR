@@ -33,9 +33,9 @@ public class Oadr20bEiRegisterPartyBuilders {
 				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
 	}
 
-	public static Oadr20bCreatedPartyRegistrationBuilder newOadr20bCreatedPartyRegistrationBuilder(String requestId,
-			int responseCode, String venId, String vtnId) {
-		return new Oadr20bCreatedPartyRegistrationBuilder(requestId, responseCode, venId, vtnId)
+	public static Oadr20bCreatedPartyRegistrationBuilder newOadr20bCreatedPartyRegistrationBuilder(
+			EiResponseType eiresponse, String venId, String vtnId) {
+		return new Oadr20bCreatedPartyRegistrationBuilder(eiresponse, venId, vtnId)
 				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
 	}
 

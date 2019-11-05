@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
@@ -178,7 +179,8 @@ public class Oadr20bVTNEiEventControllerTest {
 				oadrMockEiHttpMvc, oadrMockEiXmpp, xmlSignatureService);
 
 		OadrCreatedEventType build = Oadr20bEiEventBuilders
-				.newCreatedEventBuilder(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, "0", 123)
+				.newCreatedEventBuilder(Oadr20bResponseBuilders.newOadr20bEiResponseBuilder("0", 123).build(),
+						OadrDataBaseSetup.VEN_HTTP_PULL_DSIG)
 				.addEventResponse(Oadr20bEiEventBuilders
 						.newOadr20bCreatedEventEventResponseBuilder("1", 0L, "0", 123, OptTypeType.OPT_IN).build())
 				.build();

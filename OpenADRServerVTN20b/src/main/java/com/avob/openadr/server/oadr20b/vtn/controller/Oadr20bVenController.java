@@ -61,10 +61,10 @@ import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportR
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierSearchCriteria;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierSpecification;
-import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNEiReportService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenOptService;
 import com.avob.openadr.server.oadr20b.vtn.service.dtomapper.Oadr20bDtoMapper;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiReportService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityDescriptionService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportDataFloatService;
