@@ -34,7 +34,6 @@ import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
 import com.avob.openadr.model.oadr20b.ei.OptReasonEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
-import com.avob.openadr.model.oadr20b.ei.PayloadBaseType;
 import com.avob.openadr.model.oadr20b.ei.PayloadFloatType;
 import com.avob.openadr.model.oadr20b.ei.QualifiedEventIDType;
 import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
@@ -207,14 +206,6 @@ public class Oadr20bFactory {
 		StringBuilder builder = new StringBuilder();
 		builder.append("P");
 
-		if (newDuration.getYears() > 0) {
-			builder.append(newDuration.getYears());
-			builder.append("Y");
-		}
-		if (newDuration.getMonths() > 0) {
-			builder.append(newDuration.getMonths());
-			builder.append("M");
-		}
 		if (newDuration.getDays() > 0) {
 			builder.append(newDuration.getDays());
 			builder.append("D");
@@ -243,10 +234,6 @@ public class Oadr20bFactory {
 		Duration newDuration = datatypeFactory.newDuration(duration);
 		Duration multiply = newDuration.multiply(multiplier);
 		return multiply.toString();
-	}
-
-	public static JAXBElement<EiEventType> createEiEvent(EiEventType value) {
-		return eiFactory.createEiEvent(value);
 	}
 
 	public static OadrProfiles createOadrProfiles() {
@@ -955,23 +942,6 @@ public class Oadr20bFactory {
 		return createIntervalType;
 	}
 
-	public static IntervalType createReportIntervalType(String intervalId, Long start, String xmlDuration, String rid,
-			Long confidence, Float accuracy, JAXBElement<? extends PayloadBaseType> payloadBase) {
-		IntervalType createIntervalType = eiFactory.createIntervalType();
-		createIntervalType.setUid(Oadr20bFactory.createUidType(intervalId));
-		if (xmlDuration != null) {
-			createIntervalType.setDuration(Oadr20bFactory.createDurationPropType(xmlDuration));
-		}
-		if (start != null) {
-			createIntervalType.setDtstart(Oadr20bFactory.createDtstart(start));
-		}
-
-		createIntervalType.getStreamPayloadBase().add(Oadr20bFactory.createOadrReportPayload(
-				Oadr20bFactory.createReportPayloadType(rid, confidence, accuracy, payloadBase)));
-
-		return createIntervalType;
-	}
-
 	public static CurrentValueType createCurrentValueType(float value) {
 		CurrentValueType createCurrentValueType = eiFactory.createCurrentValueType();
 		createCurrentValueType.setPayloadFloat(Oadr20bFactory.createPayloadFloatType(value));
@@ -1374,16 +1344,6 @@ public class Oadr20bFactory {
 		return createReportPayloadType;
 	}
 
-	public static OadrReportPayloadType createReportPayloadType(String rid, Long confidence, Float accuracy,
-			JAXBElement<? extends PayloadBaseType> payloadBase) {
-		OadrReportPayloadType createReportPayloadType = factory.createOadrReportPayloadType();
-		createReportPayloadType.setRID(rid);
-		createReportPayloadType.setConfidence(confidence);
-		createReportPayloadType.setAccuracy(accuracy);
-		createReportPayloadType.setPayloadBase(payloadBase);
-		return createReportPayloadType;
-	}
-
 	public static JAXBElement<OadrReportPayloadType> createOadrReportPayload(OadrReportPayloadType value) {
 		return factory.createOadrReportPayload(value);
 	}
@@ -1437,10 +1397,6 @@ public class Oadr20bFactory {
 	public static JAXBElement<PayloadAvobVenServiceRequestType> createPayloadAvobVenServiceRequest(
 			PayloadAvobVenServiceRequestType value) {
 		return avobFactory.createPayloadAvobVenServiceRequest(value);
-	}
-
-	public static JAXBElement<?> createResponseType(OadrResponseType value) {
-		return factory.createOadrResponse(value);
 	}
 
 }
