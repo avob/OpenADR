@@ -1,6 +1,7 @@
 package com.avob.openadr.model.oadr20b.eiopt;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -27,25 +28,22 @@ public class Oadr20bCanceledOptTest {
 	}
 
 	@Test
-	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
-
-		String requestId = null;
+	public void validatingMarshalUnmarshalTest()
+			throws DatatypeConfigurationException, Oadr20bMarshalException, Oadr20bUnmarshalException {
+		String requestId = "requestId";
 		int responseCode = 200;
 		String optId = "optId";
 		OadrCanceledOptType request = Oadr20bEiOptBuilders.newOadr20bCanceledOptBuilder(requestId, responseCode, optId)
 				.build();
+		String marshalRoot = jaxbContext.marshalRoot(request, true);
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
+	}
 
-		boolean assertion = false;
-		try {
-			jaxbContext.marshalRoot(request, true);
-		} catch (Oadr20bMarshalException e) {
-			assertion = true;
-		}
-
-		assertTrue(assertion);
-
+	@Test
+	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
 		File file = new File("src/test/resources/eiopt/unvalidatingOadrCanceledOpt.xml");
-		assertion = false;
+		boolean assertion = false;
 		try {
 			jaxbContext.unmarshal(file, OadrCanceledOptType.class);
 		} catch (Oadr20bUnmarshalException e) {

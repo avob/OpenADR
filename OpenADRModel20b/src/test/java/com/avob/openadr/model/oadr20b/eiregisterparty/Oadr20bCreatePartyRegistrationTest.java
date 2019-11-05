@@ -2,6 +2,7 @@ package com.avob.openadr.model.oadr20b.eiregisterparty;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -29,24 +30,32 @@ public class Oadr20bCreatePartyRegistrationTest {
 	}
 
 	@Test
-	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
-
-		String requestId = null;
+	public void validatingMarshalUnmarshalTest()
+			throws DatatypeConfigurationException, Oadr20bMarshalException, Oadr20bUnmarshalException {
+		String requestId = "requestId";
 		String venId = "ven";
 		String profilName = "2.0b";
+		Boolean pullModel = true;
+		boolean reportOnly = true;
+		String transportAddress = "transportAddress";
+		OadrTransportType transportType = OadrTransportType.SIMPLE_HTTP;
+		String venName = "venName";
+		boolean xmlSignature = true;
+		String registrationId = "registrationId";
 		OadrCreatePartyRegistrationType request = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCreatePartyRegistrationBuilder(requestId, venId, profilName).build();
-		boolean assertion = false;
-		try {
-			jaxbContext.marshalRoot(request, true);
-		} catch (Oadr20bMarshalException e) {
-			assertion = true;
-		}
+				.newOadr20bCreatePartyRegistrationBuilder(requestId, venId, profilName).withOadrHttpPullModel(pullModel)
+				.withOadrReportOnly(reportOnly).withOadrTransportAddress(transportAddress)
+				.withOadrTransportName(transportType).withOadrVenName(venName).withOadrXmlSignature(xmlSignature)
+				.withRegistrationId(registrationId).build();
+		String marshalRoot = jaxbContext.marshalRoot(request, true);
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
+	}
 
-		assertTrue(assertion);
-
+	@Test
+	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
 		File file = new File("src/test/resources/eiregisterparty/unvalidatingOadrCreatePartyRegistration.xml");
-		assertion = false;
+		boolean assertion = false;
 		try {
 			jaxbContext.unmarshal(file, OadrCreatePartyRegistrationType.class);
 		} catch (Oadr20bUnmarshalException e) {

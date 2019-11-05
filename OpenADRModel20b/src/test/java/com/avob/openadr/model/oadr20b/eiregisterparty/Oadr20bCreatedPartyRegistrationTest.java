@@ -1,6 +1,7 @@
 package com.avob.openadr.model.oadr20b.eiregisterparty;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.assertj.core.util.Files;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -17,6 +19,12 @@ import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType.OadrExtensions;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType.OadrExtensions.OadrExtension;
+import com.avob.openadr.model.oadr20b.oadr.OadrInfo;
+import com.avob.openadr.model.oadr20b.oadr.OadrServiceNameType;
+import com.avob.openadr.model.oadr20b.oadr.OadrServiceSpecificInfo;
+import com.avob.openadr.model.oadr20b.oadr.OadrServiceSpecificInfo.OadrService;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 
 public class Oadr20bCreatedPartyRegistrationTest {
@@ -28,26 +36,43 @@ public class Oadr20bCreatedPartyRegistrationTest {
 	}
 
 	@Test
-	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
+	public void validatingMarshalUnmarshalTest()
+			throws DatatypeConfigurationException, Oadr20bMarshalException, Oadr20bUnmarshalException {
 
-		String requestId = null;
+		String requestId = "requestId";
 		int responseCode = 200;
 		String vtnId = "vtn";
 		String venId = "ven";
+		OadrServiceSpecificInfo oadrServiceSpecificInfo = new OadrServiceSpecificInfo();
+		OadrService service = new OadrService();
+		service.setOadrServiceName(OadrServiceNameType.EI_EVENT);
+		OadrInfo info = new OadrInfo();
+		info.setOadrKey("key");
+		info.setOadrValue("value");
+		service.getOadrInfo().add(info);
+		oadrServiceSpecificInfo.getOadrService().add(service);
+		OadrExtensions oadrExtensions = new OadrExtensions();
+		OadrExtension extension = new OadrExtension();
+		extension.setOadrExtensionName("myextensionname");
+		extension.getOadrInfo().add(info);
+		oadrExtensions.getOadrExtension().add(extension);
 		OadrCreatedPartyRegistrationType request = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCreatedPartyRegistrationBuilder(requestId, responseCode, venId, vtnId).build();
+				.newOadr20bCreatedPartyRegistrationBuilder(requestId, responseCode, venId, vtnId)
+				.addOadrProfile(Oadr20bEiRegisterPartyBuilders.newOadr20bOadrProfileBuilder("2.0b")
+						.addTransport(OadrTransportType.SIMPLE_HTTP).build())
+				.addOadrProfile(Lists.newArrayList(Oadr20bEiRegisterPartyBuilders.newOadr20bOadrProfileBuilder("2.0b")
+						.addTransport(OadrTransportType.SIMPLE_HTTP).build()))
+				.withOadrRequestedOadrPollFreq("PT1H").withResponseDescription("mouaiccool")
+				.withOadrServiceSpecificInfo(oadrServiceSpecificInfo).withOadrExtensions(oadrExtensions).build();
+		String marshalRoot = jaxbContext.marshalRoot(request, true);
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
+	}
 
-		boolean assertion = false;
-		try {
-			jaxbContext.marshalRoot(request, true);
-		} catch (Oadr20bMarshalException e) {
-			assertion = true;
-		}
-
-		assertTrue(assertion);
-
+	@Test
+	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
 		File file = new File("src/test/resources/eiregisterparty/unvalidatingOadrCreatedPartyRegistration.xml");
-		assertion = false;
+		boolean assertion = false;
 		try {
 			jaxbContext.unmarshal(file, OadrCreatedPartyRegistrationType.class);
 		} catch (Oadr20bUnmarshalException e) {

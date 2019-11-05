@@ -1,6 +1,7 @@
 package com.avob.openadr.model.oadr20b.eiregisterparty;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -26,24 +27,21 @@ public class Oadr20bRequestReregistrationTest {
 	}
 
 	@Test
-	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
-
-		String venId = null;
-
+	public void validatingMarshalUnmarshalTest()
+			throws DatatypeConfigurationException, Oadr20bMarshalException, Oadr20bUnmarshalException {
+		String venId = "venId";
 		OadrRequestReregistrationType request = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bRequestReregistrationBuilder(venId).build();
 
-		boolean assertion = false;
-		try {
-			jaxbContext.marshalRoot(request, true);
-		} catch (Oadr20bMarshalException e) {
-			assertion = true;
-		}
+		String marshalRoot = jaxbContext.marshalRoot(request, true);
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
+	}
 
-		assertTrue(assertion);
-
+	@Test
+	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
 		File file = new File("src/test/resources/eiregisterparty/unvalidatingOadrRequestReregistration.xml");
-		assertion = false;
+		boolean assertion = false;
 		try {
 			jaxbContext.unmarshal(file, OadrRequestReregistrationType.class);
 		} catch (Oadr20bUnmarshalException e) {

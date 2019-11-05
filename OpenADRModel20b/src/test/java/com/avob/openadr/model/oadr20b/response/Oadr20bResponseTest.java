@@ -29,25 +29,45 @@ public class Oadr20bResponseTest {
 	}
 
 	@Test
-	public void marshalTest() throws DatatypeConfigurationException, Oadr20bMarshalException {
-		String requestId = null;
+	public void validatingMarshalUnmarshalTest()
+			throws DatatypeConfigurationException, Oadr20bMarshalException, Oadr20bUnmarshalException {
+		String requestId = "requestId";
 		Integer responseCode = 200;
-		String responseDescription = "";
+		String responseDescription = "responseDescription";
 		String venId = "venId";
 		OadrResponseType response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestId, responseCode, venId)
 				.withDescription(responseDescription).build();
+		String marshalRoot = jaxbContext.marshalRoot(response, true);
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
 
-		boolean assertion = false;
-		try {
-			jaxbContext.marshalRoot(response, true);
-		} catch (Oadr20bMarshalException e) {
-			assertion = true;
-		}
+		response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(Oadr20bResponseBuilders
+				.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestId, "mouaiccool", venId).build(), venId)
+				.build();
+		marshalRoot = jaxbContext.marshalRoot(response, true);
+		unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
 
-		assertTrue(assertion);
+		response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(Oadr20bResponseBuilders
+				.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder(requestId, venId).build(), venId).build();
+		marshalRoot = jaxbContext.marshalRoot(response, true);
+		unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
 
+		response = Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder(
+						Oadr20bResponseBuilders.newOadr20bEiResponseBuilder(requestId, responseCode).build(), venId)
+				.build();
+		marshalRoot = jaxbContext.marshalRoot(response, true);
+		unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
+
+	}
+
+	@Test
+	public void marshalTest() throws DatatypeConfigurationException, Oadr20bMarshalException {
 		File file = new File("src/test/resources/response/unvalidatingOadrResponse.xml");
-		assertion = false;
+		boolean assertion = false;
 		try {
 			jaxbContext.unmarshal(file, OadrDistributeEventType.class);
 		} catch (Oadr20bUnmarshalException e) {
