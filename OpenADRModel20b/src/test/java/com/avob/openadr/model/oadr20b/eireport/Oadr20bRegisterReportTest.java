@@ -1,6 +1,7 @@
 package com.avob.openadr.model.oadr20b.eireport;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -12,6 +13,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.assertj.core.util.Files;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -122,7 +124,7 @@ public class Oadr20bRegisterReportTest {
 	}
 
 	@Test
-	public void testDifferentReportDescriptionMarshalling() throws Oadr20bMarshalException {
+	public void testDifferentReportDescriptionMarshalling() throws Oadr20bMarshalException, Oadr20bUnmarshalException {
 		String requestId = "requestId";
 		String venId = "venId";
 		String reportRequestId = "reportRequestId";
@@ -229,11 +231,22 @@ public class Oadr20bRegisterReportTest {
 								ReadingTypeEnumeratedType.ESTIMATED)
 						.withCustomUnitBase("x-custom-mesurement", "x-custom-unit", SiScaleCodeType.DECI)
 						.withOadrSamplingRate("PT15M", "PT1H", false).withMarketContext(marketContextName).build())
+				.addReportDescription(Oadr20bEiReportBuilders
+						.newOadr20bOadrReportDescriptionBuilder("rid", ReportEnumeratedType.OPERATING_STATE,
+								ReadingTypeEnumeratedType.ESTIMATED)
+						.withCustomUnitBase("x-custom-mesurement", "x-custom-unit", SiScaleCodeType.DECI)
+						.withOadrSamplingRate("PT15M", "PT1H", false).withMarketContext(marketContextName).build())
+				.addInterval(Oadr20bEiBuilders
+						.newOadr20bReportIntervalTypeBuilder("intervalId", 0L, "PT1H", "rid", 0L, 0F, 0F).build())
+				.addInterval(Lists.newArrayList(Oadr20bEiBuilders
+						.newOadr20bReportIntervalTypeBuilder("intervalId", 0L, "PT1H", "rid", 0L, 0F, 0F).build()))
 				.withStart(start).withDuration(duration).build();
 
 		OadrRegisterReportType request = Oadr20bEiReportBuilders
 				.newOadr20bRegisterReportBuilder(requestId, venId, reportRequestId).addOadrReport(build).build();
 
-		jaxbContext.marshalRoot(request);
+		String marshalRoot = jaxbContext.marshalRoot(request, true);
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
 	}
 }

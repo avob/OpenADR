@@ -1,6 +1,7 @@
 package com.avob.openadr.model.oadr20b.eireport;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.assertj.core.util.Files;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -32,25 +34,39 @@ public class Oadr20bUpdateReportTest {
 	}
 
 	@Test
+	public void validatingMarshalUnmarshalTest() throws Oadr20bMarshalException, Oadr20bUnmarshalException {
+
+		String requestId = "requestId";
+		String venId = "venId";
+		String reportId = "reportId";
+		String reportrequestId = "reportrequestId";
+		String reportSpecifierId = "reportSpecifierId";
+		ReportNameEnumeratedType reportName = ReportNameEnumeratedType.HISTORY_GREENBUTTON;
+		long createdTimestamp = 0L;
+		Long startTimestamp = 0L;
+		String duration = "PT1H";
+		OadrReportType reportType = Oadr20bEiReportBuilders
+				.newOadr20bUpdateReportOadrReportBuilder(reportId, reportrequestId, reportSpecifierId, reportName,
+						createdTimestamp, startTimestamp, duration)
+				.addInterval(Oadr20bEiBuilders
+						.newOadr20bReportIntervalTypeBuilder("intervalId", 0L, "PT1H", "rid", 0L, 0F, 0F).build())
+				.addInterval(Lists.newArrayList(Oadr20bEiBuilders
+						.newOadr20bReportIntervalTypeBuilder("intervalId", 0L, "PT1H", "rid", 0L, 0F, 0F).build()))
+				.build();
+
+		OadrUpdateReportType request = Oadr20bEiReportBuilders.newOadr20bUpdateReportBuilder(requestId, venId)
+				.addReport(reportType).build();
+
+		String marshalRoot = jaxbContext.marshalRoot(request, true);
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
+	}
+
+	@Test
 	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
 
-		String requestId = null;
-		String venId = "venId";
-		OadrReportType report = null;
-		OadrUpdateReportType request = Oadr20bEiReportBuilders.newOadr20bUpdateReportBuilder(requestId, venId)
-				.addReport(report).build();
-
-		boolean assertion = false;
-		try {
-			jaxbContext.marshalRoot(request, true);
-		} catch (Oadr20bMarshalException e) {
-			assertion = true;
-		}
-
-		assertTrue(assertion);
-
 		File file = new File("src/test/resources/eireport/unvalidatingOadrUpdateReport.xml");
-		assertion = false;
+		boolean assertion = false;
 		try {
 			jaxbContext.unmarshal(file, OadrUpdateReportType.class);
 		} catch (Oadr20bUnmarshalException e) {

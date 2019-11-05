@@ -396,7 +396,6 @@ public class OadrXMLSignatureHandlerTest {
 		int responseCode = 200;
 		OadrRegisteredReportType request = Oadr20bEiReportBuilders
 				.newOadr20bRegisteredReportBuilder(REQUEST_ID, responseCode, VEN_ID).addReportRequest(reportRequest)
-
 				.build();
 		validate(OadrXMLSignatureHandler.sign(request, privateKey, certificate, NONCE, 0L));
 	}

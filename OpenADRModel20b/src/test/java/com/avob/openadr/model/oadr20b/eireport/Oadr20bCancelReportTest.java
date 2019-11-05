@@ -1,6 +1,7 @@
 package com.avob.openadr.model.oadr20b.eireport;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.assertj.core.util.Files;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -27,26 +29,26 @@ public class Oadr20bCancelReportTest {
 	}
 
 	@Test
+	public void validatingMarshalUnmarshalTest() throws Oadr20bMarshalException, Oadr20bUnmarshalException {
+
+	String requestId = "requestId";
+	String venId = "venId";
+	boolean reportToFollow = true;
+	String reportId = "reportId";
+	OadrCancelReportType request = Oadr20bEiReportBuilders
+			.newOadr20bCancelReportBuilder(requestId, venId, reportToFollow).addReportRequestId(reportId)
+			.addReportRequestId(Lists.newArrayList("mouaiccool")).build();
+	
+		String marshalRoot = jaxbContext.marshalRoot(request, true);
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
+	}
+
+	@Test
 	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
 
-		String requestId = null;
-		String venId = "venId";
-		boolean reportToFollow = true;
-		String reportId = "reportId";
-		OadrCancelReportType request = Oadr20bEiReportBuilders
-				.newOadr20bCancelReportBuilder(requestId, venId, reportToFollow).addReportRequestId(reportId).build();
-
-		boolean assertion = false;
-		try {
-			jaxbContext.marshalRoot(request, true);
-		} catch (Oadr20bMarshalException e) {
-			assertion = true;
-		}
-
-		assertTrue(assertion);
-
 		File file = new File("src/test/resources/eireport/unvalidatingOadrCancelReport.xml");
-		assertion = false;
+		boolean assertion = false;
 		try {
 			jaxbContext.unmarshal(file, OadrCancelReportType.class);
 		} catch (Oadr20bUnmarshalException e) {

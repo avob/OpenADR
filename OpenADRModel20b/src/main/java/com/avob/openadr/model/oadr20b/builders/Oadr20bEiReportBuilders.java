@@ -73,11 +73,6 @@ public class Oadr20bEiReportBuilders {
 		return new Oadr20bReportRequestTypeBuilder(reportRequestId, reportSpecifierId, granularity, reportBackDuration);
 	}
 
-	public static Oadr20bReportRequestTypeBuilder newOadr20bReportRequestTypeBuilder(String reportRequestId,
-			String reportSpecifierId, Long start, String duration) {
-		return new Oadr20bReportRequestTypeBuilder(reportRequestId, reportSpecifierId, start, duration);
-	}
-
 	public static Oadr20bUpdateReportOadrReportBuilder newOadr20bUpdateReportOadrReportBuilder(String reportId,
 			String reportrequestId, String reportSpecifierId, ReportNameEnumeratedType reportName,
 			long createdTimestamp, Long startTimestamp, String duration) {

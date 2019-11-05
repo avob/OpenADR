@@ -668,19 +668,6 @@ public class Oadr20bFactory {
 		return createOadrReportRequestType;
 	}
 
-	public static OadrReportRequestType createOadrReportRequestType(String reportRequestId, String reportSpecifierId,
-			Long start, String duration) {
-		OadrReportRequestType createOadrReportRequestType = factory.createOadrReportRequestType();
-		createOadrReportRequestType.setReportRequestID(reportRequestId);
-
-		ReportSpecifierType reportSpecifier = Oadr20bFactory.createReportSpecifierType(reportSpecifierId, start,
-				duration);
-
-		createOadrReportRequestType.setReportSpecifier(reportSpecifier);
-
-		return createOadrReportRequestType;
-	}
-
 	public static OadrReportType createOadrUpdateReportOadrReportType(String reportId, String reportrequestId,
 			String reportSpecifierId, ReportNameEnumeratedType reportName, long createdTimestamp, Long startTimestamp,
 			String duration) {
@@ -1040,19 +1027,6 @@ public class Oadr20bFactory {
 
 		DurationPropType reportBackDurationProp = Oadr20bFactory.createDurationPropType(reportBackDuration);
 		createReportSpecifierType.setReportBackDuration(reportBackDurationProp);
-		return createReportSpecifierType;
-	}
-
-	public static ReportSpecifierType createReportSpecifierType(String reportSpecifierId, Long start, String duration) {
-
-		ReportSpecifierType createReportSpecifierType = eiFactory.createReportSpecifierType();
-		createReportSpecifierType.setReportSpecifierID(reportSpecifierId);
-
-		WsCalendarIntervalType createWsCalendarIntervalType = Oadr20bFactory.createWsCalendarIntervalType(start,
-				duration);
-
-		createReportSpecifierType.setReportInterval(createWsCalendarIntervalType);
-
 		return createReportSpecifierType;
 	}
 

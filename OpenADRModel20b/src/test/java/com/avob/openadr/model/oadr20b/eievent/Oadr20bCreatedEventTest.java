@@ -51,7 +51,6 @@ public class Oadr20bCreatedEventTest {
 				.build();
 
 		String marshalRoot = jaxbContext.marshalRoot(request, true);
-
 		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
 		assertNotNull(unmarshal);
 

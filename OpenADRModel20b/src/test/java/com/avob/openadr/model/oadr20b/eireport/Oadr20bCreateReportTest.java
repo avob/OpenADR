@@ -1,6 +1,7 @@
 package com.avob.openadr.model.oadr20b.eireport;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -14,10 +15,13 @@ import org.junit.Test;
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
+import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
+import com.avob.openadr.model.oadr20b.oadr.TemperatureUnitType;
+import com.avob.openadr.model.oadr20b.siscale.SiScaleCodeType;
 
 public class Oadr20bCreateReportTest {
 
@@ -28,25 +32,35 @@ public class Oadr20bCreateReportTest {
 	}
 
 	@Test
+	public void validatingMarshalUnmarshalTest() throws Oadr20bMarshalException, Oadr20bUnmarshalException {
+		String requestId = "requestId";
+		String venId = "venId";
+		String reportRequestId = "reportRequestId";
+		String reportSpecifierId = "reportSpecifierId";
+		String granularity = "PT1H";
+		String reportBackDuration = "PT1H";
+		String rid = "rid";
+		OadrReportRequestType build = Oadr20bEiReportBuilders
+				.newOadr20bReportRequestTypeBuilder(reportRequestId, reportSpecifierId, granularity, reportBackDuration)
+				.addSpecifierPayload(
+						Oadr20bFactory.createTemperature(Oadr20bFactory
+								.createTemperatureType(TemperatureUnitType.CELSIUS, SiScaleCodeType.KILO)),
+						ReadingTypeEnumeratedType.DIRECT_READ, rid)
+				.build();
+
+		OadrCreateReportType request = Oadr20bEiReportBuilders.newOadr20bCreateReportBuilder(requestId, venId)
+				.addReportRequest(build).build();
+
+		String marshalRoot = jaxbContext.marshalRoot(request, true);
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
+	}
+
+	@Test
 	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
 
-		String requestId = null;
-		String venId = "venId";
-		OadrReportRequestType reportRequest = null;
-		OadrCreateReportType request = Oadr20bEiReportBuilders.newOadr20bCreateReportBuilder(requestId, venId)
-				.addReportRequest(reportRequest).build();
-
-		boolean assertion = false;
-		try {
-			jaxbContext.marshalRoot(request, true);
-		} catch (Oadr20bMarshalException e) {
-			assertion = true;
-		}
-
-		assertTrue(assertion);
-
 		File file = new File("src/test/resources/eireport/unvalidatingOadrCreateReport.xml");
-		assertion = false;
+		boolean assertion = false;
 		try {
 			jaxbContext.unmarshal(file, OadrCreateReportType.class);
 		} catch (Oadr20bUnmarshalException e) {

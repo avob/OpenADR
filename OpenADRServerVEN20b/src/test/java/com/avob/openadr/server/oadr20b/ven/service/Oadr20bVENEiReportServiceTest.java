@@ -108,26 +108,6 @@ public class Oadr20bVENEiReportServiceTest {
 	}
 
 	@Test
-	public void oadrCreateReportTest()
-			throws Oadr20bApplicationLayerException, Oadr20bMarshalException, Oadr20bUnmarshalException,
-			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException {
-		String reportRequestId = "";
-		String reportSpecifierId = "";
-		Long start = 0L;
-		String duration = "PT1S";
-		OadrReportRequestType reportRequest = Oadr20bEiReportBuilders
-				.newOadr20bReportRequestTypeBuilder(reportRequestId, reportSpecifierId, start, duration).build();
-		OadrCreateReportType oadrCancelReport = Oadr20bEiReportBuilders
-				.newOadr20bCreateReportBuilder("", venConfig.getVenId()).addReportRequest(reportRequest).build();
-		String request = oadr20bVENEiReportService.request(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrCancelReport));
-
-		OadrCreatedReportType resp = oadr20bJAXBContext.unmarshal(request, OadrCreatedReportType.class);
-		assertNotNull(resp);
-		assertEquals(resp.getEiResponse().getResponseCode(),
-				String.valueOf(Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453));
-	}
-
-	@Test
 	public void oadrCancelReportTest()
 			throws Oadr20bApplicationLayerException, Oadr20bMarshalException, Oadr20bUnmarshalException,
 			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException {

@@ -1,6 +1,7 @@
 package com.avob.openadr.model.oadr20b.eireport;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.assertj.core.util.Files;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -27,27 +29,30 @@ public class Oadr20bUpdatedReportTest {
 	}
 
 	@Test
-	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
+	public void validatingMarshalUnmarshalTest() throws Oadr20bMarshalException, Oadr20bUnmarshalException {
 
-		String requestId = null;
+		String requestId = "requestId";
 		String venId = "venId";
 		int responseCode = 200;
-		OadrCancelReportType oadrCancelReport = null;
+		boolean reportToFollow = true;
+		String reportId = "reportId";
+		OadrCancelReportType oadrCancelReport = Oadr20bEiReportBuilders
+				.newOadr20bCancelReportBuilder(requestId, venId, reportToFollow).addReportRequestId(reportId)
+				.addReportRequestId(Lists.newArrayList(reportId)).build();
 		OadrUpdatedReportType request = Oadr20bEiReportBuilders
 				.newOadr20bUpdatedReportBuilder(requestId, responseCode, venId).withOadrCancelReport(oadrCancelReport)
 				.build();
 
-		boolean assertion = false;
-		try {
-			jaxbContext.marshalRoot(request, true);
-		} catch (Oadr20bMarshalException e) {
-			assertion = true;
-		}
+		String marshalRoot = jaxbContext.marshalRoot(request, true);
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
+	}
 
-		assertTrue(assertion);
+	@Test
+	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
 
 		File file = new File("src/test/resources/eireport/unvalidatingOadrUpdatedReport.xml");
-		assertion = false;
+		boolean assertion = false;
 		try {
 			jaxbContext.unmarshal(file, OadrUpdatedReportType.class);
 		} catch (Oadr20bUnmarshalException e) {

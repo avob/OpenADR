@@ -1,6 +1,7 @@
 package com.avob.openadr.model.oadr20b.eireport;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -27,9 +28,8 @@ public class Oadr20bCreatedReportTest {
 	}
 
 	@Test
-	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
-
-		String requestId = null;
+	public void validatingMarshalUnmarshalTest() throws Oadr20bMarshalException, Oadr20bUnmarshalException {
+		String requestId = "requestId";
 		String venId = "venId";
 		String reportId = "reportId";
 		int responseCode = 200;
@@ -37,17 +37,16 @@ public class Oadr20bCreatedReportTest {
 				.newOadr20bCreatedReportBuilder(requestId, responseCode, venId).addPendingReportRequestId(reportId)
 				.build();
 
-		boolean assertion = false;
-		try {
-			jaxbContext.marshalRoot(request, true);
-		} catch (Oadr20bMarshalException e) {
-			assertion = true;
-		}
+		String marshalRoot = jaxbContext.marshalRoot(request, true);
+		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
+		assertNotNull(unmarshal);
+	}
 
-		assertTrue(assertion);
+	@Test
+	public void unvalidatingMarshalUnmarshalTest() throws DatatypeConfigurationException {
 
 		File file = new File("src/test/resources/eireport/unvalidatingOadrCreatedReport.xml");
-		assertion = false;
+		boolean assertion = false;
 		try {
 			jaxbContext.unmarshal(file, OadrCreatedReportType.class);
 		} catch (Oadr20bUnmarshalException e) {

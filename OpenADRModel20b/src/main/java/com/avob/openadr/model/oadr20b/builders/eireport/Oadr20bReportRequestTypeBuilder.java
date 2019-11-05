@@ -19,12 +19,6 @@ public class Oadr20bReportRequestTypeBuilder {
 				granularity, reportBackDuration);
 	}
 
-	public Oadr20bReportRequestTypeBuilder(String reportRequestId, String reportSpecifierId, Long start,
-			String duration) {
-		oadrReportRequestType = Oadr20bFactory.createOadrReportRequestType(reportRequestId, reportSpecifierId, start,
-				duration);
-	}
-
 	public Oadr20bReportRequestTypeBuilder withWsCalendarIntervalType(WsCalendarIntervalType calendar) {
 		oadrReportRequestType.getReportSpecifier().setReportInterval(calendar);
 		return this;
