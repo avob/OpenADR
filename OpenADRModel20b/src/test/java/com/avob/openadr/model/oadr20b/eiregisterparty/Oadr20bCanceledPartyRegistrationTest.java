@@ -15,6 +15,7 @@ import org.junit.Test;
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
@@ -31,11 +32,12 @@ public class Oadr20bCanceledPartyRegistrationTest {
 	public void validatingMarshalUnmarshalTest()
 			throws DatatypeConfigurationException, Oadr20bMarshalException, Oadr20bUnmarshalException {
 		String requestId = "requestId";
-		int responseCode = 200;
 		String registrationId = "registrationId";
 		String venId = "venId";
 		OadrCanceledPartyRegistrationType request = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCanceledPartyRegistrationBuilder(requestId, responseCode, registrationId, venId).build();
+				.newOadr20bCanceledPartyRegistrationBuilder(Oadr20bResponseBuilders.newOadr20bEiResponseOK(requestId),
+						registrationId, venId)
+				.build();
 		String marshalRoot = jaxbContext.marshalRoot(request, true);
 		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
 		assertNotNull(unmarshal);

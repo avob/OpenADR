@@ -541,11 +541,9 @@ public class Oadr20bFactory {
 		return createOadrCancelPartyRegistrationType;
 	}
 
-	public static OadrCanceledPartyRegistrationType createOadrCanceledPartyRegistrationType(String requestId,
-			int responseCode, String registrationId, String venId) {
+	public static OadrCanceledPartyRegistrationType createOadrCanceledPartyRegistrationType(EiResponseType eiResponse, String registrationId, String venId) {
 		OadrCanceledPartyRegistrationType createOadrCanceledPartyRegistrationType = factory
 				.createOadrCanceledPartyRegistrationType();
-		EiResponseType eiResponse = Oadr20bFactory.createEiResponseType(requestId, responseCode);
 		createOadrCanceledPartyRegistrationType.setEiResponse(eiResponse);
 		createOadrCanceledPartyRegistrationType.setRegistrationID(registrationId);
 		createOadrCanceledPartyRegistrationType.setVenID(venId);

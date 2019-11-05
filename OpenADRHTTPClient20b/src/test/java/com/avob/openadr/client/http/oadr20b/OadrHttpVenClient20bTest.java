@@ -319,7 +319,9 @@ public class OadrHttpVenClient20bTest {
 		OadrHttpClient20b oadrHttpClient20b = Mockito.mock(OadrHttpClient20b.class);
 
 		OadrCanceledPartyRegistrationType build = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCanceledPartyRegistrationBuilder("", HttpStatus.SC_OK, "venId", "vtnId").build();
+				.newOadr20bCanceledPartyRegistrationBuilder(Oadr20bResponseBuilders.newOadr20bEiResponseOK(""), "venId",
+						"vtnId")
+				.build();
 		OadrHttpVenClient20b oadrHttpVenClient20bTestClass = new OadrHttpVenClient20b(oadrHttpClient20b);
 
 		when(oadrHttpClient20b.<OadrCanceledPartyRegistrationType, JAXBElement<OadrCanceledPartyRegistrationType>>post(

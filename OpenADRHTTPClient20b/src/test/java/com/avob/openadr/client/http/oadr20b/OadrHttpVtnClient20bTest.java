@@ -111,7 +111,9 @@ public class OadrHttpVtnClient20bTest {
 		OadrHttpVtnClient20b oadrHttpVtnClient20b = new OadrHttpVtnClient20b(OadrHttpClient20b);
 
 		OadrCanceledPartyRegistrationType build = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCanceledPartyRegistrationBuilder("", HttpStatus.SC_OK, "registrationId", "venId").build();
+				.newOadr20bCanceledPartyRegistrationBuilder(Oadr20bResponseBuilders.newOadr20bEiResponseOK(""),
+						"registrationId", "venId")
+				.build();
 
 		when(OadrHttpClient20b.<OadrCanceledPartyRegistrationType, JAXBElement<OadrCanceledPartyRegistrationType>>post(
 				Matchers.<JAXBElement<OadrCanceledPartyRegistrationType>>anyObject(), Matchers.any(), Matchers.any()))

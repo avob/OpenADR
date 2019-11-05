@@ -73,8 +73,9 @@ public class Oadr20bVENEiRegisterPartyServiceTest {
 				.withRegistrationId(registrationId).build();
 
 		OadrCanceledPartyRegistrationType canceledPartyRegistration = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCanceledPartyRegistrationBuilder("0", HttpStatus.OK_200, registrationId,
-						venConfig.getVenId())
+				.newOadr20bCanceledPartyRegistrationBuilder(
+						Oadr20bResponseBuilders.newOadr20bEiResponseBuilder("", HttpStatus.OK_200).build(),
+						registrationId, venConfig.getVenId())
 				.build();
 
 		Mockito.when(client.oadrQueryRegistrationType(Mockito.any())).thenReturn(createdpartyRegistration);

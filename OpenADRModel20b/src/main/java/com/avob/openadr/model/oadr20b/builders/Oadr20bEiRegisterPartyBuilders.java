@@ -15,12 +15,6 @@ public class Oadr20bEiRegisterPartyBuilders {
 	private Oadr20bEiRegisterPartyBuilders() {
 	}
 
-	public static Oadr20bCanceledPartyRegistrationBuilder newOadr20bCanceledPartyRegistrationBuilder(String requestId,
-			int responseCode, String registrationId, String venId) {
-		return new Oadr20bCanceledPartyRegistrationBuilder(requestId, responseCode, registrationId, venId)
-				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
-	}
-
 	public static Oadr20bCanceledPartyRegistrationBuilder newOadr20bCanceledPartyRegistrationBuilder(
 			EiResponseType eiresponse, String registrationId, String venId) {
 		return new Oadr20bCanceledPartyRegistrationBuilder(eiresponse, registrationId, venId)

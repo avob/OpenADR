@@ -50,6 +50,16 @@ public class OadrDataBaseSetup {
 	public static final UserRequestPostProcessor VEN_XMPP_DSIG_SECURITY_SESSION = SecurityMockMvcRequestPostProcessors
 			.user(VEN_HTTP_PULL).roles("VEN", "REGISTERED");
 
+	public static final String VEN_HTTP_PUSH_DSIG = "ven5";
+	public static final String VEN_HTTP_PUSH_DSIG_REGISTRATION_ID = "ven5RegistrationId";
+	public static final UserRequestPostProcessor VEN_HTTP_PUSH_DSIG_SECURITY_SESSION = SecurityMockMvcRequestPostProcessors
+			.user(VEN_HTTP_PUSH_DSIG).roles("VEN", "REGISTERED");
+
+	public static final String VEN_HTTP_PUSH = "ven6";
+	public static final String VEN_HTTP_PUSH_REGISTRATION_ID = "ven6RegistrationId";
+	public static final UserRequestPostProcessor VEN_HTTP_PUSH_SECURITY_SESSION = SecurityMockMvcRequestPostProcessors
+			.user(VEN_HTTP_PUSH).roles("VEN", "REGISTERED");
+
 	public static final String VEN_RESOURCE_1 = "venResource1";
 	public static final String VEN_RESOURCE_2 = "venResource2";
 
@@ -73,6 +83,8 @@ public class OadrDataBaseSetup {
 		VEN_TEST_LIST.put(OadrDataBaseSetup.VEN_HTTP_PULL, ANOTHER_VEN_SECURITY_SESSION);
 		VEN_TEST_LIST.put(OadrDataBaseSetup.VEN_XMPP, VEN_XMPP_SECURITY_SESSION);
 		VEN_TEST_LIST.put(OadrDataBaseSetup.VEN_XMPP_DSIG, VEN_XMPP_DSIG_SECURITY_SESSION);
+//		VEN_TEST_LIST.put(OadrDataBaseSetup.VEN_HTTP_PUSH_DSIG, VEN_HTTP_PUSH_DSIG_SECURITY_SESSION);
+//		VEN_TEST_LIST.put(OadrDataBaseSetup.VEN_HTTP_PUSH, VEN_HTTP_PUSH_SECURITY_SESSION);
 	}
 
 	@Resource
@@ -130,6 +142,7 @@ public class OadrDataBaseSetup {
 		ven.setVenGroup(Sets.newHashSet(group));
 		ven.setTransport(OadrTransportType.SIMPLE_HTTP.value());
 		ven.setHttpPullModel(true);
+		ven.setXmlSignature(false);
 		venService.save(ven);
 
 		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
@@ -142,6 +155,8 @@ public class OadrDataBaseSetup {
 		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
 		ven.setVenGroup(Sets.newHashSet(group));
 		ven.setTransport(OadrTransportType.XMPP.value());
+		ven.setXmlSignature(false);
+		ven.setHttpPullModel(false);
 		ven.setPushUrl(VEN_XMPP + "@" + vtnConfig.getXmppDomain() + "/client");
 		venService.save(ven);
 
@@ -156,7 +171,38 @@ public class OadrDataBaseSetup {
 		ven.setVenGroup(Sets.newHashSet(group));
 		ven.setTransport(OadrTransportType.XMPP.value());
 		ven.setXmlSignature(true);
+		ven.setHttpPullModel(false);
 		ven.setPushUrl(VEN_XMPP_DSIG + "@" + vtnConfig.getXmppDomain() + "/client");
+		venService.save(ven);
+
+		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
+		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
+
+		ven = venService.prepare(VEN_HTTP_PUSH);
+		ven.setOadrName(VEN_HTTP_PUSH);
+		ven.setOadrProfil(SchemaVersionEnumeratedType.OADR_20B.value());
+		ven.setRegistrationId(VEN_HTTP_PUSH_REGISTRATION_ID);
+		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
+		ven.setVenGroup(Sets.newHashSet(group));
+		ven.setTransport(OadrTransportType.SIMPLE_HTTP.value());
+		ven.setXmlSignature(false);
+		ven.setHttpPullModel(false);
+		ven.setPushUrl("https://" + VEN_HTTP_PUSH + ".oadr.com");
+		venService.save(ven);
+
+		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
+		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
+
+		ven = venService.prepare(VEN_HTTP_PUSH_DSIG);
+		ven.setOadrName(VEN_HTTP_PUSH_DSIG);
+		ven.setOadrProfil(SchemaVersionEnumeratedType.OADR_20B.value());
+		ven.setRegistrationId(VEN_HTTP_PUSH_DSIG_REGISTRATION_ID);
+		ven.setVenMarketContexts(Sets.newHashSet(marketContext));
+		ven.setVenGroup(Sets.newHashSet(group));
+		ven.setTransport(OadrTransportType.SIMPLE_HTTP.value());
+		ven.setXmlSignature(true);
+		ven.setHttpPullModel(false);
+		ven.setPushUrl("https://" + VEN_HTTP_PUSH_DSIG + ".oadr.com");
 		venService.save(ven);
 
 		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));

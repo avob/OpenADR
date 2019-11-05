@@ -8,17 +8,9 @@ public class Oadr20bCanceledPartyRegistrationBuilder {
 
 	private OadrCanceledPartyRegistrationType oadrCanceledPartyRegistration;
 
-	public Oadr20bCanceledPartyRegistrationBuilder(String requestId, int responseCode, String registrationId,
-			String venId) {
-		oadrCanceledPartyRegistration = Oadr20bFactory.createOadrCanceledPartyRegistrationType(requestId, responseCode,
-				registrationId, venId);
-
-	}
-
 	public Oadr20bCanceledPartyRegistrationBuilder(EiResponseType eiresponse, String registrationId, String venId) {
-		oadrCanceledPartyRegistration.setEiResponse(eiresponse);
-		oadrCanceledPartyRegistration.setRegistrationID(registrationId);
-		oadrCanceledPartyRegistration.setVenID(venId);
+		oadrCanceledPartyRegistration = Oadr20bFactory.createOadrCanceledPartyRegistrationType(eiresponse,
+				registrationId, venId);
 	}
 
 	public Oadr20bCanceledPartyRegistrationBuilder withSchemaVersion(String schemaVersion) {

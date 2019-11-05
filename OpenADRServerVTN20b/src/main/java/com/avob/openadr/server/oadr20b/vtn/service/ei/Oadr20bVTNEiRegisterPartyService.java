@@ -210,11 +210,10 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 		String requestID = payload.getRequestID();
 		String registrationID = payload.getRegistrationID();
 		if (!payload.getVenID().equals(venID)) {
-			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
 			OadrCanceledPartyRegistrationType build = Oadr20bEiRegisterPartyBuilders
-					.newOadr20bCanceledPartyRegistrationBuilder(requestID,
-							Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), null, venID)
+					.newOadr20bCanceledPartyRegistrationBuilder(Oadr20bResponseBuilders
+							.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID),
+							registrationID, venID)
 					.build();
 			return marshall(build, signed);
 		}
@@ -233,18 +232,18 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 
 		if (ven.getRegistrationId() == null || !ven.getRegistrationId().equals(registrationID)) {
 			OadrCanceledPartyRegistrationType build = Oadr20bEiRegisterPartyBuilders
-					.newOadr20bCanceledPartyRegistrationBuilder(requestID,
-							Oadr20bApplicationLayerErrorCode.INVALID_ID_452, null, ven.getUsername())
+					.newOadr20bCanceledPartyRegistrationBuilder(
+							Oadr20bResponseBuilders.newOadr20bEiResponseInvalidRegistrationIdBuilder(requestID, venID),
+							null, ven.getUsername())
 					.build();
 
 			return marshall(build, signed);
 
 		}
-
 		clearRegistration(ven);
 		OadrCanceledPartyRegistrationType response = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCanceledPartyRegistrationBuilder(requestID, HttpStatus.OK_200, registrationID,
-						ven.getUsername())
+				.newOadr20bCanceledPartyRegistrationBuilder(Oadr20bResponseBuilders.newOadr20bEiResponseOK(requestID),
+						registrationID, ven.getUsername())
 				.build();
 		return marshall(response, signed);
 	}

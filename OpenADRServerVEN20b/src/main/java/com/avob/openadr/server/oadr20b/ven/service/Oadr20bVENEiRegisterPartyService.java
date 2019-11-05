@@ -97,9 +97,9 @@ public class Oadr20bVENEiRegisterPartyService {
 			responseCode = Oadr20bApplicationLayerErrorCode.INVALID_ID_452;
 		}
 
-		return Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCanceledPartyRegistrationBuilder(requestID, responseCode, registrationID, venID).build();
-
+		return Oadr20bEiRegisterPartyBuilders.newOadr20bCanceledPartyRegistrationBuilder(
+				Oadr20bResponseBuilders.newOadr20bEiResponseBuilder(requestID, responseCode).build(), registrationID,
+				venID).build();
 	}
 
 	public void clearRegistration(VtnSessionConfiguration vtnConfiguration) {

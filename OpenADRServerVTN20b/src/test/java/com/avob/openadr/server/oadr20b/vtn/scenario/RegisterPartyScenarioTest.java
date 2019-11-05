@@ -169,8 +169,10 @@ public class RegisterPartyScenarioTest {
 
 		// EI REGISTER PARTY CONTROLLER - ven response reregistration request invalid
 		// mismatch payload venID and username auth session
+
 		OadrCanceledPartyRegistrationType canceledPartyRegistration = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCanceledPartyRegistrationBuilder(cancelPartyRegistration.getRequestID(), HttpStatus.OK_200,
+				.newOadr20bCanceledPartyRegistrationBuilder(Oadr20bResponseBuilders
+						.newOadr20bEiResponseBuilder(cancelPartyRegistration.getRequestID(), HttpStatus.OK_200).build(),
 						venDto.getRegistrationId(), "mouaiccool")
 				.build();
 		OadrResponseType postEiRegisterPartyAndExpect = mockVen.register(canceledPartyRegistration, HttpStatus.OK_200,
@@ -179,10 +181,10 @@ public class RegisterPartyScenarioTest {
 				postEiRegisterPartyAndExpect.getEiResponse().getResponseCode());
 
 		// EI REGISTER PARTY CONTROLLER - ven response reregistration request
-		canceledPartyRegistration = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCanceledPartyRegistrationBuilder(cancelPartyRegistration.getRequestID(), HttpStatus.OK_200,
-						venDto.getRegistrationId(), venDto.getUsername())
-				.build();
+		canceledPartyRegistration = Oadr20bEiRegisterPartyBuilders.newOadr20bCanceledPartyRegistrationBuilder(
+				Oadr20bResponseBuilders
+						.newOadr20bEiResponseBuilder(cancelPartyRegistration.getRequestID(), HttpStatus.OK_200).build(),
+				venDto.getRegistrationId(), venDto.getUsername()).build();
 
 		postEiRegisterPartyAndExpect = mockVen.register(canceledPartyRegistration, HttpStatus.OK_200,
 				OadrResponseType.class);

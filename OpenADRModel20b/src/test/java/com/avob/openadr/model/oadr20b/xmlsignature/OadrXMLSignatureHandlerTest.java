@@ -301,9 +301,10 @@ public class OadrXMLSignatureHandlerTest {
 	@Test
 	public void testOadrCanceledPartyRegistrationType()
 			throws Oadr20bXMLSignatureException, Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {
-		int responseCode = 200;
 		OadrCanceledPartyRegistrationType request = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCanceledPartyRegistrationBuilder(REQUEST_ID, responseCode, REGISTRATION_ID, VEN_ID).build();
+				.newOadr20bCanceledPartyRegistrationBuilder(Oadr20bResponseBuilders.newOadr20bEiResponseOK(REQUEST_ID),
+						REGISTRATION_ID, VEN_ID)
+				.build();
 		String sign = OadrXMLSignatureHandler.sign(request, privateKey, certificate, NONCE, 0L);
 		validate(sign);
 		OadrPayload unmarshal = jaxbContext.unmarshal(sign, OadrPayload.class, true);
