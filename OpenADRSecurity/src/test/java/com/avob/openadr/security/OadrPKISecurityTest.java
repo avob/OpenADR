@@ -127,6 +127,17 @@ public class OadrPKISecurityTest {
 	}
 
 	@Test
+	public void createDefaultSSLContextTest() throws OadrSecurityException, KeyStoreException, NoSuchAlgorithmException,
+			CertificateException, IOException {
+		String password = UUID.randomUUID().toString();
+		List<String> certificates = new ArrayList<>();
+		certificates.add(TestUtils.TEST_CRT);
+		SSLContext createSSLContext = OadrPKISecurity.createSSLContext(null, null, null, password);
+		assertNotNull(createSSLContext);
+
+	}
+
+	@Test
 	public void generateRsaKeyPairTest() throws NoSuchAlgorithmException {
 		OadrPKISecurity.generateRsaKeyPair();
 

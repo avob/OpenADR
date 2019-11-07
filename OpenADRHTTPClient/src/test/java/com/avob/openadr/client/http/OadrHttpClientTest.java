@@ -53,7 +53,8 @@ public class OadrHttpClientTest {
 
 		new OadrHttpClientBuilder().withPooling(1, 1).withProtocol(protocols, ciphers)
 				.withDefaultDigestAuthentication("http://localhost:8080", "", "", "", "")
-				.withTrustedCertificate(Arrays.asList(certs)).withTimeout(TIMEOUT).build();
+				.withTrustedCertificate(Arrays.asList(certs)).withHeader("Content-Type", "application/json")
+				.enableHttp(false).withTimeout(TIMEOUT).build();
 
 	}
 
@@ -62,9 +63,9 @@ public class OadrHttpClientTest {
 
 		String[] certs = { rsaTrustedRootCertificate, rsaTrustedIntermediateCertificate };
 
-		new OadrHttpClientBuilder().withPooling(1, 1).withProtocol(protocols, ciphers)
+		new OadrHttpClientBuilder().withProtocol(protocols, ciphers)
 				.withX509Authentication(rsaPrivateKeyPemFilePath, rsaClientCertPemFilePath)
-				.withTrustedCertificate(Arrays.asList(certs)).withTimeout(TIMEOUT).build();
+				.withTrustedCertificate(Arrays.asList(certs)).enableHttp(false).withTimeout(TIMEOUT).build();
 
 	}
 

@@ -68,7 +68,6 @@ public class DemandResponseControllerTest {
 
 	private static final String APPLICATION_JSON_HEADER_VALUE = "application/json";
 	private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
-	private static final String STATE_PARAM = "state";
 	private static final String VEN_PARAM = "ven";
 	private static final String LEVEL_SIGNAL_TYPE = "level";
 	private static final String SIMPLE_SIGNAL_NAME = "SIMPLE";

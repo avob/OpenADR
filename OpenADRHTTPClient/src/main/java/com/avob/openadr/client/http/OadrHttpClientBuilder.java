@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+
+import javax.net.ssl.SSLContext;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -219,11 +222,11 @@ public class OadrHttpClientBuilder {
 
 	public OadrHttpClient build() throws OadrSecurityException {
 
-		
-		
-		SSLConnectionSocketFactory createSSLSocketFactory = SSLSocketFactoryBuilder.createSSLSocketFactory(
-				clientPrivateKeyPemFilePath, clientCertificatePemFilePath, trustedCertificateFilePath, protocols,
-				ciphers);
+		String password = UUID.randomUUID().toString();
+		SSLContext sc = OadrPKISecurity.createSSLContext(clientPrivateKeyPemFilePath, clientCertificatePemFilePath,
+				this.trustedCertificateFilePath, password);
+		SSLConnectionSocketFactory createSSLSocketFactory = new SSLConnectionSocketFactory(sc, protocols, ciphers,
+				SSLConnectionSocketFactory.getDefaultHostnameVerifier());
 
 		RegistryBuilder<ConnectionSocketFactory> register = RegistryBuilder.<ConnectionSocketFactory>create()
 				.register("https", createSSLSocketFactory);

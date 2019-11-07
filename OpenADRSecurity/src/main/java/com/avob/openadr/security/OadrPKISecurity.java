@@ -257,11 +257,26 @@ public class OadrPKISecurity {
 	 */
 	public static SSLContext createSSLContext(String clientPrivateKeyPemFilePath, String clientCertificatePemFilePath,
 			List<String> trustCertificates, String password) throws OadrSecurityException {
+		KeyManagerFactory kmf;
+		TrustManagerFactory tmf;
 		SSLContext sslContext;
 		try {
-			KeyManagerFactory kmf = OadrPKISecurity.createKeyManagerFactory(clientPrivateKeyPemFilePath,
-					clientCertificatePemFilePath, password);
-			TrustManagerFactory tmf = OadrPKISecurity.createTrustManagerFactory(trustCertificates);
+
+			if (clientPrivateKeyPemFilePath != null && clientCertificatePemFilePath != null) {
+				kmf = OadrPKISecurity.createKeyManagerFactory(clientPrivateKeyPemFilePath, clientCertificatePemFilePath,
+						password);
+			} else {
+				kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+				kmf.init(null, null);
+			}
+
+			if (trustCertificates != null) {
+				tmf = OadrPKISecurity.createTrustManagerFactory(trustCertificates);
+			} else {
+				tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+				tmf.init(KeyStore.getInstance("JKS"));
+			}
+
 			// SSL Context Factory
 
 			sslContext = SSLContext.getInstance("TLS");
@@ -273,7 +288,7 @@ public class OadrPKISecurity {
 
 			return sslContext;
 
-		} catch (NoSuchAlgorithmException | KeyManagementException e) {
+		} catch (NoSuchAlgorithmException | KeyManagementException | UnrecoverableKeyException | KeyStoreException e) {
 			throw new OadrSecurityException(e);
 		}
 	}
