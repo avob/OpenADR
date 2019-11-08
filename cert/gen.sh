@@ -106,12 +106,12 @@ gen_oadr20a_fingerprint()
 gen_selfsigned_key_crt()
 {
 	openssl req -nodes -new -x509  -keyout $1.key -out $1.crt \
-		-subj "/C=$COUNTRY/ST=$STATE/L=$LOCALITY/O=$ORGANIZATION/OU=$ORGANIZATION/CN=$1" -days 365
+		-subj "/C=$COUNTRY/ST=$STATE/L=$LOCALITY/O=$ORGANIZATION/OU=$ORGANIZATION/CN=$1" -days $2
 }
 ###################################
 # CA
 ###################################
-gen_selfsigned_key_crt $CA_NAME
+gen_selfsigned_key_crt $CA_NAME 365
 
 ###################################
 # VTN RSA
