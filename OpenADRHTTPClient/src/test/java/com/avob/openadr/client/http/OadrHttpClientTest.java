@@ -65,7 +65,7 @@ public class OadrHttpClientTest {
 
 		new OadrHttpClientBuilder().withProtocol(protocols, ciphers)
 				.withX509Authentication(rsaPrivateKeyPemFilePath, rsaClientCertPemFilePath)
-				.withTrustedCertificate(Arrays.asList(certs)).enableHttp(false).withTimeout(TIMEOUT).build();
+				.withTrustedCertificate(Arrays.asList(certs)).enableHttp(true).withTimeout(TIMEOUT).build();
 
 	}
 

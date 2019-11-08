@@ -15,6 +15,8 @@ import org.jxmpp.stringprep.XmppStringprepException;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20b;
@@ -31,6 +33,8 @@ import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppListener;
 
 @Service
 public class OadrMockEiXmpp {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(OadrMockEiXmpp.class);
 
 	@Resource
 	private XmppConnector xmppConnector;
@@ -81,18 +85,11 @@ public class OadrMockEiXmpp {
 //				response.add(invocation);
 				return null;
 			}).when(mockUplinkClient).sendMessage(Mockito.any(Jid.class), Mockito.any(String.class));
-		} catch (XmppStringprepException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NotConnectedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Oadr20bMarshalException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Oadr20bMarshalException | NotConnectedException | XmppStringprepException e) {
+			LOGGER.error("", e);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("", e);
+			Thread.currentThread().interrupt();
 		}
 
 		xmppEiRegisterPartyListener = new XmppListener(oadr20bVTNEiRegisterPartyService, mockUplinkClient,

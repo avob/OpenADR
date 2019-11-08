@@ -2,6 +2,8 @@ package com.avob.openadr.server.oadr20b.vtn.service.ei;
 
 import javax.annotation.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -21,6 +23,8 @@ import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 
 @Service
 public class Oadr20bVTNPayloadService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVTNPayloadService.class);
 
 	@Resource
 	private VenService venService;
@@ -47,15 +51,29 @@ public class Oadr20bVTNPayloadService {
 	private Oadr20bVTNOadrPollService oadr20bVTNOadrPollService;
 
 	private class UnmarshalledPayload {
-		public Object payload;
-		public boolean signed;
-	}
+		private Object payload;
+		private boolean signed;
 
-	private UnmarshalledPayload wrapper(Object unsignedPayload, boolean signed) {
-		UnmarshalledPayload unmarshalledPayload = new UnmarshalledPayload();
-		unmarshalledPayload.payload = unsignedPayload;
-		unmarshalledPayload.signed = signed;
-		return unmarshalledPayload;
+		public UnmarshalledPayload(Object payload, boolean signed) {
+			this.payload = payload;
+			this.signed = signed;
+		}
+
+		public Object getPayload() {
+			return payload;
+		}
+
+		public void setPayload(Object payload) {
+			this.payload = payload;
+		}
+
+		public boolean isSigned() {
+			return signed;
+		}
+
+		public void setSigned(boolean signed) {
+			this.signed = signed;
+		}
 	}
 
 	private UnmarshalledPayload unmarshall(Ven ven, String payload)
@@ -77,10 +95,10 @@ public class Oadr20bVTNPayloadService {
 					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder("", ven.getUsername());
 			OadrResponseType build = Oadr20bResponseBuilders
 					.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, ven.getUsername()).build();
-			return wrapper(build, signed);
+			return new UnmarshalledPayload(build, signed);
 		}
 
-		return wrapper(unsignedPayload, signed);
+		return new UnmarshalledPayload(unsignedPayload, signed);
 	}
 
 	private String marshall(Object payload, boolean signed) {
@@ -91,19 +109,14 @@ public class Oadr20bVTNPayloadService {
 			} else {
 				return oadr20bJAXBContext.marshalRoot(payload);
 			}
-		} catch (Oadr20bXMLSignatureException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		} catch (Oadr20bMarshalException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Oadr20bXMLSignatureException | Oadr20bMarshalException e) {
+			LOGGER.error("Internal error happened when marhsalling VTN message", e);
 			return null;
 		}
 	}
 
 	private String signatureError(Ven ven) {
-		boolean signed = (ven != null && ven.getXmlSignature() != null) ? ven.getXmlSignature() : false;
+		boolean signed = (ven.getXmlSignature() != null) ? ven.getXmlSignature() : false;
 		OadrResponseType response = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.INVALID_DATA_454, ven.getUsername())
 				.withDescription("Can't validate payload xml signature").build();
@@ -111,15 +124,25 @@ public class Oadr20bVTNPayloadService {
 	}
 
 	private String unmarshallError(Ven ven) {
-		boolean signed = (ven != null && ven.getXmlSignature() != null) ? ven.getXmlSignature() : false;
+		boolean signed = (ven.getXmlSignature() != null) ? ven.getXmlSignature() : false;
 		OadrResponseType response = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, ven.getUsername())
 				.withDescription("Can't unmarshall payload").build();
 		return marshall(response, signed);
 	}
 
+	private String venNotfoundError(String username) {
+		OadrResponseType response = Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, username)
+				.withDescription("Can't found ven wth venID: " + username).build();
+		return marshall(response, false);
+	}
+
 	public String event(String username, String payload) {
 		Ven ven = venService.findOneByUsername(username);
+		if (ven == null) {
+			return venNotfoundError(username);
+		}
 		UnmarshalledPayload unsignedPayload;
 		try {
 			unsignedPayload = unmarshall(ven, payload);
@@ -129,13 +152,16 @@ public class Oadr20bVTNPayloadService {
 			return signatureError(ven);
 		}
 
-		Object request = oadr20bVTNEiEventService.request(ven, unsignedPayload.payload);
-		return marshall(request, unsignedPayload.signed);
+		Object request = oadr20bVTNEiEventService.request(ven, unsignedPayload.getPayload());
+		return marshall(request, unsignedPayload.isSigned());
 
 	}
 
 	public String registerParty(String username, String payload) {
 		Ven ven = venService.findOneByUsername(username);
+		if (ven == null) {
+			return venNotfoundError(username);
+		}
 		UnmarshalledPayload unsignedPayload;
 		try {
 			unsignedPayload = unmarshall(ven, payload);
@@ -144,12 +170,15 @@ public class Oadr20bVTNPayloadService {
 		} catch (Oadr20bXMLSignatureValidationException e) {
 			return signatureError(ven);
 		}
-		Object request = oadr20bVTNEiRegisterPartyService.request(ven, unsignedPayload.payload);
-		return marshall(request, unsignedPayload.signed);
+		Object request = oadr20bVTNEiRegisterPartyService.request(ven, unsignedPayload.getPayload());
+		return marshall(request, unsignedPayload.isSigned());
 	}
 
 	public String opt(String username, String payload) {
 		Ven ven = venService.findOneByUsername(username);
+		if (ven == null) {
+			return venNotfoundError(username);
+		}
 		UnmarshalledPayload unsignedPayload;
 		try {
 			unsignedPayload = unmarshall(ven, payload);
@@ -158,12 +187,15 @@ public class Oadr20bVTNPayloadService {
 		} catch (Oadr20bXMLSignatureValidationException e) {
 			return signatureError(ven);
 		}
-		Object request = oadr20bVTNEiOptService.request(ven, unsignedPayload.payload);
-		return marshall(request, unsignedPayload.signed);
+		Object request = oadr20bVTNEiOptService.request(ven, unsignedPayload.getPayload());
+		return marshall(request, unsignedPayload.isSigned());
 	}
 
 	public String report(String username, String payload) {
 		Ven ven = venService.findOneByUsername(username);
+		if (ven == null) {
+			return venNotfoundError(username);
+		}
 		UnmarshalledPayload unsignedPayload;
 		try {
 			unsignedPayload = unmarshall(ven, payload);
@@ -172,12 +204,15 @@ public class Oadr20bVTNPayloadService {
 		} catch (Oadr20bXMLSignatureValidationException e) {
 			return signatureError(ven);
 		}
-		Object request = oadr20bVTNEiReportService.request(ven, unsignedPayload.payload);
-		return marshall(request, unsignedPayload.signed);
+		Object request = oadr20bVTNEiReportService.request(ven, unsignedPayload.getPayload());
+		return marshall(request, unsignedPayload.isSigned());
 	}
 
 	public String poll(String username, String payload) {
 		Ven ven = venService.findOneByUsername(username);
+		if (ven == null) {
+			return venNotfoundError(username);
+		}
 		UnmarshalledPayload unsignedPayload;
 		try {
 			unsignedPayload = unmarshall(ven, payload);
@@ -186,7 +221,7 @@ public class Oadr20bVTNPayloadService {
 		} catch (Oadr20bXMLSignatureValidationException e) {
 			return signatureError(ven);
 		}
-		Object request = oadr20bVTNOadrPollService.request(ven, unsignedPayload.payload);
-		return marshall(request, unsignedPayload.signed);
+		Object request = oadr20bVTNOadrPollService.request(ven, unsignedPayload.getPayload());
+		return marshall(request, unsignedPayload.isSigned());
 	}
 }

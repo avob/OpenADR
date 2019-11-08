@@ -2,10 +2,13 @@ package com.avob.openadr.server.common.vtn.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Executor;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -23,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
-import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDao;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
@@ -81,15 +83,11 @@ public class DemandResponseEventService {
 	@Resource
 	private DtoMapper dtoMapper;
 
-	private static DatatypeFactory datatypeFactory;
-	static {
-		try {
-			datatypeFactory = DatatypeFactory.newInstance();
+	private DatatypeFactory datatypeFactory;
 
-		} catch (DatatypeConfigurationException e) {
-			LOGGER.error("", e);
-			throw new OadrVTNInitializationException(e);
-		}
+	@PostConstruct
+	public void init() throws DatatypeConfigurationException {
+		datatypeFactory = DatatypeFactory.newInstance();
 	}
 
 	private List<Ven> findVenForTarget(DemandResponseEvent event,
@@ -187,16 +185,15 @@ public class DemandResponseEventService {
 	@Transactional(readOnly = false)
 	public DemandResponseEvent update(DemandResponseEvent event, DemandResponseEventUpdateDto dto) {
 
+		List<DemandResponseEventTarget> toKeep = new ArrayList<>();
 		List<DemandResponseEventTargetDto> toAdd = new ArrayList<>();
-		List<DemandResponseEventTargetDto> unchanged = new ArrayList<>();
-
 		for (DemandResponseEventTargetDto updateTarget : dto.getTargets()) {
 			boolean found = false;
 			for (DemandResponseEventTarget target : event.getTargets()) {
 				if (target.getTargetType().equals(updateTarget.getTargetType())
 						&& target.getTargetId().equals(updateTarget.getTargetId())) {
 					found = true;
-					unchanged.add(updateTarget);
+					toKeep.add(target);
 				}
 			}
 			if (!found) {
@@ -205,22 +202,28 @@ public class DemandResponseEventService {
 
 		}
 
-		List<DemandResponseEventTarget> toRemove = new ArrayList<>();
-		if (dto.getTargets().size() < unchanged.size() + toAdd.size()) {
-			for (DemandResponseEventTarget target : event.getTargets()) {
-				boolean found = false;
-				for (DemandResponseEventTargetDto updateTarget : dto.getTargets()) {
-					if (target.getTargetType().equals(updateTarget.getTargetType())
-							&& target.getTargetId().equals(updateTarget.getTargetId())) {
-						found = true;
-					}
-				}
-
-				if (!found) {
-					toRemove.add(target);
-				}
+		if (!toAdd.isEmpty()) {
+			List<VenDemandResponseEvent> list = new ArrayList<>();
+			List<Ven> findVenForTarget = findVenForTarget(event, toAdd);
+			for (Ven ven : findVenForTarget) {
+				list.add(new VenDemandResponseEvent(event, ven));
 			}
+			if (!list.isEmpty()) {
+				venDemandResponseEventDao.saveAll(list);
+			}
+
 		}
+
+		Set<DemandResponseEventTarget> actualSet = new HashSet<DemandResponseEventTarget>(event.getTargets());
+		boolean removeAll = actualSet.removeAll(toKeep);
+		VenDemandResponseEvent findOneByEventAndVenId = venDemandResponseEventDao.findOneByEventAndVenId(event, "ven1");
+		// unlink removed target
+		if (!actualSet.isEmpty()) {
+			List<Ven> vens = findVenForTarget(event, new ArrayList<>(actualSet));
+			venDemandResponseEventDao.deleteByEventIdAndVenIn(event.getId(), vens);
+		}
+
+		findOneByEventAndVenId = venDemandResponseEventDao.findOneByEventAndVenId(event, "ven1");
 
 		// update modification number if event is published
 		if (dto.isPublished()) {
@@ -232,28 +235,13 @@ public class DemandResponseEventService {
 		demandResponseEventSignalDao.deleteAll(event.getSignals());
 		partialUpdate.getSignals().forEach(sig -> sig.setEvent(event));
 		demandResponseEventSignalDao.saveAll(partialUpdate.getSignals());
+
 		// update event
 		event.setSignals(partialUpdate.getSignals());
 		event.setTargets(partialUpdate.getTargets());
 		event.setLastUpdateTimestamp(System.currentTimeMillis());
 		event.setPublished(partialUpdate.isPublished());
 		DemandResponseEvent save = demandResponseEventDao.save(event);
-
-		// link added targets
-		if (!toAdd.isEmpty()) {
-			List<Ven> vens = findVenForTarget(event, toAdd);
-			List<VenDemandResponseEvent> list = new ArrayList<>();
-			for (Ven ven : vens) {
-				list.add(new VenDemandResponseEvent(event, ven));
-			}
-			venDemandResponseEventDao.saveAll(list);
-		}
-
-		// unlink removed target
-		if (!toRemove.isEmpty()) {
-			List<Ven> vens = findVenForTarget(event, toRemove);
-			venDemandResponseEventDao.deleteByEventIdAndVenIn(event.getId(), vens);
-		}
 
 		if (dto.isPublished()) {
 			this.distributeEventToPushVen(event);
