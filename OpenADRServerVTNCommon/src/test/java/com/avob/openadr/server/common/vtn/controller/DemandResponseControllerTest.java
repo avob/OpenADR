@@ -115,7 +115,7 @@ public class DemandResponseControllerTest {
 	private UserRequestPostProcessor userSession = SecurityMockMvcRequestPostProcessors.user(VEN1).roles("USER");
 
 	private List<Ven> vens = new ArrayList<>();
-	private List<Long> events = new ArrayList<>();
+	private List<DemandResponseEvent> events = new ArrayList<>();
 	private DemandResponseEvent event1 = null;
 	private VenMarketContext marketContext = null;
 	private VenGroup group = null;
@@ -126,7 +126,7 @@ public class DemandResponseControllerTest {
 
 	@After
 	public void after() {
-		demandResponseEventService.deleteById(events);
+		demandResponseEventService.delete(events);
 		venService.delete(vens);
 		venMarketContextService.delete(marketContext);
 		venGroupService.delete(group);
@@ -173,7 +173,7 @@ public class DemandResponseControllerTest {
 		dto.getSignals().add(signal);
 
 		event1 = demandResponseEventService.create(dto);
-		events.add(event1.getId());
+		events.add(event1);
 
 		dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
@@ -186,7 +186,7 @@ public class DemandResponseControllerTest {
 		dto.getTargets().add(new DemandResponseEventTargetDto(VEN_PARAM, VEN2));
 		dto.getSignals().add(signal);
 		event2 = demandResponseEventService.create(dto);
-		events.add(event2.getId());
+		events.add(event2);
 
 		dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
@@ -199,7 +199,7 @@ public class DemandResponseControllerTest {
 		dto.getTargets().add(new DemandResponseEventTargetDto(GROUP_PARAM, GROUP1));
 		dto.getSignals().add(signal);
 		event3 = demandResponseEventService.create(dto);
-		events.add(event3.getId());
+		events.add(event3);
 
 	}
 

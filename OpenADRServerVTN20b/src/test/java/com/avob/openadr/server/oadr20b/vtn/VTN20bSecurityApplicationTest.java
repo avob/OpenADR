@@ -21,9 +21,6 @@ public class VTN20bSecurityApplicationTest {
 
 	@MockBean
 	JmsTemplate jmsTemplate;
-//
-//	@MockBean
-//	XmppConnector xmppConnector;
 
 	public static void main(String[] args) {
 

@@ -63,17 +63,10 @@ public class Oadr20bVTNPayloadService {
 			return payload;
 		}
 
-		public void setPayload(Object payload) {
-			this.payload = payload;
-		}
-
 		public boolean isSigned() {
 			return signed;
 		}
 
-		public void setSigned(boolean signed) {
-			this.signed = signed;
-		}
 	}
 
 	private UnmarshalledPayload unmarshall(Ven ven, String payload)

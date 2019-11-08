@@ -77,7 +77,7 @@ public class OadrDataBaseSetup {
 	public static final String GROUP = "group1";
 	public static final String ANOTHER_GROUP = "group2";
 
-	public static Map<String, UserRequestPostProcessor> VEN_TEST_LIST = new HashMap<>();
+	public static final Map<String, UserRequestPostProcessor> VEN_TEST_LIST = new HashMap<>();
 	static {
 		VEN_TEST_LIST.put(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, VEN_HTTP_PULL_DSIG_SECURITY_SESSION);
 		VEN_TEST_LIST.put(OadrDataBaseSetup.VEN_HTTP_PULL, ANOTHER_VEN_SECURITY_SESSION);

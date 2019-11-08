@@ -3,6 +3,8 @@ package com.avob.openadr.server.common.vtn.service.push;
 import javax.annotation.Resource;
 import javax.jms.JMSException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessagePostProcessor;
@@ -16,6 +18,8 @@ import com.rabbitmq.jms.client.message.RMQTextMessage;
 
 @Service
 public class OadrAppNotificationPublisher {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(OadrAppNotificationPublisher.class);
 
 	public static final String OADR_APP_NOTIFICATION_TOPIC = "topic.app.notification";
 
@@ -36,29 +40,16 @@ public class OadrAppNotificationPublisher {
 				destination.setDestinationName(OADR_APP_NOTIFICATION_TOPIC + "." + subTopic + ".*");
 				destination.setAmqpExchangeName("jms.durable.queues");
 				destination.setQueue(true);
-//				destination.setAmqp(true);
-//				destination.setAmqpQueueName("jms.durable.queues");
-//				destination.setDeclared(false);
 				destination.setAmqpRoutingKey(OADR_APP_NOTIFICATION_TOPIC + "." + subTopic + ".*");
-//				destination.setAmqpRoutingKey(OADR_APP_NOTIFICATION_TOPIC + "." + subTopic + "."+venId);
-
-//				Message<String> msg = MessageBuilder.withPayload(writeValueAsString).setHeader("venID", venId).build();
 				RMQTextMessage msg = new RMQTextMessage();
 				try {
 					msg.setText(writeValueAsString);
 					msg.setStringProperty("venID", venId);
 					jmsTemplate.convertAndSend(destination, msg);
 				} catch (JMSException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOGGER.error("Can't publish notification", e);
 				}
-
-//				jmsTemplate.convertAndSend(OADR_APP_NOTIFICATION_TOPIC + "." + subTopic + "." + venId, writeValueAsString);
-//				jmsTemplate.convertAndSend(OADR_APP_NOTIFICATION_TOPIC, writeValueAsString);
-
-			}
-
-			else {
+			} else {
 
 				jmsTemplate.convertAndSend(OADR_APP_NOTIFICATION_TOPIC + "." + subTopic + "." + venId,
 						writeValueAsString, new MessagePostProcessor() {
@@ -72,8 +63,7 @@ public class OadrAppNotificationPublisher {
 						});
 			}
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("Can't marshall message for notification", e);
 		}
 
 	}

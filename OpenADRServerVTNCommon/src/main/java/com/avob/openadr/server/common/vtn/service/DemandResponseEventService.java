@@ -215,15 +215,12 @@ public class DemandResponseEventService {
 		}
 
 		Set<DemandResponseEventTarget> actualSet = new HashSet<DemandResponseEventTarget>(event.getTargets());
-		boolean removeAll = actualSet.removeAll(toKeep);
-		VenDemandResponseEvent findOneByEventAndVenId = venDemandResponseEventDao.findOneByEventAndVenId(event, "ven1");
+		actualSet.removeAll(toKeep);
 		// unlink removed target
 		if (!actualSet.isEmpty()) {
 			List<Ven> vens = findVenForTarget(event, new ArrayList<>(actualSet));
 			venDemandResponseEventDao.deleteByEventIdAndVenIn(event.getId(), vens);
 		}
-
-		findOneByEventAndVenId = venDemandResponseEventDao.findOneByEventAndVenId(event, "ven1");
 
 		// update modification number if event is published
 		if (dto.isPublished()) {
@@ -324,21 +321,9 @@ public class DemandResponseEventService {
 	}
 
 	public void delete(Iterable<DemandResponseEvent> entities) {
+		demandResponseEventSignalDao.deleteByEventIn(Lists.newArrayList(entities));
 		venDemandResponseEventDao.deleteByEventIn(Lists.newArrayList(entities));
 		demandResponseEventDao.deleteAll(entities);
-	}
-
-	public void deleteById(Iterable<Long> entities) {
-		for (Long id : entities) {
-			venDemandResponseEventDao.deleteByEventId(id);
-
-		}
-
-		demandResponseEventDao.deleteByIdIn(entities);
-	}
-
-	public boolean exists(Long id) {
-		return demandResponseEventDao.existsById(id);
 	}
 
 	public boolean hasResponded(String venId, DemandResponseEvent event) {
@@ -402,10 +387,7 @@ public class DemandResponseEventService {
 	 */
 	public DemandResponseEventOptEnum getVenDemandResponseEventOpt(Long demandResponseEventId, String venUsername)
 			throws OadrElementNotFoundException {
-
-		VenDemandResponseEvent findOneByEventIdAndVenId = this.getVenDemandResponseEvent(demandResponseEventId,
-				venUsername);
-		return findOneByEventIdAndVenId.getVenOpt();
+		return this.getVenDemandResponseEvent(demandResponseEventId, venUsername).getVenOpt();
 	}
 
 	public List<DemandResponseEvent> findToSentEventByVenUsername(String username) {
