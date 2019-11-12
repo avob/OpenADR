@@ -371,7 +371,7 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		OadrCreatedEvent build = Oadr20aBuilders.newCreatedEventBuilder(VEN, "0", 123)
 				.addEventResponse(Oadr20aBuilders
-						.newOadr20aCreatedEventEventResponseBuilder("1", 0L, "0", 123, OptTypeType.OPT_IN).build())
+						.newOadr20aCreatedEventEventResponseBuilder("1", 0L, "0", 123, OptTypeType.OPT_IN).withDescription("mouaiccool").build())
 				.build();
 
 		String marshal = jaxbContext.marshal(build);

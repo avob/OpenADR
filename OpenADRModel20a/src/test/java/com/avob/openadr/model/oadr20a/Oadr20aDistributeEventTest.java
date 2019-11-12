@@ -45,7 +45,7 @@ public class Oadr20aDistributeEventTest {
 		EiActivePeriodType period = Oadr20aBuilders
 				.newOadr20aEiActivePeriodTypeBuilder(timestampStart, eventXmlDuration, toleranceXmlDuration,
 						notificationXmlDuration)
-				.withRampUp(rampUpXmlDuration).withRecovery(recoveryXmlDuration).build();
+				.withRampUp(rampUpXmlDuration).withRecovery(recoveryXmlDuration).withComponent("mouaiccool").build();
 
 		float currentValue = 3f;
 		String xmlDuration = "";

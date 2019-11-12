@@ -24,6 +24,7 @@ import com.avob.openadr.security.OadrFingerprintSecurity;
 import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.ApplicationTest;
+import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.user.OadrApp;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
@@ -52,6 +53,9 @@ public class OadrSecurityRoleServiceTest {
 
 	@Resource
 	private VenService venService;
+
+	@Resource
+	private VtnConfig vtnConfig;
 
 	private OadrUser adminUser = null;
 	private OadrUser passwordUser = null;
@@ -174,6 +178,11 @@ public class OadrSecurityRoleServiceTest {
 				|| authorities.get(1).getAuthority().equals("ROLE_REGISTERED"));
 		assertTrue(authorities.get(0).getAuthority().equals("ROLE_VEN")
 				|| authorities.get(0).getAuthority().equals("ROLE_REGISTERED"));
+
+		grantX509Role = oadrSecurityRoleService.grantX509Role(vtnConfig.getOadr20bFingerprint());
+		authorities = new ArrayList<>(grantX509Role.getAuthorities());
+		assertEquals(1, authorities.size());
+		assertEquals("ROLE_VTN", authorities.get(0).getAuthority());
 
 		boolean exception = false;
 		try {

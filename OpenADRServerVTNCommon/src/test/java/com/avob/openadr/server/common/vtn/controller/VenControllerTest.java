@@ -205,6 +205,16 @@ public class VenControllerTest {
 		filter.setType(VenFilterType.VEN);
 		filter.setValue("ven1");
 		filters.add(filter);
+		
+		filter = new VenFilter();
+		filter.setType(VenFilterType.VEN);
+		filter.setValue("ven2");
+		filters.add(filter);
+		
+		filter = new VenFilter();
+		filter.setType(VenFilterType.IS_REGISTERED);
+		filter.setValue("true");
+		filters.add(filter);
 
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + "search?page=0&size=10")
@@ -213,7 +223,37 @@ public class VenControllerTest {
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
 		assertNotNull(venDto);
-		assertEquals(1, venDto.size());
+		assertEquals(0, venDto.size());
+		
+		filters = new ArrayList<>();
+		filter = new VenFilter();
+		filter.setType(VenFilterType.VEN);
+		filter.setValue("ven1");
+		filters.add(filter);
+		
+		filter = new VenFilter();
+		filter.setType(VenFilterType.VEN);
+		filter.setValue("ven2");
+		filters.add(filter);
+		
+		filter = new VenFilter();
+		filter.setType(VenFilterType.IS_REGISTERED);
+		filter.setValue("false");
+		filters.add(filter);
+		
+		filter = new VenFilter();
+		filter.setType(VenFilterType.IS_REGISTERED);
+		filter.setValue("true");
+		filters.add(filter);
+
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(VEN_URL + "search?page=0&size=10")
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(filters))
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
+		assertNotNull(venDto);
+		assertEquals(2, venDto.size());
 
 		// read
 		this.mockMvc.perform(MockMvcRequestBuilders.get(VEN_URL + "mouaiccool").with(venSession))
@@ -289,6 +329,11 @@ public class VenControllerTest {
 		filter = new VenFilter();
 		filter.setType(VenFilterType.GROUP);
 		filter.setValue(groupName);
+		filters.add(filter);
+		
+		filter = new VenFilter();
+		filter.setType(VenFilterType.GROUP);
+		filter.setValue("mouaiccool");
 		filters.add(filter);
 
 		andReturn = this.mockMvc
@@ -418,6 +463,26 @@ public class VenControllerTest {
 		filter = new VenFilter();
 		filter.setType(VenFilterType.MARKET_CONTEXT);
 		filter.setValue(marketContextName);
+		filters.add(filter);
+
+		andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(VEN_URL + "search?page=0&size=10")
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(filters))
+						.with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
+		assertNotNull(venDto);
+		assertEquals(1, venDto.size());
+		
+		filters = new ArrayList<>();
+		filter = new VenFilter();
+		filter.setType(VenFilterType.MARKET_CONTEXT);
+		filter.setValue(marketContextName);
+		filters.add(filter);
+		
+		filter = new VenFilter();
+		filter.setType(VenFilterType.MARKET_CONTEXT);
+		filter.setValue("mouaiccool");
 		filters.add(filter);
 
 		andReturn = this.mockMvc

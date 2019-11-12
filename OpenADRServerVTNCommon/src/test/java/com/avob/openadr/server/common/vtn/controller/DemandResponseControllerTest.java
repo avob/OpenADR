@@ -978,6 +978,9 @@ public class DemandResponseControllerTest {
 
 		filters = DemandResponseEventFilter.builder().isPublished().addMarketContext(marketContext.getName()).build();
 		searchAndExpect(filters, 0);
+		
+		filters = DemandResponseEventFilter.builder().isPublished().isNotPublished().addMarketContext(marketContext.getName()).build();
+		searchAndExpect(filters, 3);
 
 		filters = DemandResponseEventFilter.builder().addMarketContext(marketContext.getName()).isPublished().build();
 		searchAndExpect(filters, 0);
@@ -989,6 +992,9 @@ public class DemandResponseControllerTest {
 		filters = DemandResponseEventFilter.builder().addVenId(VEN1).build();
 		searchAndExpect(filters, 2);
 
+		filters = DemandResponseEventFilter.builder().addVenId(VEN1).addVenId(VEN2).build();
+		searchAndExpect(filters, 3);
+
 		filters = DemandResponseEventFilter.builder().addVenId(VEN1).addMarketContext(UNKNOWN_MARKETCONTEXT_NAME)
 				.build();
 		searchAndExpect(filters, 0);
@@ -996,6 +1002,10 @@ public class DemandResponseControllerTest {
 		filters = DemandResponseEventFilter.builder().addMarketContext(UNKNOWN_MARKETCONTEXT_NAME).addVenId(VEN1)
 				.build();
 		searchAndExpect(filters, 0);
+
+		filters = DemandResponseEventFilter.builder().addMarketContext(UNKNOWN_MARKETCONTEXT_NAME)
+				.addMarketContext(marketContext.getName()).addVenId(VEN1).build();
+		searchAndExpect(filters, 2);
 
 		filters = DemandResponseEventFilter.builder().addVenId(VEN2).build();
 		searchAndExpect(filters, 2);
@@ -1018,6 +1028,10 @@ public class DemandResponseControllerTest {
 		filters = DemandResponseEventFilter.builder().addState(DemandResponseEventStateEnum.CANCELLED).build();
 		searchAndExpect(filters, 2);
 
+		filters = DemandResponseEventFilter.builder().addState(DemandResponseEventStateEnum.CANCELLED)
+				.addState(DemandResponseEventStateEnum.ACTIVE).build();
+		searchAndExpect(filters, 3);
+
 		// search sendable
 		filters = DemandResponseEventFilter.builder().isSendable().build();
 		searchAndExpect(filters, 0);
@@ -1026,6 +1040,10 @@ public class DemandResponseControllerTest {
 		searchAndExpect(filters, 3);
 
 		filters = DemandResponseEventFilter.builder().isNotSendable().addState(DemandResponseEventStateEnum.ACTIVE)
+				.build();
+		searchAndExpect(filters, 1);
+		
+		filters = DemandResponseEventFilter.builder().isNotSendable().isSendable().addState(DemandResponseEventStateEnum.ACTIVE)
 				.build();
 		searchAndExpect(filters, 1);
 

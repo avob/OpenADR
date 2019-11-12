@@ -38,6 +38,10 @@ import com.google.common.collect.Lists;
 @ActiveProfiles("test")
 public class ActiveMQAuthorizationBrokerTest {
 
+	private static final String LOCAL_ACCESS = "tcp://localhost";
+
+	private static final String EXTERNAL_ACCESS = "tcp://test.oadr";
+
 	@Resource
 	private VenService venService;
 
@@ -63,7 +67,7 @@ public class ActiveMQAuthorizationBrokerTest {
 		ConnectionContext context = Mockito.mock(ConnectionContext.class, Answers.RETURNS_DEEP_STUBS);
 
 		Mockito.when(context.getConnection().getConnector().getBrokerInfo().getBrokerURL())
-				.thenReturn("tcp://localhost");
+				.thenReturn(LOCAL_ACCESS);
 
 		ConnectionInfo info = Mockito.mock(ConnectionInfo.class);
 
@@ -75,8 +79,7 @@ public class ActiveMQAuthorizationBrokerTest {
 
 		ConnectionContext context = Mockito.mock(ConnectionContext.class, Answers.RETURNS_DEEP_STUBS);
 
-		Mockito.when(context.getConnection().getConnector().getBrokerInfo().getBrokerURL())
-				.thenReturn("tcp://192.168.10.10");
+		Mockito.when(context.getConnection().getConnector().getBrokerInfo().getBrokerURL()).thenReturn(EXTERNAL_ACCESS);
 
 		ConnectionInfo info = Mockito.mock(ConnectionInfo.class);
 		boolean exception = false;
@@ -100,8 +103,7 @@ public class ActiveMQAuthorizationBrokerTest {
 
 		ConnectionContext context = Mockito.mock(ConnectionContext.class, Answers.RETURNS_DEEP_STUBS);
 
-		Mockito.when(context.getConnection().getConnector().getBrokerInfo().getBrokerURL())
-				.thenReturn("tcp://192.168.10.10");
+		Mockito.when(context.getConnection().getConnector().getBrokerInfo().getBrokerURL()).thenReturn(EXTERNAL_ACCESS);
 
 		Mockito.when(context.getSecurityContext()).thenReturn(null);
 
@@ -132,8 +134,7 @@ public class ActiveMQAuthorizationBrokerTest {
 
 		ConnectionContext context = Mockito.mock(ConnectionContext.class, Answers.RETURNS_DEEP_STUBS);
 
-		Mockito.when(context.getConnection().getConnector().getBrokerInfo().getBrokerURL())
-				.thenReturn("tcp://192.168.10.10");
+		Mockito.when(context.getConnection().getConnector().getBrokerInfo().getBrokerURL()).thenReturn(EXTERNAL_ACCESS);
 
 		Mockito.when(context.getSecurityContext()).thenReturn(null);
 
@@ -164,8 +165,7 @@ public class ActiveMQAuthorizationBrokerTest {
 
 		ConnectionContext context = Mockito.mock(ConnectionContext.class, Answers.RETURNS_DEEP_STUBS);
 
-		Mockito.when(context.getConnection().getConnector().getBrokerInfo().getBrokerURL())
-				.thenReturn("tcp://192.168.10.10");
+		Mockito.when(context.getConnection().getConnector().getBrokerInfo().getBrokerURL()).thenReturn(EXTERNAL_ACCESS);
 
 		Mockito.when(context.getSecurityContext()).thenReturn(null);
 
@@ -190,8 +190,7 @@ public class ActiveMQAuthorizationBrokerTest {
 
 		ConnectionContext context = Mockito.mock(ConnectionContext.class, Answers.RETURNS_DEEP_STUBS);
 
-		Mockito.when(context.getConnection().getConnector().getBrokerInfo().getBrokerURL())
-				.thenReturn("tcp://192.168.10.10");
+		Mockito.when(context.getConnection().getConnector().getBrokerInfo().getBrokerURL()).thenReturn(EXTERNAL_ACCESS);
 
 		Mockito.when(context.getSecurityContext()).thenReturn(null);
 

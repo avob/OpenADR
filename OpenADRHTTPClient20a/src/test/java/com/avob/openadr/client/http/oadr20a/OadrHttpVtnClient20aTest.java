@@ -10,6 +10,7 @@ import java.security.UnrecoverableKeyException;
 import javax.xml.bind.JAXBException;
 
 import org.apache.http.HttpStatus;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -31,55 +32,57 @@ import com.avob.openadr.security.exception.OadrSecurityException;
 
 public class OadrHttpVtnClient20aTest {
 
-    @Test
-    public void testOadrDistributeEvent() throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException,
-            OadrSecurityException, JAXBException, Oadr20aException, URISyntaxException, Oadr20aHttpLayerException {
+	@Test
+	public void testOadrDistributeEvent() throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException,
+			OadrSecurityException, JAXBException, Oadr20aException, URISyntaxException, Oadr20aHttpLayerException {
 
-        OadrHttpClient20a oadrHttpClient20a = Mockito.mock(OadrHttpClient20a.class);
+		OadrHttpClient20a oadrHttpClient20a = Mockito.mock(OadrHttpClient20a.class);
 
-        OadrHttpVtnClient20a oadrHttpVtnClient20a = new OadrHttpVtnClient20a(oadrHttpClient20a);
+		OadrHttpVtnClient20a oadrHttpVtnClient20a = new OadrHttpVtnClient20a(oadrHttpClient20a);
 
-        OadrResponse mockOadrResponse = Oadr20aBuilders.newOadr20aResponseBuilder("", HttpStatus.SC_OK).build();
+		OadrResponse mockOadrResponse = Oadr20aBuilders.newOadr20aResponseBuilder("", HttpStatus.SC_OK).build();
 
-        when(oadrHttpClient20a.<OadrResponse>post(Matchers.<OadrDistributeEvent>anyObject(), Matchers.any(),
-                Matchers.any())).thenReturn(mockOadrResponse);
+		when(oadrHttpClient20a.<OadrResponse>post(Matchers.<OadrDistributeEvent>anyObject(), Matchers.any(),
+				Matchers.any())).thenReturn(mockOadrResponse);
 
-        long timestampStart = 0L;
-        String eventXmlDuration = "PT1H";
-        String toleranceXmlDuration = "PT5M";
-        String notificationXmlDuration = "P1D";
-        EiActivePeriodType eiActivePeriod = Oadr20aBuilders.newOadr20aEiActivePeriodTypeBuilder(timestampStart,
-                eventXmlDuration, toleranceXmlDuration, notificationXmlDuration).build();
+		long timestampStart = 0L;
+		String eventXmlDuration = "PT1H";
+		String toleranceXmlDuration = "PT5M";
+		String notificationXmlDuration = "P1D";
+		EiActivePeriodType eiActivePeriod = Oadr20aBuilders.newOadr20aEiActivePeriodTypeBuilder(timestampStart,
+				eventXmlDuration, toleranceXmlDuration, notificationXmlDuration).build();
 
-        String signalId = "0";
-        String signalName = "simple";
-        SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
-        float currentValue = 0;
+		String signalId = "0";
+		String signalName = "simple";
+		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
+		float currentValue = 0;
 
-        EiEventSignalType eiEventSignalType = Oadr20aBuilders
-                .newOadr20aEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue).build();
+		EiEventSignalType eiEventSignalType = Oadr20aBuilders
+				.newOadr20aEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue).build();
 
-        String venId = "ven1";
-        EiTargetType eiTarget = Oadr20aBuilders.newOadr20aEiTargetTypeBuilder().addVenId(venId).build();
+		String venId = "ven1";
+		EiTargetType eiTarget = Oadr20aBuilders.newOadr20aEiTargetTypeBuilder().addVenId(venId).build();
 
-        Long createdTimespamp = 0L;
-        String eventId = "0";
-        long modificationNumber = 0L;
-        String marketContext = "";
-        EventStatusEnumeratedType status = EventStatusEnumeratedType.ACTIVE;
-        EventDescriptorType eventDescriptor = Oadr20aBuilders.newOadr20aEventDescriptorTypeBuilder(createdTimespamp,
-                eventId, modificationNumber, marketContext, status).build();
+		Long createdTimespamp = 0L;
+		String eventId = "0";
+		long modificationNumber = 0L;
+		String marketContext = "";
+		EventStatusEnumeratedType status = EventStatusEnumeratedType.ACTIVE;
+		EventDescriptorType eventDescriptor = Oadr20aBuilders.newOadr20aEventDescriptorTypeBuilder(createdTimespamp,
+				eventId, modificationNumber, marketContext, status).withTestEvent(true).build();
 
-        OadrEvent oadrEvent = Oadr20aBuilders.newOadr20aDistributeEventOadrEventBuilder()
-                .withActivePeriod(eiActivePeriod).addEiEventSignal(eiEventSignalType).withEiTarget(eiTarget)
-                .withEventDescriptor(eventDescriptor).build();
+		OadrEvent oadrEvent = Oadr20aBuilders.newOadr20aDistributeEventOadrEventBuilder()
+				.withActivePeriod(eiActivePeriod).addEiEventSignal(eiEventSignalType)
+				.addEiEventSignal(Lists.newArrayList(eiEventSignalType)).withEiTarget(eiTarget)
+				.withEventDescriptor(eventDescriptor).build();
 
-        OadrDistributeEvent mockDistributeEvent = Oadr20aBuilders.newOadr20aDistributeEventBuilder("", "")
-                .addOadrEvent(oadrEvent).build();
+		OadrDistributeEvent mockDistributeEvent = Oadr20aBuilders.newOadr20aDistributeEventBuilder("", "")
+				.addOadrEvent(oadrEvent).withEiResponse(Oadr20aBuilders.newOadr20aEiResponseBuilder("", 200).withDescription("mouaiccool").build())
+				.build();
 
-        oadrHttpVtnClient20a.oadrDistributeEvent(mockDistributeEvent);
+		oadrHttpVtnClient20a.oadrDistributeEvent(mockDistributeEvent);
 
-        oadrHttpVtnClient20a.oadrDistributeEvent("http://localhost:8080", mockDistributeEvent);
+		oadrHttpVtnClient20a.oadrDistributeEvent("http://localhost:8080", mockDistributeEvent);
 
-    }
+	}
 }

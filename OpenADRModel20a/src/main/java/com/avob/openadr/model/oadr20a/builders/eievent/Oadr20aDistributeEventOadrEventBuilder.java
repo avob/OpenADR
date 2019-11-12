@@ -5,7 +5,6 @@ import java.util.List;
 import com.avob.openadr.model.oadr20a.Oadr20aFactory;
 import com.avob.openadr.model.oadr20a.ei.EiActivePeriodType;
 import com.avob.openadr.model.oadr20a.ei.EiEventSignalType;
-import com.avob.openadr.model.oadr20a.ei.EiEventType;
 import com.avob.openadr.model.oadr20a.ei.EiTargetType;
 import com.avob.openadr.model.oadr20a.ei.EventDescriptorType;
 import com.avob.openadr.model.oadr20a.oadr.OadrDistributeEvent.OadrEvent;
@@ -17,11 +16,6 @@ public class Oadr20aDistributeEventOadrEventBuilder {
 
 	public Oadr20aDistributeEventOadrEventBuilder() {
 		event = Oadr20aFactory.createOadrDistributeEventOadrEvent();
-	}
-
-	public Oadr20aDistributeEventOadrEventBuilder(EiEventType eventType) {
-		event = Oadr20aFactory.createOadrDistributeEventOadrEvent();
-		event.setEiEvent(eventType);
 	}
 
 	public Oadr20aDistributeEventOadrEventBuilder withActivePeriod(EiActivePeriodType eiActivePeriodType) {
