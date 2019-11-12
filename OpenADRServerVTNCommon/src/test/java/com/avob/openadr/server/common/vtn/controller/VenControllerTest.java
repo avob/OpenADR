@@ -1,9 +1,11 @@
 package com.avob.openadr.server.common.vtn.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -107,7 +109,7 @@ public class VenControllerTest {
 		MvcResult andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(VEN_URL).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
-		List<VenCreateDto> readValue = this.convertMvcResultToDtoList(andReturn, VenCreateDto.class);
+		List<VenDto> readValue = this.convertMvcResultToDtoList(andReturn, VenDto.class);
 		assertNotNull(readValue);
 		assertEquals(0, readValue.size());
 
@@ -588,7 +590,8 @@ public class VenControllerTest {
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
 
 		this.mockMvc.perform(MockMvcRequestBuilders.delete(VEN_URL + "mouaiccool").with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));;
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+		;
 
 		this.mockMvc.perform(MockMvcRequestBuilders.delete(VEN_URL + venUsername).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
@@ -607,7 +610,7 @@ public class VenControllerTest {
 		// empty find all
 		andReturn = this.mockMvc.perform(MockMvcRequestBuilders.get(VEN_URL).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		readValue = this.convertMvcResultToDtoList(andReturn, VenCreateDto.class);
+		readValue = this.convertMvcResultToDtoList(andReturn, VenDto.class);
 		assertNotNull(readValue);
 		assertEquals(0, readValue.size());
 
@@ -664,6 +667,8 @@ public class VenControllerTest {
 		assertNotNull(andReturn.getResponse().getHeader("x-VenID"));
 		findByUsername = venService.findOneByUsername(andReturn.getResponse().getHeader("x-VenID"));
 		assertNotNull(findByUsername);
+		assertFalse(findByUsername.getReportOnly());
+		assertFalse(findByUsername.getXmlSignature());
 		venService.delete(findByUsername);
 
 		// create x509 auth app ecc certificate gen
@@ -671,6 +676,8 @@ public class VenControllerTest {
 		dto.setCommonName("myapp");
 		dto.setAuthenticationType("x509");
 		dto.setNeedCertificateGeneration("ecc");
+		dto.setReportOnly(true);
+		dto.setXmlSignature(true);
 		content = mapper.writeValueAsBytes(dto);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL).content(content)
@@ -681,6 +688,8 @@ public class VenControllerTest {
 		assertNotNull(andReturn.getResponse().getHeader("x-VenID"));
 		findByUsername = venService.findOneByUsername(andReturn.getResponse().getHeader("x-VenID"));
 		assertNotNull(findByUsername);
+		assertTrue(findByUsername.getReportOnly());
+		assertTrue(findByUsername.getXmlSignature());
 		venService.delete(findByUsername);
 
 	}

@@ -42,10 +42,12 @@ public class DemandResponseEventDtoValidator {
 	protected void validateContent(DemandResponseEventContentDto dto, Errors errors) {
 
 		if (dto.getSignals().isEmpty()) {
-			errors.rejectValue("signals", "field.required", "At least one signals must be configured");
+			errors.rejectValue("signals", "field.required", "At least one signal must be configured");
 		}
 
-		failOnMissingOrEmpty(dto.getTargets(), errors, "targets");
+		if (dto.getTargets().isEmpty()) {
+			errors.rejectValue("targets", "field.required", "At least one target must be configured");
+		}
 
 	}
 
@@ -55,7 +57,7 @@ public class DemandResponseEventDtoValidator {
 		failOnMissingOrEmpty(dto.getDescriptor().getResponseRequired(), errors, "descriptor.responseRequired");
 		failOnPresent(dto.getDescriptor().getModificationNumber(), errors, "descriptor.modificationNumber");
 		if (dto.getDescriptor().getPriority() != null && dto.getDescriptor().getPriority() < 0) {
-			errors.rejectValue("priority", "field.priority.invalid", "Priority MUST be greater than 0");
+			errors.rejectValue("descriptor.priority", "field.priority.invalid", "Priority MUST be greater than 0");
 		}
 
 	}

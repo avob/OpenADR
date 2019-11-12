@@ -28,9 +28,4 @@ public class ResourceCheck extends BaseCheck {
 		this.permission = permission;
 	}
 
-	@Override
-	public String toString() {
-		return "ResourceCheck{" + "resource='" + resource + '\'' + ", name='" + name + '\'' + ", permission='"
-				+ permission + '\'' + "} " + super.toString();
-	}
 }

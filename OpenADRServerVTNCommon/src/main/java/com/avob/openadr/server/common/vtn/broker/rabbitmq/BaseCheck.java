@@ -22,8 +22,4 @@ public class BaseCheck {
 		this.vhost = vhost;
 	}
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "{" + "username='" + username + '\'' + ", vhost='" + vhost + '\'' + '}';
-	}
 }

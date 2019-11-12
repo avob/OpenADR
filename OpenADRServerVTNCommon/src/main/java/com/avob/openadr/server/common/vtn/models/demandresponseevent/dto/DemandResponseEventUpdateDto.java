@@ -2,13 +2,13 @@ package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto;
 
 public class DemandResponseEventUpdateDto extends DemandResponseEventContentDto {
 
-	private boolean published = false;
+	private Boolean published = false;
 
-	public boolean isPublished() {
+	public Boolean getPublished() {
 		return published;
 	}
 
-	public void setPublished(boolean published) {
+	public void setPublished(Boolean published) {
 		this.published = published;
 	}
 }

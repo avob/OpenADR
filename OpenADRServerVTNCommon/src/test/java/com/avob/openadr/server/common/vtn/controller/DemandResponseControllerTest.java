@@ -309,10 +309,55 @@ public class DemandResponseControllerTest {
 					dto.getSignals().get(0).getCurrentValue());
 		}
 
+		// perform invalid create: null market context
+		toCreate = createValidEvent();
+		toCreate.getDescriptor().setMarketContext(null);
+		String contentStr = mapper.writeValueAsString(toCreate);
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(contentStr)
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
+		// perform invalid create: null profile
+		toCreate = createValidEvent();
+		toCreate.getDescriptor().setOadrProfile(null);
+		contentStr = mapper.writeValueAsString(toCreate);
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(contentStr)
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
+		// perform invalid create: null response required
+		toCreate = createValidEvent();
+		toCreate.getDescriptor().setResponseRequired(null);
+		contentStr = mapper.writeValueAsString(toCreate);
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(contentStr)
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
 		// perform invalid create: unknown market context
 		toCreate = createValidEvent();
 		toCreate.getDescriptor().setMarketContext(UNKNOWN_MARKETCONTEXT_NAME);
-		String contentStr = mapper.writeValueAsString(toCreate);
+		contentStr = mapper.writeValueAsString(toCreate);
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(contentStr)
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
+		// perform invalid create: invalid priority
+		toCreate = createValidEvent();
+		toCreate.getDescriptor().setPriority(-1L);
+		contentStr = mapper.writeValueAsString(toCreate);
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(contentStr)
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
+		// perform invalid create: no signal configured
+		toCreate = createValidEvent();
+		toCreate.getSignals().clear();
+		contentStr = mapper.writeValueAsString(toCreate);
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(contentStr)
 						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
@@ -451,15 +496,49 @@ public class DemandResponseControllerTest {
 		signalModerate.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
 		signalModerate.setSignalName(SIMPLE_SIGNAL_NAME);
 		signalModerate.setSignalType(LEVEL_SIGNAL_TYPE);
-		// update but don't publish
-		DemandResponseEventUpdateDto updateDto = new DemandResponseEventUpdateDto();
-		updateDto.setPublished(false);
-		updateDto.getSignals().add(signalModerate);
+
 		List<DemandResponseEventTargetDto> targets = new ArrayList<>();
 		targets.add(new DemandResponseEventTargetDto(VEN_PARAM, VEN2));
+		// invalid update: signals not set
+		DemandResponseEventUpdateDto updateDto = new DemandResponseEventUpdateDto();
+		updateDto.setPublished(false);
+		updateDto.getSignals().clear();
 		updateDto.setTargets(targets);
 
 		String contentStr = mapper.writeValueAsString(updateDto);
+		this.mockMvc.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + event1.getId())
+				.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).content(contentStr).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
+		// invalid update: signals not set
+		updateDto = new DemandResponseEventUpdateDto();
+		updateDto.setPublished(false);
+		updateDto.getSignals().add(signalModerate);
+		updateDto.getTargets().clear();
+
+		contentStr = mapper.writeValueAsString(updateDto);
+		this.mockMvc.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + event1.getId())
+				.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).content(contentStr).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
+		// invalid update: published null
+		updateDto = new DemandResponseEventUpdateDto();
+		updateDto.setPublished(null);
+		updateDto.getSignals().add(signalModerate);
+		updateDto.setTargets(targets);
+
+		contentStr = mapper.writeValueAsString(updateDto);
+		this.mockMvc.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + event1.getId())
+				.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).content(contentStr).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
+		// update but don't publish
+		updateDto = new DemandResponseEventUpdateDto();
+		updateDto.setPublished(false);
+		updateDto.getSignals().add(signalModerate);
+		updateDto.setTargets(targets);
+
+		contentStr = mapper.writeValueAsString(updateDto);
 		this.mockMvc.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + event1.getId())
 				.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).content(contentStr).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));

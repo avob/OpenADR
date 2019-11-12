@@ -12,8 +12,4 @@ public class TopicCheck extends ResourceCheck {
 		this.routing_key = routing_key;
 	}
 
-	@Override
-	public String toString() {
-		return "TopicCheck{" + "routing_key='" + routing_key + '\'' + "} " + super.toString();
-	}
 }

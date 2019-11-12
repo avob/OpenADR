@@ -19,7 +19,9 @@ public class VenCreateDto extends AbstractUserCreateDto {
 
 	private Boolean httpPullModel;
 
-	
+	private Boolean reportOnly = false;
+
+	private Boolean xmlSignature = false;
 
 	public VenCreateDto() {
 	}
@@ -60,14 +62,28 @@ public class VenCreateDto extends AbstractUserCreateDto {
 		this.pushUrl = pushUrl;
 	}
 
-	
-
 	public Boolean getHttpPullModel() {
 		return httpPullModel;
 	}
 
 	public void setHttpPullModel(Boolean httpPullModel) {
 		this.httpPullModel = httpPullModel;
+	}
+
+	public Boolean getReportOnly() {
+		return reportOnly;
+	}
+
+	public void setReportOnly(Boolean reportOnly) {
+		this.reportOnly = reportOnly;
+	}
+
+	public Boolean getXmlSignature() {
+		return xmlSignature;
+	}
+
+	public void setXmlSignature(Boolean xmlSignature) {
+		this.xmlSignature = xmlSignature;
 	}
 
 }

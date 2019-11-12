@@ -223,7 +223,7 @@ public class DemandResponseEventService {
 		}
 
 		// update modification number if event is published
-		if (dto.isPublished()) {
+		if (dto.getPublished()) {
 			event.getDescriptor().setModificationNumber(event.getDescriptor().getModificationNumber() + 1);
 		}
 
@@ -242,7 +242,7 @@ public class DemandResponseEventService {
 		event.setPublished(partialUpdate.isPublished());
 		DemandResponseEvent save = demandResponseEventDao.save(event);
 
-		if (dto.isPublished()) {
+		if (dto.getPublished()) {
 			this.distributeEventToPushVen(event);
 		}
 

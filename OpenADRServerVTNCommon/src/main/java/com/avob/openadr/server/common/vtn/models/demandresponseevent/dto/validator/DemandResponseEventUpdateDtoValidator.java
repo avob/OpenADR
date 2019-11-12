@@ -30,6 +30,10 @@ public class DemandResponseEventUpdateDtoValidator extends DemandResponseEventDt
 
 		validateContent(dto, errors);
 
+		if (dto.getPublished() == null) {
+			errors.rejectValue("published", "field.required", "published must be configured");
+		}
+
 		if (errors.hasErrors()) {
 			LOGGER.warn(errors.getAllErrors().toString());
 		}
