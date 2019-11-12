@@ -100,12 +100,6 @@ public class VenDemandResponseEvent {
 		this.venOpt = venOpt;
 	}
 
-	@Override
-	public String toString() {
-		return "VenDemandResponseEvent [id=" + id + ", ven=" + ven + ", event=" + event
-				+ ", lastSentModificationNumber=" + lastSentModificationNumber + ", venOpt=" + venOpt + "]";
-	}
-
 	public Long getLastUpdateDatetime() {
 		return lastUpdateDatetime;
 	}

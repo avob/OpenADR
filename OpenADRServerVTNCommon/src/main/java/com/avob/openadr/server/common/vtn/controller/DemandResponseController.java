@@ -75,10 +75,11 @@ public class DemandResponseController {
 			@RequestParam(value = "start", required = false) Long start,
 			@RequestParam(value = "end", required = false) Long end,
 			@RequestParam(value = "page", required = false) Integer page,
-			@RequestParam(value = "size", required = false) Integer size) {
-
-		Page<DemandResponseEvent> find = demandResponseEventService.search(filters, start, end, page, size);
-		return dtoMapper.mapList(find, DemandResponseEventReadDto.class);
+			@RequestParam(value = "size", required = false) Integer size, HttpServletResponse response) {
+		Page<DemandResponseEvent> search = demandResponseEventService.search(filters, start, end, page, size);
+		response.addHeader("X-total-page", String.valueOf(search.getTotalPages()));
+		response.addHeader("X-total-count", String.valueOf(search.getTotalElements()));
+		return dtoMapper.mapList(search, DemandResponseEventReadDto.class);
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)

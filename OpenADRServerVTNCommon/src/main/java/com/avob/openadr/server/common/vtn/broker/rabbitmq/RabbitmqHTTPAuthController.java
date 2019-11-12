@@ -45,7 +45,7 @@ public class RabbitmqHTTPAuthController {
 	@RequestMapping("topic")
 	public String topic(TopicCheck check) {
 		LOGGER.info("Checking topic access with {}", check);
-		return check.getRouting_key().startsWith("a") ? "allow" : "deny";
+		return "allow";
 	}
 
 }

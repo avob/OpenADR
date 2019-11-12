@@ -44,7 +44,7 @@ public abstract class AbstractUser implements Serializable {
 	private String commonName;
 
 	private String authenticationType;
-	
+
 	@ElementCollection
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<String> roles;
@@ -58,11 +58,6 @@ public abstract class AbstractUser implements Serializable {
 	}
 
 	public AbstractUser() {
-	}
-
-	public AbstractUser(String username, String password) {
-		this.setUsername(username);
-		this.setDigestPassword(password);
 	}
 
 	public Long getId() {

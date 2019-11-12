@@ -29,10 +29,6 @@ public class ActiveMQAuthorizationBroker extends BrokerFilter {
 		super(next);
 	}
 
-	public SecurityContext authenticate(String username, String password, X509Certificate[] certificates) {
-		return null;
-	}
-
 	@Override
 	public void addConnection(ConnectionContext context, ConnectionInfo info) throws Exception {
 

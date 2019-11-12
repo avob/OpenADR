@@ -59,6 +59,10 @@ public class DemandResponseEventSpecification {
 	public static Specification<DemandResponseEvent> hasActivePeriodStartAfter(Long timestamp) {
 		return (event, cq, cb) -> cb.ge(event.get(FIELD_ACTIVE_PERIOD).get(FIELD_START), timestamp);
 	}
+	
+	public static Specification<DemandResponseEvent> hasActivePeriodStartBefore(Long timestamp) {
+		return (event, cq, cb) -> cb.lt(event.get(FIELD_ACTIVE_PERIOD).get(FIELD_START), timestamp);
+	}
 
 	public static Specification<DemandResponseEvent> hasActivePeriodEndNullOrBefore(Long timestamp) {
 		return (event, cq, cb) -> {

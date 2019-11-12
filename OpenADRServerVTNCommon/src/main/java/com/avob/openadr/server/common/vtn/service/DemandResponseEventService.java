@@ -436,11 +436,12 @@ public class DemandResponseEventService {
 		}
 		Specification<DemandResponseEvent> spec = Specification.where(DemandResponseEventSpecification.search(filters));
 
-		if (start != null) {
+		if (start != null && end != null) {
+			spec = spec.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrAfter(start)
+					.and(DemandResponseEventSpecification.hasActivePeriodStartBefore(end)));
+		} else if (start != null) {
 			spec = spec.and(DemandResponseEventSpecification.hasActivePeriodStartAfter(start));
-		}
-
-		if (end != null) {
+		} else if (end != null) {
 			spec = spec.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrBefore(end));
 		}
 

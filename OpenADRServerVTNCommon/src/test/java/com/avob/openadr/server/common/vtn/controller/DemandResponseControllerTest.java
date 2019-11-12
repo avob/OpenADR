@@ -59,6 +59,7 @@ import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,14 +76,12 @@ public class DemandResponseControllerTest {
 	private static final String APPLICATION_JSON_HEADER_VALUE = "application/json";
 	private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
 
-	private static final String LEVEL_SIGNAL_TYPE = "level";
-	private static final String SIMPLE_SIGNAL_NAME = "SIMPLE";
 	private static final String DEMAND_RESPONSE_EVENT_URL = "/DemandResponseEvent/";
-	private static final String DURATION = "PT1H";
+	private static final String DURATION = "PT5S";
 	private static final String NOTIFICATION_DURATION = "P1D";
 	private static final String TOLERANCE_DURATION = "PT5M";
 	private static final Long MODIFICATION = -1L;
-	private static final Long START = 0L;
+	private static final Long START = 10L;
 
 	private static final String VEN1 = "ven1";
 	private static final String VEN2 = "ven2";
@@ -91,6 +90,10 @@ public class DemandResponseControllerTest {
 	private static final String MARKETCONTEXT_NAME = "http://oadr.avob.com";
 	private static final String GROUP_PARAM = "group";
 	private static final String VEN_PARAM = "ven";
+
+	private static final String LEVEL_SIGNAL_TYPE = "level";
+	private static final String SIMPLE_SIGNAL_NAME = "SIMPLE";
+	private static final String SIGNAL_UNIT_TYPE = "NONE";
 
 	@Autowired
 	private WebApplicationContext wac;
@@ -172,8 +175,8 @@ public class DemandResponseControllerTest {
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
-		dto.getActivePeriod().setStart(START);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
+		dto.getActivePeriod().setStart(START);
 		dto.getActivePeriod().setDuration(DURATION);
 		dto.getActivePeriod().setToleranceDuration(TOLERANCE_DURATION);
 		dto.getActivePeriod().setNotificationDuration(NOTIFICATION_DURATION);
@@ -187,8 +190,8 @@ public class DemandResponseControllerTest {
 		dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
-		dto.getActivePeriod().setStart(START);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
+		dto.getActivePeriod().setStart(START);
 		dto.getActivePeriod().setDuration(DURATION);
 		dto.getActivePeriod().setToleranceDuration(TOLERANCE_DURATION);
 		dto.getActivePeriod().setNotificationDuration(NOTIFICATION_DURATION);
@@ -200,8 +203,8 @@ public class DemandResponseControllerTest {
 		dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
-		dto.getActivePeriod().setStart(START);
 		dto.getDescriptor().setMarketContext(marketContext.getName());
+		dto.getActivePeriod().setStart(START);
 		dto.getActivePeriod().setDuration(DURATION);
 		dto.getActivePeriod().setToleranceDuration(TOLERANCE_DURATION);
 		dto.getActivePeriod().setNotificationDuration(NOTIFICATION_DURATION);
@@ -659,6 +662,7 @@ public class DemandResponseControllerTest {
 		signalModerate.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
 		signalModerate.setSignalName(SIMPLE_SIGNAL_NAME);
 		signalModerate.setSignalType(LEVEL_SIGNAL_TYPE);
+		signalModerate.setUnitType(SIGNAL_UNIT_TYPE);
 		// update but don't publish
 		DemandResponseEventUpdateDto updateDto = new DemandResponseEventUpdateDto();
 		updateDto.setPublished(false);
@@ -679,8 +683,12 @@ public class DemandResponseControllerTest {
 		assertNotNull(dto);
 		assertNotNull(dto.getSignals());
 		assertEquals(1, dto.getSignals().size());
-		assertEquals(dto.getSignals().get(0).getCurrentValue(),
-				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
+		assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue(),
+				dto.getSignals().get(0).getCurrentValue());
+		assertEquals(SIMPLE_SIGNAL_NAME, dto.getSignals().get(0).getSignalName());
+		assertEquals(LEVEL_SIGNAL_TYPE, dto.getSignals().get(0).getSignalType());
+		assertEquals(SIGNAL_UNIT_TYPE, dto.getSignals().get(0).getUnitType());
+
 		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 
 		// publish unknown
@@ -920,151 +928,139 @@ public class DemandResponseControllerTest {
 		assertEquals("", mockHttpServletResponse.getContentAsString());
 	}
 
-	@Test
-	public void searchTest() throws Exception {
-
-		// search published state
-		List<DemandResponseEventFilter> filters = DemandResponseEventFilter.builder().isPublished().build();
+	private void searchAndExpect(List<DemandResponseEventFilter> filters, int expected)
+			throws JsonProcessingException, Exception {
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
 						.content(mapper.writeValueAsString(filters))
 						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		List<DemandResponseEventReadDto> list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(0, list.size());
+		assertEquals(expected, list.size());
+	}
 
-		filters = DemandResponseEventFilter.builder().isNotPublished().build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
+	private void searchAndExpect(List<DemandResponseEventFilter> filters, Long start, Long end, int expected)
+			throws JsonProcessingException, Exception {
+		String url = DEMAND_RESPONSE_EVENT_URL + "search";
+		List<String> params = new ArrayList<>();
+		if (start != null) {
+			params.add("start=" + start);
+		}
+		if (end != null) {
+			params.add("end=" + end);
+		}
+
+		if (!params.isEmpty()) {
+			url += "?" + String.join("&", params);
+		}
+
+		MvcResult andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(url).content(mapper.writeValueAsString(filters))
 						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(3, list.size());
+		List<DemandResponseEventReadDto> list = convertMvcResultToDemandResponseDtoList(andReturn);
+		assertEquals(expected, list.size());
+	}
+
+	@Test
+	public void searchTest() throws Exception {
+
+		// search published state
+		List<DemandResponseEventFilter> filters = DemandResponseEventFilter.builder().isPublished().build();
+		searchAndExpect(filters, 0);
+
+		filters = DemandResponseEventFilter.builder().isNotPublished().build();
+		searchAndExpect(filters, 3);
 
 		// search by marketcontext
 		filters = DemandResponseEventFilter.builder().addMarketContext(marketContext.getName()).build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
-						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(3, list.size());
+		searchAndExpect(filters, 3);
+
+		filters = DemandResponseEventFilter.builder().isPublished().addMarketContext(marketContext.getName()).build();
+		searchAndExpect(filters, 0);
 
 		filters = DemandResponseEventFilter.builder().addMarketContext(marketContext.getName()).isPublished().build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
-						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(0, list.size());
+		searchAndExpect(filters, 0);
 
 		filters = DemandResponseEventFilter.builder().addMarketContext(UNKNOWN_MARKETCONTEXT_NAME).build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
-						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(0, list.size());
+		searchAndExpect(filters, 0);
 
 		// search by ven
 		filters = DemandResponseEventFilter.builder().addVenId(VEN1).build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
-						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(2, list.size());
+		searchAndExpect(filters, 2);
 
 		filters = DemandResponseEventFilter.builder().addVenId(VEN1).addMarketContext(UNKNOWN_MARKETCONTEXT_NAME)
 				.build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
-						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(0, list.size());
+		searchAndExpect(filters, 0);
+
+		filters = DemandResponseEventFilter.builder().addMarketContext(UNKNOWN_MARKETCONTEXT_NAME).addVenId(VEN1)
+				.build();
+		searchAndExpect(filters, 0);
 
 		filters = DemandResponseEventFilter.builder().addVenId(VEN2).build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
-						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(2, list.size());
+		searchAndExpect(filters, 2);
 
 		filters = DemandResponseEventFilter.builder().addVenId("mouaiccool").build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
-						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(0, list.size());
+		searchAndExpect(filters, 0);
 
 		// search by state
 		filters = DemandResponseEventFilter.builder().addState(DemandResponseEventStateEnum.ACTIVE).build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
-						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(1, list.size());
+		searchAndExpect(filters, 1);
 
 		filters = DemandResponseEventFilter.builder().addState(DemandResponseEventStateEnum.ACTIVE).addVenId(VEN1)
 				.build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
-						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(1, list.size());
+		searchAndExpect(filters, 1);
+
+		filters = DemandResponseEventFilter.builder().addVenId(VEN1).addState(DemandResponseEventStateEnum.ACTIVE)
+				.build();
+		searchAndExpect(filters, 1);
 
 		filters = DemandResponseEventFilter.builder().addState(DemandResponseEventStateEnum.CANCELLED).build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
-						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(2, list.size());
+		searchAndExpect(filters, 2);
 
 		// search sendable
 		filters = DemandResponseEventFilter.builder().isSendable().build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
-						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(0, list.size());
+		searchAndExpect(filters, 0);
 
 		filters = DemandResponseEventFilter.builder().isNotSendable().build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
-						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(3, list.size());
+		searchAndExpect(filters, 3);
 
 		filters = DemandResponseEventFilter.builder().isNotSendable().addState(DemandResponseEventStateEnum.ACTIVE)
 				.build();
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
-						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		list = convertMvcResultToDemandResponseDtoList(andReturn);
-		assertEquals(1, list.size());
+		searchAndExpect(filters, 1);
+
+		filters = DemandResponseEventFilter.builder().addState(DemandResponseEventStateEnum.ACTIVE).isNotSendable()
+				.build();
+		searchAndExpect(filters, 1);
+
+		filters = DemandResponseEventFilter.builder().addState(DemandResponseEventStateEnum.ACTIVE).isNotSendable()
+				.addVenId("mouaiccool").build();
+		searchAndExpect(filters, 0);
+
+		// search start end
+		filters = DemandResponseEventFilter.builder().isNotSendable().build();
+		searchAndExpect(filters, 0L, 1L, 0);
+
+		filters = DemandResponseEventFilter.builder().isNotSendable().build();
+		searchAndExpect(filters, 0L, 10L * 1000, 3);
+
+		filters = DemandResponseEventFilter.builder().isNotSendable().build();
+		searchAndExpect(filters, 0L, null, 3);
+
+		filters = DemandResponseEventFilter.builder().isNotSendable().build();
+		searchAndExpect(filters, null, 10L * 1000, 3);
+
+		filters = DemandResponseEventFilter.builder().isNotSendable().build();
+		searchAndExpect(filters, 10L, 10L * 1000, 3);
+
+		filters = DemandResponseEventFilter.builder().isNotSendable().build();
+		searchAndExpect(filters, 0L, 5L * 1000, 3);
+
+		filters = DemandResponseEventFilter.builder().isNotSendable().build();
+		searchAndExpect(filters, 5L * 1000, 10L * 1000, 3);
+
+		filters = DemandResponseEventFilter.builder().isNotSendable().build();
+		searchAndExpect(filters, 11L * 1000, 15L * 1000, 0);
 
 	}
 

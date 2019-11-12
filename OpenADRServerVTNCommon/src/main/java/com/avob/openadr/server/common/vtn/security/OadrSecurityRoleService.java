@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import javax.annotation.Resource;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -28,9 +27,6 @@ import com.google.common.collect.Lists;
  */
 @Service
 public class OadrSecurityRoleService {
-
-	@Value("${oadr.security.admin.username:#{null}}")
-	private String adminUsername;
 
 	@Resource
 	private VtnConfig vtnConfig;
@@ -62,9 +58,6 @@ public class OadrSecurityRoleService {
 	}
 
 	public User grantX509Role(String username) {
-		if (adminUsername != null && adminUsername.equals(username)) {
-			return new User(username, "", Lists.newArrayList(new SimpleGrantedAuthority("ROLE_ADMIN")));
-		}
 
 		if (username.equals(vtnConfig.getOadr20bFingerprint())) {
 			return new User(username, "", Lists.newArrayList(new SimpleGrantedAuthority("ROLE_VTN")));
@@ -80,7 +73,7 @@ public class OadrSecurityRoleService {
 		return abstractUser;
 	}
 
-	public User grantRole(AbstractUser abstractUser, String password) {
+	private User grantRole(AbstractUser abstractUser, String password) {
 		if (abstractUser instanceof Ven) {
 			ArrayList<SimpleGrantedAuthority> roles = Lists.newArrayList(new SimpleGrantedAuthority("ROLE_VEN"));
 			Ven ven = (Ven) abstractUser;

@@ -30,35 +30,36 @@ import com.google.common.collect.Sets;
 @Service
 public class OadrDataBaseSetup {
 
+	private static final String REGISTERED = "REGISTERED";
 	public static final String VEN_HTTP_PULL_DSIG = "ven1";
 	public static final String VEN_HTTP_PULL_DSIG_REGISTRATION_ID = "ven1RegistrationId";
 	public static final UserRequestPostProcessor VEN_HTTP_PULL_DSIG_SECURITY_SESSION = SecurityMockMvcRequestPostProcessors
-			.user(VEN_HTTP_PULL_DSIG).roles("VEN", "REGISTERED");
+			.user(VEN_HTTP_PULL_DSIG).roles("VEN", REGISTERED);
 
 	public static final String VEN_HTTP_PULL = "ven2";
 	public static final String VEN_HTTP_PULL_REGISTRATION_ID = "ven2RegistrationId";
 	public static final UserRequestPostProcessor ANOTHER_VEN_SECURITY_SESSION = SecurityMockMvcRequestPostProcessors
-			.user(VEN_HTTP_PULL).roles("VEN", "REGISTERED");
+			.user(VEN_HTTP_PULL).roles("VEN", REGISTERED);
 
 	public static final String VEN_XMPP = "ven3";
 	public static final String VEN_XMPP_REGISTRATION_ID = "ven3RegistrationId";
 	public static final UserRequestPostProcessor VEN_XMPP_SECURITY_SESSION = SecurityMockMvcRequestPostProcessors
-			.user(VEN_HTTP_PULL).roles("VEN", "REGISTERED");
+			.user(VEN_HTTP_PULL).roles("VEN", REGISTERED);
 
 	public static final String VEN_XMPP_DSIG = "ven4";
 	public static final String VEN_XMPP_DSIG_REGISTRATION_ID = "ven4RegistrationId";
 	public static final UserRequestPostProcessor VEN_XMPP_DSIG_SECURITY_SESSION = SecurityMockMvcRequestPostProcessors
-			.user(VEN_HTTP_PULL).roles("VEN", "REGISTERED");
+			.user(VEN_HTTP_PULL).roles("VEN", REGISTERED);
 
 	public static final String VEN_HTTP_PUSH_DSIG = "ven5";
 	public static final String VEN_HTTP_PUSH_DSIG_REGISTRATION_ID = "ven5RegistrationId";
 	public static final UserRequestPostProcessor VEN_HTTP_PUSH_DSIG_SECURITY_SESSION = SecurityMockMvcRequestPostProcessors
-			.user(VEN_HTTP_PUSH_DSIG).roles("VEN", "REGISTERED");
+			.user(VEN_HTTP_PUSH_DSIG).roles("VEN", REGISTERED);
 
 	public static final String VEN_HTTP_PUSH = "ven6";
 	public static final String VEN_HTTP_PUSH_REGISTRATION_ID = "ven6RegistrationId";
 	public static final UserRequestPostProcessor VEN_HTTP_PUSH_SECURITY_SESSION = SecurityMockMvcRequestPostProcessors
-			.user(VEN_HTTP_PUSH).roles("VEN", "REGISTERED");
+			.user(VEN_HTTP_PUSH).roles("VEN", REGISTERED);
 
 	public static final String VEN_RESOURCE_1 = "venResource1";
 	public static final String VEN_RESOURCE_2 = "venResource2";

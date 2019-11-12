@@ -17,12 +17,6 @@ public class VenMarketContextDto {
 		this.name = name;
 	}
 
-	public VenMarketContextDto(String name, String description, String color) {
-		this.name = name;
-		this.description = description;
-		this.color = color;
-	}
-
 	public Long getId() {
 		return id;
 	}

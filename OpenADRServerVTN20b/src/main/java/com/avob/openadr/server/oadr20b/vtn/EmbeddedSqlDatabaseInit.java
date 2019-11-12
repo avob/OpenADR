@@ -284,11 +284,15 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 	public void onApplicationEvent(ContextRefreshedEvent arg0) {
 
 		// create fake market contexts
-		VenMarketContext oadrMarketContext = saveMarketContextIfMissing(
-				new VenMarketContextDto("http://oadr.avob.com", "Avob Test Market Context", "#90CAF9"));
+		VenMarketContextDto marketContextDto = new VenMarketContextDto("http://oadr.avob.com");
+		marketContextDto.setDescription("Avob Test Market Context");
+		marketContextDto.setColor("#90CAF9");
+		VenMarketContext oadrMarketContext = saveMarketContextIfMissing(marketContextDto);
 
-		VenMarketContext marketContext = saveMarketContextIfMissing(
-				new VenMarketContextDto("http://MarketContext1", "Test Market Context 1", "#ff8080"));
+		marketContextDto = new VenMarketContextDto("http://MarketContext1");
+		marketContextDto.setColor("#ff8080");
+		marketContextDto.setDescription("Test Market Context 1");
+		VenMarketContext marketContext = saveMarketContextIfMissing(marketContextDto);
 
 		// create fake groups
 		VenGroup customCaCert = saveGroupIfMissing(new VenGroupDto("CustomCACert"));

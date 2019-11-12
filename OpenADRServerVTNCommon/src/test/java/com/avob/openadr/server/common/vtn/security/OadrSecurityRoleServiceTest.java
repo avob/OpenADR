@@ -3,18 +3,26 @@ package com.avob.openadr.server.common.vtn.security;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import com.avob.openadr.security.OadrFingerprintSecurity;
+import com.avob.openadr.security.OadrPKISecurity;
+import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.ApplicationTest;
 import com.avob.openadr.server.common.vtn.models.user.OadrApp;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
@@ -49,15 +57,16 @@ public class OadrSecurityRoleServiceTest {
 	private OadrUser passwordUser = null;
 	private OadrApp appUser = null;
 	private Ven venUser = null;
+	private Ven venX509 = null;
 
 	@Before
-	public void before() {
+	public void before() throws OadrSecurityException {
 		oadrUserService.delete(oadrUserService.findAll());
 		oadrAppService.delete(oadrAppService.findAll());
 		venService.delete(venService.findAll());
 
 		String username = "admin";
-		adminUser = oadrUserService.prepare(username);
+		adminUser = oadrUserService.prepare(username, username);
 		adminUser.setRoles(Lists.newArrayList("ROLE_ADMIN"));
 		oadrUserService.save(adminUser);
 
@@ -66,13 +75,19 @@ public class OadrSecurityRoleServiceTest {
 		oadrUserService.save(passwordUser);
 
 		username = "app";
-		appUser = oadrAppService.prepare(username);
+		appUser = oadrAppService.prepare(username, username);
 		appUser.setRoles(Lists.newArrayList("ROLE_DEVICE_MANAGER"));
 		oadrAppService.save(appUser);
 
 		username = "ven";
-		venUser = venService.prepare(username);
+		venUser = venService.prepare(username, username);
 		venService.save(venUser);
+
+		X509Certificate cert = OadrPKISecurity.parseCertificate("src/test/resources/cert/test.crt");
+		String fingerprint = OadrFingerprintSecurity.getOadr20bFingerprint(cert);
+		venX509 = venService.prepare(fingerprint);
+		venService.save(venX509);
+
 	}
 
 	@After
@@ -81,10 +96,11 @@ public class OadrSecurityRoleServiceTest {
 		oadrUserService.delete(passwordUser);
 		oadrAppService.delete(appUser);
 		venService.delete(venUser);
+		venService.delete(venX509);
 	}
 
 	@Test
-	public void digestUserDetailTest() {
+	public void grantDigestRoleTest() {
 
 		String encodeDigest = oadrUserService.encodeDigest("passUser", "passUser",
 				digestAuthenticationProvider.getRealm());
@@ -107,9 +123,28 @@ public class OadrSecurityRoleServiceTest {
 	}
 
 	@Test
-	public void basicUserDetailTest() {
+	public void grantBasicRoleTest() {
 
-		oadrSecurityRoleService.grantBasicRole("passUser", "passUser");
+		User grantBasicRole = oadrSecurityRoleService.grantBasicRole("passUser", "passUser");
+		List<GrantedAuthority> authorities = new ArrayList<>(grantBasicRole.getAuthorities());
+		assertEquals(1, authorities.size());
+		assertEquals("ROLE_USER", authorities.get(0).getAuthority());
+
+		grantBasicRole = oadrSecurityRoleService.grantBasicRole(appUser.getUsername(), appUser.getUsername());
+		authorities = new ArrayList<>(grantBasicRole.getAuthorities());
+		assertEquals(2, authorities.size());
+		assertTrue(authorities.get(0).getAuthority().equals("ROLE_APP")
+				|| authorities.get(0).getAuthority().equals("ROLE_DEVICE_MANAGER"));
+		assertTrue(authorities.get(1).getAuthority().equals("ROLE_APP")
+				|| authorities.get(1).getAuthority().equals("ROLE_DEVICE_MANAGER"));
+
+		grantBasicRole = oadrSecurityRoleService.grantBasicRole(adminUser.getUsername(), adminUser.getUsername());
+		authorities = new ArrayList<>(grantBasicRole.getAuthorities());
+		assertEquals(2, authorities.size());
+		assertTrue(authorities.get(0).getAuthority().equals("ROLE_USER")
+				|| authorities.get(0).getAuthority().equals("ROLE_ADMIN"));
+		assertTrue(authorities.get(1).getAuthority().equals("ROLE_USER")
+				|| authorities.get(1).getAuthority().equals("ROLE_ADMIN"));
 
 		boolean exception = false;
 		try {
@@ -119,4 +154,34 @@ public class OadrSecurityRoleServiceTest {
 		}
 		assertTrue(exception);
 	}
+
+	@Test
+	public void grantX509RoleTest() throws OadrSecurityException {
+		X509Certificate cert = OadrPKISecurity.parseCertificate("src/test/resources/cert/test.crt");
+		String fingerprint = OadrFingerprintSecurity.getOadr20bFingerprint(cert);
+		User grantX509Role = oadrSecurityRoleService.grantX509Role(fingerprint);
+		List<GrantedAuthority> authorities = new ArrayList<>(grantX509Role.getAuthorities());
+		assertEquals(1, authorities.size());
+		assertEquals("ROLE_VEN", authorities.get(0).getAuthority());
+
+		venX509.setRegistrationId("registrationId");
+		venService.save(venX509);
+
+		grantX509Role = oadrSecurityRoleService.grantX509Role(fingerprint);
+		authorities = new ArrayList<>(grantX509Role.getAuthorities());
+		assertEquals(2, authorities.size());
+		assertTrue(authorities.get(1).getAuthority().equals("ROLE_VEN")
+				|| authorities.get(1).getAuthority().equals("ROLE_REGISTERED"));
+		assertTrue(authorities.get(0).getAuthority().equals("ROLE_VEN")
+				|| authorities.get(0).getAuthority().equals("ROLE_REGISTERED"));
+
+		boolean exception = false;
+		try {
+			oadrSecurityRoleService.grantX509Role("mouaiccool");
+		} catch (Exception e) {
+			exception = true;
+		}
+		assertTrue(exception);
+	}
+
 }
