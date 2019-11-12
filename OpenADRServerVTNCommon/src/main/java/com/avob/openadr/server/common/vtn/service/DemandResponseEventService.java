@@ -234,8 +234,10 @@ public class DemandResponseEventService {
 		demandResponseEventSignalDao.saveAll(partialUpdate.getSignals());
 
 		// update event
-		event.setSignals(partialUpdate.getSignals());
-		event.setTargets(partialUpdate.getTargets());
+		event.getSignals().clear();
+		event.getTargets().clear();
+		event.getSignals().addAll(partialUpdate.getSignals());
+		event.getTargets().addAll(partialUpdate.getTargets());
 		event.setLastUpdateTimestamp(System.currentTimeMillis());
 		event.setPublished(partialUpdate.isPublished());
 		DemandResponseEvent save = demandResponseEventDao.save(event);

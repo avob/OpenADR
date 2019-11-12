@@ -44,6 +44,7 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandR
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalIntervalDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
@@ -69,6 +70,8 @@ import com.google.common.collect.Sets;
 @ActiveProfiles("test")
 public class DemandResponseControllerTest {
 
+	private static final Float INTERVAL_VALUE = 1.0F;
+	private static final Integer INTERVAL_DURATION = 1000;
 	private static final String APPLICATION_JSON_HEADER_VALUE = "application/json";
 	private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
 
@@ -159,6 +162,12 @@ public class DemandResponseControllerTest {
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
 		signal.setSignalName(SIMPLE_SIGNAL_NAME);
 		signal.setSignalType(LEVEL_SIGNAL_TYPE);
+		List<DemandResponseEventSignalIntervalDto> intervals = new ArrayList<>();
+		DemandResponseEventSignalIntervalDto interval = new DemandResponseEventSignalIntervalDto();
+		interval.setDuration(INTERVAL_DURATION);
+		interval.setValue(INTERVAL_VALUE);
+		intervals.add(interval);
+		signal.setIntervals(intervals);
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
@@ -433,6 +442,10 @@ public class DemandResponseControllerTest {
 		assertEquals(1, dto.getSignals().size());
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
+		assertNotNull(dto.getSignals().get(0).getIntervals());
+		assertEquals(1, dto.getSignals().get(0).getIntervals().size());
+		assertEquals(INTERVAL_VALUE, dto.getSignals().get(0).getIntervals().get(0).getValue());
+		assertEquals(INTERVAL_DURATION, dto.getSignals().get(0).getIntervals().get(0).getDuration());
 
 		DemandResponseEventSignalDto signalModerate = new DemandResponseEventSignalDto();
 		signalModerate.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
@@ -463,6 +476,8 @@ public class DemandResponseControllerTest {
 		assertEquals(dto.getSignals().get(0).getCurrentValue(),
 				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
 		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
+		assertTrue(dto.getSignals().get(0).getIntervals().isEmpty());
+
 		assertEquals(1, dto.getTargets().size());
 		assertEquals(VEN2, dto.getTargets().get(0).getTargetId());
 		assertEquals(VEN_PARAM, dto.getTargets().get(0).getTargetType());
@@ -682,8 +697,8 @@ public class DemandResponseControllerTest {
 		assertNotNull(dto);
 		assertNotNull(dto.getSignals());
 		assertEquals(1, dto.getSignals().size());
-		assertEquals(dto.getSignals().get(0).getCurrentValue(),
-				DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue());
+		assertEquals(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_MODERATE.getValue(),
+				dto.getSignals().get(0).getCurrentValue());
 		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 
 		// activate an already activated event does nothing
