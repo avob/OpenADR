@@ -66,10 +66,10 @@
 					</execution>
 				</executions>
 				<configuration>
-					<!-- The package of your generated sources -->
-					<bindingDirectory>src/main/resources/oadr20b_binding</bindingDirectory>
+					<bindingDirectory>xsd/oadr20b_binding</bindingDirectory>
+					<schemaDirectory>xsd/oadr20b_schema</schemaDirectory>
 					<generateDirectory>${project.build.directory}/generated-sources/oadr20b</generateDirectory>
-					<schemaDirectory>src/main/resources/oadr20b_schema</schemaDirectory>
+
 					<args>
 						<arg>-extension</arg>
 						<arg>-Xnamespace-prefix</arg>

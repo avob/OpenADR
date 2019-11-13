@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 import javax.xml.XMLConstants;
@@ -31,8 +30,7 @@ import com.avob.openadr.model.oadr20a.exception.Oadr20aUnmarshalException;
  */
 public class Oadr20aJAXBContext {
 
-	public static final String SHARED_RESOURCE_PATH = "target/maven-shared-archive-resources";
-	public static final String XSD_PATH = "/oadr20a_schema/oadr_20a.xsd";
+	public static final String XSD_PATH = "oadr_20a.xsd";
 
 	private static Oadr20aJAXBContext instance = null;
 
@@ -43,24 +41,20 @@ public class Oadr20aJAXBContext {
 	private Oadr20aJAXBContext(Schema schema) throws JAXBException {
 		jaxbContext = JAXBContext.newInstance(
 				"com.avob.openadr.model.oadr20a.oadr:com.avob.openadr.model.oadr20a.strm:com.avob.openadr.model.oadr20a.emix");
-
 		this.schema = schema;
-
 	}
 
 	public static Oadr20aJAXBContext getInstance() throws JAXBException {
 		return Oadr20aJAXBContext.getInstance(null);
 	}
 
-	public synchronized static Oadr20aJAXBContext getInstance(Schema schema) throws JAXBException {
+	public synchronized static Oadr20aJAXBContext getInstance(String xsdFolderPath) throws JAXBException {
 		if (instance == null) {
-			Schema loadedSchema = schema;
-			if (schema == null) {
+			Schema loadedSchema = null;
+			if (xsdFolderPath != null) {
 				SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-				URL url = Oadr20aJAXBContext.class.getResource(XSD_PATH);
-				File xsdFile = new File(url.getPath());
-
+				File xsdFile = new File(xsdFolderPath + "/" + XSD_PATH);
 				if (xsdFile.exists()) {
 					try {
 						loadedSchema = sf.newSchema(new Source[] { new StreamSource(xsdFile) });
@@ -70,7 +64,6 @@ public class Oadr20aJAXBContext {
 				}
 			}
 			instance = new Oadr20aJAXBContext(loadedSchema);
-
 		}
 		return instance;
 	}

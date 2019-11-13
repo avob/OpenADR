@@ -65,8 +65,14 @@ public class VenConfig {
 	@Value("${oadr.security.authentication.digest.realm:#{null}}")
 	private String digestRealm;
 
-	@Value("${oadr.security.replayProtectAcceptedDelaySecond}")
+	@Value("${oadr.security.replayProtectAcceptedDelaySecond:#{null}}")
 	private Long replayProtectAcceptedDelaySecond;
+
+	@Value("${oadr.security.validateOadrPayloadAgainstXsdFilePath:#{null}}")
+	private String validateOadrPayloadAgainstXsdFilePath;
+
+	public static final String VALIDATE_OADR_PAYLOAD_XSD_CONF = "oadr.validateOadrPayloadAgainstXsd";
+	public static final String VALIDATE_OADR_PAYLOAD_XSD_FILEPATH_CONF = "oadr.security.validateOadrPayloadAgainstXsdFilePath";
 
 	public VenConfig() {
 	}
@@ -89,6 +95,7 @@ public class VenConfig {
 		this.venPrivateKeyPath = clone.getVenPrivateKeyPath();
 		this.venUrl = clone.getVenUrl();
 		this.xmlSignature = clone.getXmlSignature();
+		this.validateOadrPayloadAgainstXsdFilePath = clone.getValidateOadrPayloadAgainstXsdFilePath();
 	}
 
 	@PostConstruct
@@ -205,6 +212,10 @@ public class VenConfig {
 
 	public String getVenIdFile() {
 		return venIdFile;
+	}
+
+	public String getValidateOadrPayloadAgainstXsdFilePath() {
+		return validateOadrPayloadAgainstXsdFilePath;
 	}
 
 }

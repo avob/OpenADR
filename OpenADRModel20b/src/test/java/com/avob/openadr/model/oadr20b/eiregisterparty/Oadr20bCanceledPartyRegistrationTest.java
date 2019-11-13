@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.TestUtils;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiRegisterPartyBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
@@ -25,7 +26,7 @@ public class Oadr20bCanceledPartyRegistrationTest {
 	private Oadr20bJAXBContext jaxbContext;
 
 	public Oadr20bCanceledPartyRegistrationTest() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
+		jaxbContext = Oadr20bJAXBContext.getInstance(TestUtils.XSD_OADR20B_SCHEMA);
 	}
 
 	@Test

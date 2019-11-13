@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.TestUtils;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiBuilders;
 import com.avob.openadr.model.oadr20b.builders.eipayload.EndDeviceAssertMridType;
 import com.avob.openadr.model.oadr20b.ei.EiTargetType;
@@ -28,7 +29,7 @@ public class Oadr20bEiTargetTypeBuilderTest {
 	private Oadr20bJAXBContext jaxbContext;
 
 	public Oadr20bEiTargetTypeBuilderTest() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
+		jaxbContext = Oadr20bJAXBContext.getInstance(TestUtils.XSD_OADR20B_SCHEMA);
 	}
 
 	private void checkMarshalling(EiTargetType build) throws Oadr20bMarshalException {

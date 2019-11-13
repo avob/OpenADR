@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.TestUtils;
 import com.avob.openadr.model.oadr20b.avob.AvobVenServiceRequestType;
 import com.avob.openadr.model.oadr20b.avob.KeyTokenType;
 import com.avob.openadr.model.oadr20b.avob.PayloadAvobVenServiceRequestType;
@@ -103,7 +104,7 @@ public class OadrXMLSignatureHandlerTest {
 	public OadrXMLSignatureHandlerTest() throws OadrSecurityException, JAXBException {
 		privateKey = OadrPKISecurity.parsePrivateKey(PRIVATE_KEY_FILE_PATH);
 		certificate = OadrPKISecurity.parseCertificate(CERTIFICATE_FILE_PATH);
-		jaxbContext = Oadr20bJAXBContext.getInstance();
+		jaxbContext = Oadr20bJAXBContext.getInstance(TestUtils.XSD_OADR20B_SCHEMA);
 	}
 
 	private void validate(String payload) throws Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {

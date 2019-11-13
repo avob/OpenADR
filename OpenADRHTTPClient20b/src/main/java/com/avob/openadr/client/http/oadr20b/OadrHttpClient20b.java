@@ -64,7 +64,7 @@ public class OadrHttpClient20b {
 	public OadrHttpClient20b(OadrHttpClient client, String privateKeyPath, String clientCertificatePath,
 			Long replayProtectAcceptedDelaySecond, Boolean validateXmlPayload)
 			throws JAXBException, OadrSecurityException {
-		this.jaxbContext = Oadr20bJAXBContext.getInstance();
+		this.jaxbContext = Oadr20bJAXBContext.getInstance("src/test/resources/oadr20b_schema/");
 		this.client = client;
 
 		if (privateKeyPath != null && clientCertificatePath != null) {

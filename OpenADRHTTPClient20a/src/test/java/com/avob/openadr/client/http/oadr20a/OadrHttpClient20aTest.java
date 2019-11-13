@@ -44,158 +44,166 @@ import com.avob.openadr.model.oadr20a.oadr.OadrResponse;
 
 public class OadrHttpClient20aTest {
 
-    private OadrDistributeEvent createOadrDistributeEvent() {
-        long timestampStart = 0L;
-        String eventXmlDuration = "PT1H";
-        String toleranceXmlDuration = "PT5M";
-        String notificationXmlDuration = "P1D";
-        EiActivePeriodType eiActivePeriod = Oadr20aBuilders.newOadr20aEiActivePeriodTypeBuilder(timestampStart,
-                eventXmlDuration, toleranceXmlDuration, notificationXmlDuration).build();
+	public static final String XSD_OADR20A_SCHEMA = "src/test/resources/oadr20a_schema";
 
-        String signalId = "0";
-        String signalName = "simple";
-        SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
-        String xmlDuration = "PT1H";
-        float currentValue = 0;
-        String intervalId = "intervalId";
+	private Oadr20aJAXBContext jaxbContext;
 
-        EiEventSignalType eiEventSignalType = Oadr20aBuilders
-                .newOadr20aEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue)
-                .addInterval(
-                        Oadr20aBuilders.newOadr20aIntervalTypeBuilder(intervalId, xmlDuration, currentValue).build())
-                .build();
+	public OadrHttpClient20aTest() throws JAXBException {
+		jaxbContext = Oadr20aJAXBContext.getInstance(XSD_OADR20A_SCHEMA);
+	}
 
-        String venId = "ven1";
-        EiTargetType eiTarget = Oadr20aBuilders.newOadr20aEiTargetTypeBuilder().addVenId(venId).build();
+	private OadrDistributeEvent createOadrDistributeEvent() {
+		long timestampStart = 0L;
+		String eventXmlDuration = "PT1H";
+		String toleranceXmlDuration = "PT5M";
+		String notificationXmlDuration = "P1D";
+		EiActivePeriodType eiActivePeriod = Oadr20aBuilders.newOadr20aEiActivePeriodTypeBuilder(timestampStart,
+				eventXmlDuration, toleranceXmlDuration, notificationXmlDuration).build();
 
-        Long createdTimespamp = 0L;
-        String eventId = "0";
-        long modificationNumber = 0L;
-        String marketContext = "";
-        EventStatusEnumeratedType status = EventStatusEnumeratedType.ACTIVE;
-        EventDescriptorType eventDescriptor = Oadr20aBuilders.newOadr20aEventDescriptorTypeBuilder(createdTimespamp,
-                eventId, modificationNumber, marketContext, status).build();
+		String signalId = "0";
+		String signalName = "simple";
+		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
+		String xmlDuration = "PT1H";
+		float currentValue = 0;
+		String intervalId = "intervalId";
 
-        OadrEvent oadrEvent = Oadr20aBuilders.newOadr20aDistributeEventOadrEventBuilder()
-                .withActivePeriod(eiActivePeriod).addEiEventSignal(eiEventSignalType).withEiTarget(eiTarget)
-                .withEventDescriptor(eventDescriptor).withResponseRequired(false).build();
+		EiEventSignalType eiEventSignalType = Oadr20aBuilders
+				.newOadr20aEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue)
+				.addInterval(
+						Oadr20aBuilders.newOadr20aIntervalTypeBuilder(intervalId, xmlDuration, currentValue).build())
+				.build();
 
-        return Oadr20aBuilders.newOadr20aDistributeEventBuilder("", "").addOadrEvent(oadrEvent).build();
-    }
+		String venId = "ven1";
+		EiTargetType eiTarget = Oadr20aBuilders.newOadr20aEiTargetTypeBuilder().addVenId(venId).build();
 
-    private HttpResponse createHttpResponse(int responseCode, String payload)
-            throws Oadr20aMarshalException, JAXBException {
+		Long createdTimespamp = 0L;
+		String eventId = "0";
+		long modificationNumber = 0L;
+		String marketContext = "";
+		EventStatusEnumeratedType status = EventStatusEnumeratedType.ACTIVE;
+		EventDescriptorType eventDescriptor = Oadr20aBuilders.newOadr20aEventDescriptorTypeBuilder(createdTimespamp,
+				eventId, modificationNumber, marketContext, status).build();
 
-        StatusLine statusLine = new BasicStatusLine(new ProtocolVersion("HTTP", 1, 0), responseCode, "");
-        HttpResponse response = new BasicHttpResponse(statusLine);
-        BasicHttpEntity entity = new BasicHttpEntity();
-        entity.setContent(new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8)));
-        response.setEntity(entity);
-        return response;
-    }
+		OadrEvent oadrEvent = Oadr20aBuilders.newOadr20aDistributeEventOadrEventBuilder()
+				.withActivePeriod(eiActivePeriod).addEiEventSignal(eiEventSignalType).withEiTarget(eiTarget)
+				.withEventDescriptor(eventDescriptor).withResponseRequired(false).build();
 
-    @Test
-    public void validPostTest() throws ClientProtocolException, IOException, JAXBException, Oadr20aException,
-            Oadr20aMarshalException, URISyntaxException, Oadr20aHttpLayerException {
+		return Oadr20aBuilders.newOadr20aDistributeEventBuilder("", "").addOadrEvent(oadrEvent).build();
+	}
 
-        OadrHttpClient oadrHttpClient = Mockito.mock(OadrHttpClient.class);
-        int scOk = HttpStatus.SC_OK;
+	private HttpResponse createHttpResponse(int responseCode, String payload)
+			throws Oadr20aMarshalException, JAXBException {
 
-        OadrResponse mockOadrResponse = Oadr20aBuilders.newOadr20aResponseBuilder("", scOk).build();
-        String marshal = Oadr20aJAXBContext.getInstance().marshal(mockOadrResponse);
+		StatusLine statusLine = new BasicStatusLine(new ProtocolVersion("HTTP", 1, 0), responseCode, "");
+		HttpResponse response = new BasicHttpResponse(statusLine);
+		BasicHttpEntity entity = new BasicHttpEntity();
+		entity.setContent(new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8)));
+		response.setEntity(entity);
+		return response;
+	}
 
-        HttpResponse response = this.createHttpResponse(scOk, marshal);
-        when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
+	@Test
+	public void validPostTest() throws ClientProtocolException, IOException, JAXBException, Oadr20aException,
+			Oadr20aMarshalException, URISyntaxException, Oadr20aHttpLayerException {
 
-        OadrHttpClient20a client = new OadrHttpClient20a(oadrHttpClient);
+		OadrHttpClient oadrHttpClient = Mockito.mock(OadrHttpClient.class);
+		int scOk = HttpStatus.SC_OK;
 
-        OadrDistributeEvent mockDistributeEvent = this.createOadrDistributeEvent();
-        OadrResponse post = client.post(mockDistributeEvent,
-                Oadr20aUrlPath.OADR_BASE_PATH + Oadr20aUrlPath.EI_EVENT_SERVICE, OadrResponse.class);
+		OadrResponse mockOadrResponse = Oadr20aBuilders.newOadr20aResponseBuilder("", scOk).build();
+		String marshal = jaxbContext.marshal(mockOadrResponse);
 
-        assertEquals(String.valueOf(scOk), post.getEiResponse().getResponseCode());
-    }
+		HttpResponse response = this.createHttpResponse(scOk, marshal);
+		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
 
-    @Test
-    public void httpLayerErrorPostTest() throws ClientProtocolException, IOException, JAXBException, Oadr20aException,
-            Oadr20aMarshalException, URISyntaxException, Oadr20aHttpLayerException {
+		OadrHttpClient20a client = new OadrHttpClient20a(oadrHttpClient);
 
-        // HTTP layer error
-        OadrHttpClient oadrHttpClient = Mockito.mock(OadrHttpClient.class);
-        int scForbidden = HttpStatus.SC_FORBIDDEN;
+		OadrDistributeEvent mockDistributeEvent = this.createOadrDistributeEvent();
+		OadrResponse post = client.post(mockDistributeEvent,
+				Oadr20aUrlPath.OADR_BASE_PATH + Oadr20aUrlPath.EI_EVENT_SERVICE, OadrResponse.class);
 
-        OadrResponse mockOadrResponse = Oadr20aBuilders.newOadr20aResponseBuilder("", scForbidden).build();
-        String marshal = Oadr20aJAXBContext.getInstance().marshal(mockOadrResponse);
+		assertEquals(String.valueOf(scOk), post.getEiResponse().getResponseCode());
+	}
 
-        HttpResponse response = this.createHttpResponse(scForbidden, marshal);
-        when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
+	@Test
+	public void httpLayerErrorPostTest() throws ClientProtocolException, IOException, JAXBException, Oadr20aException,
+			Oadr20aMarshalException, URISyntaxException, Oadr20aHttpLayerException {
 
-        OadrHttpClient20a client = new OadrHttpClient20a(oadrHttpClient);
+		// HTTP layer error
+		OadrHttpClient oadrHttpClient = Mockito.mock(OadrHttpClient.class);
+		int scForbidden = HttpStatus.SC_FORBIDDEN;
 
-        OadrDistributeEvent mockDistributeEvent = this.createOadrDistributeEvent();
+		OadrResponse mockOadrResponse = Oadr20aBuilders.newOadr20aResponseBuilder("", scForbidden).build();
+		String marshal = jaxbContext.marshal(mockOadrResponse);
 
-        boolean exception = false;
-        try {
-            client.post(mockDistributeEvent, Oadr20aUrlPath.OADR_BASE_PATH + Oadr20aUrlPath.EI_EVENT_SERVICE,
-                    OadrResponse.class);
-        } catch (Oadr20aHttpLayerException e) {
-            exception = true;
-        }
-        assertTrue(exception);
+		HttpResponse response = this.createHttpResponse(scForbidden, marshal);
+		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
 
-    }
+		OadrHttpClient20a client = new OadrHttpClient20a(oadrHttpClient);
 
-    @Test
-    public void requestMarshallingErrorPostTest() throws ClientProtocolException, IOException, JAXBException,
-            Oadr20aException, Oadr20aMarshalException, URISyntaxException, Oadr20aHttpLayerException {
+		OadrDistributeEvent mockDistributeEvent = this.createOadrDistributeEvent();
 
-        OadrHttpClient oadrHttpClient = Mockito.mock(OadrHttpClient.class);
-        int scOk = HttpStatus.SC_OK;
+		boolean exception = false;
+		try {
+			client.post(mockDistributeEvent, Oadr20aUrlPath.OADR_BASE_PATH + Oadr20aUrlPath.EI_EVENT_SERVICE,
+					OadrResponse.class);
+		} catch (Oadr20aHttpLayerException e) {
+			exception = true;
+		}
+		assertTrue(exception);
 
-        OadrResponse mockOadrResponse = Oadr20aBuilders.newOadr20aResponseBuilder("", scOk).build();
-        String marshal = Oadr20aJAXBContext.getInstance().marshal(mockOadrResponse);
+	}
 
-        HttpResponse response = this.createHttpResponse(scOk, marshal);
-        when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
+	@Test
+	public void requestMarshallingErrorPostTest() throws ClientProtocolException, IOException, JAXBException,
+			Oadr20aException, Oadr20aMarshalException, URISyntaxException, Oadr20aHttpLayerException {
 
-        OadrHttpClient20a client = new OadrHttpClient20a(oadrHttpClient);
+		OadrHttpClient oadrHttpClient = Mockito.mock(OadrHttpClient.class);
+		int scOk = HttpStatus.SC_OK;
 
-        OadrDistributeEvent mockDistributeEvent = this.createOadrDistributeEvent();
-        mockDistributeEvent.setVtnID(null);
+		OadrResponse mockOadrResponse = Oadr20aBuilders.newOadr20aResponseBuilder("", scOk).build();
+		String marshal = jaxbContext.marshal(mockOadrResponse);
 
-        boolean exception = false;
-        try {
-            client.post(mockDistributeEvent, Oadr20aUrlPath.OADR_BASE_PATH + Oadr20aUrlPath.EI_EVENT_SERVICE,
-                    OadrResponse.class);
-        } catch (Oadr20aException e) {
-            exception = true;
-        }
-        assertTrue(exception);
-    }
+		HttpResponse response = this.createHttpResponse(scOk, marshal);
+		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
 
-    @Test
-    public void responseUnmarshallingErrorPostTest() throws ClientProtocolException, IOException, JAXBException,
-            Oadr20aException, Oadr20aMarshalException, URISyntaxException, Oadr20aHttpLayerException {
+		OadrHttpClient20a client = new OadrHttpClient20a(oadrHttpClient);
 
-        OadrHttpClient oadrHttpClient = Mockito.mock(OadrHttpClient.class);
-        int scOk = HttpStatus.SC_OK;
+		OadrDistributeEvent mockDistributeEvent = this.createOadrDistributeEvent();
+		mockDistributeEvent.setVtnID(null);
 
-        String marshal = "";
+		boolean exception = false;
+		try {
+			client.post(mockDistributeEvent, Oadr20aUrlPath.OADR_BASE_PATH + Oadr20aUrlPath.EI_EVENT_SERVICE,
+					OadrResponse.class);
+		} catch (Oadr20aException e) {
+			exception = true;
+		}
+		assertTrue(exception);
+	}
 
-        HttpResponse response = this.createHttpResponse(scOk, marshal);
-        when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
+	@Test
+	public void responseUnmarshallingErrorPostTest() throws ClientProtocolException, IOException, JAXBException,
+			Oadr20aException, Oadr20aMarshalException, URISyntaxException, Oadr20aHttpLayerException {
 
-        OadrHttpClient20a client = new OadrHttpClient20a(oadrHttpClient);
+		OadrHttpClient oadrHttpClient = Mockito.mock(OadrHttpClient.class);
+		int scOk = HttpStatus.SC_OK;
 
-        OadrDistributeEvent mockDistributeEvent = this.createOadrDistributeEvent();
+		String marshal = "";
 
-        boolean exception = false;
-        try {
-            client.post(mockDistributeEvent, Oadr20aUrlPath.OADR_BASE_PATH + Oadr20aUrlPath.EI_EVENT_SERVICE,
-                    OadrResponse.class);
-        } catch (Oadr20aException e) {
-            exception = true;
-        }
-        assertTrue(exception);
-    }
+		HttpResponse response = this.createHttpResponse(scOk, marshal);
+		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
+
+		OadrHttpClient20a client = new OadrHttpClient20a(oadrHttpClient);
+
+		OadrDistributeEvent mockDistributeEvent = this.createOadrDistributeEvent();
+
+		boolean exception = false;
+		try {
+			client.post(mockDistributeEvent, Oadr20aUrlPath.OADR_BASE_PATH + Oadr20aUrlPath.EI_EVENT_SERVICE,
+					OadrResponse.class);
+		} catch (Oadr20aException e) {
+			exception = true;
+		}
+		assertTrue(exception);
+	}
 }

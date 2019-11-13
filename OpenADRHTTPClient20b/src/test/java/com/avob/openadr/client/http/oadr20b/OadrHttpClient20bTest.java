@@ -56,7 +56,15 @@ import com.avob.openadr.security.exception.OadrSecurityException;
 
 public class OadrHttpClient20bTest {
 
-	private static final String CERT_FOLDER_PATH = "src/test/resources/cert/";
+	public static final String CERT_FOLDER_PATH = "src/test/resources/cert/";
+
+	public static final String XSD_OADR20B_SCHEMA = "src/test/resources/oadr20b_schema";
+
+	private Oadr20bJAXBContext jaxbContext;
+
+	public OadrHttpClient20bTest() throws JAXBException {
+		jaxbContext = Oadr20bJAXBContext.getInstance(XSD_OADR20B_SCHEMA);
+	}
 
 	private OadrDistributeEventType createOadrDistributeEvent() {
 		long timestampStart = 0L;
@@ -119,7 +127,7 @@ public class OadrHttpClient20bTest {
 
 		OadrResponseType mockOadrResponseType = Oadr20bResponseBuilders.newOadr20bResponseBuilder("", scOk, "venId")
 				.build();
-		String marshal = Oadr20bJAXBContext.getInstance().marshalRoot(mockOadrResponseType);
+		String marshal = jaxbContext.marshalRoot(mockOadrResponseType);
 
 		HttpResponse response = this.createHttpResponse(scOk, marshal);
 		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
@@ -143,7 +151,7 @@ public class OadrHttpClient20bTest {
 
 		OadrResponseType mockOadrResponseType = Oadr20bResponseBuilders.newOadr20bResponseBuilder("", scOk, "venId")
 				.build();
-		String marshal = Oadr20bJAXBContext.getInstance().marshalRoot(mockOadrResponseType);
+		String marshal = jaxbContext.marshalRoot(mockOadrResponseType);
 
 		HttpResponse response = this.createHttpResponse(scOk, marshal);
 		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
@@ -198,7 +206,7 @@ public class OadrHttpClient20bTest {
 
 		OadrResponseType mockOadrResponseType = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("", HttpStatus.SC_FORBIDDEN, "venId").build();
-		String marshal = Oadr20bJAXBContext.getInstance().marshalRoot(mockOadrResponseType);
+		String marshal = jaxbContext.marshalRoot(mockOadrResponseType);
 
 		HttpResponse response = this.createHttpResponse(HttpStatus.SC_OK, marshal);
 		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
@@ -222,7 +230,8 @@ public class OadrHttpClient20bTest {
 
 		OadrResponseType mockOadrResponseType = Oadr20bResponseBuilders.newOadr20bResponseBuilder("", scOk, "venId")
 				.build();
-		String marshal = Oadr20bJAXBContext.getInstance().marshalRoot(mockOadrResponseType);
+
+		String marshal = jaxbContext.marshalRoot(mockOadrResponseType);
 
 		HttpResponse response = this.createHttpResponse(scOk, marshal);
 		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
@@ -279,7 +288,7 @@ public class OadrHttpClient20bTest {
 
 		OadrResponseType mockOadrResponseType = Oadr20bResponseBuilders.newOadr20bResponseBuilder("", scOk, "venId")
 				.build();
-		String marshal = Oadr20bJAXBContext.getInstance().marshalRoot(mockOadrResponseType);
+		String marshal = jaxbContext.marshalRoot(mockOadrResponseType);
 
 		HttpResponse response = this.createHttpResponse(scOk, marshal);
 		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);

@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.StringJoiner;
 
@@ -55,8 +54,8 @@ public class Oadr20bJAXBContext {
 
 	private static final boolean DEFAULT_VALIDATE_XML_PAYLOAD = false;
 	public static final String SHARED_RESOURCE_PATH = "target/maven-shared-archive-resources";
-	public static final String XSD_PATH = "/oadr20b_schema/oadr_20b.xsd";
-	public static final String XSD_AVOB_PATH = "/oadr20b_schema/oadr_avob.xsd";
+	public static final String XSD_PATH = "oadr_20b.xsd";
+	public static final String XSD_AVOB_PATH = "oadr_avob.xsd";
 
 	private static Oadr20bJAXBContext instance = null;
 
@@ -94,16 +93,14 @@ public class Oadr20bJAXBContext {
 		return Oadr20bJAXBContext.getInstance(null);
 	}
 
-	public synchronized static Oadr20bJAXBContext getInstance(Schema schema) throws JAXBException {
+	public synchronized static Oadr20bJAXBContext getInstance(String xsdFolderPath) throws JAXBException {
 		if (instance == null) {
-			Schema loadedSchema = schema;
-			if (schema == null) {
+			Schema loadedSchema = null;
+			if (xsdFolderPath != null) {
 				SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-				URL url = Oadr20bJAXBContext.class.getResource(XSD_PATH);
-				File xsdFile = new File(url.getPath());
-				url = Oadr20bJAXBContext.class.getResource(XSD_AVOB_PATH);
-				File xsdAvobFile = new File(url.getPath());
+				File xsdFile = new File(xsdFolderPath + "/" + XSD_PATH);
+				File xsdAvobFile = new File(xsdFolderPath + "/" + XSD_AVOB_PATH);
 				if (xsdFile.exists() && xsdAvobFile.exists()) {
 					try {
 						loadedSchema = sf

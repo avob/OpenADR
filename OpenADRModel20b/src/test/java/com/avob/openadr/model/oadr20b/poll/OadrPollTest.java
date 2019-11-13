@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.TestUtils;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bPollBuilders;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
@@ -22,7 +23,7 @@ public class OadrPollTest {
 	private Oadr20bJAXBContext jaxbContext;
 
 	public OadrPollTest() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
+		jaxbContext = Oadr20bJAXBContext.getInstance(TestUtils.XSD_OADR20B_SCHEMA);
 	}
 
 	@Test

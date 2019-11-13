@@ -36,11 +36,10 @@
 					</execution>
 				</executions>
 				<configuration>
-					<!-- The package of your generated sources -->
-					<!-- <generatePackage>com.avob.openadr.model.oadr20a</generatePackage> -->
-					<bindingDirectory>src/main/resources/oadr20a_binding</bindingDirectory>
+					<bindingDirectory>xsd/oadr20a_binding</bindingDirectory>
+					<schemaDirectory>xsd/oadr20a_schema</schemaDirectory>
 					<generateDirectory>${project.build.directory}/generated-sources/oadr20a</generateDirectory>
-					<schemaDirectory>src/main/resources/oadr20a_schema</schemaDirectory>
+
 					<args>
 						<arg>-extension</arg>
 						<arg>-Xnamespace-prefix</arg>

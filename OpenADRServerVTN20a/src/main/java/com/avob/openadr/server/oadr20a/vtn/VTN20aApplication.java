@@ -20,7 +20,6 @@ import org.xml.sax.SAXException;
 
 import com.avob.openadr.model.oadr20a.Oadr20aJAXBContext;
 import com.avob.openadr.model.oadr20a.Oadr20aSecurity;
-import com.avob.openadr.security.OadrXmlUtils;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VTNEmbeddedServletContainerCustomizer;
 import com.avob.openadr.server.common.vtn.VtnConfig;
@@ -53,8 +52,7 @@ public class VTN20aApplication {
 	public Oadr20aJAXBContext jaxbContextProd() throws OadrSecurityException, JAXBException {
 		if (vtnConfig.getValidateOadrPayloadAgainstXsd()
 				&& vtnConfig.getValidateOadrPayloadAgainstXsdFilePath() != null) {
-			return Oadr20aJAXBContext
-					.getInstance(OadrXmlUtils.loadXsdSchema(vtnConfig.getValidateOadrPayloadAgainstXsdFilePath()));
+			return Oadr20aJAXBContext.getInstance(vtnConfig.getValidateOadrPayloadAgainstXsdFilePath());
 		}
 		return Oadr20aJAXBContext.getInstance();
 	};

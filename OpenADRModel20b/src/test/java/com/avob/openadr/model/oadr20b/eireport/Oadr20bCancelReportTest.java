@@ -15,30 +15,32 @@ import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.TestUtils;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
+import com.avob.openadr.security.exception.OadrSecurityException;
 
 public class Oadr20bCancelReportTest {
 
 	private Oadr20bJAXBContext jaxbContext;
 
-	public Oadr20bCancelReportTest() throws JAXBException {
-		jaxbContext = Oadr20bJAXBContext.getInstance();
+	public Oadr20bCancelReportTest() throws JAXBException, OadrSecurityException {
+		jaxbContext = Oadr20bJAXBContext.getInstance(TestUtils.XSD_OADR20B_SCHEMA);
 	}
 
 	@Test
 	public void validatingMarshalUnmarshalTest() throws Oadr20bMarshalException, Oadr20bUnmarshalException {
 
-	String requestId = "requestId";
-	String venId = "venId";
-	boolean reportToFollow = true;
-	String reportId = "reportId";
-	OadrCancelReportType request = Oadr20bEiReportBuilders
-			.newOadr20bCancelReportBuilder(requestId, venId, reportToFollow).addReportRequestId(reportId)
-			.addReportRequestId(Lists.newArrayList("mouaiccool")).build();
-	
+		String requestId = "requestId";
+		String venId = "venId";
+		boolean reportToFollow = true;
+		String reportId = "reportId";
+		OadrCancelReportType request = Oadr20bEiReportBuilders
+				.newOadr20bCancelReportBuilder(requestId, venId, reportToFollow).addReportRequestId(reportId)
+				.addReportRequestId(Lists.newArrayList("mouaiccool")).build();
+
 		String marshalRoot = jaxbContext.marshalRoot(request, true);
 		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
 		assertNotNull(unmarshal);

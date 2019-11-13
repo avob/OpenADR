@@ -22,7 +22,7 @@ public class Oadr20aRequestEventTest {
 	private Oadr20aJAXBContext jaxbContext;
 
 	public Oadr20aRequestEventTest() throws JAXBException {
-		jaxbContext = Oadr20aJAXBContext.getInstance();
+		jaxbContext = Oadr20aJAXBContext.getInstance(TestUtils.XSD_OADR20A_SCHEMA);
 	}
 
 	@Test

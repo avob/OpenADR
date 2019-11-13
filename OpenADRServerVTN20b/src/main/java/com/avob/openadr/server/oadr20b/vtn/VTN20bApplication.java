@@ -20,10 +20,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jms.annotation.EnableJms;
 import org.xml.sax.SAXException;
 
-import com.avob.openadr.model.oadr20a.Oadr20aJAXBContext;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.Oadr20bSecurity;
-import com.avob.openadr.security.OadrXmlUtils;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VTNEmbeddedServletContainerCustomizer;
 import com.avob.openadr.server.common.vtn.VtnConfig;
@@ -54,13 +52,12 @@ public class VTN20bApplication {
 
 	@Bean
 	@Profile({ "!test" })
-	public Oadr20aJAXBContext jaxbContextProd() throws OadrSecurityException, JAXBException {
+	public Oadr20bJAXBContext jaxbContextProd() throws OadrSecurityException, JAXBException {
 		if (vtnConfig.getValidateOadrPayloadAgainstXsd()
 				&& vtnConfig.getValidateOadrPayloadAgainstXsdFilePath() != null) {
-			return Oadr20aJAXBContext
-					.getInstance(OadrXmlUtils.loadXsdSchema(vtnConfig.getValidateOadrPayloadAgainstXsdFilePath()));
+			return Oadr20bJAXBContext.getInstance(vtnConfig.getValidateOadrPayloadAgainstXsdFilePath());
 		}
-		return Oadr20aJAXBContext.getInstance();
+		return Oadr20bJAXBContext.getInstance();
 	};
 
 	@Bean
