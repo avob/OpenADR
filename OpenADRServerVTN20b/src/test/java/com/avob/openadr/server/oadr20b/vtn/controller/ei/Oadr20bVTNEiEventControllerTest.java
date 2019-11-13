@@ -161,10 +161,10 @@ public class Oadr20bVTNEiEventControllerTest {
 				signedObjectFromOadrPayload.getEiResponse().getResponseCode());
 
 		// POST with unsigned content
-		OadrRequestEventType oadrRequestEventType = Oadr20bEiEventBuilders
+		OadrRequestEventType build = Oadr20bEiEventBuilders
 				.newOadrRequestEventBuilder(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, "requestId").withReplyLimit(12)
 				.build();
-		OadrPayload createOadrPayload = Oadr20bFactory.createOadrPayload("mypayload", oadrRequestEventType);
+		OadrPayload createOadrPayload = Oadr20bFactory.createOadrPayload("mypayload", build);
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		DOMResult res = new DOMResult();
@@ -192,6 +192,17 @@ public class Oadr20bVTNEiEventControllerTest {
 		unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), OadrPayload.class);
 		signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, OadrResponseType.class);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.INVALID_DATA_454),
+				signedObjectFromOadrPayload.getEiResponse().getResponseCode());
+
+		// no signature while expected
+		content = jaxbContext.marshalRoot(build);
+		andReturn = this.oadrMockEiHttpMvc
+				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT)
+						.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION).content(content))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), OadrPayload.class);
+		signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, OadrResponseType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.COMPLIANCE_ERROR_459),
 				signedObjectFromOadrPayload.getEiResponse().getResponseCode());
 
 	}

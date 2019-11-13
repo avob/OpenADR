@@ -70,7 +70,7 @@ public class Oadr20bVTNPayloadService {
 	}
 
 	private UnmarshalledPayload unmarshall(Ven ven, String payload)
-			throws Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {
+			throws Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException, MarshallException {
 
 		Object unmarshal = oadr20bJAXBContext.unmarshal(payload);
 		Object unsignedPayload = null;
@@ -84,11 +84,8 @@ public class Oadr20bVTNPayloadService {
 			unsignedPayload = unmarshal;
 		}
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
-			EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
-					.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder("", ven.getUsername());
-			OadrResponseType build = Oadr20bResponseBuilders
-					.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, ven.getUsername()).build();
-			return new UnmarshalledPayload(build, signed);
+			throw new MarshallException(expectedSignatureError(ven));
+			
 		}
 
 		return new UnmarshalledPayload(unsignedPayload, signed);
@@ -106,6 +103,15 @@ public class Oadr20bVTNPayloadService {
 			LOGGER.error("Internal error happened when marhsalling VTN message", e);
 			return null;
 		}
+	}
+	
+	private String expectedSignatureError(Ven ven) {
+		boolean signed = (ven.getXmlSignature() != null) ? ven.getXmlSignature() : false;
+		EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
+				.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder("", ven.getUsername());
+		OadrResponseType build = Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder(xmlSignatureRequiredButAbsent, ven.getUsername()).build();
+		return marshall(build, signed);
 	}
 
 	private String signatureError(Ven ven) {
