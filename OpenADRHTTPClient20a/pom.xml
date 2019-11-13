@@ -28,29 +28,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-remote-resources-plugin</artifactId>
-				<version>1.6.0</version>
-				<configuration>
-					<resourceBundles>
-						<resourceBundle>com.avob.openadr:OpenADRModel20a:${project.version}</resourceBundle>
-					</resourceBundles>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>process</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
-
-
 </project>

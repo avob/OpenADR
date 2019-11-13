@@ -54,9 +54,16 @@ public class OadrPKISecurityTest {
 
 	@Test
 	public void parseCertificateTest() throws OadrSecurityException {
+
+		// valid rsa
 		X509Certificate parseCertificate = OadrPKISecurity.parseCertificate(TestUtils.TEST_CRT);
 		assertNotNull(parseCertificate);
 
+		// valid ecc
+		parseCertificate = OadrPKISecurity.parseCertificate(TestUtils.TEST_ECC_CRT);
+		assertNotNull(parseCertificate);
+
+		// invalid path raise exception
 		boolean exception = false;
 		try {
 			OadrPKISecurity.parseCertificate("mouaiccool");
@@ -64,13 +71,20 @@ public class OadrPKISecurityTest {
 			exception = true;
 		}
 		assertTrue(exception);
+
 	}
 
 	@Test
 	public void parsePrivateKeyTest() throws OadrSecurityException {
+		// valid rsa
 		PrivateKey parsePrivateKey = OadrPKISecurity.parsePrivateKey(TestUtils.TEST_KEY);
 		assertNotNull(parsePrivateKey);
 
+		// valid ecc
+		parsePrivateKey = OadrPKISecurity.parsePrivateKey(TestUtils.TEST_ECC_KEY);
+		assertNotNull(parsePrivateKey);
+
+		// invalid path raise exception
 		boolean exception = false;
 		try {
 			OadrPKISecurity.parsePrivateKey("mouaiccool");
@@ -78,6 +92,7 @@ public class OadrPKISecurityTest {
 			exception = true;
 		}
 		assertTrue(exception);
+
 	}
 
 	@Test
@@ -192,6 +207,12 @@ public class OadrPKISecurityTest {
 		generateCredentials = OadrPKISecurity.generateCredentials(ca, caCert, commonName, OadrPKIAlgorithm.SHA256_DSA);
 		testGeneratedCredential(generateCredentials, "SHA256withDSA");
 
+	}
+
+	@Test
+	public void md5HexTest() {
+		String md5Hex = OadrPKISecurity.md5Hex("mouaiccool");
+		assertEquals("f2d3fcdce97f021064356321534e2fda", md5Hex);
 	}
 
 	private void testGeneratedCredential(OadrUserX509Credential generateCredentials, String sigAlgo)

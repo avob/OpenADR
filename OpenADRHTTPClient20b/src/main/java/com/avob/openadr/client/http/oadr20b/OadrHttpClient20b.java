@@ -11,7 +11,6 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
@@ -54,17 +53,17 @@ public class OadrHttpClient20b {
 	private boolean validateXmlPayload = false;
 
 	public OadrHttpClient20b(OadrHttpClient client) throws JAXBException, OadrSecurityException {
-		this(client, null, null, null);
-	}
-
-	public OadrHttpClient20b(OadrHttpClient client, boolean validateXmlPayload)
-			throws JAXBException, OadrSecurityException {
-		this(client, null, null, null);
-		this.validateXmlPayload = validateXmlPayload;
+		this(client, null, null, null, null);
 	}
 
 	public OadrHttpClient20b(OadrHttpClient client, String privateKeyPath, String clientCertificatePath,
 			Long replayProtectAcceptedDelaySecond) throws JAXBException, OadrSecurityException {
+		this(client, privateKeyPath, clientCertificatePath, replayProtectAcceptedDelaySecond, null);
+	}
+
+	public OadrHttpClient20b(OadrHttpClient client, String privateKeyPath, String clientCertificatePath,
+			Long replayProtectAcceptedDelaySecond, Boolean validateXmlPayload)
+			throws JAXBException, OadrSecurityException {
 		this.jaxbContext = Oadr20bJAXBContext.getInstance();
 		this.client = client;
 
@@ -74,6 +73,9 @@ public class OadrHttpClient20b {
 		}
 
 		this.replayProtectAcceptedDelaySecond = replayProtectAcceptedDelaySecond;
+		if (validateXmlPayload != null) {
+			this.validateXmlPayload = validateXmlPayload;
+		}
 	}
 
 	private boolean isXmlSignatureEnabled() {
@@ -129,41 +131,30 @@ public class OadrHttpClient20b {
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 				EntityUtils.consumeQuietly(response.getEntity());
 				throw new Oadr20bHttpLayerException(response.getStatusLine().getStatusCode(),
-						response.getStatusLine().getStatusCode() + "");
-
+						String.valueOf(response.getStatusLine().getStatusCode()));
 			}
 
 			// if request was a success, validate xml signature if required and then
 			// unmarshall response
 			if (isXmlSignatureEnabled()) {
-					String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
-					OadrPayload unmarshal = jaxbContext.unmarshal(entity, OadrPayload.class, validateXmlPayload);
-					this.validate(entity, unmarshal);
-					EntityUtils.consumeQuietly(response.getEntity());
-					if (Object.class.equals(responseKlass)) {
-						Object signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal);
-
-						return responseKlass.cast(signedObjectFromOadrPayload);
-					} else {
-						return Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, responseKlass);
-					}
-
+				String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
+				OadrPayload unmarshal = jaxbContext.unmarshal(entity, OadrPayload.class, validateXmlPayload);
+				this.validate(entity, unmarshal);
+				EntityUtils.consumeQuietly(response.getEntity());
+				if (Object.class.equals(responseKlass)) {
+					Object signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal);
+					return responseKlass.cast(signedObjectFromOadrPayload);
+				} else {
+					return Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, responseKlass);
+				}
 
 			} else {
 				String resp = EntityUtils.toString(response.getEntity(), "UTF-8");
 				return jaxbContext.unmarshal(resp, responseKlass, validateXmlPayload);
 			}
 
-		} catch (ClientProtocolException e) {
-			throw new Oadr20bException("http request failed", e);
-		} catch (IOException e) {
-			throw new Oadr20bException("data stream can't be read/write", e);
-		} catch (Oadr20bMarshalException e) {
-			throw new Oadr20bException("serialization failed", e);
-		} catch (Oadr20bUnmarshalException e) {
-			throw new Oadr20bException("Deserialization failed", e);
-		} catch (URISyntaxException e) {
-			throw new Oadr20bException("Host is not a valid URI", e);
+		} catch (IOException | URISyntaxException | Oadr20bUnmarshalException | Oadr20bMarshalException e) {
+			throw new Oadr20bException(e);
 		}
 	}
 

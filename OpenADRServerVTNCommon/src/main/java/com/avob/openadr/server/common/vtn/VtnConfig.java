@@ -44,11 +44,14 @@ public class VtnConfig {
 	public static final String TRUSTED_CERTIFICATES_CONF = "oadr.security.ven.trustcertificate";
 	public static final String PRIVATE_KEY_CONF = "oadr.security.vtn.key";
 	public static final String CERTIFICATE_CONF = "oadr.security.vtn.cert";
+
 	public static final String SUPPORT_PUSH_CONF = "oadr.supportPush";
 	public static final String SUPPORT_UNSECURED_PHTTP_PUSH_CONF = "oadr.supportUnsecuredHttpPush";
 	public static final String PULL_FREQUENCY_SECONDS_CONF = "oadr.pullFrequencySeconds";
 	public static final String HOST_CONF = "oadr.server.host";
 	public static final String VALIDATE_OADR_PAYLOAD_XSD_CONF = "oadr.validateOadrPayloadAgainstXsd";
+	public static final String VALIDATE_OADR_PAYLOAD_XSD_FILEPATH_CONF = "oadr.security.validateOadrPayloadAgainstXsdFilePath";
+
 	public static final String VTN_ID_CONF = "oadr.vtnid";
 	public static final String SAVE_VEN_UPDATE_REPORT_CONF = "oadr.saveVenData";
 	public static final String REPLAY_PROTECTACCEPTED_DELAY_SECONDS_CONF = "oadr.security.replayProtectAcceptedDelaySecond";
@@ -96,8 +99,11 @@ public class VtnConfig {
 	@Value("${" + HOST_CONF + ":localhost}")
 	private String host;
 
-	@Value("${" + VALIDATE_OADR_PAYLOAD_XSD_CONF + ":false}")
+	@Value("${" + VALIDATE_OADR_PAYLOAD_XSD_CONF + ":#{false}}")
 	private Boolean validateOadrPayloadAgainstXsd;
+
+	@Value("${" + VALIDATE_OADR_PAYLOAD_XSD_FILEPATH_CONF + ":#{null}}")
+	private String validateOadrPayloadAgainstXsdFilePath;
 
 	@Value("${" + VTN_ID_CONF + ":#{null}}")
 	private String vtnId;
@@ -171,14 +177,14 @@ public class VtnConfig {
 
 			try {
 				// get VTN fingerprints
-				setOadr20aFingerprint(OadrFingerprintSecurity.getOadr20aFingerprint(this.getCert()));
-				setOadr20bFingerprint(OadrFingerprintSecurity.getOadr20bFingerprint(this.getCert()));
+				oadr20aFingerprint = OadrFingerprintSecurity.getOadr20aFingerprint(this.getCert());
+				oadr20bFingerprint = OadrFingerprintSecurity.getOadr20bFingerprint(this.getCert());
 				setTrustManagerFactory(OadrPKISecurity.createTrustManagerFactory(trustCertificates));
 				setKeyManagerFactory(
 						OadrPKISecurity.createKeyManagerFactory(this.getKey(), this.getCert(), keystorePassword));
 
 				// SSL Context Factory
-				setSslContext(SSLContext.getInstance("TLS"));
+				sslContext = SSLContext.getInstance("TLS");
 
 				// init ssl context
 				String seed = UUID.randomUUID().toString();
@@ -194,14 +200,14 @@ public class VtnConfig {
 		}
 
 		if (getBrokerPort() == null) {
-			setBrokerPort(SocketUtils.findAvailableTcpPort());
+			brokerPort = SocketUtils.findAvailableTcpPort();
 		}
 
 		if (brokerSslPort == null) {
 			brokerSslPort = SocketUtils.findAvailableTcpPort();
 		}
-		setBrokerUrl("tcp://" + getBrokerHost() + ":" + getBrokerPort());
-		setSslBrokerUrl("ssl://" + brokerSslHost + ":" + brokerSslPort);
+		brokerUrl = "tcp://" + getBrokerHost() + ":" + getBrokerPort();
+		sslBrokerUrl = "ssl://" + brokerSslHost + ":" + brokerSslPort;
 
 	}
 
@@ -354,88 +360,44 @@ public class VtnConfig {
 		return brokerUrl;
 	}
 
-	public void setBrokerUrl(String brokerUrl) {
-		this.brokerUrl = brokerUrl;
-	}
-
 	public String getSslBrokerUrl() {
 		return sslBrokerUrl;
-	}
-
-	public void setSslBrokerUrl(String sslBrokerUrl) {
-		this.sslBrokerUrl = sslBrokerUrl;
 	}
 
 	public String getBrokerUser() {
 		return brokerUser;
 	}
 
-	public void setBrokerUser(String brokerUser) {
-		this.brokerUser = brokerUser;
-	}
-
 	public String getBrokerPass() {
 		return brokerPass;
-	}
-
-	public void setBrokerPass(String brokerPass) {
-		this.brokerPass = brokerPass;
 	}
 
 	public String getBrokerHost() {
 		return brokerHost;
 	}
 
-	public void setBrokerHost(String brokerHost) {
-		this.brokerHost = brokerHost;
-	}
-
 	public Integer getBrokerPort() {
 		return brokerPort;
-	}
-
-	public void setBrokerPort(Integer brokerPort) {
-		this.brokerPort = brokerPort;
 	}
 
 	public String getXmppHost() {
 		return xmppHost;
 	}
 
-	public void setXmppHost(String xmppHost) {
-		this.xmppHost = xmppHost;
-	}
-
 	public Integer getXmppPort() {
 		return xmppPort;
-	}
-
-	public void setXmppPort(Integer xmppPort) {
-		this.xmppPort = xmppPort;
-	}
-
-	private void setOadr20bFingerprint(String oadr20bFingerprint) {
-		this.oadr20bFingerprint = oadr20bFingerprint;
-	}
-
-	private void setOadr20aFingerprint(String oadr20aFingerprint) {
-		this.oadr20aFingerprint = oadr20aFingerprint;
 	}
 
 	public String getXmppDomain() {
 		return xmppDomain;
 	}
 
-	public void setXmppDomain(String xmppDomain) {
-		this.xmppDomain = xmppDomain;
-	}
-
 	public SSLContext getSslContext() {
 		return sslContext;
 	}
 
-	private void setSslContext(SSLContext sslContext) {
-		this.sslContext = sslContext;
+	public String getValidateOadrPayloadAgainstXsdFilePath() {
+		return validateOadrPayloadAgainstXsdFilePath;
 	}
 
 }

@@ -95,23 +95,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-remote-resources-plugin</artifactId>
-				<version>1.6.0</version>
-				<configuration>
-					<resourceBundles>
-						<resourceBundle>com.avob.openadr:OpenADRModel20b:${project.version}</resourceBundle>
-					</resourceBundles>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>process</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.7.9</version>
@@ -204,7 +187,8 @@
 										<!-- <copy todir="${project.build.directory}/classes/public"> -->
 										<!-- <fileset dir="${project.basedir}/frontend/build" /> -->
 										<!-- </copy> -->
-										<copy todir="${project.basedir}/src/main/resources/public">
+										<copy
+											todir="${project.basedir}/src/main/resources/public">
 											<fileset dir="${project.basedir}/frontend/build" />
 										</copy>
 									</target>

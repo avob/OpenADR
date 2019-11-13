@@ -17,6 +17,13 @@ public class TestUtils {
 	public static final String TEST_KEY = TEST + ".key";
 	public static final String TEST_FINGERPRINT_20B = TEST + ".fingerprint";
 	public static final String TEST_FINGERPRINT_20A = TEST + ".fingerprint.oadr20a";
+	
+	
+	public static final String TEST_ECC = "src/test/resources/cert/test";
+	public static final String TEST_ECC_CRT = TEST_ECC + ".crt";
+	public static final String TEST_ECC_KEY = TEST_ECC + ".key";
+	public static final String TEST_ECC_FINGERPRINT_20B = TEST_ECC + ".fingerprint";
+	public static final String TEST_ECC_FINGERPRINT_20A = TEST_ECC + ".fingerprint.oadr20a";
 
 	public static String readFile(String path) throws OadrSecurityException {
 		try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
