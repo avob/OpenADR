@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import javax.annotation.Resource;
 
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,7 +68,8 @@ public class Oadr20bVENEiReportServiceTest {
 		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(reportId,
 				reportrequestId, reportSpecifierId, reportName, createdTimestamp, startTimestamp, duration).build();
 		OadrUpdateReportType oadrUpdateReport = Oadr20bEiReportBuilders
-				.newOadr20bUpdateReportBuilder("", venConfig.getVenId()).addReport(report).build();
+				.newOadr20bUpdateReportBuilder("", venConfig.getVenId()).addReport(report)
+				.addReport(Lists.newArrayList(report)).build();
 
 		String request = oadr20bVENEiReportService.request(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrUpdateReport));
 

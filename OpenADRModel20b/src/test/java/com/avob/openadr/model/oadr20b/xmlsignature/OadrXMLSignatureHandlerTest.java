@@ -14,6 +14,7 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.dom.DOMResult;
 
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -565,7 +566,7 @@ public class OadrXMLSignatureHandlerTest {
 		int responseCode = 200;
 		OadrCreatedReportType request = Oadr20bEiReportBuilders
 				.newOadr20bCreatedReportBuilder(REQUEST_ID, responseCode, VEN_ID).addPendingReportRequestId(REPORT_ID)
-				.build();
+				.addPendingReportRequestId(Lists.newArrayList(REPORT_ID)).build();
 
 		String sign = OadrXMLSignatureHandler.sign(request, privateKey, certificate, NONCE, 0L);
 		validate(sign);
@@ -595,7 +596,7 @@ public class OadrXMLSignatureHandlerTest {
 				.withWsCalendarIntervalType(calendar).build();
 
 		OadrCreateReportType request = Oadr20bEiReportBuilders.newOadr20bCreateReportBuilder(REQUEST_ID, VEN_ID)
-				.addReportRequest(reportRequest).build();
+				.addReportRequest(reportRequest).addReportRequest(Lists.newArrayList(reportRequest)).build();
 
 		String sign = OadrXMLSignatureHandler.sign(request, privateKey, certificate, NONCE, 0L);
 		validate(sign);

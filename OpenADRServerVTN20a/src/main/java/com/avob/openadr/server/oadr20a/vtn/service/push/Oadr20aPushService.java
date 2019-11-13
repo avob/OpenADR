@@ -18,7 +18,6 @@ import com.avob.openadr.client.http.oadr20a.OadrHttpClient20a;
 import com.avob.openadr.client.http.oadr20a.vtn.OadrHttpVtnClient20a;
 import com.avob.openadr.model.oadr20a.exception.Oadr20aException;
 import com.avob.openadr.model.oadr20a.exception.Oadr20aHttpLayerException;
-import com.avob.openadr.model.oadr20a.exception.Oadr20aInitializationException;
 import com.avob.openadr.model.oadr20a.oadr.OadrDistributeEvent;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
@@ -45,23 +44,17 @@ public class Oadr20aPushService {
 	private OadrHttpVtnClient20a oadrHttpVtnClient20a;
 
 	@PostConstruct
-	public void init() {
+	public void init() throws OadrSecurityException, JAXBException {
 
 		OadrHttpClientBuilder builder;
-		try {
-			builder = new OadrHttpClientBuilder().withTrustedCertificate(vtnConfig.getTrustCertificates())
-					.withX509Authentication(vtnConfig.getKey(), vtnConfig.getCert());
+		builder = new OadrHttpClientBuilder().withTrustedCertificate(vtnConfig.getTrustCertificates())
+				.withX509Authentication(vtnConfig.getKey(), vtnConfig.getCert());
 
-			if (vtnConfig.getSupportUnsecuredHttpPush()) {
-				builder.enableHttp(true);
-			}
-
-			setOadrHttpVtnClient20a(new OadrHttpVtnClient20a(new OadrHttpClient20a(builder.build())));
-		} catch (OadrSecurityException e) {
-			throw new Oadr20aInitializationException(e);
-		} catch (JAXBException e) {
-			throw new Oadr20aInitializationException(e);
+		if (vtnConfig.getSupportUnsecuredHttpPush()) {
+			builder.enableHttp(true);
 		}
+
+		setOadrHttpVtnClient20a(new OadrHttpVtnClient20a(new OadrHttpClient20a(builder.build())));
 
 	}
 

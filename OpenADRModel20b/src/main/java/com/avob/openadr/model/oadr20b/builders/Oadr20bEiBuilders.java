@@ -1,6 +1,5 @@
 package com.avob.openadr.model.oadr20b.builders;
 
-import com.avob.openadr.model.oadr20b.avob.PayloadAvobVenServiceRequestType;
 import com.avob.openadr.model.oadr20b.avob.PayloadKeyTokenType;
 import com.avob.openadr.model.oadr20b.builders.eipayload.Oadr20bEiTargetTypeBuilder;
 import com.avob.openadr.model.oadr20b.builders.eipayload.Oadr20bReportIntervalTypeBuilder;
@@ -26,13 +25,6 @@ public class Oadr20bEiBuilders {
 	public static Oadr20bReportIntervalTypeBuilder newOadr20bReportIntervalTypeBuilder(String intervalId, Long start,
 			String xmlDuration, String rid, Long confidence, Float accuracy, PayloadKeyTokenType tokens) {
 		return new Oadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration, rid, confidence, accuracy, tokens);
-	}
-
-	public static Oadr20bReportIntervalTypeBuilder newOadr20bReportIntervalTypeBuilder(String intervalId, Long start,
-			String xmlDuration, String rid, Long confidence, Float accuracy,
-			PayloadAvobVenServiceRequestType requests) {
-		return new Oadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration, rid, confidence, accuracy,
-				requests);
 	}
 
 	public static Oadr20bReportIntervalTypeBuilder newOadr20bReportIntervalTypeBuilder(String intervalId, Long start,
