@@ -43,8 +43,7 @@ public class VTN20aApplication {
 			trustedCertificates.put("cert_" + (i++), path);
 		}
 		return new VTNEmbeddedServletContainerCustomizer(vtnConfig.getPort(), vtnConfig.getContextPath(),
-				vtnConfig.getKeyManagerFactory(), vtnConfig.getTrustManagerFactory(), Oadr20aSecurity.getProtocols(),
-				Oadr20aSecurity.getCiphers());
+				vtnConfig.getSslContext(), Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers());
 	}
 
 	@Bean

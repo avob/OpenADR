@@ -179,9 +179,9 @@ public class VtnConfig {
 				// get VTN fingerprints
 				oadr20aFingerprint = OadrFingerprintSecurity.getOadr20aFingerprint(this.getCert());
 				oadr20bFingerprint = OadrFingerprintSecurity.getOadr20bFingerprint(this.getCert());
-				setTrustManagerFactory(OadrPKISecurity.createTrustManagerFactory(trustCertificates));
-				setKeyManagerFactory(
-						OadrPKISecurity.createKeyManagerFactory(this.getKey(), this.getCert(), keystorePassword));
+				trustManagerFactory = OadrPKISecurity.createTrustManagerFactory(trustCertificates);
+				keyManagerFactory = OadrPKISecurity.createKeyManagerFactory(this.getKey(), this.getCert(),
+						keystorePassword);
 
 				// SSL Context Factory
 				sslContext = SSLContext.getInstance("TLS");
@@ -224,10 +224,6 @@ public class VtnConfig {
 		return contextPath;
 	}
 
-	public void setContextPath(String contextPath) {
-		this.contextPath = contextPath;
-	}
-
 	public int getPort() {
 		return port;
 	}
@@ -240,112 +236,56 @@ public class VtnConfig {
 		return trustCertificates;
 	}
 
-	public void setTrustCertificates(List<String> trustCertificates) {
-		this.trustCertificates = trustCertificates;
-	}
-
 	public String getKey() {
 		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
 	}
 
 	public String getCert() {
 		return cert;
 	}
 
-	public void setCert(String cert) {
-		this.cert = cert;
-	}
-
 	public Boolean getSupportPush() {
 		return supportPush;
-	}
-
-	public void setSupportPush(Boolean supportPush) {
-		this.supportPush = supportPush;
 	}
 
 	public Boolean getSupportUnsecuredHttpPush() {
 		return supportUnsecuredHttpPush;
 	}
 
-	public void setSupportUnsecuredHttpPush(Boolean supportUnsecuredHttpPush) {
-		this.supportUnsecuredHttpPush = supportUnsecuredHttpPush;
-	}
-
 	public Long getPullFrequencySeconds() {
 		return pullFrequencySeconds;
-	}
-
-	public void setPullFrequencySeconds(Long pullFrequencySeconds) {
-		this.pullFrequencySeconds = pullFrequencySeconds;
 	}
 
 	public String getHost() {
 		return host;
 	}
 
-	public void setHost(String host) {
-		this.host = host;
-	}
-
 	public Boolean getValidateOadrPayloadAgainstXsd() {
 		return validateOadrPayloadAgainstXsd;
-	}
-
-	public void setValidateOadrPayloadAgainstXsd(Boolean validateOadrPayloadAgainstXsd) {
-		this.validateOadrPayloadAgainstXsd = validateOadrPayloadAgainstXsd;
 	}
 
 	public String getVtnId() {
 		return vtnId;
 	}
 
-	public void setVtnId(String vtnId) {
-		this.vtnId = vtnId;
-	}
-
 	public Long getReplayProtectAcceptedDelaySecond() {
 		return replayProtectAcceptedDelaySecond;
-	}
-
-	public void setReplayProtectAcceptedDelaySecond(Long replayProtectAcceptedDelaySecond) {
-		this.replayProtectAcceptedDelaySecond = replayProtectAcceptedDelaySecond;
 	}
 
 	public String getCaKey() {
 		return caKey;
 	}
 
-	public void setCaKey(String ca) {
-		this.caKey = ca;
-	}
-
 	public String getCaCert() {
 		return caCert;
-	}
-
-	public void setCaCert(String caPubKey) {
-		this.caCert = caPubKey;
 	}
 
 	public KeyManagerFactory getKeyManagerFactory() {
 		return keyManagerFactory;
 	}
 
-	public void setKeyManagerFactory(KeyManagerFactory keyManagerFactory) {
-		this.keyManagerFactory = keyManagerFactory;
-	}
-
 	public TrustManagerFactory getTrustManagerFactory() {
 		return trustManagerFactory;
-	}
-
-	public void setTrustManagerFactory(TrustManagerFactory trustManagerFactory) {
-		this.trustManagerFactory = trustManagerFactory;
 	}
 
 	public String getOadr20bFingerprint() {

@@ -44,7 +44,7 @@ public class VTN20bApplication {
 	public WebServerFactoryCustomizer<JettyServletWebServerFactory> servletContainerCustomizer() {
 
 		vtnEmbeddedServletContainerCustomizer = new VTNEmbeddedServletContainerCustomizer(vtnConfig.getPort(),
-				vtnConfig.getContextPath(), vtnConfig.getKeyManagerFactory(), vtnConfig.getTrustManagerFactory(),
+				vtnConfig.getContextPath(), vtnConfig.getSslContext(),
 				Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers());
 
 		return vtnEmbeddedServletContainerCustomizer;
