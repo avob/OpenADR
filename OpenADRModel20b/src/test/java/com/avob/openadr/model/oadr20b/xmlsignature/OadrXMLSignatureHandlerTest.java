@@ -3,6 +3,8 @@ package com.avob.openadr.model.oadr20b.xmlsignature;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -10,8 +12,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.transform.dom.DOMResult;
 
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
@@ -39,6 +46,7 @@ import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
@@ -77,6 +85,7 @@ import com.avob.openadr.model.oadr20b.oadr.TemperatureType;
 import com.avob.openadr.model.oadr20b.oadr.TemperatureUnitType;
 import com.avob.openadr.model.oadr20b.siscale.SiScaleCodeType;
 import com.avob.openadr.model.oadr20b.xcal.WsCalendarIntervalType;
+import com.avob.openadr.model.oadr20b.xmldsig.SignatureValueType;
 import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 
@@ -136,10 +145,137 @@ public class OadrXMLSignatureHandlerTest {
 			exception = true;
 		}
 		assertTrue(exception);
+
+	}
+
+	private String oadrPayloadToString(OadrPayload payload) throws Oadr20bXMLSignatureException {
+		DOMResult res = new DOMResult();
+		try {
+			jaxbContext.marshal(payload, res);
+		} catch (Oadr20bMarshalException e) {
+			throw new Oadr20bXMLSignatureException(e);
+		}
+		Document doc = (Document) res.getNode();
+		DOMImplementationLS domImplLS = (DOMImplementationLS) doc.getImplementation();
+		LSSerializer serializer = domImplLS.createLSSerializer();
+		serializer.getDomConfig().setParameter("xml-declaration", Boolean.FALSE);
+		LSOutput lsOutput = domImplLS.createLSOutput();
+		// set utf8 xml prolog
+		lsOutput.setEncoding("UTF-8");
+		Writer stringWriter = new StringWriter();
+		lsOutput.setCharacterStream(stringWriter);
+		serializer.write(doc, lsOutput);
+		return stringWriter.toString().replaceAll("\n", "");
+	}
+
+	@Test
+	public void testInvalidSign() {
+
+		boolean exception = false;
+		try {
+			OadrXMLSignatureHandler.sign("moauiccool", privateKey, certificate, NONCE, 0L);
+		} catch (Oadr20bXMLSignatureException e) {
+			exception = true;
+		}
+		assertTrue(exception);
+
+	}
+
+	@Test
+	public void testInvalidValidate() throws Oadr20bXMLSignatureException {
+
+		OadrResponseType response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(REQUEST_ID, 200, VEN_ID).build();
+		String sign = OadrXMLSignatureHandler.sign(response, privateKey, certificate, NONCE, 0L);
+
+		boolean exception = false;
+		try {
+			OadrPayload unmarshal = jaxbContext.unmarshal(sign, OadrPayload.class, true);
+			OadrXMLSignatureHandler.validate("mouaiccool", unmarshal, 0, -10);
+		} catch (Oadr20bXMLSignatureValidationException | Oadr20bUnmarshalException e) {
+			exception = true;
+		}
+		assertTrue(exception);
+
+	}
+
+	@Test
+	public void testNoSignature() throws Oadr20bXMLSignatureException, Oadr20bUnmarshalException {
+
+		OadrRequestEventType oadrRequestEventType = Oadr20bEiEventBuilders
+				.newOadrRequestEventBuilder("ven1", "requestId").withReplyLimit(12).build();
+		OadrPayload createOadrPayload = Oadr20bFactory.createOadrPayload("mypayload", oadrRequestEventType);
+
+		String content = oadrPayloadToString(createOadrPayload);
+
+		boolean exception = false;
+		try {
+			OadrPayload unmarshal = jaxbContext.unmarshal(content, OadrPayload.class, true);
+			OadrXMLSignatureHandler.validate(content, unmarshal, 0, -10);
+		} catch (Oadr20bXMLSignatureValidationException e) {
+			exception = true;
+		}
+		assertTrue(exception);
+
+	}
+
+	@Test
+	public void testInvalidSignature() throws Oadr20bXMLSignatureException, Oadr20bUnmarshalException {
+
+		OadrResponseType response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(REQUEST_ID, 200, VEN_ID).build();
+		String sign = OadrXMLSignatureHandler.sign(response, privateKey, certificate, NONCE, 0L);
+		OadrPayload unmarshal = jaxbContext.unmarshal(sign, OadrPayload.class, true);
+		SignatureValueType value = new SignatureValueType();
+		value.setId("myid");
+		value.setValue("mouaiccool".getBytes());
+		unmarshal.getSignature().setSignatureValue(value);
+		String content = oadrPayloadToString(unmarshal);
+
+		boolean exception = false;
+		try {
+			unmarshal = jaxbContext.unmarshal(content, OadrPayload.class, true);
+			OadrXMLSignatureHandler.validate(content, unmarshal, 0, -10);
+		} catch (Oadr20bXMLSignatureValidationException e) {
+			exception = true;
+		}
+		assertTrue(exception);
+
+	}
+
+	@Test
+	public void testInvalidReference() throws Oadr20bXMLSignatureException, Oadr20bUnmarshalException {
+
+		OadrResponseType response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(REQUEST_ID, 200, VEN_ID).build();
+		String sign = OadrXMLSignatureHandler.sign(response, privateKey, certificate, NONCE, 0L);
+		OadrPayload unmarshal = jaxbContext.unmarshal(sign, OadrPayload.class, true);
+		unmarshal.getSignature().getObject().clear();
+		String content = oadrPayloadToString(unmarshal);
+
+		boolean exception = false;
+		try {
+			unmarshal = jaxbContext.unmarshal(content, OadrPayload.class, true);
+			OadrXMLSignatureHandler.validate(content, unmarshal, 0, -10);
+		} catch (Oadr20bXMLSignatureValidationException e) {
+			exception = true;
+		}
+		assertTrue(exception);
+
 	}
 
 	@Test
 	public void testOadrResponseType()
+			throws Oadr20bXMLSignatureException, Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {
+		OadrResponseType response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(REQUEST_ID, 200, VEN_ID).build();
+		String sign = OadrXMLSignatureHandler.sign(response, privateKey, certificate, NONCE, 0L);
+		validate(sign);
+		OadrPayload unmarshal = jaxbContext.unmarshal(sign, OadrPayload.class, true);
+		OadrResponseType signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal,
+				OadrResponseType.class);
+		assertNotNull(signedObjectFromOadrPayload);
+
+	}
+
+	@Test
+	public void testOadrResponseType_InvalidSignature()
 			throws Oadr20bXMLSignatureException, Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {
 		OadrResponseType response = Oadr20bResponseBuilders.newOadr20bResponseBuilder(REQUEST_ID, 200, VEN_ID).build();
 		String sign = OadrXMLSignatureHandler.sign(response, privateKey, certificate, NONCE, 0L);
