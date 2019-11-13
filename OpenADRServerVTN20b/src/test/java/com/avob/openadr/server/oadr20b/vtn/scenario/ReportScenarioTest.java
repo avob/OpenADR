@@ -869,6 +869,14 @@ public class ReportScenarioTest {
 		OadrRegisterReportType secondPoll = mockVen.poll(HttpStatus.OK_200, OadrRegisterReportType.class);
 		assertEquals(0, secondPoll.getOadrReport().size());
 
+		OadrRegisteredReportType registeredPayload = Oadr20bEiReportBuilders
+				.newOadr20bRegisteredReportBuilder(secondPoll.getRequestID(), HttpStatus.OK_200, mockVen.getVenId())
+				.build();
+		// EI REPORT CONTROLLER - send OadrRegisteredReport
+		OadrResponseType report = mockVen.report(registeredPayload, HttpStatus.OK_200, OadrResponseType.class);
+		assertNotNull(report);
+		assertEquals(String.valueOf(HttpStatus.OK_200), report.getEiResponse().getResponseCode());
+
 		// create available (self) report on VTN
 		String selfPayloadReportRequestId = REPORT_REQUEST_ID;
 		String selfReportSpecifierId = "selfReportSpecifierId";

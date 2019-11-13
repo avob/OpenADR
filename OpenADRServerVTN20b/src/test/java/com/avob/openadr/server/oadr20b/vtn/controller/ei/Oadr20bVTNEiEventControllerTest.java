@@ -4,8 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.StringWriter;
+import java.io.Writer;
+
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.dom.DOMResult;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
@@ -20,22 +25,31 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.w3c.dom.Document;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 
+import com.avob.openadr.model.oadr20b.Oadr20bFactory;
+import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
+import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.server.common.vtn.models.ven.VenDto;
-import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.push.DemandResponseEventPublisher;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
-import com.avob.openadr.server.oadr20b.vtn.service.VenPollService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bDemandResponseEventCreateListener;
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bPushListener;
@@ -57,12 +71,6 @@ public class Oadr20bVTNEiEventControllerTest {
 
 	@Value("${oadr.vtnid}")
 	private String vtnId;
-
-	@Resource
-	private VenPollService venPollService;
-
-	@Resource
-	private VenMarketContextService venMarketContextService;
 
 	@Resource
 	private OadrMockEiHttpMvc oadrMockEiHttpMvc;
@@ -91,8 +99,12 @@ public class Oadr20bVTNEiEventControllerTest {
 	@Resource
 	private Oadr20bDemandResponseEventCreateListener oadr20bDemandResponseEventCreateListener;
 
+	private Oadr20bJAXBContext jaxbContext;
+
 	@Before
 	public void init() throws JAXBException {
+
+		jaxbContext = Oadr20bJAXBContext.getInstance();
 
 		Mockito.doAnswer((Answer<?>) invocation -> {
 			oadr20bPushListener.receiveCommand(invocation.getArgument(1));
@@ -137,10 +149,50 @@ public class Oadr20bVTNEiEventControllerTest {
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// POST without content
-//		content = "mouaiccool";
-//		this.oadrMockEiHttpMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT)
-//				.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION).content(content))
-//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
+		content = "mouaiccool";
+		MvcResult andReturn = this.oadrMockEiHttpMvc
+				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT)
+						.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION).content(content))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		OadrPayload unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), OadrPayload.class);
+		OadrResponseType signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal,
+				OadrResponseType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453),
+				signedObjectFromOadrPayload.getEiResponse().getResponseCode());
+
+		// POST with unsigned content
+		OadrRequestEventType oadrRequestEventType = Oadr20bEiEventBuilders
+				.newOadrRequestEventBuilder(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, "requestId").withReplyLimit(12)
+				.build();
+		OadrPayload createOadrPayload = Oadr20bFactory.createOadrPayload("mypayload", oadrRequestEventType);
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		DOMResult res = new DOMResult();
+		try {
+			jaxbContext.marshal(createOadrPayload, res);
+		} catch (Oadr20bMarshalException e) {
+			throw new Oadr20bXMLSignatureException(e);
+		}
+		Document doc = (Document) res.getNode();
+		DOMImplementationLS domImplLS = (DOMImplementationLS) doc.getImplementation();
+		LSSerializer serializer = domImplLS.createLSSerializer();
+		serializer.getDomConfig().setParameter("xml-declaration", Boolean.FALSE);
+		LSOutput lsOutput = domImplLS.createLSOutput();
+		// set utf8 xml prolog
+		lsOutput.setEncoding("UTF-8");
+		Writer stringWriter = new StringWriter();
+		lsOutput.setCharacterStream(stringWriter);
+		serializer.write(doc, lsOutput);
+		String signed = stringWriter.toString();
+		content = signed.replaceAll("\n", "");
+		andReturn = this.oadrMockEiHttpMvc
+				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT)
+						.with(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG_SECURITY_SESSION).content(content))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), OadrPayload.class);
+		signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, OadrResponseType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.INVALID_DATA_454),
+				signedObjectFromOadrPayload.getEiResponse().getResponseCode());
 
 	}
 

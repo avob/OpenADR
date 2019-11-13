@@ -353,7 +353,6 @@ public class OadrXMLSignatureHandler {
 		}
 
 		DOMImplementationLS domImplLS = (DOMImplementationLS) doc.getImplementation();
-
 		LSSerializer serializer = domImplLS.createLSSerializer();
 		serializer.getDomConfig().setParameter("xml-declaration", Boolean.FALSE);
 		LSOutput lsOutput = domImplLS.createLSOutput();

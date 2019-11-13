@@ -5,9 +5,6 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.http.HttpStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +14,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
-import com.avob.openadr.security.OadrFingerprintSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VtnConfig;
+import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDescriptionDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDto;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapability;
@@ -35,8 +32,6 @@ import com.avob.openadr.server.oadr20b.vtn.service.report.SelfReportRequestServi
 @RequestMapping("/Vtn")
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 public class Oadr20bVtnController {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVtnController.class);
 
 	@Resource
 	private SelfReportCapabilityService selfReportCapabilityService;
@@ -55,17 +50,10 @@ public class Oadr20bVtnController {
 
 	@RequestMapping(value = "/configuration", method = RequestMethod.GET)
 	@ResponseBody
-	public VtnConfigurationDto viewConf() throws Oadr20bMarshalException {
+	public VtnConfigurationDto viewConf() throws Oadr20bMarshalException, OadrSecurityException {
 
 		VtnConfigurationDto dto = oadr20bDtoMapper.map(vtnConfig, VtnConfigurationDto.class);
-		String oadr20bFingerprint;
-		try {
-			oadr20bFingerprint = OadrFingerprintSecurity.getOadr20bFingerprint(vtnConfig.getCert());
-			dto.setVtnId(oadr20bFingerprint);
-		} catch (OadrSecurityException e) {
-			LOGGER.error("", e);
-		}
-
+		dto.setVtnId(vtnConfig.getOadr20bFingerprint());
 		dto.setSupportCertificateGeneration(vtnConfig.getCaKey() != null && vtnConfig.getCaCert() != null);
 		dto.setXmlSignatureReplayProtectSecond(vtnConfig.getReplayProtectAcceptedDelaySecond());
 		dto.setXsdValidation(vtnConfig.getValidateOadrPayloadAgainstXsd());
@@ -83,12 +71,12 @@ public class Oadr20bVtnController {
 	@ResponseBody
 	public List<ReportCapabilityDescriptionDto> viewOtherReportCapabilityDescription(
 			@PathVariable("reportSpecifierId") String reportSpecifierId, HttpServletResponse response)
-			throws Oadr20bMarshalException {
+			throws Oadr20bMarshalException, OadrElementNotFoundException {
 
 		SelfReportCapability reportCapability = selfReportCapabilityService.findByReportSpecifierId(reportSpecifierId);
 		if (reportCapability == null) {
-			response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
-			return null;
+			throw new OadrElementNotFoundException(
+					"Self ReportCapabilityDescription with reporSpecifierId: " + reportSpecifierId + " not found");
 		}
 
 		List<SelfReportCapabilityDescription> findByOtherReportCapability = selfReportCapabilityDescriptionService

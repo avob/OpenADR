@@ -8,9 +8,6 @@ public class OptConverter {
 	}
 
 	public static final DemandResponseEventOptEnum convert(OptTypeType opt) {
-		if (opt == null) {
-			return null;
-		}
 		switch (opt) {
 		case OPT_IN:
 			return DemandResponseEventOptEnum.OPT_IN;

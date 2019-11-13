@@ -509,7 +509,7 @@ public class Oadr20bVenController {
 	private void checkResource(Ven ven, String resourceName) throws OadrElementNotFoundException {
 		VenResource resource = venResourceService.findByVenAndName(ven, resourceName);
 		if (resource == null) {
-			throw new OadrElementNotFoundException();
+			throw new OadrElementNotFoundException("Resource: " + resourceName + " not foudn for ven: " + ven.getId());
 		}
 	}
 
@@ -517,7 +517,7 @@ public class Oadr20bVenController {
 		if (marketContextName != null) {
 			VenMarketContext marketContext = venMarketContextService.findOneByName(marketContextName);
 			if (marketContext == null) {
-				throw new OadrElementNotFoundException();
+				throw new OadrElementNotFoundException("MarketContext: " + marketContextName + " not found");
 			}
 		}
 	}
@@ -528,7 +528,8 @@ public class Oadr20bVenController {
 				.findOneBySourceUsernameAndReportSpecifierId(venId, reportSpecifierId);
 
 		if (otherReportCapability == null) {
-			throw new OadrElementNotFoundException();
+			throw new OadrElementNotFoundException(
+					"ReportCapability with reportSpecifierId: " + reportSpecifierId + " not found for venID: " + venId);
 		}
 
 		return otherReportCapability;
@@ -537,7 +538,7 @@ public class Oadr20bVenController {
 	private Ven checkVen(String venID) throws OadrElementNotFoundException {
 		Ven ven = venService.findOneByUsername(venID);
 		if (ven == null) {
-			throw new OadrElementNotFoundException();
+			throw new OadrElementNotFoundException("ven: " + venID + " not found");
 		}
 		return ven;
 	}
@@ -548,7 +549,8 @@ public class Oadr20bVenController {
 		OtherReportCapabilityDescription otherReportCapabilityDescription = otherReportCapabilityDescriptionService
 				.findByOtherReportCapabilityAndRid(otherReportCapability, rid);
 		if (otherReportCapabilityDescription == null) {
-			throw new OadrElementNotFoundException();
+			throw new OadrElementNotFoundException("ReportCapabilityDescription with reportSpecifierId: "
+					+ reportSpecifierId + " and rid: " + rid + " not found for venID: " + venID);
 		}
 		return otherReportCapability;
 	}

@@ -9,16 +9,13 @@ import com.avob.openadr.server.common.vtn.utils.DateUtils;
 
 public class InstantConverter implements Converter<String, Instant> {
 
-    @Override
-    public Instant convert(String source) {
-        if (source == null) {
-            return null;
-        }
-        try {
-            return Instant.ofEpochMilli(DateUtils.parseDateAsTimestamp(source));
-        } catch (UnparsableDateFormatException e) {
-            return null;
-        }
-    }
+	@Override
+	public Instant convert(String source) {
+		try {
+			return Instant.ofEpochMilli(DateUtils.parseDateAsTimestamp(source));
+		} catch (UnparsableDateFormatException e) {
+			return null;
+		}
+	}
 
 }

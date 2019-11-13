@@ -51,6 +51,7 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalIntervalDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.ven.VenDto;
@@ -171,9 +172,16 @@ public class EventScenarioTest {
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
 		signal.setSignalName("SIMPLE");
 		signal.setSignalType("level");
+		List<DemandResponseEventSignalIntervalDto> intervals = new ArrayList<>();
+		DemandResponseEventSignalIntervalDto interval = new DemandResponseEventSignalIntervalDto();
+		interval.setDuration(60 * 1000);
+		interval.setValue(1F);
+		intervals.add(interval);
+		signal.setIntervals(intervals);
+
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setMarketContext(marketContext.getName());
-		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+		dto.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.NEVER);
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		dto.getActivePeriod().setToleranceDuration("P1D");
@@ -241,7 +249,7 @@ public class EventScenarioTest {
 
 		// ensure "active" drevent is translated into OadrEvent
 		OadrEvent oadrEventActive = event.getOadrEvent().get(0);
-		assertEquals(ResponseRequiredType.ALWAYS, oadrEventActive.getOadrResponseRequired());
+		assertEquals(ResponseRequiredType.NEVER, oadrEventActive.getOadrResponseRequired());
 		EiEventType eiEventActive = oadrEventActive.getEiEvent();
 
 		// ensure ven id is correctly set

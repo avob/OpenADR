@@ -131,22 +131,41 @@ public class Oadr20bVTNPayloadService {
 		return marshall(response, false);
 	}
 
+	private class MarshallException extends Exception {
+		private static final long serialVersionUID = 6536341286113107628L;
+		private String response = null;
+
+		public MarshallException(String response) {
+			this.response = response;
+		}
+
+		public String getResponse() {
+			return response;
+		}
+	}
+
+	private UnmarshalledPayload marshall(Ven ven, String payload) throws MarshallException {
+		try {
+			return unmarshall(ven, payload);
+		} catch (Oadr20bUnmarshalException e) {
+			throw new MarshallException(unmarshallError(ven));
+		} catch (Oadr20bXMLSignatureValidationException e) {
+			throw new MarshallException(signatureError(ven));
+		}
+	}
+
 	public String event(String username, String payload) {
 		Ven ven = venService.findOneByUsername(username);
 		if (ven == null) {
 			return venNotfoundError(username);
 		}
-		UnmarshalledPayload unsignedPayload;
 		try {
-			unsignedPayload = unmarshall(ven, payload);
-		} catch (Oadr20bUnmarshalException e) {
-			return unmarshallError(ven);
-		} catch (Oadr20bXMLSignatureValidationException e) {
-			return signatureError(ven);
+			UnmarshalledPayload unsignedPayload = marshall(ven, payload);
+			Object request = oadr20bVTNEiEventService.request(ven, unsignedPayload.getPayload());
+			return marshall(request, unsignedPayload.isSigned());
+		} catch (MarshallException e) {
+			return e.getResponse();
 		}
-
-		Object request = oadr20bVTNEiEventService.request(ven, unsignedPayload.getPayload());
-		return marshall(request, unsignedPayload.isSigned());
 
 	}
 
@@ -155,16 +174,13 @@ public class Oadr20bVTNPayloadService {
 		if (ven == null) {
 			return venNotfoundError(username);
 		}
-		UnmarshalledPayload unsignedPayload;
 		try {
-			unsignedPayload = unmarshall(ven, payload);
-		} catch (Oadr20bUnmarshalException e) {
-			return unmarshallError(ven);
-		} catch (Oadr20bXMLSignatureValidationException e) {
-			return signatureError(ven);
+			UnmarshalledPayload unsignedPayload = marshall(ven, payload);
+			Object request = oadr20bVTNEiRegisterPartyService.request(ven, unsignedPayload.getPayload());
+			return marshall(request, unsignedPayload.isSigned());
+		} catch (MarshallException e) {
+			return e.getResponse();
 		}
-		Object request = oadr20bVTNEiRegisterPartyService.request(ven, unsignedPayload.getPayload());
-		return marshall(request, unsignedPayload.isSigned());
 	}
 
 	public String opt(String username, String payload) {
@@ -172,16 +188,13 @@ public class Oadr20bVTNPayloadService {
 		if (ven == null) {
 			return venNotfoundError(username);
 		}
-		UnmarshalledPayload unsignedPayload;
 		try {
-			unsignedPayload = unmarshall(ven, payload);
-		} catch (Oadr20bUnmarshalException e) {
-			return unmarshallError(ven);
-		} catch (Oadr20bXMLSignatureValidationException e) {
-			return signatureError(ven);
+			UnmarshalledPayload unsignedPayload = marshall(ven, payload);
+			Object request = oadr20bVTNEiOptService.request(ven, unsignedPayload.getPayload());
+			return marshall(request, unsignedPayload.isSigned());
+		} catch (MarshallException e) {
+			return e.getResponse();
 		}
-		Object request = oadr20bVTNEiOptService.request(ven, unsignedPayload.getPayload());
-		return marshall(request, unsignedPayload.isSigned());
 	}
 
 	public String report(String username, String payload) {
@@ -189,16 +202,13 @@ public class Oadr20bVTNPayloadService {
 		if (ven == null) {
 			return venNotfoundError(username);
 		}
-		UnmarshalledPayload unsignedPayload;
 		try {
-			unsignedPayload = unmarshall(ven, payload);
-		} catch (Oadr20bUnmarshalException e) {
-			return unmarshallError(ven);
-		} catch (Oadr20bXMLSignatureValidationException e) {
-			return signatureError(ven);
+			UnmarshalledPayload unsignedPayload = marshall(ven, payload);
+			Object request = oadr20bVTNEiReportService.request(ven, unsignedPayload.getPayload());
+			return marshall(request, unsignedPayload.isSigned());
+		} catch (MarshallException e) {
+			return e.getResponse();
 		}
-		Object request = oadr20bVTNEiReportService.request(ven, unsignedPayload.getPayload());
-		return marshall(request, unsignedPayload.isSigned());
 	}
 
 	public String poll(String username, String payload) {
@@ -206,15 +216,12 @@ public class Oadr20bVTNPayloadService {
 		if (ven == null) {
 			return venNotfoundError(username);
 		}
-		UnmarshalledPayload unsignedPayload;
 		try {
-			unsignedPayload = unmarshall(ven, payload);
-		} catch (Oadr20bUnmarshalException e) {
-			return unmarshallError(ven);
-		} catch (Oadr20bXMLSignatureValidationException e) {
-			return signatureError(ven);
+			UnmarshalledPayload unsignedPayload = marshall(ven, payload);
+			Object request = oadr20bVTNOadrPollService.request(ven, unsignedPayload.getPayload());
+			return marshall(request, unsignedPayload.isSigned());
+		} catch (MarshallException e) {
+			return e.getResponse();
 		}
-		Object request = oadr20bVTNOadrPollService.request(ven, unsignedPayload.getPayload());
-		return marshall(request, unsignedPayload.isSigned());
 	}
 }
