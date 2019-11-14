@@ -223,15 +223,6 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 		return Oadr20bEiOptBuilders.newOadr20bCanceledOptBuilder(requestID, HttpStatus.OK_200, optID).build();
 	}
 
-	private Object handle(Ven ven, OadrCreateOptType oadrCreateOpt) {
-		return this.oadrCreateOpt(ven, oadrCreateOpt);
-
-	}
-
-	private Object handle(Ven ven, OadrCancelOptType oadrCancelOpt) {
-		return this.oadrCancelOptType(ven, oadrCancelOpt);
-	}
-
 	@Override
 	public Object request(Ven ven, Object payload) {
 
@@ -241,7 +232,7 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 
 			OadrCreateOptType oadrCreateOptType = (OadrCreateOptType) payload;
 
-			return handle(ven, oadrCreateOptType);
+			return this.oadrCreateOpt(ven, oadrCreateOptType);
 
 		} else if (payload instanceof OadrCancelOptType) {
 
@@ -249,7 +240,7 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 
 			OadrCancelOptType oadrCancelOptType = (OadrCancelOptType) payload;
 
-			return handle(ven, oadrCancelOptType);
+			return this.oadrCancelOptType(ven, oadrCancelOptType);
 
 		}
 

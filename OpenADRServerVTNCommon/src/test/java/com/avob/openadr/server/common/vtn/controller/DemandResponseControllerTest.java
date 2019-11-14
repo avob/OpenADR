@@ -348,6 +348,16 @@ public class DemandResponseControllerTest {
 						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
+		// perform invalid create: modification number present
+		toCreate = createValidEvent();
+		toCreate.getDescriptor().setMarketContext(UNKNOWN_MARKETCONTEXT_NAME);
+		toCreate.getDescriptor().setModificationNumber(0L);
+		contentStr = mapper.writeValueAsString(toCreate);
+		this.mockMvc
+				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL).content(contentStr)
+						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+
 		// perform invalid create: invalid priority
 		toCreate = createValidEvent();
 		toCreate.getDescriptor().setPriority(-1L);
@@ -978,8 +988,13 @@ public class DemandResponseControllerTest {
 
 		filters = DemandResponseEventFilter.builder().isPublished().addMarketContext(marketContext.getName()).build();
 		searchAndExpect(filters, 0);
-		
-		filters = DemandResponseEventFilter.builder().isPublished().isNotPublished().addMarketContext(marketContext.getName()).build();
+
+		filters = DemandResponseEventFilter.builder().isPublished().isNotPublished()
+				.addMarketContext(marketContext.getName()).build();
+		searchAndExpect(filters, 3);
+
+		filters = DemandResponseEventFilter.builder().isNotPublished().isPublished()
+				.addMarketContext(marketContext.getName()).build();
 		searchAndExpect(filters, 3);
 
 		filters = DemandResponseEventFilter.builder().addMarketContext(marketContext.getName()).isPublished().build();
@@ -1042,9 +1057,13 @@ public class DemandResponseControllerTest {
 		filters = DemandResponseEventFilter.builder().isNotSendable().addState(DemandResponseEventStateEnum.ACTIVE)
 				.build();
 		searchAndExpect(filters, 1);
-		
-		filters = DemandResponseEventFilter.builder().isNotSendable().isSendable().addState(DemandResponseEventStateEnum.ACTIVE)
-				.build();
+
+		filters = DemandResponseEventFilter.builder().isNotSendable().isSendable()
+				.addState(DemandResponseEventStateEnum.ACTIVE).build();
+		searchAndExpect(filters, 1);
+
+		filters = DemandResponseEventFilter.builder().isSendable().isNotSendable()
+				.addState(DemandResponseEventStateEnum.ACTIVE).build();
 		searchAndExpect(filters, 1);
 
 		filters = DemandResponseEventFilter.builder().addState(DemandResponseEventStateEnum.ACTIVE).isNotSendable()

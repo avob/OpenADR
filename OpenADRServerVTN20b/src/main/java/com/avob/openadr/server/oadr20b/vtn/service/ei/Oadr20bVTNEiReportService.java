@@ -1192,33 +1192,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		venDistributeService.distribute(ven, build);
 	}
 
-	private Object handle(Ven ven, OadrRegisterReportType oadrRegisterReport) {
-		return this.oadrRegisterReport(ven, oadrRegisterReport);
-	}
-
-	private Object handle(Ven ven, OadrRegisteredReportType oadrRegisteredReport) {
-		return this.oadrRegisteredReport(ven, oadrRegisteredReport);
-	}
-
-	private Object handle(Ven ven, OadrUpdateReportType oadrUpdateReport) {
-		return this.oadrUpdateReport(ven, oadrUpdateReport);
-	}
-
-	private Object handle(Ven ven, OadrCreatedReportType oadrCreatedReport) {
-		return this.oadrCreatedReport(ven, oadrCreatedReport);
-
-	}
-
-	private Object handle(Ven ven, OadrCreateReportType oadrCreateReport) {
-		return this.oadrCreateReport(ven, oadrCreateReport);
-
-	}
-
-	private Object handle(Ven ven, OadrCancelReportType oadrCancelReport) {
-		return this.oadrCancelReport(ven, oadrCancelReport);
-
-	}
-
 	@Override
 	public Object request(Ven ven, Object payload) {
 
@@ -1228,7 +1201,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 			OadrRegisterReportType obj = (OadrRegisterReportType) payload;
 
-			return handle(ven, obj);
+			return this.oadrRegisterReport(ven, obj);
 
 		} else if (payload instanceof OadrRegisteredReportType) {
 
@@ -1236,7 +1209,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 			OadrRegisteredReportType obj = (OadrRegisteredReportType) payload;
 
-			return handle(ven, obj);
+			return this.oadrRegisteredReport(ven, obj);
 
 		} else if (payload instanceof OadrUpdateReportType) {
 
@@ -1244,7 +1217,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 			OadrUpdateReportType obj = (OadrUpdateReportType) payload;
 
-			return handle(ven, obj);
+			return this.oadrUpdateReport(ven, obj);
 
 		} else if (payload instanceof OadrCreatedReportType) {
 
@@ -1252,7 +1225,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 			OadrCreatedReportType obj = (OadrCreatedReportType) payload;
 
-			return handle(ven, obj);
+			return this.oadrCreatedReport(ven, obj);
 
 		} else if (payload instanceof OadrCreateReportType) {
 
@@ -1260,7 +1233,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 			OadrCreateReportType obj = (OadrCreateReportType) payload;
 
-			return handle(ven, obj);
+			return this.oadrCreateReport(ven, obj);
 
 		} else if (payload instanceof OadrCancelReportType) {
 
@@ -1268,7 +1241,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 			OadrCancelReportType obj = (OadrCancelReportType) payload;
 
-			return handle(ven, obj);
+			return this.oadrCancelReport(ven, obj);
 
 		} else {
 			return Oadr20bResponseBuilders

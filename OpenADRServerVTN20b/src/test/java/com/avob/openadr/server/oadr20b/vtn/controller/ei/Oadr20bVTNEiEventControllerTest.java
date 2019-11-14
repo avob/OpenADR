@@ -36,12 +36,14 @@ import org.w3c.dom.ls.LSSerializer;
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bEiOptBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
@@ -204,6 +206,19 @@ public class Oadr20bVTNEiEventControllerTest {
 		signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, OadrResponseType.class);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.COMPLIANCE_ERROR_459),
 				signedObjectFromOadrPayload.getEiResponse().getResponseCode());
+
+		// send well formed object meant for another service
+		OadrCreatedOptType opt = Oadr20bEiOptBuilders
+				.newOadr20bCreatedOptBuilder("requestId", HttpStatus.OK_200, "optId").build();
+		content = jaxbContext.marshalRoot(opt);
+		andReturn = this.oadrMockEiHttpMvc
+				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT)
+						.with(OadrDataBaseSetup.VEN_HTTP_PUSH_SECURITY_SESSION).content(content))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		OadrResponseType resp = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(),
+				OadrResponseType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453),
+				resp.getEiResponse().getResponseCode());
 
 	}
 

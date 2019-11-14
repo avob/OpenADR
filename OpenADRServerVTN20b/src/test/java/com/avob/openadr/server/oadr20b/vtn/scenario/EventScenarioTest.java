@@ -151,7 +151,7 @@ public class EventScenarioTest {
 	 */
 	@Test
 	public void testPullOadrRequestEventTypeActiveSuccessCase() throws Exception {
-		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.VEN_TEST_LIST.entrySet()) {
+		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.getTestVen().entrySet()) {
 			VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, entry.getKey(),
 					HttpStatus.OK_200);
 			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, oadrMockEiXmpp,
@@ -401,7 +401,7 @@ public class EventScenarioTest {
 	 */
 	@Test
 	public void testScenario1() throws Exception {
-		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.VEN_TEST_LIST.entrySet()) {
+		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.getTestVen().entrySet()) {
 			VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, entry.getKey(),
 					HttpStatus.OK_200);
 			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, oadrMockEiXmpp,
@@ -583,7 +583,7 @@ public class EventScenarioTest {
 	 */
 	@Test
 	public void testScenario2() throws Exception {
-		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.VEN_TEST_LIST.entrySet()) {
+		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.getTestVen().entrySet()) {
 			VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, entry.getKey(),
 					HttpStatus.OK_200);
 			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, oadrMockEiXmpp,

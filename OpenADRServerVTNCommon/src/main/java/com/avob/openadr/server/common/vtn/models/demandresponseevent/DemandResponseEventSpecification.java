@@ -59,7 +59,7 @@ public class DemandResponseEventSpecification {
 	public static Specification<DemandResponseEvent> hasActivePeriodStartAfter(Long timestamp) {
 		return (event, cq, cb) -> cb.ge(event.get(FIELD_ACTIVE_PERIOD).get(FIELD_START), timestamp);
 	}
-	
+
 	public static Specification<DemandResponseEvent> hasActivePeriodStartBefore(Long timestamp) {
 		return (event, cq, cb) -> cb.lt(event.get(FIELD_ACTIVE_PERIOD).get(FIELD_START), timestamp);
 	}
@@ -195,12 +195,8 @@ public class DemandResponseEventSpecification {
 				.and(venPredicates).and(statePredicates).and(isPublishedPredicates).and(isSendablePredicates);
 
 		return (event, cq, cb) -> {
-			if (finalRes != null) {
-				cq.distinct(true);
-				return finalRes.toPredicate(event, cq, cb);
-			}
-			return null;
-
+			cq.distinct(true);
+			return finalRes.toPredicate(event, cq, cb);
 		};
 	}
 

@@ -36,8 +36,6 @@ import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
@@ -307,6 +305,16 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 		return res;
 	}
 
+	/**
+	 * compute oadr event status
+	 * 
+	 * @param now
+	 * @param start
+	 * @param end
+	 * @param startNotification
+	 * @param rampUpDuration
+	 * @return
+	 */
 	private EventStatusEnumeratedType getOadrEventStatus(Date now, long start, long end, long startNotification,
 			String rampUpDuration) {
 		EventStatusEnumeratedType status = null;
@@ -342,12 +350,12 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 		return status;
 	}
 
+
 	/**
-	 * create EventDescriptorType for a specific DemandResponseEvent
+	 * Create DREvent descriptor from DemandResponseEvent
 	 * 
 	 * @param drEvent
 	 * @return
-	 * @throws DatatypeConfigurationException
 	 */
 	private EventDescriptorType createEventDescriptor(DemandResponseEvent drEvent) {
 
@@ -381,31 +389,6 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 
 	}
 
-	/**
-	 * @param username
-	 * @param oadrCreatedEvent
-	 * @return
-	 * @throws Oadr20bCreatedEventApplicationLayerException
-	 * @throws Oadr20bMarshalException
-	 * @throws Oadr20bXMLSignatureException
-	 */
-	private Object handle(Ven ven, OadrCreatedEventType oadrCreatedEvent) {
-		return this.oadrCreatedEvent(ven, oadrCreatedEvent);
-
-	}
-
-	/**
-	 * @param username
-	 * @param oadrRequestEvent
-	 * @return
-	 * @throws Oadr20bRequestEventApplicationLayerException
-	 * @throws Oadr20bMarshalException
-	 * @throws Oadr20bXMLSignatureException
-	 */
-	private Object handle(Ven ven, OadrRequestEventType oadrRequestEvent) {
-		return this.oadrRequestEvent(ven, oadrRequestEvent);
-	}
-
 	@Override
 	public Object request(Ven ven, Object payload) {
 
@@ -415,7 +398,7 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 
 			OadrCreatedEventType oadrCreatedEvent = (OadrCreatedEventType) payload;
 
-			return handle(ven, oadrCreatedEvent);
+			return this.oadrCreatedEvent(ven, oadrCreatedEvent);
 
 		} else if (payload instanceof OadrRequestEventType) {
 
@@ -423,7 +406,7 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 
 			OadrRequestEventType oadrRequestEvent = (OadrRequestEventType) payload;
 
-			return handle(ven, oadrRequestEvent);
+			return this.oadrRequestEvent(ven, oadrRequestEvent);
 
 		} else if (payload instanceof OadrResponseType) {
 

@@ -33,14 +33,15 @@ import org.w3c.dom.ls.LSSerializer;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
+import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
-import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.common.vtn.service.push.DemandResponseEventPublisher;
 import com.avob.openadr.server.oadr20b.vtn.VTN20bSecurityApplicationTest;
 import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
@@ -52,7 +53,6 @@ import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiHttpMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockEiXmpp;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpDemandResponseEventMvc;
 import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockHttpVenMvc;
-import com.avob.openadr.server.oadr20b.vtn.utils.OadrMockVen;
 import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppConnector;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -199,6 +199,20 @@ public class Oadr20bVTNEiReportControllerTest {
 		signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal, OadrResponseType.class);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.COMPLIANCE_ERROR_459),
 				signedObjectFromOadrPayload.getEiResponse().getResponseCode());
+
+		// send well formed object meant for another service
+		OadrRequestEventType event = Oadr20bEiEventBuilders
+				.newOadrRequestEventBuilder(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, "requestId").withReplyLimit(12)
+				.build();
+		content = jaxbContext.marshalRoot(event);
+		andReturn = this.oadrMockEiHttpMvc
+				.perform(MockMvcRequestBuilders.post(EIREPORT_ENDPOINT)
+						.with(OadrDataBaseSetup.VEN_HTTP_PUSH_SECURITY_SESSION).content(content))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		OadrResponseType resp = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(),
+				OadrResponseType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453),
+				resp.getEiResponse().getResponseCode());
 
 	}
 }

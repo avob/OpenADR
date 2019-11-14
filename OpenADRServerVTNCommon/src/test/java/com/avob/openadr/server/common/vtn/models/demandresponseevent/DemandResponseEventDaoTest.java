@@ -82,6 +82,8 @@ public class DemandResponseEventDaoTest {
 		assertEquals(event.getDescriptor().getMarketContext(), saved.getDescriptor().getMarketContext());
 		assertEquals(event.getDescriptor().getModificationNumber(), saved.getDescriptor().getModificationNumber());
 		assertEquals(event.getActivePeriod().getStart(), saved.getActivePeriod().getStart());
+		assertEquals(event.getActivePeriod().getEnd(), saved.getActivePeriod().getEnd());
+		assertEquals(event.getActivePeriod().getStartNotification(), saved.getActivePeriod().getStartNotification());
 		assertEquals(event.getDescriptor().getState(), saved.getDescriptor().getState());
 
 		// test find by id

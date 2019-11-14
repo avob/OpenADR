@@ -467,6 +467,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
+		dto.getActivePeriod().setRecoveryDuration("PT5M");
 		dto.getActivePeriod().setStart(System.currentTimeMillis());
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.getSignals().add(signal);

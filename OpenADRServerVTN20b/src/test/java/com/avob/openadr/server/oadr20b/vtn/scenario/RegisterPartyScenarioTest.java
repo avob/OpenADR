@@ -133,7 +133,7 @@ public class RegisterPartyScenarioTest {
 
 	@Test
 	public void test() throws Exception {
-		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.VEN_TEST_LIST.entrySet()) {
+		for (Entry<String, UserRequestPostProcessor> entry : OadrDataBaseSetup.getTestVen().entrySet()) {
 			VenDto ven = oadrMockHttpVenMvc.getVen(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, entry.getKey(),
 					HttpStatus.OK_200);
 			OadrMockVen mockVen = new OadrMockVen(ven, entry.getValue(), oadrMockEiHttpMvc, oadrMockEiXmpp,

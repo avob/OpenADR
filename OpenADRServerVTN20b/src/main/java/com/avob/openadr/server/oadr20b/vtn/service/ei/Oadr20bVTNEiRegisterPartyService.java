@@ -205,27 +205,6 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 		return Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID, HttpStatus.OK_200, venID).build();
 	}
 
-	public Object handle(Ven ven, OadrCreatePartyRegistrationType oadrCreatePartyRegistrationType) {
-		return oadrCreatePartyRegistration(ven, oadrCreatePartyRegistrationType);
-
-	}
-
-	public Object handle(Ven ven, OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType) {
-		return oadrCancelPartyRegistrationType(ven, oadrCancelPartyRegistrationType);
-	}
-
-	public Object handle(Ven ven, OadrCanceledPartyRegistrationType oadrCanceledPartyRegistrationType) {
-		return oadrCanceledPartyRegistrationType(ven, oadrCanceledPartyRegistrationType);
-	}
-
-	public Object handle(Ven ven, OadrQueryRegistrationType oadrQueryRegistrationType) {
-		return oadrQueryRegistrationType(ven, oadrQueryRegistrationType);
-	}
-
-	public Object handle(Ven ven, OadrResponseType oadrResponseType) {
-		return oadrResponsePartyReregistration(ven, oadrResponseType);
-	}
-
 	@Override
 	public Object request(Ven ven, Object payload) {
 
@@ -235,7 +214,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 
 			OadrCreatePartyRegistrationType oadrCreatePartyRegistration = (OadrCreatePartyRegistrationType) payload;
 
-			return handle(ven, oadrCreatePartyRegistration);
+			return oadrCreatePartyRegistration(ven, oadrCreatePartyRegistration);
 
 		} else if (payload instanceof OadrCancelPartyRegistrationType) {
 
@@ -243,7 +222,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 
 			OadrCancelPartyRegistrationType oadrCancelPartyRegistrationType = (OadrCancelPartyRegistrationType) payload;
 
-			return handle(ven, oadrCancelPartyRegistrationType);
+			return oadrCancelPartyRegistrationType(ven, oadrCancelPartyRegistrationType);
 
 		} else if (payload instanceof OadrCanceledPartyRegistrationType) {
 
@@ -251,7 +230,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 
 			OadrCanceledPartyRegistrationType oadrCanceledPartyRegistrationType = (OadrCanceledPartyRegistrationType) payload;
 
-			return handle(ven, oadrCanceledPartyRegistrationType);
+			return oadrCanceledPartyRegistrationType(ven, oadrCanceledPartyRegistrationType);
 
 		} else if (payload instanceof OadrQueryRegistrationType) {
 
@@ -259,7 +238,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 
 			OadrQueryRegistrationType oadrQueryRegistrationType = (OadrQueryRegistrationType) payload;
 
-			return handle(ven, oadrQueryRegistrationType);
+			return oadrQueryRegistrationType(ven, oadrQueryRegistrationType);
 
 		} else if (payload instanceof OadrResponseType) {
 
@@ -267,7 +246,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 
 			OadrResponseType oadrResponseType = (OadrResponseType) payload;
 
-			return handle(ven, oadrResponseType);
+			return oadrResponsePartyReregistration(ven, oadrResponseType);
 
 		} else {
 			return Oadr20bResponseBuilders

@@ -8,13 +8,13 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedde
 
 public class DemandResponseEventContentDto {
 
-	private List<DemandResponseEventSignalDto> signals = new ArrayList<>();
+	private List<DemandResponseEventSignalDto> signals;
 
-	private List<DemandResponseEventTargetDto> targets = new ArrayList<>();
+	private List<DemandResponseEventTargetDto> targets;
 
 	public List<DemandResponseEventSignalDto> getSignals() {
 		if (signals == null) {
-			return new ArrayList<>();
+			signals = new ArrayList<>();
 		}
 		return signals;
 	}
@@ -24,6 +24,9 @@ public class DemandResponseEventContentDto {
 	}
 
 	public List<DemandResponseEventTargetDto> getTargets() {
+		if (targets == null) {
+			targets = new ArrayList<>();
+		}
 		return targets;
 	}
 

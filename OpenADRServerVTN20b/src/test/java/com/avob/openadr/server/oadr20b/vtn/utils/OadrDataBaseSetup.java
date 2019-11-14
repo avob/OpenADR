@@ -78,7 +78,7 @@ public class OadrDataBaseSetup {
 	public static final String GROUP = "group1";
 	public static final String ANOTHER_GROUP = "group2";
 
-	public static final Map<String, UserRequestPostProcessor> VEN_TEST_LIST = new HashMap<>();
+	private static final Map<String, UserRequestPostProcessor> VEN_TEST_LIST = new HashMap<>();
 	static {
 		VEN_TEST_LIST.put(OadrDataBaseSetup.VEN_HTTP_PULL_DSIG, VEN_HTTP_PULL_DSIG_SECURITY_SESSION);
 		VEN_TEST_LIST.put(OadrDataBaseSetup.VEN_HTTP_PULL, ANOTHER_VEN_SECURITY_SESSION);
@@ -86,6 +86,10 @@ public class OadrDataBaseSetup {
 		VEN_TEST_LIST.put(OadrDataBaseSetup.VEN_XMPP_DSIG, VEN_XMPP_DSIG_SECURITY_SESSION);
 		VEN_TEST_LIST.put(OadrDataBaseSetup.VEN_HTTP_PUSH_DSIG, VEN_HTTP_PUSH_DSIG_SECURITY_SESSION);
 		VEN_TEST_LIST.put(OadrDataBaseSetup.VEN_HTTP_PUSH, VEN_HTTP_PUSH_SECURITY_SESSION);
+	}
+
+	public static Map<String, UserRequestPostProcessor> getTestVen() {
+		return VEN_TEST_LIST;
 	}
 
 	@Resource
