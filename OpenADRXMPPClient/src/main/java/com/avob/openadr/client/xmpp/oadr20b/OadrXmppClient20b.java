@@ -90,8 +90,10 @@ public class OadrXmppClient20b {
 		}
 	}
 
-	public OadrXmppClient20b(String userJid, XMPPTCPConnection connection, String domain, StanzaListener onMessageListener)
-			throws OadrXmppException {
+	public OadrXmppClient20b(String userJid, XMPPTCPConnection connection, String domain,
+			StanzaListener onMessageListener) throws OadrXmppException {
+		this.connection = connection;
+
 		try {
 			SASLAnonymous mechanism = new SASLAnonymous();
 			SASLExternalMechanism ext = new SASLExternalMechanism();
