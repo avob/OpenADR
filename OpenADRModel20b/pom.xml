@@ -98,6 +98,47 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco-plugin.version}</version>
+				<configuration>
+					<destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
+					<dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+					<excludes>
+						<exclude>com.avob.openadr.model.*.ei.*</exclude>
+						<exclude>com.avob.openadr.model.*.emix.*</exclude>
+						<exclude>com.avob.openadr.model.*.oadr.*</exclude>
+						<exclude>com.avob.openadr.model.*.pyld.*</exclude>
+						<exclude>com.avob.openadr.model.*.strm.*</exclude>
+						<exclude>com.avob.openadr.model.*.xcal.*</exclude>
+						<exclude>com.avob.openadr.model.*.atom.*</exclude>
+						<exclude>com.avob.openadr.model.*.gml.*</exclude>
+						<exclude>com.avob.openadr.model.*.greenbutton.*</exclude>
+						<exclude>com.avob.openadr.model.*.iso.*</exclude>
+						<exclude>com.avob.openadr.model.*.power.*</exclude>
+						<exclude>com.avob.openadr.model.*.siscale.*</exclude>
+						<exclude>com.avob.openadr.model.*.xmldsig.*</exclude>
+						<exclude>com.avob.openadr.model.*.xmldsig11.*</exclude>
+						<exclude>com.avob.openadr.model.*.xmldsig.properties.*</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>jacoco-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-site</id>
+						<phase>package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>

@@ -350,8 +350,6 @@ public class OadrPKISecurity {
 			} else if (OadrPKIAlgorithm.SHA256_RSA.equals(algo)) {
 				venCred = OadrPKISecurity.generateRsaKeyPair();
 				csrAlgo = "SHA256withRSA";
-			} else {
-				throw new OadrSecurityException("Undefined OadrPKIAlgorithm algo");
 			}
 
 			String x509PrincipalName = "C=FR, ST=Paris, L=Paris, O=Avob, OU=Avob, CN=" + venCN;

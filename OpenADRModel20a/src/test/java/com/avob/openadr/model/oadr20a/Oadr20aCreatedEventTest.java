@@ -35,9 +35,12 @@ public class Oadr20aCreatedEventTest {
 		int responseCode = 200;
 		String eventId = null;
 		long modificationNumber = 0L;
-		OadrCreatedEvent request = Oadr20aBuilders.newCreatedEventBuilder(venId, requestId, responseCode)
-				.addEventResponse(Oadr20aBuilders.newOadr20aCreatedEventEventResponseBuilder(eventId,
-						modificationNumber, requestId, responseCode, OptTypeType.OPT_IN).build())
+		OadrCreatedEvent request = Oadr20aBuilders
+				.newCreatedEventBuilder(venId, requestId,
+						responseCode)
+				.addEventResponse(
+						Oadr20aBuilders.newOadr20aCreatedEventEventResponseBuilder(eventId, modificationNumber,
+								requestId, responseCode, OptTypeType.OPT_IN).withDescription("mouaiccool").build())
 				.build();
 
 		boolean assertion = false;

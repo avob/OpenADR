@@ -35,6 +35,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.assertj.core.util.Lists;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -72,6 +73,15 @@ public class OadrPKISecurityTest {
 		}
 		assertTrue(exception);
 
+		// invalid pem raise exception
+		exception = false;
+		try {
+			OadrPKISecurity.parseCertificate(TestUtils.TEST_KEY);
+		} catch (OadrSecurityException e) {
+			exception = true;
+		}
+		assertTrue(exception);
+
 	}
 
 	@Test
@@ -93,6 +103,15 @@ public class OadrPKISecurityTest {
 		}
 		assertTrue(exception);
 
+		// invalid pem raise exception
+		exception = false;
+		try {
+			OadrPKISecurity.parsePrivateKey(TestUtils.TEST_CRT);
+		} catch (OadrSecurityException e) {
+			exception = true;
+		}
+		assertTrue(exception);
+
 	}
 
 	@Test
@@ -101,6 +120,16 @@ public class OadrPKISecurityTest {
 		String password = UUID.randomUUID().toString();
 		KeyStore createKeyStore = OadrPKISecurity.createKeyStore(TestUtils.TEST_KEY, TestUtils.TEST_CRT, password);
 		assertNotNull(createKeyStore);
+
+		// invalid pem
+		boolean exception = false;
+		try {
+			createKeyStore = OadrPKISecurity.createKeyStore(TestUtils.TEST_CRT, TestUtils.TEST_KEY, password);
+		} catch (OadrSecurityException e) {
+			exception = true;
+		}
+		assertTrue(exception);
+
 	}
 
 	@Test
@@ -109,6 +138,16 @@ public class OadrPKISecurityTest {
 		KeyManagerFactory createKeyManagerFactory = OadrPKISecurity.createKeyManagerFactory(TestUtils.TEST_KEY,
 				TestUtils.TEST_CRT, password);
 		assertNotNull(createKeyManagerFactory);
+
+		// invalid pem
+		boolean exception = false;
+		try {
+			createKeyManagerFactory = OadrPKISecurity.createKeyManagerFactory(TestUtils.TEST_CRT, TestUtils.TEST_KEY,
+					password);
+		} catch (OadrSecurityException e) {
+			exception = true;
+		}
+		assertTrue(exception);
 	}
 
 	@Test
@@ -118,6 +157,19 @@ public class OadrPKISecurityTest {
 		certificates.add(TestUtils.TEST_CRT);
 		KeyStore createTrustStore = OadrPKISecurity.createTrustStore(certificates);
 		assertNotNull(createTrustStore);
+		createTrustStore = OadrPKISecurity.createTrustStore(Lists.newArrayList());
+		assertNotNull(createTrustStore);
+
+		// invalid pem
+		certificates = new ArrayList<>();
+		certificates.add(TestUtils.TEST_KEY);
+		boolean exception = false;
+		try {
+			createTrustStore = OadrPKISecurity.createTrustStore(certificates);
+		} catch (OadrSecurityException e) {
+			exception = true;
+		}
+		assertTrue(exception);
 	}
 
 	@Test
@@ -127,6 +179,19 @@ public class OadrPKISecurityTest {
 		certificates.add(TestUtils.TEST_CRT);
 		TrustManagerFactory createTrustManagerFactory = OadrPKISecurity.createTrustManagerFactory(certificates);
 		assertNotNull(createTrustManagerFactory);
+		createTrustManagerFactory = OadrPKISecurity.createTrustManagerFactory(Lists.newArrayList());
+		assertNotNull(createTrustManagerFactory);
+
+		// invalid pem
+		certificates = new ArrayList<>();
+		certificates.add(TestUtils.TEST_KEY);
+		boolean exception = false;
+		try {
+			createTrustManagerFactory = OadrPKISecurity.createTrustManagerFactory(certificates);
+		} catch (OadrSecurityException e) {
+			exception = true;
+		}
+		assertTrue(exception);
 	}
 
 	@Test
@@ -138,6 +203,19 @@ public class OadrPKISecurityTest {
 		SSLContext createSSLContext = OadrPKISecurity.createSSLContext(TestUtils.TEST_KEY, TestUtils.TEST_CRT,
 				certificates, password);
 		assertNotNull(createSSLContext);
+		createSSLContext = OadrPKISecurity.createSSLContext(TestUtils.TEST_KEY, TestUtils.TEST_CRT,
+				Lists.newArrayList(), password);
+		assertNotNull(createSSLContext);
+
+		// invalid pem
+		boolean exception = false;
+		try {
+			createSSLContext = OadrPKISecurity.createSSLContext(TestUtils.TEST_CRT, TestUtils.TEST_KEY, certificates,
+					password);
+		} catch (OadrSecurityException e) {
+			exception = true;
+		}
+		assertTrue(exception);
 
 	}
 
