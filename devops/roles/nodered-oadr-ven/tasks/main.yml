@@ -1,9 +1,9 @@
 ---
   - name: Install node-gyp build dependencies
     when: ( ansible_os_family  == "Debian" )
-    apt: name={{item}} state=installed
-    with_items:
-      - build-essential
+    apt:
+      name: build-essential
+      state: present
 
   - name: Ansible check file exists example.
     stat:

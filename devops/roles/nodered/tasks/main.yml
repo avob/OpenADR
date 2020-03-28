@@ -1,7 +1,6 @@
 --- # provisioning/roles/nodered/tasks/main.yml
 
   - name: install node-red globally
-    become: no
     shell: sudo npm install -g node-red # intentional sudo
     args:
       creates: /usr/bin/node-red
@@ -9,7 +8,6 @@
       - nodered
 
   - name: add modules to Node Red
-    become: no
     npm:
       name: "{{ item }}"
       path: "{{ nodered_home }}"  
