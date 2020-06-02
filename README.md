@@ -27,7 +27,7 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 - Install [Virtualbox](https://www.virtualbox.org/)
 - Install Backend build dependencies: Java 8 / Maven 3
 - Install Frontend build dependencies: NodeJS 8.15.0 / NPM 6.4.1
-- Install x509 admin certificate in your browser: cert/admin.oadr.crt
+- Install x509 admin certificate in your browser: cert/admin.oadr.com.crt
 - Install self-signed certificate authority in your browser: cert/oadr.com.crt
 - Add "192.168.33.2 vtn.oadr.com" to your local "/etc/hosts"
 
