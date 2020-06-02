@@ -6,6 +6,8 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "bento/ubuntu-16.04"
   config.vm.hostname = "vtn20b"
+  
+  config.gui = true
 
   # forward RabbitMQ ampq
   config.vm.network "forwarded_port", guest: 5671, host: 5671
@@ -37,8 +39,8 @@ Vagrant.configure("2") do |config|
 
 
 
-  # config.ssh.username = "vagrant"
-  # config.ssh.password = "vagrant"
+  config.ssh.username = "admin"
+  config.ssh.password = "1234"
 
   # Set the name of the VM. See: http://stackoverflow.com/a/17864388/100134
   config.vm.define :vtn20b do |vtn|
