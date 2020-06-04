@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- hosts: 127.0.0.1
+  connection: local
   gather_facts: yes
   become: yes
   pre_tasks:
