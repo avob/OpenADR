@@ -99,10 +99,10 @@ public class Oadr20bPushService {
 				builder.enableHttp(true);
 			}
 
-			setOadrHttpVtnClient20b(new OadrHttpVtnClient20b(new OadrHttpClient20b(builder.build())));
+			setOadrHttpVtnClient20b(new OadrHttpVtnClient20b(new OadrHttpClient20b(builder.build(), false)));
 
 			setSecuredOadrHttpVtnClient20b(new OadrHttpVtnClient20b(new OadrHttpClient20b(builder.build(),
-					vtnConfig.getKey(), vtnConfig.getCert(), vtnConfig.getReplayProtectAcceptedDelaySecond())));
+					vtnConfig.getKey(), vtnConfig.getCert(), vtnConfig.getReplayProtectAcceptedDelaySecond(), false)));
 
 		} catch (OadrSecurityException e) {
 			throw new Oadr20bInitializationException(e);

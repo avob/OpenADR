@@ -172,7 +172,7 @@ public class Oadr20bVTNSecurityTest {
 				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers())
 				.withX509Authentication(rsaPrivateKeyPemFilePath, rsaClientCertPemFilePath);
 
-		OadrHttpVenClient20b x509HttpClient = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
+		OadrHttpVenClient20b x509HttpClient = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build(), false));
 
 		String username = fingerprint;
 		Ven ven = venService.prepare(username);
@@ -192,7 +192,7 @@ public class Oadr20bVTNSecurityTest {
 				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers())
 				.withX509Authentication(eccPrivateKeyPemFilePath, eccClientCertPemFilePath);
 
-		x509HttpClient = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
+		x509HttpClient = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build(), false));
 
 		username = fingerprint;
 		ven = venService.prepare(username);
@@ -218,7 +218,7 @@ public class Oadr20bVTNSecurityTest {
 				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers())
 				.withDefaultDigestAuthentication(eiEventEndpointUrl, realm, key, username, "securityVen1");
 
-		OadrHttpVenClient20b digestHttpClient = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
+		OadrHttpVenClient20b digestHttpClient = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build(), false));
 
 		Ven ven = venService.prepare(username, "securityVen1");
 		ven.setRegistrationId(username);
@@ -240,7 +240,7 @@ public class Oadr20bVTNSecurityTest {
 				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers())
 				.withDefaultBasicAuthentication(eiEventEndpointUrl, venUsername, "securityVen1");
 
-		OadrHttpVenClient20b venBasicHttpClient = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
+		OadrHttpVenClient20b venBasicHttpClient = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build(), false));
 
 		VenMarketContext marketContext = venMarketContextService.prepare(new VenMarketContextDto(MARKET_CONTEXT_NAME));
 		venMarketContextService.save(marketContext);

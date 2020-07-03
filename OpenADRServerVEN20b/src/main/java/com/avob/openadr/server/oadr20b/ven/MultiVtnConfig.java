@@ -100,9 +100,9 @@ public class MultiVtnConfig {
 				client = new OadrHttpVenClient20b(
 						new OadrHttpClient20b(builder.build(), session.getVenSessionConfig().getVenPrivateKeyPath(),
 								session.getVenSessionConfig().getVenCertificatePath(),
-								session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond()));
+								session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond(), venConfig.getAcceptUnsignedResponse()));
 			} else {
-				client = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
+				client = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build(), venConfig.getAcceptUnsignedResponse()));
 			}
 
 			getMultiHttpClientConfig().put(session.getVtnId(), client);

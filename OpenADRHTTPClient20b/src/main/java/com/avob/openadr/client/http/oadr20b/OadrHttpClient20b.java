@@ -52,17 +52,20 @@ public class OadrHttpClient20b {
 
 	private boolean validateXmlPayload = false;
 
-	public OadrHttpClient20b(OadrHttpClient client) throws JAXBException, OadrSecurityException {
-		this(client, null, null, null, null);
+	private boolean acceptUnsignedResponse = false;
+	
+
+	public OadrHttpClient20b(OadrHttpClient client, Boolean acceptUnsignedResponse) throws JAXBException, OadrSecurityException {
+		this(client, null, null, null, null, acceptUnsignedResponse);
 	}
 
 	public OadrHttpClient20b(OadrHttpClient client, String privateKeyPath, String clientCertificatePath,
-			Long replayProtectAcceptedDelaySecond) throws JAXBException, OadrSecurityException {
-		this(client, privateKeyPath, clientCertificatePath, replayProtectAcceptedDelaySecond, null);
+			Long replayProtectAcceptedDelaySecond, Boolean acceptUnsignedResponse) throws JAXBException, OadrSecurityException {
+		this(client, privateKeyPath, clientCertificatePath, replayProtectAcceptedDelaySecond, null, acceptUnsignedResponse);
 	}
 
 	public OadrHttpClient20b(OadrHttpClient client, String privateKeyPath, String clientCertificatePath,
-			Long replayProtectAcceptedDelaySecond, Boolean validateXmlPayload)
+			Long replayProtectAcceptedDelaySecond, Boolean validateXmlPayload, Boolean acceptUnsignedResponse)
 			throws JAXBException, OadrSecurityException {
 		this.jaxbContext = Oadr20bJAXBContext.getInstance("src/test/resources/oadr20b_schema/");
 		this.client = client;
@@ -140,7 +143,9 @@ public class OadrHttpClient20b {
 			if (isXmlSignatureEnabled()) {
 				String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
 				OadrPayload unmarshal = jaxbContext.unmarshal(entity, OadrPayload.class, validateXmlPayload);
-				this.validate(entity, unmarshal);
+				if(unmarshal.getSignature() == null && acceptUnsignedResponse) {
+					this.validate(entity, unmarshal);
+				}
 				EntityUtils.consumeQuietly(response.getEntity());
 				if (Object.class.equals(responseKlass)) {
 					Object signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(unmarshal);
@@ -167,6 +172,9 @@ public class OadrHttpClient20b {
 
 	private void validate(String raw, OadrPayload payload) throws Oadr20bXMLSignatureValidationException {
 		long nowDate = System.currentTimeMillis();
+		if(payload.getSignature() == null && !acceptUnsignedResponse) {
+			throw new Oadr20bXMLSignatureValidationException("Signature is not provided and unsigned repsonse is not accepted.");
+		}
 		OadrXMLSignatureHandler.validate(raw, payload, nowDate, replayProtectAcceptedDelaySecond * 1000L);
 	}
 

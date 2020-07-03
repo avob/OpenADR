@@ -132,7 +132,7 @@ public class OadrHttpClient20bTest {
 		HttpResponse response = this.createHttpResponse(scOk, marshal);
 		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
 
-		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient);
+		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient, false);
 
 		OadrDistributeEventType mockDistributeEvent = this.createOadrDistributeEvent();
 		OadrResponseType post = client.post(Oadr20bFactory.createOadrDistributeEvent(mockDistributeEvent),
@@ -157,7 +157,7 @@ public class OadrHttpClient20bTest {
 		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
 
 		String certPath = "src/test/resources/cert/test";
-		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient, certPath + ".key", certPath + ".crt", 1200L);
+		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient, certPath + ".key", certPath + ".crt", 1200L, false);
 
 		OadrDistributeEventType mockDistributeEvent = this.createOadrDistributeEvent();
 		boolean exception = false;
@@ -181,7 +181,7 @@ public class OadrHttpClient20bTest {
 		HttpResponse response = this.createHttpResponse(HttpStatus.SC_FORBIDDEN, "");
 		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
 
-		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient);
+		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient, false);
 
 		OadrDistributeEventType mockDistributeEvent = this.createOadrDistributeEvent();
 
@@ -211,7 +211,7 @@ public class OadrHttpClient20bTest {
 		HttpResponse response = this.createHttpResponse(HttpStatus.SC_OK, marshal);
 		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
 
-		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient);
+		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient, false);
 
 		OadrDistributeEventType mockDistributeEvent = this.createOadrDistributeEvent();
 
@@ -236,7 +236,7 @@ public class OadrHttpClient20bTest {
 		HttpResponse response = this.createHttpResponse(scOk, marshal);
 		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
 
-		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient, null, null, null, true);
+		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient, null, null, null, true, false);
 
 		OadrDistributeEventType mockDistributeEvent = this.createOadrDistributeEvent();
 		mockDistributeEvent.setVtnID(null);
@@ -264,7 +264,7 @@ public class OadrHttpClient20bTest {
 		HttpResponse response = this.createHttpResponse(scOk, marshal);
 		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
 
-		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient);
+		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient, false);
 
 		OadrDistributeEventType mockDistributeEvent = this.createOadrDistributeEvent();
 
@@ -295,7 +295,7 @@ public class OadrHttpClient20bTest {
 
 		String keyFile = CERT_FOLDER_PATH + "test.key";
 		String certFile = CERT_FOLDER_PATH + "test.crt";
-		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient, keyFile, certFile, 1200L);
+		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient, keyFile, certFile, 1200L, false);
 
 		OadrDistributeEventType mockDistributeEvent = this.createOadrDistributeEvent();
 		mockDistributeEvent.setVtnID("vtnId");
@@ -337,7 +337,7 @@ public class OadrHttpClient20bTest {
 		HttpResponse response = this.createHttpResponse(scOk, sign);
 		when(oadrHttpClient.execute(Matchers.<HttpPost>anyObject(), any(), any(), any())).thenReturn(response);
 
-		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient, keyFile, certFile, 1200L);
+		OadrHttpClient20b client = new OadrHttpClient20b(oadrHttpClient, keyFile, certFile, 1200L, false);
 
 		OadrDistributeEventType mockDistributeEvent = this.createOadrDistributeEvent();
 		mockDistributeEvent.setVtnID("vtnId");
