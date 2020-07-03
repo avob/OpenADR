@@ -125,6 +125,7 @@ public class OadrHttpClient20b {
 
 			StringEntity stringEntity = new StringEntity(marshal);
 			post.setEntity(stringEntity);
+			post.setHeader("content-type", "application/xml");
 			HttpResponse response = client.execute(post, host, Oadr20bUrlPath.OADR_BASE_PATH + path, context);
 
 			// if request did not result in 200 http code throw exception
