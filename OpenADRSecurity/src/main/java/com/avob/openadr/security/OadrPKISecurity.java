@@ -47,6 +47,7 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.crypto.util.PrivateKeyFactory;
+import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.operator.ContentSigner;
@@ -101,6 +102,9 @@ public class OadrPKISecurity {
 		Object readObject;
 		try {
 			readObject = parsePem(fileReader);
+			if (readObject instanceof PEMKeyPair) {
+				readObject = ((PEMKeyPair) readObject).getPrivateKeyInfo();
+			}
 			if (readObject instanceof PrivateKeyInfo) {
 				PrivateKeyInfo privateKeyInfo = (PrivateKeyInfo) readObject;
 				return new JcaPEMKeyConverter().setProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider())
