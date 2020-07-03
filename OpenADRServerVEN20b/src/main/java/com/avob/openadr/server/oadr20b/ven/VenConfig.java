@@ -41,6 +41,9 @@ public class VenConfig {
 	@Value("${oadr.venUrl:#{null}}")
 	private String venUrl;
 
+	@Value("${oadr.acceptUnsignedResponse}")
+	private Boolean acceptUnsignedResponse;
+
 	@Value("#{'${oadr.security.vtn.trustcertificate}'.split(',')}")
 	private List<String> trustCertificates;
 
@@ -96,6 +99,7 @@ public class VenConfig {
 		this.venUrl = clone.getVenUrl();
 		this.xmlSignature = clone.getXmlSignature();
 		this.validateOadrPayloadAgainstXsdFilePath = clone.getValidateOadrPayloadAgainstXsdFilePath();
+		this.acceptUnsignedResponse = clone.getAcceptUnsignedResponse();
 	}
 
 	@PostConstruct
@@ -144,6 +148,10 @@ public class VenConfig {
 
 	public Boolean getXmlSignature() {
 		return xmlSignature;
+	}
+
+	public Boolean getAcceptUnsignedResponse() {
+		return acceptUnsignedResponse;
 	}
 
 	public Boolean getPullModel() {
