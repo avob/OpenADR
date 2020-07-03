@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>com.avob.openadr</groupId>
 		<artifactId>OpenADR</artifactId>
-		<version>0.1.0-SNAPSHOT</version>
+		<version>0.1.0-bitinity-SNAPSHOT</version>
 	</parent>
 	<dependencies>
 		<dependency>
@@ -84,11 +84,11 @@
 
 	<build>
 		<plugins>
-
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
+			<!--    TODO we want to build a lib so no stand alone spring boot app -->
+			<!-- 			<plugin> -->
+			<!-- 				<groupId>org.springframework.boot</groupId> -->
+			<!-- 				<artifactId>spring-boot-maven-plugin</artifactId> -->
+			<!-- 			</plugin> -->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
