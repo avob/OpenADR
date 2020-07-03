@@ -32,7 +32,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatePartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
-import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
@@ -114,18 +113,28 @@ public class Oadr20bVENEiRegisterPartyService {
 	public void initRegistration(VtnSessionConfiguration vtnConfiguration) {
 
 		String requestId = "0";
-		OadrQueryRegistrationType queryRegistration = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bQueryRegistrationBuilder(requestId)
-
-				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value()).build();
+		/**
+		 * TODO skip query of registration for now
+		 */
+        /*
+        		OadrQueryRegistrationType queryRegistration = Oadr20bEiRegisterPartyBuilders
+        				.newOadr20bQueryRegistrationBuilder(requestId)
+        
+        				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value()).build();
+        */
+		OadrCreatePartyRegistrationType createPartyRegistration = Oadr20bEiRegisterPartyBuilders
+				.newOadr20bCreatePartyRegistrationBuilder(requestId, venConfig.getVenId(), SchemaVersionEnumeratedType.OADR_20B.value())
+				.withOadrTransportName(OadrTransportType.SIMPLE_HTTP)
+				
+				.withOadrVenName(venConfig.getVenName()).withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value()).build();
 
 		try {
 			if (vtnConfiguration.getVtnUrl() != null) {
 				OadrCreatedPartyRegistrationType oadrQueryRegistrationType = multiVtnConfig
-						.getMultiHttpClientConfig(vtnConfiguration).oadrQueryRegistrationType(queryRegistration);
+						.getMultiHttpClientConfig(vtnConfiguration).oadrCreatePartyRegistration(createPartyRegistration);
 				this.oadrCreatedPartyRegistration(vtnConfiguration, oadrQueryRegistrationType);
 			} else {
-				multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).oadrQueryRegistrationType(queryRegistration);
+				multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).oadrCreatePartyRegistration(createPartyRegistration);
 			}
 
 		} catch (Oadr20bException | Oadr20bHttpLayerException | Oadr20bXMLSignatureException
