@@ -60,7 +60,7 @@ public class XmppVenListener implements StanzaListener {
 	private Oadr20bVENEiRegisterPartyService oadr20bVENEiRegisterPartyService;
 
 	@Resource
-	private Oadr20bVENEiReportService reportService;
+	private Oadr20bVENEiReportService oadrReportService;
 
 	private void failIfPayloadNeedToBeSigned(VtnSessionConfiguration multiConfig)
 			throws Oadr20bApplicationLayerException {
@@ -128,7 +128,7 @@ public class XmppVenListener implements StanzaListener {
 						|| oadrPayload.getOadrSignedObject().getOadrRegisterReport() != null
 						|| oadrPayload.getOadrSignedObject().getOadrCancelReport() != null) {
 
-					Object handle = reportService.handle(multiConfig, oadrPayload);
+					Object handle = oadrReportService.handle(multiConfig, oadrPayload);
 					response = payloadHandler.payloadToString(multiConfig, handle, true);
 
 					multiXmppClientConfig.sendReportMessage(response);
@@ -188,7 +188,7 @@ public class XmppVenListener implements StanzaListener {
 
 					LOGGER.info(username + " - OadrCancelReport");
 
-					Object handle = reportService.oadrCancelReport(multiConfig, oadrCancelReportType);
+					Object handle = oadrReportService.oadrCancelReport(multiConfig, oadrCancelReportType);
 					response = payloadHandler.payloadToString(multiConfig, handle, false);
 
 					multiXmppClientConfig.sendReportMessage(response);
@@ -199,7 +199,7 @@ public class XmppVenListener implements StanzaListener {
 
 					LOGGER.info(username + " - OadrCreateReport");
 
-					Object handle = reportService.oadrCreateReport(multiConfig, oadrCreateReportType);
+					Object handle = oadrReportService.oadrCreateReport(multiConfig, oadrCreateReportType);
 					response = payloadHandler.payloadToString(multiConfig, handle, false);
 
 					multiXmppClientConfig.sendReportMessage(response);
@@ -210,7 +210,7 @@ public class XmppVenListener implements StanzaListener {
 
 					LOGGER.info(username + " - OadrCreatedReport");
 
-					reportService.oadrCreatedReport(multiConfig, oadrCreatedReportType);
+					oadrReportService.oadrCreatedReport(multiConfig, oadrCreatedReportType);
 
 				} else if (unmarshal instanceof OadrRegisterReportType) {
 
@@ -218,7 +218,7 @@ public class XmppVenListener implements StanzaListener {
 
 					LOGGER.info(username + " - OadrRegisterReport");
 
-					Object handle = reportService.oadrRegisterReport(multiConfig, oadrRegisterReportType);
+					Object handle = oadrReportService.oadrRegisterReport(multiConfig, oadrRegisterReportType);
 					response = payloadHandler.payloadToString(multiConfig, handle, false);
 
 					multiXmppClientConfig.sendReportMessage(response);
@@ -229,7 +229,7 @@ public class XmppVenListener implements StanzaListener {
 
 					LOGGER.info(username + " - OadrUpdateReport");
 
-					Object handle = reportService.oadrUpdateReport(multiConfig, oadrUpdateReportType);
+					Object handle = oadrReportService.oadrUpdateReport(multiConfig, oadrUpdateReportType);
 					response = payloadHandler.payloadToString(multiConfig, handle, false);
 
 					multiXmppClientConfig.sendReportMessage(response);

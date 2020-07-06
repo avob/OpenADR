@@ -28,7 +28,7 @@ import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiReportService;
 public class Oadr20bVENEiReportController {
 
 	@Resource
-	private Oadr20bVENEiReportService reportService;
+	private Oadr20bVENEiReportService oadrReportService;
 
 	@RequestMapping(value = Oadr20bUrlPath.EI_REPORT_SERVICE, method = RequestMethod.POST)
 	@ResponseBody
@@ -36,7 +36,7 @@ public class Oadr20bVENEiReportController {
 			throws Oadr20bMarshalException, Oadr20bUnmarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException {
 
-		return reportService.request(principal.getName(), payload);
+		return oadrReportService.request(principal.getName(), payload);
 	}
 
 }

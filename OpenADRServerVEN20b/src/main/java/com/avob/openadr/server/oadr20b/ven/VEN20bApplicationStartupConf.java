@@ -49,7 +49,7 @@ public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartySe
 	private MultiVtnConfig multiVtnConfig;
 
 	@Resource
-	private Oadr20bVENEiReportService reportService;
+	private Oadr20bVENEiReportService oadrReportService;
 
 	@Resource
 	private Oadr20bVENEiRegisterPartyService oadr20bVENEiRegisterPartyService;
@@ -103,7 +103,7 @@ public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartySe
 		// send VEN RegisterReport to VTN
 		String requestId = "0";
 		String reportRequestId = "0";
-		OadrRegisterReportType payload = reportService.selfOadrRegisterReport(requestId, venConfig.getVenId(),
+		OadrRegisterReportType payload = oadrReportService.selfOadrRegisterReport(requestId, venConfig.getVenId(),
 				reportRequestId);
 
 		multiVtnConfig.oadrRegisterReport(vtnConfiguration, payload);
