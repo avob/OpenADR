@@ -69,6 +69,7 @@ public class OadrHttpClient20b {
 			throws JAXBException, OadrSecurityException {
 		this.jaxbContext = Oadr20bJAXBContext.getInstance("src/test/resources/oadr20b_schema/");
 		this.client = client;
+		this.acceptUnsignedResponse = acceptUnsignedResponse;
 
 		if (privateKeyPath != null && clientCertificatePath != null) {
 			this.privateKey = OadrPKISecurity.parsePrivateKey(privateKeyPath);
@@ -136,14 +137,14 @@ public class OadrHttpClient20b {
 				EntityUtils.consumeQuietly(response.getEntity());
 				throw new Oadr20bHttpLayerException(response.getStatusLine().getStatusCode(),
 						String.valueOf(response.getStatusLine().getStatusCode()));
-			}
+	        }
 
-			// if request was a success, validate xml signature if required and then
-			// unmarshall response
-			if (isXmlSignatureEnabled()) {
+            // if request was a success, validate xml signature if required and then
+            // unmarshall response
+            if (isXmlSignatureEnabled()) {
 				String entity = EntityUtils.toString(response.getEntity(), "UTF-8");
 				OadrPayload unmarshal = jaxbContext.unmarshal(entity, OadrPayload.class, validateXmlPayload);
-				if(unmarshal.getSignature() == null && acceptUnsignedResponse) {
+				if(unmarshal.getSignature() == null && !acceptUnsignedResponse) {
 					this.validate(entity, unmarshal);
 				}
 				EntityUtils.consumeQuietly(response.getEntity());
@@ -172,7 +173,7 @@ public class OadrHttpClient20b {
 
 	private void validate(String raw, OadrPayload payload) throws Oadr20bXMLSignatureValidationException {
 		long nowDate = System.currentTimeMillis();
-		if(payload.getSignature() == null && !acceptUnsignedResponse) {
+		if(payload.getSignature() == null) {
 			throw new Oadr20bXMLSignatureValidationException("Signature is not provided and unsigned repsonse is not accepted.");
 		}
 		OadrXMLSignatureHandler.validate(raw, payload, nowDate, replayProtectAcceptedDelaySecond * 1000L);
