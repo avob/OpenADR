@@ -11,6 +11,7 @@ public class Oadr20bHttpLayerException extends Exception {
     private String errorMessage;
 
     public Oadr20bHttpLayerException(int errorCode, String errorMessage) {
+        super(String.format("error-code:%s error-message:%s", errorCode, errorMessage));
         this.setErrorMessage(errorMessage);
         this.setErrorCode(errorCode);
     }
@@ -30,5 +31,12 @@ public class Oadr20bHttpLayerException extends Exception {
     private void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
+
+    @Override
+    public String toString() {
+        return "Oadr20bHttpLayerException [errorCode=" + errorCode + ", errorMessage=" + errorMessage + "]";
+    }
+    
+    
 
 }
