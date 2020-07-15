@@ -15,6 +15,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.avob.openadr.client.http.OadrHttpClient;
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -38,6 +40,8 @@ import com.avob.openadr.security.exception.OadrSecurityException;
  *
  */
 public class OadrHttpClient20b {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(OadrHttpClient20b.class);
 
 	private OadrHttpClient client;
 
@@ -126,11 +130,15 @@ public class OadrHttpClient20b {
 			} else {
 				marshal = jaxbContext.marshal(payload, validateXmlPayload);
 			}
+			
+			LOGGER.debug("client post server:{}", marshal);
 
 			StringEntity stringEntity = new StringEntity(marshal);
 			post.setEntity(stringEntity);
 			post.setHeader("content-type", "application/xml");
 			HttpResponse response = client.execute(post, host, Oadr20bUrlPath.OADR_BASE_PATH + path, context);
+			
+			LOGGER.debug("server response to client:{}", response);
 
 			// if request did not result in 200 http code throw exception
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
