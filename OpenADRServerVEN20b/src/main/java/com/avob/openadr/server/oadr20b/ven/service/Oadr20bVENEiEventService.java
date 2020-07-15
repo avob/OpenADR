@@ -290,7 +290,12 @@ public class Oadr20bVENEiEventService {
 			doNeedResponse = true;
 			if (listeners != null) {
 				listeners.forEach(listener -> listener.onCreateEvent(vtnConfiguration, event));
-				applyOadrEventScheduling(vtnConfiguration, event);
+                try {
+                    applyOadrEventScheduling(vtnConfiguration, event);
+                } catch (Exception e) {
+                    // TODO just catching everything here an skip might not be the best solution
+                    LOGGER.warn("apply oadr event scheduling failed", e);
+                }				
 			}
 		}
 		if (isUpdatedEvent(vtnConfiguration, requestId, event)) {
@@ -298,7 +303,12 @@ public class Oadr20bVENEiEventService {
 			if (listeners != null) {
 				listeners.forEach(listener -> listener.onUpdateEvent(vtnConfiguration, event));
 				cancelScheduledTask(vtnConfiguration, event.getEiEvent().getEventDescriptor().getEventID());
-				applyOadrEventScheduling(vtnConfiguration, event);
+                try {
+                    applyOadrEventScheduling(vtnConfiguration, event);
+                } catch (Exception e) {
+                    // TODO just catching everything here an skip might not be the best solution
+                    LOGGER.warn("apply oadr event scheduling failed", e);
+                }				
 			}
 		}
 
