@@ -41,7 +41,7 @@ public class VenConfig {
 	@Value("${oadr.venUrl:#{null}}")
 	private String venUrl;
 
-	@Value("${oadr.acceptUnsignedResponse}")
+	@Value("${oadr.acceptUnsignedResponse:false}")
 	private Boolean acceptUnsignedResponse;
 
 	@Value("#{'${oadr.security.vtn.trustcertificate}'.split(',')}")
