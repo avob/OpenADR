@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -48,6 +49,8 @@ import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bDistributeEventApplicationLayerException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class Oadr20bVENEiEventService {
@@ -127,6 +130,17 @@ public class Oadr20bVENEiEventService {
 					listener -> listener.onLastIntervalEnd(vtnConfiguration, event, eiEventSignalType, intervalType));
 		}
 	}
+	
+    public static String toJson(final Object object) {
+        if(Objects.isNull(object)) {
+            return null;
+        }
+        try {
+            return new ObjectMapper().writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            return object.toString();
+        }
+    }
 
 	private static class OadrCreatedEventTask implements Runnable {
 
@@ -154,9 +168,11 @@ public class Oadr20bVENEiEventService {
 			try {
 
 				if (httpClient != null) {
+				    LOGGER.info("post oadr created event: {}", toJson(payload));
 					OadrResponseType response = httpClient.oadrCreatedEvent(payload);
 
 					String responseCode = response.getEiResponse().getResponseCode();
+					LOGGER.info("response to oadr created event: {}", toJson(response.getEiResponse()));
 
 					if (HttpStatus.OK_200 != Integer.valueOf(responseCode)) {
 						LOGGER.error("Fail oadrCreatedEvent: " + responseCode
