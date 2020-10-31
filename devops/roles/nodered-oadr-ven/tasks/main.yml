@@ -65,5 +65,22 @@
       src: files/flows_default.json
       dest: /home/vagrant/.node-red/flows_{{ansible_hostname}}.json
 
+  - name: Get venId
+    shell: "cat /opt/oadr-vtn20b/cert/ven1.oadr.com.fingerprint"
+    register: venId
+
+  - name: Inject venIdinto flow
+    shell: "sed -i 's/%VEN_ID%/{{ venId.stdout }}/g' /home/vagrant/.node-red/flows_{{ansible_hostname}}.json"
+
+
+
+  - name: Recursively change ownership of a directory
+    file:
+      path: /home/vagrant/.node-red
+      state: directory
+      recurse: yes
+      owner: vagrant
+      group: vagrant
+
   - name: start nodered from unit
     shell: systemctl restart nodered 

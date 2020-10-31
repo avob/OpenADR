@@ -12,6 +12,30 @@ OpenADRModel20b | OADR 2.0b model java classes generated from XSDL definition fi
 OpenADRServerVEN20b | OADR 2.0b VEN skeleton implementation
 OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 
+## Build dependencies
+- Backend build dependencies: Java 8 / Maven 3
+- Frontend build dependencies: NodeJS 8.15.0 / NPM 6.4.1
+
+## Devops dependencies
+
+- Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-the-control-machine)
+- Install [Vagrant] v1.6.0(https://www.vagrantup.com/) and [Vagrant ansible provisioner plugin](https://www.vagrantup.com/docs/provisioning/ansible.html)
+- Install [Virtualbox] v5.2 (https://www.virtualbox.org/)
+
+## Certificates
+
+Tests certificates are required to build project:
+```shell
+	# generate certificates test suite
+	# mandatory passphare for devops purpose: changeme
+	./generate_test_cert.sh
+```
+
+This command will create several VTN / VEN certificates upon a self-signed generated authority. This authority has to be installed and trusted. An admin trusted client certificate is also generated and can be installed to to perform client authentication:
+
+- Install self-signed vtn certificate in your browser: cert/vtn.oadr.com-rsa.crt
+- Install x509 admin certificate in your browser: cert/admin.oadr.com.crt (optional, authentication can be performed using login/pass: admin/admin)
+
 ## Oadr Prototyping Workbench VM
 
 ### Architecture
@@ -20,15 +44,9 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
   <img src="https://github.com/avob/OpenADR/raw/master/oadr_workbench_integration_infra.png?raw=true" alt="Sublime's custom image"/>
 </p>
 
-### Requirements
 
-- Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-the-control-machine)
-- Install [Vagrant] v1.6.0(https://www.vagrantup.com/) and [Vagrant ansible provisioner plugin](https://www.vagrantup.com/docs/provisioning/ansible.html)
-- Install [Virtualbox] v5.2 (https://www.virtualbox.org/)
-- Install Backend build dependencies: Java 8 / Maven 3
-- Install Frontend build dependencies: NodeJS 8.15.0 / NPM 6.4.1
-- Install x509 admin certificate in your browser: cert/admin.oadr.com.crt
-- Install self-signed certificate authority in your browser: cert/oadr.com.crt
+### Configuration
+
 - Add "192.168.33.2 vtn.oadr.com" to your local "/etc/hosts"
 
 ### Endpoints
@@ -40,10 +58,12 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 - Nodered Terminal: http://192.168.33.2:1880 
 - Ven1 Nodered Dashboard: http://192.168.33.2:1880/ui/#!/0
 
+
 ### Build apps and start VM
 ```shell
-	# build backend with external profile
+	# build project with external middlewares and UI frontend dependencies
 	mvn clean package install -P external,frontend -DskipTests=true
+
 	# create and provision VM
 	cd devops/vtn20b_postgres
 	vagrant up
@@ -58,17 +78,12 @@ OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
 </p>
 
 
-### Requirements
+### Configuration
 
-- Install [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-the-control-machine)
-- Install [Vagrant](https://www.vagrantup.com/) and [Vagrant ansible provisioner plugin](https://www.vagrantup.com/docs/provisioning/ansible.html)
-- Install [Virtualbox](https://www.virtualbox.org/)
-- Install Backend build dependencies: Java 8 / Maven 3
-- Install Frontend build dependencies: NodeJS 8.15.0 / NPM 6.4.1
-- Install x509 admin certificate in your browser: cert/admin.oadr.crt
-- Install self-signed certificate authority in your browser: cert/oadr.com.crt
+- Start local VTN
 - Add "127.0.0.1 vtn.oadr.com" to your local "/etc/hosts"
 - Add "192.168.33.2 ven1.oadr.com" to your local "/etc/hosts"
+
 ### Endpoints
 
 - VTN Control UI: https://vtn.oadr.com:8181/testvtn/

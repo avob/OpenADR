@@ -40,12 +40,13 @@
 
   roles:
     - ../../roles/common
-    # - geerlingguy.apache
-    # - ../../roles/nodejs
-    # - ../../roles/nodered
-    # - ../../roles/nodered-oadr-ven
     - ../../roles/oadr-common
     - ../../roles/oadr-postgresql
     - ../../roles/oadr-rabbitmq
     - ../../roles/oadr-openfire
     - ../../roles/oadr-vtn20b
+    - geerlingguy.apache
+    - ../../roles/nodejs
+    - ../../roles/nodered
+    - ../../roles/nodered-oadr-ven
+    

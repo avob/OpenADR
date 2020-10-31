@@ -108,6 +108,14 @@ gen_selfsigned_key_crt()
 	openssl req -nodes -new -x509  -keyout $1.key -out $1.crt \
 		-subj "/C=$COUNTRY/ST=$STATE/L=$LOCALITY/O=$ORGANIZATION/OU=$ORGANIZATION/CN=$1" -days $2
 }
+
+###################################
+# Create ./cert folder
+# Fail if already exists
+###################################
+mkdir cert
+cd cert
+
 ###################################
 # CA
 ###################################
@@ -178,4 +186,9 @@ gen_oadr20a_fingerprint $VEN3_NAME
 gen_ecc_key_csr $VEN4_NAME $VEN4_NAME $CA_NAME 09 365
 gen_oadr20b_fingerprint $VEN4_NAME
 gen_oadr20a_fingerprint $VEN4_NAME
+
+###################################
+# go back to home
+###################################
+cd ..
 

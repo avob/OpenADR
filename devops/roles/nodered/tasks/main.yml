@@ -1,7 +1,7 @@
 --- # provisioning/roles/nodered/tasks/main.yml
 
   - name: install node-red globally
-    shell: sudo npm install -g node-red # intentional sudo
+    shell: npm install -g node-red # intentional sudo
     args:
       creates: /usr/bin/node-red
     tags:
@@ -25,6 +25,14 @@
       mode:  "{{ nodered_service_unit_mode  }}"
     tags:
       - nodered
+
+  - name: Recursively change ownership of a directory
+    file:
+      path: /home/vagrant/.node-red
+      state: directory
+      recurse: yes
+      owner: vagrant
+      group: vagrant
 
 
   - name: systemctl daemon-reload after new unit file

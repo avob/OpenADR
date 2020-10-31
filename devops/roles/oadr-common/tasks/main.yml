@@ -47,11 +47,6 @@
       owner: oadr-vtn20b
       group: oadr-vtn20b
 
-
-
-
-
-
   - name: Copy cert folder
     copy:
       src: ../../../cert/
