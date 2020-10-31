@@ -23,7 +23,7 @@ public class SelfReportRequestService extends GenericService<SelfReportRequest> 
     }
 
     public List<SelfReportRequest> findByTargetAndReportRequestId(Ven ven, List<String> reportRequestId) {
-        return selfReportRequestDao.findByTargetAndReportRequestId(ven, reportRequestId);
+        return selfReportRequestDao.findByTargetAndReportRequestIdIn(ven, reportRequestId);
     }
 
     @Override

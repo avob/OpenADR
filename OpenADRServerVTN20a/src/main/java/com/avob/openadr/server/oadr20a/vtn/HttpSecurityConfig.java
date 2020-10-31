@@ -62,8 +62,7 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().anyRequest().authenticated().and().x509().subjectPrincipalRegex("CN=(.*?)(?:,|$)")
 				.authenticationUserDetailsService(oadr20aX509AuthenticatedUserDetailsService);
 
-		http.addFilter(digestAuthenticationFilter).authorizeRequests().anyRequest().authenticated().and()
-				.addFilter(basicAuthenticationFilter).authorizeRequests().anyRequest().authenticated();
+		http.addFilter(digestAuthenticationFilter).addFilter(basicAuthenticationFilter);
 
 	}
 

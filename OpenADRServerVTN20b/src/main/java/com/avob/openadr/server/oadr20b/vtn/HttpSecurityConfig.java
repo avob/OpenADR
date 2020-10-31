@@ -86,11 +86,14 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 		DigestAuthenticationEntryPoint authenticationEntryPoint = new DigestAuthenticationEntryPoint();
 		authenticationEntryPoint.setKey(DigestAuthenticationProvider.DIGEST_KEY);
 		authenticationEntryPoint.setRealmName(digestAuthenticationProvider.getRealm());
+		authenticationEntryPoint.setNonceValiditySeconds(300);
 
 		DigestAuthenticationFilter digestAuthenticationFilter = new DigestAuthenticationFilter();
 		digestAuthenticationFilter.setAuthenticationEntryPoint(authenticationEntryPoint);
 		digestAuthenticationFilter.setUserDetailsService(digestUserDetailsService);
 		digestAuthenticationFilter.setPasswordAlreadyEncoded(true);
+		
+		digestAuthenticationFilter.afterPropertiesSet();
 
 		BasicAuthenticationEntryPoint basicAuthenticationEntryPoint = new BasicAuthenticationEntryPoint();
 		basicAuthenticationEntryPoint.setRealmName(BasicAuthenticationManager.BASIC_REALM);
@@ -105,13 +108,13 @@ public class HttpSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		http.authorizeRequests().regexMatchers(HttpMethod.POST, ".*/auth/.*").permitAll();
 
-//		http.authorizeRequests().antMatchers("/testvtn/").permitAll();
+		// http.authorizeRequests().antMatchers("/testvtn/").permitAll();
 
 		http.authorizeRequests().anyRequest().authenticated().and().x509().subjectPrincipalRegex("CN=(.*?)(?:,|$)")
 				.authenticationUserDetailsService(oadr20bX509AuthenticatedUserDetailsService);
 
-		http.addFilter(digestAuthenticationFilter).authorizeRequests().anyRequest().authenticated().and()
-				.addFilter(basicAuthenticationFilter).authorizeRequests().anyRequest().authenticated();
+		http.addFilter(digestAuthenticationFilter).addFilter(basicAuthenticationFilter);
+				
 
 		http.exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPoint() {
 

@@ -2,6 +2,7 @@ package com.avob.openadr.client.http;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
@@ -113,7 +114,8 @@ public class OadrHttpClientBuilder {
 
 	public static String buildNonce(String key) {
 		// expirationTime + ":" + md5Hex(expirationTime + ":" + key)
-		String dateTimeString = Long.toString(new Date().getTime());
+		
+		String dateTimeString = Long.toString(OffsetDateTime.now().plusMinutes(5).toEpochSecond() * 1000);
 		String nonce = dateTimeString + ":" + OadrPKISecurity.md5Hex(dateTimeString + ":" + key);
 		return Base64.getEncoder().encodeToString(nonce.getBytes());
 	}

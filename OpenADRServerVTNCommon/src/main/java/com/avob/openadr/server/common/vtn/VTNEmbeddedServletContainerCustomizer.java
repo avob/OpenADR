@@ -27,7 +27,7 @@ public class VTNEmbeddedServletContainerCustomizer implements WebServerFactoryCu
 	@Override
 	public void customize(JettyServletWebServerFactory jettyFactory) {
 
-		jettyFactory.setRegisterDefaultServlet(false);
+//		jettyFactory.setRegisterDefaultServlet(false);
 		if (contextPath != null && !"".equals(contextPath.trim())) {
 			jettyFactory.setContextPath(contextPath);
 		}

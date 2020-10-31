@@ -49,7 +49,7 @@ public class VTNJettyServerCustomizer implements JettyServerCustomizer {
 			throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException,
 			OadrSecurityException, UnrecoverableKeyException, KeyManagementException {
 		// SSL Context Factory
-		SslContextFactory sslContextFactory = new SslContextFactory();
+		SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
 
 		sslContextFactory.setSslContext(this.sslContext);
 
@@ -63,6 +63,7 @@ public class VTNJettyServerCustomizer implements JettyServerCustomizer {
 		// require client certificate authentication
 		sslContextFactory.setWantClientAuth(true);
 
+		
 		return sslContextFactory;
 
 	}
@@ -78,10 +79,11 @@ public class VTNJettyServerCustomizer implements JettyServerCustomizer {
 			SslConnectionFactory ssl = new SslConnectionFactory(this.getSslContextFactory(), "http/1.1");
 
 			ServerConnector connector = new ServerConnector(server, ssl, http1);
-
+			
 			connector.setPort(port);
 			Connector[] connectors = { connector };
 			server.setConnectors(connectors);
+//			server.
 
 		} catch (OadrSecurityException | UnrecoverableKeyException | KeyManagementException | NoSuchAlgorithmException
 				| KeyStoreException | CertificateException | IOException e) {
