@@ -84,13 +84,13 @@ gen_pkcs12()
 # prompt password
 gen_java_keystore()
 {
-	keytool -importkeystore -v -srckeystore $1.p12 -srcstoretype PKCS12 -srcstorepass "changeme" -destkeystore $1.jks -deststoretype JKS -deststorepass "changeme"
+	keytool -importkeystore -v -srckeystore $1.p12 -srcstoretype PKCS12 -srcstorepass "changeme"  -destkeystore $1.jks -deststoretype JKS -deststorepass "changeme" -destkeypass "changeme"
 }
 # gen_java_trustore
 # promt trust 
 gen_java_truststore()
 {
-	keytool -import -alias ca -file $1.crt -keystore $1.trust -noprompt
+	keytool -import -alias ca -file $1.crt -keystore $1.trust -keypass "changeme" -storepass "changeme" -noprompt
 }
 # gen_oadr20b_fingerprint "in/out crt/fingerprint name"
 gen_oadr20b_fingerprint()
