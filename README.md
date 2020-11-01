@@ -49,6 +49,16 @@ This command will create several VTN / VEN certificates upon a self-signed gener
 
 - Add "192.168.33.2 vtn.oadr.com" to your local "/etc/hosts"
 
+### Build apps and start VM
+```shell
+	# build project with external middlewares and UI frontend dependencies
+	mvn clean package -P external,frontend -DskipTests=true
+
+	# create and provision VM
+	cd devops/vtn20b_postgres
+	vagrant up
+```
+
 ### Endpoints
 
 - VTN Control Swagger UI: https://vtn.oadr.com:8181/testvtn/swagger-ui.html
@@ -57,17 +67,6 @@ This command will create several VTN / VEN certificates upon a self-signed gener
 - VTN Openfire Management UI: http://192.168.33.2:9090
 - Nodered Terminal: http://192.168.33.2:1880 
 - Ven1 Nodered Dashboard: http://192.168.33.2:1880/ui/#!/0
-
-
-### Build apps and start VM
-```shell
-	# build project with external middlewares and UI frontend dependencies
-	mvn clean package install -P external,frontend -DskipTests=true
-
-	# create and provision VM
-	cd devops/vtn20b_postgres
-	vagrant up
-```
 
 ## Oadr Prototyping Workbench VM DEV MODE
 
@@ -80,23 +79,30 @@ This command will create several VTN / VEN certificates upon a self-signed gener
 
 ### Configuration
 
-- Start local VTN
 - Add "127.0.0.1 vtn.oadr.com" to your local "/etc/hosts"
 - Add "192.168.33.2 ven1.oadr.com" to your local "/etc/hosts"
-
-### Endpoints
-
-- VTN Control UI: https://vtn.oadr.com:8181/testvtn/
-- VTN Control Swagger UI: https://vtn.oadr.com:8181/testvtn/swagger-ui.html
-- Nodered Terminal: http://192.168.33.2:1880 
-- Ven1 Nodered Dashboard: http://192.168.33.2:1880/ui/#!/0
  
 ### Start VM
 ```shell
+	# build vtn backend with in-memory middleware and start locally
+	mvn clean package -DskipTests=true
+	java -jar OpenADRServerVTN20b/target ......
+
+	# build vtn frontend
+	cd OpenADRServerVTN20b/frontend
+	npm start
+
     # create and provision VM
 	cd {root}/devops/nodered
 	vagrant up
 ```
+
+### Endpoints
+
+- VTN Control UI: http://localhost:3000/
+- VTN Control Swagger UI: https://vtn.oadr.com:8181/testvtn/swagger-ui.html
+- Nodered Terminal: http://192.168.33.2:1880 
+- Ven1 Nodered Dashboard: http://192.168.33.2:1880/ui/#!/0
 
 ## Links
 
