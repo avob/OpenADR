@@ -1101,7 +1101,11 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 					.findByOtherReportCapability(reportCapability);
 			Map<String, OtherReportCapabilityDescription> descriptions = findByOtherReportCapability.stream()
 					.collect(Collectors.toMap(OtherReportCapabilityDescription::getRid, Function.identity()));
-			for (Entry<String, Boolean> entry : subscription.getRid().entrySet()) {
+			 Map<String, Boolean> rids = subscription.getRid();
+			 if(rids == null) {
+				 rids = findByOtherReportCapability.stream().collect(Collectors.toMap(OtherReportCapabilityDescription::getRid, p -> true));
+			 }
+			for (Entry<String, Boolean> entry : rids.entrySet()) {
 
 				if (descriptions.containsKey(entry.getKey())) {
 					OtherReportRequestSpecifier otherReportRequestSpecifier = new OtherReportRequestSpecifier();

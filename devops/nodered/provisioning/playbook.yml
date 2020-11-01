@@ -29,6 +29,7 @@
 
   roles:
     - ../../roles/common
+    - ../../roles/oadr-common
     - ../../roles/nodejs
     - ../../roles/nodered
     - ../../roles/nodered-oadr-ven

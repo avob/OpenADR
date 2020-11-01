@@ -231,23 +231,29 @@ export const createRequestedReportSubscription  = (venId, reportSpecifierId, gra
     return swaggerAction(types.CREATE_REQUESTED_REPORT, 
       (api) => {
         var params = { venID: venId
-          , reportSpecifierId: reportSpecifierId
-          , granularity: granularity
-          , reportBackDuration: reportBackDuration
+          , subscriptions: [{
+              reportSpecifierId: reportSpecifierId
+              , granularity: granularity
+              , reportBackDuration: reportBackDuration
+            }]
         };
-        return  api.apis[ 'oadr-20b-ven-controller' ].subscribeAllOtherReportCapabilityDescriptionRidUsingPOST(params, jsonResponseContentType);
+        return  api.apis[ 'oadr-20b-ven-controller' ].subscribeOtherReportCapabilityDescriptionRidUsingPOST(params, jsonResponseContentType);
       },
       () => { history.push("/ven/detail/"+venId+"/reports");  },
     );
   }
   else {
+    var ridMap = {};
+    for(var i in rid) {
+      ridMap[rid[i]] = true;
+    }
     return swaggerAction(types.CREATE_REQUESTED_REPORT, 
       (api) => {
         var params = { venID: venId
           , reportSpecifierId: reportSpecifierId
           , granularity: granularity
           , reportBackDuration: reportBackDuration
-          , rid:rid.join(",") 
+          , rid:ridMap
         };
         return  api.apis[ 'oadr-20b-ven-controller' ].subscribeOtherReportCapabilityDescriptionRidUsingPOST(params, jsonResponseContentType);
       },
