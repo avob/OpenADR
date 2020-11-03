@@ -1,10 +1,7 @@
 package com.avob.openadr.server.oadr20b.ven;
 
-import java.io.IOException;
-import java.security.KeyStoreException;
+import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -26,7 +23,6 @@ import org.xml.sax.SAXException;
 
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.Oadr20bSecurity;
-import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 
 @Configuration
@@ -73,25 +69,8 @@ public class VEN20bApplication {
 	@Bean
 	public WebServerFactoryCustomizer<JettyServletWebServerFactory> servletContainerCustomizer() {
 
-		try {
-			String password = UUID.randomUUID().toString();
-			return new VENEmbeddedServletContainerCustomizer(port, contextPath,
-					OadrPKISecurity.createKeyStore(venConfig.getVenPrivateKeyPath(), venConfig.getVenCertificatePath(),
-							password),
-					password, OadrPKISecurity.createTrustStore(venConfig.getTrustCertificates()),
-					Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers());
-		} catch (KeyStoreException e) {
-			LOGGER.error("", e);
-		} catch (NoSuchAlgorithmException e) {
-			LOGGER.error("", e);
-		} catch (CertificateException e) {
-			LOGGER.error("", e);
-		} catch (IOException e) {
-			LOGGER.error("", e);
-		} catch (OadrSecurityException e) {
-			LOGGER.error("", e);
-		}
-		return null;
+		return new VENEmbeddedServletContainerCustomizer(port, contextPath, venConfig.getSslContext(),
+				Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers());
 	}
 
 	public static void main(String[] args) {

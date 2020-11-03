@@ -26,7 +26,6 @@ rabbitmq_version: "3.6.16"
 
 # OADRVTN SPRING BOOT APP CONF
 springboot_application_name: oadr-vtn20b
-# springboot_src_url: file://Users/bzanni/work/avob/OpenADR/OpenADRServerVTN20b/target/OpenADRServerVTN20b-0.1.0-SNAPSHOT.jar
 springboot_src_file: ../../../OpenADRServerVTN20b/target/OpenADRServerVTN20b-0.1.0-SNAPSHOT.jar
 springboot_propertyfile_template: templates/application.properties
 springboot_configuration_template: templates/oadr-vtn20b.conf

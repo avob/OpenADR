@@ -1,0 +1,2107 @@
+[
+    {
+        "id": "1dffdf2e.789011",
+        "type": "tab",
+        "label": "OADR Logic",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "f1a6d320.00a1e",
+        "type": "tls-config",
+        "name": "ven1.oadr.com",
+        "cert": "/opt/oadr-vtn20b/cert/ven1.oadr.com.crt",
+        "key": "/opt/oadr-vtn20b/cert/ven1.oadr.com.key",
+        "ca": "/opt/oadr-vtn20b/cert/oadr.com.crt",
+        "certname": "oadr.avob.com.crt",
+        "keyname": "oadr.avob.com.key",
+        "caname": "ca.crt",
+        "servername": "",
+        "verifyservercert": true
+    },
+    {
+        "id": "696de223.b4ebec",
+        "type": "ui_tab",
+        "name": "OadrVEN",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "209e5971.89aa06",
+        "type": "ui_group",
+        "name": "Registration",
+        "tab": "696de223.b4ebec",
+        "order": 1,
+        "disp": true,
+        "width": "8",
+        "collapse": false
+    },
+    {
+        "id": "225a8f1a.d7048",
+        "type": "ui_group",
+        "name": "Events",
+        "tab": "696de223.b4ebec",
+        "order": 2,
+        "disp": true,
+        "width": "18",
+        "collapse": false
+    },
+    {
+        "id": "13341368.3a4cfd",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-dark",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#097479",
+                    "value": "#097479",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#097479",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#000000",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#0eb8c0",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#555555",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#333333",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#eeeeee",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#097479",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#333333",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "true",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "ee3b7d6e.35fe2",
+        "type": "ui_group",
+        "name": "Command",
+        "tab": "696de223.b4ebec",
+        "order": 3,
+        "disp": true,
+        "width": "8",
+        "collapse": false
+    },
+    {
+        "id": "f40ecb5f.c076a8",
+        "type": "ui_group",
+        "name": "Reports",
+        "tab": "696de223.b4ebec",
+        "order": 4,
+        "disp": true,
+        "width": "18",
+        "collapse": false
+    },
+    {
+        "id": "54600305.646f1c",
+        "type": "ui_group",
+        "name": "Requests",
+        "tab": "696de223.b4ebec",
+        "order": 5,
+        "disp": true,
+        "width": "18",
+        "collapse": false
+    },
+    {
+        "id": "d28a0d54.bb967",
+        "type": "ui_tab",
+        "name": "LoraGateway",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "18ce2ef6.830401",
+        "type": "ui_group",
+        "name": "Devices",
+        "tab": "d28a0d54.bb967",
+        "order": 4,
+        "disp": true,
+        "width": "24",
+        "collapse": false
+    },
+    {
+        "id": "42d4f4c2.e8c6ac",
+        "type": "ui_group",
+        "name": "Scan Header",
+        "tab": "d28a0d54.bb967",
+        "order": 1,
+        "disp": false,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "3e08a723.3a5338",
+        "type": "ui_group",
+        "name": "Codec",
+        "tab": "d28a0d54.bb967",
+        "order": 3,
+        "disp": true,
+        "width": "24",
+        "collapse": false
+    },
+    {
+        "id": "9d3f666d.f679a8",
+        "type": "ui_group",
+        "name": "Groups",
+        "tab": "d28a0d54.bb967",
+        "order": 2,
+        "disp": true,
+        "width": "18",
+        "collapse": false
+    },
+    {
+        "id": "ac26414f.30755",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "QueryRegistration",
+        "payloadType": "str",
+        "x": 1810,
+        "y": 1780,
+        "wires": [
+            [
+                "7b2e7a5f.81acf4"
+            ]
+        ]
+    },
+    {
+        "id": "b0a87681.4bbea8",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "CreatePartyRegistration",
+        "payloadType": "str",
+        "x": 1797.5000610351562,
+        "y": 1818.25,
+        "wires": [
+            [
+                "7b2e7a5f.81acf4"
+            ]
+        ]
+    },
+    {
+        "id": "281da069.ff15f",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "RequestEvent",
+        "payloadType": "str",
+        "x": 1768.2500305175781,
+        "y": 1983.7499389648438,
+        "wires": [
+            [
+                "7b2e7a5f.81acf4"
+            ]
+        ]
+    },
+    {
+        "id": "cc442aaa.171bf8",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "Single Poll",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "Poll",
+        "payloadType": "str",
+        "x": 1767.5001525878906,
+        "y": 2087.2499389648438,
+        "wires": [
+            [
+                "7b2e7a5f.81acf4"
+            ]
+        ]
+    },
+    {
+        "id": "2a14239d.71a25c",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "CancelPartyRegistration",
+        "payloadType": "str",
+        "x": 1810,
+        "y": 1940,
+        "wires": [
+            [
+                "7b2e7a5f.81acf4"
+            ]
+        ]
+    },
+    {
+        "id": "915b083c.1cb0d8",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "venID",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "DEMO_VEN_NODE:IDs.venID",
+        "payloadType": "global",
+        "x": 1830,
+        "y": 2700,
+        "wires": [
+            [
+                "bfff5250.161ad"
+            ]
+        ]
+    },
+    {
+        "id": "bfff5250.161ad",
+        "type": "debug",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 2027,
+        "y": 2734.6499633789062,
+        "wires": []
+    },
+    {
+        "id": "cbcfadcb.0bf1d",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "vtnID",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "DEMO_VEN_NODE:IDs.vtnID",
+        "payloadType": "global",
+        "x": 1828.75,
+        "y": 2749.6000061035156,
+        "wires": [
+            [
+                "bfff5250.161ad"
+            ]
+        ]
+    },
+    {
+        "id": "676af627.4cfc18",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "registrationID",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "DEMO_VEN_NODE:IDs.registrationID",
+        "payloadType": "global",
+        "x": 1812,
+        "y": 2792.8499755859375,
+        "wires": [
+            [
+                "bfff5250.161ad"
+            ]
+        ]
+    },
+    {
+        "id": "c46a09f9.3e2aa8",
+        "type": "switch",
+        "z": "1dffdf2e.789011",
+        "name": "Switch responseTypes",
+        "property": "oadr.responseType",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "oadrCreatedPartyRegistration",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrResponse",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrDistributeEvent",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrRegisterReport",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrCanceledPartyRegistration",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrCreatedOpt",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrCanceledOpt",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 7,
+        "x": 540,
+        "y": 1300,
+        "wires": [
+            [
+                "784baa34.7d5554",
+                "2b96349f.5ac99c"
+            ],
+            [],
+            [
+                "b18237f5.b1abd8"
+            ],
+            [
+                "54411fe6.ef24e"
+            ],
+            [
+                "f150d196.79515",
+                "6fe724cc.ca676c"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "903a3418.137958",
+        "type": "comment",
+        "z": "1dffdf2e.789011",
+        "name": "Registration requests",
+        "info": "",
+        "x": 1797.5000915527344,
+        "y": 1736.6900024414062,
+        "wires": []
+    },
+    {
+        "id": "7b2e7a5f.81acf4",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "convert simple payload string to requestType",
+        "func": "let req = msg.payload;\nmsg.payload = {};\nmsg.payload.requestType = req;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2170,
+        "y": 1800,
+        "wires": [
+            [
+                "578ac1b4.838f7"
+            ]
+        ]
+    },
+    {
+        "id": "29323785.22e678",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "Handle DistributeEvents Requests",
+        "func": "let data = msg.payload.data.oadrDistributeEvent;\n/*\nvar oadrDistributeEvent = msg.payload.data.oadrDistributeEvent;\nfor(var i in oadrDistributeEvent.oadrEvent) {\n    var oadrEvent = oadrDistributeEvent.oadrEvent[i]\n    var activePeriod = oadrEvent.eiEvent.eiActivePeriod;\n    node.log(JSON.stringify(activePeriod));\n}*/\nlet respMsg = {};\nrespMsg.payload = {};\nrespMsg.payload.requestID = data.requestID;\n//respMsg.payload.venID = '48ac6ed956e1f1f4fdbe';\n\nif(data.responseRequired === 'never'){\n    // don't repsone to broadcast messages\n    return;\n}\n\nrespMsg.payload.requestType = \"CreatedEvent\";\nrespMsg.payload.responseCode = \"200\";\nrespMsg.payload.responseDescription = \"\"\n\nlet eventArray = [];\n\nfor(var i in data.oadrEvent){\n    console.log(data.oadrEvent[i].oadrResponseRequired)\n    var event = xyz(data.oadrEvent[i]);\n    if(event){\n        eventArray.push(event)\n    }\n}\n\nif(eventArray.length > 0){\n    respMsg.payload.eventResponses = eventArray;\n}\n\nfunction xyz(event){\n    // Don't respond if not requested\n    if (event.oadrResponseRequired === 'never'){\n        return;\n    }\n    \n    let optType;\n    \n    let ed = event.eiEvent.eventDescriptor;\n    \n    switch(ed.eventStatus.toLowerCase()){\n        case('completed'):\n        case('canceled'):\n            optType = 'optOut';\n            break;\n        default: \n            optType = 'optIn';\n            break;\n    }\n    \n    if(optType === 'optIn'){\n        switch(ed.eiMarketContext.marketContext.toLowerCase()){\n            case('demand_response'):\n            case('http://marketcontext1'):\n                break;\n            default:\n                optType = 'optOut';\n                break;\n        }\n    }\n    \n    optType = (ed.eventStatus.toLowerCase() === 'completed' )? 'optOut' : 'optIn';\n    \n    \n    var createdEvent = {\n        responseCode: \"200\",\n        responseDescription: 'OK',\n        //requestID: '11111111',\n        qualifiedEventID : {\n            eventID: ed.eventID,\n            modificationNumber: ed.modificationNumber\n        },\n        optType: optType\n    };\n    console.log(createdEvent)\n    return createdEvent;\n\n}\n\nconsole.log(respMsg)\nreturn respMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1280,
+        "y": 240,
+        "wires": [
+            [
+                "664e2454.44a75c"
+            ]
+        ],
+        "outputLabels": [
+            "Response"
+        ]
+    },
+    {
+        "id": "6e357478.e3ebcc",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "CreateParty Push",
+        "func": "msg = {};\nmsg.payload = {};\n\nmsg.payload = { \n    requestType: \"CreatePartyRegistration\",\n    oadrHttpPullModel: false,\n    stripPayloadEnv: true,\n    //oadrTransportAddress: 'http://localhost:8843'\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2090,
+        "y": 1860,
+        "wires": [
+            [
+                "578ac1b4.838f7"
+            ]
+        ]
+    },
+    {
+        "id": "c9558b1c.dc8168",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "Register w/ Push",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "CreatePartyRegistration",
+        "payloadType": "str",
+        "x": 1780,
+        "y": 1860,
+        "wires": [
+            [
+                "6e357478.e3ebcc"
+            ]
+        ]
+    },
+    {
+        "id": "54411fe6.ef24e",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "RegisterReport",
+        "func": "let requestID = msg.payload.data.oadrRegisterReport.requestID;\n\nmsg = {};\n\nmsg.payload = {\n    requestType: 'RegisteredReport',\n    requestID\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1100,
+        "y": 1060,
+        "wires": [
+            [
+                "664e2454.44a75c"
+            ]
+        ]
+    },
+    {
+        "id": "f54dd2ff.ae13f",
+        "type": "switch",
+        "z": "1dffdf2e.789011",
+        "name": "Req or Rep",
+        "property": "oadr.msgType",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "request",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 230,
+        "y": 480,
+        "wires": [
+            [
+                "6398f490.ac7d3c"
+            ],
+            [
+                "c46a09f9.3e2aa8"
+            ]
+        ]
+    },
+    {
+        "id": "6398f490.ac7d3c",
+        "type": "switch",
+        "z": "1dffdf2e.789011",
+        "name": "Switch requestTypes",
+        "property": "oadr.requestType",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "oadrCreatedPartyRegistration",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrResponse",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrDistributeEvent",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrRegisterReport",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrCanceledPartyRegistration",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrRequestReregistration",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrCancelPartyRegistration",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrCreateReport",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrCancelReport",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "oadrUpdateReport",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 10,
+        "x": 540,
+        "y": 480,
+        "wires": [
+            [
+                "2b96349f.5ac99c"
+            ],
+            [],
+            [
+                "b18237f5.b1abd8"
+            ],
+            [
+                "54411fe6.ef24e"
+            ],
+            [
+                "6fe724cc.ca676c"
+            ],
+            [
+                "2213545e.6880dc"
+            ],
+            [
+                "6bad119c.51064"
+            ],
+            [
+                "7418d07b.d94a2",
+                "8a549908.0c3678"
+            ],
+            [
+                "816eb53e.358778",
+                "25d094aa.e74a9c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "daa96a87.ce2c58",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "Auto Poll",
+        "func": "var pollMsg = {\n    payload: {\n        requestType : \"Poll\"\n    }\n};\n\nvar flowvar = \"DEMO_VEN_NODE:pollRate\";\nvar pollInt = flow.get(flowvar);\n//var pollInt = msg.payload;\n\nif (pollInt === 0) return;\n\nvar it = setInterval(doPolling, pollInt * 1000);\n\nnode.status( { fill: \"green\", shape: \"dot\", text: \"Polling sec: \" + pollInt});\n\nfunction doPolling(){\n    var newPollingInt = flow.get(flowvar);\n    if (newPollingInt === 0){\n        clearInterval(it);\n        node.status( { fill: \"red\", shape: \"dot\", text: \"Polling: stopped\"});\n        return;\n    }\n    if (newPollingInt != pollInt){\n        clearInterval(it);\n        hbInt = newPollingInt;\n        it = setInterval(doPolling, pollInt * 1000);\n        node.status( { fill: \"green\", shape: \"dot\", text: \"Polling sec: \" + pollInt});\n    }\n    node.send(pollMsg);\n}\n\nnode.on('close', function(){\n    clearInterval(it);\n    node.status( { fill: \"red\", shape: \"dot\", text: \"Polling: stopped\"});\n})\nreturn;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2040.625,
+        "y": 2111.8125,
+        "wires": [
+            [
+                "578ac1b4.838f7"
+            ]
+        ]
+    },
+    {
+        "id": "c852a937.868068",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "Toggle Polling",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "5",
+        "payloadType": "num",
+        "x": 1775.3750610351562,
+        "y": 2121.6874389648438,
+        "wires": [
+            [
+                "daa96a87.ce2c58"
+            ]
+        ]
+    },
+    {
+        "id": "a9e3e376.866f3",
+        "type": "link in",
+        "z": "1dffdf2e.789011",
+        "name": "OADR",
+        "links": [
+            "34dd8f26.4d23a",
+            "578ac1b4.838f7",
+            "664e2454.44a75c",
+            "bca19151.e0c12"
+        ],
+        "x": 155,
+        "y": 420,
+        "wires": [
+            [
+                "3352eecc.771e62"
+            ]
+        ]
+    },
+    {
+        "id": "784baa34.7d5554",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "oadrCreatedPartyRegistration",
+        "func": "if (typeof msg.oadr.pollFreqSeconds === 'number'){\n    flow.set(\"DEMO_VEN_NODE:pollRate\", msg.oadr.pollFreqSeconds );\n}\n\nlet _ids = {\n    vtnID: msg.payload.data.oadrCreatedPartyRegistration.vtnID,\n    venID: msg.payload.data.oadrCreatedPartyRegistration.venID,\n    registrationID: msg.payload.data.oadrCreatedPartyRegistration.registrationID,\n}\n\nmsg.payload = _ids;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1030,
+        "y": 1380,
+        "wires": [
+            [
+                "48228dd7.b0df94",
+                "d79848be.d13558"
+            ]
+        ]
+    },
+    {
+        "id": "48228dd7.b0df94",
+        "type": "link out",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "links": [
+            "72471075.73fb",
+            "b23f4853.ec7be8",
+            "4c762ac5.f464d4"
+        ],
+        "x": 1336.6250610351562,
+        "y": 1434.0750122070312,
+        "wires": []
+    },
+    {
+        "id": "f150d196.79515",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "oadrCanceledPartyRegistration",
+        "func": "flow.set(\"DEMO_VEN_NODE:pollRate\", 0 );\n\nlet _ids = {\n    vtnID: \"\",\n    venID: \"\",\n    registrationID: \"\"\n}\n\nmsg.payload = _ids;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1030,
+        "y": 1460,
+        "wires": [
+            [
+                "48228dd7.b0df94",
+                "799cbb82.63d9c4"
+            ]
+        ]
+    },
+    {
+        "id": "799cbb82.63d9c4",
+        "type": "debug",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 1310,
+        "y": 1480,
+        "wires": []
+    },
+    {
+        "id": "d79848be.d13558",
+        "type": "debug",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 1310,
+        "y": 1380,
+        "wires": []
+    },
+    {
+        "id": "578ac1b4.838f7",
+        "type": "link out",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "links": [
+            "a9e3e376.866f3"
+        ],
+        "x": 2375.625,
+        "y": 1931.6250305175781,
+        "wires": []
+    },
+    {
+        "id": "664e2454.44a75c",
+        "type": "link out",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "links": [
+            "a9e3e376.866f3"
+        ],
+        "x": 2215,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "676088ad.e18ad8",
+        "type": "comment",
+        "z": "1dffdf2e.789011",
+        "name": "Show Globals",
+        "info": "",
+        "x": 1812.375,
+        "y": 2650.4124717712402,
+        "wires": []
+    },
+    {
+        "id": "c7f9eb49.c6fef8",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "OptIn Multiple",
+        "func": "msg = {};\nmsg.payload = {};\n\nlet d1 = new Date();\nlet d2 = new Date();\nlet d3 = new Date();\nd2.setDate(d1.getDate() + 1);\nd3.setDate(d2.getDate() + 1);\n\nlet components = [];\n\nlet available = {\n        properties: {\n            dtstart: {\n                dateTime: d1.toISOString()\n            },\n            duration: {\n                duration: 'PT5M'\n            }\n        }\n            \n    };\n\navailable.properties.dtstart.dateTime = d1.toISOString();\navailable.properties.duration.duration = 'PT5M';\navailable.properties.xEiRampUp = {\n    duration: 'PT2M'\n};\ncomponents.push(JSON.parse(JSON.stringify(available)));\n\navailable.properties.dtstart.dateTime = d2.toISOString();\navailable.properties.duration.duration = 'PT10M';\navailable.properties.xEiRampUp = {\n    duration: 'PT12M'\n};\ncomponents.push(JSON.parse(JSON.stringify(available)));\n\navailable.properties.dtstart.dateTime = d3.toISOString();\navailable.properties.duration.duration = 'PT15M';\navailable.properties.xEiRampUp = {\n    duration: 'PT22M'\n};\ncomponents.push(JSON.parse(JSON.stringify(available)));\n\n\nmsg.payload = { \n    requestType: \"CreateOpt\",\n    optType: 'optIn',\n    optReason: 'economic',\n    marketContext: 'http://MarketContext1',\n    components: components\n};\n\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1991.2222290039062,
+        "y": 2189.7222290039062,
+        "wires": [
+            [
+                "578ac1b4.838f7"
+            ]
+        ]
+    },
+    {
+        "id": "a9f4f93.6737108",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "OptIn",
+        "payloadType": "str",
+        "x": 1746.1111145019531,
+        "y": 2188.4999389648438,
+        "wires": [
+            [
+                "c7f9eb49.c6fef8"
+            ]
+        ]
+    },
+    {
+        "id": "e7c0a655.6507c8",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "OptOut 1H15M",
+        "func": "msg = {};\nmsg.payload = {};\n\nlet d1 = new Date();\nd1.setDate(15);\n\nmsg.payload = { \n    requestType: \"CreateOpt\",\n    optType: 'optOut',\n    optID: '111111111-OUT',\n    optReason: 'economic',\n    marketContext: 'http://MarketContext1',\n    dtstart: d1.toISOString(),\n    duration: 'PT1H15M'\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1990.5556030273438,
+        "y": 2244.2222900390625,
+        "wires": [
+            [
+                "578ac1b4.838f7"
+            ]
+        ]
+    },
+    {
+        "id": "86fa50d7.c4a4b",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "Cancel OptOut 1H15M",
+        "func": "msg = {};\nmsg.payload = {};\n\nlet d1 = new Date();\n\nmsg.payload = { \n    requestType: \"CancelOpt\",\n    optID: '111111111-OUT'\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2005.1111450195312,
+        "y": 2283.4443359375,
+        "wires": [
+            [
+                "578ac1b4.838f7"
+            ]
+        ]
+    },
+    {
+        "id": "74e6a82c.43f578",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "OptOut",
+        "payloadType": "str",
+        "x": 1744.3333129882812,
+        "y": 2241.833251953125,
+        "wires": [
+            [
+                "e7c0a655.6507c8"
+            ]
+        ]
+    },
+    {
+        "id": "bfb44e9b.91ea9",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "Cancel Opt",
+        "payloadType": "str",
+        "x": 1752.7777709960938,
+        "y": 2282.833251953125,
+        "wires": [
+            [
+                "86fa50d7.c4a4b"
+            ]
+        ]
+    },
+    {
+        "id": "c1a0e616.232958",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "2.0a requestEvent",
+        "func": "// let venID = '48ac6ed956e1f1f4fdbe';\nmsg = {};\nmsg.payload = {};\n\nmsg.payload = { \n    requestType: \"RequestEvent\",\n//    venID\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2031.5,
+        "y": 2029.449951171875,
+        "wires": [
+            [
+                "578ac1b4.838f7"
+            ]
+        ]
+    },
+    {
+        "id": "7c6a0c05.80cd54",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "RequestEvent 2.0a",
+        "payloadType": "str",
+        "x": 1789,
+        "y": 2027,
+        "wires": [
+            [
+                "c1a0e616.232958"
+            ]
+        ]
+    },
+    {
+        "id": "3352eecc.771e62",
+        "type": "VEN",
+        "z": "1dffdf2e.789011",
+        "name": "DEMO_VEN_NODE",
+        "url": "https://vtn.oadr.com:8181/testvtn",
+        "tls": "f1a6d320.00a1e",
+        "profile": "2.0b",
+        "pushport": "8843",
+        "pushurl": "http://nodered",
+        "venid": "%VEN_ID%",
+        "pollrate": "",
+        "stripPayloadEnv": true,
+        "log": false,
+        "pathlog": "",
+        "x": 300,
+        "y": 420,
+        "wires": [
+            [
+                "f54dd2ff.ae13f"
+            ]
+        ]
+    },
+    {
+        "id": "c19bd1f0.0b2a2",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "venID",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "DEMO_VEN_20A:IDs.venID",
+        "payloadType": "global",
+        "x": 1821.25,
+        "y": 2887.0999755859375,
+        "wires": [
+            [
+                "bfff5250.161ad"
+            ]
+        ]
+    },
+    {
+        "id": "27accbbf.e83424",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "vtnID",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "DEMO_VEN_20A:IDs.vtnID",
+        "payloadType": "global",
+        "x": 1820,
+        "y": 2936.699981689453,
+        "wires": [
+            [
+                "bfff5250.161ad"
+            ]
+        ]
+    },
+    {
+        "id": "ec4db215.0968f",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "registrationID",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "DEMO_VEN_20A:IDs.registrationID",
+        "payloadType": "global",
+        "x": 1803.25,
+        "y": 2979.949951171875,
+        "wires": [
+            [
+                "bfff5250.161ad"
+            ]
+        ]
+    },
+    {
+        "id": "42fb5912.f18f88",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "RegisterReport",
+        "payloadType": "str",
+        "x": 1769,
+        "y": 2340,
+        "wires": [
+            [
+                "af21da03.7faab8"
+            ]
+        ]
+    },
+    {
+        "id": "af21da03.7faab8",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "Single RegisterReport",
+        "func": "msg.payload = {}\n\nvar dt = new Date().toISOString();\n\nmsg.payload.requestType = 'RegisterReport';\nmsg.payload.duration = 'PT2H';\nmsg.payload.marketContext = 'http://MarketContext1';\nmsg.payload.createdDateTime = dt;\n\nmsg.payload = {\n    requestType: 'RegisterReport',\n    duration: 'PT2H',\n    marketContext: 'http://oadr.avob.com',\n    createdDateTime: dt,\n    rID: 'resource1_status',\n    resourceID: 'resource1',\n    reportType: 'x-resourceStatus',\n    readingType: 'x-notApplicable',\n    oadrMinPeriod: 'PT1M',\n    oadrMaxPeriod: 'PT1M',\n    oadrOnChange: false,\n    reportRequestID: 0,\n    // reportSecifierID: uid,\n    reportName: 'METADATA_TELEMETRY_STATUS',\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2001.5,
+        "y": 2341.8599853515625,
+        "wires": [
+            [
+                "578ac1b4.838f7"
+            ]
+        ]
+    },
+    {
+        "id": "2213545e.6880dc",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "oadrRequestReregistration",
+        "func": "var resMsg = {}\nresMsg.payload = {}\nresMsg.payload.opType = \"response\"\nresMsg.payload.responseType = \"Response\"\nresMsg.payload.responseCode = \"200\"\nresMsg.payload.responseDescription = \"\"\nresMsg.payload.requestID = msg.oadr.requestID\n\nvar regMsg = {}\nregMsg.payload = {};\nregMsg.payload.requestType = \"QueryRegistration\";\n\nnode.send(regMsg)\n\nreturn resMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1240,
+        "y": 320,
+        "wires": [
+            [
+                "664e2454.44a75c"
+            ]
+        ]
+    },
+    {
+        "id": "6bad119c.51064",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "oadrCancelPartyRegistration",
+        "func": "var resMsg = {}\nresMsg.payload = {}\nresMsg.payload.opType = \"response\"\nresMsg.payload.responseType = \"CanceledPartyRegistration\"\nresMsg.payload.responseCode = \"200\"\nresMsg.payload.responseDescription = \"\"\nresMsg.payload.requestID = msg.oadr.requestID\n\nglobal.set(\"DEMO_VEN_NODE:RegistrationProfile\", {})\n\nreturn resMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1240,
+        "y": 360,
+        "wires": [
+            [
+                "664e2454.44a75c"
+            ]
+        ]
+    },
+    {
+        "id": "7418d07b.d94a2",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "oadrCreateReport",
+        "func": "var resMsg = {}\nresMsg.payload = {}\nresMsg.payload.opType = \"response\"\nresMsg.payload.responseType = \"CreatedReport\"\nresMsg.payload.responseCode = \"200\"\nresMsg.payload.responseDescription = \"\"\nresMsg.payload.requestID = msg.oadr.requestID\n\nreturn resMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1230,
+        "y": 520,
+        "wires": [
+            [
+                "664e2454.44a75c"
+            ]
+        ]
+    },
+    {
+        "id": "816eb53e.358778",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "oadrCancelReport",
+        "func": "var resMsg = {}\nresMsg.payload = {}\nresMsg.payload.opType = \"response\"\nresMsg.payload.responseType = \"CanceledReport\"\nresMsg.payload.responseCode = \"200\"\nresMsg.payload.responseDescription = \"\"\nresMsg.payload.requestID = msg.oadr.requestID\n\n\nconsole.log(resMsg)\n\nreturn resMsg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1230,
+        "y": 640,
+        "wires": [
+            [
+                "664e2454.44a75c"
+            ]
+        ]
+    },
+    {
+        "id": "cc833474.1dd418",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "RegisterReport",
+        "payloadType": "str",
+        "x": 1760,
+        "y": 2400,
+        "wires": [
+            [
+                "e080335a.faa97"
+            ]
+        ]
+    },
+    {
+        "id": "e080335a.faa97",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "Multiple RegisterReport",
+        "func": "msg.payload = {}\n\nvar dt = new Date().toISOString();\nvar reportTestTelemetry = {\n   \"eiReportID\": \"reportTestTelemetry\",\n   \"reportRequestID\": \"0\",\n   \"reportSpecifierID\": \"reportTestTelemetry\",\n   \"reportName\": \"METADATA_TELEMETRY_USAGE\",\n   \"createdDateTime\": dt,\n   oadrReportDescription: [\n        {\n            \"rid\": \"reportTestTelemetry_rid\",\n            \"reportType\": \"operatingState\",\n            \"readingType\": \"Direct Read\",\n            \"oadrSamplingRate\": {\n                oadrMinPeriod: 'PT15M',\n                oadrMaxPeriod: 'PT24H',\n                oadrOnChange:  'false'\n            }\n        } \n    ]\n}\n\nvar start = new Date(2018,0,1).toISOString();\nvar reportTestHistory = {\n   \"eiReportID\": \"reportTestHistory\",\n   \"reportRequestID\": \"0\",\n   \"reportSpecifierID\": \"reportTestHistory\",\n   \"reportName\": \"METADATA_HISTORY_USAGE\",\n   \"createdDateTime\": dt,\n   \"duration\": \"P1Y\",\n   \"dtstart\": start,\n   oadrReportDescription: [\n        {\n            \"rid\": \"reportTestTelemetry_rid_1\",\n            \"reportType\": \"operatingState\",\n            \"readingType\": \"Direct Read\",\n            \"oadrSamplingRate\": {\n                oadrMinPeriod: 'PT15M',\n                oadrMaxPeriod: 'PT24H',\n                oadrOnChange:  'false'\n            }\n        },\n        {\n            \"rid\": \"reportTestTelemetry_rid_2\",\n            \"reportType\": \"operatingState\",\n            \"readingType\": \"Direct Read\",\n            \"oadrSamplingRate\": {\n                oadrMinPeriod: 'PT15M',\n                oadrMaxPeriod: 'PT24H',\n                oadrOnChange:  'false'\n            }\n        } \n    ]\n}\n\nvar payload = {\n    requestID:\"0\",\n    venID:global.get(\"DEMO_VEN_NODE:IDs\").venID,\n    oadrReport: [\n       reportTestTelemetry,\n       reportTestHistory\n    ]\n}\n\nmsg.payload = {\n    requestType: 'RegisterReport',\n    oadrRegisterReport: payload\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2010,
+        "y": 2400,
+        "wires": [
+            [
+                "578ac1b4.838f7"
+            ]
+        ]
+    },
+    {
+        "id": "3d45ac23.5034b4",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "Register w/ Push xmlSignature",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "CreatePartyRegistration",
+        "payloadType": "str",
+        "x": 1810,
+        "y": 1900,
+        "wires": [
+            [
+                "9b5c888d.9795a8"
+            ]
+        ]
+    },
+    {
+        "id": "9b5c888d.9795a8",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "CreateParty Push",
+        "func": "msg = {};\nmsg.payload = {};\n\nmsg.payload = { \n    requestType: \"CreatePartyRegistration\",\n    oadrHttpPullModel: false,\n    xmlSignature: true,\n    //oadrTransportAddress: 'http://localhost:8843'\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 2090,
+        "y": 1900,
+        "wires": [
+            [
+                "578ac1b4.838f7"
+            ]
+        ]
+    },
+    {
+        "id": "b18237f5.b1abd8",
+        "type": "ui_template",
+        "z": "1dffdf2e.789011",
+        "group": "225a8f1a.d7048",
+        "name": "Events",
+        "order": 1,
+        "width": "18",
+        "height": "4",
+        "format": "<!-- div ng-bind-html=\"msg.payload\"></div -->\n\n<div layout=\"row\" layout-align=\"start center\">\n  <span flex>Status</span>\n  <!-- <span flex>Version</span> -->\n  <span flex>Start</span>\n  <span flex>Dur</span>\n  <span flex>Sig Name</span>\n  <span flex>Sig Type</span>\n  <span flex>Sig Value</span>\n</div>\n<div ng-repeat=\"Event in msg.payload.data.oadrDistributeEvent.oadrEvent\">\n    <div layout=\"row\" layout-align=\"start center\" ng-repeat=\"Signal in Event.eiEvent.eiEventSignals.eiEventSignal\">\n      <span flex style=\"color: gray\">{{($index == 0 ) ? Event.eiEvent.eventDescriptor.eventStatus: \"\"}}</span>\n      <!-- <span flex style=\"color: gray\">{{($index == 0 ) ? Event.eiEvent.eventDescriptor.modificationNumber: \"\"}}</span> -->\n      <span flex style=\"color: gray\">{{($index == 0 ) ? Event.eiEvent.eiActivePeriod.properties.dtstart.dateTime.date: \"\"}}</span>\n\n      <span flex style=\"color: gray\">{{($index == 0 ) ? Event.eiEvent.eiActivePeriod.properties.duration.duration: \"\"}}</span>\n      <span flex style=\"color: gray\">{{Signal.signalName}}</span>\n      <span flex style=\"color: gray\">{{Signal.signalType}}</span>\n      <span flex style=\"color: gray\">{{Signal.currentValue.payloadFloat.value}}</span>\n    </div>\n</div>",
+        "storeOutMessages": false,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 870,
+        "y": 320,
+        "wires": [
+            [
+                "29323785.22e678"
+            ]
+        ]
+    },
+    {
+        "id": "49f884b6.90693c",
+        "type": "ui_text",
+        "z": "1dffdf2e.789011",
+        "group": "209e5971.89aa06",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "vtnID",
+        "format": "{{msg.payload.vtnID}}",
+        "layout": "row-left",
+        "x": 950,
+        "y": 1740,
+        "wires": []
+    },
+    {
+        "id": "1fb4a400.1689ac",
+        "type": "ui_text",
+        "z": "1dffdf2e.789011",
+        "group": "209e5971.89aa06",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "venID",
+        "label": "venID",
+        "format": "{{msg.payload.venID}}",
+        "layout": "row-left",
+        "x": 945.625,
+        "y": 1786.8749923706055,
+        "wires": []
+    },
+    {
+        "id": "d85b6d1c.56677",
+        "type": "ui_text",
+        "z": "1dffdf2e.789011",
+        "group": "209e5971.89aa06",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "registrationID",
+        "format": "{{msg.payload.registrationID}}",
+        "layout": "row-left",
+        "x": 961.8749694824219,
+        "y": 1831.8749923706055,
+        "wires": []
+    },
+    {
+        "id": "b23f4853.ec7be8",
+        "type": "link in",
+        "z": "1dffdf2e.789011",
+        "name": "UI_IDS",
+        "links": [
+            "48228dd7.b0df94",
+            "42b0cc70.70e1e4",
+            "4ca5b974.5d3848"
+        ],
+        "x": 815,
+        "y": 1780,
+        "wires": [
+            [
+                "49f884b6.90693c",
+                "1fb4a400.1689ac",
+                "d85b6d1c.56677"
+            ]
+        ]
+    },
+    {
+        "id": "bca19151.e0c12",
+        "type": "link out",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "links": [
+            "a9e3e376.866f3"
+        ],
+        "x": 1075,
+        "y": 2120,
+        "wires": []
+    },
+    {
+        "id": "e850ea4b.0f1938",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "RegisterReport",
+        "payloadType": "str",
+        "x": 160,
+        "y": 1840,
+        "wires": [
+            [
+                "721e9bbe.c06ca4"
+            ]
+        ]
+    },
+    {
+        "id": "428c5e2d.b7928",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "Multiple RegisterReport",
+        "func": "msg.payload = {}\n\nvar dt = new Date().toISOString();\n\nvar metadata = {\n   \"eiReportID\": \"METADATA\",\n   \"reportRequestID\": \"0\",\n   \"reportSpecifierID\": \"METADATA\",\n   \"reportName\": \"METADATA_TELEMETRY_USAGE\",\n   \"createdDateTime\": dt,\n   oadrReportDescription: [\n        {\n            \"rid\": \"METADATA\",\n            \"reportType\": \"operatingState\",\n            \"readingType\": \"Direct Read\",\n            \"oadrSamplingRate\": {\n                oadrMinPeriod: 'P0D',\n                oadrMaxPeriod: 'P0D',\n                oadrOnChange:  'true'\n            }\n        }\n    ]\n}\n\nvar loraAvobGatewayReport = {\n   \"eiReportID\": \"loraAvobGatewayReport\",\n   \"reportRequestID\": \"0\",\n   \"reportSpecifierID\": \"lora.avob.gateway\",\n   \"reportName\": \"METADATA_TELEMETRY_USAGE\",\n   \"createdDateTime\": dt,\n   oadrReportDescription: [\n        {\n            \"rid\": \"x-gateway-metadata\",\n            \"reportType\": \"operatingState\",\n            \"readingType\": \"Direct Read\",\n            \"oadrSamplingRate\": {\n                oadrMinPeriod: 'P0D',\n                oadrMaxPeriod: 'P0D',\n                oadrOnChange:  'true'\n            }\n        }, {\n            \"rid\": \"x-gateway-scan\",\n            \"reportType\": \"operatingState\",\n            \"readingType\": \"Direct Read\",\n            \"oadrSamplingRate\": {\n                oadrMinPeriod: 'P0D',\n                oadrMaxPeriod: 'P0D',\n                oadrOnChange:  'true'\n            }\n        } \n    ]\n}\n\n/*var reportTestTelemetry = {\n   \"eiReportID\": \"reportTestTelemetry\",\n   \"reportRequestID\": \"0\",\n   \"reportSpecifierID\": \"reportTestTelemetry\",\n   \"reportName\": \"METADATA_TELEMETRY_USAGE\",\n   \"createdDateTime\": dt,\n   oadrReportDescription: [\n        {\n            \"rid\": \"reportTestTelemetry_rid\",\n            \"reportType\": \"operatingState\",\n            \"readingType\": \"Direct Read\",\n            \"oadrSamplingRate\": {\n                oadrMinPeriod: 'PT15M',\n                oadrMaxPeriod: 'PT24H',\n                oadrOnChange:  'false'\n            }\n        } \n    ]\n}\n\nvar start = new Date(2018,0,1).toISOString();\nvar reportTestHistory = {\n   \"eiReportID\": \"reportTestHistory\",\n   \"reportRequestID\": \"0\",\n   \"reportSpecifierID\": \"reportTestHistory\",\n   \"reportName\": \"METADATA_HISTORY_USAGE\",\n   \"createdDateTime\": dt,\n   \"duration\": \"P1Y\",\n   \"dtstart\": start,\n   oadrReportDescription: [\n        {\n            \"rid\": \"reportTestTelemetry_rid_1\",\n            \"reportType\": \"operatingState\",\n            \"readingType\": \"Direct Read\",\n            \"oadrSamplingRate\": {\n                oadrMinPeriod: 'PT15M',\n                oadrMaxPeriod: 'PT24H',\n                oadrOnChange:  'false'\n            }\n        },\n        {\n            \"rid\": \"reportTestTelemetry_rid_2\",\n            \"reportType\": \"operatingState\",\n            \"readingType\": \"Direct Read\",\n            \"oadrSamplingRate\": {\n                oadrMinPeriod: 'PT15M',\n                oadrMaxPeriod: 'PT24H',\n                oadrOnChange:  'false'\n            }\n        } \n    ]\n}*/\n\nvar payload = {\n    requestID:\"0\",\n    venID:global.get(\"DEMO_VEN_NODE:IDs\").venID,\n    oadrReport: [\n       metadata,\n       loraAvobGatewayReport,\n       /*reportTestTelemetry,\n       reportTestHistory*/\n    ]\n}\n\nmsg.payload = {\n    requestType: 'RegisterReport',\n    oadrRegisterReport: payload\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 570,
+        "y": 1740,
+        "wires": [
+            [
+                "38ea468f.06831a"
+            ]
+        ]
+    },
+    {
+        "id": "721e9bbe.c06ca4",
+        "type": "ui_button",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "group": "ee3b7d6e.35fe2",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Register Report",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 340,
+        "y": 1840,
+        "wires": [
+            [
+                "428c5e2d.b7928",
+                "807ce729.c1d8a8"
+            ]
+        ]
+    },
+    {
+        "id": "93bd91b1.7fdfa",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "QueryRegistration",
+        "payloadType": "str",
+        "x": 1770,
+        "y": 2460,
+        "wires": [
+            [
+                "39ccefd4.3ef57"
+            ]
+        ]
+    },
+    {
+        "id": "752f9cf6.05b124",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "CreateParty Push",
+        "func": "msg = {};\nmsg.payload = {};\n\nmsg.payload = { \n    requestType: \"CreatePartyRegistration\",\n    oadrHttpPullModel: false,\n    stripPayloadEnv: true,\n    //oadrTransportAddress: 'http://localhost:8843'\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 650,
+        "y": 2300,
+        "wires": [
+            [
+                "bca19151.e0c12"
+            ]
+        ]
+    },
+    {
+        "id": "99b9e32a.ab1f8",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "CreatePartyRegistration",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "CreatePartyRegistration",
+        "payloadType": "str",
+        "x": 180,
+        "y": 2300,
+        "wires": [
+            [
+                "51b9749d.030a5c"
+            ]
+        ]
+    },
+    {
+        "id": "51b9749d.030a5c",
+        "type": "ui_button",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "group": "ee3b7d6e.35fe2",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Create Party Registration",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 410,
+        "y": 2300,
+        "wires": [
+            [
+                "752f9cf6.05b124"
+            ]
+        ]
+    },
+    {
+        "id": "39ccefd4.3ef57",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "QueryRegistration",
+        "func": "msg = {};\nmsg.payload = {};\n\nmsg.payload = { \n    requestType: \"QueryRegistration\",\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1990,
+        "y": 2460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dbb740e1.52dd8",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "RequestEvent",
+        "payloadType": "str",
+        "x": 150,
+        "y": 2360,
+        "wires": [
+            [
+                "e56b0de1.977aa"
+            ]
+        ]
+    },
+    {
+        "id": "e56b0de1.977aa",
+        "type": "ui_button",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "group": "ee3b7d6e.35fe2",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Request Event",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 360,
+        "y": 2360,
+        "wires": [
+            [
+                "2c95a975.514cd6"
+            ]
+        ]
+    },
+    {
+        "id": "2c95a975.514cd6",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "RequestEvent",
+        "func": "msg = {};\nmsg.payload = {};\n\nmsg.payload = { \n    requestType: \"RequestEvent\"};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 640,
+        "y": 2360,
+        "wires": [
+            [
+                "bca19151.e0c12"
+            ]
+        ]
+    },
+    {
+        "id": "6e107d77.cad854",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "Clean Registration",
+        "func": "return {\n    payload: {\n        vtnID: \"\",\n        venID: \"\",\n        registrationID: \"\"\n    }\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 610,
+        "y": 2060,
+        "wires": [
+            [
+                "42b0cc70.70e1e4"
+            ]
+        ]
+    },
+    {
+        "id": "af328027.22281",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "Clean Events",
+        "func": "return {\n    payload: {\n        data: {\n            oadrDistributeEvent: {\n                oadrEvent: []\n            }\n        }\n    }\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 590,
+        "y": 1920,
+        "wires": [
+            [
+                "34d479c6.452896"
+            ]
+        ]
+    },
+    {
+        "id": "34d479c6.452896",
+        "type": "link out",
+        "z": "1dffdf2e.789011",
+        "name": "EVENTS",
+        "links": [
+            "4b35c.fba74ca4"
+        ],
+        "x": 715,
+        "y": 1920,
+        "wires": []
+    },
+    {
+        "id": "4b35c.fba74ca4",
+        "type": "link in",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "links": [
+            "34d479c6.452896"
+        ],
+        "x": 715,
+        "y": 260,
+        "wires": [
+            [
+                "b18237f5.b1abd8"
+            ]
+        ]
+    },
+    {
+        "id": "42b0cc70.70e1e4",
+        "type": "link out",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "links": [
+            "72471075.73fb",
+            "b23f4853.ec7be8",
+            "4c762ac5.f464d4"
+        ],
+        "x": 735,
+        "y": 2060,
+        "wires": []
+    },
+    {
+        "id": "38ea468f.06831a",
+        "type": "ui_template",
+        "z": "1dffdf2e.789011",
+        "group": "f40ecb5f.c076a8",
+        "name": "Reports",
+        "order": 1,
+        "width": "18",
+        "height": "3",
+        "format": "<!-- div ng-bind-html=\"msg.payload\"></div -->\n\n<div layout=\"row\" layout-align=\"start center\">\n  <span flex>ReportSpecifierID</span>\n  <span flex>reportName</span>\n  <span flex>Created Datetime</span>\n  <span flex>rID</span>\n\n</div>\n<div ng-repeat=\"Report in msg.payload.oadrRegisterReport.oadrReport\">\n    <div layout=\"row\" layout-align=\"end\" ng-repeat=\"Description in Report.oadrReportDescription\">\n      <span flex style=\"color: gray\">{{($index == 0 ) ? Report.reportSpecifierID: \"\"}}</span>\n      <span flex style=\"color: gray\">{{($index == 0 ) ? Report.reportName: \"\"}}</span>\n      <span flex style=\"color: gray\">{{($index == 0 ) ? Report.createdDateTime: \"\"}}</span>\n      <span flex style=\"color: gray\">{{Description.rid}}</span>\n    </div>\n</div>",
+        "storeOutMessages": false,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 980,
+        "y": 1940,
+        "wires": [
+            [
+                "bca19151.e0c12"
+            ]
+        ]
+    },
+    {
+        "id": "3a2297c.74b4e68",
+        "type": "ui_template",
+        "z": "1dffdf2e.789011",
+        "group": "54600305.646f1c",
+        "name": "Requests",
+        "order": 1,
+        "width": "18",
+        "height": "3",
+        "format": "<!-- div ng-bind-html=\"msg.payload\"></div -->\n\n<div layout=\"row\" layout-align=\"start center\">\n  <span flex>ReportRequestId</span>\n  <span flex>ReportSpecifierId</span>\n  <span flex>Granularity</span>\n  <span flex>Report Back Duration</span>\n  <span flex>RID</span>\n</div>\n<div ng-repeat=\"Request in msg.payload\">\n    <div layout=\"row\" layout-align=\"start center\" ng-repeat=\"SpecifierPayload in Request.reportSpecifier.specifierPayload\" >\n        \n            <span flex style=\"color: gray\">{{ Request.reportRequestID }}</span>\n            <span flex style=\"color: gray\">{{ Request.reportSpecifier.reportSpecifierID }}</span>\n            <span flex style=\"color: gray\">{{ Request.reportSpecifier.granularity.duration }}</span>\n            <span flex style=\"color: gray\">{{ Request.reportSpecifier.reportBackDuration.duration }}</span>\n            <span flex style=\"color: gray\">{{ SpecifierPayload.rid }}</span>\n    </div>\n</div>",
+        "storeOutMessages": false,
+        "fwdInMessages": true,
+        "templateScope": "local",
+        "x": 1480,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fe905c7c.e354c",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "SinglePoll",
+        "payloadType": "str",
+        "x": 1240,
+        "y": 2580,
+        "wires": [
+            [
+                "492cdef9.ab4fd"
+            ]
+        ]
+    },
+    {
+        "id": "492cdef9.ab4fd",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "SinglePoll",
+        "func": "msg = {};\nmsg.payload = {};\n\nmsg.payload = { \n    requestType: \"Poll\"};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1400,
+        "y": 2580,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "62260acd.5daa24",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "UpdateData SCAN",
+        "func": "msg.payload = {}\n\n\nvar dt = new Date().toISOString();\n\nvar jsonConf = {\n    \"test\": \"test\"\n}\n\nvar payload = {\n    requestID:\"0\",\n    venID:global.get(\"DEMO_VEN_NODE:IDs\").venID,\n    oadrReport: [{\n        \"createdDateTime\": dt,\n        \"eiReportID\": \"loraAvobGatewayReport\",\n        \"reportRequestID\": \"2147057b-969d-4e2b-9341-c1ff1ea553a4\",\n        \"reportSpecifierID\": \"lora.avob.gateway\",\n        \"reportName\": \"METADATA_TELEMETRY_USAGE\",\n        \"intervals\": [{\n            \"uid\": \"0\",\n            \"oadrDataQuality\": \"Quality Good - Non Specific\",\n            \"streamPayloadBase\": [{\n                \"name\": {\n                    \"namespaceURI\": 'http://openadr.org/oadr-2.0b/2012/07',\n\t\t\t\t\t\"localPart\": 'oadrReportPayload',\n                },\n                \"value\": {\n                    \"rid\": \"x-gateway-scan\",\n                    \"confidence\": 95,\n                    \"accuracy\": 0.2,\n                    \"payloadBase\": {\n                        \"name\": {\n                            \"namespaceURI\": 'http://oadr.avob.com',\n\t\t\t\t\t\t\t\"localPart\": 'payloadKeyToken',\n                        },\n                        \"value\": {\n                            \"tokens\": [{\n                                \"key\": \"mouaiccool\",\n                                \"value\": JSON.stringify(jsonConf)\n                            }]\n                        }\n                    }\n                }\n            }]\n            \n        }]\n    }],\n}\n\n\nmsg.payload = {\n    requestType: 'UpdateReport',\n    oadrUpdateReport: payload\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1430,
+        "y": 2680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c9ae5f21.7d58",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "UpdateData DATA",
+        "func": "msg.payload = {}\n\n\nvar dt = new Date().toISOString();\n\nvar payload = {\n    requestID:\"0\",\n    venID:global.get(\"DEMO_VEN_NODE:IDs\").venID,\n    oadrReport: [{\n        \"createdDateTime\": dt,\n        \"eiReportID\": \"loraAvobGatewayReport\",\n        \"reportRequestID\": \"0\",\n        \"reportSpecifierID\": \"lora.avob.gateway\",\n        \"reportName\": \"METADATA_TELEMETRY_USAGE\",\n        \"intervals\": [{\n            \"uid\": \"0\",\n            \"dtstart\": dt,\n            \"duration\": {\n                \"duration\": \"P5M\"\n            },\n            \"oadrDataQuality\": \"Quality Good - Non Specific\",\n            \"streamPayloadBase\": [{\n                \"name\": {\n                    \"namespaceURI\": 'http://openadr.org/oadr-2.0b/2012/07',\n\t\t\t\t\t\"localPart\": 'oadrReportPayload',\n                },\n                \"value\": {\n                    \"rid\": \"x-gateway-metadata\",\n                    \"confidence\": 95,\n                    \"accuracy\": 0.2,\n                    \"payloadBase\": {\n                        \"name\": {\n                            \"namespaceURI\": 'http://docs.oasis-open.org/ns/energyinterop/201110',\n\t\t\t\t\t\t\t\"localPart\": 'payloadFloat',\n                        },\n                        \"value\": {\n                            \"value\": 3.14159\n                        }\n                    }\n                }\n            }]\n            \n        }]\n    }],\n}\n\n\nmsg.payload = {\n    requestType: 'UpdateReport',\n    oadrUpdateReport: payload\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1430,
+        "y": 2640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8a549908.0c3678",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "Requests Storage",
+        "func": "var requests = global.get(\"DEMO_VEN_NODE:requests\")\nif(requests == null) {\n    requests = {};\n}\n\nvar receivedRequests = msg.payload.data.oadrCreateReport.oadrReportRequest;\nfor(var r of receivedRequests) {\n    var id = r.reportRequestID;\n    var list = requests[id];\n    if(list == null) {\n        list = []\n    }\n    list.push(r);\n    requests[id] = list;\n}\n\nglobal.set(\"DEMO_VEN_NODE:requests\", requests)\n\nvar res = [];\nfor(var r of Object.values(requests)){\n    res = res.concat(r);\n}\n\nreturn {\n    payload: res\n};\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1230,
+        "y": 560,
+        "wires": [
+            [
+                "3a2297c.74b4e68"
+            ]
+        ]
+    },
+    {
+        "id": "25d094aa.e74a9c",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "Requests Clean",
+        "func": "var requests = global.get(\"DEMO_VEN_NODE:requests\")\nif(requests == null) {\n    requests = {};\n}\n\nvar id = msg.payload.data.oadrCancelReport.reportRequestID;\n\ndelete requests[id];\nglobal.set(\"DEMO_VEN_NODE:requests\", requests)\n\n\nvar res = [];\nfor(var r of Object.values(requests)){\n    res = res.concat(r);\n}\n\n\nreturn {\n    payload: res\n};",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1220,
+        "y": 600,
+        "wires": [
+            [
+                "3a2297c.74b4e68"
+            ]
+        ]
+    },
+    {
+        "id": "807ce729.c1d8a8",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "Clean Requests",
+        "func": "\nglobal.set(\"DEMO_VEN_NODE:requests\", {})\n\n\n\nreturn {\n    payload: []\n};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 600,
+        "y": 1960,
+        "wires": [
+            [
+                "1592ec2.bed0b14"
+            ]
+        ]
+    },
+    {
+        "id": "1cb2cd00.81b183",
+        "type": "link in",
+        "z": "1dffdf2e.789011",
+        "name": "REQUESTS",
+        "links": [
+            "1592ec2.bed0b14"
+        ],
+        "x": 1395,
+        "y": 540,
+        "wires": [
+            [
+                "3a2297c.74b4e68"
+            ]
+        ]
+    },
+    {
+        "id": "1592ec2.bed0b14",
+        "type": "link out",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "links": [
+            "1cb2cd00.81b183"
+        ],
+        "x": 715,
+        "y": 1960,
+        "wires": []
+    },
+    {
+        "id": "1e79508a.18ca0f",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "Clean Reports",
+        "func": "msg.payload = {\n    requestType: 'RegisterReport',\n    oadrRegisterReport: []\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 600,
+        "y": 2000,
+        "wires": [
+            [
+                "38ea468f.06831a"
+            ]
+        ]
+    },
+    {
+        "id": "9a383fa.204b5c",
+        "type": "comment",
+        "z": "1dffdf2e.789011",
+        "name": "Events",
+        "info": "",
+        "x": 1190,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "2ef7c496.788d3c",
+        "type": "comment",
+        "z": "1dffdf2e.789011",
+        "name": "Registration",
+        "info": "",
+        "x": 1190,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "23535edf.94c772",
+        "type": "comment",
+        "z": "1dffdf2e.789011",
+        "name": "Reports / Requests",
+        "info": "",
+        "x": 1230,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "4bc638b8.95eca8",
+        "type": "ui_form",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "label": "SCAN",
+        "group": "42d4f4c2.e8c6ac",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "options": [
+            {
+                "label": "devEUI",
+                "value": "devEUI",
+                "type": "text",
+                "required": true
+            },
+            {
+                "label": "appEUI",
+                "value": "appEUI",
+                "type": "text",
+                "required": true
+            },
+            {
+                "label": "appKey",
+                "value": "appKey",
+                "type": "text",
+                "required": true
+            }
+        ],
+        "formValue": {
+            "devEUI": "",
+            "appEUI": "",
+            "appKey": ""
+        },
+        "payload": "",
+        "submit": "submit",
+        "cancel": "cancel",
+        "topic": "",
+        "x": 410,
+        "y": 2460,
+        "wires": [
+            [
+                "2501e47c.bfce6c"
+            ]
+        ]
+    },
+    {
+        "id": "2501e47c.bfce6c",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "UpdateData SCAN",
+        "func": "var dt = new Date().toISOString();\n\nvar payload = {\n    requestID:\"0\",\n    venID:global.get(\"DEMO_VEN_NODE:IDs\").venID,\n    oadrReport: [{\n        \"createdDateTime\": dt,\n        \"eiReportID\": \"loraAvobGatewayReport\",\n        \"reportRequestID\": \"2147057b-969d-4e2b-9341-c1ff1ea553a4\",\n        \"reportSpecifierID\": \"lora.avob.gateway\",\n        \"reportName\": \"METADATA_TELEMETRY_USAGE\",\n        \"intervals\": [{\n            \"uid\": \"0\",\n            \"oadrDataQuality\": \"Quality Good - Non Specific\",\n            \"streamPayloadBase\": [{\n                \"name\": {\n                    \"namespaceURI\": 'http://openadr.org/oadr-2.0b/2012/07',\n\t\t\t\t\t\"localPart\": 'oadrReportPayload',\n                },\n                \"value\": {\n                    \"rid\": \"x-gateway-scan\",\n                    \"payloadBase\": {\n                        \"name\": {\n                            \"namespaceURI\": 'http://oadr.avob.com',\n\t\t\t\t\t\t\t\"localPart\": 'payloadKeyToken',\n                        },\n                        \"value\": {\n                            \"tokens\": [{\n                                \"key\": \"scan\",\n                                \"value\": JSON.stringify(msg.payload)\n                            }]\n                        }\n                    }\n                }\n            }]\n            \n        }]\n    }],\n}\n\nreturn {\n    payload: {\n        requestType: 'UpdateReport',\n        oadrUpdateReport: payload\n    }\n};",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 590,
+        "y": 2460,
+        "wires": [
+            [
+                "bca19151.e0c12"
+            ]
+        ]
+    },
+    {
+        "id": "a4481f78.73161",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "UpdateData SCAN",
+        "payloadType": "str",
+        "x": 1230,
+        "y": 2680,
+        "wires": [
+            [
+                "62260acd.5daa24"
+            ]
+        ]
+    },
+    {
+        "id": "83bba1a7.3daa8",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "UpdateData DATA",
+        "payloadType": "str",
+        "x": 1230,
+        "y": 2640,
+        "wires": [
+            [
+                "c9ae5f21.7d58"
+            ]
+        ]
+    },
+    {
+        "id": "9581ef36.32f02",
+        "type": "function",
+        "z": "1dffdf2e.789011",
+        "name": "CancelPartyRegistration",
+        "func": "msg = {};\nmsg.payload = {};\n\nmsg.payload = { \n    requestType: \"CancelPartyRegistration\",\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 690,
+        "y": 2220,
+        "wires": [
+            [
+                "bca19151.e0c12"
+            ]
+        ]
+    },
+    {
+        "id": "b49de7f2.2fbab8",
+        "type": "inject",
+        "z": "1dffdf2e.789011",
+        "name": "CancelPartyRegistration",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "CreatePartyRegistration",
+        "payloadType": "str",
+        "x": 150,
+        "y": 2220,
+        "wires": [
+            [
+                "20092803.0a5798"
+            ]
+        ]
+    },
+    {
+        "id": "20092803.0a5798",
+        "type": "ui_button",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "group": "ee3b7d6e.35fe2",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Cancel Party Registration",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "",
+        "x": 410,
+        "y": 2220,
+        "wires": [
+            [
+                "9581ef36.32f02"
+            ]
+        ]
+    },
+    {
+        "id": "6fe724cc.ca676c",
+        "type": "link out",
+        "z": "1dffdf2e.789011",
+        "name": "onCanceledRegistration",
+        "links": [
+            "e4fa8b58.f656c8"
+        ],
+        "x": 1075,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "e4fa8b58.f656c8",
+        "type": "link in",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "links": [
+            "6fe724cc.ca676c",
+            "d60a5388.c0355"
+        ],
+        "x": 275,
+        "y": 2000,
+        "wires": [
+            [
+                "af328027.22281",
+                "807ce729.c1d8a8",
+                "1e79508a.18ca0f",
+                "6e107d77.cad854"
+            ]
+        ]
+    },
+    {
+        "id": "2b96349f.5ac99c",
+        "type": "link out",
+        "z": "1dffdf2e.789011",
+        "name": "onCreatedRegistration",
+        "links": [
+            "86c40b56.f38448"
+        ],
+        "x": 1060,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "86c40b56.f38448",
+        "type": "link in",
+        "z": "1dffdf2e.789011",
+        "name": "",
+        "links": [
+            "2b96349f.5ac99c"
+        ],
+        "x": 255,
+        "y": 1740,
+        "wires": [
+            [
+                "807ce729.c1d8a8",
+                "428c5e2d.b7928",
+                "2c95a975.514cd6"
+            ]
+        ]
+    }
+]

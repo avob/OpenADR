@@ -1,6 +1,6 @@
 package com.avob.openadr.server.oadr20b.ven;
 
-import java.security.KeyStore;
+import javax.net.ssl.SSLContext;
 
 import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
@@ -8,19 +8,14 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 public class VENEmbeddedServletContainerCustomizer implements WebServerFactoryCustomizer<JettyServletWebServerFactory> {
 
 	private int port;
-	private KeyStore keystore;
-	private KeyStore truststore;
-	private String keystorePass;
+	private SSLContext sslContext;
 	private String contextPath;
 	private String[] protocols;
 	private String[] ciphers;
 
-	public VENEmbeddedServletContainerCustomizer(int port, String contextPath, KeyStore keystore, String keystorePass,
-			KeyStore truststore, String[] protocols, String[] ciphers) {
+	public VENEmbeddedServletContainerCustomizer(int port, String contextPath, SSLContext sslContext, String[] protocols, String[] ciphers) {
 		this.port = port;
-		this.keystore = keystore;
-		this.truststore = truststore;
-		this.keystorePass = keystorePass;
+		this.sslContext = sslContext;
 		this.contextPath = contextPath;
 		this.protocols = protocols;
 		this.ciphers = ciphers;
@@ -34,7 +29,7 @@ public class VENEmbeddedServletContainerCustomizer implements WebServerFactoryCu
 			jettyFactory.setContextPath(contextPath);
 		}
 		jettyFactory.addServerCustomizers(
-				new VENJettyServerCustomizer(port, keystore, keystorePass, truststore, protocols, ciphers));
+				new VENJettyServerCustomizer(port, sslContext, protocols, ciphers));
 	}
 
 }

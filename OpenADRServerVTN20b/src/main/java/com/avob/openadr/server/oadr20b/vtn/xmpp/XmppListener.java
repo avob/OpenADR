@@ -39,6 +39,8 @@ public class XmppListener implements StanzaListener {
 		Message message = (Message) packet;
 
 		Jid from = packet.getFrom();
+		
+		LOGGER.info("Receive from: "+from.asUnescapedString());
 
 		Localpart localpartOrThrow = from.getLocalpartOrThrow();
 
@@ -65,9 +67,9 @@ public class XmppListener implements StanzaListener {
 				return;
 			}
 
-			from = JidCreate.from(username + "@" + from.getDomain().toString() + "/" + resourceOrThrow);
+			from = JidCreate.from(resourceOrThrow + "@" + from.getDomain().toString());
 
-			xmppUplinkClient.sendMessage(from, response);
+			xmppUplinkClient.sendMessage(from, response);	
 
 		} catch (XmppStringprepException | NotConnectedException | Oadr20bMarshalException e) {
 			LOGGER.error(oadr20bVTNEiService.getServiceName() + " - " + e.getMessage());

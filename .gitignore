@@ -55,14 +55,16 @@
 
 # compile foolder
 */target
-**/.vagrant
 
-devops/vtn20b_postgres/provisioning/playbook.retry
-devops/vtn20b_postgres/provisioning/roles/*
+.vagrant/**/.vagrant
+.vagrant/vtn20b_postgres/provisioning/playbook.retry
+.vagrant/vtn20b_postgres/provisioning/roles/*
 
 */package-lock.json
 
-devops/nodered/node-red-contrib-oadr-ven/
+.vagrant/nodered/node-red-contrib-oadr-ven/
+.vagrant/nodered/provisioning/playbook.retry
+.vagrant/nodered/provisioning/roles/*
 
 cert*
 OpenADRServerVTN20b/src/main/resources/public/

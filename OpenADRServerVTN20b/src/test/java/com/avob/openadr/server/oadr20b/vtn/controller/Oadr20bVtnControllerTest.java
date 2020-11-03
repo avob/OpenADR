@@ -40,7 +40,6 @@ public class Oadr20bVtnControllerTest {
 
 		assertNotNull(conf);
 
-		assertEquals(vtnConfig.getHost(), conf.getHost());
 		assertEquals(vtnConfig.getContextPath(), conf.getContextPath());
 		assertTrue(vtnConfig.getPort() == conf.getPort());
 		assertEquals(vtnConfig.getPullFrequencySeconds(), conf.getPullFrequencySeconds());

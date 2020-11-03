@@ -6,7 +6,6 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
@@ -42,8 +41,12 @@ public class VtnConfig {
 	public static final String CONTEXT_PATH_CONF = "oadr.server.context_path";
 	public static final String PORT_CONF = "oadr.server.port";
 	public static final String TRUSTED_CERTIFICATES_CONF = "oadr.security.ven.trustcertificate";
+	
 	public static final String PRIVATE_KEY_CONF = "oadr.security.vtn.key";
 	public static final String CERTIFICATE_CONF = "oadr.security.vtn.cert";
+	
+	public static final String XMPP_PRIVATE_KEY_CONF = "oadr.security.vtn.xmpp.key";
+	public static final String XMPP_CERTIFICATE_CONF = "oadr.security.vtn.xmpp.cert";
 
 	public static final String SUPPORT_PUSH_CONF = "oadr.supportPush";
 	public static final String SUPPORT_UNSECURED_PHTTP_PUSH_CONF = "oadr.supportUnsecuredHttpPush";
@@ -84,8 +87,28 @@ public class VtnConfig {
 	@Value("${" + PRIVATE_KEY_CONF + ":#{null}}")
 	private String key;
 
+	
+
 	@Value("${" + CERTIFICATE_CONF + ":#{null}}")
 	private String cert;
+	
+	@Value("${" + XMPP_CERTIFICATE_CONF + ":#{null}}")
+	private String xmppCert;
+	
+	@Value("${" + XMPP_PRIVATE_KEY_CONF + ":#{null}}")
+	private String xmppKey;
+
+	public String getXmppCert() {
+		return xmppCert;
+	}
+
+	public String getXmppKey() {
+		return xmppKey;
+	}
+
+	public SSLContext getXmppSslContext() {
+		return xmppSslContext;
+	}
 
 	@Value("${" + SUPPORT_PUSH_CONF + ":#{null}}")
 	private Boolean supportPush;
@@ -95,9 +118,6 @@ public class VtnConfig {
 
 	@Value("${" + PULL_FREQUENCY_SECONDS_CONF + ":#{null}}")
 	private Long pullFrequencySeconds;
-
-	@Value("${" + HOST_CONF + ":localhost}")
-	private String host;
 
 	@Value("${" + VALIDATE_OADR_PAYLOAD_XSD_CONF + ":#{false}}")
 	private Boolean validateOadrPayloadAgainstXsd;
@@ -152,6 +172,27 @@ public class VtnConfig {
 	private SSLContext sslContext;
 	private String oadr20bFingerprint;
 	private String oadr20aFingerprint;
+	private KeyManagerFactory xmppKeyManagerFactory;
+	public KeyManagerFactory getXmppKeyManagerFactory() {
+		return xmppKeyManagerFactory;
+	}
+
+	public TrustManagerFactory getXmppTrustManagerFactory() {
+		return xmppTrustManagerFactory;
+	}
+
+	public String getXmppOadr20bFingerprint() {
+		return xmppOadr20bFingerprint;
+	}
+
+	public String getXmppOadr20aFingerprint() {
+		return xmppOadr20aFingerprint;
+	}
+
+	private TrustManagerFactory xmppTrustManagerFactory;
+	private SSLContext xmppSslContext;
+	private String xmppOadr20bFingerprint;
+	private String xmppOadr20aFingerprint;
 	private String brokerUrl;
 	private String sslBrokerUrl;
 
@@ -163,11 +204,6 @@ public class VtnConfig {
 			trustCertificates = Arrays.asList(trustCertificatesStr.split(","));
 		} else {
 			trustCertificates = new ArrayList<>();
-		}
-		Map<String, String> trustedCertificates = Maps.newHashMap();
-		int i = 0;
-		for (String path : trustCertificates) {
-			trustedCertificates.put("cert_" + (i++), path);
 		}
 
 		// no VTN key/cert conf might be given when using HTTP only transport
@@ -196,7 +232,35 @@ public class VtnConfig {
 			}
 		} else {
 			LOGGER.warn(
-					"VTN " + PRIVATE_KEY_CONF + " or " + CERTIFICATE_CONF + " not given - no SSL transport supported");
+					"VTN " + PRIVATE_KEY_CONF + " or " + CERTIFICATE_CONF + " not given - no HTTP SSL transport supported");
+		}
+		
+		if (this.getXmppCert() != null && this.getXmppKey() != null) {
+
+			String keystorePassword = UUID.randomUUID().toString();
+
+			try {
+				// get VTN fingerprints
+				xmppOadr20aFingerprint = OadrFingerprintSecurity.getOadr20aFingerprint(this.getXmppCert());
+				xmppOadr20bFingerprint = OadrFingerprintSecurity.getOadr20bFingerprint(this.getXmppCert());
+				xmppTrustManagerFactory = OadrPKISecurity.createTrustManagerFactory(trustCertificates);
+				xmppKeyManagerFactory = OadrPKISecurity.createKeyManagerFactory(this.getXmppKey(), this.getXmppCert(),
+						keystorePassword);
+
+				// SSL Context Factory
+				xmppSslContext = SSLContext.getInstance("TLS");
+
+				// init ssl context
+				String seed = UUID.randomUUID().toString();
+				getXmppSslContext().init(xmppKeyManagerFactory.getKeyManagers(), xmppTrustManagerFactory.getTrustManagers(),
+						new SecureRandom(seed.getBytes()));
+				// init ssl context
+			} catch (OadrSecurityException | NoSuchAlgorithmException | KeyManagementException e) {
+				throw new OadrVTNInitializationException(e);
+			}
+		} else {
+			LOGGER.warn(
+					"VTN " + PRIVATE_KEY_CONF + " or " + CERTIFICATE_CONF + " not given - no XMPP transport supported");
 		}
 
 		if (getBrokerPort() == null) {
@@ -208,7 +272,9 @@ public class VtnConfig {
 		}
 		brokerUrl = "tcp://" + getBrokerHost() + ":" + getBrokerPort();
 		sslBrokerUrl = "ssl://" + brokerSslHost + ":" + brokerSslPort;
-
+		
+		LOGGER.debug("Initialized VTN configuration:");
+		LOGGER.debug(this.toString());
 	}
 
 	public boolean hasExternalRabbitMQBroker() {
@@ -254,10 +320,6 @@ public class VtnConfig {
 
 	public Long getPullFrequencySeconds() {
 		return pullFrequencySeconds;
-	}
-
-	public String getHost() {
-		return host;
 	}
 
 	public Boolean getValidateOadrPayloadAgainstXsd() {
@@ -338,6 +400,23 @@ public class VtnConfig {
 
 	public String getValidateOadrPayloadAgainstXsdFilePath() {
 		return validateOadrPayloadAgainstXsdFilePath;
+	}
+	
+	@Override
+	public String toString() {
+		return "VtnConfig [contextPath=" + contextPath + "\n, port=" + port + "\n, trustCertificatesStr="
+				+ trustCertificatesStr + "\n, key=" + key + "\n, cert=" + cert + "\n, xmppCert=" + xmppCert + "\n, xmppKey="
+				+ xmppKey + "\n, supportPush=" + supportPush + "\n, supportUnsecuredHttpPush=" + supportUnsecuredHttpPush
+				+ "\n, pullFrequencySeconds=" + pullFrequencySeconds 
+				+ "\n, validateOadrPayloadAgainstXsd=" + validateOadrPayloadAgainstXsd
+				+ "\n, validateOadrPayloadAgainstXsdFilePath=" + validateOadrPayloadAgainstXsdFilePath + "\n, vtnId="
+				+ vtnId + "\n, replayProtectAcceptedDelaySecond=" + replayProtectAcceptedDelaySecond + "\n, caKey=" + caKey
+				+ "\n, caCert=" + caCert + "\n, brokerHost=" + brokerHost + "\n, brokerPort=" + brokerPort + "\n, brokerUser="
+				+ brokerUser + "\n, brokerPass=" + brokerPass + "\n, brokerSslPort=" + brokerSslPort + "\n, brokerSslHost="
+				+ brokerSslHost + "\n, xmppHost=" + xmppHost + "\n, xmppPort=" + xmppPort + "\n, xmppDomain=" + xmppDomain
+				+ "\n, oadr20bFingerprint=" + oadr20bFingerprint + "\n, oadr20aFingerprint=" + oadr20aFingerprint
+				+ "\n, xmppOadr20bFingerprint=" + xmppOadr20bFingerprint + "\n, xmppOadr20aFingerprint="
+				+ xmppOadr20aFingerprint + "\n, brokerUrl=" + brokerUrl + "\n, sslBrokerUrl=" + sslBrokerUrl + "]";
 	}
 
 }

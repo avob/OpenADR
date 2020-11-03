@@ -61,7 +61,7 @@ public class OadrXmppClient20b {
 	private XMPPTCPConnection connection;
 
 	private DomainBareJid domainJid;
-	private EntityFullJid clientJid;
+	private String clientJid;
 
 	private ChatManager chatManager;
 
@@ -104,22 +104,20 @@ public class OadrXmppClient20b {
 			SASLAuthentication.unBlacklistSASLMechanism("PLAIN");
 			SASLAuthentication.blacklistSASLMechanism("DIGEST-MD5");
 			setDomainJid(JidCreate.domainBareFrom(XMPP_OADR_SUBDOMAIN + "." + domain));
-			setClientJid(JidCreate.entityFullFrom(userJid));
 
 			chatManager = ChatManager.getInstanceFor(connection);
 
 			if (onMessageListener != null) {
-				connection.addAsyncStanzaListener(onMessageListener, StanzaTypeFilter.MESSAGE);
+				this.connection.addAsyncStanzaListener(onMessageListener, StanzaTypeFilter.MESSAGE);
 			}
 
-			connection.connect().login(); // Establishes a connection to the server
-			if (connection.isConnected() && connection.isAuthenticated()) {
+			this.connection.connect().login(); // Establishes a connection to the server
+			if (this.connection.isConnected() && this.connection.isAuthenticated()) {
 
-				IQ request = new Ping(this.getClientJid());
-				connection.sendIqRequestAsync(request);
+				
 
 				Presence p = new Presence(Type.available);
-				connection.sendStanza(p);
+				this.connection.sendStanza(p);
 
 				boolean hasXmppOadrFeature = this.hasXmppOadrFeature();
 
@@ -128,6 +126,10 @@ public class OadrXmppClient20b {
 				}
 
 				discoveredXmppOadrServices = this.discoverXmppOadrServices();
+				
+				
+				
+				setClientJid(this.connection.getUser().asEntityBareJidString());
 
 			} else {
 				throw new OadrXmppException("Connection refused by Xmpp server ");
@@ -147,7 +149,7 @@ public class OadrXmppClient20b {
 		EntityBareJid entityBareFrom = JidCreate.entityBareFrom(jid);
 		Chat chatWith = chatManager.chatWith(entityBareFrom);
 		Message message = new Message();
-		message.setFrom(getClientJid());
+		message.setFrom(this.connection.getUser());
 		message.setTo(jid);
 		message.setBody(payload);
 		chatWith.send(message);
@@ -186,11 +188,11 @@ public class OadrXmppClient20b {
 		return discoveredXmppOadrServices;
 	}
 
-	public EntityFullJid getClientJid() {
-		return clientJid;
+	public String getClientJid() {
+		return this.connection.getUser().asEntityBareJidString();
 	}
 
-	private void setClientJid(EntityFullJid clientJid) {
+	private void setClientJid(String clientJid) {
 		this.clientJid = clientJid;
 	}
 

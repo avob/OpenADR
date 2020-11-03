@@ -69,7 +69,10 @@ public class OadrXmppClient20bBuilder {
 			xmpptcpConnection = new XMPPTCPConnection(anonymousConnection);
 		}
 
-		String jid = this.venId + "@" + domain + "/" + resource;
+		String jid = this.venId + "@" + domain;
+		if(this.resource != null) {
+			jid += "/"+resource;
+		}
 		return new OadrXmppClient20b(jid, xmpptcpConnection, domain, this.listener);
 
 	}

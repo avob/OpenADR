@@ -2,17 +2,12 @@ package com.avob.openadr.server.oadr20b.ven;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.UUID;
 
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -29,18 +24,14 @@ import com.avob.openadr.security.exception.OadrSecurityException;
 public class VENJettyServerCustomizer implements JettyServerCustomizer {
 
 	private int port;
-	private KeyStore keystore;
-	private KeyStore truststore;
-	private String keystorePass;
+	private SSLContext sslContext;
 	private String[] protocols;
 	private String[] ciphers;
 
-	public VENJettyServerCustomizer(int port, KeyStore keystore, String keystorePass, KeyStore truststore,
+	public VENJettyServerCustomizer(int port, SSLContext sslContext, 
 			String[] protocols, String[] ciphers) {
 		this.port = port;
-		this.keystore = keystore;
-		this.truststore = truststore;
-		this.keystorePass = keystorePass;
+		this.sslContext = sslContext;
 		this.protocols = protocols;
 		this.ciphers = ciphers;
 	}
@@ -60,26 +51,7 @@ public class VENJettyServerCustomizer implements JettyServerCustomizer {
 			throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException,
 			OadrSecurityException, UnrecoverableKeyException, KeyManagementException {
 		// SSL Context Factory
-		SslContextFactory sslContextFactory = new SslContextFactory();
-
-		SSLContext sslContext = SSLContext.getInstance("TLS");
-
-		// init key manager factory
-		KeyStore createKeyStore = keystore;
-		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		keyManagerFactory.init(createKeyStore, keystorePass.toCharArray());
-
-		// init trust manager factory
-		KeyStore createTrustStore = truststore;
-		TrustManagerFactory trustManagerFactory = TrustManagerFactory
-				.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-		trustManagerFactory.init(createTrustStore);
-
-		// init ssl context
-		String seed = UUID.randomUUID().toString();
-
-		sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
-				new SecureRandom(seed.getBytes()));
+		SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
 
 		sslContextFactory.setSslContext(sslContext);
 

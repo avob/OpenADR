@@ -37,11 +37,6 @@ public class VTN20aApplication {
 
 	@Bean
 	public WebServerFactoryCustomizer<JettyServletWebServerFactory> servletContainerCustomizer() {
-		Map<String, String> trustedCertificates = Maps.newHashMap();
-		int i = 0;
-		for (String path : vtnConfig.getTrustCertificates()) {
-			trustedCertificates.put("cert_" + (i++), path);
-		}
 		return new VTNEmbeddedServletContainerCustomizer(vtnConfig.getPort(), vtnConfig.getContextPath(),
 				vtnConfig.getSslContext(), Oadr20aSecurity.getProtocols(), Oadr20aSecurity.getCiphers());
 	}

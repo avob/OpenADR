@@ -59,7 +59,7 @@ public class OadrSecurityRoleService {
 
 	public User grantX509Role(String username) {
 
-		if (username.equals(vtnConfig.getOadr20bFingerprint())) {
+		if (username.equals(vtnConfig.getOadr20bFingerprint()) || username.equals(vtnConfig.getXmppOadr20bFingerprint())) {
 			return new User(username, "", Lists.newArrayList(new SimpleGrantedAuthority("ROLE_VTN")));
 		}
 		return this.grantRole(saveFindUser(username), "");

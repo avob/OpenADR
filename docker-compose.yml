@@ -1,0 +1,79 @@
+version: "3.8"
+services:
+  build:
+    build:
+      context: .
+      dockerfile: Dockerfile-build
+  postgres:
+    build: .docker/postgres
+    environment:
+      - POSTGRES_PASSWORD=supersecure
+    depends_on:
+      - "build"
+  openfire:
+    build: .docker/openfire
+    depends_on:
+      - "build"
+      - "postgres"
+    ports:
+      - "5222:5222"
+      - "9090:9090"
+    networks:
+      default:
+      http:
+      xmpp:
+        aliases:
+          - xmpp.vtn.oadr.com
+  rabbitmq:
+    build: .docker/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    depends_on:
+      - "build"
+  vtn20b:
+    build: .docker/vtn20b
+    depends_on:
+      - "build"
+      - "postgres"
+      - "rabbitmq"
+      - "openfire"
+    ports:
+      - "8181:8181"
+    networks:
+      default:
+      xmpp:
+      http:
+        aliases:
+          - vtn.oadr.com
+  ven20b:
+    build: .docker/ven20b
+    ports:
+      - "8083:8083"
+    depends_on:
+      - "build"
+      - "openfire"
+      - "vtn20b"
+    networks:
+      xmpp:
+      # http:
+      #   aliases:
+      #     - ven2.oadr.com
+      # xmpp:
+  # nodered:
+  #   build: .docker/nodered
+  #   depends_on:
+  #     - "build"
+  #     - "vtn20b"
+  #   links:
+  #     - "vtn20b:vtn.oadr.com"
+  #   ports:
+  #     - "1880:1880"
+  #     - "8843:8843"
+networks:
+  http:
+  xmpp:
+

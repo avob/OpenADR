@@ -48,7 +48,7 @@ public class XmppConnector {
 
 	private XMPPTCPConnection getXmppConnection(String domain, Oadr20bVTNEiService service) throws OadrXmppException {
 		String resource = (service != null) ? service.getServiceName() : "uplink";
-		SSLContext sslContext = vtnConfig.getSslContext();
+		SSLContext sslContext = vtnConfig.getXmppSslContext();
 		String host = vtnConfig.getXmppHost();
 		int port = vtnConfig.getXmppPort();
 

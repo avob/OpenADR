@@ -114,18 +114,26 @@ public class Oadr20bVENEiRegisterPartyService {
 	public void initRegistration(VtnSessionConfiguration vtnConfiguration) {
 
 		String requestId = "0";
-		OadrQueryRegistrationType queryRegistration = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bQueryRegistrationBuilder(requestId)
-
-				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value()).build();
+		
 
 		try {
 			if (vtnConfiguration.getVtnUrl() != null) {
+				OadrQueryRegistrationType queryRegistration = Oadr20bEiRegisterPartyBuilders
+						.newOadr20bQueryRegistrationBuilder(requestId)
+
+						.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value()).build();
+				
 				OadrCreatedPartyRegistrationType oadrQueryRegistrationType = multiVtnConfig
 						.getMultiHttpClientConfig(vtnConfiguration).oadrQueryRegistrationType(queryRegistration);
 				this.oadrCreatedPartyRegistration(vtnConfiguration, oadrQueryRegistrationType);
 			} else {
-				multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).oadrQueryRegistrationType(queryRegistration);
+				
+				OadrCreatePartyRegistrationType createPartyRegistration = Oadr20bEiRegisterPartyBuilders.newOadr20bCreatePartyRegistrationBuilder(requestId, venConfig.getVenId(), "xmpp")
+					.withOadrTransportName(OadrTransportType.XMPP)
+					.withOadrTransportAddress(multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).getConnectionJid())
+					.build();
+				
+				multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).oadrCreatePartyRegistration(createPartyRegistration);
 			}
 
 		} catch (Oadr20bException | Oadr20bHttpLayerException | Oadr20bXMLSignatureException
@@ -138,7 +146,7 @@ public class Oadr20bVENEiRegisterPartyService {
 		}
 
 	}
-
+	
 	public void register(VtnSessionConfiguration vtnConfiguration, OadrCreatedPartyRegistrationType registration)
 			throws Oadr20bMarshalException, IOException {
 		setRegistration(vtnConfiguration, registration);
@@ -241,7 +249,7 @@ public class Oadr20bVENEiRegisterPartyService {
 
 			OadrXmppVenClient20b xmppClient = multiVtnConfig.getMultiXmppClientConfig(vtnConfig);
 
-			String transportAddress = xmppClient.getConnectionJid().toString();
+			String transportAddress = xmppClient.getConnectionJid();
 
 			OadrTransportType transportType = OadrTransportType.XMPP;
 

@@ -5,14 +5,24 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+
+import com.avob.openadr.security.OadrPKISecurity;
+import com.avob.openadr.security.exception.OadrSecurityException;
 
 @Configuration
 public class VenConfig {
@@ -74,6 +84,8 @@ public class VenConfig {
 	public static final String VALIDATE_OADR_PAYLOAD_XSD_CONF = "oadr.validateOadrPayloadAgainstXsd";
 	public static final String VALIDATE_OADR_PAYLOAD_XSD_FILEPATH_CONF = "oadr.security.validateOadrPayloadAgainstXsdFilePath";
 
+	private  SSLContext sslContext;
+	
 	public VenConfig() {
 	}
 
@@ -96,6 +108,10 @@ public class VenConfig {
 		this.venUrl = clone.getVenUrl();
 		this.xmlSignature = clone.getXmlSignature();
 		this.validateOadrPayloadAgainstXsdFilePath = clone.getValidateOadrPayloadAgainstXsdFilePath();
+		
+		 
+		
+		
 	}
 
 	@PostConstruct
@@ -123,6 +139,23 @@ public class VenConfig {
 						"oadr.venid.must be a valid file path containing venId as it's first line", e);
 
 			}
+		}
+		String password = UUID.randomUUID().toString();
+		 TrustManagerFactory trustManagerFactory;
+		try {
+			trustManagerFactory = OadrPKISecurity.createTrustManagerFactory(trustCertificates);
+			 KeyManagerFactory keyManagerFactory =  OadrPKISecurity.createKeyManagerFactory(this.getVenPrivateKeyPath(), this.getVenCertificatePath(),
+					 password);
+			 
+			// SSL Context Factory
+			 sslContext = SSLContext.getInstance("TLS");
+
+			// init ssl context
+			String seed = UUID.randomUUID().toString();
+			sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
+					new SecureRandom(seed.getBytes()));
+		} catch (OadrSecurityException | NoSuchAlgorithmException | KeyManagementException e) {
+			throw new IllegalStateException(e);
 		}
 	}
 
@@ -216,6 +249,11 @@ public class VenConfig {
 
 	public String getValidateOadrPayloadAgainstXsdFilePath() {
 		return validateOadrPayloadAgainstXsdFilePath;
+	}
+	
+	public SSLContext getSslContext() {
+		
+		return sslContext;
 	}
 
 }

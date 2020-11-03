@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    This file stores bootstrap properties needed by Openfire.
+    Property names must be in the format: "prop.name.is.blah=value"
+    That will be stored as:
+        <prop>
+            <name>
+                <is>
+                    <blah>value</blah>
+                </is>
+            </name>
+        </prop>
+
+    Most properties are stored in the Openfire database. A
+    property viewer and editor is included in the admin console.
+-->
+<!-- root element, all properties must be under this element -->
+<!--
+admin.web.ssl.keypass changeme
+admin.web.ssl.keystore  /usr/share/openfire/resources/security/keystore
+admin.web.ssl.trustpass changeme
+admin.web.ssl.truststore  /usr/share/openfire/resources/security/truststore
+hybridAuthProvider.primaryProvider.className  org.jivesoftware.openfire.auth.DefaultAuthProvider
+hybridAuthProvider.secondaryProvider.className  com.avob.server.openfire.OpenfireOadrAuthProvider
+provider.auth.className org.jivesoftware.openfire.auth.HybridAuthProvider
+sasl.mechs  EXTERNAL,PLAIN,ANONYMOUS
+xmpp.auth.anonymous true
+xmpp.auth.external  true
+xmpp.bosh.ssl.client.keypass  changeme
+xmpp.bosh.ssl.client.keystore /usr/share/openfire/resources/security/keystore
+xmpp.bosh.ssl.client.trustpass  changeme
+xmpp.bosh.ssl.client.truststore /usr/share/openfire/resources/security/client.truststore
+xmpp.client.cert.policy wanted
+xmpp.client.tls.policy  required
+xmpp.component.keypass  changeme
+xmpp.component.keystore /usr/share/openfire/resources/security/keystore
+xmpp.component.trustpass  changeme
+xmpp.component.truststore /usr/share/openfire/resources/security/truststore
+xmpp.multiplex.keypass  changeme
+xmpp.multiplex.keystore /usr/share/openfire/resources/security/keystore
+xmpp.multiplex.trustpass  changeme
+xmpp.multiplex.truststore /usr/share/openfire/resources/security/truststore
+xmpp.oadr.vtnAuthEndpoint https://vtn.oadr.com:8181/testvtn/Role
+xmpp.oadr.vtnId 1f24e2cfb468ce2b06ec
+xmpp.session.conflict-limit 0
+xmpp.socket.ssl.client.certificate.accept-selfsigned  false
+xmpp.socket.ssl.client.certificate.verify.validity  true
+xmpp.socket.ssl.client.ciphersuites TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_RSA_WITH_AES_256_CBC_SHA256,TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384,TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384,TLS_DHE_RSA_WITH_AES_256_CBC_SHA256,TLS_DHE_DSS_WITH_AES_256_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA,TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA,TLS_ECDH_RSA_WITH_AES_256_CBC_SHA,TLS_DHE_RSA_WITH_AES_256_CBC_SHA,TLS_DHE_DSS_WITH_AES_256_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_DSS_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDH_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,TLS_DHE_DSS_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_DSS_WITH_AES_128_GCM_SHA256,TLS_EMPTY_RENEGOTIATION_INFO_SCSV
+xmpp.socket.ssl.client.keypass  changeme
+xmpp.socket.ssl.client.keystore /usr/share/openfire/resources/security/keystore
+xmpp.socket.ssl.client.protocols  TLSv1.2
+xmpp.socket.ssl.client.trustpass  changeme
+xmpp.socket.ssl.client.truststore /usr/share/openfire/resources/security/client.truststore
+xmpp.socket.ssl.keypass changeme
+xmpp.socket.ssl.keystore  /usr/share/openfire/resources/security/keystore
+xmpp.socket.ssl.trustpass changeme
+xmpp.socket.ssl.truststore  /usr/share/openfire/resources/security/truststore
+-->
+<jive> 
+  <adminConsole> 
+    <!-- Disable either port by setting the value to -1 -->  
+    <port>9090</port>  
+    <securePort>9091</securePort> 
+  </adminConsole>  
+  <locale>en</locale>  
+  <!-- Network settings. By default, Openfire will bind to all network interfaces.
+      Alternatively, you can specify a specific network interfaces that the server
+      will listen on. For example, 127.0.0.1. This setting is generally only useful
+       on multi-homed servers. -->  
+  <!--
+    <network>
+        <interface></interface>
+    </network>
+    -->  
+  <!--
+        One time token to gain temporary access to the admin console.
+    -->  
+  <!--
+    <oneTimeAccessToken>secretToken</oneTimeAccessToken>
+    -->  
+  <connectionProvider> 
+    <className>org.jivesoftware.database.DefaultConnectionProvider</className> 
+  </connectionProvider>  
+  <database> 
+    <defaultProvider> 
+      <driver>org.postgresql.Driver</driver>  
+      <serverURL>jdbc:postgresql://postgres:5432/oadr-openfire</serverURL>  
+      <username encrypted="true">1b26bcaf16f9c8400b2f1013112e159084d81d137e43de5c58eb811aaf3fb4b3b15356f1851c56a4</username>  
+      <password encrypted="true">8b48f39b45601cb00a3e7885528acc44256aa1f786386354793901cd1758bf35</password>  
+      <testSQL>select 1</testSQL>  
+      <testBeforeUse>false</testBeforeUse>  
+      <testAfterUse>false</testAfterUse>  
+      <testTimeout>500</testTimeout>  
+      <timeBetweenEvictionRuns>30000</timeBetweenEvictionRuns>  
+      <minIdleTime>900000</minIdleTime>  
+      <maxWaitTime>500</maxWaitTime>  
+      <minConnections>5</minConnections>  
+      <maxConnections>25</maxConnections>  
+      <connectionTimeout>1.0</connectionTimeout> 
+    </defaultProvider> 
+  </database>  
+  <setup>true</setup>  
+  <fqdn>xmpp.vtn.oadr.com</fqdn> 
+</jive>

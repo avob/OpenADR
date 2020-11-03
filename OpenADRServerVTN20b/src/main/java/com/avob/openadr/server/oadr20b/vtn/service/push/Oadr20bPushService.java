@@ -220,7 +220,7 @@ public class Oadr20bPushService {
 			}
 
 		} catch (Oadr20bException e) {
-			LOGGER.error("Fail to distribute payload", e);
+			LOGGER.error("Fail to distribute payload to "+venPushUrl, e);
 		} catch (Oadr20bMarshalException e) {
 			LOGGER.error("Fail to distribute payload", e);
 		} catch (URISyntaxException e) {

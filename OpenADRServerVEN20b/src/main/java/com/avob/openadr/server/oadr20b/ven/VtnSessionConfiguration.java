@@ -100,10 +100,6 @@ public class VtnSessionConfiguration {
 	public String getVtnId() {
 		return vtnId;
 	}
-	
-	public String getSlugifiedVtnId() {
-		return vtnId.replace("\\.", "").replace(":", "");
-	}
 
 	public void setVtnId(String vtnId) {
 		this.vtnId = vtnId;

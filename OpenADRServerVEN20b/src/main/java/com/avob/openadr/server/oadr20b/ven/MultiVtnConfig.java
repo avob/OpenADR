@@ -117,7 +117,7 @@ public class MultiVtnConfig {
 
 				OadrXmppClient20bBuilder builder = new OadrXmppClient20bBuilder()
 						.withHostAndPort(session.getVtnXmppHost(), session.getVtnXmppPort())
-						.withVenID(session.getSlugifiedVtnId()).withResource("client").withSSLContext(sslContext)
+						.withVenID(venConfig.getVenId()).withResource("client").withSSLContext(sslContext)
 						.withListener(xmppVenListeners);
 
 				if (session.getVtnXmppDomain() != null) {
@@ -286,7 +286,7 @@ public class MultiVtnConfig {
 	}
 
 	public OadrXmppVenClient20b getMultiXmppClientConfig(VtnSessionConfiguration vtnConfiguration) {
-		return multiXmppClientConfig.get(vtnConfiguration.getSlugifiedVtnId());
+		return multiXmppClientConfig.get(vtnConfiguration.getVtnId());
 	}
 
 	public void putMultiXmppClientConfig(VtnSessionConfiguration vtnConfiguration, OadrXmppVenClient20b venClient) {
