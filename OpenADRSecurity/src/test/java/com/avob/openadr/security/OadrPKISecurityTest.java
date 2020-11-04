@@ -35,7 +35,6 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.assertj.core.util.Lists;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -157,7 +156,7 @@ public class OadrPKISecurityTest {
 		certificates.add(TestUtils.TEST_CRT);
 		KeyStore createTrustStore = OadrPKISecurity.createTrustStore(certificates);
 		assertNotNull(createTrustStore);
-		createTrustStore = OadrPKISecurity.createTrustStore(Lists.newArrayList());
+		createTrustStore = OadrPKISecurity.createTrustStore(new ArrayList<>());
 		assertNotNull(createTrustStore);
 
 		// invalid pem
@@ -179,7 +178,7 @@ public class OadrPKISecurityTest {
 		certificates.add(TestUtils.TEST_CRT);
 		TrustManagerFactory createTrustManagerFactory = OadrPKISecurity.createTrustManagerFactory(certificates);
 		assertNotNull(createTrustManagerFactory);
-		createTrustManagerFactory = OadrPKISecurity.createTrustManagerFactory(Lists.newArrayList());
+		createTrustManagerFactory = OadrPKISecurity.createTrustManagerFactory(new ArrayList<>());
 		assertNotNull(createTrustManagerFactory);
 
 		// invalid pem
@@ -204,7 +203,7 @@ public class OadrPKISecurityTest {
 				certificates, password);
 		assertNotNull(createSSLContext);
 		createSSLContext = OadrPKISecurity.createSSLContext(TestUtils.TEST_KEY, TestUtils.TEST_CRT,
-				Lists.newArrayList(), password);
+				new ArrayList<>(), password);
 		assertNotNull(createSSLContext);
 
 		// invalid pem

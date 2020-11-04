@@ -9,7 +9,6 @@ import java.io.File;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import org.assertj.core.util.Files;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -70,7 +69,7 @@ public class Oadr20bCanceledReportTest {
 		File file2 = new File("src/test/resources/eireport/genOadrCanceledReport.xml");
 		jaxbContext.marshal(Oadr20bFactory.createOadrCanceledReport(unmarshal), file2);
 		assertTrue(file2.exists());
-		Files.delete(file2);
+		file2.delete();
 
 	}
 

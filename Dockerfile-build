@@ -1,6 +1,7 @@
 FROM adoptopenjdk/maven-openjdk8
 
 RUN mkdir /opt/oadr
+RUN mkdir /opt/oadr/lib
 RUN mkdir /opt/oadr/vtn20b
 RUN mkdir /opt/oadr/ven20b
 RUN mkdir /usr/src/openadr
@@ -8,19 +9,15 @@ RUN mkdir /usr/src/openadr
 COPY cert /opt/oadr/cert
 COPY . /usr/src/openadr/
 
-RUN ls -al /usr/src/openadr/OpenADRServerVTN20b
 
-# COPY --from=openadr_build:latest /opt/oadr/  /opt/oadr/
-
-# RUN if [ -f /opt/oadr/node_modules ]; then mv /opt/oadr/node_modules /usr/src/openadr/OpenADRServerVTN20b/frontend/node_modules; fi
-# RUN if [ -f /opt/oadr/package-lock.json ]; then mv /opt/oadr/package-lock.json /usr/src/openadr/OpenADRServerVTN20b/frontend/package-lock.json; fi
+RUN mvn dependency:copy@copy-external-dependency -f /usr/src/openadr/pom.xml
+RUN ls -al /usr/src/openadr/target/
+RUN mv /usr/src/openadr/target/* /opt/oadr/lib/
 
 RUN if [ ! -f /usr/src/openadr/OpenADRServerVTN20b/target/OpenADRServerVTN20b-0.1.0-SNAPSHOT.jar ]; then mvn package -P external,frontend -DskipTests=true -f /usr/src/openadr/pom.xml; fi
 
 RUN mv /usr/src/openadr/OpenADRServerVEN20b/target/*.jar /opt/oadr/ven20b/;
 RUN mv /usr/src/openadr/OpenADRServerVTN20b/target/*.jar /opt/oadr/vtn20b/;
-# RUN mv /usr/src/openadr/OpenADRServerVTN20b/frontend/node_modules /opt/oadr/node_modules
-# RUN mv /usr/src/openadr/OpenADRServerVTN20b/frontend/package-lock.json /opt/oadr/package-lock.json
 
 RUN rm -rf /usr/src/openadr
 

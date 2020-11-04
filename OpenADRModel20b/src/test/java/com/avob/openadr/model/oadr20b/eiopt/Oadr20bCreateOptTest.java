@@ -8,7 +8,6 @@ import java.io.File;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import org.assertj.core.util.Files;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -97,7 +96,7 @@ public class Oadr20bCreateOptTest {
 		File file2 = new File("src/test/resources/eiopt/genOadrCreateOpt.xml");
 		jaxbContext.marshal(Oadr20bFactory.createOadrCreateOpt(unmarshal), file2);
 		assertTrue(file2.exists());
-		Files.delete(file2);
+		file2.delete();
 
 	}
 

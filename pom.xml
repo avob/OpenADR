@@ -24,16 +24,17 @@
 		<smack.version>4.3.4</smack.version>
 		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
 		<jacoco-plugin.version>0.8.5</jacoco-plugin.version>
+		<postgres.version>42.2.5</postgres.version>
+		<rabbitmq-jms.version>1.11.2</rabbitmq-jms.version>
+		<springfox.version>2.9.2</springfox.version>
+		<dozer.version>5.5.1</dozer.version>
+		<commons-compress.version>1.19</commons-compress.version>
+		<guava.version>21.0	</guava.version>
 	</properties>
 
 
 
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -43,6 +44,45 @@
 
 
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+			    <groupId>org.postgresql</groupId>
+			    <artifactId>postgresql</artifactId>
+			    <version>${postgres.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.rabbitmq.jms</groupId>
+				<artifactId>rabbitmq-jms</artifactId>
+				<version>${rabbitmq-jms.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger2</artifactId>
+				<version>${springfox.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+				<version>${springfox.version}</version>
+			</dependency>
+			<dependency>
+			<groupId>net.sf.dozer</groupId>
+			<artifactId>dozer</artifactId>
+			<version>${dozer.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>${commons-compress.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
+		</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 
 
@@ -56,6 +96,30 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-external-dependency</id>
+            <phase>none</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <artifactItems>
+            <artifactItem>
+              <groupId>org.postgresql</groupId>
+			  <artifactId>postgresql</artifactId>
+			  <version>${postgres.version}</version>
+              <type>jar</type>
+              <outputDirectory>${project.build.directory}/</outputDirectory>
+            </artifactItem>
+          </artifactItems>
+        </configuration>
+        </plugin>
 		</plugins>
 	</build>
 

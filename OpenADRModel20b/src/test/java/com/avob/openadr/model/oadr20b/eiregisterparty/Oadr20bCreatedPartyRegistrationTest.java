@@ -5,12 +5,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.Arrays;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import org.assertj.core.util.Files;
-import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -63,7 +62,7 @@ public class Oadr20bCreatedPartyRegistrationTest {
 						Oadr20bResponseBuilders.newOadr20bEiResponseBuilder(requestId, responseCode).build(), venId, vtnId)
 				.addOadrProfile(Oadr20bEiRegisterPartyBuilders.newOadr20bOadrProfileBuilder("2.0b")
 						.addTransport(OadrTransportType.SIMPLE_HTTP).build())
-				.addOadrProfile(Lists.newArrayList(Oadr20bEiRegisterPartyBuilders.newOadr20bOadrProfileBuilder("2.0b")
+				.addOadrProfile(Arrays.asList(Oadr20bEiRegisterPartyBuilders.newOadr20bOadrProfileBuilder("2.0b")
 						.addTransport(OadrTransportType.SIMPLE_HTTP).build()))
 				.withOadrRequestedOadrPollFreq("PT1H").withResponseDescription("mouaiccool")
 				.withOadrServiceSpecificInfo(oadrServiceSpecificInfo).withOadrExtensions(oadrExtensions).build();
@@ -120,7 +119,7 @@ public class Oadr20bCreatedPartyRegistrationTest {
 		File file2 = new File("src/test/resources/eiregisterparty/genOadrCreatePartyRegistration.xml");
 		jaxbContext.marshal(Oadr20bFactory.createOadrCreatedPartyRegistration(unmarshal), file2);
 		assertTrue(file2.exists());
-		Files.delete(file2);
+		file2.delete();
 
 	}
 

@@ -8,8 +8,9 @@ RUN mkdir /var/run/oadr-vtn20b
 
 COPY --from=openadr_build:latest /opt/oadr/cert /opt/oadr-vtn20b/cert
 COPY --from=openadr_build:latest /opt/oadr/vtn20b/*.jar /opt/oadr-vtn20b/
+COPY --from=openadr_build:latest /opt/oadr/lib/* /opt/oadr-vtn20b/lib/
 
-ADD https://jdbc.postgresql.org/download/postgresql-42.2.5.jar /opt/oadr-vtn20b/lib/postgresql-42.2.5.jar
+RUN ls -al /opt/oadr-vtn20b/lib/
 
 COPY application.properties /opt/oadr-vtn20b/application.properties
 COPY loader.properties /opt/oadr-vtn20b/loader.properties

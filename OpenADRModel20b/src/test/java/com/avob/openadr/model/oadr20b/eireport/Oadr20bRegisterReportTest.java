@@ -12,8 +12,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import org.assertj.core.util.Files;
-import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -121,7 +119,7 @@ public class Oadr20bRegisterReportTest {
 		File file2 = new File("src/test/resources/eireport/genOadrRegisterReport.xml");
 		jaxbContext.marshal(Oadr20bFactory.createOadrRegisterReport(unmarshal), file2);
 		assertTrue(file2.exists());
-		Files.delete(file2);
+		file2.delete();
 	}
 
 	@Test
@@ -239,7 +237,7 @@ public class Oadr20bRegisterReportTest {
 						.withOadrSamplingRate("PT15M", "PT1H", false).withMarketContext(marketContextName).build())
 				.addInterval(Oadr20bEiBuilders
 						.newOadr20bReportIntervalTypeBuilder("intervalId", 0L, "PT1H", "rid", 0L, 0F, 0F).build())
-				.addInterval(Lists.newArrayList(Oadr20bEiBuilders
+				.addInterval(Arrays.asList(Oadr20bEiBuilders
 						.newOadr20bReportIntervalTypeBuilder("intervalId", 0L, "PT1H", "rid", 0L, 0F, 0F).build()))
 				.withStart(start).withDuration(duration).build();
 

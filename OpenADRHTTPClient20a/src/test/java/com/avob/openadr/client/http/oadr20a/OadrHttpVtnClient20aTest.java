@@ -6,11 +6,11 @@ import java.net.URISyntaxException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.util.Arrays;
 
 import javax.xml.bind.JAXBException;
 
 import org.apache.http.HttpStatus;
-import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -73,7 +73,7 @@ public class OadrHttpVtnClient20aTest {
 
 		OadrEvent oadrEvent = Oadr20aBuilders.newOadr20aDistributeEventOadrEventBuilder()
 				.withActivePeriod(eiActivePeriod).addEiEventSignal(eiEventSignalType)
-				.addEiEventSignal(Lists.newArrayList(eiEventSignalType)).withEiTarget(eiTarget)
+				.addEiEventSignal(Arrays.asList(eiEventSignalType)).withEiTarget(eiTarget)
 				.withEventDescriptor(eventDescriptor).build();
 
 		OadrDistributeEvent mockDistributeEvent = Oadr20aBuilders.newOadr20aDistributeEventBuilder("", "")

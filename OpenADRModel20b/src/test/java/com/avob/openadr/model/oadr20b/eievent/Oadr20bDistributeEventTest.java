@@ -10,8 +10,6 @@ import java.util.Arrays;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import org.assertj.core.util.Files;
-import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -69,10 +67,10 @@ public class Oadr20bDistributeEventTest {
 				.newOadr20bEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue)
 				.addInterval(Oadr20bEiBuilders
 						.newOadr20bSignalIntervalTypeBuilder(intervalId, start, xmlDuration, currentValue).build())
-				.addInterval(Lists.newArrayList(Oadr20bEiBuilders
+				.addInterval(Arrays.asList(Oadr20bEiBuilders
 						.newOadr20bSignalIntervalTypeBuilder(intervalId, start, xmlDuration, currentValue).build()))
 				.withEiTarget(
-						Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addVenId(Lists.newArrayList("ven")).build())
+						Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addVenId(Arrays.asList("ven")).build())
 				.withItemBase(Oadr20bFactory
 						.createCurrency(Oadr20bFactory.createCurrencyType(CurrencyItemDescriptionType.CURRENCY,
 								ISO3AlphaCurrencyCodeContentType.EUR, SiScaleCodeType.NONE)))
@@ -115,7 +113,7 @@ public class Oadr20bDistributeEventTest {
 
 		OadrDistributeEventType createOadrDistributeEvent = Oadr20bEiEventBuilders
 				.newOadr20bDistributeEventBuilder(vtnId, requestId).addOadrEvent(event)
-				.addOadrEvent(Lists.newArrayList(event)).build();
+				.addOadrEvent(Arrays.asList(event)).build();
 
 		String marshalRoot = jaxbContext.marshalRoot(createOadrDistributeEvent, true);
 
@@ -147,7 +145,7 @@ public class Oadr20bDistributeEventTest {
 		File file2 = new File("src/test/resources/eievent/genOadrDistributeEvent.xml");
 		jaxbContext.marshal(Oadr20bFactory.createOadrDistributeEvent(unmarshal), file2);
 		assertTrue(file2.exists());
-		Files.delete(file2);
+		file2.delete();
 
 	}
 }

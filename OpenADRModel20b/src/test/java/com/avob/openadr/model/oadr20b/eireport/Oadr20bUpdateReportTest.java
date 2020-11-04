@@ -5,12 +5,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.Arrays;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import org.assertj.core.util.Files;
-import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -51,7 +50,7 @@ public class Oadr20bUpdateReportTest {
 						createdTimestamp, startTimestamp, duration)
 				.addInterval(Oadr20bEiBuilders
 						.newOadr20bReportIntervalTypeBuilder("intervalId", 0L, "PT1H", "rid", 0L, 0F, 0F).build())
-				.addInterval(Lists.newArrayList(Oadr20bEiBuilders
+				.addInterval(Arrays.asList(Oadr20bEiBuilders
 						.newOadr20bReportIntervalTypeBuilder("intervalId", 0L, "PT1H", "rid", 0L, 0F, 0F).build()))
 				.build();
 
@@ -87,7 +86,7 @@ public class Oadr20bUpdateReportTest {
 		File file2 = new File("src/test/resources/eireport/genOadrUpdateReport.xml");
 		jaxbContext.marshal(Oadr20bFactory.createOadrUpdateReport(unmarshal), file2);
 		assertTrue(file2.exists());
-		Files.delete(file2);
+		file2.delete();
 
 	}
 

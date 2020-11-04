@@ -38,7 +38,7 @@ oadr.xmpp.port=5222
 ### In-memory profile
 Package jar with JMS broker dependencies. Do not require AMPQ broker middleware. Default true
 ```sh
-mvn clean package -P in-memory
+mvn clean package -P standalone
 ```
 ### External profile
 Package jar with RabbitMQ broker dependencies. Require AMPQ broker middleware.
@@ -51,7 +51,7 @@ Package jar with swagger dependencies used to deliver HTTP Control API descripti
 mvn clean package -P swagger
 ```
 ### Frontend profile
-Compile ReactJS frontend and package jar with compiled files.
+Compile ReactJS frontend and package jar with compiled files. Default true
 ```sh
 mvn clean package -P frontend
 ```

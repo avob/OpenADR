@@ -5,12 +5,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.Arrays;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import org.assertj.core.util.Files;
-import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -39,7 +38,7 @@ public class Oadr20bCancelReportTest {
 		String reportId = "reportId";
 		OadrCancelReportType request = Oadr20bEiReportBuilders
 				.newOadr20bCancelReportBuilder(requestId, venId, reportToFollow).addReportRequestId(reportId)
-				.addReportRequestId(Lists.newArrayList("mouaiccool")).build();
+				.addReportRequestId(Arrays.asList("mouaiccool")).build();
 
 		String marshalRoot = jaxbContext.marshalRoot(request, true);
 		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);
@@ -73,7 +72,7 @@ public class Oadr20bCancelReportTest {
 		File file2 = new File("src/test/resources/eireport/genOadrCancelReport.xml");
 		jaxbContext.marshal(Oadr20bFactory.createOadrCancelReport(unmarshal), file2);
 		assertTrue(file2.exists());
-		Files.delete(file2);
+		file2.delete();
 
 	}
 }
