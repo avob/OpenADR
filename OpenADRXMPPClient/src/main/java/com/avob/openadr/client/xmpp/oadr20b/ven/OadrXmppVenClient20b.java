@@ -147,7 +147,6 @@ public class OadrXmppVenClient20b {
 
 	public String getConnectionJid() {
 		return client.getClientJid().toString();
-		// return client.getClientJid();
 	}
 
 	public void oadrCreatedReport(OadrCreatedReportType payload) throws Oadr20bException, Oadr20bHttpLayerException,

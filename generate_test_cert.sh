@@ -44,7 +44,7 @@ write_openssl_config_file()
 	organizationName           = $ORGANIZATION
 	commonName                 = $2
 	[ req_ext ]
-	subjectAltName =DNS:$2,DNS:127.0.0.1
+	subjectAltName =DNS:$2,DNS:127.0.0.1,DNS:localhost
 	EOM
 }
 # gen_rsa_certificate "key/csr/crt files name" "certificate CN" "in ca key/crt name" "serial" "days"

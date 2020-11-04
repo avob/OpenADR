@@ -11,15 +11,18 @@
 		<version>0.1.0-SNAPSHOT</version>
 	</parent>
 	<dependencies>
+		 
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>1.2</version>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRSecurity</artifactId>
@@ -46,7 +49,7 @@
 					</execution>
 					<execution>
 						<id>jacoco-site</id>
-						<phase>package</phase>
+						<phase>site</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>

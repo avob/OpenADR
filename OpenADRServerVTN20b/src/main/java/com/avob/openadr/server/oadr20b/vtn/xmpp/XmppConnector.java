@@ -46,12 +46,15 @@ public class XmppConnector {
 
 	private OadrXmppClient20b xmppUplinkClient;
 
+	private String getJid(Oadr20bVTNEiService service, String domain) {
+		String resource = (service != null) ? service.getServiceName() : "uplink";
+		return vtnConfig.getVtnId() + "@" + domain + "/" + resource;
+	}
 	private XMPPTCPConnection getXmppConnection(String domain, Oadr20bVTNEiService service) throws OadrXmppException {
 		String resource = (service != null) ? service.getServiceName() : "uplink";
 		SSLContext sslContext = vtnConfig.getXmppSslContext();
 		String host = vtnConfig.getXmppHost();
 		int port = vtnConfig.getXmppPort();
-
 		XMPPTCPConnectionConfiguration anonymousConnection = OadrXmppClient20b.anonymousConnection(host, port, domain,
 				resource, sslContext);
 		return new XMPPTCPConnection(anonymousConnection);
@@ -59,16 +62,15 @@ public class XmppConnector {
 
 	private OadrXmppClient20b getXmppClient(String domain, Oadr20bVTNEiService service, OadrXmppClient20b uplinkClient)
 			throws OadrXmppException {
-		String resource = (service != null) ? service.getServiceName() : "uplink";
 		XmppListener xmppListener = new XmppListener(service, uplinkClient, oadr20bVTNPayloadService);
 		XMPPTCPConnection xmppConnection = getXmppConnection(domain, service);
-		String jid = vtnConfig.getVtnId() + "@" + domain + "/" + resource;
+		String jid = getJid(service, domain);
 		return new OadrXmppClient20b(jid, xmppConnection, domain, xmppListener);
 	}
 
 	private OadrXmppClient20b getXmppUplinkClient(String domain) throws OadrXmppException {
 		XMPPTCPConnection xmppConnection = getXmppConnection(domain, null);
-		String jid = vtnConfig.getVtnId() + "@" + domain + "/uplink";
+		String jid = getJid(null, domain);
 		return new OadrXmppClient20b(jid, xmppConnection, domain, null);
 	}
 

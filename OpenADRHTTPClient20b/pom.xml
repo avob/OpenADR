@@ -50,7 +50,7 @@
 					</execution>
 					<execution>
 						<id>jacoco-site</id>
-						<phase>package</phase>
+						<phase>site</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>

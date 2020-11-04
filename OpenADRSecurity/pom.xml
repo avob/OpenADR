@@ -17,11 +17,13 @@
 			<artifactId>bcpkix-jdk15on</artifactId>
 			<version>1.64</version>
 		</dependency>
+		<!--  
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>1.64</version>
 		</dependency>
+		-->
 	</dependencies>
 	<build>
 		<plugins>
@@ -42,7 +44,7 @@
 					</execution>
 					<execution>
 						<id>jacoco-site</id>
-						<phase>package</phase>
+						<phase>site</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>

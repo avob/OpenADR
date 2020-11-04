@@ -87,7 +87,6 @@
 			<groupId>net.sf.dozer</groupId>
 			<artifactId>dozer</artifactId>
 			<version>5.5.1</version>
-
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -144,7 +143,7 @@
 					</execution>
 					<execution>
 						<id>jacoco-site</id>
-						<phase>package</phase>
+						<phase>site</phase>
 						<goals>
 							<goal>report</goal>
 						</goals>
@@ -153,8 +152,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
-
 	<profiles>
 		<profile>
 			<id>in-memory</id>

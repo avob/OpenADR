@@ -18,7 +18,6 @@ import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
-import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Presence.Type;
@@ -32,10 +31,8 @@ import org.jivesoftware.smackx.disco.packet.DiscoverInfo;
 import org.jivesoftware.smackx.disco.packet.DiscoverInfo.Feature;
 import org.jivesoftware.smackx.disco.packet.DiscoverItems;
 import org.jivesoftware.smackx.disco.packet.DiscoverItems.Item;
-import org.jivesoftware.smackx.ping.packet.Ping;
 import org.jxmpp.jid.DomainBareJid;
 import org.jxmpp.jid.EntityBareJid;
-import org.jxmpp.jid.EntityFullJid;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
@@ -61,7 +58,6 @@ public class OadrXmppClient20b {
 	private XMPPTCPConnection connection;
 
 	private DomainBareJid domainJid;
-	private String clientJid;
 
 	private ChatManager chatManager;
 
@@ -126,10 +122,7 @@ public class OadrXmppClient20b {
 				}
 
 				discoveredXmppOadrServices = this.discoverXmppOadrServices();
-				
-				
-				
-				setClientJid(this.connection.getUser().asEntityBareJidString());
+								
 
 			} else {
 				throw new OadrXmppException("Connection refused by Xmpp server ");
@@ -141,7 +134,7 @@ public class OadrXmppClient20b {
 			Thread.currentThread().interrupt();
 			throw new OadrXmppException(e);
 		}
-
+		
 	}
 
 	public void sendMessage(Jid jid, String payload)
@@ -189,12 +182,9 @@ public class OadrXmppClient20b {
 	}
 
 	public String getClientJid() {
-		return this.connection.getUser().asEntityBareJidString();
+		return this.connection.getUser().asEntityFullJidIfPossible().toString();
 	}
 
-	private void setClientJid(String clientJid) {
-		this.clientJid = clientJid;
-	}
 
 	public DomainBareJid getDomainJid() {
 		return domainJid;

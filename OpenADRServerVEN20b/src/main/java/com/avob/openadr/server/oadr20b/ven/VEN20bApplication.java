@@ -1,15 +1,11 @@
 package com.avob.openadr.server.oadr20b.ven;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -29,8 +25,6 @@ import com.avob.openadr.security.exception.OadrSecurityException;
 @EnableAutoConfiguration
 @ComponentScan(basePackages = { "com.avob.openadr.server.oadr20b.ven" })
 public class VEN20bApplication {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(VEN20bApplication.class);
 
 	@Resource
 	private VenConfig venConfig;

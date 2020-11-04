@@ -14,4 +14,5 @@ COPY wait-fot-it.sh /opt/oadr-ven20b/wait-fot-it.sh
 
 RUN chmod +x /opt/oadr-ven20b/wait-fot-it.sh
 
-CMD ["/opt/oadr-ven20b/wait-fot-it.sh", "vtn.oadr.com:8081", "-t", "45", "--", "java", "-jar", "/opt/oadr-ven20b/oadr-ven20b.jar", "--spring.config.location=/opt/oadr-ven20b/application.properties", "--ven.autostart=true", "-Djavax.net.debug=ssl,handshake"]
+CMD ["/opt/oadr-ven20b/wait-fot-it.sh", "vtn.oadr.com:8081", "-t", "45", "--" \
+	, "java", "-jar", "/opt/oadr-ven20b/oadr-ven20b.jar", "--spring.config.location=/opt/oadr-ven20b/application.properties"]

@@ -4,12 +4,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-build
+      
   postgres:
     build: .docker/postgres
     environment:
       - POSTGRES_PASSWORD=supersecure
     depends_on:
       - "build"
+
   openfire:
     build: .docker/openfire
     depends_on:
@@ -24,6 +26,7 @@ services:
       xmpp:
         aliases:
           - xmpp.vtn.oadr.com
+
   rabbitmq:
     build: .docker/rabbitmq
     environment:
@@ -34,6 +37,7 @@ services:
       - "15672:15672"
     depends_on:
       - "build"
+
   vtn20b:
     build: .docker/vtn20b
     depends_on:
@@ -49,6 +53,7 @@ services:
       http:
         aliases:
           - vtn.oadr.com
+
   ven20b:
     build: .docker/ven20b
     ports:
@@ -59,10 +64,10 @@ services:
       - "vtn20b"
     networks:
       xmpp:
-      # http:
-      #   aliases:
-      #     - ven2.oadr.com
-      # xmpp:
+      http:
+        aliases:
+          - ven2.oadr.com
+  
   # nodered:
   #   build: .docker/nodered
   #   depends_on:
