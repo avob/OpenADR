@@ -1,4 +1,5 @@
-FROM adoptopenjdk/openjdk8
+#FROM adoptopenjdk/openjdk8:debian-slim
+FROM openjdk:8u232-jre-slim
 
 RUN mkdir /opt/oadr-ven20b
 RUN mkdir /var/log/oadr-ven20b
@@ -14,5 +15,5 @@ COPY wait-fot-it.sh /opt/oadr-ven20b/wait-fot-it.sh
 
 RUN chmod +x /opt/oadr-ven20b/wait-fot-it.sh
 
-CMD ["/opt/oadr-ven20b/wait-fot-it.sh", "vtn.oadr.com:8081", "-t", "45", "--" \
+CMD ["/opt/oadr-ven20b/wait-fot-it.sh", "vtn.oadr.com:8081", "-t", "30", "--" \
 	, "java", "-jar", "/opt/oadr-ven20b/oadr-ven20b.jar", "--spring.config.location=/opt/oadr-ven20b/application.properties"]

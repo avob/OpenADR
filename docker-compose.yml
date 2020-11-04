@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-build
-      
+
   postgres:
     build: .docker/postgres
     environment:
@@ -56,6 +56,7 @@ services:
 
   ven20b:
     build: .docker/ven20b
+    restart: always
     ports:
       - "8083:8083"
     depends_on:

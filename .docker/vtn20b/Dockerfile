@@ -1,4 +1,5 @@
-FROM adoptopenjdk/openjdk8
+#FROM adoptopenjdk/openjdk8:debian-slim
+FROM openjdk:8u232-jre-slim
 
 RUN mkdir /opt/oadr-vtn20b/
 RUN mkdir /opt/oadr-vtn20b/lib
