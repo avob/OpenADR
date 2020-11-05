@@ -18,7 +18,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<project.version>0.1.0-SNAPSHOT</project.version>
 		<amq.version>5.7.0</amq.version>
 		<smack.version>4.3.4</smack.version>
@@ -30,6 +30,8 @@
 		<dozer.version>5.5.1</dozer.version>
 		<commons-compress.version>1.19</commons-compress.version>
 		<guava.version>21.0	</guava.version>
+		
+		
 	</properties>
 
 
@@ -92,8 +94,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>

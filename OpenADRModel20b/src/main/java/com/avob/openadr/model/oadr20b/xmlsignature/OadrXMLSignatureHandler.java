@@ -304,7 +304,7 @@ public class OadrXMLSignatureHandler {
 			throw new Oadr20bXMLSignatureException(e);
 		}
 
-		List<XMLStructure> lstruct = null;
+		List<XMLObject> lstruct = null;
 		try {
 			ReplayProtectType replayProtect = Oadr20bFactory.createReplayProtectType(nonce, createdtimestamp);
 
@@ -346,6 +346,7 @@ public class OadrXMLSignatureHandler {
 
 		// sign payload
 		XMLSignature signature = fac.newXMLSignature(si, ki, lstruct, null, null);
+		
 		try {
 			signature.sign(dsc);
 		} catch (MarshalException | XMLSignatureException e) {
