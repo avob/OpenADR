@@ -20,7 +20,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.security.exception.OadrSecurityException;
-import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyService;
+import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENPayloadService;
 
 @ConditionalOnExpression("#{!${oadr.pullModel}}")
 @PreAuthorize("hasRole('ROLE_VTN')")
@@ -29,7 +29,7 @@ import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyServ
 public class Oadr20bVENEiRegisterPartyController {
 
 	@Resource
-	private Oadr20bVENEiRegisterPartyService oadr20bVENEiRegisterPartyService;
+	private Oadr20bVENPayloadService oadr20bVENPayloadService;
 
 	@RequestMapping(value = Oadr20bUrlPath.EI_REGISTER_PARTY_SERVICE, method = RequestMethod.POST)
 	@ResponseBody
@@ -37,7 +37,7 @@ public class Oadr20bVENEiRegisterPartyController {
 			throws Oadr20bMarshalException, Oadr20bUnmarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException, IOException {
 
-		return oadr20bVENEiRegisterPartyService.request(principal.getName(), payload);
+		return oadr20bVENPayloadService.registerParty(principal.getName(), payload);
 	}
 
 }

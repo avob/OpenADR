@@ -7,7 +7,6 @@ import java.util.UUID;
 import javax.xml.bind.JAXBException;
 
 import org.jivesoftware.smack.SmackException.NotConnectedException;
-import org.jxmpp.jid.EntityFullJid;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.stringprep.XmppStringprepException;
 
@@ -41,6 +40,7 @@ import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 
 public class OadrXmppVenClient20b {
+
 	private OadrXmppClient20b client;
 
 	/**
@@ -84,7 +84,7 @@ public class OadrXmppVenClient20b {
 	}
 
 	public void sendEventMessage(Object payload) throws XmppStringprepException, NotConnectedException,
-			Oadr20bMarshalException, InterruptedException, Oadr20bXMLSignatureException {
+	Oadr20bMarshalException, InterruptedException, Oadr20bXMLSignatureException {
 		String marshalRoot = null;
 		if (payload instanceof String) {
 			marshalRoot = (String) payload;
@@ -100,7 +100,7 @@ public class OadrXmppVenClient20b {
 	}
 
 	public void sendOptMessage(Object payload) throws XmppStringprepException, NotConnectedException,
-			Oadr20bMarshalException, InterruptedException, Oadr20bXMLSignatureException {
+	Oadr20bMarshalException, InterruptedException, Oadr20bXMLSignatureException {
 		String marshalRoot = null;
 		if (payload instanceof String) {
 			marshalRoot = (String) payload;
@@ -115,7 +115,7 @@ public class OadrXmppVenClient20b {
 	}
 
 	public void sendReportMessage(Object payload) throws XmppStringprepException, NotConnectedException,
-			Oadr20bMarshalException, InterruptedException, Oadr20bXMLSignatureException {
+	Oadr20bMarshalException, InterruptedException, Oadr20bXMLSignatureException {
 
 		String marshalRoot = null;
 		if (payload instanceof String) {
@@ -131,7 +131,7 @@ public class OadrXmppVenClient20b {
 	}
 
 	public void sendRegisterPartyMessage(Object payload) throws XmppStringprepException, NotConnectedException,
-			Oadr20bMarshalException, InterruptedException, Oadr20bXMLSignatureException {
+	Oadr20bMarshalException, InterruptedException, Oadr20bXMLSignatureException {
 		String marshalRoot = null;
 		if (payload instanceof String) {
 			marshalRoot = (String) payload;
@@ -141,6 +141,7 @@ public class OadrXmppVenClient20b {
 			marshalRoot = jaxbContext.marshalRoot(payload);
 		}
 		Jid jid = client.getDiscoveredXmppOadrServices().get(OadrXmppClient20b.OADR_REGISTERPARTY_SERVICE_NAMESPACE);
+
 		client.sendMessage(jid.asEntityBareJidIfPossible(), marshalRoot);
 
 	}
@@ -150,105 +151,105 @@ public class OadrXmppVenClient20b {
 	}
 
 	public void oadrCreatedReport(OadrCreatedReportType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
+	NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendReportMessage(payload);
 
 	}
 
 	public void oadrCreateReport(OadrCreateReportType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
+	NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendReportMessage(payload);
 	}
 
 	public void oadrUpdateReport(OadrUpdateReportType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
+	NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendReportMessage(payload);
 	}
 
 	public void oadrUpdatedReport(OadrUpdatedReportType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
+	NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendReportMessage(payload);
 	}
 
 	public void oadrCancelReport(OadrCancelReportType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
+	NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendReportMessage(payload);
 	}
 
 	public void oadrCanceledReport(OadrCanceledReportType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
+	NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendReportMessage(payload);
 	}
 
 	public void oadrCreatePartyRegistration(OadrCreatePartyRegistrationType payload) throws Oadr20bException,
-			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException,
-			XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException,
+	XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendRegisterPartyMessage(payload);
 	}
 
 	public void oadrCancelPartyRegistration(OadrCancelPartyRegistrationType payload) throws Oadr20bException,
-			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException,
-			XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException,
+	XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendRegisterPartyMessage(payload);
 	}
 
 	public void oadrResponseReregisterParty(OadrResponseType payload) throws Oadr20bException,
-			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException,
-			XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException,
+	XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendRegisterPartyMessage(payload);
 	}
 
 	public void oadrCanceledPartyRegistrationType(OadrCanceledPartyRegistrationType payload) throws Oadr20bException,
-			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException,
-			XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException,
+	XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendRegisterPartyMessage(payload);
 	}
 
 	public void oadrCreateOpt(OadrCreateOptType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
+	NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendOptMessage(payload);
 	}
 
 	public void oadrCancelOptType(OadrCancelOptType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
+	NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendOptMessage(payload);
 	}
 
 	public void oadrCreatedEvent(OadrCreatedEventType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
+	NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendEventMessage(payload);
 	}
 
 	public void oadrRequestEvent(OadrRequestEventType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
+	NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendEventMessage(payload);
 	}
 
 	public void oadrRegisterReport(OadrRegisterReportType payload) throws Oadr20bException, Oadr20bHttpLayerException,
-			Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
-			NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,
+	NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendReportMessage(payload);
 	}
 
 	public void oadrRegisteredReport(OadrRegisteredReportType payload) throws Oadr20bException,
-			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException,
-			XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException,
+	XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendReportMessage(payload);
 	}
 
 	public void oadrQueryRegistrationType(OadrQueryRegistrationType payload) throws Oadr20bException,
-			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException,
-			XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
+	Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException,
+	XmppStringprepException, NotConnectedException, Oadr20bMarshalException, InterruptedException {
 		this.sendRegisterPartyMessage(payload);
 	}
 }

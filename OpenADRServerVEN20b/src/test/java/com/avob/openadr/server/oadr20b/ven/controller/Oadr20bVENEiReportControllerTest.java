@@ -1,5 +1,7 @@
 package com.avob.openadr.server.oadr20b.ven.controller;
 
+import static org.junit.Assert.assertEquals;
+
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 
@@ -17,12 +19,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
+import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
+import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.server.oadr20b.ven.VEN20bApplicationTest;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -35,6 +41,8 @@ public class Oadr20bVENEiReportControllerTest {
 
 	public static final UserRequestPostProcessor VTN_SECURITY_SESSION = SecurityMockMvcRequestPostProcessors.user("vtn")
 			.roles("VTN");
+	
+	private Oadr20bJAXBContext jaxbContext;
 
 	@Autowired
 	private WebApplicationContext wac;
@@ -46,6 +54,7 @@ public class Oadr20bVENEiReportControllerTest {
 
 	@Before
 	public void setup() throws Exception {
+		jaxbContext = Oadr20bJAXBContext.getInstance();
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilters(springSecurityFilterChain).build();
 	}
 
@@ -78,7 +87,13 @@ public class Oadr20bVENEiReportControllerTest {
 
 		// POST without content
 		content = "mouaiccool";
-		this.mockMvc.perform(MockMvcRequestBuilders.post(EIREPORT_ENDPOINT).with(VTN_SECURITY_SESSION).content(content))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
+		MvcResult andReturn = this.mockMvc
+				.perform(MockMvcRequestBuilders.post(EIREPORT_ENDPOINT)
+						.with(VTN_SECURITY_SESSION).content(content))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		OadrResponseType unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), OadrResponseType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453),
+				unmarshal.getEiResponse().getResponseCode());
+
 	}
 }

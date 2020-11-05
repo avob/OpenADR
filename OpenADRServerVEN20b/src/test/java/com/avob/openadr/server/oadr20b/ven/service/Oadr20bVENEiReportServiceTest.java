@@ -52,6 +52,9 @@ public class Oadr20bVENEiReportServiceTest {
 
 	@Resource
 	private Oadr20bVENEiReportService oadr20bVENEiReportService;
+	
+	@Resource
+	private Oadr20bVENPayloadService oadr20bVENPayloadService;
 
 	@Test
 	public void oadrUpdateReportTest()
@@ -71,7 +74,8 @@ public class Oadr20bVENEiReportServiceTest {
 				.newOadr20bUpdateReportBuilder("", venConfig.getVenId()).addReport(report)
 				.addReport(Lists.newArrayList(report)).build();
 
-		String request = oadr20bVENEiReportService.request(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrUpdateReport));
+		String request = oadr20bVENPayloadService.report(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrUpdateReport));
+		
 
 		OadrUpdatedReportType resp = oadr20bJAXBContext.unmarshal(request, OadrUpdatedReportType.class);
 		assertNotNull(resp);
@@ -98,7 +102,7 @@ public class Oadr20bVENEiReportServiceTest {
 				.newOadr20bRegisterReportBuilder("", venConfig.getVenId(), reportRequestId).addOadrReport(report)
 				.build();
 
-		String request = oadr20bVENEiReportService.request(vtnHttpId,
+		String request = oadr20bVENPayloadService.report(vtnHttpId,
 				oadr20bJAXBContext.marshalRoot(oadrRegisterReport));
 
 		OadrRegisteredReportType resp = oadr20bJAXBContext.unmarshal(request, OadrRegisteredReportType.class);
@@ -112,7 +116,7 @@ public class Oadr20bVENEiReportServiceTest {
 			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException {
 		OadrCancelReportType oadrCancelReport = Oadr20bEiReportBuilders
 				.newOadr20bCancelReportBuilder("", venConfig.getVenId(), false).addReportRequestId("").build();
-		String request = oadr20bVENEiReportService.request(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrCancelReport));
+		String request = oadr20bVENPayloadService.report(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrCancelReport));
 
 		OadrCanceledReportType resp = oadr20bJAXBContext.unmarshal(request, OadrCanceledReportType.class);
 		assertNotNull(resp);

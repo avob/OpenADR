@@ -31,11 +31,11 @@ import com.avob.openadr.model.oadr20b.ei.EventResponses.EventResponse;
 import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
+import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
@@ -50,7 +50,9 @@ import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bDistributeEventApplicationLayerException;
 
 @Service
-public class Oadr20bVENEiEventService {
+public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
+	
+	private static final String EI_SERVICE_NAME = "EiEvent";
 
 	private static final long DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS = 1;
 
@@ -314,8 +316,8 @@ public class Oadr20bVENEiEventService {
 	}
 
 	public OadrResponseType oadrDistributeEvent(VtnSessionConfiguration vtnConfiguration, OadrDistributeEventType event)
-			throws Oadr20bDistributeEventApplicationLayerException {
-
+			 {
+		try {
 		String vtnRequestID = event.getRequestID();
 
 		int responseCode = HttpStatus.OK_200;
@@ -326,7 +328,10 @@ public class Oadr20bVENEiEventService {
 			String eventID = next.getEiEvent().getEventDescriptor().getEventID();
 			retrievedEventIdList.add(eventID);
 			// the process might lead to an answer
-			Optional<EventResponse> processOadrEvent = processOadrEvent(vtnConfiguration, vtnRequestID, next);
+			Optional<EventResponse> processOadrEvent;
+			
+				processOadrEvent = processOadrEvent(vtnConfiguration, vtnRequestID, next);
+			
 			if (processOadrEvent.isPresent()) {
 				eventResponses.add(processOadrEvent.get());
 			}
@@ -356,9 +361,14 @@ public class Oadr20bVENEiEventService {
 			}
 
 		}
-
 		return Oadr20bResponseBuilders.newOadr20bResponseBuilder(vtnRequestID, responseCode, "").build();
-	}
+			
+		} catch (Oadr20bDistributeEventApplicationLayerException e) {
+			return e.getResponse();
+		}
+
+		
+			 }
 
 	/**
 	 * true if the event is already known, based on it's eventID, without
@@ -522,45 +532,28 @@ public class Oadr20bVENEiEventService {
 		}
 	}
 
-	public String request(String username, String payload) throws Oadr20bMarshalException, Oadr20bUnmarshalException,
-			Oadr20bDistributeEventApplicationLayerException, Oadr20bApplicationLayerException,
-			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException {
+	public Object request(VtnSessionConfiguration multiConfig, Object unmarshal) {
 
-		Object unmarshal = payloadHandler.stringToObject(payload);
 
-		VtnSessionConfiguration multiConfig = multiVtnConfig.getMultiConfig(username);
-
-		Object response = null;
-
-		Boolean sign = false;
-
-		if (unmarshal instanceof OadrPayload) {
-
-			OadrPayload oadrPayload = (OadrPayload) unmarshal;
-
-			payloadHandler.validate(multiConfig, payload, oadrPayload);
-
-			response = handle(multiConfig, payload, oadrPayload);
-
-			sign = true;
-
-		} else if (unmarshal instanceof OadrDistributeEventType) {
+		if (unmarshal instanceof OadrDistributeEventType) {
 
 			OadrDistributeEventType oadrDistributeEvent = (OadrDistributeEventType) unmarshal;
 
-			LOGGER.info(username + " - OadrDistributeEventType");
+			LOGGER.info(multiConfig.getVtnId() + " - OadrDistributeEventType");
 
-			response = oadrDistributeEvent(multiConfig, oadrDistributeEvent);
-
-		}
-
-		if (response != null) {
-
-			return payloadHandler.payloadToString(multiConfig, response, sign);
+			return oadrDistributeEvent(multiConfig, oadrDistributeEvent);
+			
 
 		}
 
-		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
+		return Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, multiConfig.getVtnId())
+				.withDescription("Unknown payload type for service: " + this.getServiceName()).build();
+	}
+
+	@Override
+	public String getServiceName() {
+		return EI_SERVICE_NAME;
 	}
 
 }

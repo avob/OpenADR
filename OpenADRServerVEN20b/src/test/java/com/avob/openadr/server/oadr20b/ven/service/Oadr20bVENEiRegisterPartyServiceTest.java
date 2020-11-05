@@ -47,6 +47,9 @@ public class Oadr20bVENEiRegisterPartyServiceTest {
 
 	@Resource
 	private Oadr20bVENEiRegisterPartyService oadr20bVENEiRegisterPartyService;
+	
+	@Resource
+	private Oadr20bVENPayloadService oadr20bVENPayloadService;
 
 	@Resource
 	private MultiVtnConfig multiVtnConfig;
@@ -91,9 +94,8 @@ public class Oadr20bVENEiRegisterPartyServiceTest {
 			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException, IOException {
 		OadrRequestReregistrationType oadrRequestReregistrationType = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bRequestReregistrationBuilder(venConfig.getVenId()).build();
-
-		String request = oadr20bVENEiRegisterPartyService.request(vtnHttpId,
-				oadr20bJAXBContext.marshalRoot(oadrRequestReregistrationType));
+		
+		String request = oadr20bVENPayloadService.registerParty(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrRequestReregistrationType));
 
 		OadrResponseType oadrRequestReregistration = oadr20bJAXBContext.unmarshal(request, OadrResponseType.class);
 
@@ -109,15 +111,15 @@ public class Oadr20bVENEiRegisterPartyServiceTest {
 		oadr20bVENEiRegisterPartyService.initRegistration(multiConfig);
 
 		assertNotNull(oadr20bVENEiRegisterPartyService.getRegistration(multiConfig));
-
+		
 		OadrCancelPartyRegistrationType cancelPartyRegistration = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCancelPartyRegistrationBuilder("0",
 						oadr20bVENEiRegisterPartyService.getRegistration(multiConfig).getRegistrationID(),
 						venConfig.getVenId())
 				.build();
 
-		String request = oadr20bVENEiRegisterPartyService.request(vtnHttpId,
-				oadr20bJAXBContext.marshalRoot(cancelPartyRegistration));
+		
+		String request = oadr20bVENPayloadService.registerParty(vtnHttpId, oadr20bJAXBContext.marshalRoot(cancelPartyRegistration));
 
 		OadrCanceledPartyRegistrationType oadrCanceledPartyRegistration = oadr20bJAXBContext.unmarshal(request,
 				OadrCanceledPartyRegistrationType.class);

@@ -1201,7 +1201,8 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		if (payload instanceof OadrRegisterReportType) {
 
-			LOGGER.info(ven + " - OadrRegisterReport");
+			LOGGER.info(ven.getUsername() + " - OadrRegisterReport");
+
 
 			OadrRegisterReportType obj = (OadrRegisterReportType) payload;
 
@@ -1209,7 +1210,8 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		} else if (payload instanceof OadrRegisteredReportType) {
 
-			LOGGER.info(ven + " - OadrRegisteredReport");
+			LOGGER.info(ven.getUsername() + " - OadrRegisteredReport");
+
 
 			OadrRegisteredReportType obj = (OadrRegisteredReportType) payload;
 
@@ -1217,7 +1219,8 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		} else if (payload instanceof OadrUpdateReportType) {
 
-			LOGGER.info(ven + " - OadrUpdateReport");
+			LOGGER.info(ven.getUsername() + " - OadrUpdateReport");
+
 
 			OadrUpdateReportType obj = (OadrUpdateReportType) payload;
 
@@ -1225,7 +1228,8 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		} else if (payload instanceof OadrCreatedReportType) {
 
-			LOGGER.info(ven + " - OadrCreatedReport");
+			LOGGER.info(ven.getUsername() + " - OadrCreatedReport");
+
 
 			OadrCreatedReportType obj = (OadrCreatedReportType) payload;
 
@@ -1233,7 +1237,8 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		} else if (payload instanceof OadrCreateReportType) {
 
-			LOGGER.info(ven + " - OadrCreateReport");
+			LOGGER.info(ven.getUsername() + " - OadrCreateReport");
+
 
 			OadrCreateReportType obj = (OadrCreateReportType) payload;
 
@@ -1241,7 +1246,8 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		} else if (payload instanceof OadrCancelReportType) {
 
-			LOGGER.info(ven + " - OadrCancelReport");
+			LOGGER.info(ven.getUsername() + " - OadrCancelReport	");
+
 
 			OadrCancelReportType obj = (OadrCancelReportType) payload;
 

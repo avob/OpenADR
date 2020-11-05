@@ -97,8 +97,8 @@ public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartySe
 	}
 
 	private void initReport(VtnSessionConfiguration vtnConfiguration) throws XmppStringprepException,
-			NotConnectedException, Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, InterruptedException {
+	NotConnectedException, Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
+	Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, InterruptedException {
 
 		// send VEN RegisterReport to VTN
 		String requestId = "0";
@@ -125,8 +125,8 @@ public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartySe
 	}
 
 	private void initOpt(VtnSessionConfiguration vtnConfiguration) throws XmppStringprepException,
-			NotConnectedException, Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-			Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, InterruptedException {
+	NotConnectedException, Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
+	Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, InterruptedException {
 		String requestId = "0";
 		String optId = "0";
 		VavailabilityType vavailabilityType = Oadr20bEiOptBuilders.newOadr20bVavailabilityBuilder()
@@ -142,8 +142,10 @@ public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartySe
 	}
 
 	@Override
-	public void onRegistrationError(VtnSessionConfiguration vtnConfiguration) {
+	public void onRegistrationError(VtnSessionConfiguration vtnConfiguration, OadrCreatedPartyRegistrationType registration) {
 		LOGGER.error("Failed to create party registration");
+		LOGGER.error(registration.getEiResponse().getResponseCode() + " - " + registration.getEiResponse().getResponseDescription() );
+
 	}
 
 }

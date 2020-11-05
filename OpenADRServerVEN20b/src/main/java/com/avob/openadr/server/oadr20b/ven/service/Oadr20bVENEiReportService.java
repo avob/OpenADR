@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
@@ -28,7 +28,9 @@ import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 
 @Service
-public class Oadr20bVENEiReportService {
+public class Oadr20bVENEiReportService implements Oadr20bVENEiService{
+	
+	private static final String EI_SERVICE_NAME = "EiReport";
 
 	protected static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVENEiReportService.class);
 
@@ -111,77 +113,75 @@ public class Oadr20bVENEiReportService {
 		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiReport");
 	}
 
-	public String request(String username, String payload)
-			throws Oadr20bMarshalException, Oadr20bUnmarshalException, Oadr20bApplicationLayerException,
-			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException {
+	@Override
+	public Object request(VtnSessionConfiguration multiConfig, Object unmarshal) {
 
-		Object unmarshal = payloadHandler.stringToObject(payload);
-
-		VtnSessionConfiguration multiConfig = multiVtnConfig.getMultiConfig(username);
-
-		Object response = null;
-
-		Boolean sign = false;
-
-		if (unmarshal instanceof OadrPayload) {
-
-			OadrPayload oadrPayload = (OadrPayload) unmarshal;
-
-			payloadHandler.validate(multiConfig, payload, oadrPayload);
-
-			response = handle(multiConfig, oadrPayload);
-
-			sign = true;
-
-		} else if (unmarshal instanceof OadrCancelReportType) {
-
-			LOGGER.debug(payload);
+		if (unmarshal instanceof OadrCancelReportType) {
 
 			OadrCancelReportType oadrCancelReportType = (OadrCancelReportType) unmarshal;
 
-			LOGGER.info(username + " - OadrCancelReport");
+			LOGGER.info(multiConfig.getVtnId() + " - OadrCancelReport");
 
-			response = oadrCancelReport(multiConfig, oadrCancelReportType);
+			return oadrCancelReport(multiConfig, oadrCancelReportType);
 
 		} else if (unmarshal instanceof OadrCreateReportType) {
 
-			LOGGER.debug(payload);
-
 			OadrCreateReportType oadrCreateReportType = (OadrCreateReportType) unmarshal;
 
-			LOGGER.info(username + " - OadrCreateReport");
+			LOGGER.info(multiConfig.getVtnId() + " - OadrCreateReport");
 
-			response = oadrCreateReport(multiConfig, oadrCreateReportType);
+			return oadrCreateReport(multiConfig, oadrCreateReportType);
 
 		} else if (unmarshal instanceof OadrRegisterReportType) {
 
-			LOGGER.debug(payload);
-
 			OadrRegisterReportType oadrRegisterReportType = (OadrRegisterReportType) unmarshal;
 
-			LOGGER.info(username + " - OadrRegisterReport");
+			LOGGER.info(multiConfig.getVtnId() + " - OadrRegisterReport");
 
-			response = oadrRegisterReport(multiConfig, oadrRegisterReportType);
+			return oadrRegisterReport(multiConfig, oadrRegisterReportType);
 
 		} else if (unmarshal instanceof OadrUpdateReportType) {
 
-			LOGGER.debug(payload);
-
 			OadrUpdateReportType oadrUpdateReportType = (OadrUpdateReportType) unmarshal;
 
-			LOGGER.info(username + " - OadrUpdateReport");
+			LOGGER.info(multiConfig.getVtnId() + " - OadrUpdateReport");
 
-			response = oadrUpdateReport(multiConfig, oadrUpdateReportType);
+			return oadrUpdateReport(multiConfig, oadrUpdateReportType);
+
+		} else if (unmarshal instanceof OadrCanceledReportType) {
+
+			LOGGER.info(multiConfig.getVtnId() + " - OadrCanceledReportType");
+
+			return null;
+
+		} else if (unmarshal instanceof OadrCreatedReportType) {
+
+			LOGGER.info(multiConfig.getVtnId() + " - OadrCreatedReportType");
+
+			return null;
+
+		} else if (unmarshal instanceof OadrRegisteredReportType) {
+
+			LOGGER.info(multiConfig.getVtnId() + " - OadrRegisteredReportType");
+
+			return null;
+
+		} else if (unmarshal instanceof OadrUpdatedReportType) {
+
+			LOGGER.info(multiConfig.getVtnId() + " - OadrUpdatedReportType");
+
+			return null;
 
 		}
 
-		if (response != null) {
+		return Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, multiConfig.getVtnId())
+				.withDescription("Unknown payload type for service: " + this.getServiceName()).build();
+	}
 
-			return payloadHandler.payloadToString(multiConfig, response, sign);
-
-		}
-
-		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiReport");
+	@Override
+	public String getServiceName() {
+		return EI_SERVICE_NAME;
 	}
 
 }

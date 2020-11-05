@@ -19,7 +19,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.security.exception.OadrSecurityException;
-import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiReportService;
+import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENPayloadService;
 
 @ConditionalOnExpression("#{!${oadr.pullModel}}")
 @PreAuthorize("hasRole('ROLE_VTN')")
@@ -28,7 +28,7 @@ import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiReportService;
 public class Oadr20bVENEiReportController {
 
 	@Resource
-	private Oadr20bVENEiReportService reportService;
+	private Oadr20bVENPayloadService oadr20bVENPayloadService;
 
 	@RequestMapping(value = Oadr20bUrlPath.EI_REPORT_SERVICE, method = RequestMethod.POST)
 	@ResponseBody
@@ -36,7 +36,7 @@ public class Oadr20bVENEiReportController {
 			throws Oadr20bMarshalException, Oadr20bUnmarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException {
 
-		return reportService.request(principal.getName(), payload);
+		return oadr20bVENPayloadService.report(principal.getName(), payload);
 	}
 
 }

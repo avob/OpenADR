@@ -12,6 +12,7 @@ import javax.servlet.ServletContext;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -24,11 +25,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.avob.openadr.client.http.oadr20b.ven.OadrHttpVenClient20b;
+import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
 import com.avob.openadr.model.oadr20b.builders.eipayload.Oadr20bEiTargetTypeBuilder;
 import com.avob.openadr.model.oadr20b.ei.EiActivePeriodType;
@@ -37,6 +40,7 @@ import com.avob.openadr.model.oadr20b.ei.EiTargetType;
 import com.avob.openadr.model.oadr20b.ei.EventDescriptorType;
 import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
+import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
@@ -78,10 +82,17 @@ public class Oadr20bVENEiEventControllerTest {
 	@Value("${oadr.vtn.myvtn.vtnid}")
 	private String vtnHttpId;
 
+	@Before
+	public void setup() throws Exception {
+		jaxbContext = Oadr20bJAXBContext.getInstance();
+	}
+	
 	@Resource
 	private Oadr20bVENEiEventService oadr20bVENEiEventService;
 
 	private Oadr20bVENEiEventListener oadr20bVENEiEventListener = new Oadr20bVENEiEventListener();
+	
+	private Oadr20bJAXBContext jaxbContext;
 
 	private class Oadr20bVENEiEventListener implements Oadr20bVENEiEventServiceListener {
 
@@ -172,9 +183,13 @@ public class Oadr20bVENEiEventControllerTest {
 
 		// POST without content
 		content = "mouaiccool";
-		this.oadrMockMvc
-				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(VTN_SECURITY_SESSION).content(content))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
+		MvcResult andReturn = this.oadrMockMvc
+				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT)
+						.with(VTN_SECURITY_SESSION).content(content))
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+		OadrResponseType unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), OadrResponseType.class);
+		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453),
+				unmarshal.getEiResponse().getResponseCode());
 	}
 
 	@Test
