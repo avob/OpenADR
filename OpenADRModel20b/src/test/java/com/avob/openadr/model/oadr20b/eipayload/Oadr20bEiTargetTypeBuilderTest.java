@@ -75,7 +75,7 @@ public class Oadr20bEiTargetTypeBuilderTest {
 		checkMarshalling(build);
 
 		List<Double> pos = new ArrayList<Double>();
-		pos.add(new Double(12));
+		pos.add(Double.valueOf(12));
 		ServiceAreaType serviceAreaType = Oadr20bFactory.createServiceAreaType("featureCollectionId", "locationId",
 				pos);
 		build = Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addServiceArea(serviceAreaType).build();

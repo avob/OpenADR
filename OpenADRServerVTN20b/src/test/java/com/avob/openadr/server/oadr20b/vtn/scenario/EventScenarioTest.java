@@ -267,7 +267,7 @@ public class EventScenarioTest {
 
 		// ensure currentValue is set to correct level when event status is
 		// "active" (rule 14)
-		assertEquals(new Double(2), new Double(eiEventSignalTypeActive.getCurrentValue().getPayloadFloat().getValue()));
+		assertEquals(Double.valueOf(2), Double.valueOf(eiEventSignalTypeActive.getCurrentValue().getPayloadFloat().getValue()));
 
 		// ensure correct signal name/type (rule 7)
 		assertEquals("SIMPLE", eiEventSignalTypeActive.getSignalName());
@@ -834,7 +834,7 @@ public class EventScenarioTest {
 		}
 
 		venPollService.deleteAll();
-		assertEquals(new Long(0), venPollService.countAll());
+		assertEquals(Long.valueOf(0), venPollService.countAll());
 
 	}
 

@@ -232,8 +232,8 @@ public class Oadr20bVENEiEventControllerTest {
 
 		// assert event stored in service event list
 		assertEquals(oadr20bVENEiEventService.getOadrEvents(multiConfig).size(), 1);
-		assertEquals(new Long(0),
-				new Long(oadr20bVENEiEventService.getOadrEvents(multiConfig)
+		assertEquals(Long.valueOf(0),
+				Long.valueOf(oadr20bVENEiEventService.getOadrEvents(multiConfig)
 						.get(event.getEiEvent().getEventDescriptor().getEventID()).getEiEvent().getEventDescriptor()
 						.getModificationNumber()));
 		// assert listener called
@@ -250,8 +250,8 @@ public class Oadr20bVENEiEventControllerTest {
 		assertNotNull(postEiEventAndExpect);
 
 		assertEquals(oadr20bVENEiEventService.getOadrEvents(multiConfig).size(), 1);
-		assertEquals(new Long(1),
-				new Long(oadr20bVENEiEventService.getOadrEvents(multiConfig)
+		assertEquals(Long.valueOf(1),
+				Long.valueOf(oadr20bVENEiEventService.getOadrEvents(multiConfig)
 						.get(event.getEiEvent().getEventDescriptor().getEventID()).getEiEvent().getEventDescriptor()
 						.getModificationNumber()));
 		assertEquals(1, oadr20bVENEiEventListener.size());

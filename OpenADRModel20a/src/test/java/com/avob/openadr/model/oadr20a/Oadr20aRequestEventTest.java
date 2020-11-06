@@ -57,7 +57,7 @@ public class Oadr20aRequestEventTest {
 		OadrRequestEvent unmarshal = jaxbContext.unmarshal(new FileInputStream(file), OadrRequestEvent.class);
 		assertEquals("pyld:requestID", unmarshal.getEiRequestEvent().getRequestID());
 		assertEquals("ei:venID", unmarshal.getEiRequestEvent().getVenID());
-		assertEquals(new Long(0), unmarshal.getEiRequestEvent().getReplyLimit());
+		assertEquals(Long.valueOf(0), unmarshal.getEiRequestEvent().getReplyLimit());
 
 		jaxbContext.marshal(unmarshal);
 	}

@@ -27,6 +27,6 @@ public class VenConfigTest {
 		assertEquals(false, venConfig.getXmlSignature());
 		assertEquals(false, venConfig.getReportOnly());
 		assertEquals(false, venConfig.getPullModel());
-		assertEquals(new Long(5), venConfig.getPullFrequencySeconds());
+		assertEquals(Long.valueOf(5), venConfig.getPullFrequencySeconds());
 	}
 }

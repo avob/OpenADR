@@ -25,7 +25,6 @@ import com.avob.openadr.security.OadrFingerprintSecurity;
 import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
-import com.google.common.collect.Maps;
 
 /**
  * Load vtn configuration from application.properties file

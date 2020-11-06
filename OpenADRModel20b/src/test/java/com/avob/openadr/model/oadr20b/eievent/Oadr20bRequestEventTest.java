@@ -72,7 +72,7 @@ public class Oadr20bRequestEventTest {
 		OadrRequestEventType unmarshal = jaxbContext.unmarshal(file, OadrRequestEventType.class);
 		assertEquals("REQ_12345", unmarshal.getEiRequestEvent().getRequestID());
 		assertEquals("VEN_1234", unmarshal.getEiRequestEvent().getVenID());
-		assertEquals(new Long(5), unmarshal.getEiRequestEvent().getReplyLimit());
+		assertEquals(Long.valueOf(5), unmarshal.getEiRequestEvent().getReplyLimit());
 
 		File file2 = new File("src/test/resources/eievent/genOadrRequestEvent.xml");
 		jaxbContext.marshal(Oadr20bFactory.createOadrRequestEvent(unmarshal), file2);

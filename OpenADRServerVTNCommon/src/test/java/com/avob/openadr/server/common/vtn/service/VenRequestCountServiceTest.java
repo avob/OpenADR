@@ -26,11 +26,11 @@ public class VenRequestCountServiceTest {
     public void getAndIncreaseTest() {
         String venId = "ven1";
         Long andIncrease = venRequestCountService.getAndIncrease(venId);
-        assertEquals(new Long(0), andIncrease);
+		assertEquals(Long.valueOf(0), andIncrease);
         andIncrease = venRequestCountService.getAndIncrease(venId);
-        assertEquals(new Long(1), andIncrease);
+        assertEquals(Long.valueOf(1), andIncrease);
         andIncrease = venRequestCountService.getAndIncrease(venId);
-        assertEquals(new Long(2), andIncrease);
+        assertEquals(Long.valueOf(2), andIncrease);
 
     }
 }

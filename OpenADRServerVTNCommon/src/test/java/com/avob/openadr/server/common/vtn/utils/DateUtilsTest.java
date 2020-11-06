@@ -11,15 +11,15 @@ public class DateUtilsTest {
 
     @Test
     public void test() throws UnparsableDateFormatException {
-        assertEquals(new Long(1483228800000L), DateUtils.parseDateAsTimestamp("2017-01-01"));
-        assertEquals(new Long(1483228800000L), DateUtils.parseDateAsTimestamp("2017-01-01 00:00"));
-        assertEquals(new Long(1483228800000L), DateUtils.parseDateAsTimestamp("01/01/2017"));
-        assertEquals(new Long(1483228800000L), DateUtils.parseDateAsTimestamp("01/01/2017 00:00"));
-        assertEquals(new Long(1483228800000L), DateUtils.parseDateAsTimestamp("1483228800000"));
+        assertEquals(Long.valueOf(1483228800000L), DateUtils.parseDateAsTimestamp("2017-01-01"));
+        assertEquals(Long.valueOf(1483228800000L), DateUtils.parseDateAsTimestamp("2017-01-01 00:00"));
+        assertEquals(Long.valueOf(1483228800000L), DateUtils.parseDateAsTimestamp("01/01/2017"));
+        assertEquals(Long.valueOf(1483228800000L), DateUtils.parseDateAsTimestamp("01/01/2017 00:00"));
+        assertEquals(Long.valueOf(1483228800000L), DateUtils.parseDateAsTimestamp("1483228800000"));
 
         boolean exception = false;
         try {
-            assertEquals(new Long(1483228800000L), DateUtils.parseDateAsTimestamp("mouaiccool"));
+            assertEquals(Long.valueOf(1483228800000L), DateUtils.parseDateAsTimestamp("mouaiccool"));
         } catch (UnparsableDateFormatException e) {
             exception = true;
         }
@@ -27,7 +27,7 @@ public class DateUtilsTest {
 
         exception = false;
         try {
-            assertEquals(new Long(1483228800000L), DateUtils.parseDateAsTimestamp(""));
+            assertEquals(Long.valueOf(1483228800000L), DateUtils.parseDateAsTimestamp(""));
         } catch (UnparsableDateFormatException e) {
             exception = true;
         }
@@ -35,7 +35,7 @@ public class DateUtilsTest {
 
         exception = false;
         try {
-            assertEquals(new Long(1483228800000L), DateUtils.parseDateAsTimestamp(null));
+            assertEquals(Long.valueOf(1483228800000L), DateUtils.parseDateAsTimestamp(null));
         } catch (UnparsableDateFormatException e) {
             exception = true;
         }

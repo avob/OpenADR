@@ -17,7 +17,7 @@ public class Oadr20bFactoryTest {
 
 		duration = Oadr20bFactory.addXMLDurationToTimestamp(0L, "PT1S");
 		assertNotNull(duration);
-		assertEquals(new Long(1000), duration);
+		assertEquals(Long.valueOf(1000), duration);
 
 		boolean ex = false;
 		try {
@@ -33,7 +33,7 @@ public class Oadr20bFactoryTest {
 		Long duration = null;
 		duration = Oadr20bFactory.xmlDurationToMillisecond("PT1S");
 		assertNotNull(duration);
-		assertEquals(new Long(1000), duration);
+		assertEquals(Long.valueOf(1000), duration);
 
 		boolean ex = false;
 		try {

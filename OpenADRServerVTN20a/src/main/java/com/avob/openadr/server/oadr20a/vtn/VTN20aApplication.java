@@ -1,7 +1,5 @@
 package com.avob.openadr.server.oadr20a.vtn;
 
-import java.util.Map;
-
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
@@ -23,7 +21,6 @@ import com.avob.openadr.model.oadr20a.Oadr20aSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VTNEmbeddedServletContainerCustomizer;
 import com.avob.openadr.server.common.vtn.VtnConfig;
-import com.google.common.collect.Maps;
 
 @Configuration
 @EnableAutoConfiguration(exclude = { SecurityAutoConfiguration.class })
