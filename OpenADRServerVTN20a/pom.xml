@@ -14,17 +14,14 @@
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRModel20a</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRHTTPClient20a</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRServerVTNCommon</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		
 		<!-- tests dependencies -->

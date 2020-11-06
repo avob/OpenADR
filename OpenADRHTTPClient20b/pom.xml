@@ -16,17 +16,14 @@
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRModel20b</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRHTTPClient</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-			<version>1.9.5</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

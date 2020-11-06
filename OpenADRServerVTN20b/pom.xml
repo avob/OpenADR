@@ -14,22 +14,18 @@
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRHTTPClient20b</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRXMPPClient</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRServerVTNCommon</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRServerVTN20a</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.springfox</groupId>
@@ -41,7 +37,7 @@
 			<artifactId>springfox-swagger-ui</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<!-- tests dependencies -->
 		<dependency>
 			<groupId>junit</groupId>

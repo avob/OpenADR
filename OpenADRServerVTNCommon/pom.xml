@@ -14,7 +14,6 @@
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRHTTPClient</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

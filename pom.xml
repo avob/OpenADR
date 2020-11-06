@@ -30,8 +30,9 @@
 		<dozer.version>5.5.1</dozer.version>
 		<commons-compress.version>1.19</commons-compress.version>
 		<guava.version>21.0	</guava.version>
-		
-		
+		<mokito.version>1.9.5</mokito.version>
+		<common-logging.version>1.2</common-logging.version>
+
 	</properties>
 
 
@@ -49,9 +50,61 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-			    <groupId>org.postgresql</groupId>
-			    <artifactId>postgresql</artifactId>
-			    <version>${postgres.version}</version>
+				<groupId>com.avob.openadr</groupId>
+				<artifactId>OpenADRModel20b</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avob.openadr</groupId>
+				<artifactId>OpenADRHTTPClient</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avob.openadr</groupId>
+				<artifactId>OpenADRSecurity</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avob.openadr</groupId>
+				<artifactId>OpenADRModel20a</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avob.openadr</groupId>
+				<artifactId>OpenADRHTTPClient20a</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avob.openadr</groupId>
+				<artifactId>OpenADRHTTPClient20b</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avob.openadr</groupId>
+				<artifactId>OpenADRXMPPClient</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avob.openadr</groupId>
+				<artifactId>OpenADRServerVTNCommon</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avob.openadr</groupId>
+				<artifactId>OpenADRServerVTN20a</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.avob.openadr</groupId>
+				<artifactId>OpenADRServerVEN20b</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>org.postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>${postgres.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.rabbitmq.jms</groupId>
@@ -69,20 +122,30 @@
 				<version>${springfox.version}</version>
 			</dependency>
 			<dependency>
-			<groupId>net.sf.dozer</groupId>
-			<artifactId>dozer</artifactId>
-			<version>${dozer.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-compress</artifactId>
-			<version>${commons-compress.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>${guava.version}</version>
-		</dependency>
+				<groupId>net.sf.dozer</groupId>
+				<artifactId>dozer</artifactId>
+				<version>${dozer.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-compress</artifactId>
+				<version>${commons-compress.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guava.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-all</artifactId>
+				<version>${mokito.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<version>${common-logging.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -99,29 +162,29 @@
 				</configuration>
 			</plugin>
 			<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-external-dependency</id>
-            <phase>none</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <artifactItems>
-            <artifactItem>
-              <groupId>org.postgresql</groupId>
-			  <artifactId>postgresql</artifactId>
-			  <version>${postgres.version}</version>
-              <type>jar</type>
-              <outputDirectory>${project.build.directory}/</outputDirectory>
-            </artifactItem>
-          </artifactItems>
-        </configuration>
-        </plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-external-dependency</id>
+						<phase>none</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>org.postgresql</groupId>
+							<artifactId>postgresql</artifactId>
+							<version>${postgres.version}</version>
+							<type>jar</type>
+							<outputDirectory>${project.build.directory}/</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -137,6 +200,8 @@
 		<module>./OpenADRServerVTN20a</module>
 		<module>./OpenADRServerVEN20b</module>
 		<module>./OpenADRServerVTN20b</module>
+		<module>./DummyVEN20b</module>
+		<module>./DummyVTN20bController</module>
 
 	</modules>
 	<scm>
