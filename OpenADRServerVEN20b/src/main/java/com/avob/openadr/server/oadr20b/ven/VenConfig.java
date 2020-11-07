@@ -26,6 +26,12 @@ import com.avob.openadr.security.exception.OadrSecurityException;
 
 @Configuration
 public class VenConfig {
+	
+	@Value("${oadr.server.context_path:#{null}}")
+	private String contextPath;
+
+	@Value("${oadr.server.port:#{8443}}")
+	private int port;
 
 	@Value("${oadr.venid:#{null}}")
 	private String venId;
@@ -254,6 +260,14 @@ public class VenConfig {
 	public SSLContext getSslContext() {
 		
 		return sslContext;
+	}
+
+	public String getContextPath() {
+		return contextPath;
+	}
+
+	public int getPort() {
+		return port;
 	}
 
 }

@@ -32,7 +32,6 @@ import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
@@ -41,10 +40,8 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationExc
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
-import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.ResponseRequiredType;
-import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bDistributeEventApplicationLayerException;
@@ -57,9 +54,6 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 	private static final long DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS = 1;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVENEiEventService.class);
-
-	@Resource
-	private PayloadHandler payloadHandler;
 
 	@Resource
 	private MultiVtnConfig multiVtnConfig;
@@ -518,18 +512,6 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 			listeners = new ArrayList<>();
 		}
 		listeners.add(listener);
-	}
-
-	public Object handle(VtnSessionConfiguration multiConfig, String raw, OadrPayload oadrPayload)
-			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
-			Oadr20bXMLSignatureException, OadrSecurityException {
-
-		if (oadrPayload.getOadrSignedObject().getOadrDistributeEvent() != null) {
-			LOGGER.info(multiConfig.getVtnId() + " - OadrDistributeEventType signed");
-			return oadrDistributeEvent(multiConfig, oadrPayload.getOadrSignedObject().getOadrDistributeEvent());
-		} else {
-			throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
-		}
 	}
 
 	public Object request(VtnSessionConfiguration multiConfig, Object unmarshal) {

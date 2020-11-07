@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
-import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,21 +18,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
-import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCanceledReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
-import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrPollType;
-import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrRegisteredReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
-import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
-import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.model.oadr20b.xcal.DurationPropType;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
@@ -54,13 +39,7 @@ public class Oadr20bPollService {
 	private MultiVtnConfig multiVtnConfig;
 
 	@Resource
-	private Oadr20bVENEiRegisterPartyService oadr20bVENEiRegisterPartyService;
-
-	@Resource
-	private Oadr20bVENEiReportService oadr20bVENEiReportService;
-
-	@Resource
-	private Oadr20bVENEiEventService oadr20bVENEiEventService;
+	private Oadr20bVENPayloadService oadr20bVENPayloadService;
 
 	@Resource
 	private ScheduledExecutorService scheduledExecutorService;
@@ -75,137 +54,24 @@ public class Oadr20bPollService {
 			this.vtnSession = vtnSession;
 		}
 
-		private void processOadrResponse(OadrResponseType response, Class<?> klass) {
-			String responseCode = response.getEiResponse().getResponseCode();
-			if (HttpStatus.OK_200 != Integer.valueOf(responseCode)) {
-				LOGGER.error("Fail " + klass.getSimpleName() + ": " + responseCode
-						+ response.getEiResponse().getResponseDescription());
-			}
-		}
-
-		private void processPollResponse(Object payload) throws Oadr20bException, Oadr20bHttpLayerException,
-				Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
-			if (payload instanceof OadrPayload) {
-				LOGGER.info("Retrieved OadrPayload");
-				OadrPayload val = (OadrPayload) payload;
-				Object signedObjectFromOadrPayload = Oadr20bFactory.getSignedObjectFromOadrPayload(val);
-
-				processPollResponse(signedObjectFromOadrPayload);
-
-			} else if (payload instanceof OadrDistributeEventType) {
-				LOGGER.info("Retrieved OadrDistributeEventType");
-				OadrDistributeEventType val = (OadrDistributeEventType) payload;
-				OadrResponseType oadrDistributeEvent = oadr20bVENEiEventService.oadrDistributeEvent(vtnSession, val);
-				processOadrResponse(oadrDistributeEvent, OadrDistributeEventType.class);
-
-			} else if (payload instanceof OadrCancelPartyRegistrationType) {
-				LOGGER.info("Retrieved OadrCancelPartyRegistrationType");
-				OadrCancelPartyRegistrationType val = (OadrCancelPartyRegistrationType) payload;
-
-				OadrCanceledPartyRegistrationType oadrCancelPartyRegistration = oadr20bVENEiRegisterPartyService
-						.oadrCancelPartyRegistration(vtnSession, val);
-
-				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
-						.oadrCanceledPartyRegistrationType(oadrCancelPartyRegistration);
-
-				processOadrResponse(response, OadrCanceledPartyRegistrationType.class);
-
-			} else if (payload instanceof OadrRequestReregistrationType) {
-				LOGGER.info("Retrieved OadrRequestReregistrationType");
-				OadrRequestReregistrationType val = (OadrRequestReregistrationType) payload;
-
-				OadrResponseType oadrRequestReregistration = oadr20bVENEiRegisterPartyService
-						.oadrRequestReregistration(vtnSession, val);
-
-				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
-						.oadrResponseReregisterParty(oadrRequestReregistration);
-
-				processOadrResponse(response, OadrRequestReregistrationType.class);
-
-			} else if (payload instanceof OadrCancelReportType) {
-				LOGGER.info("Retrieved OadrCancelReportType");
-				OadrCancelReportType val = (OadrCancelReportType) payload;
-
-				OadrCanceledReportType oadrCancelReport = oadr20bVENEiReportService.oadrCancelReport(vtnSession, val);
-
-				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
-						.oadrCanceledReport(oadrCancelReport);
-
-				processOadrResponse(response, OadrCancelReportType.class);
-
-			} else if (payload instanceof OadrCreateReportType) {
-				LOGGER.info("Retrieved OadrCreateReportType");
-				OadrCreateReportType val = (OadrCreateReportType) payload;
-
-				OadrCreatedReportType oadrCreateReport = oadr20bVENEiReportService.oadrCreateReport(vtnSession, val);
-
-				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
-						.oadrCreatedReport(oadrCreateReport);
-
-				processOadrResponse(response, OadrCreateReportType.class);
-
-			} else if (payload instanceof OadrRegisterReportType) {
-				LOGGER.info("Retrieved OadrRegisterReportType");
-				OadrRegisterReportType val = (OadrRegisterReportType) payload;
-
-				OadrRegisteredReportType oadrRegisterReport = oadr20bVENEiReportService.oadrRegisterReport(vtnSession,
-						val);
-
-				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
-						.oadrRegisteredReport(oadrRegisterReport);
-
-				processOadrResponse(response, OadrRegisterReportType.class);
-
-			} else if (payload instanceof OadrUpdateReportType) {
-				LOGGER.info("Retrieved OadrUpdateReportType");
-				OadrUpdateReportType val = (OadrUpdateReportType) payload;
-
-				OadrUpdatedReportType oadrUpdateReport = oadr20bVENEiReportService.oadrUpdateReport(vtnSession, val);
-
-				OadrResponseType response = multiVtnConfig.getMultiHttpClientConfig(vtnSession)
-						.oadrUpdatedReport(oadrUpdateReport);
-
-				processOadrResponse(response, OadrUpdateReportType.class);
-
-			} else if (payload instanceof OadrResponseType) {
-				LOGGER.info("Retrieved OadrResponseType");
-				OadrResponseType response = (OadrResponseType) payload;
-
-				processOadrResponse(response, OadrResponseType.class);
-
-			} else if (payload != null) {
-				LOGGER.warn("Unknown retrieved payload: " + payload.getClass().toString());
-			} else {
-				LOGGER.warn("Null payload");
-			}
-		}
-
 		@Override
 		public void run() {
 
 			OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(vtnSession.getVenSessionConfig().getVenId())
 					.build();
 
+			Object payload;
 			try {
-				Object payload = multiVtnConfig.getMultiHttpClientConfig(vtnSession).oadrPoll(poll);
-
-				processPollResponse(payload);
-
-			} catch (Oadr20bException e) {
-				LOGGER.error("", e);
-			} catch (Oadr20bHttpLayerException e) {
-				LOGGER.error("Fail to distribute event: HttpLayerException[" + e.getErrorCode() + "]: "
-						+ e.getErrorMessage());
-				if (e.getErrorCode() == HttpStatus.FORBIDDEN_403) {
-					LOGGER.warn("Receive Forbidden[403]: clear and init registration");
-					oadr20bVENEiRegisterPartyService.reinitRegistration(vtnSession);
-					reinitPoll(vtnSession);
-				}
-			} catch (Oadr20bXMLSignatureException e) {
-				LOGGER.error("Fail to sign request payload", e);
-			} catch (Oadr20bXMLSignatureValidationException e) {
-				LOGGER.error("Fail to validate response xml signature", e);
+				payload = multiVtnConfig.getMultiHttpClientConfig(vtnSession).oadrPoll(poll);
+				
+				oadr20bVENPayloadService.httpPollRequest(vtnSession, payload);
+				
+			} catch (Oadr20bException | Oadr20bHttpLayerException | Oadr20bXMLSignatureException
+					| Oadr20bXMLSignatureValidationException e) {
+				LOGGER.error("Payload cannot be sent to HTTP vtn", e);
 			}
+
+			
 
 		}
 
@@ -217,7 +83,7 @@ public class Oadr20bPollService {
 	 * @param vtnConfiguration
 	 * @param mayInterruptIfRunning
 	 */
-	public void cancelHttpScheduledPullRequestTask(VtnSessionConfiguration vtnConfiguration,
+	public void cancelPoll(VtnSessionConfiguration vtnConfiguration,
 			boolean mayInterruptIfRunning) {
 		if (httpScheduledPullRequestTask.get(vtnConfiguration.getVtnId()) != null) {
 			httpScheduledPullRequestTask.get(vtnConfiguration.getVtnId()).cancel(mayInterruptIfRunning);
@@ -225,27 +91,16 @@ public class Oadr20bPollService {
 		}
 	}
 
-	/**
-	 * Reinit poll service
-	 * 
-	 * @param vtnConfiguration
-	 */
-	public void reinitPoll(VtnSessionConfiguration vtnConfiguration) {
-		cancelHttpScheduledPullRequestTask(vtnConfiguration, true);
-		initPoll(vtnConfiguration);
-	}
 
 	/**
 	 * Init poll service if VEN has been successfully registerd to VTN
 	 * 
 	 * @param vtnSession
 	 */
-	public void initPoll(VtnSessionConfiguration vtnSession) {
-		if (oadr20bVENEiRegisterPartyService.getRegistration(vtnSession) != null
-				&& vtnSession.getVenSessionConfig().getPullModel()) {
+	public void initPoll(VtnSessionConfiguration vtnSession, DurationPropType oadrRequestedOadrPollFreq) {
+		
 			Long xmlDurationToMillisecond = vtnSession.getVenSessionConfig().getPullFrequencySeconds() * 1000;
-			DurationPropType oadrRequestedOadrPollFreq = oadr20bVENEiRegisterPartyService.getRegistration(vtnSession)
-					.getOadrRequestedOadrPollFreq();
+
 			if (oadrRequestedOadrPollFreq != null) {
 				xmlDurationToMillisecond = Oadr20bFactory
 						.xmlDurationToMillisecond(oadrRequestedOadrPollFreq.getDuration());
@@ -255,7 +110,9 @@ public class Oadr20bPollService {
 					new OadrPollTask(vtnSession), xmlDurationToMillisecond, xmlDurationToMillisecond,
 					TimeUnit.MILLISECONDS);
 			httpScheduledPullRequestTask.put(vtnSession.getVtnId(), scheduleWithFixedDelay);
-		}
+		
 	}
+
+	
 
 }

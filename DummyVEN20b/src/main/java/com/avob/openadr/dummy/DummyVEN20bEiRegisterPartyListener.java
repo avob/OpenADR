@@ -1,4 +1,4 @@
-package com.avob.openadr.server.oadr20b.ven;
+package com.avob.openadr.dummy;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -7,7 +7,6 @@ import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
@@ -28,19 +27,17 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
 import com.avob.openadr.model.oadr20b.xcal.VavailabilityType;
-import com.avob.openadr.server.oadr20b.ven.service.Oadr20bPollService;
+import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
+import com.avob.openadr.server.oadr20b.ven.VenConfig;
+import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyService;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyService.Oadr20bVENEiRegisterPartyServiceListener;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiReportService;
 
 @Configuration
-@ConditionalOnProperty(name = "ven.autostart")
-public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartyServiceListener {
+public class DummyVEN20bEiRegisterPartyListener implements Oadr20bVENEiRegisterPartyServiceListener {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(VEN20bApplicationStartupConf.class);
-
-	@Resource
-	private Oadr20bPollService oadr20bPollService;
+	private static final Logger LOGGER = LoggerFactory.getLogger(DummyVEN20bEiRegisterPartyListener.class);
 
 	@Resource
 	private VenConfig venConfig;
@@ -72,7 +69,6 @@ public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartySe
 	public void onRegistrationSuccess(VtnSessionConfiguration vtnConfiguration,
 			OadrCreatedPartyRegistrationType registration) {
 
-		oadr20bPollService.initPoll(vtnConfiguration);
 		try {
 			initReport(vtnConfiguration);
 			initOpt(vtnConfiguration);
@@ -103,7 +99,7 @@ public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartySe
 		// send VEN RegisterReport to VTN
 		String requestId = "0";
 		String reportRequestId = "0";
-		OadrRegisterReportType payload = reportService.selfOadrRegisterReport(requestId, venConfig.getVenId(),
+		OadrRegisterReportType payload = selfOadrRegisterReport(requestId, venConfig.getVenId(),
 				reportRequestId);
 
 		multiVtnConfig.oadrRegisterReport(vtnConfiguration, payload);
@@ -122,6 +118,10 @@ public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartySe
 
 		multiVtnConfig.oadrCreateReport(vtnConfiguration, createReport);
 
+	}
+	
+	public OadrRegisterReportType selfOadrRegisterReport(String requestId, String venId, String reportRequestId) {
+		return Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder(requestId, venId, reportRequestId).build();
 	}
 
 	private void initOpt(VtnSessionConfiguration vtnConfiguration) throws XmppStringprepException,
@@ -147,5 +147,4 @@ public class VEN20bApplicationStartupConf implements Oadr20bVENEiRegisterPartySe
 		LOGGER.error(registration.getEiResponse().getResponseCode() + " - " + registration.getEiResponse().getResponseDescription() );
 
 	}
-
 }

@@ -19,7 +19,10 @@
 			<groupId>com.avob.openadr</groupId>
 			<artifactId>OpenADRSecurity</artifactId>
 		</dependency>
-	
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -16,7 +16,7 @@ RUN mv /usr/src/openadr/target/* /opt/oadr/lib/
 
 RUN if [ ! -f /usr/src/openadr/OpenADRServerVTN20b/target/OpenADRServerVTN20b-0.1.0-SNAPSHOT.jar ]; then mvn package -P external,frontend -DskipTests=true -f /usr/src/openadr/pom.xml; fi
 
-RUN mv /usr/src/openadr/OpenADRServerVEN20b/target/*.jar /opt/oadr/ven20b/;
+RUN mv /usr/src/openadr/DummyVEN20b/target/*.jar /opt/oadr/ven20b/;
 RUN mv /usr/src/openadr/OpenADRServerVTN20b/target/*.jar /opt/oadr/vtn20b/;
 
 RUN rm -rf /usr/src/openadr

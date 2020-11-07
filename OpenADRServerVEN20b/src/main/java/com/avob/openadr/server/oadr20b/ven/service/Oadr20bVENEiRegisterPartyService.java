@@ -20,7 +20,6 @@ import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.builders.eiregisterparty.Oadr20bCreatePartyRegistrationBuilder;
 import com.avob.openadr.model.oadr20b.ei.SchemaVersionEnumeratedType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
-import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
@@ -30,7 +29,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatePartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
-import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
@@ -46,9 +44,6 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 	private static final String EI_SERVICE_NAME = "EiRegisterParty";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVENEiRegisterPartyService.class);
-
-	@Resource
-	private PayloadHandler payloadHandler;
 
 	@Resource
 	private MultiVtnConfig multiVtnConfig;
@@ -78,8 +73,6 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 		int responseCode = HttpStatus.OK_200;
 		reinitRegistration(vtnConfiguration);
 
-		oadrPollService.reinitPoll(vtnConfiguration);
-
 		return Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestId, responseCode, venID).build();
 	}
 
@@ -93,7 +86,7 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 		int responseCode = HttpStatus.OK_200;
 		if (getRegistration(vtnConfiguration).getRegistrationID().equals(registrationID)) {
 			clearRegistration(vtnConfiguration);
-			oadrPollService.cancelHttpScheduledPullRequestTask(vtnConfiguration, false);
+			oadrPollService.cancelPoll(vtnConfiguration, false);
 		} else {
 			responseCode = Oadr20bApplicationLayerErrorCode.INVALID_ID_452;
 		}
@@ -109,6 +102,7 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 
 	public void reinitRegistration(VtnSessionConfiguration vtnConfiguration) {
 		clearRegistration(vtnConfiguration);
+		oadrPollService.cancelPoll(vtnConfiguration, true);
 		this.initRegistration(vtnConfiguration);
 	}
 
@@ -126,6 +120,7 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 
 				OadrCreatedPartyRegistrationType oadrQueryRegistrationType = multiVtnConfig
 						.getMultiHttpClientConfig(vtnConfiguration).oadrQueryRegistrationType(queryRegistration);
+				
 				this.oadrCreatedPartyRegistration(vtnConfiguration, oadrQueryRegistrationType);
 			} else {
 
@@ -151,6 +146,10 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 	public void register(VtnSessionConfiguration vtnConfiguration, OadrCreatedPartyRegistrationType registration) {
 		if(registration.getRegistrationID() != null) {
 			setRegistration(vtnConfiguration, registration);
+			
+			if(vtnConfiguration.getVenSessionConfig().getPullModel()) {
+				oadrPollService.initPoll(vtnConfiguration, registration.getOadrRequestedOadrPollFreq());
+			}
 
 			LOGGER.info("Ven has successfully register using registrationId: " + registration.getRegistrationID());
 			LOGGER.debug("        xmlSignature: " + vtnConfiguration.getVenSessionConfig().getXmlSignature());
@@ -196,28 +195,6 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 			getListeners().add(listener);
 		}
 
-	}
-
-	public Object handle(VtnSessionConfiguration vtnConfig, OadrPayload oadrPayload)
-			throws Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, Oadr20bApplicationLayerException,
-			Oadr20bXMLSignatureException, OadrSecurityException, IOException {
-
-		if (oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration() != null) {
-			LOGGER.info(vtnConfig.getVtnId() + " - OadrCancelPartyRegistrationType signed");
-			return oadrCancelPartyRegistration(vtnConfig,
-					oadrPayload.getOadrSignedObject().getOadrCancelPartyRegistration());
-		} else if (oadrPayload.getOadrSignedObject().getOadrRequestReregistration() != null) {
-			LOGGER.info(vtnConfig.getVtnId() + " - OadrRequestReregistrationType signed");
-			return oadrRequestReregistration(vtnConfig,
-					oadrPayload.getOadrSignedObject().getOadrRequestReregistration());
-		} else if (oadrPayload.getOadrSignedObject().getOadrCreatedPartyRegistration() != null) {
-			LOGGER.info(vtnConfig.getVtnId() + " - OadrCreatedPartyRegistrationType signed");
-			oadrCreatedPartyRegistration(vtnConfig,
-					oadrPayload.getOadrSignedObject().getOadrCreatedPartyRegistration());
-			return null;
-		}
-
-		throw new Oadr20bApplicationLayerException("Unacceptable request payload for EiEventService");
 	}
 
 	public void oadrCreatedPartyRegistration(VtnSessionConfiguration vtnConfig,

@@ -45,16 +45,6 @@ public class OadrHttpVenClient20b {
 		this.client = client;
 	}
 
-	/**
-	 * REPORT: createReport
-	 * 
-	 * @param payload
-	 * @return
-	 * @throws Oadr20bException
-	 * @throws Oadr20bHttpLayerException
-	 * @throws Oadr20bXMLSignatureException
-	 * @throws Oadr20bXMLSignatureValidationException
-	 */
 	public OadrResponseType oadrCreatedReport(OadrCreatedReportType payload) throws Oadr20bException,
 			Oadr20bHttpLayerException, Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException {
 		return client.post(Oadr20bFactory.createOadrCreatedReport(payload), Oadr20bUrlPath.EI_REPORT_SERVICE,
