@@ -3,9 +3,7 @@ package com.avob.openadr.server.oadr20b.vtn;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -51,7 +49,6 @@ import com.avob.openadr.server.common.vtn.service.OadrUserService;
 import com.avob.openadr.server.common.vtn.service.VenGroupService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenService;
-import com.google.common.collect.Sets;
 
 @Profile({ "fake-data" })
 @Component
@@ -59,7 +56,7 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedSqlDatabaseInit.class);
 
-	protected static final String VEN_FILE_PREFIX = "ven";
+//	protected static final String VEN_FILE_PREFIX = "ven";
 	protected static final String ADMIN_FILE_PREFIX = "admin";
 	protected static final String USER_FILE_PREFIX = "user";
 	protected static final String APP_FILE_PREFIX = "app";
@@ -106,43 +103,43 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 		return getFilename(APP_FILE_PREFIX);
 	}
 
-	private List<String> getVenFilename() {
-		return getFilename(VEN_FILE_PREFIX);
-	}
+//	private List<String> getVenFilename() {
+//		return getFilename(VEN_FILE_PREFIX);
+//	}
 
-	private VenMarketContext saveMarketContextIfMissing(VenMarketContextDto dto) {
-		VenMarketContext findOneByName = venMarketContextService.findOneByName(dto.getName());
-		if (findOneByName == null) {
-			VenMarketContext marketContext = venMarketContextService.prepare(dto);
-			findOneByName = venMarketContextService.save(marketContext);
-			LOGGER.debug("Create MarketContext: " + findOneByName.getName());
-		}
+//	private VenMarketContext saveMarketContextIfMissing(VenMarketContextDto dto) {
+//		VenMarketContext findOneByName = venMarketContextService.findOneByName(dto.getName());
+//		if (findOneByName == null) {
+//			VenMarketContext marketContext = venMarketContextService.prepare(dto);
+//			findOneByName = venMarketContextService.save(marketContext);
+//			LOGGER.debug("Create MarketContext: " + findOneByName.getName());
+//		}
+//
+//		return findOneByName;
+//	}
+//
+//	private VenGroup saveGroupIfMissing(VenGroupDto dto) {
+//		VenGroup findOneByName = venGroupService.findByName(dto.getName());
+//		if (findOneByName == null) {
+//			VenGroup group = venGroupService.prepare(dto);
+//			findOneByName = venGroupService.save(group);
+//			LOGGER.debug("Create Group: " + findOneByName.getName());
+//		}
+//		return findOneByName;
+//	}
 
-		return findOneByName;
-	}
-
-	private VenGroup saveGroupIfMissing(VenGroupDto dto) {
-		VenGroup findOneByName = venGroupService.findByName(dto.getName());
-		if (findOneByName == null) {
-			VenGroup group = venGroupService.prepare(dto);
-			findOneByName = venGroupService.save(group);
-			LOGGER.debug("Create Group: " + findOneByName.getName());
-		}
-		return findOneByName;
-	}
-
-	private Ven saveVenIfMissing(VenCreateDto dto, Set<VenMarketContext> linkedMarketContext,
-			Set<VenGroup> linkedGroup) {
-		Ven findOneByName = venService.findOneByUsername(dto.getUsername());
-		if (findOneByName == null) {
-			Ven prepare = venService.prepare(dto);
-			prepare.setVenMarketContexts(linkedMarketContext);
-			prepare.setVenGroup(linkedGroup);
-			findOneByName = venService.save(prepare);
-			LOGGER.debug("Create VEN: " + findOneByName.getUsername());
-		}
-		return findOneByName;
-	}
+//	private Ven saveVenIfMissing(VenCreateDto dto, Set<VenMarketContext> linkedMarketContext,
+//			Set<VenGroup> linkedGroup) {
+//		Ven findOneByName = venService.findOneByUsername(dto.getUsername());
+//		if (findOneByName == null) {
+//			Ven prepare = venService.prepare(dto);
+//			prepare.setVenMarketContexts(linkedMarketContext);
+//			prepare.setVenGroup(linkedGroup);
+//			findOneByName = venService.save(prepare);
+//			LOGGER.debug("Create VEN: " + findOneByName.getUsername());
+//		}
+//		return findOneByName;
+//	}
 
 	private OadrUser saveUserIfMissing(OadrUserCreateDto dto) {
 		OadrUser findOneByName = oadrUserService.findByUsername(dto.getUsername());
@@ -284,73 +281,73 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 	public void onApplicationEvent(ContextRefreshedEvent arg0) {
 
 		// create fake market contexts
-		VenMarketContextDto marketContextDto = new VenMarketContextDto("http://oadr.avob.com");
-		marketContextDto.setDescription("Avob Test Market Context");
-		marketContextDto.setColor("#90CAF9");
-		VenMarketContext oadrMarketContext = saveMarketContextIfMissing(marketContextDto);
+//		VenMarketContextDto marketContextDto = new VenMarketContextDto("http://oadr.avob.com");
+//		marketContextDto.setDescription("Avob Test Market Context");
+//		marketContextDto.setColor("#90CAF9");
+//		VenMarketContext oadrMarketContext = saveMarketContextIfMissing(marketContextDto);
+//
+//		marketContextDto = new VenMarketContextDto("http://MarketContext1");
+//		marketContextDto.setColor("#ff8080");
+//		marketContextDto.setDescription("Test Market Context 1");
+//		VenMarketContext marketContext = saveMarketContextIfMissing(marketContextDto);
+//
+//		// create fake groups
+////		VenGroup customCaCert = saveGroupIfMissing(new VenGroupDto("CustomCACert"));
+//		VenGroup group1 = saveGroupIfMissing(new VenGroupDto("Group1"));
 
-		marketContextDto = new VenMarketContextDto("http://MarketContext1");
-		marketContextDto.setColor("#ff8080");
-		marketContextDto.setDescription("Test Market Context 1");
-		VenMarketContext marketContext = saveMarketContextIfMissing(marketContextDto);
-
-		// create fake groups
-		VenGroup customCaCert = saveGroupIfMissing(new VenGroupDto("CustomCACert"));
-		VenGroup group1 = saveGroupIfMissing(new VenGroupDto("Group1"));
-
-		List<DemandResponseEventTargetDto> venTargets = new ArrayList<>();
-		List<DemandResponseEventTargetDto> groupTargets = new ArrayList<>();
-		groupTargets.add(getGroupTarget(group1));
+//		List<DemandResponseEventTargetDto> venTargets = new ArrayList<>();
+//		List<DemandResponseEventTargetDto> groupTargets = new ArrayList<>();
+//		groupTargets.add(getGroupTarget(group1));
 
 		// load fake ven from ./cert
-		List<String> venFilename = getVenFilename();
-		int i = 0;
-		if (!venFilename.isEmpty()) {
-
-			for (String filename : venFilename) {
-				String[] split = filename.split("\\.");
-				String commonName = filename.replace("." + split[split.length - 1], "");
-				try {
-					String fingerprintForVen = OadrFingerprintSecurity
-							.getOadr20bFingerprint(customCertFolder + "/" + commonName + ".crt");
-
-					VenCreateDto dto = new VenCreateDto();
-					String ven1Username = fingerprintForVen;
-					dto.setUsername(ven1Username);
-					if (commonName.contains("login")) {
-						dto.setAuthenticationType("login");
-						dto.setPassword(commonName);
-					} else {
-						dto.setAuthenticationType("x509");
-					}
-
-					dto.setCommonName(commonName);
-					dto.setOadrProfil("20b");
-					HashSet<VenGroup> groups = Sets.newHashSet(customCaCert);
-					DemandResponseEventTargetDto venTarget = getVenTarget(fingerprintForVen);
-					venTargets.add(venTarget);
-					if (i == 0) {
-						groups.add(group1);
-						i++;
-					}
-					saveVenIfMissing(dto, Sets.newHashSet(oadrMarketContext, marketContext), groups);
-				} catch (OadrSecurityException e) {
-					LOGGER.error("Ven " + commonName + " can't be created");
-				}
-
-			}
-
-			Calendar c = Calendar.getInstance();
-			c.add(Calendar.DATE, -1);
-			Date start = c.getTime();
-			c = Calendar.getInstance();
-			c.add(Calendar.DATE, 1);
-			Date end = c.getTime();
-
-			// gen fake DR events links to loaded ven
-			genDailyElectricityPriceSignals("daily_electricity_price", marketContext.getName(), venTargets, start, end);
-			genLoadControlSignals("daily_load_control", oadrMarketContext.getName(), groupTargets, start, end);
-		}
+//		List<String> venFilename = getVenFilename();
+//		int i = 0;
+//		if (!venFilename.isEmpty()) {
+//
+//			for (String filename : venFilename) {
+//				String[] split = filename.split("\\.");
+//				String commonName = filename.replace("." + split[split.length - 1], "");
+//				try {
+//					String fingerprintForVen = OadrFingerprintSecurity
+//							.getOadr20bFingerprint(customCertFolder + "/" + commonName + ".crt");
+//
+//					VenCreateDto dto = new VenCreateDto();
+//					String ven1Username = fingerprintForVen;
+//					dto.setUsername(ven1Username);
+//					if (commonName.contains("login")) {
+//						dto.setAuthenticationType("login");
+//						dto.setPassword(commonName);
+//					} else {
+//						dto.setAuthenticationType("x509");
+//					}
+//
+//					dto.setCommonName(commonName);
+//					dto.setOadrProfil("20b");
+//					HashSet<VenGroup> groups = Sets.newHashSet(customCaCert);
+//					DemandResponseEventTargetDto venTarget = getVenTarget(fingerprintForVen);
+//					venTargets.add(venTarget);
+//					if (i == 0) {
+//						groups.add(group1);
+//						i++;
+//					}
+//					saveVenIfMissing(dto, Sets.newHashSet(oadrMarketContext, marketContext), groups);
+//				} catch (OadrSecurityException e) {
+//					LOGGER.error("Ven " + commonName + " can't be created");
+//				}
+//
+//			}
+//
+//			Calendar c = Calendar.getInstance();
+//			c.add(Calendar.DATE, -1);
+//			Date start = c.getTime();
+//			c = Calendar.getInstance();
+//			c.add(Calendar.DATE, 1);
+//			Date end = c.getTime();
+//
+//			// gen fake DR events links to loaded ven
+//			genDailyElectricityPriceSignals("daily_electricity_price", marketContext.getName(), venTargets, start, end);
+//			genLoadControlSignals("daily_load_control", oadrMarketContext.getName(), groupTargets, start, end);
+//		}
 
 		// load fake user from ./cert
 		List<String> filenames = getAdminFilename();

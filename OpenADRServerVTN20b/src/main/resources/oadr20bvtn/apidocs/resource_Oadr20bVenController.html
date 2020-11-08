@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+  <title>OpenADRServerVTN20b: Oadr20bVenController</title>
+
+  <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+  <!--custom css for these pages-->
+  <link rel="stylesheet" href="css/enunciate.css">
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+
+<body data-spy="scroll" data-target="#apinav">
+
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">OpenADRServerVTN20b: Oadr20bVenController</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="resources.html">Resources</a></li>
+          <li><a href="data.html">Data Types</a></li>
+          <li><a href="downloads.html">Files and Libraries</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-3 col-md-2 sidebar" id="apinav">
+        <ul class="nav nav-sidebar">
+          <li><a href="#resource_Oadr20bVenController_venOpt_GET"><abbr title="GET /Ven/{venID}/opt" class="side-abbr"><span class="sideoverflow">GET /Ven/{venID}/opt</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_registerPartyCancelPartyRegistration_POST"><abbr title="POST /Ven/{venID}/registerparty/cancelPartyRegistration" class="side-abbr"><span class="sideoverflow">POST /Ven/{venID}/registerparty/cancelPartyRegistration</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_registerPartyRequestReregistration_POST"><abbr title="POST /Ven/{venID}/registerparty/requestReregistration" class="side-abbr"><span class="sideoverflow">POST /Ven/{venID}/registerparty/requestReregistration</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_viewOtherReportCapability_GET"><abbr title="GET /Ven/{venID}/report/available" class="side-abbr"><span class="sideoverflow">GET /Ven/{venID}/report/available</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_viewReportRequest_GET"><abbr title="GET /Ven/{venID}/report/requested" class="side-abbr"><span class="sideoverflow">GET /Ven/{venID}/report/requested</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_cancelReport_POST"><abbr title="POST /Ven/{venID}/report_action/cancel" class="side-abbr"><span class="sideoverflow">POST /Ven/{venID}/report_action/cancel</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_requestRegisterReport_POST"><abbr title="POST /Ven/{venID}/report_action/requestRegister" class="side-abbr"><span class="sideoverflow">POST /Ven/{venID}/report_action/requestRegister</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_sendRegisterReport_POST"><abbr title="POST /Ven/{venID}/report_action/sendRegister" class="side-abbr"><span class="sideoverflow">POST /Ven/{venID}/report_action/sendRegister</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_venResourceOpt_GET"><abbr title="GET /Ven/{venID}/opt/resource/{resourceName}" class="side-abbr"><span class="sideoverflow">GET /Ven/{venID}/opt/resource/{resourceName}</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_viewOtherReportCapabilityDescription_GET"><abbr title="GET /Ven/{venID}/report/available/description" class="side-abbr"><span class="sideoverflow">GET /Ven/{venID}/report/available/description</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_pageOtherReportCapability_GET"><abbr title="GET /Ven/{venID}/report/available/search" class="side-abbr"><span class="sideoverflow">GET /Ven/{venID}/report/available/search</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_cancelSubscriptionReportRequest_POST"><abbr title="POST /Ven/{venID}/report/requested/cancelSubscription" class="side-abbr"><span class="sideoverflow">POST /Ven/{venID}/report/requested/cancelSubscription</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_pageReportRequest_GET"><abbr title="GET /Ven/{venID}/report/requested/search" class="side-abbr"><span class="sideoverflow">GET /Ven/{venID}/report/requested/search</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_viewReportRequestSpecifier_POST"><abbr title="POST /Ven/{venID}/report/requested/specifier" class="side-abbr"><span class="sideoverflow">POST /Ven/{venID}/report/requested/specifier</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_requestOtherReportCapabilityDescriptionRid_POST"><abbr title="POST /Ven/{venID}/report/available/description/request" class="side-abbr"><span class="sideoverflow">POST /Ven/{venID}/report/available/description/request</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_subscribeOtherReportCapabilityDescriptionRid_POST"><abbr title="POST /Ven/{venID}/report/available/description/subscribe" class="side-abbr"><span class="sideoverflow">POST /Ven/{venID}/report/available/description/subscribe</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_viewsFloatReportData_GET"><abbr title="GET /Ven/{venID}/report/data/float/{reportSpecifierId}" class="side-abbr"><span class="sideoverflow">GET /Ven/{venID}/report/data/float/{reportSpecifierId}</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_viewsKeyTokenReportData_GET"><abbr title="GET /Ven/{venID}/report/data/keytoken/{reportSpecifierId}" class="side-abbr"><span class="sideoverflow">GET /Ven/{venID}/report/data/keytoken/{reportSpecifierId}</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_viewsResourceStatusReportData_GET"><abbr title="GET /Ven/{venID}/report/data/resourcestatus/{reportSpecifierId}" class="side-abbr"><span class="sideoverflow">GET /Ven/{venID}/report/data/resourcestatus/{reportSpecifierId}</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_viewsFloatReportData_GET"><abbr title="GET /Ven/{venID}/report/data/float/{reportSpecifierId}/rid/{rid}" class="side-abbr"><span class="sideoverflow">GET /Ven/{venID}/report/data/float/{reportSpecifierId}/rid/{rid}</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_viewsKeyTokenReportData_GET"><abbr title="GET /Ven/{venID}/report/data/keytoken/{reportSpecifierId}/rid/{rid}" class="side-abbr"><span class="sideoverflow">GET /Ven/{venID}/report/data/keytoken/{reportSpecifierId}/rid/{rid}</span></abbr></a></li>
+          <li><a href="#resource_Oadr20bVenController_viewsResourceStatusReportData_GET"><abbr title="GET /Ven/{venID}/report/data/resourcestatus/{reportSpecifierId}/rid/{rid}" class="side-abbr"><span class="sideoverflow">GET /Ven/{venID}/report/data/resourcestatus/{reportSpecifierId}/rid/{rid}</span></abbr></a></li>
+          <li class="divider"></li>
+          <li class="text-right"><a href="#top"><small>Back to Top</small></a></li>
+        </ul>
+      </div>
+
+      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <ol class="breadcrumb" id="top">
+          <li class="active dropdown"><a href="index.html">Home</a></li>
+          <li class="active dropdown"><a href="resources.html">Resources</a></li>
+          <li class="dropdown"><a href="resource_Oadr20bVenController.html">Oadr20bVenController</a></li>
+        </ol>
+
+      <h1 class="page-header">Oadr20bVenController <small>Resource</small></h1>
+
+      <p></p>
+
+      <div id="resource_Oadr20bVenController_venOpt_GET">
+        <h3><span class="label label-default resource-method">GET</span> <span class="resource-path">/Ven/{venID}/opt <a href="../Ven/{venID}/opt" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">end</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">&nbsp;</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">marketContext</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">&nbsp;</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">start</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">&nbsp;</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_VenOptDto.html">VenOptDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_venOptDto.html">venOptDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+GET /Ven/{venID}/opt
+Content-Type: */*
+Accept: application/json
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;id&quot; : 12345,
+  &quot;venId&quot; : &quot;...&quot;,
+  &quot;marketContext&quot; : &quot;...&quot;,
+  &quot;resourceId&quot; : 12345,
+  &quot;eventId&quot; : &quot;...&quot;,
+  &quot;optId&quot; : &quot;...&quot;,
+  &quot;start&quot; : 12345,
+  &quot;end&quot; : 12345,
+  &quot;opt&quot; : &quot;OPT_OUT&quot;
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_registerPartyCancelPartyRegistration_POST">
+        <h3><span class="label label-default resource-method">POST</span> <span class="resource-path">/Ven/{venID}/registerparty/cancelPartyRegistration <a href="../Ven/{venID}/registerparty/cancelPartyRegistration" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+POST /Ven/{venID}/registerparty/cancelPartyRegistration
+Content-Type: */*
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 201 Created
+
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_registerPartyRequestReregistration_POST">
+        <h3><span class="label label-default resource-method">POST</span> <span class="resource-path">/Ven/{venID}/registerparty/requestReregistration <a href="../Ven/{venID}/registerparty/requestReregistration" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+POST /Ven/{venID}/registerparty/requestReregistration
+Content-Type: */*
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 201 Created
+
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_viewOtherReportCapability_GET">
+        <h3><span class="label label-default resource-method">GET</span> <span class="resource-path">/Ven/{venID}/report/available <a href="../Ven/{venID}/report/available" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">reportSpecifierId</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">&nbsp;</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_ReportCapabilityDto.html">ReportCapabilityDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_reportCapabilityDto.html">reportCapabilityDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+GET /Ven/{venID}/report/available
+Content-Type: */*
+Accept: application/json
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;id&quot; : 12345,
+  &quot;reportSpecifierId&quot; : &quot;...&quot;,
+  &quot;reportName&quot; : &quot;TELEMETRY_USAGE&quot;,
+  &quot;duration&quot; : &quot;...&quot;,
+  &quot;reportRequestId&quot; : &quot;...&quot;,
+  &quot;createdDatetime&quot; : 12345,
+  &quot;reportId&quot; : &quot;...&quot;,
+  &quot;start&quot; : 12345
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_viewReportRequest_GET">
+        <h3><span class="label label-default resource-method">GET</span> <span class="resource-path">/Ven/{venID}/report/requested <a href="../Ven/{venID}/report/requested" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">reportRequestId</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">&nbsp;</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">reportSpecifierId</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">&nbsp;</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_OtherReportRequestDto.html">OtherReportRequestDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_otherReportRequestDto.html">otherReportRequestDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+GET /Ven/{venID}/report/requested
+Content-Type: */*
+Accept: application/json
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;reportSpecifierId&quot; : &quot;...&quot;,
+  &quot;venId&quot; : &quot;...&quot;,
+  &quot;requestorUsername&quot; : &quot;...&quot;,
+  &quot;id&quot; : 12345,
+  &quot;reportRequestId&quot; : &quot;...&quot;,
+  &quot;granularity&quot; : &quot;...&quot;,
+  &quot;reportBackDuration&quot; : &quot;...&quot;,
+  &quot;start&quot; : 12345,
+  &quot;end&quot; : 12345,
+  &quot;acked&quot; : true,
+  &quot;createdDatetime&quot; : 12345
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_cancelReport_POST">
+        <h3><span class="label label-default resource-method">POST</span> <span class="resource-path">/Ven/{venID}/report_action/cancel <a href="../Ven/{venID}/report_action/cancel" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">reportRequestId</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+POST /Ven/{venID}/report_action/cancel
+Content-Type: */*
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 201 Created
+
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_requestRegisterReport_POST">
+        <h3><span class="label label-default resource-method">POST</span> <span class="resource-path">/Ven/{venID}/report_action/requestRegister <a href="../Ven/{venID}/report_action/requestRegister" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+POST /Ven/{venID}/report_action/requestRegister
+Content-Type: */*
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 201 Created
+
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_sendRegisterReport_POST">
+        <h3><span class="label label-default resource-method">POST</span> <span class="resource-path">/Ven/{venID}/report_action/sendRegister <a href="../Ven/{venID}/report_action/sendRegister" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+POST /Ven/{venID}/report_action/sendRegister
+Content-Type: */*
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 201 Created
+
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_venResourceOpt_GET">
+        <h3><span class="label label-default resource-method">GET</span> <span class="resource-path">/Ven/{venID}/opt/resource/{resourceName} <a href="../Ven/{venID}/opt/resource/{resourceName}" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">resourceName</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">end</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">&nbsp;</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">marketContext</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">&nbsp;</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">start</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">&nbsp;</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_VenOptDto.html">VenOptDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_venOptDto.html">venOptDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+GET /Ven/{venID}/opt/resource/{resourceName}
+Content-Type: */*
+Accept: application/json
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;id&quot; : 12345,
+  &quot;venId&quot; : &quot;...&quot;,
+  &quot;marketContext&quot; : &quot;...&quot;,
+  &quot;resourceId&quot; : 12345,
+  &quot;eventId&quot; : &quot;...&quot;,
+  &quot;optId&quot; : &quot;...&quot;,
+  &quot;start&quot; : 12345,
+  &quot;end&quot; : 12345,
+  &quot;opt&quot; : &quot;OPT_IN&quot;
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_viewOtherReportCapabilityDescription_GET">
+        <h3><span class="label label-default resource-method">GET</span> <span class="resource-path">/Ven/{venID}/report/available/description <a href="../Ven/{venID}/report/available/description" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">reportSpecifierId</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_ReportCapabilityDescriptionDto.html">ReportCapabilityDescriptionDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_reportCapabilityDescriptionDto.html">reportCapabilityDescriptionDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+GET /Ven/{venID}/report/available/description
+Content-Type: */*
+Accept: application/json
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;id&quot; : 12345,
+  &quot;rid&quot; : &quot;...&quot;,
+  &quot;reportType&quot; : &quot;USAGE&quot;,
+  &quot;readingType&quot; : &quot;SUMMED&quot;,
+  &quot;oadrMaxPeriod&quot; : &quot;...&quot;,
+  &quot;oadrMinPeriod&quot; : &quot;...&quot;,
+  &quot;oadrOnChange&quot; : true,
+  &quot;itemDescription&quot; : &quot;...&quot;,
+  &quot;itemUnits&quot; : &quot;...&quot;,
+  &quot;siScaleCode&quot; : &quot;PICO&quot;
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_pageOtherReportCapability_GET">
+        <h3><span class="label label-default resource-method">GET</span> <span class="resource-path">/Ven/{venID}/report/available/search <a href="../Ven/{venID}/report/available/search" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>default</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-default-value">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">page</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-default-value">0</span></td>
+            <td><span class="parameter-constraints">int</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">size</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-default-value">20</span></td>
+            <td><span class="parameter-constraints">int</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_OtherReportCapabilityDto.html">OtherReportCapabilityDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_otherReportCapabilityDto.html">otherReportCapabilityDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+GET /Ven/{venID}/report/available/search
+Content-Type: */*
+Accept: application/json
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;venId&quot; : &quot;...&quot;,
+  &quot;id&quot; : 12345,
+  &quot;reportSpecifierId&quot; : &quot;...&quot;,
+  &quot;reportName&quot; : &quot;METADATA_TELEMETRY_USAGE&quot;,
+  &quot;duration&quot; : &quot;...&quot;,
+  &quot;reportRequestId&quot; : &quot;...&quot;,
+  &quot;createdDatetime&quot; : 12345,
+  &quot;reportId&quot; : &quot;...&quot;,
+  &quot;start&quot; : 12345
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_cancelSubscriptionReportRequest_POST">
+        <h3><span class="label label-default resource-method">POST</span> <span class="resource-path">/Ven/{venID}/report/requested/cancelSubscription <a href="../Ven/{venID}/report/requested/cancelSubscription" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">reportRequestId</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+POST /Ven/{venID}/report/requested/cancelSubscription
+Content-Type: */*
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 201 Created
+
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_pageReportRequest_GET">
+        <h3><span class="label label-default resource-method">GET</span> <span class="resource-path">/Ven/{venID}/report/requested/search <a href="../Ven/{venID}/report/requested/search" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>default</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-default-value">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">page</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-default-value">0</span></td>
+            <td><span class="parameter-constraints">int</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">size</span></td>
+            <td>query</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-default-value">20</span></td>
+            <td><span class="parameter-constraints">int</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_OtherReportRequestDto.html">OtherReportRequestDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_otherReportRequestDto.html">otherReportRequestDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+GET /Ven/{venID}/report/requested/search
+Content-Type: */*
+Accept: application/json
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;reportSpecifierId&quot; : &quot;...&quot;,
+  &quot;venId&quot; : &quot;...&quot;,
+  &quot;requestorUsername&quot; : &quot;...&quot;,
+  &quot;id&quot; : 12345,
+  &quot;reportRequestId&quot; : &quot;...&quot;,
+  &quot;granularity&quot; : &quot;...&quot;,
+  &quot;reportBackDuration&quot; : &quot;...&quot;,
+  &quot;start&quot; : 12345,
+  &quot;end&quot; : 12345,
+  &quot;acked&quot; : true,
+  &quot;createdDatetime&quot; : 12345
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_viewReportRequestSpecifier_POST">
+        <h3><span class="label label-default resource-method">POST</span> <span class="resource-path">/Ven/{venID}/report/requested/specifier <a href="../Ven/{venID}/report/requested/specifier" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-request-body">
+          <caption>Request Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Content-Type: application/json&quot; HTTP header to specify this media type to the server."><span class="request-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference"><a href="json_OtherReportRequestSpecifierSearchCriteria.html">OtherReportRequestSpecifierSearchCriteria</a>
+ (JSON)</span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Content-Type: application/xml&quot; HTTP header to specify this media type to the server."><span class="request-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference"><a href="xml_ns0_otherReportRequestSpecifierSearchCriteria.html">otherReportRequestSpecifierSearchCriteria</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_OtherReportRequestSpecifierDto.html">OtherReportRequestSpecifierDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_otherReportRequestSpecifierDto.html">otherReportRequestSpecifierDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+POST /Ven/{venID}/report/requested/specifier
+Content-Type: application/json
+Accept: application/json
+
+                <code class="prettyprint language-js">
+{
+  &quot;reportSpecifierId&quot; : [ &quot;...&quot;, &quot;...&quot; ],
+  &quot;reportRequestId&quot; : [ &quot;...&quot;, &quot;...&quot; ],
+  &quot;rid&quot; : [ &quot;...&quot;, &quot;...&quot; ]
+}
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 201 Created
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;id&quot; : 12345,
+  &quot;rid&quot; : &quot;...&quot;,
+  &quot;archived&quot; : true,
+  &quot;lastUpdateDatetime&quot; : 12345,
+  &quot;lastUpdateValue&quot; : &quot;...&quot;,
+  &quot;reportRequestId&quot; : &quot;...&quot;
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_requestOtherReportCapabilityDescriptionRid_POST">
+        <h3><span class="label label-default resource-method">POST</span> <span class="resource-path">/Ven/{venID}/report/available/description/request <a href="../Ven/{venID}/report/available/description/request" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-request-body">
+          <caption>Request Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Content-Type: application/json&quot; HTTP header to specify this media type to the server."><span class="request-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_OtherReportRequestDtoCreateRequestDto.html">OtherReportRequestDtoCreateRequestDto</a>
+ (JSON)</span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Content-Type: application/xml&quot; HTTP header to specify this media type to the server."><span class="request-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_otherReportRequestDtoCreateRequestDto.html">otherReportRequestDtoCreateRequestDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+POST /Ven/{venID}/report/available/description/request
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;reportSpecifierId&quot; : &quot;...&quot;,
+  &quot;rid&quot; : [ &quot;...&quot;, &quot;...&quot; ],
+  &quot;start&quot; : 12345,
+  &quot;end&quot; : 12345
+} ]
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 201 Created
+
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_subscribeOtherReportCapabilityDescriptionRid_POST">
+        <h3><span class="label label-default resource-method">POST</span> <span class="resource-path">/Ven/{venID}/report/available/description/subscribe <a href="../Ven/{venID}/report/available/description/subscribe" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-request-body">
+          <caption>Request Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Content-Type: application/json&quot; HTTP header to specify this media type to the server."><span class="request-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_OtherReportRequestDtoCreateSubscriptionDto.html">OtherReportRequestDtoCreateSubscriptionDto</a>
+ (JSON)</span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Content-Type: application/xml&quot; HTTP header to specify this media type to the server."><span class="request-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_otherReportRequestDtoCreateSubscriptionDto.html">otherReportRequestDtoCreateSubscriptionDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+POST /Ven/{venID}/report/available/description/subscribe
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;reportSpecifierId&quot; : &quot;...&quot;,
+  &quot;rid&quot; : {
+    &quot;property1&quot; : true,
+    &quot;property2&quot; : true
+  },
+  &quot;granularity&quot; : &quot;...&quot;,
+  &quot;reportBackDuration&quot; : &quot;...&quot;
+} ]
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 201 Created
+
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_viewsFloatReportData_GET">
+        <h3><span class="label label-default resource-method">GET</span> <span class="resource-path">/Ven/{venID}/report/data/float/{reportSpecifierId} <a href="../Ven/{venID}/report/data/float/{reportSpecifierId}" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">reportSpecifierId</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_OtherReportDataFloatDto.html">OtherReportDataFloatDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_otherReportDataFloatDto.html">otherReportDataFloatDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+GET /Ven/{venID}/report/data/float/{reportSpecifierId}
+Content-Type: */*
+Accept: application/json
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;value&quot; : 12345.0,
+  &quot;id&quot; : 12345,
+  &quot;reportSpecifierId&quot; : &quot;...&quot;,
+  &quot;rid&quot; : &quot;...&quot;,
+  &quot;confidence&quot; : 12345,
+  &quot;accuracy&quot; : 12345.0,
+  &quot;start&quot; : 12345,
+  &quot;duration&quot; : &quot;...&quot;
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_viewsKeyTokenReportData_GET">
+        <h3><span class="label label-default resource-method">GET</span> <span class="resource-path">/Ven/{venID}/report/data/keytoken/{reportSpecifierId} <a href="../Ven/{venID}/report/data/keytoken/{reportSpecifierId}" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">reportSpecifierId</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_OtherReportDataKeyTokenDto.html">OtherReportDataKeyTokenDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_otherReportDataKeyTokenDto.html">otherReportDataKeyTokenDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+GET /Ven/{venID}/report/data/keytoken/{reportSpecifierId}
+Content-Type: */*
+Accept: application/json
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;tokens&quot; : [ {
+    &quot;key&quot; : &quot;...&quot;,
+    &quot;value&quot; : &quot;...&quot;
+  }, {
+    &quot;key&quot; : &quot;...&quot;,
+    &quot;value&quot; : &quot;...&quot;
+  } ],
+  &quot;id&quot; : 12345,
+  &quot;reportSpecifierId&quot; : &quot;...&quot;,
+  &quot;rid&quot; : &quot;...&quot;,
+  &quot;confidence&quot; : 12345,
+  &quot;accuracy&quot; : 12345.0,
+  &quot;start&quot; : 12345,
+  &quot;duration&quot; : &quot;...&quot;
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_viewsResourceStatusReportData_GET">
+        <h3><span class="label label-default resource-method">GET</span> <span class="resource-path">/Ven/{venID}/report/data/resourcestatus/{reportSpecifierId} <a href="../Ven/{venID}/report/data/resourcestatus/{reportSpecifierId}" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">reportSpecifierId</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_OtherReportDataPayloadResourceStatusDto.html">OtherReportDataPayloadResourceStatusDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_otherReportDataPayloadResourceStatusDto.html">otherReportDataPayloadResourceStatusDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+GET /Ven/{venID}/report/data/resourcestatus/{reportSpecifierId}
+Content-Type: */*
+Accept: application/json
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;oadrCapacityMin&quot; : 12345.0,
+  &quot;oadrCapacityMax&quot; : 12345.0,
+  &quot;oadrCapacityCurrent&quot; : 12345.0,
+  &quot;oadrCapacityNormal&quot; : 12345.0,
+  &quot;oadrLevelOffsetMin&quot; : 12345.0,
+  &quot;oadrLevelOffsetMax&quot; : 12345.0,
+  &quot;oadrLevelOffsetCurrent&quot; : 12345.0,
+  &quot;oadrLevelOffsetNormal&quot; : 12345.0,
+  &quot;oadrPercentOffsetMin&quot; : 12345.0,
+  &quot;oadrPercentOffsetMax&quot; : 12345.0,
+  &quot;oadrPercentOffsetCurrent&quot; : 12345.0,
+  &quot;oadrPercentOffsetNormal&quot; : 12345.0,
+  &quot;oadrSetPointMin&quot; : 12345.0,
+  &quot;oadrSetPointMax&quot; : 12345.0,
+  &quot;oadrSetPointCurrent&quot; : 12345.0,
+  &quot;oadrSetPointNormal&quot; : 12345.0,
+  &quot;id&quot; : 12345,
+  &quot;reportSpecifierId&quot; : &quot;...&quot;,
+  &quot;rid&quot; : &quot;...&quot;,
+  &quot;confidence&quot; : 12345,
+  &quot;accuracy&quot; : 12345.0,
+  &quot;start&quot; : 12345,
+  &quot;duration&quot; : &quot;...&quot;
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_viewsFloatReportData_GET">
+        <h3><span class="label label-default resource-method">GET</span> <span class="resource-path">/Ven/{venID}/report/data/float/{reportSpecifierId}/rid/{rid} <a href="../Ven/{venID}/report/data/float/{reportSpecifierId}/rid/{rid}" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">reportSpecifierId</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">rid</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_OtherReportDataFloatDto.html">OtherReportDataFloatDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_otherReportDataFloatDto.html">otherReportDataFloatDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+GET /Ven/{venID}/report/data/float/{reportSpecifierId}/rid/{rid}
+Content-Type: */*
+Accept: application/json
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;value&quot; : 12345.0,
+  &quot;id&quot; : 12345,
+  &quot;reportSpecifierId&quot; : &quot;...&quot;,
+  &quot;rid&quot; : &quot;...&quot;,
+  &quot;confidence&quot; : 12345,
+  &quot;accuracy&quot; : 12345.0,
+  &quot;start&quot; : 12345,
+  &quot;duration&quot; : &quot;...&quot;
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_viewsKeyTokenReportData_GET">
+        <h3><span class="label label-default resource-method">GET</span> <span class="resource-path">/Ven/{venID}/report/data/keytoken/{reportSpecifierId}/rid/{rid} <a href="../Ven/{venID}/report/data/keytoken/{reportSpecifierId}/rid/{rid}" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">reportSpecifierId</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">rid</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_OtherReportDataKeyTokenDto.html">OtherReportDataKeyTokenDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_otherReportDataKeyTokenDto.html">otherReportDataKeyTokenDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+GET /Ven/{venID}/report/data/keytoken/{reportSpecifierId}/rid/{rid}
+Content-Type: */*
+Accept: application/json
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;tokens&quot; : [ {
+    &quot;key&quot; : &quot;...&quot;,
+    &quot;value&quot; : &quot;...&quot;
+  }, {
+    &quot;key&quot; : &quot;...&quot;,
+    &quot;value&quot; : &quot;...&quot;
+  } ],
+  &quot;id&quot; : 12345,
+  &quot;reportSpecifierId&quot; : &quot;...&quot;,
+  &quot;rid&quot; : &quot;...&quot;,
+  &quot;confidence&quot; : 12345,
+  &quot;accuracy&quot; : 12345.0,
+  &quot;start&quot; : 12345,
+  &quot;duration&quot; : &quot;...&quot;
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="resource_Oadr20bVenController_viewsResourceStatusReportData_GET">
+        <h3><span class="label label-default resource-method">GET</span> <span class="resource-path">/Ven/{venID}/report/data/resourcestatus/{reportSpecifierId}/rid/{rid} <a href="../Ven/{venID}/report/data/resourcestatus/{reportSpecifierId}/rid/{rid}" class="glyphicon glyphicon-new-window" target="_blank"></a></span></h3>
+
+        <p></p>
+
+        <table class="table resource-parameters">
+          <caption>Request Parameters</caption>
+          <thead>
+          <tr>
+            <th>name</th>
+            <th>type</th>
+            <th>description</th>
+            <th>constraints</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><span class="parameter-name">reportSpecifierId</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">rid</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          <tr>
+            <td><span class="parameter-name">venID</span></td>
+            <td>path</td>
+            <td><span class="parameter-description">&nbsp;</span></td>
+            <td><span class="parameter-constraints">required</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+        <table class="table resource-response-body">
+          <caption>Response Body</caption>
+          <thead>
+          <tr>
+            <th>media type</th>
+            <th>data type</th>
+            <th>description</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/json&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/json</span></abbr></td>
+            <td><span class="datatype-reference">array of <a href="json_OtherReportDataPayloadResourceStatusDto.html">OtherReportDataPayloadResourceStatusDto</a>
+ (JSON)</span></td>
+            <td rowspan="2" class="multi-row-description"><span class="response-description"></span></td>
+          </tr>
+          <tr>
+            <td><abbr data-toggle="tooltip" data-placement="top" title="Use the &quot;Accept: application/xml&quot; HTTP header to request that this media type be provided by the server."><span class="response-type">application/xml</span></abbr></td>
+            <td><span class="datatype-reference">list of <a href="xml_ns0_otherReportDataPayloadResourceStatusDto.html">otherReportDataPayloadResourceStatusDto</a>
+ (XML)</span></td>
+          </tr>
+          </tbody>
+        </table>
+        <h4>Example</h4>
+
+        <div class="container-fluid example panel">
+          <div class="row panel-body">
+            <div class="col-md-6">
+              <h5>Request</h5>
+              <pre>
+GET /Ven/{venID}/report/data/resourcestatus/{reportSpecifierId}/rid/{rid}
+Content-Type: */*
+Accept: application/json
+
+                <code class="prettyprint language-txt">
+...
+                </code>
+              </pre>
+            </div>
+            <div class="col-md-6">
+              <h5>Response</h5>
+              <pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+                <code class="prettyprint language-js">
+[ {
+  &quot;oadrCapacityMin&quot; : 12345.0,
+  &quot;oadrCapacityMax&quot; : 12345.0,
+  &quot;oadrCapacityCurrent&quot; : 12345.0,
+  &quot;oadrCapacityNormal&quot; : 12345.0,
+  &quot;oadrLevelOffsetMin&quot; : 12345.0,
+  &quot;oadrLevelOffsetMax&quot; : 12345.0,
+  &quot;oadrLevelOffsetCurrent&quot; : 12345.0,
+  &quot;oadrLevelOffsetNormal&quot; : 12345.0,
+  &quot;oadrPercentOffsetMin&quot; : 12345.0,
+  &quot;oadrPercentOffsetMax&quot; : 12345.0,
+  &quot;oadrPercentOffsetCurrent&quot; : 12345.0,
+  &quot;oadrPercentOffsetNormal&quot; : 12345.0,
+  &quot;oadrSetPointMin&quot; : 12345.0,
+  &quot;oadrSetPointMax&quot; : 12345.0,
+  &quot;oadrSetPointCurrent&quot; : 12345.0,
+  &quot;oadrSetPointNormal&quot; : 12345.0,
+  &quot;id&quot; : 12345,
+  &quot;reportSpecifierId&quot; : &quot;...&quot;,
+  &quot;rid&quot; : &quot;...&quot;,
+  &quot;confidence&quot; : 12345,
+  &quot;accuracy&quot; : 12345.0,
+  &quot;start&quot; : 12345,
+  &quot;duration&quot; : &quot;...&quot;
+} ]
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <footer class="footer">
+          <div class="container">
+            <p class="text-muted">Generated by <a href="http://enunciate.webcohesion.com">Enunciate</a>.</p>
+          </div>
+        </footer>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- JavaScript placed at the end of the document so the pages load faster. -->
+  <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
+
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+  <!-- prettify code blocks. see http://code.google.com/p/google-code-prettify/ -->
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js" type="text/javascript"></script>
+  <script>
+    $(function() {
+      $(".clickable-row").click(function() {
+        window.document.location = $(this).data("href");
+      });
+
+      $('[data-toggle="tooltip"]').tooltip()
+    });
+  </script>
+
+</body>
+</html>

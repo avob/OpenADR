@@ -204,6 +204,7 @@
 		<module>./DummyVTN20bController</module>
 
 	</modules>
+
 	<scm>
 		<url>https://github.com/avob/OpenADR</url>
 		<connection>scm:git:git://github.com/avob/OpenADR</connection>

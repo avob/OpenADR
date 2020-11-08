@@ -16,7 +16,7 @@ import org.springframework.jms.core.JmsTemplate;
 
 import com.avob.openadr.server.common.vtn.broker.activemq.ActiveMQAuthorizationPlugin;
 
-@Profile({ "test", "in-memory-broker" })
+@Profile({ "test", "in-memory" })
 @Configuration
 public class VtnConfigEmbeddedBroker {
 
@@ -37,7 +37,7 @@ public class VtnConfigEmbeddedBroker {
 			broker.addSslConnector(vtnConfig.getSslBrokerUrl() + "?transport.needClientAuth=true",
 					vtnConfig.getKeyManagerFactory().getKeyManagers(),
 					vtnConfig.getTrustManagerFactory().getTrustManagers(), new SecureRandom());
-
+			
 			broker.setPersistent(false);
 			broker.setBrokerName("broker");
 			broker.setUseShutdownHook(true);

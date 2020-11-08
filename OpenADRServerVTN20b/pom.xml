@@ -10,6 +10,10 @@
 		<artifactId>OpenADR</artifactId>
 		<version>0.1.0-SNAPSHOT</version>
 	</parent>
+	<properties>
+		<swagger.output.dir>${project.build.directory}/swagger</swagger.output.dir>
+		<swagger.input>${swagger.output.dir}/swagger.json</swagger.input>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>com.avob.openadr</groupId>
@@ -87,6 +91,16 @@
 					<mainClass>org.springframework.boot.loader.PropertiesLauncher</mainClass>
 					<startClass>com.avob.openadr.server.oadr20b.vtn.VTN20bApplication</startClass>
 					<executable>true</executable>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<io.springfox.staticdocs.outputDir>${swagger.output.dir}</io.springfox.staticdocs.outputDir>
+						<io.springfox.staticdocs.snippetsOutputDir>${swagger.snippetOutput.dir}</io.springfox.staticdocs.snippetsOutputDir>
+					</systemPropertyVariables>
 				</configuration>
 			</plugin>
 			<plugin>

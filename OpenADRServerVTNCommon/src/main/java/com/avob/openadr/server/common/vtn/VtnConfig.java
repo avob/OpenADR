@@ -40,10 +40,10 @@ public class VtnConfig {
 	public static final String CONTEXT_PATH_CONF = "oadr.server.context_path";
 	public static final String PORT_CONF = "oadr.server.port";
 	public static final String TRUSTED_CERTIFICATES_CONF = "oadr.security.ven.trustcertificate";
-	
+
 	public static final String PRIVATE_KEY_CONF = "oadr.security.vtn.key";
 	public static final String CERTIFICATE_CONF = "oadr.security.vtn.cert";
-	
+
 	public static final String XMPP_PRIVATE_KEY_CONF = "oadr.security.vtn.xmpp.key";
 	public static final String XMPP_CERTIFICATE_CONF = "oadr.security.vtn.xmpp.cert";
 
@@ -86,14 +86,14 @@ public class VtnConfig {
 	@Value("${" + PRIVATE_KEY_CONF + ":#{null}}")
 	private String key;
 
-	
+
 
 	@Value("${" + CERTIFICATE_CONF + ":#{null}}")
 	private String cert;
-	
+
 	@Value("${" + XMPP_CERTIFICATE_CONF + ":#{null}}")
 	private String xmppCert;
-	
+
 	@Value("${" + XMPP_PRIVATE_KEY_CONF + ":#{null}}")
 	private String xmppKey;
 
@@ -218,6 +218,8 @@ public class VtnConfig {
 				keyManagerFactory = OadrPKISecurity.createKeyManagerFactory(this.getKey(), this.getCert(),
 						keystorePassword);
 
+
+
 				// SSL Context Factory
 				sslContext = SSLContext.getInstance("TLS");
 
@@ -225,6 +227,10 @@ public class VtnConfig {
 				String seed = UUID.randomUUID().toString();
 				getSslContext().init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
 						new SecureRandom(seed.getBytes()));
+
+
+
+				//				sslContext = OadrPKISecurity.createSSLContext(clientPrivateKeyPemFilePath, clientCertificatePemFilePath, trustCertificates, password)
 				// init ssl context
 			} catch (OadrSecurityException | NoSuchAlgorithmException | KeyManagementException e) {
 				throw new OadrVTNInitializationException(e);
@@ -233,7 +239,7 @@ public class VtnConfig {
 			LOGGER.warn(
 					"VTN " + PRIVATE_KEY_CONF + " or " + CERTIFICATE_CONF + " not given - no HTTP SSL transport supported");
 		}
-		
+
 		if (this.getXmppCert() != null && this.getXmppKey() != null) {
 
 			String keystorePassword = UUID.randomUUID().toString();
@@ -271,7 +277,7 @@ public class VtnConfig {
 		}
 		brokerUrl = "tcp://" + getBrokerHost() + ":" + getBrokerPort();
 		sslBrokerUrl = "ssl://" + brokerSslHost + ":" + brokerSslPort;
-		
+
 		LOGGER.debug("Initialized VTN configuration:");
 		LOGGER.debug(this.toString());
 	}
@@ -400,7 +406,7 @@ public class VtnConfig {
 	public String getValidateOadrPayloadAgainstXsdFilePath() {
 		return validateOadrPayloadAgainstXsdFilePath;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "VtnConfig [contextPath=" + contextPath + "\n, port=" + port + "\n, trustCertificatesStr="

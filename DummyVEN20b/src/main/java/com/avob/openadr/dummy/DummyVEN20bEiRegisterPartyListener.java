@@ -12,27 +12,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiOptBuilders;
-import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
 import com.avob.openadr.model.oadr20b.ei.OptReasonEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
-import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
-import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
-import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
 import com.avob.openadr.model.oadr20b.xcal.VavailabilityType;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
-import com.avob.openadr.server.oadr20b.ven.VenConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyService;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyService.Oadr20bVENEiRegisterPartyServiceListener;
-import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiReportService;
 
 @Configuration
 public class DummyVEN20bEiRegisterPartyListener implements Oadr20bVENEiRegisterPartyServiceListener {
@@ -40,16 +33,15 @@ public class DummyVEN20bEiRegisterPartyListener implements Oadr20bVENEiRegisterP
 	private static final Logger LOGGER = LoggerFactory.getLogger(DummyVEN20bEiRegisterPartyListener.class);
 
 	@Resource
-	private VenConfig venConfig;
-
-	@Resource
 	private MultiVtnConfig multiVtnConfig;
 
 	@Resource
-	private Oadr20bVENEiReportService reportService;
+	private OadrAction oadrAction;
 
 	@Resource
 	private Oadr20bVENEiRegisterPartyService oadr20bVENEiRegisterPartyService;
+
+
 
 	@PostConstruct
 	public void init() {
@@ -92,37 +84,15 @@ public class DummyVEN20bEiRegisterPartyListener implements Oadr20bVENEiRegisterP
 		}
 	}
 
-	private void initReport(VtnSessionConfiguration vtnConfiguration) throws XmppStringprepException,
-	NotConnectedException, Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-	Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, InterruptedException {
+	private void initReport(VtnSessionConfiguration vtnConfiguration)  {
 
-		// send VEN RegisterReport to VTN
-		String requestId = "0";
-		String reportRequestId = "0";
-		OadrRegisterReportType payload = selfOadrRegisterReport(requestId, venConfig.getVenId(),
-				reportRequestId);
+		oadrAction.sendRegisterReport(vtnConfiguration);
 
-		multiVtnConfig.oadrRegisterReport(vtnConfiguration, payload);
-
-		String reportSpecifierId = "METADATA";
-		String granularity = "P0D";
-		String reportBackDuration = "P0D";
-
-		// Require RegisterReport from VTN (by sending METADATA CreatedReport)
-		OadrReportRequestType oadrReportRequestType = Oadr20bEiReportBuilders
-				.newOadr20bReportRequestTypeBuilder(reportRequestId, reportSpecifierId, granularity, reportBackDuration)
-				.addSpecifierPayload(null, ReadingTypeEnumeratedType.DIRECT_READ, reportSpecifierId).build();
-		OadrCreateReportType createReport = Oadr20bEiReportBuilders
-				.newOadr20bCreateReportBuilder(requestId, vtnConfiguration.getVenSessionConfig().getVenId())
-				.addReportRequest(oadrReportRequestType).build();
-
-		multiVtnConfig.oadrCreateReport(vtnConfiguration, createReport);
+		oadrAction.requestReqisterReport(vtnConfiguration);
 
 	}
-	
-	public OadrRegisterReportType selfOadrRegisterReport(String requestId, String venId, String reportRequestId) {
-		return Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder(requestId, venId, reportRequestId).build();
-	}
+
+
 
 	private void initOpt(VtnSessionConfiguration vtnConfiguration) throws XmppStringprepException,
 	NotConnectedException, Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
@@ -135,7 +105,7 @@ public class DummyVEN20bEiRegisterPartyListener implements Oadr20bVENEiRegisterP
 		OptTypeType optType = OptTypeType.OPT_OUT;
 		OptReasonEnumeratedType optReason = OptReasonEnumeratedType.NOT_PARTICIPATING;
 
-		OadrCreateOptType build = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, venConfig.getVenId(),
+		OadrCreateOptType build = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, vtnConfiguration.getVenSessionConfig().getVenId(),
 				System.currentTimeMillis(), vavailabilityType, optId, optType, optReason).build();
 
 		multiVtnConfig.oadrCreateOpt(vtnConfiguration, build);

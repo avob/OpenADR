@@ -1,0 +1,3680 @@
+{
+  "swagger": "2.0",
+  "info" : {
+    "description" : "<h1>OpenADRServerVTN20b<\/h1><p>VTN2.0b application<\/p>",
+    "license" : {
+      "url" : "https://www.apache.org/licenses/LICENSE-2.0",
+      "name" : "Apache License, Version 2.0"
+    },
+    "version" : "0.1.0-SNAPSHOT",
+    "title" : "OpenADRServerVTN20b"
+  },
+  "basePath" : "/OpenADRServerVTN20b",
+  "schemes" : [],
+  "tags" : [
+    {
+      "name" : "Oadr20bVTNEiEventController"
+      ,
+      "description" : "Oadr EiEvent service controller."
+    }
+    ,
+    {
+      "name" : "Oadr20bVTNEiOptController"
+    }
+    ,
+    {
+      "name" : "Oadr20bVTNEiRegisterPartyController"
+    }
+    ,
+    {
+      "name" : "Oadr20bVTNEiReportController"
+    }
+    ,
+    {
+      "name" : "Oadr20bVTNOadrPollController"
+    }
+    ,
+    {
+      "name" : "Oadr20bVenController"
+    }
+    ,
+    {
+      "name" : "Oadr20bVtnController"
+    }
+    ,
+    {
+      "name" : "ReportController"
+    }
+  ],
+  "definitions" : {
+    "DemandResponseEventOptEnum" : {
+      "type" : "string",
+      "title" : "DemandResponseEventOptEnum",
+          "enum" : [
+            "OPT_IN",
+            "OPT_OUT"
+          ],
+      "description" : ""
+    }
+    ,
+    "KeyTokenType" : {
+      "type" : "object",
+      "title" : "KeyTokenType",
+          "properties" : {
+            "key" : {
+            "readOnly" : false,
+"description" : "Obtient la valeur de la propriété key.",
+"type" : "string"
+            },
+            "value" : {
+            "readOnly" : false,
+"description" : "Obtient la valeur de la propriété value.",
+"type" : "string"
+            }
+          },
+      "example" : {
+  "key" : "...",
+  "value" : "..."
+},
+      "description" : "Represent a key-value object\n\n\n<p>Classe Java pour keyTokenType complex type.\n\n<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.\n\n<pre>\n &lt;complexType name=\"keyTokenType\"&gt;\n   &lt;complexContent&gt;\n     &lt;restriction base=\"{http://www.w3.org/2001/XMLSchema}anyType\"&gt;\n       &lt;sequence&gt;\n         &lt;element name=\"key\" type=\"{http://www.w3.org/2001/XMLSchema}string\"/&gt;\n         &lt;element name=\"value\" type=\"{http://www.w3.org/2001/XMLSchema}string\"/&gt;\n       &lt;/sequence&gt;\n     &lt;/restriction&gt;\n   &lt;/complexContent&gt;\n &lt;/complexType&gt;\n <\/pre>"
+    }
+    ,
+    "OtherReportCapabilityDescriptionDto" : {
+      "type" : "object",
+      "title" : "OtherReportCapabilityDescriptionDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/ReportCapabilityDescriptionDto"
+        },
+        {
+          "properties" : {
+            "venId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportSpecifierId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            }
+          }
+        }
+      ],
+      "example" : {
+  "venId" : "...",
+  "reportSpecifierId" : "...",
+  "id" : 12345,
+  "rid" : "...",
+  "reportType" : "STORED_ENERGY",
+  "readingType" : "NET",
+  "oadrMaxPeriod" : "...",
+  "oadrMinPeriod" : "...",
+  "oadrOnChange" : true,
+  "itemDescription" : "...",
+  "itemUnits" : "...",
+  "siScaleCode" : "DECI"
+},
+      "description" : ""
+    }
+    ,
+    "OtherReportCapabilityDto" : {
+      "type" : "object",
+      "title" : "OtherReportCapabilityDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/ReportCapabilityDto"
+        },
+        {
+          "properties" : {
+            "venId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            }
+          }
+        }
+      ],
+      "example" : {
+  "venId" : "...",
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "reportName" : "HISTORY_USAGE",
+  "duration" : "...",
+  "reportRequestId" : "...",
+  "createdDatetime" : 12345,
+  "reportId" : "...",
+  "start" : 12345
+},
+      "description" : ""
+    }
+    ,
+    "OtherReportDataFloatDto" : {
+      "type" : "object",
+      "title" : "OtherReportDataFloatDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/ReportDataDto"
+        },
+        {
+          "properties" : {
+            "value" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            }
+          }
+        }
+      ],
+      "example" : {
+  "value" : 12345.0,
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "rid" : "...",
+  "confidence" : 12345,
+  "accuracy" : 12345.0,
+  "start" : 12345,
+  "duration" : "..."
+},
+      "description" : ""
+    }
+    ,
+    "OtherReportDataKeyTokenDto" : {
+      "type" : "object",
+      "title" : "OtherReportDataKeyTokenDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/ReportDataDto"
+        },
+        {
+          "properties" : {
+            "tokens" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/KeyTokenType"
+}
+            }
+          }
+        }
+      ],
+      "example" : {
+  "tokens" : [ {
+    "key" : "...",
+    "value" : "..."
+  }, {
+    "key" : "...",
+    "value" : "..."
+  } ],
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "rid" : "...",
+  "confidence" : 12345,
+  "accuracy" : 12345.0,
+  "start" : 12345,
+  "duration" : "..."
+},
+      "description" : ""
+    }
+    ,
+    "OtherReportDataPayloadResourceStatusDto" : {
+      "type" : "object",
+      "title" : "OtherReportDataPayloadResourceStatusDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/ReportDataDto"
+        },
+        {
+          "properties" : {
+            "oadrCapacityMin" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrCapacityMax" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrCapacityCurrent" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrCapacityNormal" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrLevelOffsetMin" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrLevelOffsetMax" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrLevelOffsetCurrent" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrLevelOffsetNormal" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrPercentOffsetMin" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrPercentOffsetMax" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrPercentOffsetCurrent" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrPercentOffsetNormal" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrSetPointMin" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrSetPointMax" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrSetPointCurrent" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "oadrSetPointNormal" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            }
+          }
+        }
+      ],
+      "example" : {
+  "oadrCapacityMin" : 12345.0,
+  "oadrCapacityMax" : 12345.0,
+  "oadrCapacityCurrent" : 12345.0,
+  "oadrCapacityNormal" : 12345.0,
+  "oadrLevelOffsetMin" : 12345.0,
+  "oadrLevelOffsetMax" : 12345.0,
+  "oadrLevelOffsetCurrent" : 12345.0,
+  "oadrLevelOffsetNormal" : 12345.0,
+  "oadrPercentOffsetMin" : 12345.0,
+  "oadrPercentOffsetMax" : 12345.0,
+  "oadrPercentOffsetCurrent" : 12345.0,
+  "oadrPercentOffsetNormal" : 12345.0,
+  "oadrSetPointMin" : 12345.0,
+  "oadrSetPointMax" : 12345.0,
+  "oadrSetPointCurrent" : 12345.0,
+  "oadrSetPointNormal" : 12345.0,
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "rid" : "...",
+  "confidence" : 12345,
+  "accuracy" : 12345.0,
+  "start" : 12345,
+  "duration" : "..."
+},
+      "description" : ""
+    }
+    ,
+    "OtherReportRequestDto" : {
+      "type" : "object",
+      "title" : "OtherReportRequestDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/ReportRequestDto"
+        },
+        {
+          "properties" : {
+            "reportSpecifierId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "venId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "requestorUsername" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            }
+          }
+        }
+      ],
+      "example" : {
+  "reportSpecifierId" : "...",
+  "venId" : "...",
+  "requestorUsername" : "...",
+  "id" : 12345,
+  "reportRequestId" : "...",
+  "granularity" : "...",
+  "reportBackDuration" : "...",
+  "start" : 12345,
+  "end" : 12345,
+  "acked" : true,
+  "createdDatetime" : 12345
+},
+      "description" : ""
+    }
+    ,
+    "OtherReportRequestDtoCreateRequestDto" : {
+      "type" : "object",
+      "title" : "OtherReportRequestDtoCreateRequestDto",
+          "properties" : {
+            "reportSpecifierId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "rid" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "array",
+"items" : {
+  "type" : "string"
+}
+            },
+            "start" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "end" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            }
+          },
+      "example" : {
+  "reportSpecifierId" : "...",
+  "rid" : [ "...", "..." ],
+  "start" : 12345,
+  "end" : 12345
+},
+      "description" : ""
+    }
+    ,
+    "OtherReportRequestDtoCreateSubscriptionDto" : {
+      "type" : "object",
+      "title" : "OtherReportRequestDtoCreateSubscriptionDto",
+          "properties" : {
+            "reportSpecifierId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "rid" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "object",
+"additionalProperties" : {
+  "type" : "boolean"
+}
+            },
+            "granularity" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportBackDuration" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            }
+          },
+      "example" : {
+  "reportSpecifierId" : "...",
+  "rid" : {
+    "property1" : true,
+    "property2" : true
+  },
+  "granularity" : "...",
+  "reportBackDuration" : "..."
+},
+      "description" : ""
+    }
+    ,
+    "OtherReportRequestSpecifierDto" : {
+      "type" : "object",
+      "title" : "OtherReportRequestSpecifierDto",
+          "properties" : {
+            "id" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "rid" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "archived" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "lastUpdateDatetime" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "lastUpdateValue" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportRequestId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            }
+          },
+      "example" : {
+  "id" : 12345,
+  "rid" : "...",
+  "archived" : true,
+  "lastUpdateDatetime" : 12345,
+  "lastUpdateValue" : "...",
+  "reportRequestId" : "..."
+},
+      "description" : ""
+    }
+    ,
+    "OtherReportRequestSpecifierSearchCriteria" : {
+      "type" : "object",
+      "title" : "OtherReportRequestSpecifierSearchCriteria",
+          "properties" : {
+            "reportSpecifierId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "array",
+"items" : {
+  "type" : "string"
+}
+            },
+            "reportRequestId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "array",
+"items" : {
+  "type" : "string"
+}
+            },
+            "rid" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "array",
+"items" : {
+  "type" : "string"
+}
+            }
+          },
+      "example" : {
+  "reportSpecifierId" : [ "...", "..." ],
+  "reportRequestId" : [ "...", "..." ],
+  "rid" : [ "...", "..." ]
+},
+      "description" : ""
+    }
+    ,
+    "ReadingTypeEnumeratedType" : {
+      "type" : "string",
+      "title" : "ReadingTypeEnumeratedType",
+          "enum" : [
+            "DIRECT_READ",
+            "NET",
+            "ALLOCATED",
+            "ESTIMATED",
+            "SUMMED",
+            "DERIVED",
+            "MEAN",
+            "PEAK",
+            "HYBRID",
+            "CONTRACT",
+            "PROJECTED",
+            "X_RMS",
+            "X_NOT_APPLICABLE"
+          ],
+      "description" : "<p>Classe Java pour ReadingTypeEnumeratedType.\n\n<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.\n<p>\n<pre>\n &lt;simpleType name=\"ReadingTypeEnumeratedType\"&gt;\n   &lt;restriction base=\"{http://www.w3.org/2001/XMLSchema}token\"&gt;\n     &lt;enumeration value=\"Direct Read\"/&gt;\n     &lt;enumeration value=\"Net\"/&gt;\n     &lt;enumeration value=\"Allocated\"/&gt;\n     &lt;enumeration value=\"Estimated\"/&gt;\n     &lt;enumeration value=\"Summed\"/&gt;\n     &lt;enumeration value=\"Derived\"/&gt;\n     &lt;enumeration value=\"Mean\"/&gt;\n     &lt;enumeration value=\"Peak\"/&gt;\n     &lt;enumeration value=\"Hybrid\"/&gt;\n     &lt;enumeration value=\"Contract\"/&gt;\n     &lt;enumeration value=\"Projected\"/&gt;\n     &lt;enumeration value=\"x-RMS\"/&gt;\n     &lt;enumeration value=\"x-notApplicable\"/&gt;\n   &lt;/restriction&gt;\n &lt;/simpleType&gt;\n <\/pre>"
+    }
+    ,
+    "ReportCapabilityDescriptionDto" : {
+      "type" : "object",
+      "title" : "ReportCapabilityDescriptionDto",
+      "required" : ["id", "oadrOnChange"],
+          "properties" : {
+            "id" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "rid" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportType" : {
+            "readOnly" : false,
+"$ref" : "#/definitions/ReportEnumeratedType",
+"description" : ""
+            },
+            "readingType" : {
+            "readOnly" : false,
+"$ref" : "#/definitions/ReadingTypeEnumeratedType",
+"description" : ""
+            },
+            "oadrMaxPeriod" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "oadrMinPeriod" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "oadrOnChange" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "itemDescription" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "itemUnits" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "siScaleCode" : {
+            "readOnly" : false,
+"$ref" : "#/definitions/SiScaleCodeType",
+"description" : ""
+            }
+          },
+      "example" : {
+  "id" : 12345,
+  "rid" : "...",
+  "reportType" : "PERCENT_DEMAND",
+  "readingType" : "PROJECTED",
+  "oadrMaxPeriod" : "...",
+  "oadrMinPeriod" : "...",
+  "oadrOnChange" : true,
+  "itemDescription" : "...",
+  "itemUnits" : "...",
+  "siScaleCode" : "CENTI"
+},
+      "description" : ""
+    }
+    ,
+    "ReportCapabilityDto" : {
+      "type" : "object",
+      "title" : "ReportCapabilityDto",
+      "required" : ["id"],
+          "properties" : {
+            "id" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "reportSpecifierId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportName" : {
+            "readOnly" : false,
+"$ref" : "#/definitions/ReportNameEnumeratedType",
+"description" : ""
+            },
+            "duration" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportRequestId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "createdDatetime" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "reportId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "start" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            }
+          },
+      "example" : {
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "reportName" : "METADATA_HISTORY_GREENBUTTON",
+  "duration" : "...",
+  "reportRequestId" : "...",
+  "createdDatetime" : 12345,
+  "reportId" : "...",
+  "start" : 12345
+},
+      "description" : ""
+    }
+    ,
+    "ReportDataDto" : {
+      "type" : "object",
+      "title" : "ReportDataDto",
+      "required" : ["id"],
+          "properties" : {
+            "id" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "reportSpecifierId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "rid" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "confidence" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "accuracy" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "number"
+            },
+            "start" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "duration" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            }
+          },
+      "example" : {
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "rid" : "...",
+  "confidence" : 12345,
+  "accuracy" : 12345.0,
+  "start" : 12345,
+  "duration" : "..."
+},
+      "description" : ""
+    }
+    ,
+    "ReportEnumeratedType" : {
+      "type" : "string",
+      "title" : "ReportEnumeratedType",
+          "enum" : [
+            "READING",
+            "USAGE",
+            "DEMAND",
+            "SET_POINT",
+            "DELTA_USAGE",
+            "DELTA_SET_POINT",
+            "DELTA_DEMAND",
+            "BASELINE",
+            "DEVIATION",
+            "AVG_USAGE",
+            "AVG_DEMAND",
+            "OPERATING_STATE",
+            "UP_REGULATION_CAPACITY_AVAILABLE",
+            "DOWN_REGULATION_CAPACITY_AVAILABLE",
+            "REGULATION_SETPOINT",
+            "STORED_ENERGY",
+            "TARGET_ENERGY_STORAGE",
+            "AVAILABLE_ENERGY_STORAGE",
+            "PRICE",
+            "LEVEL",
+            "POWER_FACTOR",
+            "PERCENT_USAGE",
+            "PERCENT_DEMAND",
+            "X_RESOURCE_STATUS"
+          ],
+      "description" : "<p>Classe Java pour ReportEnumeratedType.\n\n<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.\n<p>\n<pre>\n &lt;simpleType name=\"ReportEnumeratedType\"&gt;\n   &lt;restriction base=\"{http://www.w3.org/2001/XMLSchema}token\"&gt;\n     &lt;enumeration value=\"reading\"/&gt;\n     &lt;enumeration value=\"usage\"/&gt;\n     &lt;enumeration value=\"demand\"/&gt;\n     &lt;enumeration value=\"setPoint\"/&gt;\n     &lt;enumeration value=\"deltaUsage\"/&gt;\n     &lt;enumeration value=\"deltaSetPoint\"/&gt;\n     &lt;enumeration value=\"deltaDemand\"/&gt;\n     &lt;enumeration value=\"baseline\"/&gt;\n     &lt;enumeration value=\"deviation\"/&gt;\n     &lt;enumeration value=\"avgUsage\"/&gt;\n     &lt;enumeration value=\"avgDemand\"/&gt;\n     &lt;enumeration value=\"operatingState\"/&gt;\n     &lt;enumeration value=\"upRegulationCapacityAvailable\"/&gt;\n     &lt;enumeration value=\"downRegulationCapacityAvailable\"/&gt;\n     &lt;enumeration value=\"regulationSetpoint\"/&gt;\n     &lt;enumeration value=\"storedEnergy\"/&gt;\n     &lt;enumeration value=\"targetEnergyStorage\"/&gt;\n     &lt;enumeration value=\"availableEnergyStorage\"/&gt;\n     &lt;enumeration value=\"price\"/&gt;\n     &lt;enumeration value=\"level\"/&gt;\n     &lt;enumeration value=\"powerFactor\"/&gt;\n     &lt;enumeration value=\"percentUsage\"/&gt;\n     &lt;enumeration value=\"percentDemand\"/&gt;\n     &lt;enumeration value=\"x-resourceStatus\"/&gt;\n   &lt;/restriction&gt;\n &lt;/simpleType&gt;\n <\/pre>"
+    }
+    ,
+    "ReportNameEnumeratedType" : {
+      "type" : "string",
+      "title" : "ReportNameEnumeratedType",
+          "enum" : [
+            "METADATA_HISTORY_USAGE",
+            "HISTORY_USAGE",
+            "METADATA_HISTORY_GREENBUTTON",
+            "HISTORY_GREENBUTTON",
+            "METADATA_TELEMETRY_USAGE",
+            "TELEMETRY_USAGE",
+            "METADATA_TELEMETRY_STATUS",
+            "TELEMETRY_STATUS"
+          ],
+      "description" : "<p>Classe Java pour reportNameEnumeratedType.\n\n<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.\n<p>\n<pre>\n &lt;simpleType name=\"reportNameEnumeratedType\"&gt;\n   &lt;restriction base=\"{http://www.w3.org/2001/XMLSchema}token\"&gt;\n     &lt;enumeration value=\"METADATA_HISTORY_USAGE\"/&gt;\n     &lt;enumeration value=\"HISTORY_USAGE\"/&gt;\n     &lt;enumeration value=\"METADATA_HISTORY_GREENBUTTON\"/&gt;\n     &lt;enumeration value=\"HISTORY_GREENBUTTON\"/&gt;\n     &lt;enumeration value=\"METADATA_TELEMETRY_USAGE\"/&gt;\n     &lt;enumeration value=\"TELEMETRY_USAGE\"/&gt;\n     &lt;enumeration value=\"METADATA_TELEMETRY_STATUS\"/&gt;\n     &lt;enumeration value=\"TELEMETRY_STATUS\"/&gt;\n   &lt;/restriction&gt;\n &lt;/simpleType&gt;\n <\/pre>"
+    }
+    ,
+    "ReportRequestDto" : {
+      "type" : "object",
+      "title" : "ReportRequestDto",
+      "required" : ["acked"],
+          "properties" : {
+            "id" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "reportRequestId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "granularity" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportBackDuration" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "start" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "end" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "acked" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "reportSpecifierId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "createdDatetime" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            }
+          },
+      "example" : {
+  "id" : 12345,
+  "reportRequestId" : "...",
+  "granularity" : "...",
+  "reportBackDuration" : "...",
+  "start" : 12345,
+  "end" : 12345,
+  "acked" : true,
+  "reportSpecifierId" : "...",
+  "createdDatetime" : 12345
+},
+      "description" : ""
+    }
+    ,
+    "SiScaleCodeType" : {
+      "type" : "string",
+      "title" : "SiScaleCodeType",
+          "enum" : [
+            "PICO",
+            "NANO",
+            "MICRO",
+            "MILLI",
+            "CENTI",
+            "DECI",
+            "KILO",
+            "MEGA",
+            "GIGA",
+            "TERA",
+            "NONE"
+          ],
+      "description" : "<p>Classe Java pour SiScaleCodeType.\n\n<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.\n<p>\n<pre>\n &lt;simpleType name=\"SiScaleCodeType\"&gt;\n   &lt;restriction base=\"{http://www.w3.org/2001/XMLSchema}string\"&gt;\n     &lt;enumeration value=\"p\"/&gt;\n     &lt;enumeration value=\"n\"/&gt;\n     &lt;enumeration value=\"micro\"/&gt;\n     &lt;enumeration value=\"m\"/&gt;\n     &lt;enumeration value=\"c\"/&gt;\n     &lt;enumeration value=\"d\"/&gt;\n     &lt;enumeration value=\"k\"/&gt;\n     &lt;enumeration value=\"M\"/&gt;\n     &lt;enumeration value=\"G\"/&gt;\n     &lt;enumeration value=\"T\"/&gt;\n     &lt;enumeration value=\"none\"/&gt;\n   &lt;/restriction&gt;\n &lt;/simpleType&gt;\n <\/pre>"
+    }
+    ,
+    "VenOptDto" : {
+      "type" : "object",
+      "title" : "VenOptDto",
+      "required" : ["id"],
+          "properties" : {
+            "id" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "venId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "marketContext" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "resourceId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "eventId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "optId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "start" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "end" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "opt" : {
+            "readOnly" : false,
+"$ref" : "#/definitions/DemandResponseEventOptEnum",
+"description" : ""
+            }
+          },
+      "example" : {
+  "id" : 12345,
+  "venId" : "...",
+  "marketContext" : "...",
+  "resourceId" : 12345,
+  "eventId" : "...",
+  "optId" : "...",
+  "start" : 12345,
+  "end" : 12345,
+  "opt" : "OPT_IN"
+},
+      "description" : ""
+    }
+    ,
+    "VenReportCapabilityDto" : {
+      "type" : "object",
+      "title" : "VenReportCapabilityDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/ReportCapabilityDto"
+        },
+        {
+          "properties" : {
+            "descriptions" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/ReportCapabilityDescriptionDto"
+}
+            }
+          }
+        }
+      ],
+      "example" : {
+  "descriptions" : [ {
+    "id" : 12345,
+    "rid" : "...",
+    "reportType" : "UP_REGULATION_CAPACITY_AVAILABLE",
+    "readingType" : "DERIVED",
+    "oadrMaxPeriod" : "...",
+    "oadrMinPeriod" : "...",
+    "oadrOnChange" : true,
+    "itemDescription" : "...",
+    "itemUnits" : "...",
+    "siScaleCode" : "MILLI"
+  }, {
+    "id" : 12345,
+    "rid" : "...",
+    "reportType" : "USAGE",
+    "readingType" : "HYBRID",
+    "oadrMaxPeriod" : "...",
+    "oadrMinPeriod" : "...",
+    "oadrOnChange" : true,
+    "itemDescription" : "...",
+    "itemUnits" : "...",
+    "siScaleCode" : "PICO"
+  } ],
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "reportName" : "TELEMETRY_USAGE",
+  "duration" : "...",
+  "reportRequestId" : "...",
+  "createdDatetime" : 12345,
+  "reportId" : "...",
+  "start" : 12345
+},
+      "description" : ""
+    }
+    ,
+    "VtnConfigurationDto" : {
+      "type" : "object",
+      "title" : "VtnConfigurationDto",
+      "required" : ["port", "supportCertificateGeneration", "xsdValidation", "saveVenDate"],
+          "properties" : {
+            "vtnId" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "supportPush" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "supportUnsecuredHttpPush" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "pullFrequencySeconds" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "port" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int32"
+            },
+            "contextPath" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "host" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "oadrVersion" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "supportCertificateGeneration" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "xsdValidation" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "xmlSignatureReplayProtectSecond" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "saveVenDate" : {
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            }
+          },
+      "example" : {
+  "vtnId" : "...",
+  "supportPush" : true,
+  "supportUnsecuredHttpPush" : true,
+  "pullFrequencySeconds" : 12345,
+  "port" : 12345,
+  "contextPath" : "...",
+  "host" : "...",
+  "oadrVersion" : "...",
+  "supportCertificateGeneration" : true,
+  "xsdValidation" : true,
+  "xmlSignatureReplayProtectSecond" : 12345,
+  "saveVenDate" : true
+},
+      "description" : ""
+    }
+    ,
+    "xml_ns0_demandResponseEventOptEnum" : {
+      "type" : "string",
+      "title" : "demandResponseEventOptEnum",
+          "enum" : [
+            "OPT_IN",
+            "OPT_OUT"
+          ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_vtnConfigurationDto" : {
+      "type" : "object",
+      "title" : "vtnConfigurationDto",
+      "required" : ["port", "saveVenDate", "supportCertificateGeneration", "xsdValidation"],
+      "allOf" : [
+        {
+          "properties" : {
+            "contextPath" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "host" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "oadrVersion" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "port" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int32"
+            },
+            "pullFrequencySeconds" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "saveVenDate" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "supportCertificateGeneration" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "supportPush" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "supportUnsecuredHttpPush" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "vtnId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "xmlSignatureReplayProtectSecond" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "xsdValidation" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_venOptDto" : {
+      "type" : "object",
+      "title" : "venOptDto",
+      "required" : ["id"],
+      "allOf" : [
+        {
+          "properties" : {
+            "end" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "eventId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "id" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "marketContext" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "opt" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"$ref" : "#/definitions/xml_ns0_demandResponseEventOptEnum",
+"description" : ""
+            },
+            "optId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "resourceId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "start" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "venId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_otherReportCapabilityDescriptionDto" : {
+      "type" : "object",
+      "title" : "otherReportCapabilityDescriptionDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/xml_ns0_reportCapabilityDescriptionDto"
+        },
+        {
+          "properties" : {
+            "reportSpecifierId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "venId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_otherReportCapabilityDto" : {
+      "type" : "object",
+      "title" : "otherReportCapabilityDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/xml_ns0_reportCapabilityDto"
+        },
+        {
+          "properties" : {
+            "venId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_reportCapabilityDescriptionDto" : {
+      "type" : "object",
+      "title" : "reportCapabilityDescriptionDto",
+      "required" : ["id", "oadrOnChange"],
+      "allOf" : [
+        {
+          "properties" : {
+            "id" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "itemDescription" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "itemUnits" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "oadrMaxPeriod" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "oadrMinPeriod" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "oadrOnChange" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "readingType" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"$ref" : "#/definitions/xml_ei_ReadingTypeEnumeratedType",
+"description" : ""
+            },
+            "reportType" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"$ref" : "#/definitions/xml_ei_ReportEnumeratedType",
+"description" : ""
+            },
+            "rid" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "siScaleCode" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"$ref" : "#/definitions/xml_ns2_SiScaleCodeType",
+"description" : ""
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_reportCapabilityDto" : {
+      "type" : "object",
+      "title" : "reportCapabilityDto",
+      "required" : ["id"],
+      "allOf" : [
+        {
+          "properties" : {
+            "createdDatetime" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "duration" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "id" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "reportId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportName" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"$ref" : "#/definitions/xml_ei_reportNameEnumeratedType",
+"description" : ""
+            },
+            "reportRequestId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportSpecifierId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "start" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_venReportCapabilityDto" : {
+      "type" : "object",
+      "title" : "venReportCapabilityDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/xml_ns0_reportCapabilityDto"
+        },
+        {
+          "properties" : {
+            "descriptions" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/xml_ns0_reportCapabilityDescriptionDto"
+}
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_otherReportDataFloatDto" : {
+      "type" : "object",
+      "title" : "otherReportDataFloatDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/xml_ns0_reportDataDto"
+        },
+        {
+          "properties" : {
+            "value" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_otherReportDataKeyTokenDto" : {
+      "type" : "object",
+      "title" : "otherReportDataKeyTokenDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/xml_ns0_reportDataDto"
+        },
+        {
+          "properties" : {
+            "tokens" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/xml_avob_keyTokenType"
+}
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_otherReportDataPayloadResourceStatusDto" : {
+      "type" : "object",
+      "title" : "otherReportDataPayloadResourceStatusDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/xml_ns0_reportDataDto"
+        },
+        {
+          "properties" : {
+            "oadrCapacityCurrent" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrCapacityMax" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrCapacityMin" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrCapacityNormal" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrLevelOffsetCurrent" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrLevelOffsetMax" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrLevelOffsetMin" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrLevelOffsetNormal" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrPercentOffsetCurrent" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrPercentOffsetMax" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrPercentOffsetMin" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrPercentOffsetNormal" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrSetPointCurrent" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrSetPointMax" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrSetPointMin" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "oadrSetPointNormal" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_reportDataDto" : {
+      "type" : "object",
+      "title" : "reportDataDto",
+      "required" : ["id"],
+      "allOf" : [
+        {
+          "properties" : {
+            "accuracy" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "number",
+"format" : "float"
+            },
+            "confidence" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "duration" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "id" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "reportSpecifierId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "rid" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "start" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_otherReportRequestDto" : {
+      "type" : "object",
+      "title" : "otherReportRequestDto",
+      "allOf" : [
+        {
+          "$ref" : "#/definitions/xml_ns0_reportRequestDto"
+        },
+        {
+          "properties" : {
+            "requestorUsername" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "venId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_otherReportRequestDtoCreateRequestDto" : {
+      "type" : "object",
+      "title" : "otherReportRequestDtoCreateRequestDto",
+      "allOf" : [
+        {
+          "properties" : {
+            "end" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "reportSpecifierId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "rid" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "array",
+"items" : {
+  "type" : "string"
+}
+            },
+            "start" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_otherReportRequestDtoCreateSubscriptionDto" : {
+      "type" : "object",
+      "title" : "otherReportRequestDtoCreateSubscriptionDto",
+      "allOf" : [
+        {
+          "properties" : {
+            "granularity" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportBackDuration" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportSpecifierId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "rid" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "object"
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_otherReportRequestSpecifierDto" : {
+      "type" : "object",
+      "title" : "otherReportRequestSpecifierDto",
+      "allOf" : [
+        {
+          "properties" : {
+            "archived" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "id" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "lastUpdateDatetime" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "lastUpdateValue" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportRequestId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "rid" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_otherReportRequestSpecifierSearchCriteria" : {
+      "type" : "object",
+      "title" : "otherReportRequestSpecifierSearchCriteria",
+      "allOf" : [
+        {
+          "properties" : {
+            "reportRequestId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "array",
+"items" : {
+  "type" : "string"
+}
+            },
+            "reportSpecifierId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "array",
+"items" : {
+  "type" : "string"
+}
+            },
+            "rid" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "array",
+"items" : {
+  "type" : "string"
+}
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns0_reportRequestDto" : {
+      "type" : "object",
+      "title" : "reportRequestDto",
+      "required" : ["acked"],
+      "allOf" : [
+        {
+          "properties" : {
+            "acked" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "boolean"
+            },
+            "createdDatetime" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "end" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "granularity" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "id" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            },
+            "reportBackDuration" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportRequestId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "reportSpecifierId" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "start" : {
+              "xml" : {
+                "namespace" : ""
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "integer",
+"format" : "int64"
+            }
+          }
+        }
+      ],
+      "description" : ""
+    }
+    ,
+    "xml_ns2_SiScaleCodeType" : {
+      "type" : "string",
+      "title" : "SiScaleCodeType",
+          "enum" : [
+            "p",
+            "n",
+            "micro",
+            "m",
+            "c",
+            "d",
+            "k",
+            "M",
+            "G",
+            "T",
+            "none"
+          ],
+      "description" : "<p>Classe Java pour SiScaleCodeType.\n\n<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.\n<p>\n<pre>\n &lt;simpleType name=\"SiScaleCodeType\"&gt;\n   &lt;restriction base=\"{http://www.w3.org/2001/XMLSchema}string\"&gt;\n     &lt;enumeration value=\"p\"/&gt;\n     &lt;enumeration value=\"n\"/&gt;\n     &lt;enumeration value=\"micro\"/&gt;\n     &lt;enumeration value=\"m\"/&gt;\n     &lt;enumeration value=\"c\"/&gt;\n     &lt;enumeration value=\"d\"/&gt;\n     &lt;enumeration value=\"k\"/&gt;\n     &lt;enumeration value=\"M\"/&gt;\n     &lt;enumeration value=\"G\"/&gt;\n     &lt;enumeration value=\"T\"/&gt;\n     &lt;enumeration value=\"none\"/&gt;\n   &lt;/restriction&gt;\n &lt;/simpleType&gt;\n <\/pre>"
+    }
+    ,
+    "xml_ei_ReadingTypeEnumeratedType" : {
+      "type" : "string",
+      "title" : "ReadingTypeEnumeratedType",
+          "enum" : [
+            "Direct Read",
+            "Net",
+            "Allocated",
+            "Estimated",
+            "Summed",
+            "Derived",
+            "Mean",
+            "Peak",
+            "Hybrid",
+            "Contract",
+            "Projected",
+            "x-RMS",
+            "x-notApplicable"
+          ],
+      "description" : "<p>Classe Java pour ReadingTypeEnumeratedType.\n\n<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.\n<p>\n<pre>\n &lt;simpleType name=\"ReadingTypeEnumeratedType\"&gt;\n   &lt;restriction base=\"{http://www.w3.org/2001/XMLSchema}token\"&gt;\n     &lt;enumeration value=\"Direct Read\"/&gt;\n     &lt;enumeration value=\"Net\"/&gt;\n     &lt;enumeration value=\"Allocated\"/&gt;\n     &lt;enumeration value=\"Estimated\"/&gt;\n     &lt;enumeration value=\"Summed\"/&gt;\n     &lt;enumeration value=\"Derived\"/&gt;\n     &lt;enumeration value=\"Mean\"/&gt;\n     &lt;enumeration value=\"Peak\"/&gt;\n     &lt;enumeration value=\"Hybrid\"/&gt;\n     &lt;enumeration value=\"Contract\"/&gt;\n     &lt;enumeration value=\"Projected\"/&gt;\n     &lt;enumeration value=\"x-RMS\"/&gt;\n     &lt;enumeration value=\"x-notApplicable\"/&gt;\n   &lt;/restriction&gt;\n &lt;/simpleType&gt;\n <\/pre>"
+    }
+    ,
+    "xml_ei_ReportEnumeratedType" : {
+      "type" : "string",
+      "title" : "ReportEnumeratedType",
+          "enum" : [
+            "reading",
+            "usage",
+            "demand",
+            "setPoint",
+            "deltaUsage",
+            "deltaSetPoint",
+            "deltaDemand",
+            "baseline",
+            "deviation",
+            "avgUsage",
+            "avgDemand",
+            "operatingState",
+            "upRegulationCapacityAvailable",
+            "downRegulationCapacityAvailable",
+            "regulationSetpoint",
+            "storedEnergy",
+            "targetEnergyStorage",
+            "availableEnergyStorage",
+            "price",
+            "level",
+            "powerFactor",
+            "percentUsage",
+            "percentDemand",
+            "x-resourceStatus"
+          ],
+      "description" : "<p>Classe Java pour ReportEnumeratedType.\n\n<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.\n<p>\n<pre>\n &lt;simpleType name=\"ReportEnumeratedType\"&gt;\n   &lt;restriction base=\"{http://www.w3.org/2001/XMLSchema}token\"&gt;\n     &lt;enumeration value=\"reading\"/&gt;\n     &lt;enumeration value=\"usage\"/&gt;\n     &lt;enumeration value=\"demand\"/&gt;\n     &lt;enumeration value=\"setPoint\"/&gt;\n     &lt;enumeration value=\"deltaUsage\"/&gt;\n     &lt;enumeration value=\"deltaSetPoint\"/&gt;\n     &lt;enumeration value=\"deltaDemand\"/&gt;\n     &lt;enumeration value=\"baseline\"/&gt;\n     &lt;enumeration value=\"deviation\"/&gt;\n     &lt;enumeration value=\"avgUsage\"/&gt;\n     &lt;enumeration value=\"avgDemand\"/&gt;\n     &lt;enumeration value=\"operatingState\"/&gt;\n     &lt;enumeration value=\"upRegulationCapacityAvailable\"/&gt;\n     &lt;enumeration value=\"downRegulationCapacityAvailable\"/&gt;\n     &lt;enumeration value=\"regulationSetpoint\"/&gt;\n     &lt;enumeration value=\"storedEnergy\"/&gt;\n     &lt;enumeration value=\"targetEnergyStorage\"/&gt;\n     &lt;enumeration value=\"availableEnergyStorage\"/&gt;\n     &lt;enumeration value=\"price\"/&gt;\n     &lt;enumeration value=\"level\"/&gt;\n     &lt;enumeration value=\"powerFactor\"/&gt;\n     &lt;enumeration value=\"percentUsage\"/&gt;\n     &lt;enumeration value=\"percentDemand\"/&gt;\n     &lt;enumeration value=\"x-resourceStatus\"/&gt;\n   &lt;/restriction&gt;\n &lt;/simpleType&gt;\n <\/pre>"
+    }
+    ,
+    "xml_ei_reportNameEnumeratedType" : {
+      "type" : "string",
+      "title" : "reportNameEnumeratedType",
+          "enum" : [
+            "METADATA_HISTORY_USAGE",
+            "HISTORY_USAGE",
+            "METADATA_HISTORY_GREENBUTTON",
+            "HISTORY_GREENBUTTON",
+            "METADATA_TELEMETRY_USAGE",
+            "TELEMETRY_USAGE",
+            "METADATA_TELEMETRY_STATUS",
+            "TELEMETRY_STATUS"
+          ],
+      "description" : "<p>Classe Java pour reportNameEnumeratedType.\n\n<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.\n<p>\n<pre>\n &lt;simpleType name=\"reportNameEnumeratedType\"&gt;\n   &lt;restriction base=\"{http://www.w3.org/2001/XMLSchema}token\"&gt;\n     &lt;enumeration value=\"METADATA_HISTORY_USAGE\"/&gt;\n     &lt;enumeration value=\"HISTORY_USAGE\"/&gt;\n     &lt;enumeration value=\"METADATA_HISTORY_GREENBUTTON\"/&gt;\n     &lt;enumeration value=\"HISTORY_GREENBUTTON\"/&gt;\n     &lt;enumeration value=\"METADATA_TELEMETRY_USAGE\"/&gt;\n     &lt;enumeration value=\"TELEMETRY_USAGE\"/&gt;\n     &lt;enumeration value=\"METADATA_TELEMETRY_STATUS\"/&gt;\n     &lt;enumeration value=\"TELEMETRY_STATUS\"/&gt;\n   &lt;/restriction&gt;\n &lt;/simpleType&gt;\n <\/pre>"
+    }
+    ,
+    "xml_avob_keyTokenType" : {
+      "type" : "object",
+      "title" : "keyTokenType",
+      "required" : ["key", "value"],
+      "allOf" : [
+        {
+          "properties" : {
+            "key" : {
+              "xml" : {
+                "prefix" : "avob",
+                "namespace" : "http://oadr.avob.com"
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            },
+            "value" : {
+              "xml" : {
+                "prefix" : "avob",
+                "namespace" : "http://oadr.avob.com"
+              },
+            "readOnly" : false,
+"description" : "",
+"type" : "string"
+            }
+          }
+        }
+      ],
+      "description" : "Represent a key-value object\n\n\n<p>Classe Java pour keyTokenType complex type.\n\n<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.\n\n<pre>\n &lt;complexType name=\"keyTokenType\"&gt;\n   &lt;complexContent&gt;\n     &lt;restriction base=\"{http://www.w3.org/2001/XMLSchema}anyType\"&gt;\n       &lt;sequence&gt;\n         &lt;element name=\"key\" type=\"{http://www.w3.org/2001/XMLSchema}string\"/&gt;\n         &lt;element name=\"value\" type=\"{http://www.w3.org/2001/XMLSchema}string\"/&gt;\n       &lt;/sequence&gt;\n     &lt;/restriction&gt;\n   &lt;/complexContent&gt;\n &lt;/complexType&gt;\n <\/pre>"
+    }
+  },
+  "paths": {
+    "\/OpenADR2/Simple/2.0b/EiEvent" : {
+      "post" : {
+        "tags" : [ "Oadr20bVTNEiEventController" ],
+        "description" : "Service HTTP Endpoint",
+        "operationId" : "request",
+        "consumes" : [ "application/json", "application/xml" ],
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "body",
+            "required" : false,
+            "in" : "body",
+            "schema" : {
+"description" : "",
+"type" : "string"
+            },
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "schema" : {
+"description" : "",
+"type" : "string"
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/OpenADR2/Simple/2.0b/EiOpt" : {
+      "post" : {
+        "tags" : [ "Oadr20bVTNEiOptController" ],
+        "operationId" : "request2",
+        "consumes" : [ "application/json", "application/xml" ],
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "body",
+            "required" : false,
+            "in" : "body",
+            "schema" : {
+"description" : "",
+"type" : "string"
+            },
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "schema" : {
+"description" : "",
+"type" : "string"
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/OpenADR2/Simple/2.0b/EiRegisterParty" : {
+      "post" : {
+        "tags" : [ "Oadr20bVTNEiRegisterPartyController" ],
+        "operationId" : "request3",
+        "consumes" : [ "application/json", "application/xml" ],
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "body",
+            "required" : false,
+            "in" : "body",
+            "schema" : {
+"description" : "",
+"type" : "string"
+            },
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "schema" : {
+"description" : "",
+"type" : "string"
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/OpenADR2/Simple/2.0b/EiReport" : {
+      "post" : {
+        "tags" : [ "Oadr20bVTNEiReportController" ],
+        "operationId" : "request4",
+        "consumes" : [ "application/json", "application/xml" ],
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "body",
+            "required" : false,
+            "in" : "body",
+            "schema" : {
+"description" : "",
+"type" : "string"
+            },
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "schema" : {
+"description" : "",
+"type" : "string"
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/OpenADR2/Simple/2.0b/OadrPoll" : {
+      "post" : {
+        "tags" : [ "Oadr20bVTNOadrPollController" ],
+        "operationId" : "request5",
+        "consumes" : [ "application/json", "application/xml" ],
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "body",
+            "required" : false,
+            "in" : "body",
+            "schema" : {
+"description" : "",
+"type" : "string"
+            },
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "schema" : {
+"description" : "",
+"type" : "string"
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Report/available/description/search" : {
+      "get" : {
+        "tags" : [ "ReportController" ],
+        "operationId" : "searchOtherReportCapabilityDescription",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "readingType",
+            "in" : "query",
+            "type" : "string",
+            "enum" : ["ALLOCATED", "CONTRACT", "DERIVED", "DIRECT_READ", "ESTIMATED", "HYBRID", "MEAN", "NET", "PEAK", "PROJECTED", "SUMMED", "X_NOT_APPLICABLE", "X_RMS"],
+            "description" : ""
+          },
+          {
+            "name" : "reportName",
+            "in" : "query",
+            "type" : "string",
+            "enum" : ["HISTORY_GREENBUTTON", "HISTORY_USAGE", "METADATA_HISTORY_GREENBUTTON", "METADATA_HISTORY_USAGE", "METADATA_TELEMETRY_STATUS", "METADATA_TELEMETRY_USAGE", "TELEMETRY_STATUS", "TELEMETRY_USAGE"],
+            "description" : ""
+          },
+          {
+            "name" : "reportSpecifierId",
+            "in" : "query",
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "reportType",
+            "in" : "query",
+            "type" : "string",
+            "enum" : ["AVAILABLE_ENERGY_STORAGE", "AVG_DEMAND", "AVG_USAGE", "BASELINE", "DELTA_DEMAND", "DELTA_SET_POINT", "DELTA_USAGE", "DEMAND", "DEVIATION", "DOWN_REGULATION_CAPACITY_AVAILABLE", "LEVEL", "OPERATING_STATE", "PERCENT_DEMAND", "PERCENT_USAGE", "POWER_FACTOR", "PRICE", "READING", "REGULATION_SETPOINT", "SET_POINT", "STORED_ENERGY", "TARGET_ENERGY_STORAGE", "UP_REGULATION_CAPACITY_AVAILABLE", "USAGE", "X_RESOURCE_STATUS"],
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportCapabilityDescriptionDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "venId" : "...",
+  "reportSpecifierId" : "...",
+  "id" : 12345,
+  "rid" : "...",
+  "reportType" : "UP_REGULATION_CAPACITY_AVAILABLE",
+  "readingType" : "X_NOT_APPLICABLE",
+  "oadrMaxPeriod" : "...",
+  "oadrMinPeriod" : "...",
+  "oadrOnChange" : true,
+  "itemDescription" : "...",
+  "itemUnits" : "...",
+  "siScaleCode" : "NANO"
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Report/available/search" : {
+      "get" : {
+        "tags" : [ "ReportController" ],
+        "operationId" : "viewOtherReportCapability",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "reportSpecifierId",
+            "in" : "query",
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "venID",
+            "in" : "query",
+            "type" : "array",
+            "items" : {
+            "type" : "string"
+            },
+            "collectionFormat" : "multi",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportCapabilityDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "venId" : "...",
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "reportName" : "HISTORY_USAGE",
+  "duration" : "...",
+  "reportRequestId" : "...",
+  "createdDatetime" : 12345,
+  "reportId" : "...",
+  "start" : 12345
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/opt" : {
+      "get" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "venOpt",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "end",
+            "in" : "query",
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "marketContext",
+            "in" : "query",
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "start",
+            "in" : "query",
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/VenOptDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "id" : 12345,
+  "venId" : "...",
+  "marketContext" : "...",
+  "resourceId" : 12345,
+  "eventId" : "...",
+  "optId" : "...",
+  "start" : 12345,
+  "end" : 12345,
+  "opt" : "OPT_OUT"
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/opt/resource/{resourceName}" : {
+      "get" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "venResourceOpt",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "resourceName",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "end",
+            "in" : "query",
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "marketContext",
+            "in" : "query",
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "start",
+            "in" : "query",
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/VenOptDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "id" : 12345,
+  "venId" : "...",
+  "marketContext" : "...",
+  "resourceId" : 12345,
+  "eventId" : "...",
+  "optId" : "...",
+  "start" : 12345,
+  "end" : 12345,
+  "opt" : "OPT_OUT"
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/registerparty/cancelPartyRegistration" : {
+      "post" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "registerPartyCancelPartyRegistration",
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "description" : "Success"
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/registerparty/requestReregistration" : {
+      "post" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "registerPartyRequestReregistration",
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "description" : "Success"
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/available" : {
+      "get" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "viewOtherReportCapability2",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "reportSpecifierId",
+            "in" : "query",
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/ReportCapabilityDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "reportName" : "HISTORY_GREENBUTTON",
+  "duration" : "...",
+  "reportRequestId" : "...",
+  "createdDatetime" : 12345,
+  "reportId" : "...",
+  "start" : 12345
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/available/description" : {
+      "get" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "viewOtherReportCapabilityDescription",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "reportSpecifierId",
+            "in" : "query",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/ReportCapabilityDescriptionDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "id" : 12345,
+  "rid" : "...",
+  "reportType" : "AVAILABLE_ENERGY_STORAGE",
+  "readingType" : "DIRECT_READ",
+  "oadrMaxPeriod" : "...",
+  "oadrMinPeriod" : "...",
+  "oadrOnChange" : true,
+  "itemDescription" : "...",
+  "itemUnits" : "...",
+  "siScaleCode" : "CENTI"
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/available/description/request" : {
+      "post" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "requestOtherReportCapabilityDescriptionRid",
+        "consumes" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "body",
+            "required" : false,
+            "in" : "body",
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportRequestDtoCreateRequestDto"
+}
+            },
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "description" : "Success"
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/available/description/subscribe" : {
+      "post" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "subscribeOtherReportCapabilityDescriptionRid",
+        "consumes" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "body",
+            "required" : false,
+            "in" : "body",
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportRequestDtoCreateSubscriptionDto"
+}
+            },
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "description" : "Success"
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/available/search" : {
+      "get" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "pageOtherReportCapability",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "page",
+            "in" : "query",
+            "default" : "0",
+            "type" : "integer",
+            "description" : ""
+          },
+          {
+            "name" : "size",
+            "in" : "query",
+            "default" : "20",
+            "type" : "integer",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportCapabilityDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "venId" : "...",
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "reportName" : "METADATA_HISTORY_GREENBUTTON",
+  "duration" : "...",
+  "reportRequestId" : "...",
+  "createdDatetime" : 12345,
+  "reportId" : "...",
+  "start" : 12345
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/data/float/{reportSpecifierId}" : {
+      "get" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "viewsFloatReportData",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "reportSpecifierId",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportDataFloatDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "value" : 12345.0,
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "rid" : "...",
+  "confidence" : 12345,
+  "accuracy" : 12345.0,
+  "start" : 12345,
+  "duration" : "..."
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/data/float/{reportSpecifierId}/rid/{rid}" : {
+      "get" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "viewsFloatReportData",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "reportSpecifierId",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "rid",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportDataFloatDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "value" : 12345.0,
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "rid" : "...",
+  "confidence" : 12345,
+  "accuracy" : 12345.0,
+  "start" : 12345,
+  "duration" : "..."
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/data/keytoken/{reportSpecifierId}" : {
+      "get" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "viewsKeyTokenReportData",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "reportSpecifierId",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportDataKeyTokenDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "tokens" : [ {
+    "key" : "...",
+    "value" : "..."
+  }, {
+    "key" : "...",
+    "value" : "..."
+  } ],
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "rid" : "...",
+  "confidence" : 12345,
+  "accuracy" : 12345.0,
+  "start" : 12345,
+  "duration" : "..."
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/data/keytoken/{reportSpecifierId}/rid/{rid}" : {
+      "get" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "viewsKeyTokenReportData",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "reportSpecifierId",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "rid",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportDataKeyTokenDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "tokens" : [ {
+    "key" : "...",
+    "value" : "..."
+  }, {
+    "key" : "...",
+    "value" : "..."
+  } ],
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "rid" : "...",
+  "confidence" : 12345,
+  "accuracy" : 12345.0,
+  "start" : 12345,
+  "duration" : "..."
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/data/resourcestatus/{reportSpecifierId}" : {
+      "get" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "viewsResourceStatusReportData",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "reportSpecifierId",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportDataPayloadResourceStatusDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "oadrCapacityMin" : 12345.0,
+  "oadrCapacityMax" : 12345.0,
+  "oadrCapacityCurrent" : 12345.0,
+  "oadrCapacityNormal" : 12345.0,
+  "oadrLevelOffsetMin" : 12345.0,
+  "oadrLevelOffsetMax" : 12345.0,
+  "oadrLevelOffsetCurrent" : 12345.0,
+  "oadrLevelOffsetNormal" : 12345.0,
+  "oadrPercentOffsetMin" : 12345.0,
+  "oadrPercentOffsetMax" : 12345.0,
+  "oadrPercentOffsetCurrent" : 12345.0,
+  "oadrPercentOffsetNormal" : 12345.0,
+  "oadrSetPointMin" : 12345.0,
+  "oadrSetPointMax" : 12345.0,
+  "oadrSetPointCurrent" : 12345.0,
+  "oadrSetPointNormal" : 12345.0,
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "rid" : "...",
+  "confidence" : 12345,
+  "accuracy" : 12345.0,
+  "start" : 12345,
+  "duration" : "..."
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/data/resourcestatus/{reportSpecifierId}/rid/{rid}" : {
+      "get" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "viewsResourceStatusReportData",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "reportSpecifierId",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "rid",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportDataPayloadResourceStatusDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "oadrCapacityMin" : 12345.0,
+  "oadrCapacityMax" : 12345.0,
+  "oadrCapacityCurrent" : 12345.0,
+  "oadrCapacityNormal" : 12345.0,
+  "oadrLevelOffsetMin" : 12345.0,
+  "oadrLevelOffsetMax" : 12345.0,
+  "oadrLevelOffsetCurrent" : 12345.0,
+  "oadrLevelOffsetNormal" : 12345.0,
+  "oadrPercentOffsetMin" : 12345.0,
+  "oadrPercentOffsetMax" : 12345.0,
+  "oadrPercentOffsetCurrent" : 12345.0,
+  "oadrPercentOffsetNormal" : 12345.0,
+  "oadrSetPointMin" : 12345.0,
+  "oadrSetPointMax" : 12345.0,
+  "oadrSetPointCurrent" : 12345.0,
+  "oadrSetPointNormal" : 12345.0,
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "rid" : "...",
+  "confidence" : 12345,
+  "accuracy" : 12345.0,
+  "start" : 12345,
+  "duration" : "..."
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/requested" : {
+      "get" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "viewReportRequest",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "reportRequestId",
+            "in" : "query",
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "reportSpecifierId",
+            "in" : "query",
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportRequestDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "reportSpecifierId" : "...",
+  "venId" : "...",
+  "requestorUsername" : "...",
+  "id" : 12345,
+  "reportRequestId" : "...",
+  "granularity" : "...",
+  "reportBackDuration" : "...",
+  "start" : 12345,
+  "end" : 12345,
+  "acked" : true,
+  "createdDatetime" : 12345
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/requested/cancelSubscription" : {
+      "post" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "cancelSubscriptionReportRequest",
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "reportRequestId",
+            "in" : "query",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "description" : "Success"
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/requested/search" : {
+      "get" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "pageReportRequest",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "page",
+            "in" : "query",
+            "default" : "0",
+            "type" : "integer",
+            "description" : ""
+          },
+          {
+            "name" : "size",
+            "in" : "query",
+            "default" : "20",
+            "type" : "integer",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportRequestDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "reportSpecifierId" : "...",
+  "venId" : "...",
+  "requestorUsername" : "...",
+  "id" : 12345,
+  "reportRequestId" : "...",
+  "granularity" : "...",
+  "reportBackDuration" : "...",
+  "start" : 12345,
+  "end" : 12345,
+  "acked" : true,
+  "createdDatetime" : 12345
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report/requested/specifier" : {
+      "post" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "viewReportRequestSpecifier",
+        "consumes" : [ "application/json", "application/xml" ],
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "body",
+            "required" : false,
+            "in" : "body",
+            "schema" : {
+"$ref" : "#/definitions/OtherReportRequestSpecifierSearchCriteria",
+"description" : ""
+            },
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/OtherReportRequestSpecifierDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "id" : 12345,
+  "rid" : "...",
+  "archived" : true,
+  "lastUpdateDatetime" : 12345,
+  "lastUpdateValue" : "...",
+  "reportRequestId" : "..."
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report_action/cancel" : {
+      "post" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "cancelReport",
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          },
+          {
+            "name" : "reportRequestId",
+            "in" : "query",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "description" : "Success"
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report_action/requestRegister" : {
+      "post" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "requestRegisterReport",
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "description" : "Success"
+          }
+        }
+      }
+    },
+    "\/Ven/{venID}/report_action/sendRegister" : {
+      "post" : {
+        "tags" : [ "Oadr20bVenController" ],
+        "operationId" : "sendRegisterReport",
+        "parameters" : [
+          {
+            "name" : "venID",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "201" : {
+            "description" : "Success"
+          }
+        }
+      }
+    },
+    "\/Vtn/configuration" : {
+      "get" : {
+        "tags" : [ "Oadr20bVtnController" ],
+        "operationId" : "viewConf",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"$ref" : "#/definitions/VtnConfigurationDto",
+"description" : ""
+            },
+            "examples" : {
+              "application/json" : {
+  "vtnId" : "...",
+  "supportPush" : true,
+  "supportUnsecuredHttpPush" : true,
+  "pullFrequencySeconds" : 12345,
+  "port" : 12345,
+  "contextPath" : "...",
+  "host" : "...",
+  "oadrVersion" : "...",
+  "supportCertificateGeneration" : true,
+  "xsdValidation" : true,
+  "xmlSignatureReplayProtectSecond" : 12345,
+  "saveVenDate" : true
+}
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Vtn/report/available" : {
+      "get" : {
+        "tags" : [ "Oadr20bVtnController" ],
+        "operationId" : "viewSelfReportCapability",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/ReportCapabilityDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "id" : 12345,
+  "reportSpecifierId" : "...",
+  "reportName" : "HISTORY_GREENBUTTON",
+  "duration" : "...",
+  "reportRequestId" : "...",
+  "createdDatetime" : 12345,
+  "reportId" : "...",
+  "start" : 12345
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Vtn/report/available/{reportSpecifierId}" : {
+      "get" : {
+        "tags" : [ "Oadr20bVtnController" ],
+        "operationId" : "viewOtherReportCapabilityDescription2",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+          {
+            "name" : "reportSpecifierId",
+            "in" : "path",
+            "required" : true,
+            "type" : "string",
+            "description" : ""
+          }
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/ReportCapabilityDescriptionDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "id" : 12345,
+  "rid" : "...",
+  "reportType" : "X_RESOURCE_STATUS",
+  "readingType" : "ESTIMATED",
+  "oadrMaxPeriod" : "...",
+  "oadrMinPeriod" : "...",
+  "oadrOnChange" : true,
+  "itemDescription" : "...",
+  "itemUnits" : "...",
+  "siScaleCode" : "KILO"
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    },
+    "\/Vtn/report/requested" : {
+      "get" : {
+        "tags" : [ "Oadr20bVtnController" ],
+        "operationId" : "viewReportRequest2",
+        "produces" : [ "application/json", "application/xml" ],
+        "parameters" : [
+        ],
+        "responses" : {
+          "200" : {
+            "schema" : {
+"description" : "",
+"type" : "array",
+"items" : {
+  "$ref" : "#/definitions/ReportRequestDto"
+}
+            },
+            "examples" : {
+              "application/json" : [ {
+  "id" : 12345,
+  "reportRequestId" : "...",
+  "granularity" : "...",
+  "reportBackDuration" : "...",
+  "start" : 12345,
+  "end" : 12345,
+  "acked" : true,
+  "reportSpecifierId" : "...",
+  "createdDatetime" : 12345
+} ]
+            },
+            "description" : ""
+          }
+        }
+      }
+    }
+  }
+}

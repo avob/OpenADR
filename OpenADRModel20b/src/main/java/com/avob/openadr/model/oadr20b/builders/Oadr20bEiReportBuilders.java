@@ -1,5 +1,7 @@
 package com.avob.openadr.model.oadr20b.builders;
 
+import java.util.Arrays;
+
 import com.avob.openadr.model.oadr20b.builders.eireport.Oadr20bCancelReportBuilder;
 import com.avob.openadr.model.oadr20b.builders.eireport.Oadr20bCanceledReportBuilder;
 import com.avob.openadr.model.oadr20b.builders.eireport.Oadr20bCreateReportBuilder;
@@ -16,6 +18,8 @@ import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SchemaVersionEnumeratedType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 
 public class Oadr20bEiReportBuilders {
 

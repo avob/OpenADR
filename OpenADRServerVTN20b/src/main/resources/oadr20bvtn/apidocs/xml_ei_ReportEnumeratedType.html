@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+  <title>OpenADRServerVTN20b: ReportEnumeratedType</title>
+
+  <!-- Mobile viewport optimized: j.mp/bplateviewport -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+  <!--custom css for these pages-->
+  <link rel="stylesheet" href="css/enunciate.css">
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+
+<body data-spy="scroll" data-target="#apinav">
+
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">OpenADRServerVTN20b: ReportEnumeratedType</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="resources.html">Resources</a></li>
+          <li><a href="data.html">Data Types</a></li>
+          <li><a href="downloads.html">Files and Libraries</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-3 col-md-2 sidebar" id="apinav">
+        <ul class="nav nav-sidebar">
+          <li><a href="#reading"><abbr title="reading" class="side-abbr"><span class="sideoverflow">reading</span></abbr></a></li>
+          <li><a href="#usage"><abbr title="usage" class="side-abbr"><span class="sideoverflow">usage</span></abbr></a></li>
+          <li><a href="#demand"><abbr title="demand" class="side-abbr"><span class="sideoverflow">demand</span></abbr></a></li>
+          <li><a href="#setPoint"><abbr title="setPoint" class="side-abbr"><span class="sideoverflow">setPoint</span></abbr></a></li>
+          <li><a href="#deltaUsage"><abbr title="deltaUsage" class="side-abbr"><span class="sideoverflow">deltaUsage</span></abbr></a></li>
+          <li><a href="#deltaSetPoint"><abbr title="deltaSetPoint" class="side-abbr"><span class="sideoverflow">deltaSetPoint</span></abbr></a></li>
+          <li><a href="#deltaDemand"><abbr title="deltaDemand" class="side-abbr"><span class="sideoverflow">deltaDemand</span></abbr></a></li>
+          <li><a href="#baseline"><abbr title="baseline" class="side-abbr"><span class="sideoverflow">baseline</span></abbr></a></li>
+          <li><a href="#deviation"><abbr title="deviation" class="side-abbr"><span class="sideoverflow">deviation</span></abbr></a></li>
+          <li><a href="#avgUsage"><abbr title="avgUsage" class="side-abbr"><span class="sideoverflow">avgUsage</span></abbr></a></li>
+          <li><a href="#avgDemand"><abbr title="avgDemand" class="side-abbr"><span class="sideoverflow">avgDemand</span></abbr></a></li>
+          <li><a href="#operatingState"><abbr title="operatingState" class="side-abbr"><span class="sideoverflow">operatingState</span></abbr></a></li>
+          <li><a href="#upRegulationCapacityAvailable"><abbr title="upRegulationCapacityAvailable" class="side-abbr"><span class="sideoverflow">upRegulationCapacityAvailable</span></abbr></a></li>
+          <li><a href="#downRegulationCapacityAvailable"><abbr title="downRegulationCapacityAvailable" class="side-abbr"><span class="sideoverflow">downRegulationCapacityAvailable</span></abbr></a></li>
+          <li><a href="#regulationSetpoint"><abbr title="regulationSetpoint" class="side-abbr"><span class="sideoverflow">regulationSetpoint</span></abbr></a></li>
+          <li><a href="#storedEnergy"><abbr title="storedEnergy" class="side-abbr"><span class="sideoverflow">storedEnergy</span></abbr></a></li>
+          <li><a href="#targetEnergyStorage"><abbr title="targetEnergyStorage" class="side-abbr"><span class="sideoverflow">targetEnergyStorage</span></abbr></a></li>
+          <li><a href="#availableEnergyStorage"><abbr title="availableEnergyStorage" class="side-abbr"><span class="sideoverflow">availableEnergyStorage</span></abbr></a></li>
+          <li><a href="#price"><abbr title="price" class="side-abbr"><span class="sideoverflow">price</span></abbr></a></li>
+          <li><a href="#level"><abbr title="level" class="side-abbr"><span class="sideoverflow">level</span></abbr></a></li>
+          <li><a href="#powerFactor"><abbr title="powerFactor" class="side-abbr"><span class="sideoverflow">powerFactor</span></abbr></a></li>
+          <li><a href="#percentUsage"><abbr title="percentUsage" class="side-abbr"><span class="sideoverflow">percentUsage</span></abbr></a></li>
+          <li><a href="#percentDemand"><abbr title="percentDemand" class="side-abbr"><span class="sideoverflow">percentDemand</span></abbr></a></li>
+          <li><a href="#x-resourceStatus"><abbr title="x-resourceStatus" class="side-abbr"><span class="sideoverflow">x-resourceStatus</span></abbr></a></li>
+          <li class="divider"></li>
+          <li class="text-right"><a href="#top"><small>Back to Top</small></a></li>
+        </ul>
+      </div>
+
+      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <ol class="breadcrumb" id="top">
+          <li class="active dropdown"><a href="index.html">Home</a></li>
+          <li class="active dropdown"><a href="syntax_xml.html">XML</a></li>
+          <li class="dropdown"><a href="xml_ei_ReportEnumeratedType.html">ReportEnumeratedType</a></li>
+        </ol>
+
+      <h1 class="page-header">ReportEnumeratedType <small>Data Type</small></h1>
+
+      <p><p>Classe Java pour ReportEnumeratedType.
+
+<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.
+<p>
+<pre>
+ &lt;simpleType name="ReportEnumeratedType"&gt;
+   &lt;restriction base=" <a target="_blank" href="http://www.w3.org/2001/XMLSchema}token">http://www.w3.org/2001/XMLSchema}token</a>"&gt;
+     &lt;enumeration value="reading"/&gt;
+     &lt;enumeration value="usage"/&gt;
+     &lt;enumeration value="demand"/&gt;
+     &lt;enumeration value="setPoint"/&gt;
+     &lt;enumeration value="deltaUsage"/&gt;
+     &lt;enumeration value="deltaSetPoint"/&gt;
+     &lt;enumeration value="deltaDemand"/&gt;
+     &lt;enumeration value="baseline"/&gt;
+     &lt;enumeration value="deviation"/&gt;
+     &lt;enumeration value="avgUsage"/&gt;
+     &lt;enumeration value="avgDemand"/&gt;
+     &lt;enumeration value="operatingState"/&gt;
+     &lt;enumeration value="upRegulationCapacityAvailable"/&gt;
+     &lt;enumeration value="downRegulationCapacityAvailable"/&gt;
+     &lt;enumeration value="regulationSetpoint"/&gt;
+     &lt;enumeration value="storedEnergy"/&gt;
+     &lt;enumeration value="targetEnergyStorage"/&gt;
+     &lt;enumeration value="availableEnergyStorage"/&gt;
+     &lt;enumeration value="price"/&gt;
+     &lt;enumeration value="level"/&gt;
+     &lt;enumeration value="powerFactor"/&gt;
+     &lt;enumeration value="percentUsage"/&gt;
+     &lt;enumeration value="percentDemand"/&gt;
+     &lt;enumeration value="x-resourceStatus"/&gt;
+   &lt;/restriction&gt;
+ &lt;/simpleType&gt;
+ </pre></p>
+
+      <dl class="dl-horizontal">
+        <dt>Namespace</dt>
+        <dd><code>http://docs.oasis-open.org/ns/energyinterop/201110</code></dd>
+        <dt>Schema</dt>
+        <dd><a href="ei.xsd">ei.xsd</a></dd>
+      </dl>
+
+      <table class="table datatype-values">
+        <caption>Values</caption>
+        <thead>
+        <tr>
+          <th>value</th>
+          <th>description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td><span class="value-value" id="reading">reading</span></td>
+          <td><span class="value-description">Report indicates a reading, as from a meter. Readings are moments in time-changes over time can be computed from the difference between successive readings. Payload type is float</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="usage">usage</span></td>
+          <td><span class="value-description">Report indicates an amount of units (denominated in ItemBase or in the EMIX Product) over a period. Payload type is Quantity. A typical ItemBase is Real Energy.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="demand">demand</span></td>
+          <td><span class="value-description">Report indicates an amount of units (denominated in ItemBase or in the EMIX Product). Payload type is Quantity. A typical ItemBase is Real Power.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="setPoint">setPoint</span></td>
+          <td><span class="value-description">Report indicates the amount (denominated in ItemBase or in the EMIX Product) currently set. May be a confirmation/return of the setpoint control value sent from the VTN. Payload type is Quantity. A typical ItemBase is Real Power.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="deltaUsage">deltaUsage</span></td>
+          <td><span class="value-description">Change in usage as compared to the baseline. See usage for more information</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="deltaSetPoint">deltaSetPoint</span></td>
+          <td><span class="value-description">Changes in setpoint from previous schedule.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="deltaDemand">deltaDemand</span></td>
+          <td><span class="value-description">Change in demand as compared to the baseline. See demand for more information</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="baseline">baseline</span></td>
+          <td><span class="value-description">Can be demand or usage, as indicated by ItemBase. Indicates what [measurement] would be if not for the event or regulation. Report is of the format Baseline.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="deviation">deviation</span></td>
+          <td><span class="value-description">Difference between some instruction and actual state.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="avgUsage">avgUsage</span></td>
+          <td><span class="value-description">Average usage over the duration indicated by the Granularity. See usage for more information.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="avgDemand">avgDemand</span></td>
+          <td><span class="value-description">Average usage over the duration indicated by the Granularity. See demand for more information.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="operatingState">operatingState</span></td>
+          <td><span class="value-description">Generalized state of a resource such as on/off, occupancy of building, etc. No ItemBase is relevant. Requires an Application Specific Payload Extension.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="upRegulationCapacityAvailable">upRegulationCapacityAvailable</span></td>
+          <td><span class="value-description">Up Regulation capacity available for dispatch, expressed in EMIX Real Power. Payload is always expressed as positive Quantity.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="downRegulationCapacityAvailable">downRegulationCapacityAvailable</span></td>
+          <td><span class="value-description">Down Regulation capacity available for dispatch, expressed in EMIX Real Power. Payload is always expressed as positive Quantity.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="regulationSetpoint">regulationSetpoint</span></td>
+          <td><span class="value-description">Regulation setpoint as instructed as part of regulation services</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="storedEnergy">storedEnergy</span></td>
+          <td><span class="value-description">Stored Energy is expressed as Real Energy and Payload is expressed as a Quantity.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="targetEnergyStorage">targetEnergyStorage</span></td>
+          <td><span class="value-description">Target Energy is expressed as Real Energy and Payload is expressed as a Quantity.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="availableEnergyStorage">availableEnergyStorage</span></td>
+          <td><span class="value-description">Capacity available for further energy storage, perhaps to get to Target Energy Storage</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="price">price</span></td>
+          <td><span class="value-description">Price per ItemBase at each Interval</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="level">level</span></td>
+          <td><span class="value-description">Simple level from market at each Interval. Itembase is not relevant.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="powerFactor">powerFactor</span></td>
+          <td><span class="value-description">Power factor for the resource.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="percentUsage">percentUsage</span></td>
+          <td><span class="value-description">Percentage of usage.</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="percentDemand">percentDemand</span></td>
+          <td><span class="value-description">Percentage of demand</span></td>
+        </tr>
+        <tr>
+          <td><span class="value-value" id="x-resourceStatus">x-resourceStatus</span></td>
+          <td><span class="value-description">Percentage of demand</span></td>
+        </tr>
+        </tbody>
+      </table>
+
+        <footer class="footer">
+          <div class="container">
+            <p class="text-muted">Generated by <a href="http://enunciate.webcohesion.com">Enunciate</a>.</p>
+          </div>
+        </footer>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- JavaScript placed at the end of the document so the pages load faster. -->
+  <script src="https://code.jquery.com/jquery-1.12.2.min.js"></script>
+
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+  <!-- prettify code blocks. see http://code.google.com/p/google-code-prettify/ -->
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js" type="text/javascript"></script>
+  <script>
+    $(function() {
+      $(".clickable-row").click(function() {
+        window.document.location = $(this).data("href");
+      });
+
+      $('[data-toggle="tooltip"]').tooltip()
+    });
+  </script>
+
+</body>
+</html>

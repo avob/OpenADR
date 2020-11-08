@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema version="1.0" targetNamespace="http://docs.oasis-open.org/ns/energyinterop/201110"
+elementFormDefault="qualified"   xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110"
+  
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:simpleType name="ReadingTypeEnumeratedType">
+  <xs:annotation>
+    <xs:documentation>
+      <![CDATA[<p>Classe Java pour ReadingTypeEnumeratedType.
+
+<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.
+<p>
+<pre>
+ &lt;simpleType name="ReadingTypeEnumeratedType"&gt;
+   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}token"&gt;
+     &lt;enumeration value="Direct Read"/&gt;
+     &lt;enumeration value="Net"/&gt;
+     &lt;enumeration value="Allocated"/&gt;
+     &lt;enumeration value="Estimated"/&gt;
+     &lt;enumeration value="Summed"/&gt;
+     &lt;enumeration value="Derived"/&gt;
+     &lt;enumeration value="Mean"/&gt;
+     &lt;enumeration value="Peak"/&gt;
+     &lt;enumeration value="Hybrid"/&gt;
+     &lt;enumeration value="Contract"/&gt;
+     &lt;enumeration value="Projected"/&gt;
+     &lt;enumeration value="x-RMS"/&gt;
+     &lt;enumeration value="x-notApplicable"/&gt;
+   &lt;/restriction&gt;
+ &lt;/simpleType&gt;
+ </pre>]]>
+    </xs:documentation>
+  </xs:annotation>
+  <xs:restriction base="xs:string">
+     
+    <xs:enumeration value="Direct Read"/>
+ 
+    <xs:enumeration value="Net"/>
+ 
+    <xs:enumeration value="Allocated"/>
+ 
+    <xs:enumeration value="Estimated"/>
+ 
+    <xs:enumeration value="Summed"/>
+ 
+    <xs:enumeration value="Derived"/>
+ 
+    <xs:enumeration value="Mean"/>
+ 
+    <xs:enumeration value="Peak"/>
+ 
+    <xs:enumeration value="Hybrid"/>
+ 
+    <xs:enumeration value="Contract"/>
+ 
+    <xs:enumeration value="Projected"/>
+ 
+    <xs:enumeration value="x-RMS"/>
+ 
+    <xs:enumeration value="x-notApplicable"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="ReportEnumeratedType">
+  <xs:annotation>
+    <xs:documentation>
+      <![CDATA[<p>Classe Java pour ReportEnumeratedType.
+
+<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.
+<p>
+<pre>
+ &lt;simpleType name="ReportEnumeratedType"&gt;
+   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}token"&gt;
+     &lt;enumeration value="reading"/&gt;
+     &lt;enumeration value="usage"/&gt;
+     &lt;enumeration value="demand"/&gt;
+     &lt;enumeration value="setPoint"/&gt;
+     &lt;enumeration value="deltaUsage"/&gt;
+     &lt;enumeration value="deltaSetPoint"/&gt;
+     &lt;enumeration value="deltaDemand"/&gt;
+     &lt;enumeration value="baseline"/&gt;
+     &lt;enumeration value="deviation"/&gt;
+     &lt;enumeration value="avgUsage"/&gt;
+     &lt;enumeration value="avgDemand"/&gt;
+     &lt;enumeration value="operatingState"/&gt;
+     &lt;enumeration value="upRegulationCapacityAvailable"/&gt;
+     &lt;enumeration value="downRegulationCapacityAvailable"/&gt;
+     &lt;enumeration value="regulationSetpoint"/&gt;
+     &lt;enumeration value="storedEnergy"/&gt;
+     &lt;enumeration value="targetEnergyStorage"/&gt;
+     &lt;enumeration value="availableEnergyStorage"/&gt;
+     &lt;enumeration value="price"/&gt;
+     &lt;enumeration value="level"/&gt;
+     &lt;enumeration value="powerFactor"/&gt;
+     &lt;enumeration value="percentUsage"/&gt;
+     &lt;enumeration value="percentDemand"/&gt;
+     &lt;enumeration value="x-resourceStatus"/&gt;
+   &lt;/restriction&gt;
+ &lt;/simpleType&gt;
+ </pre>]]>
+    </xs:documentation>
+  </xs:annotation>
+  <xs:restriction base="xs:string">
+     
+    <xs:enumeration value="reading"/>
+ 
+    <xs:enumeration value="usage"/>
+ 
+    <xs:enumeration value="demand"/>
+ 
+    <xs:enumeration value="setPoint"/>
+ 
+    <xs:enumeration value="deltaUsage"/>
+ 
+    <xs:enumeration value="deltaSetPoint"/>
+ 
+    <xs:enumeration value="deltaDemand"/>
+ 
+    <xs:enumeration value="baseline"/>
+ 
+    <xs:enumeration value="deviation"/>
+ 
+    <xs:enumeration value="avgUsage"/>
+ 
+    <xs:enumeration value="avgDemand"/>
+ 
+    <xs:enumeration value="operatingState"/>
+ 
+    <xs:enumeration value="upRegulationCapacityAvailable"/>
+ 
+    <xs:enumeration value="downRegulationCapacityAvailable"/>
+ 
+    <xs:enumeration value="regulationSetpoint"/>
+ 
+    <xs:enumeration value="storedEnergy"/>
+ 
+    <xs:enumeration value="targetEnergyStorage"/>
+ 
+    <xs:enumeration value="availableEnergyStorage"/>
+ 
+    <xs:enumeration value="price"/>
+ 
+    <xs:enumeration value="level"/>
+ 
+    <xs:enumeration value="powerFactor"/>
+ 
+    <xs:enumeration value="percentUsage"/>
+ 
+    <xs:enumeration value="percentDemand"/>
+ 
+    <xs:enumeration value="x-resourceStatus"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="reportNameEnumeratedType">
+  <xs:annotation>
+    <xs:documentation>
+      <![CDATA[<p>Classe Java pour reportNameEnumeratedType.
+
+<p>Le fragment de schéma suivant indique le contenu attendu figurant dans cette classe.
+<p>
+<pre>
+ &lt;simpleType name="reportNameEnumeratedType"&gt;
+   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}token"&gt;
+     &lt;enumeration value="METADATA_HISTORY_USAGE"/&gt;
+     &lt;enumeration value="HISTORY_USAGE"/&gt;
+     &lt;enumeration value="METADATA_HISTORY_GREENBUTTON"/&gt;
+     &lt;enumeration value="HISTORY_GREENBUTTON"/&gt;
+     &lt;enumeration value="METADATA_TELEMETRY_USAGE"/&gt;
+     &lt;enumeration value="TELEMETRY_USAGE"/&gt;
+     &lt;enumeration value="METADATA_TELEMETRY_STATUS"/&gt;
+     &lt;enumeration value="TELEMETRY_STATUS"/&gt;
+   &lt;/restriction&gt;
+ &lt;/simpleType&gt;
+ </pre>]]>
+    </xs:documentation>
+  </xs:annotation>
+  <xs:restriction base="xs:string">
+     
+    <xs:enumeration value="METADATA_HISTORY_USAGE"/>
+ 
+    <xs:enumeration value="HISTORY_USAGE"/>
+ 
+    <xs:enumeration value="METADATA_HISTORY_GREENBUTTON"/>
+ 
+    <xs:enumeration value="HISTORY_GREENBUTTON"/>
+ 
+    <xs:enumeration value="METADATA_TELEMETRY_USAGE"/>
+ 
+    <xs:enumeration value="TELEMETRY_USAGE"/>
+ 
+    <xs:enumeration value="METADATA_TELEMETRY_STATUS"/>
+ 
+    <xs:enumeration value="TELEMETRY_STATUS"/>
+  </xs:restriction>
+</xs:simpleType>
+
+</xs:schema>

@@ -695,10 +695,17 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	public void otherOadrCancelReport(OadrCancelReportType payload) {
 		String venID = payload.getVenID();
 		Ven ven = venService.findOneByUsername(venID);
+		
+		List<OtherReportRequestSpecifier> findByRequestSourceAndRequestReportRequestIdIn = otherReportRequestSpecifierDao.findByRequestSourceAndRequestReportRequestIdIn(ven, payload.getReportRequestID());
+
+		if(findByRequestSourceAndRequestReportRequestIdIn != null) {
+			otherReportRequestSpecifierDao.deleteAll(findByRequestSourceAndRequestReportRequestIdIn);
+		}
 
 		List<OtherReportRequest> otherReportRequests = otherReportRequestService.findBySourceAndReportRequestIdIn(ven,
 				payload.getReportRequestID());
-
+		
+		
 		if (otherReportRequests != null && !otherReportRequests.isEmpty()) {
 			otherReportRequestService.delete(otherReportRequests);
 		}

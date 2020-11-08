@@ -129,6 +129,9 @@ public class Oadr20bDtoMapper extends DtoMapper {
 
 				fields.fields("request", "reportRequestId", customConverter(OtherReportRequestMapper.class),
 						customConverterId(Oadr20bDtoMapper.OTHER_REPORT_REQUEST_MAPPER_ID));
+				
+//				fields.fields("request", "reportSpecifierId", customConverter(OtherReportRequestMapper.class),
+//						customConverterId(Oadr20bDtoMapper.OTHER_REPORT_CAPABILITY_MAPPER_ID));
 
 				fields.fields("otherReportCapabilityDescription", "rid",
 						customConverter(OtherReportCapabilityDescriptionMapper.class),

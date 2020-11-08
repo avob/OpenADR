@@ -88,9 +88,9 @@ public class MarketContextController {
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEVICE_MANAGER') or hasRole('ROLE_DRPROGRAM')")
 	@RequestMapping(value = "/{marketContextName}", method = RequestMethod.GET)
 	@ResponseBody
-	public VenMarketContextDto findMarketContextByName(@PathVariable("marketContextName") String groupName,
+	public VenMarketContextDto findMarketContextByName(@PathVariable("marketContextName") String marketContextName,
 			HttpServletResponse response) {
-		VenMarketContext group = venMarketContextService.findOneByName(groupName);
+		VenMarketContext group = venMarketContextService.findOneByName(marketContextName);
 		if (group == null) {
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return null;

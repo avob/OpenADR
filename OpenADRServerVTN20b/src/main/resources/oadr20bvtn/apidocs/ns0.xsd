@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema version="1.0"
+  xmlns:ns2="http://docs.oasis-open.org/ns/emix/2011/06/siscale"
+  xmlns:ei="http://docs.oasis-open.org/ns/energyinterop/201110"
+  xmlns:avob="http://oadr.avob.com"
+  
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://docs.oasis-open.org/ns/emix/2011/06/siscale" schemaLocation="ns2.xsd"/>
+  <xs:import namespace="http://docs.oasis-open.org/ns/energyinterop/201110" schemaLocation="ei.xsd"/>
+  <xs:import namespace="http://oadr.avob.com" schemaLocation="avob.xsd"/>
+
+<xs:simpleType name="demandResponseEventOptEnum">
+  <xs:restriction base="xs:string">
+     
+    <xs:enumeration value="OPT_IN"/>
+ 
+    <xs:enumeration value="OPT_OUT"/>
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="vtnConfigurationDto">
+       <xs:sequence>
+              <xs:element name="vtnId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="supportPush" type="xs:boolean" minOccurs="0">
+              </xs:element>
+              <xs:element name="supportUnsecuredHttpPush" type="xs:boolean" minOccurs="0">
+              </xs:element>
+              <xs:element name="pullFrequencySeconds" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="port" type="xs:int" minOccurs="1">
+              </xs:element>
+              <xs:element name="contextPath" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="host" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrVersion" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="supportCertificateGeneration" type="xs:boolean" minOccurs="1">
+              </xs:element>
+              <xs:element name="xsdValidation" type="xs:boolean" minOccurs="1">
+              </xs:element>
+              <xs:element name="xmlSignatureReplayProtectSecond" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="saveVenDate" type="xs:boolean" minOccurs="1">
+              </xs:element>
+      </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="venOptDto">
+       <xs:sequence>
+              <xs:element name="id" type="xs:long" minOccurs="1">
+              </xs:element>
+              <xs:element name="venId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="marketContext" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="resourceId" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="eventId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="optId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="start" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="end" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="opt" type="demandResponseEventOptEnum" minOccurs="0">
+              </xs:element>
+      </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="otherReportCapabilityDescriptionDto">
+   <xs:complexContent>
+    <xs:extension base="reportCapabilityDescriptionDto">
+      <xs:sequence>
+              <xs:element name="venId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="reportSpecifierId" type="xs:string" minOccurs="0">
+              </xs:element>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="otherReportCapabilityDto">
+   <xs:complexContent>
+    <xs:extension base="reportCapabilityDto">
+      <xs:sequence>
+              <xs:element name="venId" type="xs:string" minOccurs="0">
+              </xs:element>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="reportCapabilityDescriptionDto">
+       <xs:sequence>
+              <xs:element name="id" type="xs:long" minOccurs="1">
+              </xs:element>
+              <xs:element name="rid" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="reportType" type="ei:ReportEnumeratedType" minOccurs="0">
+              </xs:element>
+              <xs:element name="readingType" type="ei:ReadingTypeEnumeratedType" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrMaxPeriod" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrMinPeriod" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrOnChange" type="xs:boolean" minOccurs="1">
+              </xs:element>
+              <xs:element name="itemDescription" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="itemUnits" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="siScaleCode" type="ns2:SiScaleCodeType" minOccurs="0">
+              </xs:element>
+      </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="reportCapabilityDto">
+       <xs:sequence>
+              <xs:element name="id" type="xs:long" minOccurs="1">
+              </xs:element>
+              <xs:element name="reportSpecifierId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="reportName" type="ei:reportNameEnumeratedType" minOccurs="0">
+              </xs:element>
+              <xs:element name="duration" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="reportRequestId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="createdDatetime" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="reportId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="start" type="xs:long" minOccurs="0">
+              </xs:element>
+      </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="venReportCapabilityDto">
+   <xs:complexContent>
+    <xs:extension base="reportCapabilityDto">
+      <xs:sequence>
+              <xs:element name="descriptions" type="reportCapabilityDescriptionDto" minOccurs="0" maxOccurs="unbounded">
+              </xs:element>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="otherReportDataFloatDto">
+   <xs:complexContent>
+    <xs:extension base="reportDataDto">
+      <xs:sequence>
+              <xs:element name="value" type="xs:float" minOccurs="0">
+              </xs:element>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="otherReportDataKeyTokenDto">
+   <xs:complexContent>
+    <xs:extension base="reportDataDto">
+      <xs:sequence>
+              <xs:element name="tokens" type="avob:keyTokenType" minOccurs="0" maxOccurs="unbounded">
+              </xs:element>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="otherReportDataPayloadResourceStatusDto">
+   <xs:complexContent>
+    <xs:extension base="reportDataDto">
+      <xs:sequence>
+              <xs:element name="oadrCapacityMin" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrCapacityMax" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrCapacityCurrent" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrCapacityNormal" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrLevelOffsetMin" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrLevelOffsetMax" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrLevelOffsetCurrent" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrLevelOffsetNormal" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrPercentOffsetMin" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrPercentOffsetMax" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrPercentOffsetCurrent" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrPercentOffsetNormal" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrSetPointMin" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrSetPointMax" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrSetPointCurrent" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="oadrSetPointNormal" type="xs:float" minOccurs="0">
+              </xs:element>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="reportDataDto">
+       <xs:sequence>
+              <xs:element name="id" type="xs:long" minOccurs="1">
+              </xs:element>
+              <xs:element name="reportSpecifierId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="rid" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="confidence" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="accuracy" type="xs:float" minOccurs="0">
+              </xs:element>
+              <xs:element name="start" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="duration" type="xs:string" minOccurs="0">
+              </xs:element>
+      </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="otherReportRequestDto">
+   <xs:complexContent>
+    <xs:extension base="reportRequestDto">
+      <xs:sequence>
+              <xs:element name="venId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="requestorUsername" type="xs:string" minOccurs="0">
+              </xs:element>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="otherReportRequestDtoCreateRequestDto">
+       <xs:sequence>
+              <xs:element name="reportSpecifierId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="rid" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+              </xs:element>
+              <xs:element name="start" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="end" type="xs:long" minOccurs="0">
+              </xs:element>
+      </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="otherReportRequestDtoCreateSubscriptionDto">
+       <xs:sequence>
+              <xs:element name="reportSpecifierId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="rid" minOccurs="0">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="key" minOccurs="1" type="xs:string"/>
+            <xs:element name="value" minOccurs="1" type="xs:boolean"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+              </xs:element>
+              <xs:element name="granularity" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="reportBackDuration" type="xs:string" minOccurs="0">
+              </xs:element>
+      </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="otherReportRequestSpecifierDto">
+       <xs:sequence>
+              <xs:element name="id" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="rid" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="archived" type="xs:boolean" minOccurs="0">
+              </xs:element>
+              <xs:element name="lastUpdateDatetime" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="lastUpdateValue" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="reportRequestId" type="xs:string" minOccurs="0">
+              </xs:element>
+      </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="otherReportRequestSpecifierSearchCriteria">
+       <xs:sequence>
+              <xs:element name="reportSpecifierId" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+              </xs:element>
+              <xs:element name="reportRequestId" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+              </xs:element>
+              <xs:element name="rid" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+              </xs:element>
+      </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="reportRequestDto">
+       <xs:sequence>
+              <xs:element name="id" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="reportRequestId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="granularity" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="reportBackDuration" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="start" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="end" type="xs:long" minOccurs="0">
+              </xs:element>
+              <xs:element name="acked" type="xs:boolean" minOccurs="1">
+              </xs:element>
+              <xs:element name="reportSpecifierId" type="xs:string" minOccurs="0">
+              </xs:element>
+              <xs:element name="createdDatetime" type="xs:long" minOccurs="0">
+              </xs:element>
+      </xs:sequence>
+</xs:complexType>
+
+</xs:schema>

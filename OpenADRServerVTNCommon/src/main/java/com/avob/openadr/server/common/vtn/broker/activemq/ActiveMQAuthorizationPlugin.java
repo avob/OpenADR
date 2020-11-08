@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.avob.openadr.server.common.vtn.security.OadrSecurityRoleService;
 
-@Profile({ "test", "in-memory-broker" })
+@Profile({ "test", "in-memory" })
 @Service
 public class ActiveMQAuthorizationPlugin implements BrokerPlugin {
 

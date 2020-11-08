@@ -7,7 +7,7 @@ public class OtherReportRequestSpecifierDto {
 	private Long id;
 	
 	private String reportRequestId;
-
+	
 	private String rid;
 
 	private Boolean archived;
@@ -64,4 +64,5 @@ public class OtherReportRequestSpecifierDto {
 	public void setReportRequestId(String reportRequestId) {
 		this.reportRequestId = reportRequestId;
 	}
+
 }

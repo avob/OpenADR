@@ -1,15 +1,21 @@
 package com.avob.openadr.dummy;
 
+import javax.annotation.Resource;
+
+import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
+import com.avob.openadr.model.oadr20b.ei.SpecifierPayloadType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisteredReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
@@ -18,7 +24,13 @@ import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiReportService;
 @Service
 public class DummyVEN20bEiReportService extends Oadr20bVENEiReportService {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DummyVEN20bEiRegisterPartyListener.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DummyVEN20bEiReportService.class);
+
+	@Resource
+	private OadrAction oadrAction;
+
+	@Resource
+	private RequestedReportSimulator requestedReportSimulator;
 
 	@Override
 	public OadrUpdatedReportType oadrUpdateReport(VtnSessionConfiguration vtnConfig,
@@ -45,7 +57,32 @@ public class DummyVEN20bEiReportService extends Oadr20bVENEiReportService {
 
 		LOGGER.info("Dummy received: oadrCreateReport");
 
-		return super.oadrCreateReport(vtnConfig, oadrCreateReportType);
+		String requestID = oadrCreateReportType.getRequestID();
+
+		boolean sendSelfRegisterReport = false;
+		for (OadrReportRequestType oadrReportRequestType : oadrCreateReportType.getOadrReportRequest()) {
+			String reportSpecifierID = oadrReportRequestType.getReportSpecifier().getReportSpecifierID();
+			if (METADATA_REPORT_SPECIFIER_ID.equals(reportSpecifierID)) {
+				for(SpecifierPayloadType specifier : oadrReportRequestType.getReportSpecifier().getSpecifierPayload()) {
+					String rid = specifier.getRID();
+					if (METADATA_REPORT_RID.equals(rid)) {
+						sendSelfRegisterReport = true;
+					}
+				}
+			}
+		}
+
+		if(sendSelfRegisterReport) {
+			oadrAction.sendRegisterReport(vtnConfig);
+		}
+
+		requestedReportSimulator.create(vtnConfig, oadrCreateReportType);
+
+		return Oadr20bEiReportBuilders
+				.newOadr20bCreatedReportBuilder(requestID, HttpStatus.OK_200,
+						vtnConfig.getVenSessionConfig().getVenId())
+				.addPendingReportRequestId(requestedReportSimulator.getPendingRequestReport())
+				.build();
 
 	}
 
@@ -56,7 +93,13 @@ public class DummyVEN20bEiReportService extends Oadr20bVENEiReportService {
 
 		LOGGER.info("Dummy received: oadrCancelReport");
 
-		return super.oadrCancelReport(vtnConfig, oadrCancelReportType);
+		requestedReportSimulator.cancel(vtnConfig, oadrCancelReportType);
+
+		String requestID = oadrCancelReportType.getRequestID();
+
+		return Oadr20bEiReportBuilders.newOadr20bCanceledReportBuilder(requestID,
+				HttpStatus.OK_200, vtnConfig.getVenSessionConfig().getVenId())
+				.build();
 
 	}
 
@@ -96,4 +139,6 @@ public class DummyVEN20bEiReportService extends Oadr20bVENEiReportService {
 		super.oadrUpdatedReport(vtnConfig, oadrUpdateReportType);
 
 	}
+
+
 }
