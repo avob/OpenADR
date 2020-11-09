@@ -3,9 +3,7 @@ package com.avob.openadr.server.oadr20b.vtn;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -15,34 +13,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.scheduling.support.CronSequenceGenerator;
 import org.springframework.stereotype.Component;
 
-import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
-import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
 import com.avob.openadr.security.OadrFingerprintSecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.VTNRoleEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventActivePeriodDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventDescriptorDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.user.OadrApp;
 import com.avob.openadr.server.common.vtn.models.user.OadrAppCreateDto;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.user.OadrUserCreateDto;
-import com.avob.openadr.server.common.vtn.models.ven.Ven;
-import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
-import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
-import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
-import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
-import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.OadrAppService;
 import com.avob.openadr.server.common.vtn.service.OadrUserService;
@@ -161,121 +140,121 @@ public class EmbeddedSqlDatabaseInit implements ApplicationListener<ContextRefre
 		return findOneByName;
 	}
 
-	private DemandResponseEvent saveDemandResponseEventIfMissing(DemandResponseEventCreateDto dto) {
-		DemandResponseEvent findByEventId = demandeResponseEventService.create(dto);
-		LOGGER.debug("Create DREvent: " + findByEventId.getId());
-		return findByEventId;
-	}
+//	private DemandResponseEvent saveDemandResponseEventIfMissing(DemandResponseEventCreateDto dto) {
+//		DemandResponseEvent findByEventId = demandeResponseEventService.create(dto);
+//		LOGGER.debug("Create DREvent: " + findByEventId.getId());
+//		return findByEventId;
+//	}
+//
+//	private static DemandResponseEventSignalDto getSimple(DemandResponseEventSimpleValueEnum val) {
+//		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
+//		signal.setCurrentValue(val.getValue());
+//		signal.setSignalName("SIMPLE");
+//		signal.setSignalType("level");
+//		signal.setUnitType("none");
+//		return signal;
+//	}
+//
+//	private static DemandResponseEventSignalDto getElectricityPrice(Float val) {
+//		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
+//		signal.setCurrentValue(val);
+//		signal.setSignalName(SignalNameEnumeratedType.ELECTRICITY_PRICE.value());
+//		signal.setSignalType(SignalTypeEnumeratedType.PRICE.value());
+//		signal.setUnitType("euro_per_kwh");
+//		return signal;
+//	}
+//
+//	private static DemandResponseEventSignalDto getLoadControl(Float val) {
+//		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
+//		signal.setCurrentValue(val);
+//		signal.setSignalName(SignalNameEnumeratedType.LOAD_CONTROL.value());
+//		signal.setSignalType(SignalTypeEnumeratedType.X_LOAD_CONTROL_CAPACITY.value());
+//		signal.setUnitType("none");
+//		return signal;
+//	}
 
-	private static DemandResponseEventSignalDto getSimple(DemandResponseEventSimpleValueEnum val) {
-		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
-		signal.setCurrentValue(val.getValue());
-		signal.setSignalName("SIMPLE");
-		signal.setSignalType("level");
-		signal.setUnitType("none");
-		return signal;
-	}
-
-	private static DemandResponseEventSignalDto getElectricityPrice(Float val) {
-		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
-		signal.setCurrentValue(val);
-		signal.setSignalName(SignalNameEnumeratedType.ELECTRICITY_PRICE.value());
-		signal.setSignalType(SignalTypeEnumeratedType.PRICE.value());
-		signal.setUnitType("euro_per_kwh");
-		return signal;
-	}
-
-	private static DemandResponseEventSignalDto getLoadControl(Float val) {
-		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
-		signal.setCurrentValue(val);
-		signal.setSignalName(SignalNameEnumeratedType.LOAD_CONTROL.value());
-		signal.setSignalType(SignalTypeEnumeratedType.X_LOAD_CONTROL_CAPACITY.value());
-		signal.setUnitType("none");
-		return signal;
-	}
-
-	private static DemandResponseEventTargetDto getVenTarget(String username) {
-		return new DemandResponseEventTargetDto("ven", username);
-	}
-
-	private static DemandResponseEventTargetDto getGroupTarget(VenGroup group) {
-		return new DemandResponseEventTargetDto("group", group.getName());
-	}
-
-	private static DemandResponseEventDescriptorDto getDescriptor(String marketcontextName) {
-		DemandResponseEventDescriptorDto demandResponseEventDescriptorDto = new DemandResponseEventDescriptorDto();
-		demandResponseEventDescriptorDto.setState(DemandResponseEventStateEnum.ACTIVE);
-		demandResponseEventDescriptorDto.setMarketContext(marketcontextName);
-		demandResponseEventDescriptorDto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
-		demandResponseEventDescriptorDto.setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
-		return demandResponseEventDescriptorDto;
-	}
-
-	private static DemandResponseEventActivePeriodDto getActivePeriod(Long start, String duration,
-			String notificationDuration) {
-		DemandResponseEventActivePeriodDto period = new DemandResponseEventActivePeriodDto();
-		period.setStart(start);
-		period.setNotificationDuration(notificationDuration);
-		period.setDuration(duration);
-		period.setNotificationDuration(notificationDuration);
-		return period;
-	}
-
-	private void genDailyElectricityPriceSignals(String eventPrefix, String marketcontextName,
-			List<DemandResponseEventTargetDto> targets, Date start, Date end) {
-
-		String duration = "PT4H";
-		String notificationDuration = "P1D";
-
-		String everydayCron = "0 0 4 * * *";
-		CronSequenceGenerator generator = new CronSequenceGenerator(everydayCron);
-
-		Date temp = generator.next(start);
-
-		while (temp.before(end)) {
-			DemandResponseEventCreateDto eventDto = new DemandResponseEventCreateDto();
-			eventDto.setDescriptor(EmbeddedSqlDatabaseInit.getDescriptor(marketcontextName));
-			eventDto.setActivePeriod(
-					EmbeddedSqlDatabaseInit.getActivePeriod(temp.getTime(), duration, notificationDuration));
-
-			eventDto.getTargets().addAll(targets);
-			eventDto.getSignals().add(
-					EmbeddedSqlDatabaseInit.getSimple(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH));
-			eventDto.getSignals().add(EmbeddedSqlDatabaseInit.getElectricityPrice(10.0F));
-			eventDto.setPublished(true);
-			saveDemandResponseEventIfMissing(eventDto);
-
-			temp = generator.next(temp);
-		}
-	}
-
-	private void genLoadControlSignals(String eventPrefix, String marketcontextName,
-			List<DemandResponseEventTargetDto> targets, Date start, Date end) {
-
-		String duration = "PT6H";
-		String notificationDuration = "P1D";
-
-		String everydayCron = "0 0 6 * * *";
-		CronSequenceGenerator generator = new CronSequenceGenerator(everydayCron);
-
-		Date temp = generator.next(start);
-
-		while (temp.before(end)) {
-			DemandResponseEventCreateDto eventDto = new DemandResponseEventCreateDto();
-			eventDto.setDescriptor(EmbeddedSqlDatabaseInit.getDescriptor(marketcontextName));
-			eventDto.setActivePeriod(
-					EmbeddedSqlDatabaseInit.getActivePeriod(temp.getTime(), duration, notificationDuration));
-
-			eventDto.getTargets().addAll(targets);
-			eventDto.getSignals().add(
-					EmbeddedSqlDatabaseInit.getSimple(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_NORMAL));
-			eventDto.getSignals().add(EmbeddedSqlDatabaseInit.getLoadControl(99.0F));
-			eventDto.setPublished(true);
-			saveDemandResponseEventIfMissing(eventDto);
-
-			temp = generator.next(temp);
-		}
-	}
+//	private static DemandResponseEventTargetDto getVenTarget(String username) {
+//		return new DemandResponseEventTargetDto("ven", username);
+//	}
+//
+//	private static DemandResponseEventTargetDto getGroupTarget(VenGroup group) {
+//		return new DemandResponseEventTargetDto("group", group.getName());
+//	}
+//
+//	private static DemandResponseEventDescriptorDto getDescriptor(String marketcontextName) {
+//		DemandResponseEventDescriptorDto demandResponseEventDescriptorDto = new DemandResponseEventDescriptorDto();
+//		demandResponseEventDescriptorDto.setState(DemandResponseEventStateEnum.ACTIVE);
+//		demandResponseEventDescriptorDto.setMarketContext(marketcontextName);
+//		demandResponseEventDescriptorDto.setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
+//		demandResponseEventDescriptorDto.setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
+//		return demandResponseEventDescriptorDto;
+//	}
+//
+//	private static DemandResponseEventActivePeriodDto getActivePeriod(Long start, String duration,
+//			String notificationDuration) {
+//		DemandResponseEventActivePeriodDto period = new DemandResponseEventActivePeriodDto();
+//		period.setStart(start);
+//		period.setNotificationDuration(notificationDuration);
+//		period.setDuration(duration);
+//		period.setNotificationDuration(notificationDuration);
+//		return period;
+//	}
+//
+//	private void genDailyElectricityPriceSignals(String eventPrefix, String marketcontextName,
+//			List<DemandResponseEventTargetDto> targets, Date start, Date end) {
+//
+//		String duration = "PT4H";
+//		String notificationDuration = "P1D";
+//
+//		String everydayCron = "0 0 4 * * *";
+//		CronSequenceGenerator generator = new CronSequenceGenerator(everydayCron);
+//
+//		Date temp = generator.next(start);
+//
+//		while (temp.before(end)) {
+//			DemandResponseEventCreateDto eventDto = new DemandResponseEventCreateDto();
+//			eventDto.setDescriptor(EmbeddedSqlDatabaseInit.getDescriptor(marketcontextName));
+//			eventDto.setActivePeriod(
+//					EmbeddedSqlDatabaseInit.getActivePeriod(temp.getTime(), duration, notificationDuration));
+//
+//			eventDto.getTargets().addAll(targets);
+//			eventDto.getSignals().add(
+//					EmbeddedSqlDatabaseInit.getSimple(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH));
+//			eventDto.getSignals().add(EmbeddedSqlDatabaseInit.getElectricityPrice(10.0F));
+//			eventDto.setPublished(true);
+//			saveDemandResponseEventIfMissing(eventDto);
+//
+//			temp = generator.next(temp);
+//		}
+//	}
+//
+//	private void genLoadControlSignals(String eventPrefix, String marketcontextName,
+//			List<DemandResponseEventTargetDto> targets, Date start, Date end) {
+//
+//		String duration = "PT6H";
+//		String notificationDuration = "P1D";
+//
+//		String everydayCron = "0 0 6 * * *";
+//		CronSequenceGenerator generator = new CronSequenceGenerator(everydayCron);
+//
+//		Date temp = generator.next(start);
+//
+//		while (temp.before(end)) {
+//			DemandResponseEventCreateDto eventDto = new DemandResponseEventCreateDto();
+//			eventDto.setDescriptor(EmbeddedSqlDatabaseInit.getDescriptor(marketcontextName));
+//			eventDto.setActivePeriod(
+//					EmbeddedSqlDatabaseInit.getActivePeriod(temp.getTime(), duration, notificationDuration));
+//
+//			eventDto.getTargets().addAll(targets);
+//			eventDto.getSignals().add(
+//					EmbeddedSqlDatabaseInit.getSimple(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_NORMAL));
+//			eventDto.getSignals().add(EmbeddedSqlDatabaseInit.getLoadControl(99.0F));
+//			eventDto.setPublished(true);
+//			saveDemandResponseEventIfMissing(eventDto);
+//
+//			temp = generator.next(temp);
+//		}
+//	}
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent arg0) {

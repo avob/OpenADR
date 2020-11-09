@@ -1,5 +1,7 @@
 package com.avob.openadr.server.common.vtn.models.ven;
 
+import java.util.List;
+
 import com.avob.openadr.server.common.vtn.models.user.AbstractUserCreateDto;
 
 public class VenCreateDto extends AbstractUserCreateDto {
@@ -22,6 +24,12 @@ public class VenCreateDto extends AbstractUserCreateDto {
 	private Boolean reportOnly = false;
 
 	private Boolean xmlSignature = false;
+	
+	private List<String> marketContexts;
+	
+	private List<String> groups;
+	
+	private List<String> resources;
 
 	public VenCreateDto() {
 	}
@@ -84,6 +92,30 @@ public class VenCreateDto extends AbstractUserCreateDto {
 
 	public void setXmlSignature(Boolean xmlSignature) {
 		this.xmlSignature = xmlSignature;
+	}
+
+	public List<String> getMarketContexts() {
+		return marketContexts;
+	}
+
+	public void setMarketContexts(List<String> marketContexts) {
+		this.marketContexts = marketContexts;
+	}
+
+	public List<String> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(List<String> groups) {
+		this.groups = groups;
+	}
+
+	public List<String> getResources() {
+		return resources;
+	}
+
+	public void setResources(List<String> resources) {
+		this.resources = resources;
 	}
 
 }

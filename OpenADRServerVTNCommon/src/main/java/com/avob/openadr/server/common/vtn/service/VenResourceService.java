@@ -44,6 +44,10 @@ public class VenResourceService {
     public List<VenResource> findByVenIdAndName(List<String> venId, List<String> name) {
         return venResourceDao.findByVenIdAndName(venId, name);
     }
+    
+    public List<VenResource> findByNameIn(List<String> name) {
+    	return venResourceDao.findByNameIn(name);
+    }
 
     public void delete(VenResource resource) {
         venResourceDao.delete(resource);

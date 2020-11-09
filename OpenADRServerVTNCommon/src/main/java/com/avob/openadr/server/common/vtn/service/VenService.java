@@ -3,6 +3,7 @@ package com.avob.openadr.server.common.vtn.service;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -16,13 +17,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTarget;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenDao;
 import com.avob.openadr.server.common.vtn.models.ven.VenSpecification;
 import com.avob.openadr.server.common.vtn.models.ven.filter.VenFilter;
+import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDao;
+import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
+import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDao;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
+import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDao;
 import com.avob.openadr.server.common.vtn.models.venresource.VenResourceDao;
 import com.avob.openadr.server.common.vtn.security.DigestAuthenticationProvider;
 
@@ -39,6 +47,12 @@ public class VenService extends AbstractUserService<Ven> {
 
 	@Resource
 	private VenDemandResponseEventDao venDemandResponseEventDao;
+	
+	@Resource
+	private VenGroupDao venGroupDao;
+	
+	@Resource
+	private VenMarketContextDao venMarketContextDao;
 
 	@Autowired(required = false)
 	private GenerateX509CertificateService generateX509VenService;
@@ -99,6 +113,7 @@ public class VenService extends AbstractUserService<Ven> {
 	@Override
 	@Transactional
 	public void delete(Ven instance) {
+		
 		venResourceDao.deleteByVenId(instance.getId());
 		venDemandResponseEventDao.deleteByVenId(instance.getId());
 		venDao.delete(instance);
@@ -106,7 +121,7 @@ public class VenService extends AbstractUserService<Ven> {
 
 	@Override
 	public void delete(Iterable<Ven> instances) {
-		venDao.deleteAll(instances);
+		instances.forEach(ven -> { this.delete(ven);});
 	}
 
 	@Override
@@ -171,6 +186,50 @@ public class VenService extends AbstractUserService<Ven> {
 		Sort sort = Sort.by(Sort.Order.desc("registrationId"), Sort.Order.asc("commonName"));
 		PageRequest of = PageRequest.of(page, size, sort);
 		return venDao.findAll(VenSpecification.search(filters), of);
+	}
+	
+	
+	public void addVenDemandResponseEvent(Ven ven, DemandResponseEvent event) {
+		venDemandResponseEventDao.save(new VenDemandResponseEvent(event, ven));
+	}
+	
+	@Transactional
+	public boolean isVenTargetedBy(Ven ven, DemandResponseEvent event) {
+		
+		boolean targeted = false;
+		for(DemandResponseEventTarget target : event.getTargets()) {
+			if(DemandResponseEventTargetTypeEnum.VEN.equals(target.getTargetType())) {
+				
+				if( ven.getUsername().equals(target.getTargetId())) {
+					targeted = true;
+				}
+				
+			} else if(DemandResponseEventTargetTypeEnum.GROUP.equals(target.getTargetType())) {
+				
+				
+				Set<VenGroup> venGroups = ven.getVenGroups();
+				if(venGroups != null) {
+					for(VenGroup group : venGroups) {
+						if(group.getName().equals(target.getTargetId())) {
+							targeted = true;
+						}
+					}
+				}
+				
+				
+			} else if(DemandResponseEventTargetTypeEnum.MARKET_CONTEXT.equals(target.getTargetType())) {
+				Set<VenMarketContext> venMarketContext =  ven.getVenMarketContexts();
+				if(venMarketContext != null) {
+					for(VenMarketContext marketContext : venMarketContext) {
+						if(marketContext.getName().equals(target.getTargetId())) {
+							targeted = true;
+						}
+					}
+				}
+			}
+		}
+
+		return targeted;
 	}
 
 }

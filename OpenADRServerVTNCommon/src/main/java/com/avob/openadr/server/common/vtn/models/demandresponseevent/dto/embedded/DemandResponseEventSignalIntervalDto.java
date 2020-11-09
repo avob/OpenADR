@@ -2,7 +2,7 @@ package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedd
 
 public class DemandResponseEventSignalIntervalDto {
 	private Float value;
-	private Integer duration;
+	private String duration;
 
 	public Float getValue() {
 		return value;
@@ -12,11 +12,11 @@ public class DemandResponseEventSignalIntervalDto {
 		this.value = value;
 	}
 
-	public Integer getDuration() {
+	public String getDuration() {
 		return duration;
 	}
 
-	public void setDuration(Integer duration) {
+	public void setDuration(String duration) {
 		this.duration = duration;
 	}
 }

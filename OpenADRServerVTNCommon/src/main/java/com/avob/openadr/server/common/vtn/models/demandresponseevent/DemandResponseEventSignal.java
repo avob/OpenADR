@@ -22,8 +22,8 @@ public class DemandResponseEventSignal {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	private String signalName;
-	private String signalType;
+	private DemandResponseEventSignalNameEnum signalName;
+	private DemandResponseEventSignalTypeEnum signalType;
 	private String unitType;
 
 	@ElementCollection(fetch = FetchType.EAGER)
@@ -37,19 +37,19 @@ public class DemandResponseEventSignal {
 	@JoinColumn(name = "demandresponseevent_id")
 	private DemandResponseEvent event;
 
-	public String getSignalName() {
+	public DemandResponseEventSignalNameEnum getSignalName() {
 		return signalName;
 	}
 
-	public void setSignalName(String signalName) {
+	public void setSignalName(DemandResponseEventSignalNameEnum signalName) {
 		this.signalName = signalName;
 	}
 
-	public String getSignalType() {
+	public DemandResponseEventSignalTypeEnum getSignalType() {
 		return signalType;
 	}
 
-	public void setSignalType(String signalType) {
+	public void setSignalType(DemandResponseEventSignalTypeEnum signalType) {
 		this.signalType = signalType;
 	}
 

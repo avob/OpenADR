@@ -27,8 +27,11 @@ import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalNameEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
@@ -99,8 +102,8 @@ public class DemandResponseEventServiceTest {
 
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
-		signal.setSignalName("SIMPLE");
-		signal.setSignalType("level");
+		signal.setSignalName(DemandResponseEventSignalNameEnum.SIMPLE);
+		signal.setSignalType(DemandResponseEventSignalTypeEnum.LEVEL);
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setState(state);
@@ -109,8 +112,8 @@ public class DemandResponseEventServiceTest {
 		dto.getDescriptor().setMarketContext(marketContext.getName());
 		dto.getActivePeriod().setDuration(duration);
 		dto.getActivePeriod().setNotificationDuration(notificationDuration);
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", "ven1"));
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", "ven2"));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, "ven1"));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, "ven2"));
 		dto.getSignals().add(signal);
 		dto.setPublished(true);
 		event1 = demandResponseEventService.create(dto);
@@ -126,7 +129,7 @@ public class DemandResponseEventServiceTest {
 		dto.getActivePeriod().setRampUpDuration("PT1H");
 		dto.getActivePeriod().setRecoveryDuration("PT1H");
 		dto.getDescriptor().setVtnComment("comment");
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", "ven2"));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, "ven2"));
 		dto.getSignals().add(signal);
 		dto.setPublished(true);
 		event2 = demandResponseEventService.create(dto);
@@ -139,7 +142,7 @@ public class DemandResponseEventServiceTest {
 		dto.getDescriptor().setMarketContext(marketContext.getName());
 		dto.getActivePeriod().setDuration(duration);
 		dto.getActivePeriod().setNotificationDuration(notificationDuration);
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", "ven3"));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, "ven3"));
 		dto.getSignals().add(signal);
 		dto.setPublished(true);
 		event3 = demandResponseEventService.create(dto);
@@ -207,8 +210,8 @@ public class DemandResponseEventServiceTest {
 			VenDemandResponseEvent next = iterator.next();
 			assertEquals(-1, next.getLastSentModificationNumber());
 			assertNull(next.getVenOpt());
-//			assertTrue(next.getVen().getUsername() == "ven1" || next.getVen().getUsername() == "ven2"
-//					|| next.getVen().getUsername() == "ven3");
+			//			assertTrue(next.getVen().getUsername() == "ven1" || next.getVen().getUsername() == "ven2"
+			//					|| next.getVen().getUsername() == "ven3");
 		}
 	}
 
@@ -225,8 +228,8 @@ public class DemandResponseEventServiceTest {
 			VenDemandResponseEvent next = iterator.next();
 			assertEquals(-1, next.getLastSentModificationNumber());
 			assertNull(next.getVenOpt());
-//			assertTrue(next.getVen().getUsername() == "ven1" || next.getVen().getUsername() == "ven2"
-//					|| next.getVen().getUsername() == "ven3");
+			//			assertTrue(next.getVen().getUsername() == "ven1" || next.getVen().getUsername() == "ven2"
+			//					|| next.getVen().getUsername() == "ven3");
 		}
 	}
 

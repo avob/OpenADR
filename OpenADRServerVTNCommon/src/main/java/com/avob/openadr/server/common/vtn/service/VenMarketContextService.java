@@ -1,5 +1,6 @@
 package com.avob.openadr.server.common.vtn.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Resource;
@@ -36,6 +37,10 @@ public class VenMarketContextService {
     
     public Optional<VenMarketContext> findById(Long id) {
         return venMarketcontextDao.findById(id);
+    }
+    
+    public List<VenMarketContext> findByNameIn(List<String> name) {
+    	return venMarketcontextDao.findByNameIn(name);
     }
 
     public void delete(VenMarketContext venMarketContext) {

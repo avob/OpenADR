@@ -5,15 +5,15 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class DemandResponseEventTarget implements DemandResponseEventTargetInterface {
 
-	private String targetType;
+	private DemandResponseEventTargetTypeEnum targetType;
 
 	private String targetId;
 
-	public String getTargetType() {
+	public DemandResponseEventTargetTypeEnum getTargetType() {
 		return targetType;
 	}
 
-	public void setTargetType(String targetType) {
+	public void setTargetType(DemandResponseEventTargetTypeEnum targetType) {
 		this.targetType = targetType;
 	}
 

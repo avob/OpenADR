@@ -80,7 +80,6 @@ import com.avob.openadr.model.oadr20b.xcal.Dtstart;
 import com.avob.openadr.model.oadr20b.xcal.DurationPropType;
 import com.avob.openadr.model.oadr20b.xcal.Properties;
 import com.avob.openadr.model.oadr20b.xcal.WsCalendarIntervalType;
-import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
@@ -178,9 +177,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 	@Resource
 	protected VenDistributeService venDistributeService;
-
-	@Resource
-	private VtnConfig vtnConfig;
 
 	@Resource
 	private Oadr20bAppNotificationPublisher oadr20bAppNotificationPublisher;

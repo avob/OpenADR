@@ -34,6 +34,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatePartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrProfiles.OadrProfile;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
@@ -223,7 +224,7 @@ public class RegisterPartyScenarioTest {
 			assertTrue(profile.getOadrProfileName()
 					.equals(oadr20bVTNSupportedProfileService.getProfileA().getOadrProfileName())
 					|| profile.getOadrProfileName()
-							.equals(oadr20bVTNSupportedProfileService.getProfileB().getOadrProfileName()));
+					.equals(oadr20bVTNSupportedProfileService.getProfileB().getOadrProfileName()));
 		}
 
 		// VEN CONTROLLER - test ven is still not registred
@@ -282,6 +283,11 @@ public class RegisterPartyScenarioTest {
 		assertEquals(String.valueOf(HttpStatus.OK_200),
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
 
+		// OADR POLL CONTROLLER - poll and expect for OadrDistributeEventType
+		OadrDistributeEventType oadrDistributeEventType = mockVen.poll(HttpStatus.OK_200,
+				OadrDistributeEventType.class);
+		assertNotNull(oadrDistributeEventType);
+
 		// EI REGISTER PARTY CONTROLLER - invalid test VEN can't create a registration
 		// while
 		// already registered without providing registrationId
@@ -309,6 +315,11 @@ public class RegisterPartyScenarioTest {
 		assertNotNull(oadrCreatedPartyRegistrationType);
 		assertEquals(String.valueOf(HttpStatus.OK_200),
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
+
+		// OADR POLL CONTROLLER - poll and expect for OadrDistributeEventType
+		oadrDistributeEventType = mockVen.poll(HttpStatus.OK_200,
+				OadrDistributeEventType.class);
+		assertNotNull(oadrDistributeEventType);
 
 		// VEN CONTROLLER - test ven is registred
 		venDto = oadrMockHttpVenMvc.getVen(adminSession, mockVen.getVenId(), HttpStatus.OK_200);
@@ -373,6 +384,11 @@ public class RegisterPartyScenarioTest {
 		assertEquals(ven.getTransport(), venDto.getTransport());
 		assertEquals(ven.getOadrName(), venDto.getOadrName());
 
+		// OADR POLL CONTROLLER - poll and expect for OadrDistributeEventType
+		oadrDistributeEventType = mockVen.poll(HttpStatus.OK_200,
+				OadrDistributeEventType.class);
+		assertNotNull(oadrDistributeEventType);
+
 		// EI REGISTER PARTY CONTROLLER - invalid mismatch payload venID and username
 		// auth session
 		OadrCancelPartyRegistrationType oadrCancelPartyRegistration = Oadr20bEiRegisterPartyBuilders
@@ -435,6 +451,11 @@ public class RegisterPartyScenarioTest {
 		assertEquals(String.valueOf(HttpStatus.OK_200),
 				oadrCreatedPartyRegistrationType.getEiResponse().getResponseCode());
 
+		// OADR POLL CONTROLLER - poll and expect for OadrDistributeEventType
+		oadrDistributeEventType = mockVen.poll(HttpStatus.OK_200,
+				OadrDistributeEventType.class);
+		assertNotNull(oadrDistributeEventType);
+
 		// VEN CONTROLLER - test ven is registred
 		venDto = oadrMockHttpVenMvc.getVen(adminSession, mockVen.getVenId(), HttpStatus.OK_200);
 		assertNotNull(venDto.getRegistrationId());
@@ -445,6 +466,7 @@ public class RegisterPartyScenarioTest {
 		assertEquals(ven.getPushUrl(), venDto.getPushUrl());
 		assertEquals(ven.getTransport(), venDto.getTransport());
 		assertEquals(ven.getOadrName(), venDto.getOadrName());
+
 
 		// VEN CONTROLLER - request reregistration
 		oadrMockHttpVenMvc.reregister(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), HttpStatus.OK_200);

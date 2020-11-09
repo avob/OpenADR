@@ -5,7 +5,7 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class DemandResponseEventSignalInterval {
 	private Float value;
-	private Integer duration;
+	private String duration;
 
 	public Float getValue() {
 		return value;
@@ -15,11 +15,11 @@ public class DemandResponseEventSignalInterval {
 		this.value = value;
 	}
 
-	public Integer getDuration() {
+	public String getDuration() {
 		return duration;
 	}
 
-	public void setDuration(Integer duration) {
+	public void setDuration(String duration) {
 		this.duration = duration;
 	}
 }

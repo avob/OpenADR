@@ -56,8 +56,11 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalNameEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
@@ -146,31 +149,31 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// GET not allowed
 		this.mockMvc.perform(MockMvcRequestBuilders.get(EIEVENT_ENDPOINT).with(venSecuritySession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
+		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// PUT not allowed
 		this.mockMvc.perform(MockMvcRequestBuilders.put(EIEVENT_ENDPOINT).with(venSecuritySession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
+		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// DELETE not allowed
 		this.mockMvc.perform(MockMvcRequestBuilders.delete(EIEVENT_ENDPOINT).with(venSecuritySession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
+		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// POST without content
 		String content = "";
 		this.mockMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession).content(content))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// POST without content
 		content = "mouaiccool";
 		this.mockMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession).content(content))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
+		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
 
 		// POST with not validating content
-//		OadrRequestEvent build = Oadr20aBuilders.newOadrRequestEventBuilder(null, null).build();
-//		String marshal = jaxbContext.marshal(build, false);
-//		this.mockMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession).content(marshal))
-//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
+		//		OadrRequestEvent build = Oadr20aBuilders.newOadrRequestEventBuilder(null, null).build();
+		//		String marshal = jaxbContext.marshal(build, false);
+		//		this.mockMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession).content(marshal))
+		//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
 
 		venService.delete(ven);
 	}
@@ -249,8 +252,8 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
-		signal.setSignalName("SIMPLE");
-		signal.setSignalType("level");
+		signal.setSignalName(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE);
+		signal.setSignalType(DemandResponseEventSignalTypeEnum.LEVEL);
 
 		DemandResponseEventCreateDto eventActive = new DemandResponseEventCreateDto();
 		eventActive.getDescriptor().setMarketContext(marketContext.getName());
@@ -259,7 +262,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		eventActive.getSignals().add(signal);
 		// ensure event status is "active"
 		eventActive.getActivePeriod().setStart(System.currentTimeMillis() - 10);
-		eventActive.getTargets().add(new DemandResponseEventTargetDto("ven", VEN));
+		eventActive.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, VEN));
 		eventActive.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		eventActive.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		eventActive.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
@@ -274,7 +277,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		eventCanceled.getSignals().add(signal);
 
 		eventCanceled.getActivePeriod().setStart(System.currentTimeMillis() - 10);
-		eventCanceled.getTargets().add(new DemandResponseEventTargetDto("ven", VEN));
+		eventCanceled.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, VEN));
 		eventCanceled.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		eventCanceled.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		eventCanceled.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
@@ -336,7 +339,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		assertEquals(Double.valueOf(2), Double.valueOf(eiEventSignalTypeActive.getCurrentValue().getPayloadFloat().getValue()));
 
 		// ensure correct signal name/type (rule 7)
-		assertEquals("SIMPLE", eiEventSignalTypeActive.getSignalName());
+		assertEquals(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE.getLabel(), eiEventSignalTypeActive.getSignalName());
 		assertEquals(SignalTypeEnumeratedType.LEVEL, eiEventSignalTypeActive.getSignalType());
 
 		// ensure "canceled" drevent is translated into OadrEvent
@@ -353,7 +356,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		EiEventSignalType eiEventSignalTypeCanceled = eiEventCanceled.getEiEventSignals().getEiEventSignal().get(0);
 
 		// ensure correct signal name/type (rule 7)
-		assertEquals("SIMPLE", eiEventSignalTypeCanceled.getSignalName());
+		assertEquals(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE.getLabel(), eiEventSignalTypeCanceled.getSignalName());
 		assertEquals(SignalTypeEnumeratedType.LEVEL, eiEventSignalTypeCanceled.getSignalType());
 
 		demandResponseEventService.delete(eventActivePO.getId());
@@ -459,11 +462,11 @@ public class Oadr20aVTNEiEventControllerTest {
 		// create and send DR Event to DemandResponseEvent API
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
-		signal.setSignalName("SIMPLE");
-		signal.setSignalType("level");
+		signal.setSignalName(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE);
+		signal.setSignalType(DemandResponseEventSignalTypeEnum.LEVEL);
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -559,7 +562,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		// send invalid opt-out: mismatch between ven/vtn event modification
 		// number
 		oadrCreatedEvent.getEiCreatedEvent().getEventResponses().getEventResponse().get(0)
-				.setOptType(OptTypeType.OPT_OUT);
+		.setOptType(OptTypeType.OPT_OUT);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession)
 						.content(jaxbContext.marshal(oadrCreatedEvent)))
@@ -576,7 +579,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		// send invalid opt-out: mismatch venid with authentication credentials
 		oadrCreatedEvent.getEiCreatedEvent().setVenID("unknown");
 		oadrCreatedEvent.getEiCreatedEvent().getEventResponses().getEventResponse().get(0)
-				.setOptType(OptTypeType.OPT_OUT);
+		.setOptType(OptTypeType.OPT_OUT);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession)
 						.content(jaxbContext.marshal(oadrCreatedEvent)))
@@ -593,10 +596,10 @@ public class Oadr20aVTNEiEventControllerTest {
 		// send valid opt-out
 		oadrCreatedEvent.getEiCreatedEvent().setVenID(venId);
 		oadrCreatedEvent.getEiCreatedEvent().getEventResponses().getEventResponse().get(0).getQualifiedEventID()
-				.setModificationNumber(oadrCreatedEvent.getEiCreatedEvent().getEventResponses().getEventResponse()
-						.get(0).getQualifiedEventID().getModificationNumber() + 1);
+		.setModificationNumber(oadrCreatedEvent.getEiCreatedEvent().getEventResponses().getEventResponse()
+				.get(0).getQualifiedEventID().getModificationNumber() + 1);
 		oadrCreatedEvent.getEiCreatedEvent().getEventResponses().getEventResponse().get(0)
-				.setOptType(OptTypeType.OPT_OUT);
+		.setOptType(OptTypeType.OPT_OUT);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession)
 						.content(jaxbContext.marshal(oadrCreatedEvent)))
@@ -666,11 +669,11 @@ public class Oadr20aVTNEiEventControllerTest {
 		// create 'none' and send DR Event to DemandResponseEvent API
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
-		signal.setSignalName("SIMPLE");
-		signal.setSignalType("level");
+		signal.setSignalName(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE);
+		signal.setSignalType(DemandResponseEventSignalTypeEnum.LEVEL);
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
@@ -705,7 +708,7 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create 'far' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -741,7 +744,7 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create 'near' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -777,7 +780,7 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create 'active' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -811,7 +814,7 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create 'completed' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -847,7 +850,7 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create unpublished event not to be found by ven
 		dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venId));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");

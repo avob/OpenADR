@@ -43,8 +43,11 @@ import com.avob.openadr.model.oadr20a.oadr.OadrRequestEvent;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalNameEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
@@ -243,12 +246,12 @@ public class Oadr20aVTNSecurityTest {
 		ObjectMapper mapper = new ObjectMapper();
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
-		signal.setSignalName("SIMPLE");
-		signal.setSignalType("level");
+		signal.setSignalName(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE);
+		signal.setSignalType(DemandResponseEventSignalTypeEnum.LEVEL);
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venUsername));
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", venUsername2));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venUsername));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venUsername2));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		dto.getActivePeriod().setToleranceDuration("PT5M");

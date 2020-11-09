@@ -267,7 +267,6 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 
 		List<DemandResponseEventSignal> signals = demandResponseEventService.getSignals(drEvent);
 		for (DemandResponseEventSignal demandResponseEventSignal : signals) {
-
 			Float currentValue = 0F;
 			if (demandResponseEventSignal.getCurrentValue() != null) {
 				currentValue = demandResponseEventSignal.getCurrentValue();
@@ -275,8 +274,8 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 
 			Oadr20bEiEventSignalTypeBuilder newOadr20bEiEventSignalTypeBuilder = Oadr20bEiEventBuilders
 					.newOadr20bEiEventSignalTypeBuilder("" + signalId,
-							SignalNameEnumeratedType.fromValue(demandResponseEventSignal.getSignalName()),
-							SignalTypeEnumeratedType.fromValue(demandResponseEventSignal.getSignalType()),
+							SignalNameEnumeratedType.fromValue(demandResponseEventSignal.getSignalName().getLabel()),
+							SignalTypeEnumeratedType.fromValue(demandResponseEventSignal.getSignalType().getLabel()),
 							currentValue);
 
 			if (demandResponseEventSignal.getIntervals() != null
@@ -286,7 +285,7 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 						.getIntervals()) {
 
 					IntervalType interval = Oadr20bEiBuilders.newOadr20bSignalIntervalTypeBuilder("" + intervalId,
-							start, xmlDuration, demandResponseEventSignalInterval.getValue()).build();
+							start, demandResponseEventSignalInterval.getDuration(), demandResponseEventSignalInterval.getValue()).build();
 					intervalId++;
 					newOadr20bEiEventSignalTypeBuilder.addInterval(interval);
 				}

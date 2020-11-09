@@ -3,7 +3,6 @@ package com.avob.openadr.server.common.vtn.models.demandresponseevent;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -50,7 +49,7 @@ public class DemandResponseEvent {
 
 	private DemandResponseEventActivePeriod activePeriod;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "event", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "event")
 	private Set<DemandResponseEventSignal> signals;
 
 	@ElementCollection

@@ -5238,13 +5238,36 @@
                     }
                 },
                 "signalName": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "SIMPLE",
+                        "DEPRECATED_OADR20A_SIMPLE",
+                        "ELECTRICITY_PRICE",
+                        "ENERGY_PRICE",
+                        "DEMAND_CHARGE",
+                        "BID_PRICE",
+                        "BID_LOAD",
+                        "BID_ENERGY",
+                        "CHARGE_STATE",
+                        "LOAD_DISPATCH",
+                        "LOAD_CONTROL"
+                    ]
                 },
                 "signalType": {
-                    "type": "string"
-                },
-                "unitType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "DELTA",
+                        "LEVEL",
+                        "MULTIPLIER",
+                        "PRICE",
+                        "PRICE_MULTIPLIER",
+                        "PRICE_RELATIVE",
+                        "SETPOINT",
+                        "X_LOAD_CONTROL_CAPACITY",
+                        "X_LOAD_CONTROL_LEVEL_OFFSET",
+                        "X_LOAD_CONTROL_PERCENT_OFFSET",
+                        "X_LOAD_CONTROL_SETPOINT"
+                    ]
                 }
             },
             "title": "DemandResponseEventSignalDto"
@@ -5253,8 +5276,7 @@
             "type": "object",
             "properties": {
                 "duration": {
-                    "type": "integer",
-                    "format": "int32"
+                    "type": "string"
                 },
                 "value": {
                     "type": "number",
@@ -5270,7 +5292,12 @@
                     "type": "string"
                 },
                 "targetType": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                        "VEN",
+                        "GROUP",
+                        "MARKET_CONTEXT"
+                    ]
                 }
             },
             "title": "DemandResponseEventTargetDto"
@@ -5940,9 +5967,6 @@
                 "reportRequestId": {
                     "type": "string"
                 },
-                "reportSpecifierId": {
-                    "type": "string"
-                },
                 "rid": {
                     "type": "string"
                 }
@@ -6252,8 +6276,20 @@
                 "commonName": {
                     "type": "string"
                 },
+                "groups": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "httpPullModel": {
                     "type": "boolean"
+                },
+                "marketContexts": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "needCertificateGeneration": {
                     "type": "string"
@@ -6272,6 +6308,12 @@
                 },
                 "reportOnly": {
                     "type": "boolean"
+                },
+                "resources": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "transport": {
                     "type": "string"

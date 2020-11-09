@@ -80,8 +80,6 @@ public class VenGroupDaoTest {
 		count = venGroupDao.count();
 		assertEquals(2, count);
 
-		venGroupDao.delete(venGroup);
-
 		findByVenGroupIterable = venService.findAll();
 		findByVenGroup = Lists.newArrayList(findByVenGroupIterable);
 		assertNotNull(findByVenGroup);
@@ -90,6 +88,7 @@ public class VenGroupDaoTest {
 		ven2 = venService.findOne(ven2.getId());
 		venService.delete(ven2);
 		venGroupDao.delete(venGroup2);
+		venGroupDao.delete(venGroup);
 
 	}
 }

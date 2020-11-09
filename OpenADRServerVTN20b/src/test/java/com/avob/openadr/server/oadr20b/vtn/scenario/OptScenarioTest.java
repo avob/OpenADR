@@ -34,8 +34,11 @@ import com.avob.openadr.model.oadr20b.xcal.VavailabilityType;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalNameEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
@@ -346,8 +349,8 @@ public class OptScenarioTest {
 		// create a dr event
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
-		signal.setSignalName("SIMPLE");
-		signal.setSignalType("level");
+		signal.setSignalName(DemandResponseEventSignalNameEnum.SIMPLE);
+		signal.setSignalType(DemandResponseEventSignalTypeEnum.LEVEL);
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		dto.getDescriptor().setMarketContext(OadrDataBaseSetup.MARKET_CONTEXT_NAME);
@@ -358,7 +361,7 @@ public class OptScenarioTest {
 		dto.getSignals().add(signal);
 		// ensure event status is "active"
 		dto.getActivePeriod().setStart(System.currentTimeMillis() - 10);
-		dto.getTargets().add(new DemandResponseEventTargetDto("ven", mockVen.getVenId()));
+		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, mockVen.getVenId()));
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.setPublished(true);
 		DemandResponseEventReadDto create = oadrMockHttpDemandResponseEventMvc

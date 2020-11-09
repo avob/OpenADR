@@ -24,7 +24,6 @@ public class Oadr20bEiEventSignalTypeBuilder {
 		eiEventSignalType.setSignalName(signalName.value());
 		eiEventSignalType.setSignalType(signalType);
 		eiEventSignalType.setIntervals(Oadr20bFactory.createIntervals());
-
 	}
 
 	public Oadr20bEiEventSignalTypeBuilder withItemBase(JAXBElement<? extends ItemBaseType> itemBase) {

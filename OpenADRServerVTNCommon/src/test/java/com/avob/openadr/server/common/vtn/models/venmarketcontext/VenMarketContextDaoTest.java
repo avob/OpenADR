@@ -80,7 +80,7 @@ public class VenMarketContextDaoTest {
 		count = venMarketContextDao.count();
 		assertEquals(2, count);
 
-		venMarketContextDao.delete(venGroup);
+		
 
 		findByVenGroupIterable = venService.findAll();
 		findByVenGroup = Lists.newArrayList(findByVenGroupIterable);
@@ -89,6 +89,7 @@ public class VenMarketContextDaoTest {
 
 		ven2 = venService.findOne(ven2.getId());
 		venService.delete(ven2);
+		venMarketContextDao.delete(venGroup);
 		venMarketContextDao.delete(venGroup2);
 
 	}

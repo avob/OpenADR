@@ -335,8 +335,8 @@ public class Oadr20aVTNEiEventService {
 			}
 
 			Oadr20aEiEventSignalTypeBuilder newOadr20bEiEventSignalTypeBuilder = Oadr20aBuilders
-					.newOadr20aEiEventSignalTypeBuilder("" + signalId, demandResponseEventSignal.getSignalName(),
-							SignalTypeEnumeratedType.fromValue(demandResponseEventSignal.getSignalType()),
+					.newOadr20aEiEventSignalTypeBuilder("" + signalId, demandResponseEventSignal.getSignalName().getLabel(),
+							SignalTypeEnumeratedType.fromValue(demandResponseEventSignal.getSignalType().getLabel()),
 							currentValue);
 
 			IntervalType interval = Oadr20aBuilders

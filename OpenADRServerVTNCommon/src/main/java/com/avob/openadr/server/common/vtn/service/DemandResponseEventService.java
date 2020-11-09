@@ -36,6 +36,7 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTarget;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetInterface;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
@@ -89,6 +90,8 @@ public class DemandResponseEventService {
 	public void init() throws DatatypeConfigurationException {
 		datatypeFactory = DatatypeFactory.newInstance();
 	}
+	
+	
 
 	private List<Ven> findVenForTarget(DemandResponseEvent event,
 			List<? extends DemandResponseEventTargetInterface> targets) {
@@ -96,7 +99,7 @@ public class DemandResponseEventService {
 		if (targets != null) {
 
 			for (DemandResponseEventTargetInterface target : targets) {
-				if ("ven".equals(target.getTargetType())) {
+				if (DemandResponseEventTargetTypeEnum.VEN.equals(target.getTargetType())) {
 					if (targetedSpecification == null) {
 						targetedSpecification = VenSpecification.hasVenIdEquals(target.getTargetId());
 					} else {
@@ -104,12 +107,19 @@ public class DemandResponseEventService {
 								.or(VenSpecification.hasVenIdEquals(target.getTargetId()));
 					}
 
-				} else if ("group".equals(target.getTargetType())) {
+				} else if (DemandResponseEventTargetTypeEnum.GROUP.equals(target.getTargetType())) {
 					if (targetedSpecification == null) {
 						targetedSpecification = VenSpecification.hasGroup(target.getTargetId());
 					} else {
 						targetedSpecification = targetedSpecification
 								.or(VenSpecification.hasGroup(target.getTargetId()));
+					}
+				} else if (DemandResponseEventTargetTypeEnum.MARKET_CONTEXT.equals(target.getTargetType())) {
+					if (targetedSpecification == null) {
+						targetedSpecification = VenSpecification.hasMarketContext(target.getTargetId());
+					} else {
+						targetedSpecification = targetedSpecification
+								.or(VenSpecification.hasMarketContext(target.getTargetId()));
 					}
 				}
 			}
@@ -313,19 +323,26 @@ public class DemandResponseEventService {
 		return demandResponseEventSignalDao.findByEvent(event);
 	}
 
+	@Transactional(readOnly = false)
 	public boolean delete(Long id) {
 		boolean exists = demandResponseEventDao.existsById(id);
 		if (exists) {
+			demandResponseEventSignalDao.deleteByEventId(id);
 			venDemandResponseEventDao.deleteByEventId(id);
 			demandResponseEventDao.deleteById(id);
 		}
 		return exists;
 	}
 
+	@Transactional(readOnly = false)
 	public void delete(Iterable<DemandResponseEvent> entities) {
+		List<Long> ids = new ArrayList<>();
+		for(DemandResponseEvent event: entities) {
+			ids.add(event.getId());
+		}
 		demandResponseEventSignalDao.deleteByEventIn(Lists.newArrayList(entities));
 		venDemandResponseEventDao.deleteByEventIn(Lists.newArrayList(entities));
-		demandResponseEventDao.deleteAll(entities);
+		demandResponseEventDao.deleteByIdIn(ids);
 	}
 
 	public boolean hasResponded(String venId, DemandResponseEvent event) {
@@ -447,5 +464,7 @@ public class DemandResponseEventService {
 
 		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size, SORT_ASC_ACTIVEPERIOD));
 	}
+	
+	
 
 }

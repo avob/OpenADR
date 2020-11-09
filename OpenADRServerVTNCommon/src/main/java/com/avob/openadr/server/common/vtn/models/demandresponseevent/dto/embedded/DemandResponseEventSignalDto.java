@@ -2,35 +2,29 @@ package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedd
 
 import java.util.List;
 
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalNameEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
+
 public class DemandResponseEventSignalDto {
-	private String signalName;
-	private String signalType;
-	private String unitType;
+	private DemandResponseEventSignalNameEnum signalName;
+	private DemandResponseEventSignalTypeEnum signalType;
 	private List<DemandResponseEventSignalIntervalDto> intervals;
 	private Float currentValue;
 
-	public String getSignalName() {
+	public DemandResponseEventSignalNameEnum getSignalName() {
 		return signalName;
 	}
 
-	public void setSignalName(String signalName) {
+	public void setSignalName(DemandResponseEventSignalNameEnum signalName) {
 		this.signalName = signalName;
 	}
 
-	public String getSignalType() {
+	public DemandResponseEventSignalTypeEnum getSignalType() {
 		return signalType;
 	}
 
-	public void setSignalType(String signalType) {
+	public void setSignalType(DemandResponseEventSignalTypeEnum signalType) {
 		this.signalType = signalType;
-	}
-
-	public String getUnitType() {
-		return unitType;
-	}
-
-	public void setUnitType(String unitType) {
-		this.unitType = unitType;
 	}
 
 	public List<DemandResponseEventSignalIntervalDto> getIntervals() {

@@ -1,8 +1,11 @@
 package com.avob.openadr.dummy;
 
+import java.lang.reflect.Type;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,21 +24,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.config.SimpleJmsListenerContainerFactory;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.converter.MessageConverter;
-import org.springframework.messaging.support.GenericMessage;
 
 import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.server.oadrvtn20b.api.DemandResponseControllerApi;
 import com.avob.server.oadrvtn20b.api.GroupControllerApi;
 import com.avob.server.oadrvtn20b.api.MarketContextControllerApi;
 import com.avob.server.oadrvtn20b.api.Oadr20bVenControllerApi;
 import com.avob.server.oadrvtn20b.api.ReportControllerApi;
 import com.avob.server.oadrvtn20b.api.VenControllerApi;
 import com.avob.server.oadrvtn20b.handler.ApiClient;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.avob.server.oadrvtn20b.model.OtherReportDataFloatDto;
+import com.google.common.reflect.TypeToken;
 import com.rabbitmq.jms.admin.RMQConnectionFactory;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -51,7 +51,26 @@ public class DummyVTN20bControllerConfig {
 	public static final String BROKER_HOST_CONF = "oadr.broker.host";
 
 	public static final String VTN_URL = "oadr.vtn.url";
+	
+	public static final String MARKET_CONTEXT = "DummyMarketContext";
 
+	public static final String MARKET_CONTEXT_DESCRIPTION = "DummyVTN20bController Market Context";
+
+	public static final String OADR_APP_NOTIFICATION_REGISTER_REPORT_TOPIC = "topic.app.notification.registerReport.*";
+	public static final String OADR_APP_NOTIFICATION_UPDATE_REPORT_TOPIC_FLOAT = "topic.app.notification.updateReport.float.*";
+	public static final String OADR_APP_NOTIFICATION_UPDATE_REPORT_TOPIC_RESOURCESTATUS = "topic.app.notification.updateReport.resourcestatus.*";
+	public static final String OADR_APP_NOTIFICATION_UPDATE_REPORT_TOPIC_KEYTOKEN = "topic.app.notification.updateReport.keytoken.*";
+
+	public static final DateTimeFormatter DATE_FORMATTER =  DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+	public static final Type floatListType = new TypeToken<ArrayList<OtherReportDataFloatDto>>() {
+		private static final long serialVersionUID = 1L;
+	}.getType();
+
+	public static final String CONTROLLED_VEN_CERTIFICATES = "oadr.ven.certificate";
+
+
+	@Value("${" + CONTROLLED_VEN_CERTIFICATES + "}")
+	private String controlledVenCertificates;
 
 	@Value("${" + PRIVATE_KEY_CONF + ":#{null}}")
 	private String key;
@@ -120,6 +139,20 @@ public class DummyVTN20bControllerConfig {
 	public GroupControllerApi groupControllerApi(ApiClient apiClient) {
 		return new GroupControllerApi(apiClient);
 	}	
+	
+	@Bean
+	public DemandResponseControllerApi demandResponseController(ApiClient apiClient) {
+		return new DemandResponseControllerApi(apiClient);
+	}	
+	
+	public List<String> getControlledVenCertificates() {
+		if (controlledVenCertificates != null) {
+			return Arrays.asList(controlledVenCertificates.split(","));
+		} else {
+			return new ArrayList<>();
+		}
+	}
+	
 
 	@Bean
 	@Profile("external")
@@ -173,7 +206,7 @@ public class DummyVTN20bControllerConfig {
 		return factory;
 	}
 
-
+	
 
 	private List<String> getTrustedCertificates() {
 		// load coma separated trust certificate list

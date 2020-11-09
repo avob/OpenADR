@@ -1,5 +1,6 @@
 package com.avob.openadr.server.oadr20b.vtn.service.ei;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Resource;
@@ -15,16 +16,21 @@ import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.builders.eiregisterparty.Oadr20bCreatedPartyRegistrationBuilder;
 import com.avob.openadr.model.oadr20b.ei.EiResponseType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
+import com.avob.openadr.model.oadr20b.exception.Oadr20bApplicationLayerException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatePartyRegistrationType;
+import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrQueryRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.server.common.vtn.VtnConfig;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
+import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.service.Oadr20bVTNSupportedProfileService;
+import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
 import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.service.push.Oadr20bAppNotificationPublisher;
 
@@ -58,6 +64,15 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 
 	@Resource
 	private Oadr20bVTNSupportedProfileService oadr20bVTNSupportedProfileService;
+	
+	@Resource
+	private DemandResponseEventService demandResponseEventService;
+	
+	@Resource
+	protected VenDistributeService venDistributeService;
+	
+	@Resource
+	private Oadr20bVTNEiEventService oadr20bVTNEiEventService;
 
 	private Object invalidRegistrationId(String requestId, String venId) {
 
@@ -111,6 +126,18 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 		ven.setReportOnly(oadrReportOnly);
 		ven.setXmlSignature(oadrXmlSignature);
 		venService.save(ven);
+		
+		List<DemandResponseEvent> findToSentEventByVenUsername = demandResponseEventService
+				.findToSentEventByVenUsername(ven.getUsername());
+		
+		 OadrDistributeEventType createOadrDistributeEventPayload = oadr20bVTNEiEventService
+				.createOadrDistributeEventPayload(ven.getUsername(), findToSentEventByVenUsername);
+		
+		try {
+			venDistributeService.distribute(ven, createOadrDistributeEventPayload);
+		} catch (Oadr20bApplicationLayerException e) {
+			LOGGER.error("Can't distribute payload to ven", e);
+		}
 
 		Oadr20bCreatedPartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatedPartyRegistrationBuilder(

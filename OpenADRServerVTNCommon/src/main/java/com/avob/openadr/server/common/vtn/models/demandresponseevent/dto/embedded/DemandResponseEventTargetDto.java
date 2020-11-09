@@ -1,26 +1,27 @@
 package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded;
 
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetInterface;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 
 public class DemandResponseEventTargetDto implements DemandResponseEventTargetInterface {
 
-	private String targetType;
+	private DemandResponseEventTargetTypeEnum targetType;
 
 	private String targetId;
 
 	public DemandResponseEventTargetDto() {
 	}
 
-	public DemandResponseEventTargetDto(String targetType, String targetId) {
+	public DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum targetType, String targetId) {
 		this.targetId = targetId;
 		this.targetType = targetType;
 	}
 
-	public String getTargetType() {
+	public DemandResponseEventTargetTypeEnum getTargetType() {
 		return targetType;
 	}
 
-	public void setTargetType(String targetType) {
+	public void setTargetType(DemandResponseEventTargetTypeEnum targetType) {
 		this.targetType = targetType;
 	}
 

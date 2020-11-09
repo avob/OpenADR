@@ -47,6 +47,7 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.crypto.util.PrivateKeyFactory;
+import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.operator.ContentSigner;
@@ -101,13 +102,16 @@ public class OadrPKISecurity {
 		Object readObject;
 		try {
 			readObject = parsePem(fileReader);
-			if (readObject instanceof PrivateKeyInfo) {
-				PrivateKeyInfo privateKeyInfo = (PrivateKeyInfo) readObject;
-				return new JcaPEMKeyConverter().setProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider())
-						.getPrivateKey(privateKeyInfo);
+			PrivateKeyInfo privateKeyInfo;
+			if (readObject instanceof PEMKeyPair) {
+				privateKeyInfo = ((PEMKeyPair) readObject).getPrivateKeyInfo();
+			} else if (readObject instanceof PrivateKeyInfo) {
+				privateKeyInfo = (PrivateKeyInfo) readObject;
 			} else {
 				throw new OadrSecurityException("private key file does not have good format");
 			}
+			return new JcaPEMKeyConverter().setProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider())
+					.getPrivateKey(privateKeyInfo);
 		} catch (IOException e) {
 			throw new OadrSecurityException(e);
 		}
@@ -208,7 +212,7 @@ public class OadrPKISecurity {
 	 * @throws OadrSecurityException
 	 */
 	public static KeyStore createTrustStore(List<String> certificates) throws KeyStoreException,
-			NoSuchAlgorithmException, CertificateException, IOException, OadrSecurityException {
+	NoSuchAlgorithmException, CertificateException, IOException, OadrSecurityException {
 		KeyStore ts = KeyStore.getInstance(KeyStore.getDefaultType());
 		ts.load(null, null);
 		String keyEntryPrefix = "trust_";
@@ -380,7 +384,7 @@ public class OadrPKISecurity {
 
 	private static X509Certificate signCsr(PKCS10CertificationRequest csr, KeyPair caKeyPair, X509Certificate caCert,
 			BigInteger serialNumber)
-			throws IOException, OperatorCreationException, CertificateException, NoSuchProviderException {
+					throws IOException, OperatorCreationException, CertificateException, NoSuchProviderException {
 
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 		AlgorithmIdentifier sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find("SHA256withRSA");
