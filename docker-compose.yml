@@ -38,6 +38,7 @@ services:
     depends_on:
       - "build"
 
+
   vtn20b:
     build: .docker/vtn20b
     depends_on:
@@ -54,8 +55,19 @@ services:
         aliases:
           - vtn.oadr.com
 
-  ven20b:
-    build: .docker/ven20b
+  dummy-vtn20b-controller:
+    build: .docker/dummy-vtn20b-controller
+    restart: always
+    depends_on:
+      - "build"
+      - "rabbitmq"
+      - "vtn20b"
+    networks:
+      default:
+      http:
+
+  dummy-ven20b:
+    build: .docker/dummy-ven20b
     restart: always
     ports:
       - "8083:8083"
@@ -63,6 +75,7 @@ services:
       - "build"
       - "openfire"
       - "vtn20b"
+      - "dummy-vtn20b-controller"
     networks:
       xmpp:
       http:

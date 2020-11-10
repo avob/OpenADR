@@ -259,13 +259,14 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 	private List<EiEventSignalType> createEventSignal(DemandResponseEvent drEvent, EventDescriptorType descriptor) {
 
 		List<EiEventSignalType> res = new ArrayList<>();
-		Long start = drEvent.getActivePeriod().getStart();
+		
 		int signalId = 0;
 		;
 		// signal name: MUST be 'simple' for 20a spec
 		String xmlDuration = drEvent.getActivePeriod().getDuration();
 
 		List<DemandResponseEventSignal> signals = demandResponseEventService.getSignals(drEvent);
+		Long start = drEvent.getActivePeriod().getStart();
 		for (DemandResponseEventSignal demandResponseEventSignal : signals) {
 			Float currentValue = 0F;
 			if (demandResponseEventSignal.getCurrentValue() != null) {
@@ -278,17 +279,22 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 							SignalTypeEnumeratedType.fromValue(demandResponseEventSignal.getSignalType().getLabel()),
 							currentValue);
 
+			
 			if (demandResponseEventSignal.getIntervals() != null
 					&& !demandResponseEventSignal.getIntervals().isEmpty()) {
+				
+				Long temp = start;
 				int intervalId = 0;
 				for (DemandResponseEventSignalInterval demandResponseEventSignalInterval : demandResponseEventSignal
 						.getIntervals()) {
 
+					temp = Oadr20bFactory.addXMLDurationToTimestamp(temp, demandResponseEventSignalInterval.getDuration());
 					IntervalType interval = Oadr20bEiBuilders.newOadr20bSignalIntervalTypeBuilder("" + intervalId,
-							start, demandResponseEventSignalInterval.getDuration(), demandResponseEventSignalInterval.getValue()).build();
+							temp, demandResponseEventSignalInterval.getDuration(), demandResponseEventSignalInterval.getValue()).build();
 					intervalId++;
 					newOadr20bEiEventSignalTypeBuilder.addInterval(interval);
 				}
+				
 			} else {
 				int intervalId = 0;
 				IntervalType interval = Oadr20bEiBuilders

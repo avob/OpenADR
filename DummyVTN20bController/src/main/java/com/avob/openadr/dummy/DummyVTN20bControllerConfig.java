@@ -162,11 +162,6 @@ public class DummyVTN20bControllerConfig {
 		rmqConnectionFactory.setPort(brokerPort);
 		rmqConnectionFactory.setUsername(brokerUser);
 		rmqConnectionFactory.setPassword(brokerPass);
-		String password = UUID.randomUUID().toString();
-		SSLContext sslContext = OadrPKISecurity.createSSLContext(key, cert, getTrustedCertificates(), password);
-
-
-		rmqConnectionFactory.useSslProtocol(sslContext);
 		return rmqConnectionFactory;
 	}
 

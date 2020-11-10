@@ -96,7 +96,7 @@ public class DemandResponseController {
 
 		response.setStatus(HttpStatus.CREATED_201);
 
-		LOGGER.info("create DR event: " + save.toString());
+		LOGGER.info("create DR event: " + save.getId());
 
 		return dtoMapper.map(save, DemandResponseEventReadDto.class);
 
@@ -117,7 +117,7 @@ public class DemandResponseController {
 
 		response.setStatus(HttpStatus.OK_200);
 
-		LOGGER.info("update DR event: " + save.toString());
+		LOGGER.info("update DR event: " + save.getId());
 
 		return dtoMapper.map(save, DemandResponseEventReadDto.class);
 
@@ -136,7 +136,7 @@ public class DemandResponseController {
 
 		response.setStatus(HttpStatus.OK_200);
 
-		LOGGER.info("active DR event: " + event.toString());
+		LOGGER.info("active DR event: " + event.getId());
 
 		return dtoMapper.map(event, DemandResponseEventReadDto.class);
 
@@ -155,7 +155,7 @@ public class DemandResponseController {
 
 		response.setStatus(HttpStatus.OK_200);
 
-		LOGGER.info("active DR event: " + event.toString());
+		LOGGER.info("active DR event: " + event.getId());
 
 		return dtoMapper.map(event, DemandResponseEventReadDto.class);
 
@@ -174,7 +174,7 @@ public class DemandResponseController {
 
 		response.setStatus(HttpStatus.OK_200);
 
-		LOGGER.info("cancel DR event: " + event.toString());
+		LOGGER.info("cancel DR event: " + event.getId());
 
 		return dtoMapper.map(event, DemandResponseEventReadDto.class);
 
@@ -189,7 +189,7 @@ public class DemandResponseController {
 			return null;
 		}
 		DemandResponseEvent event = op.get();
-		LOGGER.info("read DR event: " + event.toString());
+		LOGGER.info("read DR event: " + event.getId());
 		return dtoMapper.map(event, DemandResponseEventReadDto.class);
 
 	}

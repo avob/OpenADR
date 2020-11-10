@@ -55,7 +55,7 @@ import com.avob.openadr.server.oadr20b.ven.VEN20bApplicationTest;
 import com.avob.openadr.server.oadr20b.ven.VenConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiEventService;
-import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiEventService.Oadr20bVENEiEventServiceListener;
+import com.avob.openadr.server.oadr20b.ven.timeline.Timeline.EventTimelineListener;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VEN20bApplicationTest.class })
@@ -94,7 +94,7 @@ public class Oadr20bVENEiEventControllerTest {
 	
 	private Oadr20bJAXBContext jaxbContext;
 
-	private class Oadr20bVENEiEventListener implements Oadr20bVENEiEventServiceListener {
+	private class Oadr20bVENEiEventListener implements EventTimelineListener {
 
 		private Map<String, OadrEvent> events = new HashMap<>();
 
@@ -103,19 +103,19 @@ public class Oadr20bVENEiEventControllerTest {
 		}
 
 		@Override
-		public void onCreateEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
+		public void onCreatedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
 			events.put(event.getEiEvent().getEventDescriptor().getEventID(), event);
 
 		}
 
 		@Override
-		public void onUpdateEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
+		public void onUpdatedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
 			events.put(event.getEiEvent().getEventDescriptor().getEventID(), event);
 
 		}
 
 		@Override
-		public void onDeleteEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
+		public void onDeletedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
 			events.remove(event.getEiEvent().getEventDescriptor().getEventID());
 
 		}
@@ -128,10 +128,22 @@ public class Oadr20bVENEiEventControllerTest {
 		}
 
 		@Override
-		public void onLastIntervalEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+		public void onIntervalEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
 				EiEventSignalType eiEventSignalType, IntervalType intervalType) {
 			// TODO Auto-generated method stub
 
+		}
+
+		@Override
+		public void onActivePeriodStart(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onActivePeriodEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
+			// TODO Auto-generated method stub
+			
 		}
 
 	}

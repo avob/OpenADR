@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Resource;
 
@@ -47,6 +48,8 @@ public class RequestedReportSimulator {
 
 	@Resource
 	private OadrAction oadrAction;
+	
+	private AtomicInteger currentValue = new AtomicInteger(Float.floatToIntBits(-1F));
 
 	private Map<String, Map<String, Map<String, OadrReportRequestType>>> requestedReport = new HashMap<>();
 
@@ -56,7 +59,13 @@ public class RequestedReportSimulator {
 	private Map<String,  Map<String, Map<String, Map<String, TreeMap<Long, Float>>>>>simulateReadingBuffer = new HashMap<>();
 	private Map<String, VtnSessionConfiguration> vtnSessionConfig = new HashMap<>();
 
+	public Float getCurrentValue() {
+		return Float.intBitsToFloat(currentValue.get());
+	}
 
+	public void setCurrentValue(Float currentValue) {
+		this.currentValue.set(Float.floatToIntBits(currentValue));
+	}
 
 	public void create(VtnSessionConfiguration vtnConfig, OadrCreateReportType oadrCreateReportType) {
 		for (OadrReportRequestType oadrReportRequestType : oadrCreateReportType.getOadrReportRequest()) {
@@ -162,6 +171,8 @@ public class RequestedReportSimulator {
 	public List<String> getPendingRequestReport() {
 		return new ArrayList<>(requestedReport.keySet());
 	}
+
+	
 
 	private class ReportBackTask implements Runnable {
 
@@ -295,8 +306,7 @@ public class RequestedReportSimulator {
 			if(ridMap == null) {
 				ridMap = new TreeMap<>();
 			}
-			Float value = 1F;
-			ridMap.put(start.toInstant().toEpochMilli(), value );
+			ridMap.put(start.toInstant().toEpochMilli(), getCurrentValue() );
 			reportSpecifierMap.put(rid, ridMap);
 			reportRequestMap.put( reportSpecifierId, reportSpecifierMap);
 			vtnMap.put(reportRequestId, reportRequestMap);

@@ -9,8 +9,6 @@ COPY --from=openadr_build:latest /opt/oadr/cert /opt/oadr-vtn20b/cert
 COPY --from=openadr_build:latest /opt/oadr/vtn20b/*.jar /opt/oadr-vtn20b/
 COPY --from=openadr_build:latest /opt/oadr/lib/* /opt/oadr-vtn20b/lib/
 
-RUN ls -al /opt/oadr-vtn20b/lib/
-
 COPY application.properties /opt/oadr-vtn20b/application.properties
 COPY loader.properties /opt/oadr-vtn20b/loader.properties
 COPY log4j2.xml /opt/oadr-vtn20b/log4j2.xml

@@ -278,8 +278,6 @@ public class VtnConfig {
 		brokerUrl = "tcp://" + getBrokerHost() + ":" + getBrokerPort();
 		sslBrokerUrl = "ssl://" + brokerSslHost + ":" + brokerSslPort;
 
-		LOGGER.debug("Initialized VTN configuration:");
-		LOGGER.debug(this.toString());
 	}
 
 	public boolean hasExternalRabbitMQBroker() {
@@ -405,23 +403,6 @@ public class VtnConfig {
 
 	public String getValidateOadrPayloadAgainstXsdFilePath() {
 		return validateOadrPayloadAgainstXsdFilePath;
-	}
-
-	@Override
-	public String toString() {
-		return "VtnConfig [contextPath=" + contextPath + "\n, port=" + port + "\n, trustCertificatesStr="
-				+ trustCertificatesStr + "\n, key=" + key + "\n, cert=" + cert + "\n, xmppCert=" + xmppCert + "\n, xmppKey="
-				+ xmppKey + "\n, supportPush=" + supportPush + "\n, supportUnsecuredHttpPush=" + supportUnsecuredHttpPush
-				+ "\n, pullFrequencySeconds=" + pullFrequencySeconds 
-				+ "\n, validateOadrPayloadAgainstXsd=" + validateOadrPayloadAgainstXsd
-				+ "\n, validateOadrPayloadAgainstXsdFilePath=" + validateOadrPayloadAgainstXsdFilePath + "\n, vtnId="
-				+ vtnId + "\n, replayProtectAcceptedDelaySecond=" + replayProtectAcceptedDelaySecond + "\n, caKey=" + caKey
-				+ "\n, caCert=" + caCert + "\n, brokerHost=" + brokerHost + "\n, brokerPort=" + brokerPort + "\n, brokerUser="
-				+ brokerUser + "\n, brokerPass=" + brokerPass + "\n, brokerSslPort=" + brokerSslPort + "\n, brokerSslHost="
-				+ brokerSslHost + "\n, xmppHost=" + xmppHost + "\n, xmppPort=" + xmppPort + "\n, xmppDomain=" + xmppDomain
-				+ "\n, oadr20bFingerprint=" + oadr20bFingerprint + "\n, oadr20aFingerprint=" + oadr20aFingerprint
-				+ "\n, xmppOadr20bFingerprint=" + xmppOadr20bFingerprint + "\n, xmppOadr20aFingerprint="
-				+ xmppOadr20aFingerprint + "\n, brokerUrl=" + brokerUrl + "\n, sslBrokerUrl=" + sslBrokerUrl + "]";
 	}
 
 }

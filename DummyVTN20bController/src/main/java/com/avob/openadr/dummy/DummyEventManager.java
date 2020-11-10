@@ -111,12 +111,12 @@ public class DummyEventManager {
 
 
 
-		this.ensureEventAreCreatedForNext6Hours(truncatedTo, events);
+		this.ensureEventAreCreatedForNextHour(truncatedTo, events);
 
 
 	}
 
-	private void ensureEventAreCreatedForNext6Hours(OffsetDateTime start, List<DemandResponseEventReadDto> existingEvents) {
+	private void ensureEventAreCreatedForNextHour(OffsetDateTime start, List<DemandResponseEventReadDto> existingEvents) {
 
 
 		OffsetDateTime temp = start;
@@ -125,7 +125,7 @@ public class DummyEventManager {
 			existingStart.add(event.getActivePeriod().getStart());
 		}
 
-		for(int i=0; i<6; i++) {
+		for(int i=0; i<5 * 6 * 2; i++) {
 			if(!existingStart.contains(temp.toEpochSecond()*1000)) {
 				DemandResponseEventCreateDto createEvent = this.createEvent(temp.toEpochSecond()*1000);
 				try {
@@ -137,7 +137,7 @@ public class DummyEventManager {
 					LOGGER.error("Event can't be created", e);
 				};
 			}
-			temp = temp.plusHours(1);
+			temp = temp.plusMinutes(2);
 		}
 
 
@@ -146,7 +146,7 @@ public class DummyEventManager {
 	private DemandResponseEventCreateDto createEvent(Long start) {
 		DemandResponseEventCreateDto event = new DemandResponseEventCreateDto();
 
-		String duration = "PT1H";
+		String duration = "PT2M";
 		String notificationDuration = "P1D";
 		String toleranceDuration = "PT5M";
 		DemandResponseEventActivePeriodDto activePeriod = new DemandResponseEventActivePeriodDto()
@@ -168,8 +168,8 @@ public class DummyEventManager {
 				.signalName(SignalNameEnum.SIMPLE)
 				.signalType(SignalTypeEnum.LEVEL);
 
-		String intervalDuration = "PT15M";
-		for(int i=0; i < 4; i++) {
+		String intervalDuration = "PT1M";
+		for(int i=0; i < 2; i++) {
 			Float value = Float.valueOf(i);
 			DemandResponseEventSignalIntervalDto intervalsItem = new DemandResponseEventSignalIntervalDto()
 					.duration(intervalDuration )

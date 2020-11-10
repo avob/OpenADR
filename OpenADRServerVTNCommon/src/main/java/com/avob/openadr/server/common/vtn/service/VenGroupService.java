@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDao;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
-import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 
 @Service
 public class VenGroupService {

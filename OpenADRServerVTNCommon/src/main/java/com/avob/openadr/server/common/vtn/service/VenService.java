@@ -190,7 +190,13 @@ public class VenService extends AbstractUserService<Ven> {
 	
 	
 	public void addVenDemandResponseEvent(Ven ven, DemandResponseEvent event) {
-		venDemandResponseEventDao.save(new VenDemandResponseEvent(event, ven));
+		VenDemandResponseEvent el = venDemandResponseEventDao
+				.findOneByEventIdAndVenUsername(event.getId(), ven.getUsername());
+		
+		if(el == null) {
+			el = new VenDemandResponseEvent(event, ven);
+		}
+		venDemandResponseEventDao.save(el);
 	}
 	
 	@Transactional

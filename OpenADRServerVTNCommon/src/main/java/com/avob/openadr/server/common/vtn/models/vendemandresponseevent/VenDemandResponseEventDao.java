@@ -15,8 +15,6 @@ import com.avob.openadr.server.common.vtn.models.ven.Ven;
 @Transactional
 public interface VenDemandResponseEventDao extends CrudRepository<VenDemandResponseEvent, Long> {
 
-	public List<VenDemandResponseEvent> findByEventAndVen(DemandResponseEvent event, Ven ven);
-
 	public List<VenDemandResponseEvent> findByEvent(DemandResponseEvent event);
 
 	@Query(value = "select r from VenDemandResponseEvent r inner join r.event e where r.ven.username = :venUsername and r.event.id = :eventId")

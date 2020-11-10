@@ -5,14 +5,13 @@ RUN mkdir /var/log/oadr-ven20b
 RUN mkdir /var/run/oadr-ven20b
 
 COPY --from=openadr_build:latest /opt/oadr/cert /opt/oadr-ven20b/cert
-COPY --from=openadr_build:latest /opt/oadr/ven20b/*.jar /opt/oadr-ven20b/
+COPY --from=openadr_build:latest /opt/oadr/dummy-ven20b/*.jar /opt/oadr-ven20b/
 
 COPY http.properties /opt/oadr-ven20b/application.properties
 RUN mv /opt/oadr-ven20b/*.jar /opt/oadr-ven20b/oadr-ven20b.jar
 
-COPY wait-fot-it.sh /opt/oadr-ven20b/wait-fot-it.sh
+COPY wait-for-it.sh /opt/oadr-ven20b/wait-for-it.sh
+RUN chmod +x /opt/oadr-ven20b/wait-for-it.sh
 
-RUN chmod +x /opt/oadr-ven20b/wait-fot-it.sh
-
-CMD ["/opt/oadr-ven20b/wait-fot-it.sh", "vtn.oadr.com:8081", "-t", "30", "--" \
+CMD ["/opt/oadr-ven20b/wait-for-it.sh", "vtn.oadr.com:8081", "-t", "60", "--" \
 	, "java", "-jar", "/opt/oadr-ven20b/oadr-ven20b.jar", "--spring.config.location=/opt/oadr-ven20b/application.properties"]

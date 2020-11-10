@@ -41,6 +41,7 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureValidationExc
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.security.OadrPKISecurity;
@@ -282,6 +283,17 @@ public class MultiVtnConfig {
 			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrRegisterReport(payload);
 		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
 			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrRegisterReport(payload);
+		}
+	}
+	
+	public void oadrCreatedEvent(VtnSessionConfiguration vtnConfiguration, OadrCreatedEventType payload)
+			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
+			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
+			Oadr20bMarshalException, InterruptedException {
+		if (vtnConfiguration.getVtnUrl() != null) {
+			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrCreatedEvent(payload);
+		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
+			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrCreatedEvent(payload);
 		}
 	}
 

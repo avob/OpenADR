@@ -9,8 +9,11 @@ Module | Description
 ------------- | ------------- 
 OpenADRSecurity | OADR security framework (authentication, xmlSignature)
 OpenADRModel20b | OADR 2.0b model java classes generated from XSDL definition file
-OpenADRServerVEN20b | OADR 2.0b VEN skeleton implementation
-OpenADRServerVTN20b | OADR 2.0b VTN skeleton implementation
+OpenADRServerVEN20b | OADR 2.0b VEN library
+OpenADRServerVTN20b | OADR 2.0b VTN implementation
+DummyVEN20b | Dummy OADR 2.0b VEN implementation
+DummyVTN20bController | OADR 2.0b VTN controller implementation acting DRProgram and Device manager
+
 
 ## Certificates
 
@@ -28,6 +31,19 @@ This command will create several VTN / VEN certificates upon a self-signed gener
 - Add "127.0.0.1 vtn.oadr.com" to your local "/etc/hosts"
 
 ## Build docker images
+
+Build full OADR infrastructure composed of:
+- DB (postgres)
+- XMPP broker (Openfire)
+- AMPQ broker (RabbitMQ)
+- oadr vtn 2.0b
+- dummy oadr ven 2.0b
+- dummy oadr vtn 2.0b controller
+
+Docker will build application if it is not already build. You can build locally to speed things up:
+```shell
+	mvn package -P external,frontend -DskipTests=true 
+```
 
 ### Requirement
 
