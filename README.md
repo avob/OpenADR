@@ -115,31 +115,31 @@ The VTN controller is notified by VTN using AMQP when VTN receive payload from V
 	participant "dummy-vtn20b-controller" as dummyVtnController #FFF
 
 	group Device provisionning
-	dummyVtnController --> vtn: Creates MarketContext / VEN
-	dummyVtnController --> vtn: Enrolls VEN to MarketContext
+	dummyVtnController -[#green]> vtn: Creates MarketContext / VEN
+	dummyVtnController -[#green]> vtn: Enrolls VEN to MarketContext
 	end 
 
 	group Device registration
-	dummyVen --> vtn: Creates registration party
-	vtn --> dummyVtnController: Notify registration
+	dummyVen -[#red]> vtn: Creates registration party
+	vtn -[#blue]> dummyVtnController: Notify registration
 
 
 
-	dummyVen --> vtn: Registers reports
-	vtn --> dummyVtnController: Notify register reports
-	dummyVtnController--> vtn: Subscribes reports
-	vtn --> dummyVen: Creates reports subscription
+	dummyVen -[#red]> vtn: Registers reports
+	vtn -[#blue]> dummyVtnController: Notify register reports
+	dummyVtnController-[#green]> vtn: Subscribes reports
+	vtn -[#red]> dummyVen: Creates reports subscription
 	end
 
 	group Normal workflow
 	group DRProgram
-	dummyVtnController --> vtn: Creates DREvents in MarketContext
-	dummyVen <-- vtn: Send DREvents
+	dummyVtnController -[#green]> vtn: Creates DREvents in MarketContext
+	dummyVen <[#red]- vtn: Send DREvents
 	end
 	group Data reading
-	dummyVen --> dummyVen: Simulate data readings\n based on received DREvents
-	dummyVen --> vtn: Updates reports
-	vtn --> dummyVtnController: Notify data update
+	dummyVen -[#black]-> dummyVen: Simulate data readings\n based on received DREvents
+	dummyVen -[#red]> vtn: Updates reports
+	vtn -[#blue]> dummyVtnController: Notify data update
 	end
 
 	end
