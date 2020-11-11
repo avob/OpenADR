@@ -61,6 +61,7 @@ Run a demo of a full 2.0b OADR stack infrastructure interacting with a dummy VEN
 ### Components diagram
 
 <div hidden>
+
 ```
 @startuml demo_component_diagram
 
@@ -91,9 +92,9 @@ rabbitmq -down-> vtn #green;line.bold;text:green : AUTH(HTTP)
 dummyVtnController -up-> vtn #green;line.bold;text:green : DATA(HTTP)
 dummyVtnController <-- rabbitmq #blue;line.bold;text:blue   : DATA(AMPQ)
 
-
 @enduml
 ```
+
 </div>
 
 ![](demo_component_diagram.svg)
@@ -101,6 +102,7 @@ dummyVtnController <-- rabbitmq #blue;line.bold;text:blue   : DATA(AMPQ)
 ### Sequence diagram
 
 <div hidden>
+
 ```
 @startuml demo_sequence_diagram
 
@@ -140,6 +142,7 @@ end
 
 @enduml
 ```
+
 </div>
 
 ![](demo_sequence_diagram.svg)
