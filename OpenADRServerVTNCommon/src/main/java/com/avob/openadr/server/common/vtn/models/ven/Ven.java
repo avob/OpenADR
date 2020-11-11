@@ -117,12 +117,6 @@ public class Ven extends AbstractUser {
 		this.transport = transport;
 	}
 
-	@Override
-	public String toString() {
-		return "Ven [id=" + this.getId() + ", username=" + this.getUsername() + ", oadrName=" + oadrName
-				+ ", oadrProfil=" + oadrProfil + ", transport=" + transport + ", pushUrl=" + getPushUrl() + "]";
-	}
-
 	public Set<VenGroup> getVenGroups() {
 		return venGroups;
 	}
@@ -232,6 +226,14 @@ public class Ven extends AbstractUser {
 
 	public void setVenDemandResponseEvent(List<VenDemandResponseEvent> venDemandResponseEvent) {
 		this.venDemandResponseEvent = venDemandResponseEvent;
+	}
+	
+	@Override
+	public String toString() {
+		return "Ven [oadrName=" + oadrName + ", oadrProfil=" + oadrProfil + ", transport=" + transport + ", pushUrl="
+				+ pushUrl + ", registrationId=" + registrationId + ", httpPullModel=" + httpPullModel + ", reportOnly="
+				+ reportOnly + ", xmlSignature=" + xmlSignature + ", pullFrequencySeconds=" + pullFrequencySeconds
+				+ ", lastUpdateDatetime=" + lastUpdateDatetime + "]";
 	}
 
 }

@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  build:
+    build:
+      context: .
+      dockerfile: Dockerfile-build
+
+  postgres:
+    build: .docker/postgres
+    environment:
+      - POSTGRES_PASSWORD=supersecure
+    depends_on:
+      - "build"
+
+  openfire:
+    build: .docker/openfire
+    depends_on:
+      - "build"
+      - "postgres"
+    ports:
+      - "5222:5222"
+      - "9090:9090"
+    extra_hosts:
+      - "vtn.oadr.com:192.168.65.2"
+
+  rabbitmq:
+    build: .docker/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    depends_on:
+      - "build"
+

@@ -287,7 +287,7 @@ public class RequestedReportSimulator {
 		@Override
 		public void run() {
 
-			LOGGER.info(String.format("Simulate date %s %s %s %s", vtnId, reportRequestId, reportSpecifierId, rid));
+			LOGGER.info(String.format("Simulate data: %s %s %s %s", vtnId, reportRequestId, reportSpecifierId, rid));
 
 
 			Map<String, Map<String, Map<String, TreeMap<Long, Float>>>> vtnMap = simulateReadingBuffer.get(vtnId);

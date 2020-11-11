@@ -36,7 +36,11 @@ This command will create several VTN / VEN / User / App certificates upon a self
 
 ## Oadr demo
 
-Run a demo of a full 2.0b OADR stack infrastructure interacting with a dummy VEN and a dummy VTN controller. The VTN controller is acting as both a device manager by creating VEN authorization / subscribing to VEN reports, and a DemandResponseProgram manager by creating DREvents. The dummy VEN implementation will simulate data reading using information gathered in DREvents and continuously push them to the VTN. The VTN controller is notified by VTN using AMPQ when VTN receive payload from VEN (createRegistrationParty, registerReport, updateReports).
+Run a demo of a full 2.0b OADR stack infrastructure interacting with a dummy VEN and a dummy VTN controller. OpenADR communications between VEN and VTN are transported by XMPP. VEN authentication use x509 client certificates and payloads are secured with XML signatures.
+
+The VTN controller is acting as both a device manager by creating VEN authorization / subscribing to VEN reports, and a DemandResponseProgram manager by creating DREvents. The dummy VEN implementation will simulate data reading using information gathered in DREvents and continuously push them to the VTN. 
+
+The VTN controller is notified by VTN using AMQP when VTN receive payload from VEN (createRegistrationParty, registerReport, updateReports).
 
 ### Requirement
 
@@ -46,7 +50,7 @@ Run a demo of a full 2.0b OADR stack infrastructure interacting with a dummy VEN
 ### Run
 
 ```shell
-	docker-compose up
+	docker-compose up --build
 ```
 
 ### Endpoints
@@ -83,14 +87,14 @@ Run a demo of a full 2.0b OADR stack infrastructure interacting with a dummy VEN
 
 	vtn <-up-> openfire #line:red;line.bold;text:red  : OADR(XMPP)
 	openfire -> vtn #green;line.bold;text:green : AUTH(HTTP)
-	vtn -down-> rabbitmq #blue;line.bold;text:blue   : DATA(AMPQ)
+	vtn -down-> rabbitmq #blue;line.bold;text:blue   : DATA(AMQP)
 	dummyVen <--> vtn #green;line.bold;text:green : OADR(HTTP)
 	dummyVen <-> openfire #line:red;line.bold;text:red  : OADR(XMPP)
 	openfire -> postgres #black;line.dotted;text:black
 	vtn -> postgres #black;line.dotted;text:black
 	rabbitmq -down-> vtn #green;line.bold;text:green : AUTH(HTTP)
 	dummyVtnController -up-> vtn #green;line.bold;text:green : DATA(HTTP)
-	dummyVtnController <-- rabbitmq #blue;line.bold;text:blue   : DATA(AMPQ)
+	dummyVtnController <-- rabbitmq #blue;line.bold;text:blue   : DATA(AMQP)
 
 	@enduml
 	```
@@ -147,16 +151,28 @@ Run a demo of a full 2.0b OADR stack infrastructure interacting with a dummy VEN
 ![](demo_sequence_diagram.svg)
 
 
-## Test project
+## Test / build project
 
 ### Requirements
 - Backend build dependencies: Java 11 / Maven 3
 - Frontend build dependencies: NodeJS 8.15.0 / NPM 6.4.1
 
-### Run
+### Test
 
 ```shell
 	mvn clean verify
+```
+
+### Compile for external use (AMQP broker and DB middleware must be provided)
+
+```shell
+	mvn clean package -P external,frontend 
+```
+
+### Compile for standalone use (in-memory AMQP broker and DB)
+
+```shell
+	mvn clean package
 ```
 
 ## Links

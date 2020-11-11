@@ -69,85 +69,94 @@ public class MultiVtnConfig {
 
 	private Map<String, OadrXmppVenClient20b> multiXmppClientConfig = new HashMap<String, OadrXmppVenClient20b>();
 
+
+
 	private void configureClient(VtnSessionConfiguration session)
 			throws OadrSecurityException, JAXBException, OadrVTNInitializationException {
 
-		if (session.getVtnUrl() != null) {
-			OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(session.getVtnUrl())
-					.withTrustedCertificate(
-							new ArrayList<String>(session.getVenSessionConfig().getTrustCertificates()))
-					.withPooling(1, 1).withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers());
+		if (session.getVtnXmppHost() != null && session.getVtnXmppPort() != null) {
+			configureXMPPClient(session);
+		} else if (session.getVtnUrl() != null) {
+			configureHTTPClient(session);
+		}
+	}
 
-			if (session.isBasicAuthenticationConfigured()) {
-				LOGGER.info("Init HTTP VEN client with basic authentication");
-				builder.withDefaultBasicAuthentication(session.getVtnUrl(),
-						session.getVenSessionConfig().getBasicUsername(),
-						session.getVenSessionConfig().getBasicPassword());
+	private void configureHTTPClient(VtnSessionConfiguration session)
+			throws OadrSecurityException, JAXBException, OadrVTNInitializationException {
+		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(session.getVtnUrl())
+				.withTrustedCertificate(
+						new ArrayList<String>(session.getVenSessionConfig().getTrustCertificates()))
+				.withPooling(1, 1).withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers());
 
-			} else if (session.isDigestAuthenticationConfigured()) {
-				LOGGER.info("Init HTTP VEN client with digest authentication");
-				builder.withDefaultDigestAuthentication(session.getVtnUrl(),
-						session.getVenSessionConfig().getDigestRealm(), "",
-						session.getVenSessionConfig().getDigestUsername(),
-						session.getVenSessionConfig().getDigestPassword());
+		if (session.isBasicAuthenticationConfigured()) {
+			LOGGER.info("Init HTTP VEN client with basic authentication");
+			builder.withDefaultBasicAuthentication(session.getVtnUrl(),
+					session.getVenSessionConfig().getBasicUsername(),
+					session.getVenSessionConfig().getBasicPassword());
 
-			} else {
-				builder.withX509Authentication(session.getVenSessionConfig().getVenPrivateKeyPath(),
-						session.getVenSessionConfig().getVenCertificatePath());
-			}
+		} else if (session.isDigestAuthenticationConfigured()) {
+			LOGGER.info("Init HTTP VEN client with digest authentication");
+			builder.withDefaultDigestAuthentication(session.getVtnUrl(),
+					session.getVenSessionConfig().getDigestRealm(), "",
+					session.getVenSessionConfig().getDigestUsername(),
+					session.getVenSessionConfig().getDigestPassword());
 
-			OadrHttpVenClient20b client = null;
-			if (venConfig.getXmlSignature()) {
-				client = new OadrHttpVenClient20b(
-						new OadrHttpClient20b(builder.build(), session.getVenSessionConfig().getVenPrivateKeyPath(),
-								session.getVenSessionConfig().getVenCertificatePath(),
-								session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond()));
-			} else {
-				client = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
-			}
-
-			getMultiHttpClientConfig().put(session.getVtnId(), client);
-		} else if (session.getVtnXmppHost() != null && session.getVtnXmppPort() != null) {
-
-			try {
-				String password = UUID.randomUUID().toString();
-				SSLContext sslContext = OadrPKISecurity.createSSLContext(
-						session.getVenSessionConfig().getVenPrivateKeyPath(),
-						session.getVenSessionConfig().getVenCertificatePath(),
-						session.getVenSessionConfig().getTrustCertificates(), password);
-
-				OadrXmppClient20bBuilder builder = new OadrXmppClient20bBuilder()
-						.withHostAndPort(session.getVtnXmppHost(), session.getVtnXmppPort())
-						.withVenID(venConfig.getVenId()).withResource("client").withSSLContext(sslContext)
-						.withListener(xmppVenListeners);
-
-				if (session.getVtnXmppDomain() != null) {
-					builder.withDomain(session.getVtnXmppDomain());
-				}
-
-				if (session.getVtnXmppUser() != null && session.getVtnXmppPass() != null) {
-					builder.withPassword(session.getVtnXmppPass());
-				}
-
-				OadrXmppClient20b oadrXmppClient20b = builder.build();
-
-				OadrXmppVenClient20b venClient = null;
-				if (venConfig.getXmlSignature()) {
-					venClient = new OadrXmppVenClient20b(oadrXmppClient20b,
-							session.getVenSessionConfig().getVenPrivateKeyPath(),
-							session.getVenSessionConfig().getVenCertificatePath(),
-							session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond());
-				} else {
-					venClient = new OadrXmppVenClient20b(oadrXmppClient20b);
-				}
-				putMultiXmppClientConfig(session, venClient);
-
-			} catch (OadrSecurityException | OadrXmppException e) {
-				throw new OadrVTNInitializationException(e);
-			}
-
+		} else {
+			builder.withX509Authentication(session.getVenSessionConfig().getVenPrivateKeyPath(),
+					session.getVenSessionConfig().getVenCertificatePath());
 		}
 
+		OadrHttpVenClient20b client = null;
+		if (venConfig.getXmlSignature()) {
+			client = new OadrHttpVenClient20b(
+					new OadrHttpClient20b(builder.build(), session.getVenSessionConfig().getVenPrivateKeyPath(),
+							session.getVenSessionConfig().getVenCertificatePath(),
+							session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond()));
+		} else {
+			client = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
+		}
+
+		getMultiHttpClientConfig().put(session.getVtnId(), client);
+	}
+
+	private void configureXMPPClient(VtnSessionConfiguration session)
+			throws OadrSecurityException, JAXBException, OadrVTNInitializationException {
+		try {
+			String password = UUID.randomUUID().toString();
+			SSLContext sslContext = OadrPKISecurity.createSSLContext(
+					session.getVenSessionConfig().getVenPrivateKeyPath(),
+					session.getVenSessionConfig().getVenCertificatePath(),
+					session.getVenSessionConfig().getTrustCertificates(), password);
+
+			OadrXmppClient20bBuilder builder = new OadrXmppClient20bBuilder()
+					.withHostAndPort(session.getVtnXmppHost(), session.getVtnXmppPort())
+					.withVenID(venConfig.getVenId()).withResource("client").withSSLContext(sslContext)
+					.withListener(xmppVenListeners);
+
+			if (session.getVtnXmppDomain() != null) {
+				builder.withDomain(session.getVtnXmppDomain());
+			}
+
+			if (session.getVtnXmppUser() != null && session.getVtnXmppPass() != null) {
+				builder.withPassword(session.getVtnXmppPass());
+			}
+
+			OadrXmppClient20b oadrXmppClient20b = builder.build();
+
+			OadrXmppVenClient20b venClient = null;
+			if (venConfig.getXmlSignature()) {
+				venClient = new OadrXmppVenClient20b(oadrXmppClient20b,
+						session.getVenSessionConfig().getVenPrivateKeyPath(),
+						session.getVenSessionConfig().getVenCertificatePath(),
+						session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond());
+			} else {
+				venClient = new OadrXmppVenClient20b(oadrXmppClient20b);
+			}
+			putMultiXmppClientConfig(session, venClient);
+
+		} catch (OadrSecurityException | OadrXmppException e) {
+			throw new OadrVTNInitializationException(e);
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -158,23 +167,23 @@ public class MultiVtnConfig {
 		Properties props = new Properties();
 		MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
 		StreamSupport.stream(propSrcs.spliterator(), false).filter(ps -> ps instanceof EnumerablePropertySource)
-				.map(ps -> ((EnumerablePropertySource) ps).getPropertyNames()).flatMap(Arrays::<String>stream)
-				.forEach(propName -> {
-					if (propName.contains(dynamicConfigurationPattern)) {
-						String replaceAll = propName.replaceAll(dynamicConfigurationPattern, "");
-						String key = replaceAll.split("\\.")[0];
-						Properties vtnProps = perVtnProperties.get(key);
-						if (vtnProps == null) {
-							vtnProps = new Properties();
-						}
-						String propKey = replaceAll.replaceAll(key + ".", "");
-						vtnProps.put(dynamicConfigurationPattern + propKey, env.getProperty(propName));
-						perVtnProperties.put(key, vtnProps);
+		.map(ps -> ((EnumerablePropertySource) ps).getPropertyNames()).flatMap(Arrays::<String>stream)
+		.forEach(propName -> {
+			if (propName.contains(dynamicConfigurationPattern)) {
+				String replaceAll = propName.replaceAll(dynamicConfigurationPattern, "");
+				String key = replaceAll.split("\\.")[0];
+				Properties vtnProps = perVtnProperties.get(key);
+				if (vtnProps == null) {
+					vtnProps = new Properties();
+				}
+				String propKey = replaceAll.replaceAll(key + ".", "");
+				vtnProps.put(dynamicConfigurationPattern + propKey, env.getProperty(propName));
+				perVtnProperties.put(key, vtnProps);
 
-						props.setProperty(propName, env.getProperty(propName));
+				props.setProperty(propName, env.getProperty(propName));
 
-					}
-				});
+			}
+		});
 
 		return perVtnProperties;
 	}
@@ -285,7 +294,7 @@ public class MultiVtnConfig {
 			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrRegisterReport(payload);
 		}
 	}
-	
+
 	public void oadrCreatedEvent(VtnSessionConfiguration vtnConfiguration, OadrCreatedEventType payload)
 			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
 			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,

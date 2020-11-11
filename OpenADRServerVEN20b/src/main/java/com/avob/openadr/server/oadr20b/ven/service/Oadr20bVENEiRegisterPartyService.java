@@ -115,7 +115,6 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 			if (vtnConfiguration.getVtnUrl() != null) {
 				OadrQueryRegistrationType queryRegistration = Oadr20bEiRegisterPartyBuilders
 						.newOadr20bQueryRegistrationBuilder(requestId)
-
 						.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value()).build();
 
 				OadrCreatedPartyRegistrationType oadrQueryRegistrationType = multiVtnConfig
@@ -127,6 +126,8 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 				OadrCreatePartyRegistrationType createPartyRegistration = Oadr20bEiRegisterPartyBuilders.newOadr20bCreatePartyRegistrationBuilder(requestId, venConfig.getVenId(), "xmpp")
 						.withOadrTransportName(OadrTransportType.XMPP)
 						.withOadrTransportAddress(multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).getConnectionJid())
+						.withOadrReportOnly(venConfig.getReportOnly()).withOadrVenName(venConfig.getVenName())
+						.withOadrXmlSignature(venConfig.getXmlSignature()).withOadrHttpPullModel(venConfig.getPullModel())
 						.build();
 
 				multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).oadrCreatePartyRegistration(createPartyRegistration);

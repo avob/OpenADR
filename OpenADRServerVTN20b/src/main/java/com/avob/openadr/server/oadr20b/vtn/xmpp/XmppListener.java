@@ -64,11 +64,14 @@ public class XmppListener implements StanzaListener {
 				return;
 			}
 
-			String jid = resourceOrThrow + "@" + from.getDomain().toString();
-			
-			from = JidCreate.from(jid);
+			if(response != null) {
+				String jid = resourceOrThrow + "@" + from.getDomain().toString();
+				
+				from = JidCreate.from(jid);
 
-			xmppUplinkClient.sendMessage(from, response);	
+				xmppUplinkClient.sendMessage(from, response);
+			}
+				
 
 		} catch (XmppStringprepException | NotConnectedException | Oadr20bMarshalException e) {
 			LOGGER.error(oadr20bVTNEiService.getServiceName() + " - " + e.getMessage());
