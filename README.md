@@ -60,90 +60,89 @@ Run a demo of a full 2.0b OADR stack infrastructure interacting with a dummy VEN
 
 ### Components diagram
 
-<div hidden>
+<details>
+	<summary>PlantUML components diagram</summary>
+	```
+	@startuml demo_component_diagram
 
-```
-@startuml demo_component_diagram
+	package "Demand / Production" {
+	    rectangle "dummy-ven20b" as dummyVen #FFF
+	}
 
-package "Demand / Production" {
-    rectangle "dummy-ven20b" as dummyVen #FFF
-}
+	package "OADR Provider" {
+	    rectangle "vtn20b" as vtn #FFF
+	    database postgres
+	    node rabbitmq
+	    node openfire
+	}
 
-package "OADR Provider" {
-    rectangle "vtn20b" as vtn #FFF
-    database postgres
-    node rabbitmq
-    node openfire
-}
-
-package "DemandResponseProgram" {
-    rectangle "dummy-vtn20b-controller" as dummyVtnController #FFF
-}
+	package "DemandResponseProgram" {
+	    rectangle "dummy-vtn20b-controller" as dummyVtnController #FFF
+	}
 
 
-vtn <-up-> openfire #line:red;line.bold;text:red  : OADR(XMPP)
-openfire -> vtn #green;line.bold;text:green : AUTH(HTTP)
-vtn -down-> rabbitmq #blue;line.bold;text:blue   : DATA(AMPQ)
-dummyVen <--> vtn #green;line.bold;text:green : OADR(HTTP)
-dummyVen <-> openfire #line:red;line.bold;text:red  : OADR(XMPP)
-openfire -> postgres #black;line.dotted;text:black
-vtn -> postgres #black;line.dotted;text:black
-rabbitmq -down-> vtn #green;line.bold;text:green : AUTH(HTTP)
-dummyVtnController -up-> vtn #green;line.bold;text:green : DATA(HTTP)
-dummyVtnController <-- rabbitmq #blue;line.bold;text:blue   : DATA(AMPQ)
+	vtn <-up-> openfire #line:red;line.bold;text:red  : OADR(XMPP)
+	openfire -> vtn #green;line.bold;text:green : AUTH(HTTP)
+	vtn -down-> rabbitmq #blue;line.bold;text:blue   : DATA(AMPQ)
+	dummyVen <--> vtn #green;line.bold;text:green : OADR(HTTP)
+	dummyVen <-> openfire #line:red;line.bold;text:red  : OADR(XMPP)
+	openfire -> postgres #black;line.dotted;text:black
+	vtn -> postgres #black;line.dotted;text:black
+	rabbitmq -down-> vtn #green;line.bold;text:green : AUTH(HTTP)
+	dummyVtnController -up-> vtn #green;line.bold;text:green : DATA(HTTP)
+	dummyVtnController <-- rabbitmq #blue;line.bold;text:blue   : DATA(AMPQ)
 
-@enduml
-```
+	@enduml
+	```
 
-</div>
+</details>
 
 ![](demo_component_diagram.svg)
 
 ### Sequence diagram
 
-<div hidden>
+<details>
+	<summary>PlantUML sequence diagram</summary>
+	```
+	@startuml demo_sequence_diagram
 
-```
-@startuml demo_sequence_diagram
+	participant "dummy-ven20b" as dummyVen
+	participant "vtn20b" as vtn 
+	participant "dummy-vtn20b-controller" as dummyVtnController
 
-participant "dummy-ven20b" as dummyVen
-participant "vtn20b" as vtn 
-participant "dummy-vtn20b-controller" as dummyVtnController
+	group Device provisionning
+	dummyVtnController --> vtn: Creates MarketContext / VEN
+	dummyVtnController --> vtn: Enrolls VEN to MarketContext
+	end 
 
-group Device provisionning
-dummyVtnController --> vtn: Creates MarketContext / VEN
-dummyVtnController --> vtn: Enrolls VEN to MarketContext
-end 
-
-group Device registration
-dummyVen --> vtn: Creates registration party
-vtn --> dummyVtnController: Notify registration
+	group Device registration
+	dummyVen --> vtn: Creates registration party
+	vtn --> dummyVtnController: Notify registration
 
 
 
-dummyVen --> vtn: Registers reports
-vtn --> dummyVtnController: Notify register reports
-dummyVtnController--> vtn: Subscribes reports
-vtn --> dummyVen: Creates reports subscription
-end
+	dummyVen --> vtn: Registers reports
+	vtn --> dummyVtnController: Notify register reports
+	dummyVtnController--> vtn: Subscribes reports
+	vtn --> dummyVen: Creates reports subscription
+	end
 
-group Normal workflow
-group DRProgram
-dummyVtnController --> vtn: Creates DREvents in MarketContext
-dummyVen <-- vtn: Send DREvents
-end
-group Data reading
-dummyVen --> dummyVen: Simulate data readings\n based on received DREvents
-dummyVen --> vtn: Updates reports
-vtn --> dummyVtnController: Notify data update
-end
+	group Normal workflow
+	group DRProgram
+	dummyVtnController --> vtn: Creates DREvents in MarketContext
+	dummyVen <-- vtn: Send DREvents
+	end
+	group Data reading
+	dummyVen --> dummyVen: Simulate data readings\n based on received DREvents
+	dummyVen --> vtn: Updates reports
+	vtn --> dummyVtnController: Notify data update
+	end
 
-end
+	end
 
-@enduml
-```
-
-</div>
+	@enduml
+	```
+</details>
 
 ![](demo_sequence_diagram.svg)
 
