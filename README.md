@@ -3,47 +3,40 @@
 
 OpenADR protocol java implementation: *https://www.openadr.org/*
 
-This project aims to provide minimal VEN / VTN 2.0a / 2.0b skeleton implementations. Relevant projects has to be extended to implement specific business logic: data source integration for a VEN stack, aggregation mechanism for VTN stack etc...
+Provides a standalone VTN 2.0b implementation and APIs to implements demand-response program and device management.
+Provides a VEN 2.0b library which can be used to implements a VEN 2.0b.
+
+
 
 Module | Description
 ------------- | ------------- 
-OpenADRSecurity | OADR security framework (authentication, xmlSignature)
+OpenADRSecurity | OADR security framework (PKI RSA/ECC, XmlSignature)
 OpenADRModel20b | OADR 2.0b model java classes generated from XSDL definition file
 OpenADRServerVEN20b | OADR 2.0b VEN library
-OpenADRServerVTN20b | OADR 2.0b VTN implementation
-DummyVEN20b | Dummy OADR 2.0b VEN implementation
-DummyVTN20bController | OADR 2.0b VTN controller implementation acting DRProgram and Device manager
+OpenADRServerVTN20b | OADR 2.0b VTN implementation + Control API / UI
+DummyVEN20b | Dummy OADR 2.0b VEN implementation based on OpenADRServerVEN20b
+DummyVTN20bController | Dummy OADR 2.0b VTN controller implementation acting DRProgram and device manager. Leverage OpenADRServerVTN20b APIs.
 
 
 ## Certificates
 
-Tests certificates are required to test project or build docker images:
+Tests certificates are required to test project or run demo:
 ```shell
-	# generate certificates test suite
-	# mandatory passphare for devops purpose: changeme
 	./generate_test_cert.sh
 ```
 
-This command will create several VTN / VEN certificates upon a self-signed generated authority. This authority has to be installed and trusted. An admin trusted client certificate is also generated and can be installed to to perform client authentication:
+This command will create several VTN / VEN / User / App certificates upon a self-signed generated authority. This authority has to be installed to disable insecure https warning when using VTN Control API / UI in a browser. VTN certificate uses the following Common Name, which need to be added to the local DNS configuration.
 
 - Install self-signed vtn certificate in your browser: cert/vtn.oadr.com-rsa.crt
-- Install x509 admin certificate in your browser: cert/admin.oadr.com.crt (optional, authentication can be performed using login/pass: admin/admin)
 - Add "127.0.0.1 vtn.oadr.com" to your local "/etc/hosts"
 
-## Build docker images
+ An admin trusted client certificate is also generated and can be installed to to perform client authentication.
 
-Build full OADR infrastructure composed of:
-- DB (postgres)
-- XMPP broker (Openfire)
-- AMPQ broker (RabbitMQ)
-- oadr vtn 2.0b
-- dummy oadr ven 2.0b
-- dummy oadr vtn 2.0b controller
+- Install x509 admin certificate in your browser: cert/admin.oadr.com.crt (optional, authentication can be performed using login/pass: admin/admin)
 
-Docker will build application if it is not already build. You can build locally to speed things up:
-```shell
-	mvn package -P external,frontend -DskipTests=true 
-```
+## Oadr demo
+
+Run a demo of a full 2.0b OADR stack infrastructure interacting with a dummy VEN and a dummy VTN controller. The VTN controller is acting as both a device manager by creating VEN authorization / subscribing to VEN reports, and a DemandResponseProgram manager by creating DREvents. The dummy VEN implementation will simulate data reading using information gathered in DREvents and continuously push them to the VTN. The VTN controller is notified by VTN using AMPQ when VTN receive payload from VEN (createRegistrationParty, registerReport, updateReports).
 
 ### Requirement
 
@@ -64,6 +57,93 @@ Docker will build application if it is not already build. You can build locally 
 - VTN Openfire Management UI: http://localhost:9090
 - Nodered Terminal: http://localhost:1880 
 - Ven1 Nodered Dashboard: http://localhost:1880/ui/#!/0
+
+### Components diagram
+
+<div hidden>
+```
+@startuml demo_component_diagram
+
+package "Demand / Production" {
+    rectangle "dummy-ven20b" as dummyVen #FFF
+}
+
+package "OADR Provider" {
+    rectangle "vtn20b" as vtn #FFF
+    database postgres
+    node rabbitmq
+    node openfire
+}
+
+package "DemandResponseProgram" {
+    rectangle "dummy-vtn20b-controller" as dummyVtnController #FFF
+}
+
+
+vtn <-up-> openfire #line:red;line.bold;text:red  : OADR(XMPP)
+openfire -> vtn #green;line.bold;text:green : AUTH(HTTP)
+vtn -down-> rabbitmq #blue;line.bold;text:blue   : DATA(AMPQ)
+dummyVen <--> vtn #green;line.bold;text:green : OADR(HTTP)
+dummyVen <-> openfire #line:red;line.bold;text:red  : OADR(XMPP)
+openfire -> postgres #black;line.dotted;text:black
+vtn -> postgres #black;line.dotted;text:black
+rabbitmq -down-> vtn #green;line.bold;text:green : AUTH(HTTP)
+dummyVtnController -up-> vtn #green;line.bold;text:green : DATA(HTTP)
+dummyVtnController <-- rabbitmq #blue;line.bold;text:blue   : DATA(AMPQ)
+
+
+@enduml
+```
+</div>
+
+![](demo_component_diagram.svg)
+
+### Sequence diagram
+
+<div hidden>
+```
+@startuml demo_sequence_diagram
+
+participant "dummy-ven20b" as dummyVen
+participant "vtn20b" as vtn 
+participant "dummy-vtn20b-controller" as dummyVtnController
+
+group Device provisionning
+dummyVtnController --> vtn: Creates MarketContext / VEN
+dummyVtnController --> vtn: Enrolls VEN to MarketContext
+end 
+
+group Device registration
+dummyVen --> vtn: Creates registration party
+vtn --> dummyVtnController: Notify registration
+
+
+
+dummyVen --> vtn: Registers reports
+vtn --> dummyVtnController: Notify register reports
+dummyVtnController--> vtn: Subscribes reports
+vtn --> dummyVen: Creates reports subscription
+end
+
+group Normal workflow
+group DRProgram
+dummyVtnController --> vtn: Creates DREvents in MarketContext
+dummyVen <-- vtn: Send DREvents
+end
+group Data reading
+dummyVen --> dummyVen: Simulate data readings\n based on received DREvents
+dummyVen --> vtn: Updates reports
+vtn --> dummyVtnController: Notify data update
+end
+
+end
+
+@enduml
+```
+</div>
+
+![](demo_sequence_diagram.svg)
+
 
 ## Test project
 

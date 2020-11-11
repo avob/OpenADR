@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="371px" preserveAspectRatio="none" style="width:564px;height:371px;" version="1.1" viewBox="0 0 564 371" width="564px" zoomAndPan="magnify"><defs><filter height="300%" id="f1wvu1ebo10ynh" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[69c96b165d1317024b26c66f86e4ad6f]
+cluster Demand / Production--><polygon fill="#FFFFFF" filter="url(#f1wvu1ebo10ynh)" points="313,11,474,11,481,33.4883,484,33.4883,484,98,313,98,313,11" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="313" x2="481" y1="33.4883" y2="33.4883"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="155" x="317" y="26.5352">Demand / Production</text><!--MD5=[dcb45db694763a33dfcb8027856e3e50]
+cluster OADR Provider--><polygon fill="#FFFFFF" filter="url(#f1wvu1ebo10ynh)" points="16,6,130,6,137,28.4883,289,28.4883,289,364,16,364,16,6" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="16" x2="137" y1="28.4883" y2="28.4883"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="108" x="20" y="21.5352">OADR Provider</text><!--MD5=[5912b8c3a5d24a006b2405f52a0e7793]
+cluster DemandResponseProgram--><polygon fill="#FFFFFF" filter="url(#f1wvu1ebo10ynh)" points="313,272,508,272,515,294.4883,547,294.4883,547,359,313,359,313,272" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="313" x2="515" y1="294.4883" y2="294.4883"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="189" x="317" y="287.5352">DemandResponseProgram</text><!--MD5=[cfc4a67b4136acdc90fd2ae81192da0d]
+entity dummyVen--><rect fill="#FFFFFF" filter="url(#f1wvu1ebo10ynh)" height="36.4883" style="stroke: #000000; stroke-width: 1.5;" width="130" x="329" y="46"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="110" x="339" y="69.5352">dummy-ven20b</text><!--MD5=[34b44d97ca729943654bf6029c2ff543]
+entity vtn--><rect fill="#FFFFFF" filter="url(#f1wvu1ebo10ynh)" height="36.4883" style="stroke: #000000; stroke-width: 1.5;" width="68" x="156" y="168.5"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="48" x="166" y="192.0352">vtn20b</text><!--MD5=[0e1fecc31e3549f2a1667c6349b56d9e]
+entity postgres--><path d="M37,174 C37,164 77,164 77,164 C77,164 117,164 117,174 L117,199.4883 C117,209.4883 77,209.4883 77,209.4883 C77,209.4883 37,209.4883 37,199.4883 L37,174 " fill="#FEFECE" filter="url(#f1wvu1ebo10ynh)" style="stroke: #000000; stroke-width: 1.5;"/><path d="M37,174 C37,184 77,184 77,184 C77,184 117,184 117,174 " fill="none" style="stroke: #000000; stroke-width: 1.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="60" x="47" y="201.5352">postgres</text><!--MD5=[979bcc919fe3deace2fbebc05cbbcf30]
+entity rabbitmq--><polygon fill="#FEFECE" filter="url(#f1wvu1ebo10ynh)" points="108.5,312,118.5,302,211.5,302,211.5,338.4883,201.5,348.4883,108.5,348.4883,108.5,312" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="201.5" x2="211.5" y1="312" y2="302"/><line style="stroke: #000000; stroke-width: 1.5;" x1="108.5" x2="201.5" y1="312" y2="312"/><line style="stroke: #000000; stroke-width: 1.5;" x1="201.5" x2="201.5" y1="312" y2="348.4883"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="63" x="123.5" y="335.5352">rabbitmq</text><!--MD5=[c8a9a2bfa96213217a7cf157b7c4bc99]
+entity openfire--><polygon fill="#FEFECE" filter="url(#f1wvu1ebo10ynh)" points="74,51,84,41,172,41,172,77.4883,162,87.4883,74,87.4883,74,51" style="stroke: #000000; stroke-width: 1.5;"/><line style="stroke: #000000; stroke-width: 1.5;" x1="162" x2="172" y1="51" y2="41"/><line style="stroke: #000000; stroke-width: 1.5;" x1="74" x2="162" y1="51" y2="51"/><line style="stroke: #000000; stroke-width: 1.5;" x1="162" x2="162" y1="51" y2="87.4883"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="58" x="89" y="74.5352">openfire</text><!--MD5=[5bc83263e6b36fc9b57192d2967284e1]
+entity dummyVtnController--><rect fill="#FFFFFF" filter="url(#f1wvu1ebo10ynh)" height="36.4883" style="stroke: #000000; stroke-width: 1.5;" width="202" x="329" y="307"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="182" x="339" y="330.5352">dummy-vtn20b-controller</text><!--MD5=[12ee67e887a516e6396e968940ab5233]
+link openfire to vtn--><path d="M82.56,90.65 C67.84,103.27 57,118.97 67,134 C69.53,137.8 115.64,156.47 150.67,170.24 " fill="none" id="openfire-vtn" style="stroke: #FF0000; stroke-width: 2.0;"/><polygon fill="#FF0000" points="155.75,172.24,148.8345,165.2274,151.0959,170.4126,145.9107,172.674,155.75,172.24" style="stroke: #FF0000; stroke-width: 2.0;"/><polygon fill="#FF0000" points="86.8,87.17,77.3077,89.7962,82.9379,90.3455,82.3886,95.9757,86.8,87.17" style="stroke: #FF0000; stroke-width: 2.0;"/><text fill="#FF0000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="78" x="68" y="130.5684">OADR(XMPP)</text><!--MD5=[12ee67e887a516e6396e968940ab5233]
+link openfire to vtn--><path d="M137.1,87.04 C142.82,96.21 149.39,107.02 155,117 C163.62,132.35 172.65,150.05 179.37,163.61 " fill="none" id="openfire-to-vtn" style="stroke: #008000; stroke-width: 2.0;"/><polygon fill="#008000" points="181.74,168.41,181.3306,158.5697,179.5211,163.9293,174.1615,162.1199,181.74,168.41" style="stroke: #008000; stroke-width: 2.0;"/><text fill="#008000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="77" x="166" y="130.5684">AUTH(HTTP)</text><!--MD5=[d5e554b6e2901bc442e8a281a90153d7]
+link vtn to rabbitmq--><path d="M186.26,204.51 C181.17,227.66 172.02,269.33 165.97,296.83 " fill="none" id="vtn-to-rabbitmq" style="stroke: #0000FF; stroke-width: 2.0;"/><polygon fill="#0000FF" points="164.88,301.79,170.7199,293.8593,165.954,296.9067,162.9066,292.1409,164.88,301.79" style="stroke: #0000FF; stroke-width: 2.0;"/><text fill="#0000FF" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="81" x="180" y="252.5684">DATA(AMPQ)</text><!--MD5=[d0109e3c4f292fe9fc0dd379eadc2b3c]
+link rabbitmq to vtn--><path d="M120.56,301.84 C96.84,285.48 73.76,262.14 88,239 C95.32,227.11 125.42,212.73 151.04,202.19 " fill="none" id="rabbitmq-to-vtn" style="stroke: #008000; stroke-width: 2.0;"/><polygon fill="#008000" points="155.76,200.27,145.916,199.9613,151.1295,202.1565,148.9344,207.37,155.76,200.27" style="stroke: #008000; stroke-width: 2.0;"/><text fill="#008000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="77" x="89" y="252.5684">AUTH(HTTP)</text><!--MD5=[eb1e4560373996f938f8ffb65448a02e]
+link dummyVen to vtn--><path d="M360.53,84.77 C322.66,107.14 261.35,143.36 223.48,165.73 " fill="none" id="dummyVen-vtn" style="stroke: #008000; stroke-width: 2.0;"/><polygon fill="#008000" points="218.98,168.38,228.7645,167.2561,223.2875,165.8412,224.7024,160.3641,218.98,168.38" style="stroke: #008000; stroke-width: 2.0;"/><polygon fill="#008000" points="365.2,82.01,355.4171,83.1481,360.8962,84.5551,359.4893,90.0342,365.2,82.01" style="stroke: #008000; stroke-width: 2.0;"/><text fill="#008000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="78" x="305" y="130.5684">OADR(HTTP)</text><!--MD5=[5d4d1f3af9c9d6ec977400f177ac103a]
+link dummyVen to openfire--><path d="M323.74,64 C278.07,64 219.41,64 177.32,64 " fill="none" id="dummyVen-openfire" style="stroke: #FF0000; stroke-width: 2.0;"/><polygon fill="#FF0000" points="172.08,64,181.08,68,177.08,64,181.08,60,172.08,64" style="stroke: #FF0000; stroke-width: 2.0;"/><polygon fill="#FF0000" points="328.96,64,319.96,60,323.96,64,319.96,68,328.96,64" style="stroke: #FF0000; stroke-width: 2.0;"/><text fill="#FF0000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="78" x="211.5" y="57.5684">OADR(XMPP)</text><!--MD5=[f0cbc4579aa22bca1311008880d6fc68]
+link openfire to postgres--><path d="M73.96,83.82 C59.81,91.81 46.04,102.66 38,117 C30,131.28 37.99,147.17 48.77,160.05 " fill="none" id="openfire-to-postgres" style="stroke: #000000; stroke-width: 1.0; stroke-dasharray: 1.0,3.0;"/><polygon fill="#000000" points="52.2,163.95,49.2459,154.5546,48.8924,160.2004,43.2466,159.8468,52.2,163.95" style="stroke: #000000; stroke-width: 1.0;"/><!--MD5=[18e12722b9fe64b9feaa8eb155ed95ce]
+link vtn to postgres--><path d="M155.86,186.5 C144.68,186.5 133.49,186.5 122.31,186.5 " fill="none" id="vtn-to-postgres" style="stroke: #000000; stroke-width: 1.0; stroke-dasharray: 1.0,3.0;"/><polygon fill="#000000" points="117.17,186.5,126.17,190.5,122.17,186.5,126.17,182.5,117.17,186.5" style="stroke: #000000; stroke-width: 1.0;"/><!--MD5=[93e2807dd2257122ebfce8347d6b946e]
+reverse link vtn to dummyVtnController--><path d="M224.35,207.04 C271.48,233.84 355.42,281.58 400.09,306.99 " fill="none" id="vtn-backto-dummyVtnController" style="stroke: #008000; stroke-width: 2.0;"/><polygon fill="#008000" points="219.91,204.51,225.7537,212.4379,224.2556,206.983,229.7105,205.4849,219.91,204.51" style="stroke: #008000; stroke-width: 2.0;"/><text fill="#008000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="77" x="311" y="252.5684">DATA(HTTP)</text><!--MD5=[65f09e7db8059149e5dc22fe993d905c]
+reverse link dummyVtnController to rabbitmq--><path d="M323.77,325 C285.26,325 243.47,325 211.74,325 " fill="none" id="dummyVtnController-backto-rabbitmq" style="stroke: #0000FF; stroke-width: 2.0;"/><polygon fill="#0000FF" points="328.94,325,319.94,321,323.94,325,319.94,329,328.94,325" style="stroke: #0000FF; stroke-width: 2.0;"/><text fill="#0000FF" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="81" x="229.75" y="318.5684">DATA(AMPQ)</text><!--MD5=[fe24a7f1e7609911f4a745c6af1578c0]
+@startuml demo_component_diagram
+
+package "Demand / Production" {
+    rectangle "dummy-ven20b" as dummyVen #FFF
+}
+
+package "OADR Provider" {
+    rectangle "vtn20b" as vtn #FFF
+    database postgres
+    node rabbitmq
+    node openfire
+}
+
+package "DemandResponseProgram" {
+    rectangle "dummy-vtn20b-controller" as dummyVtnController #FFF
+}
+
+
+vtn <-up-> openfire #line:red;line.bold;text:red  : OADR(XMPP)
+openfire -> vtn #green;line.bold;text:green : AUTH(HTTP)
+vtn -down-> rabbitmq #blue;line.bold;text:blue   : DATA(AMPQ)
+dummyVen <- -> vtn #green;line.bold;text:green : OADR(HTTP)
+dummyVen <-> openfire #line:red;line.bold;text:red  : OADR(XMPP)
+openfire -> postgres #black;line.dotted;text:black
+vtn -> postgres #black;line.dotted;text:black
+rabbitmq -down-> vtn #green;line.bold;text:green : AUTH(HTTP)
+dummyVtnController -up-> vtn #green;line.bold;text:green : DATA(HTTP)
+dummyVtnController <- - rabbitmq #blue;line.bold;text:blue   : DATA(AMPQ)
+
+
+@enduml
+
+PlantUML version 1.2020.19(Mon Oct 12 17:10:01 CEST 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: fr
+Country: FR
+--></g></svg>
