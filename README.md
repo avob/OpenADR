@@ -106,9 +106,9 @@ Run a demo of a full 2.0b OADR stack infrastructure interacting with a dummy VEN
 	```
 	@startuml demo_sequence_diagram
 
-	participant "dummy-ven20b" as dummyVen
-	participant "vtn20b" as vtn 
-	participant "dummy-vtn20b-controller" as dummyVtnController
+	participant "dummy-ven20b" as dummyVen #FFF
+	participant "vtn20b" as vtn #FFF
+	participant "dummy-vtn20b-controller" as dummyVtnController #FFF
 
 	group Device provisionning
 	dummyVtnController --> vtn: Creates MarketContext / VEN
