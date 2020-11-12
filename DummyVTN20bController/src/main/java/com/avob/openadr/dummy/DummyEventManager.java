@@ -9,7 +9,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import org.eclipse.jetty.http.HttpStatus;
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,8 +32,8 @@ import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalDto.SignalNameE
 import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalDto.SignalTypeEnum;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalIntervalDto;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventTargetDto;
-import com.avob.server.oadrvtn20b.model.VenMarketContextDto;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventTargetDto.TargetTypeEnum;
+import com.avob.server.oadrvtn20b.model.VenMarketContextDto;
 
 @Service
 public class DummyEventManager {
@@ -56,7 +56,7 @@ public class DummyEventManager {
 			marketcontextId = findMarketContextByNameUsingGET.getId();
 			LOGGER.warn("Ven market context: "+DummyVTN20bControllerConfig.MARKET_CONTEXT+ " is already provisioned");
 		} catch (ApiException e) {
-			if(e.getCode() != HttpStatus.NOT_FOUND_404) {
+			if(e.getCode() !=  HttpStatus.SC_NOT_FOUND) {
 				LOGGER.error("Ven market context: "+DummyVTN20bControllerConfig.MARKET_CONTEXT+ " can't be provisioned", e);
 				return;
 			} else {

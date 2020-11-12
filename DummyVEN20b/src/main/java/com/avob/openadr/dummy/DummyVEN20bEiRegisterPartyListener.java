@@ -26,6 +26,7 @@ import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyService;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiRegisterPartyService.Oadr20bVENEiRegisterPartyServiceListener;
+import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiReportService;
 
 @Configuration
 public class DummyVEN20bEiRegisterPartyListener implements Oadr20bVENEiRegisterPartyServiceListener {
@@ -36,12 +37,10 @@ public class DummyVEN20bEiRegisterPartyListener implements Oadr20bVENEiRegisterP
 	private MultiVtnConfig multiVtnConfig;
 
 	@Resource
-	private OadrAction oadrAction;
-
-	@Resource
 	private Oadr20bVENEiRegisterPartyService oadr20bVENEiRegisterPartyService;
 
-
+	@Resource
+	private Oadr20bVENEiReportService oadr20bVENEiReportService;
 
 	@PostConstruct
 	public void init() {
@@ -84,19 +83,16 @@ public class DummyVEN20bEiRegisterPartyListener implements Oadr20bVENEiRegisterP
 		}
 	}
 
-	private void initReport(VtnSessionConfiguration vtnConfiguration)  {
+	private void initReport(VtnSessionConfiguration vtnConfiguration) {
 
-		oadrAction.sendRegisterReport(vtnConfiguration);
-
-		oadrAction.requestReqisterReport(vtnConfiguration);
+		oadr20bVENEiReportService.registerReport(vtnConfiguration);
+		oadr20bVENEiReportService.createReportMetadata(vtnConfiguration);
 
 	}
 
-
-
 	private void initOpt(VtnSessionConfiguration vtnConfiguration) throws XmppStringprepException,
-	NotConnectedException, Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
-	Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, InterruptedException {
+			NotConnectedException, Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
+			Oadr20bXMLSignatureValidationException, Oadr20bMarshalException, InterruptedException {
 		String requestId = "0";
 		String optId = "0";
 		VavailabilityType vavailabilityType = Oadr20bEiOptBuilders.newOadr20bVavailabilityBuilder()
@@ -105,16 +101,20 @@ public class DummyVEN20bEiRegisterPartyListener implements Oadr20bVENEiRegisterP
 		OptTypeType optType = OptTypeType.OPT_OUT;
 		OptReasonEnumeratedType optReason = OptReasonEnumeratedType.NOT_PARTICIPATING;
 
-		OadrCreateOptType build = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId, vtnConfiguration.getVenSessionConfig().getVenId(),
-				System.currentTimeMillis(), vavailabilityType, optId, optType, optReason).build();
+		OadrCreateOptType build = Oadr20bEiOptBuilders
+				.newOadr20bCreateOptBuilder(requestId, vtnConfiguration.getVenSessionConfig().getVenId(),
+						System.currentTimeMillis(), vavailabilityType, optId, optType, optReason)
+				.build();
 
 		multiVtnConfig.oadrCreateOpt(vtnConfiguration, build);
 	}
 
 	@Override
-	public void onRegistrationError(VtnSessionConfiguration vtnConfiguration, OadrCreatedPartyRegistrationType registration) {
+	public void onRegistrationError(VtnSessionConfiguration vtnConfiguration,
+			OadrCreatedPartyRegistrationType registration) {
 		LOGGER.error("Failed to create party registration");
-		LOGGER.error(registration.getEiResponse().getResponseCode() + " - " + registration.getEiResponse().getResponseDescription() );
+		LOGGER.error(registration.getEiResponse().getResponseCode() + " - "
+				+ registration.getEiResponse().getResponseDescription());
 
 	}
 }

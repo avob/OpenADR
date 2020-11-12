@@ -9,6 +9,11 @@ public class Oadr20bResponseBuilder {
 
 	private OadrResponseType response;
 
+	public Oadr20bResponseBuilder(String requestId, int responseCode) {
+		response = Oadr20bFactory.createOadrResponseType(requestId, responseCode);
+		response.setSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
+	}
+	
 	public Oadr20bResponseBuilder(String requestId, int responseCode, String venId) {
 		response = Oadr20bFactory.createOadrResponseType(requestId, responseCode, venId);
 		response.setSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());

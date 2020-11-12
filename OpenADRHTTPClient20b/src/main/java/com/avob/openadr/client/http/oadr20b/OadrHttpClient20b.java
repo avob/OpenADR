@@ -9,6 +9,7 @@ import java.util.UUID;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
@@ -128,10 +129,11 @@ public class OadrHttpClient20b {
 			HttpResponse response = client.execute(post, host, Oadr20bUrlPath.OADR_BASE_PATH + path, context);
 
 			// if request did not result in 200 http code throw exception
-			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+			int statusCode = response.getStatusLine().getStatusCode();
+			if (statusCode != HttpStatus.SC_OK) {
 				EntityUtils.consumeQuietly(response.getEntity());
-				throw new Oadr20bHttpLayerException(response.getStatusLine().getStatusCode(),
-						String.valueOf(response.getStatusLine().getStatusCode()));
+				throw new Oadr20bHttpLayerException(statusCode,
+						String.valueOf(statusCode));
 			}
 
 			// if request was a success, validate xml signature if required and then

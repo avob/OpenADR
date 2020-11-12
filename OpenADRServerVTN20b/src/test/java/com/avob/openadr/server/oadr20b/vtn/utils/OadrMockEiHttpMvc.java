@@ -176,21 +176,25 @@ public class OadrMockEiHttpMvc {
 			andReturn = this.mockMvc.perform(MockMvcRequestBuilders.post(endpoint).content(content).with(authSession))
 					.andExpect(MockMvcResultMatchers.status().is(status)).andReturn();
 
-			if (String.class.equals(klass)) {
-				return (T) andReturn.getResponse().getContentAsString();
-			}
+			try {
+				if (String.class.equals(klass)) {
+					return (T) andReturn.getResponse().getContentAsString();
+				}
 
-			Object obj = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString());
-			if (!klass.equals(obj.getClass())) {
-				fail("Response payload(" + obj.getClass().getSimpleName() + ") can't be cast to expected class: "
-						+ klass.getSimpleName());
+				Object obj = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString());
+				if (!klass.equals(obj.getClass())) {
+					fail("Response payload(" + obj.getClass().getSimpleName() + ") can't be cast to expected class: "
+							+ klass.getSimpleName());
+				}
+				return klass.cast(obj);
+			} catch (Oadr20bUnmarshalException e) {
+				e.printStackTrace();
+				fail("Response payload can't be cast to expected class: " + klass.getSimpleName());
 			}
-			return klass.cast(obj);
-		} catch (Oadr20bUnmarshalException e) {
-
-			fail("Response payload can't be cast to expected class: " + klass.getSimpleName());
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail("Mock can't perform desired request");
+
 		}
 		return null;
 	}

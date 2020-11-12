@@ -7,7 +7,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
-import org.eclipse.jetty.http.HttpStatus;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
@@ -34,6 +33,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrRegisteredReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestReregistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
@@ -48,6 +48,8 @@ import com.avob.openadr.server.oadr20b.vtn.service.XmlSignatureService;
 import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiEventService;
 import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiRegisterPartyService;
 import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiReportService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiResponseService;
+import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNPayloadService;
 import com.avob.openadr.server.oadr20b.vtn.xmpp.XmppConnector;
 
 @Service
@@ -63,6 +65,9 @@ public class Oadr20bPushService {
 	private VenService venService;
 
 	@Resource
+	private Oadr20bVTNPayloadService padr20bVTNPayloadService;
+
+	@Resource
 	private Oadr20bVTNEiEventService oadr20bVTNEiEventService;
 
 	@Resource
@@ -73,6 +78,9 @@ public class Oadr20bPushService {
 
 	@Resource
 	private DemandResponseEventService demandResponseEventService;
+
+	@Resource
+	private Oadr20bVTNEiResponseService oadr20bVTNEiResponseService;
 
 	@Resource
 	private XmppConnector xmppConnector;
@@ -133,48 +141,35 @@ public class Oadr20bPushService {
 					OadrDistributeEventType val = (OadrDistributeEventType) payload;
 
 					OadrResponseType response = requestClient.oadrDistributeEvent(venPushUrl, val);
-					String eiResponseCode = response.getEiResponse().getResponseCode();
-					if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
-						LOGGER.error("OadrDistributeEventType - Application Layer Error[" + eiResponseCode + "]");
-					}
+					oadr20bVTNEiResponseService.oadrResponse(response);
 
 				} else if (payload instanceof OadrCancelReportType) {
 					OadrCancelReportType val = (OadrCancelReportType) payload;
 
 					OadrCanceledReportType oadrCancelReport = requestClient.oadrCancelReport(venPushUrl, val);
-					String eiResponseCode = oadrCancelReport.getEiResponse().getResponseCode();
-					if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
-						LOGGER.error("OadrCancelReportType - Application Layer Error[" + eiResponseCode + "]");
-						return;
-					}
-
-					oadr20bVTNEiReportService.otherOadrCancelReport(val);
+					Ven ven = venService.findOneByUsername(venId);
+					oadr20bVTNEiReportService.oadrCanceledReport(ven, oadrCancelReport);
 
 				} else if (payload instanceof OadrCreateReportType) {
 					OadrCreateReportType val = (OadrCreateReportType) payload;
 
 					OadrCreatedReportType oadrCreateReport = requestClient.oadrCreateReport(venPushUrl, val);
-					String eiResponseCode = oadrCreateReport.getEiResponse().getResponseCode();
-					if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
-						LOGGER.error("OadrCreateReportType - Application Layer Error[" + eiResponseCode + "]");
-					}
-
 					Ven ven = venService.findOneByUsername(venId);
 					oadr20bVTNEiReportService.oadrCreatedReport(ven, oadrCreateReport);
 
 				} else if (payload instanceof OadrRegisterReportType) {
 					OadrRegisterReportType val = (OadrRegisterReportType) payload;
 
-					requestClient.oadrRegisterReport(venPushUrl, val);
+					OadrRegisteredReportType oadrRegisterReport = requestClient.oadrRegisterReport(venPushUrl, val);
+					Ven ven = venService.findOneByUsername(venId);
+					oadr20bVTNEiReportService.oadrRegisteredReport(ven, oadrRegisterReport);
 
 				} else if (payload instanceof OadrUpdateReportType) {
 					OadrUpdateReportType val = (OadrUpdateReportType) payload;
 
 					OadrUpdatedReportType oadrUpdateReport = requestClient.oadrUpdateReport(venPushUrl, val);
-					String eiResponseCode = oadrUpdateReport.getEiResponse().getResponseCode();
-					if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
-						LOGGER.error("OadrUpdateReportType - Application Layer Error[" + eiResponseCode + "]");
-					}
+					Ven ven = venService.findOneByUsername(venId);
+					oadr20bVTNEiReportService.oadrUpdatedReport(ven, oadrUpdateReport);
 
 				} else if (payload instanceof OadrCancelPartyRegistrationType) {
 					OadrCancelPartyRegistrationType val = (OadrCancelPartyRegistrationType) payload;
@@ -182,27 +177,16 @@ public class Oadr20bPushService {
 					OadrCanceledPartyRegistrationType oadrCancelPartyRegistrationType = requestClient
 							.oadrCancelPartyRegistrationType(venPushUrl, val);
 
-					String eiResponseCode = oadrCancelPartyRegistrationType.getEiResponse().getResponseCode();
-					if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
-						LOGGER.error(
-								"OadrCancelPartyRegistrationType - Application Layer Error[" + eiResponseCode + "]");
-						return;
-					}
-
 					Ven ven = venService.findOneByUsername(venId);
-					oadr20bVTNEiRegisterPartyService.oadrCanceledPartyRegistrationType(ven,
+					OadrResponseType response = oadr20bVTNEiRegisterPartyService.oadrCanceledPartyRegistrationType(ven,
 							oadrCancelPartyRegistrationType);
+					oadr20bVTNEiResponseService.oadrResponse(response);
 
 				} else if (payload instanceof OadrRequestReregistrationType) {
 					OadrRequestReregistrationType val = (OadrRequestReregistrationType) payload;
 
-					OadrResponseType oadrRequestReregistrationType = requestClient
-							.oadrRequestReregistrationType(venPushUrl, val);
-					String eiResponseCode = oadrRequestReregistrationType.getEiResponse().getResponseCode();
-					if (!String.valueOf(HttpStatus.OK_200).equals(eiResponseCode)) {
-						LOGGER.error("OadrDistributeEventType - Application Layer Error[" + eiResponseCode + "]");
-					}
-
+					OadrResponseType response = requestClient.oadrRequestReregistrationType(venPushUrl, val);
+					oadr20bVTNEiResponseService.oadrResponse(response);
 				} else {
 					LOGGER.error("Unknown payload cannot be send to VEN");
 				}
@@ -220,7 +204,7 @@ public class Oadr20bPushService {
 			}
 
 		} catch (Oadr20bException e) {
-			LOGGER.error("Fail to distribute payload to "+venPushUrl, e);
+			LOGGER.error("Fail to distribute payload to " + venPushUrl, e);
 		} catch (Oadr20bMarshalException e) {
 			LOGGER.error("Fail to distribute payload", e);
 		} catch (URISyntaxException e) {

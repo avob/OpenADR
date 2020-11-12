@@ -52,7 +52,7 @@ public class Oadr20bVENEiReportServiceTest {
 
 	@Resource
 	private Oadr20bVENEiReportService oadr20bVENEiReportService;
-	
+
 	@Resource
 	private Oadr20bVENPayloadService oadr20bVENPayloadService;
 
@@ -79,8 +79,7 @@ public class Oadr20bVENEiReportServiceTest {
 
 		OadrUpdatedReportType resp = oadr20bJAXBContext.unmarshal(request, OadrUpdatedReportType.class);
 		assertNotNull(resp);
-		assertEquals(resp.getEiResponse().getResponseCode(),
-				String.valueOf(Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453));
+		assertEquals("200", resp.getEiResponse().getResponseCode());
 
 	}
 
@@ -102,8 +101,7 @@ public class Oadr20bVENEiReportServiceTest {
 				.newOadr20bRegisterReportBuilder("", venConfig.getVenId(), reportRequestId).addOadrReport(report)
 				.build();
 
-		String request = oadr20bVENPayloadService.report(vtnHttpId,
-				oadr20bJAXBContext.marshalRoot(oadrRegisterReport));
+		String request = oadr20bVENPayloadService.report(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrRegisterReport));
 
 		OadrRegisteredReportType resp = oadr20bJAXBContext.unmarshal(request, OadrRegisteredReportType.class);
 		assertNotNull(resp);

@@ -27,6 +27,11 @@ public class Oadr20bCreatedReportBuilder {
         oadrCreatedReportType.setSchemaVersion(schemaVersion);
         return this;
     }
+    
+    public Oadr20bCreatedReportBuilder withResponseDescription(String responseDescription) {
+        oadrCreatedReportType.getEiResponse().setResponseDescription(responseDescription);
+        return this;
+    }
 
     public OadrCreatedReportType build() {
         return oadrCreatedReportType;

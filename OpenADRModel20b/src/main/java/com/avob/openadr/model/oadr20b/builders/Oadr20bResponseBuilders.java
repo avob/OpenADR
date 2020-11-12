@@ -10,6 +10,10 @@ public class Oadr20bResponseBuilders {
 	private Oadr20bResponseBuilders() {
 	}
 
+	public static Oadr20bResponseBuilder newOadr20bResponseBuilder(String requestId, int responseCode) {
+		return new Oadr20bResponseBuilder(requestId, responseCode);
+	}
+
 	public static Oadr20bResponseBuilder newOadr20bResponseBuilder(String requestId, int responseCode, String venId) {
 		return new Oadr20bResponseBuilder(requestId, responseCode, venId);
 	}
@@ -25,6 +29,15 @@ public class Oadr20bResponseBuilders {
 	public static EiResponseType newOadr20bEiResponseMismatchUsernameVenIdBuilder(String requestId, String username,
 			String venId) {
 		String description = "Mismatch between authentication username(" + username + ") and requested venId(" + venId
+				+ ")";
+		int errorCode = Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462;
+		return Oadr20bResponseBuilders.newOadr20bEiResponseBuilder(requestId, errorCode).withDescription(description)
+				.build();
+	}
+
+	public static EiResponseType newOadr20bEiResponseMismatchUsernameVtnIdBuilder(String requestId, String username,
+			String vtnId) {
+		String description = "Mismatch between authentication username(" + username + ") and requested vtnId(" + vtnId
 				+ ")";
 		int errorCode = Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462;
 		return Oadr20bResponseBuilders.newOadr20bEiResponseBuilder(requestId, errorCode).withDescription(description)

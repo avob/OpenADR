@@ -28,6 +28,11 @@ public class Oadr20bCanceledReportBuilder {
 		oadrCanceledReportType.setSchemaVersion(schemaVersion);
 		return this;
 	}
+	
+	public Oadr20bCanceledReportBuilder withResponseDescription(String responseDescription) {
+		oadrCanceledReportType.getEiResponse().setResponseDescription(responseDescription);
+        return this;
+    }
 
 	public OadrCanceledReportType build() {
 		return oadrCanceledReportType;

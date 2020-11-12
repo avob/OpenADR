@@ -298,16 +298,17 @@ public class Timeline {
 
 		@Override
 		public int compareTo(TimelineEvent o) {
-			return this.type.getEmitPriority() - o.type.getEmitPriority();
+			return  Integer.compare(this.type.getEmitPriority(), o.type.getEmitPriority());
 		}
 
 	}
 
+	
 	private enum TimelineEventType {
 
 
 
-		EVENT_ACTIVE_PERIOD_STARTED(0), INTERVAL_STARTED(1), INTERVAL_ENDED(2), EVENT_ACTIVE_PERIOD_ENDED(3);
+		EVENT_ACTIVE_PERIOD_STARTED(2), INTERVAL_STARTED(3), INTERVAL_ENDED(0), EVENT_ACTIVE_PERIOD_ENDED(1);
 
 		private int emitPriority;
 

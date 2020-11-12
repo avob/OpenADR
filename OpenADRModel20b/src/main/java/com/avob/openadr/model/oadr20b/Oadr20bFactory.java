@@ -398,6 +398,13 @@ public class Oadr20bFactory {
 		createOadrRequestEventType.setEiRequestEvent(eiRequestEvent);
 		return createOadrRequestEventType;
 	}
+	
+	public static OadrResponseType createOadrResponseType(String requestId, int responseCode) {
+		OadrResponseType createOadrResponseType = factory.createOadrResponseType();
+		EiResponseType eiResponse = Oadr20bFactory.createEiResponseType(requestId, responseCode);
+		createOadrResponseType.setEiResponse(eiResponse);
+		return createOadrResponseType;
+	}
 
 	public static OadrResponseType createOadrResponseType(String requestId, int responseCode, String venId) {
 		OadrResponseType createOadrResponseType = factory.createOadrResponseType();

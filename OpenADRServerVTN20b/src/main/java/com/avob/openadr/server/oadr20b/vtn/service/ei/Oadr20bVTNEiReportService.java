@@ -50,6 +50,7 @@ import com.avob.openadr.model.oadr20b.oadr.BaseUnitType;
 import com.avob.openadr.model.oadr20b.oadr.CurrencyType;
 import com.avob.openadr.model.oadr20b.oadr.FrequencyType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrCanceledReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrGBItemBase;
@@ -63,6 +64,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrSamplingRateType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.PulseCountType;
 import com.avob.openadr.model.oadr20b.oadr.TemperatureType;
 import com.avob.openadr.model.oadr20b.oadr.ThermType;
@@ -460,14 +462,45 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 	public Object oadrRegisteredReport(Ven ven, OadrRegisteredReportType payload) {
 		String venID = ven.getUsername();
-		String requestID = payload.getEiResponse().getRequestID();
-		if (!payload.getVenID().equals(venID)) {
-			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
-					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, venID = payload.getVenID(), venID);
-			return Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID,
-					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
+//		String requestID = payload.getEiResponse().getRequestID();
+//		if (!payload.getVenID().equals(venID)) {
+//			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
+//					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, venID = payload.getVenID(), venID);
+//			return Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID,
+//					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
+//
+//		}
 
-		}
+		return Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder(payload.getEiResponse().getRequestID(), HttpStatus.OK_200, venID).build();
+	}
+
+	public Object oadrCanceledReport(Ven ven, OadrCanceledReportType payload) {
+		String venID = ven.getUsername();
+//		String requestID = payload.getEiResponse().getRequestID();
+//		if (!payload.getVenID().equals(venID)) {
+//			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
+//					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, venID = payload.getVenID(), venID);
+//			return Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID,
+//					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
+//
+//		}
+
+		return Oadr20bResponseBuilders
+				.newOadr20bResponseBuilder(payload.getEiResponse().getRequestID(), HttpStatus.OK_200, venID).build();
+	}
+	
+	
+	public Object oadrUpdatedReport(Ven ven, OadrUpdatedReportType payload) {
+		String venID = ven.getUsername();
+//		String requestID = payload.getEiResponse().getRequestID();
+//		if (!payload.getVenID().equals(venID)) {
+//			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
+//					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, venID = payload.getVenID(), venID);
+//			return Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestID,
+//					Integer.valueOf(mismatchCredentialsVenIdResponse.getResponseCode()), venID).build();
+//
+//		}
 
 		return Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder(payload.getEiResponse().getRequestID(), HttpStatus.OK_200, venID).build();
@@ -691,17 +724,17 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 	public void otherOadrCancelReport(OadrCancelReportType payload) {
 		String venID = payload.getVenID();
 		Ven ven = venService.findOneByUsername(venID);
-		
-		List<OtherReportRequestSpecifier> findByRequestSourceAndRequestReportRequestIdIn = otherReportRequestSpecifierDao.findByRequestSourceAndRequestReportRequestIdIn(ven, payload.getReportRequestID());
 
-		if(findByRequestSourceAndRequestReportRequestIdIn != null) {
+		List<OtherReportRequestSpecifier> findByRequestSourceAndRequestReportRequestIdIn = otherReportRequestSpecifierDao
+				.findByRequestSourceAndRequestReportRequestIdIn(ven, payload.getReportRequestID());
+
+		if (findByRequestSourceAndRequestReportRequestIdIn != null) {
 			otherReportRequestSpecifierDao.deleteAll(findByRequestSourceAndRequestReportRequestIdIn);
 		}
 
 		List<OtherReportRequest> otherReportRequests = otherReportRequestService.findBySourceAndReportRequestIdIn(ven,
 				payload.getReportRequestID());
-		
-		
+
 		if (otherReportRequests != null && !otherReportRequests.isEmpty()) {
 			otherReportRequestService.delete(otherReportRequests);
 		}
@@ -1104,10 +1137,11 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 					.findByOtherReportCapability(reportCapability);
 			Map<String, OtherReportCapabilityDescription> descriptions = findByOtherReportCapability.stream()
 					.collect(Collectors.toMap(OtherReportCapabilityDescription::getRid, Function.identity()));
-			 Map<String, Boolean> rids = subscription.getRid();
-			 if(rids == null) {
-				 rids = findByOtherReportCapability.stream().collect(Collectors.toMap(OtherReportCapabilityDescription::getRid, p -> true));
-			 }
+			Map<String, Boolean> rids = subscription.getRid();
+			if (rids == null) {
+				rids = findByOtherReportCapability.stream()
+						.collect(Collectors.toMap(OtherReportCapabilityDescription::getRid, p -> true));
+			}
 			for (Entry<String, Boolean> entry : rids.entrySet()) {
 
 				if (descriptions.containsKey(entry.getKey())) {
@@ -1206,7 +1240,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 			LOGGER.info(ven.getUsername() + " - OadrRegisterReport");
 
-
 			OadrRegisterReportType obj = (OadrRegisterReportType) payload;
 
 			return this.oadrRegisterReport(ven, obj);
@@ -1214,7 +1247,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		} else if (payload instanceof OadrRegisteredReportType) {
 
 			LOGGER.info(ven.getUsername() + " - OadrRegisteredReport");
-
 
 			OadrRegisteredReportType obj = (OadrRegisteredReportType) payload;
 
@@ -1224,7 +1256,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 			LOGGER.info(ven.getUsername() + " - OadrUpdateReport");
 
-
 			OadrUpdateReportType obj = (OadrUpdateReportType) payload;
 
 			return this.oadrUpdateReport(ven, obj);
@@ -1232,7 +1263,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		} else if (payload instanceof OadrCreatedReportType) {
 
 			LOGGER.info(ven.getUsername() + " - OadrCreatedReport");
-
 
 			OadrCreatedReportType obj = (OadrCreatedReportType) payload;
 
@@ -1242,7 +1272,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 			LOGGER.info(ven.getUsername() + " - OadrCreateReport");
 
-
 			OadrCreateReportType obj = (OadrCreateReportType) payload;
 
 			return this.oadrCreateReport(ven, obj);
@@ -1251,10 +1280,17 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 			LOGGER.info(ven.getUsername() + " - OadrCancelReport	");
 
-
 			OadrCancelReportType obj = (OadrCancelReportType) payload;
 
 			return this.oadrCancelReport(ven, obj);
+
+		} else if (payload instanceof OadrCanceledReportType) {
+
+			LOGGER.info(ven.getUsername() + " - OadrCanceledReportType	");
+
+			OadrCanceledReportType obj = (OadrCanceledReportType) payload;
+
+			return this.oadrCanceledReport(ven, obj);
 
 		} else {
 			return Oadr20bResponseBuilders

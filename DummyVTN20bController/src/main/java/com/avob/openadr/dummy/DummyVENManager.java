@@ -15,12 +15,12 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.jms.JMSException;
 
+import org.apache.http.HttpStatus;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
-import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -81,7 +81,7 @@ public class DummyVENManager {
 			marketcontextId = findMarketContextByNameUsingGET.getId();
 			LOGGER.warn("Ven market context: "+DummyVTN20bControllerConfig.MARKET_CONTEXT+ " is already provisioned");
 		} catch (ApiException e) {
-			if(e.getCode() != HttpStatus.NOT_FOUND_404) {
+			if(e.getCode() != HttpStatus.SC_NOT_FOUND) {
 				LOGGER.error("Ven market context: "+DummyVTN20bControllerConfig.MARKET_CONTEXT+ " can't be provisioned", e);
 				return;
 			} else {
@@ -128,7 +128,7 @@ public class DummyVENManager {
 				}
 				return;
 			} catch (ApiException e) {
-				if(e.getCode() != HttpStatus.NOT_FOUND_404) {
+				if(e.getCode() != org.apache.http.HttpStatus.SC_NOT_FOUND) {
 					LOGGER.error("Ven certificate: "+crt+ " can't be provisioned", e);
 					return;
 				} else {

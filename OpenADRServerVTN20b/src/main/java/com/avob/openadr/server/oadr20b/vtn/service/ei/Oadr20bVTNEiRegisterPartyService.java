@@ -64,13 +64,13 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 
 	@Resource
 	private Oadr20bVTNSupportedProfileService oadr20bVTNSupportedProfileService;
-	
+
 	@Resource
 	private DemandResponseEventService demandResponseEventService;
-	
+
 	@Resource
 	protected VenDistributeService venDistributeService;
-	
+
 	@Resource
 	private Oadr20bVTNEiEventService oadr20bVTNEiEventService;
 
@@ -126,13 +126,13 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 		ven.setReportOnly(oadrReportOnly);
 		ven.setXmlSignature(oadrXmlSignature);
 		venService.save(ven);
-		
+
 		List<DemandResponseEvent> findToSentEventByVenUsername = demandResponseEventService
 				.findToSentEventByVenUsername(ven.getUsername());
-		
-		 OadrDistributeEventType createOadrDistributeEventPayload = oadr20bVTNEiEventService
+
+		OadrDistributeEventType createOadrDistributeEventPayload = oadr20bVTNEiEventService
 				.createOadrDistributeEventPayload(ven.getUsername(), findToSentEventByVenUsername);
-		
+
 		try {
 			venDistributeService.distribute(ven, createOadrDistributeEventPayload);
 		} catch (Oadr20bApplicationLayerException e) {
@@ -159,7 +159,7 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 
 	}
 
-	public Object oadrCanceledPartyRegistrationType(Ven ven, OadrCanceledPartyRegistrationType payload) {
+	public OadrResponseType oadrCanceledPartyRegistrationType(Ven ven, OadrCanceledPartyRegistrationType payload) {
 		String venID = ven.getUsername();
 		String requestID = payload.getEiResponse().getRequestID();
 		String registrationID = payload.getRegistrationID();

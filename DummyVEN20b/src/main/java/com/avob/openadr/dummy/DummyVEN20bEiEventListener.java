@@ -40,7 +40,10 @@ public class DummyVEN20bEiEventListener implements EventTimelineListener {
 	@Override
 	public void onIntervalStart(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
 			EiEventSignalType eiEventSignalType, IntervalType intervalType) {
-		LOGGER.info("onIntervalStart oadrEvent: " + event.getEiEvent().getEventDescriptor().getEventID());
+		LOGGER.info(String.format("onIntervalStart eventID: %s signalID: %s intervalID: %s" 
+				, event.getEiEvent().getEventDescriptor().getEventID()
+				, eiEventSignalType.getSignalID()
+				, intervalType.getUid().getText()));
 
 
 		Float value = null;
@@ -61,7 +64,11 @@ public class DummyVEN20bEiEventListener implements EventTimelineListener {
 		}
 
 		if(value != null) {
+			LOGGER.info(String.format("Change simulated reading from: %s to: %s"
+					, String.valueOf(requestedReportSimulator.getCurrentValue())
+					, String .valueOf(value)));
 			requestedReportSimulator.setCurrentValue(value);
+			
 		}
 
 	}
@@ -69,44 +76,47 @@ public class DummyVEN20bEiEventListener implements EventTimelineListener {
 
 	@Override
 	public void onActivePeriodStart(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
-		LOGGER.info("onIntervalStart oadrEvent: " + event.getEiEvent().getEventDescriptor().getEventID());
-		
+		LOGGER.info("onActivePeriodStart oadrEvent: " + event.getEiEvent().getEventDescriptor().getEventID());
+
 	}
 
 
 	@Override
 	public void onActivePeriodEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
-		LOGGER.info("onIntervalStart oadrEvent: " + event.getEiEvent().getEventDescriptor().getEventID());
-		
+		LOGGER.info("onActivePeriodEnd oadrEvent: " + event.getEiEvent().getEventDescriptor().getEventID());
+
 	}
 
 
 	@Override
 	public void onIntervalEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
 			EiEventSignalType eiEventSignalType, IntervalType intervalType) {
-		LOGGER.info("onIntervalEnd oadrEvent: " + event.getEiEvent().getEventDescriptor().getEventID());
-		
+		LOGGER.info(String.format("onIntervalEnd eventID: %s signalID: %s intervalID: %s" 
+				, event.getEiEvent().getEventDescriptor().getEventID()
+				, eiEventSignalType.getSignalID()
+				, intervalType.getUid().getText()));
+
 	}
 
 
 	@Override
 	public void onCreatedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
 		LOGGER.info("onCreatedEvent oadrEvent: " + event.getEiEvent().getEventDescriptor().getEventID());
-		
+
 	}
 
 
 	@Override
 	public void onDeletedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
 		LOGGER.info("onDeletedEvent oadrEvent: " + event.getEiEvent().getEventDescriptor().getEventID());
-		
+
 	}
 
 
 	@Override
 	public void onUpdatedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
 		LOGGER.info("onUpdatedEvent oadrEvent: " + event.getEiEvent().getEventDescriptor().getEventID());
-		
+
 	}
 
 
