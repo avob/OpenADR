@@ -208,6 +208,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		String venID = ven.getUsername();
 		String requestID = payload.getRequestID();
+//		String reportRequestID = payload.getReportRequestID();
 		if (!payload.getVenID().equals(venID)) {
 			EiResponseType mismatchCredentialsVenIdResponse = Oadr20bResponseBuilders
 					.newOadr20bEiResponseMismatchUsernameVenIdBuilder(requestID, payload.getVenID(), venID);
@@ -298,6 +299,15 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 				String itemUnits = null;
 				SiScaleCodeType siScaleCode = null;
 				if (oadrReportDescriptionType.getItemBase() != null) {
+
+					String marshal;
+					try {
+						marshal = jaxbContext.marshal(oadrReportDescriptionType.getItemBase());
+						description.setItemBase(marshal);
+					} catch (Oadr20bMarshalException e) {
+						LOGGER.error("Can't marshall report description item base", e);
+					}
+
 					ItemBaseType value = oadrReportDescriptionType.getItemBase().getValue();
 					Class<? extends ItemBaseType> declaredType = oadrReportDescriptionType.getItemBase()
 							.getDeclaredType();
@@ -403,6 +413,30 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 					description.setVenMarketContext(findOneByName);
 				}
 
+				if (oadrReportDescriptionType.getReportSubject() != null) {
+					String marshal;
+					try {
+
+						marshal = jaxbContext
+								.marshal(Oadr20bFactory.createEiTarget(oadrReportDescriptionType.getReportSubject()));
+						description.setEiSubject(marshal);
+					} catch (Oadr20bMarshalException e) {
+						LOGGER.error("Can't marshall report description report subject", e);
+					}
+				}
+
+				if (oadrReportDescriptionType.getReportDataSource() != null) {
+					String marshal;
+					try {
+
+						marshal = jaxbContext.marshal(
+								Oadr20bFactory.createEiTarget(oadrReportDescriptionType.getReportDataSource()));
+						description.setEiDatasource(marshal);
+					} catch (Oadr20bMarshalException e) {
+						LOGGER.error("Can't marshall report description report datasource", e);
+					}
+				}
+
 				descriptionDto.add(oadr20bDtoMapper.map(description, ReportCapabilityDescriptionDto.class));
 				descriptions.add(description);
 				capabilityDescription.add(description);
@@ -489,8 +523,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		return Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder(payload.getEiResponse().getRequestID(), HttpStatus.OK_200, venID).build();
 	}
-	
-	
+
 	public Object oadrUpdatedReport(Ven ven, OadrUpdatedReportType payload) {
 		String venID = ven.getUsername();
 //		String requestID = payload.getEiResponse().getRequestID();
@@ -1025,7 +1058,22 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 					OtherReportCapabilityDescription otherReportCapabilityDescription = otherReportRequestSpecifier
 							.getOtherReportCapabilityDescription();
-					reportRequestBuilder.addSpecifierPayload(null, otherReportCapabilityDescription.getReadingType(),
+
+					JAXBElement<? extends ItemBaseType> createItemBase = null;
+					if (otherReportCapabilityDescription.getItemBase() != null) {
+						try {
+							ItemBaseType baseItem = jaxbContext
+									.unmarshal(otherReportCapabilityDescription.getItemBase(), ItemBaseType.class);
+
+							createItemBase = Oadr20bFactory.createItemBase(baseItem);
+
+						} catch (Oadr20bUnmarshalException e) {
+							LOGGER.error("Can't unmarshal report description item base", e);
+						}
+					}
+
+					reportRequestBuilder.addSpecifierPayload(createItemBase,
+							otherReportCapabilityDescription.getReadingType(),
 							otherReportCapabilityDescription.getRid());
 
 				}
@@ -1124,7 +1172,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 					.findOneBySourceUsernameAndReportSpecifierId(ven.getUsername(),
 							subscription.getReportSpecifierId());
 
-			String reportRequestId = UUID.randomUUID().toString();
+			String reportRequestId = reportCapability.getReportRequestId();
 			OtherReportRequest otherReportRequest = new OtherReportRequest();
 			otherReportRequest.setGranularity(subscription.getGranularity());
 			otherReportRequest.setReportBackDuration(subscription.getReportBackDuration());

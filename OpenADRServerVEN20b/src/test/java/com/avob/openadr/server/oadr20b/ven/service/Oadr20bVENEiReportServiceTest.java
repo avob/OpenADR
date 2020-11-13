@@ -32,8 +32,8 @@ import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.VEN20bApplicationTest;
-import com.avob.openadr.server.oadr20b.ven.VenConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VEN20bApplicationTest.class })
@@ -45,7 +45,7 @@ public class Oadr20bVENEiReportServiceTest {
 	private String vtnHttpId;
 
 	@Resource
-	private VenConfig venConfig;
+	private MultiVtnConfig multiVtnConfig;
 
 	@Resource
 	private Oadr20bJAXBContext oadr20bJAXBContext;
@@ -71,11 +71,11 @@ public class Oadr20bVENEiReportServiceTest {
 		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(reportId,
 				reportrequestId, reportSpecifierId, reportName, createdTimestamp, startTimestamp, duration).build();
 		OadrUpdateReportType oadrUpdateReport = Oadr20bEiReportBuilders
-				.newOadr20bUpdateReportBuilder("", venConfig.getVenId()).addReport(report)
-				.addReport(Lists.newArrayList(report)).build();
+				.newOadr20bUpdateReportBuilder("",
+						multiVtnConfig.getMultiConfig(vtnHttpId).getVenSessionConfig().getVenId())
+				.addReport(report).addReport(Lists.newArrayList(report)).build();
 
 		String request = oadr20bVENPayloadService.report(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrUpdateReport));
-		
 
 		OadrUpdatedReportType resp = oadr20bJAXBContext.unmarshal(request, OadrUpdatedReportType.class);
 		assertNotNull(resp);
@@ -98,8 +98,9 @@ public class Oadr20bVENEiReportServiceTest {
 		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(reportId,
 				reportRequestId, reportSpecifierId, reportName, createdTimestamp, startTimestamp, duration).build();
 		OadrRegisterReportType oadrRegisterReport = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportBuilder("", venConfig.getVenId(), reportRequestId).addOadrReport(report)
-				.build();
+				.newOadr20bRegisterReportBuilder("",
+						multiVtnConfig.getMultiConfig(vtnHttpId).getVenSessionConfig().getVenId(), reportRequestId)
+				.addOadrReport(report).build();
 
 		String request = oadr20bVENPayloadService.report(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrRegisterReport));
 
@@ -113,7 +114,9 @@ public class Oadr20bVENEiReportServiceTest {
 			throws Oadr20bApplicationLayerException, Oadr20bMarshalException, Oadr20bUnmarshalException,
 			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException {
 		OadrCancelReportType oadrCancelReport = Oadr20bEiReportBuilders
-				.newOadr20bCancelReportBuilder("", venConfig.getVenId(), false).addReportRequestId("").build();
+				.newOadr20bCancelReportBuilder("",
+						multiVtnConfig.getMultiConfig(vtnHttpId).getVenSessionConfig().getVenId(), false)
+				.addReportRequestId("").build();
 		String request = oadr20bVENPayloadService.report(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrCancelReport));
 
 		OadrCanceledReportType resp = oadr20bJAXBContext.unmarshal(request, OadrCanceledReportType.class);

@@ -26,7 +26,7 @@ import com.avob.openadr.security.exception.OadrSecurityException;
 
 @Configuration
 public class VenConfig {
-	
+
 	@Value("${oadr.server.context_path:#{null}}")
 	private String contextPath;
 
@@ -90,8 +90,8 @@ public class VenConfig {
 	public static final String VALIDATE_OADR_PAYLOAD_XSD_CONF = "oadr.validateOadrPayloadAgainstXsd";
 	public static final String VALIDATE_OADR_PAYLOAD_XSD_FILEPATH_CONF = "oadr.security.validateOadrPayloadAgainstXsdFilePath";
 
-	private  SSLContext sslContext;
-	
+	private SSLContext sslContext;
+
 	public VenConfig() {
 	}
 
@@ -114,10 +114,7 @@ public class VenConfig {
 		this.venUrl = clone.getVenUrl();
 		this.xmlSignature = clone.getXmlSignature();
 		this.validateOadrPayloadAgainstXsdFilePath = clone.getValidateOadrPayloadAgainstXsdFilePath();
-		
-		 
-		
-		
+
 	}
 
 	@PostConstruct
@@ -147,14 +144,14 @@ public class VenConfig {
 			}
 		}
 		String password = UUID.randomUUID().toString();
-		 TrustManagerFactory trustManagerFactory;
+		TrustManagerFactory trustManagerFactory;
 		try {
 			trustManagerFactory = OadrPKISecurity.createTrustManagerFactory(trustCertificates);
-			 KeyManagerFactory keyManagerFactory =  OadrPKISecurity.createKeyManagerFactory(this.getVenPrivateKeyPath(), this.getVenCertificatePath(),
-					 password);
-			 
+			KeyManagerFactory keyManagerFactory = OadrPKISecurity.createKeyManagerFactory(this.getVenPrivateKeyPath(),
+					this.getVenCertificatePath(), password);
+
 			// SSL Context Factory
-			 sslContext = SSLContext.getInstance("TLS");
+			sslContext = SSLContext.getInstance("TLS");
 
 			// init ssl context
 			String seed = UUID.randomUUID().toString();
@@ -256,9 +253,9 @@ public class VenConfig {
 	public String getValidateOadrPayloadAgainstXsdFilePath() {
 		return validateOadrPayloadAgainstXsdFilePath;
 	}
-	
+
 	public SSLContext getSslContext() {
-		
+
 		return sslContext;
 	}
 

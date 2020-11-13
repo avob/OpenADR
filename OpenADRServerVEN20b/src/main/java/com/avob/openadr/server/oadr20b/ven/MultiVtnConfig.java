@@ -3,10 +3,13 @@ package com.avob.openadr.server.oadr20b.ven;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import javax.annotation.PostConstruct;
@@ -32,7 +35,14 @@ import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20b;
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppClient20bBuilder;
 import com.avob.openadr.client.xmpp.oadr20b.OadrXmppException;
 import com.avob.openadr.client.xmpp.oadr20b.ven.OadrXmppVenClient20b;
+import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.Oadr20bSecurity;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
+import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
+import com.avob.openadr.model.oadr20b.builders.eireport.Oadr20bRegisterReportBuilder;
+import com.avob.openadr.model.oadr20b.ei.ReportSpecifierType;
+import com.avob.openadr.model.oadr20b.ei.SpecifierPayloadType;
+import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bHttpLayerException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
@@ -43,9 +53,14 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreateOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrReportDescriptionType;
+import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrSamplingRateType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
+import com.avob.openadr.model.oadr20b.xcal.DurationPropType;
 import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bInvalidReportRequestException;
 import com.avob.openadr.server.oadr20b.ven.exception.OadrVTNInitializationException;
 import com.avob.openadr.server.oadr20b.ven.xmpp.XmppVenListener;
 
@@ -60,6 +75,9 @@ public class MultiVtnConfig {
 	@Resource
 	private VenConfig venConfig;
 
+	@Autowired(required = false)
+	private List<OadrReportType> venRegisterReport;
+
 	@Autowired
 	private Environment env;
 
@@ -69,7 +87,7 @@ public class MultiVtnConfig {
 
 	private Map<String, OadrXmppVenClient20b> multiXmppClientConfig = new HashMap<String, OadrXmppVenClient20b>();
 
-
+	private Map<String, Map<String, OadrReportType>> reports = new HashMap<>();
 
 	private void configureClient(VtnSessionConfiguration session)
 			throws OadrSecurityException, JAXBException, OadrVTNInitializationException {
@@ -84,21 +102,18 @@ public class MultiVtnConfig {
 	private void configureHTTPClient(VtnSessionConfiguration session)
 			throws OadrSecurityException, JAXBException, OadrVTNInitializationException {
 		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(session.getVtnUrl())
-				.withTrustedCertificate(
-						new ArrayList<String>(session.getVenSessionConfig().getTrustCertificates()))
+				.withTrustedCertificate(new ArrayList<String>(session.getVenSessionConfig().getTrustCertificates()))
 				.withPooling(1, 1).withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers());
 
 		if (session.isBasicAuthenticationConfigured()) {
 			LOGGER.info("Init HTTP VEN client with basic authentication");
 			builder.withDefaultBasicAuthentication(session.getVtnUrl(),
-					session.getVenSessionConfig().getBasicUsername(),
-					session.getVenSessionConfig().getBasicPassword());
+					session.getVenSessionConfig().getBasicUsername(), session.getVenSessionConfig().getBasicPassword());
 
 		} else if (session.isDigestAuthenticationConfigured()) {
 			LOGGER.info("Init HTTP VEN client with digest authentication");
-			builder.withDefaultDigestAuthentication(session.getVtnUrl(),
-					session.getVenSessionConfig().getDigestRealm(), "",
-					session.getVenSessionConfig().getDigestUsername(),
+			builder.withDefaultDigestAuthentication(session.getVtnUrl(), session.getVenSessionConfig().getDigestRealm(),
+					"", session.getVenSessionConfig().getDigestUsername(),
 					session.getVenSessionConfig().getDigestPassword());
 
 		} else {
@@ -130,8 +145,8 @@ public class MultiVtnConfig {
 
 			OadrXmppClient20bBuilder builder = new OadrXmppClient20bBuilder()
 					.withHostAndPort(session.getVtnXmppHost(), session.getVtnXmppPort())
-					.withVenID(venConfig.getVenId()).withResource("client").withSSLContext(sslContext)
-					.withListener(xmppVenListeners);
+					.withVenID(session.getVenSessionConfig().getVenId()).withResource("client")
+					.withSSLContext(sslContext).withListener(xmppVenListeners);
 
 			if (session.getVtnXmppDomain() != null) {
 				builder.withDomain(session.getVtnXmppDomain());
@@ -167,23 +182,23 @@ public class MultiVtnConfig {
 		Properties props = new Properties();
 		MutablePropertySources propSrcs = ((AbstractEnvironment) env).getPropertySources();
 		StreamSupport.stream(propSrcs.spliterator(), false).filter(ps -> ps instanceof EnumerablePropertySource)
-		.map(ps -> ((EnumerablePropertySource) ps).getPropertyNames()).flatMap(Arrays::<String>stream)
-		.forEach(propName -> {
-			if (propName.contains(dynamicConfigurationPattern)) {
-				String replaceAll = propName.replaceAll(dynamicConfigurationPattern, "");
-				String key = replaceAll.split("\\.")[0];
-				Properties vtnProps = perVtnProperties.get(key);
-				if (vtnProps == null) {
-					vtnProps = new Properties();
-				}
-				String propKey = replaceAll.replaceAll(key + ".", "");
-				vtnProps.put(dynamicConfigurationPattern + propKey, env.getProperty(propName));
-				perVtnProperties.put(key, vtnProps);
+				.map(ps -> ((EnumerablePropertySource) ps).getPropertyNames()).flatMap(Arrays::<String>stream)
+				.forEach(propName -> {
+					if (propName.contains(dynamicConfigurationPattern)) {
+						String replaceAll = propName.replaceAll(dynamicConfigurationPattern, "");
+						String key = replaceAll.split("\\.")[0];
+						Properties vtnProps = perVtnProperties.get(key);
+						if (vtnProps == null) {
+							vtnProps = new Properties();
+						}
+						String propKey = replaceAll.replaceAll(key + ".", "");
+						vtnProps.put(dynamicConfigurationPattern + propKey, env.getProperty(propName));
+						perVtnProperties.put(key, vtnProps);
 
-				props.setProperty(propName, env.getProperty(propName));
+						props.setProperty(propName, env.getProperty(propName));
 
-			}
-		});
+					}
+				});
 
 		return perVtnProperties;
 	}
@@ -199,6 +214,7 @@ public class MultiVtnConfig {
 				LOGGER.info(session.toString());
 				configureClient(session);
 				getMultiConfig().put(session.getVtnId(), session);
+
 			} catch (OadrSecurityException e) {
 				LOGGER.error("Dynamic Vtn conf key: " + entry.getKey() + " is not a valid vtn configuration", e);
 			} catch (JAXBException e) {
@@ -208,10 +224,157 @@ public class MultiVtnConfig {
 			}
 		}
 
+		if (venRegisterReport != null) {
+
+			this.getMultiConfig().keySet().forEach(vtnId -> {
+				Map<String, OadrReportType> map = new HashMap<>();
+				venRegisterReport.forEach(report -> {
+					map.put(report.getReportSpecifierID(), report);
+				});
+				reports.put(vtnId, map);
+			});
+
+		}
+
 		if (getMultiConfig().isEmpty()) {
 			throw new IllegalArgumentException("No Vtn configuration has been found");
 		}
 
+	}
+
+	public OadrRegisterReportType getVenRegisterReport(VtnSessionConfiguration vtnConfig) {
+		String requestId = UUID.randomUUID().toString();
+		String reportRequestId = UUID.randomUUID().toString();
+		Oadr20bRegisterReportBuilder builder = Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder(requestId,
+				vtnConfig.getVenSessionConfig().getVenId(), reportRequestId);
+		if (venRegisterReport != null) {
+			builder.addOadrReport(venRegisterReport);
+		}
+		return builder.build();
+	}
+
+	public void checkReportSpecifier(VtnSessionConfiguration vtnConfig, String requestId, String reportRequestId,
+			ReportSpecifierType reportSpecifier) throws Oadr20bInvalidReportRequestException {
+
+		String reportSpecifierID = reportSpecifier.getReportSpecifierID();
+		if (reports.get(vtnConfig.getVtnId()) == null
+				|| !reports.get(vtnConfig.getVtnId()).containsKey(reportSpecifierID)) {
+			throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder(requestId, Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461,
+							vtnConfig.getVenSessionConfig().getVenId())
+					.withDescription(
+							String.format("Invalid create report request: %s - report specifier %s not suported",
+									reportRequestId, reportSpecifierID))
+					.build());
+		}
+
+		OadrReportType report = reports.get(vtnConfig.getVtnId()).get(reportSpecifierID);
+		Map<String, OadrReportDescriptionType> reportDescriptions = report.getOadrReportDescription().stream()
+				.collect(Collectors.toMap(desc -> {
+					return getReportDescriptionUID(desc);
+				}, Function.identity()));
+
+		DurationPropType granularity = reportSpecifier.getGranularity();
+		DurationPropType reportBackDuration = reportSpecifier.getReportBackDuration();
+
+		Long granularityMillis = Oadr20bFactory.xmlDurationToMillisecond(granularity.getDuration());
+		Long reportBackDurationMillis = Oadr20bFactory.xmlDurationToMillisecond(reportBackDuration.getDuration());
+
+		if (reportBackDurationMillis < granularityMillis) {
+			throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
+					.newOadr20bResponseBuilder(requestId, Oadr20bApplicationLayerErrorCode.INVALID_DATA_454,
+							vtnConfig.getVenSessionConfig().getVenId())
+					.withDescription(String.format(
+							"Invalid create report request: %s - Granularity duration must be less than report back duration",
+							reportRequestId))
+					.build());
+		}
+
+		List<SpecifierPayloadType> specifierPayload = reportSpecifier.getSpecifierPayload();
+		for (SpecifierPayloadType specifier : specifierPayload) {
+			String reportDescriptionUID = getReportDescriptionUID(specifier);
+
+			if (!reportDescriptions.containsKey(reportDescriptionUID)) {
+				throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
+						.newOadr20bResponseBuilder(requestId, Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461,
+								vtnConfig.getVenSessionConfig().getVenId())
+						.withDescription(
+								String.format("Invalid create report request: %s - report specifier %s not suported",
+										reportRequestId, reportSpecifierID))
+						.build());
+			}
+
+			OadrReportDescriptionType oadrReportDescriptionType = reportDescriptions.get(reportDescriptionUID);
+			OadrSamplingRateType oadrSamplingRate = oadrReportDescriptionType.getOadrSamplingRate();
+
+			Long minSamplingRateMillis = null;
+			Long maxSamplingRateMillis = null;
+			boolean oadrOnChange = false;
+			if (oadrSamplingRate != null) {
+				if (oadrSamplingRate.getOadrMinPeriod() != null) {
+					minSamplingRateMillis = Oadr20bFactory
+							.xmlDurationToMillisecond(oadrSamplingRate.getOadrMaxPeriod());
+					if (granularityMillis < minSamplingRateMillis) {
+						throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
+								.newOadr20bResponseBuilder(requestId,
+										Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461,
+										vtnConfig.getVenSessionConfig().getVenId())
+								.withDescription(String.format(
+										"Invalid create report request: %s - granularity must be greater than every report description oadrMinPeriod if defined",
+										reportRequestId, reportSpecifierID))
+								.build());
+					}
+				}
+				if (oadrSamplingRate.getOadrMinPeriod() != null) {
+					maxSamplingRateMillis = Oadr20bFactory
+							.xmlDurationToMillisecond(oadrSamplingRate.getOadrMaxPeriod());
+					if (reportBackDurationMillis > maxSamplingRateMillis) {
+						throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
+								.newOadr20bResponseBuilder(requestId,
+										Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461,
+										vtnConfig.getVenSessionConfig().getVenId())
+								.withDescription(String.format(
+										"Invalid create report request: %s - report back duration must be greater than every report description oadrMaxPeriod if defined",
+										reportRequestId, reportSpecifierID))
+								.build());
+					}
+				}
+				oadrOnChange = oadrSamplingRate.isOadrOnChange();
+			}
+
+			if (!oadrOnChange && (granularityMillis == 0 || reportBackDurationMillis == 0)) {
+				throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
+						.newOadr20bResponseBuilder(requestId, Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461,
+								vtnConfig.getVenSessionConfig().getVenId())
+						.withDescription(String.format(
+								"Invalid create report request: %s - granularity and report back duration equals 0 while at least on report description do not support oadrOnChange",
+								reportRequestId, reportSpecifierID))
+						.build());
+			}
+
+		}
+	}
+
+	private String getReportDescriptionUID(SpecifierPayloadType description) {
+		StringBuilder builder = new StringBuilder().append(description.getRID());
+		if (description.getReadingType() != null) {
+			builder.append(description.getReadingType());
+		}
+		if (description.getItemBase() != null) {
+			builder.append(description.getItemBase().getName().toString());
+		}
+		return builder.toString();
+	}
+
+	private String getReportDescriptionUID(OadrReportDescriptionType description) {
+		StringBuilder builder = new StringBuilder().append(description.getRID());
+		if (description.getReadingType() != null) {
+			builder.append(description.getReadingType());
+		}
+		if (description.getItemBase() != null) {
+			builder.append(description.getItemBase().getName().toString());
+		}
+		return builder.toString();
 	}
 
 	public Map<String, VtnSessionConfiguration> getMultiConfig() {

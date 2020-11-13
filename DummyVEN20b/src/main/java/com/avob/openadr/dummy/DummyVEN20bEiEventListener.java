@@ -24,7 +24,6 @@ public class DummyVEN20bEiEventListener implements EventTimelineListener {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DummyVEN20bEiEventListener.class);
 
-
 	@Resource
 	private Oadr20bVENEiEventService oadr20bVENEiEventService;
 
@@ -35,7 +34,6 @@ public class DummyVEN20bEiEventListener implements EventTimelineListener {
 	public void init() {
 		oadr20bVENEiEventService.addListener(this);
 	}
-
 
 	@Override
 	public void onIntervalStart(VtnSessionConfiguration vtnConfiguration, OadrEvent event,

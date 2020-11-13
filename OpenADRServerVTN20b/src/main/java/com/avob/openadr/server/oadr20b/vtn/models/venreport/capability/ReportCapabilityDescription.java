@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.Lob;
 
 import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportEnumeratedType;
@@ -45,6 +46,15 @@ public class ReportCapabilityDescription {
 	private String itemDescription;
 
 	private String itemUnits;
+
+	@Lob
+	private String itemBase;
+
+	@Lob
+	private String eiDatasource;
+
+	@Lob
+	private String eiSubject;
 
 	@Enumerated(EnumType.STRING)
 	private SiScaleCodeType siScaleCode;
@@ -127,5 +137,29 @@ public class ReportCapabilityDescription {
 
 	public void setSiScaleCode(SiScaleCodeType siScaleCode) {
 		this.siScaleCode = siScaleCode;
+	}
+
+	public String getItemBase() {
+		return itemBase;
+	}
+
+	public void setItemBase(String itemBase) {
+		this.itemBase = itemBase;
+	}
+
+	public String getEiDatasource() {
+		return eiDatasource;
+	}
+
+	public void setEiDatasource(String eiDatasource) {
+		this.eiDatasource = eiDatasource;
+	}
+
+	public String getEiSubject() {
+		return eiSubject;
+	}
+
+	public void setEiSubject(String eiSubject) {
+		this.eiSubject = eiSubject;
 	}
 }

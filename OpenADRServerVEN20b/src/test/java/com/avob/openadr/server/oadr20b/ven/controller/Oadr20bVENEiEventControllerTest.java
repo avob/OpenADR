@@ -52,7 +52,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.OadrMockMvc;
 import com.avob.openadr.server.oadr20b.ven.VEN20bApplicationTest;
-import com.avob.openadr.server.oadr20b.ven.VenConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiEventService;
 import com.avob.openadr.server.oadr20b.ven.timeline.Timeline.EventTimelineListener;
@@ -74,9 +73,6 @@ public class Oadr20bVENEiEventControllerTest {
 	private OadrMockMvc oadrMockMvc;
 
 	@Resource
-	private VenConfig venConfig;
-
-	@Resource
 	private MultiVtnConfig multiVtnConfig;
 
 	@Value("${oadr.vtn.myvtn.vtnid}")
@@ -86,12 +82,12 @@ public class Oadr20bVENEiEventControllerTest {
 	public void setup() throws Exception {
 		jaxbContext = Oadr20bJAXBContext.getInstance();
 	}
-	
+
 	@Resource
 	private Oadr20bVENEiEventService oadr20bVENEiEventService;
 
 	private Oadr20bVENEiEventListener oadr20bVENEiEventListener = new Oadr20bVENEiEventListener();
-	
+
 	private Oadr20bJAXBContext jaxbContext;
 
 	private class Oadr20bVENEiEventListener implements EventTimelineListener {
@@ -137,13 +133,13 @@ public class Oadr20bVENEiEventControllerTest {
 		@Override
 		public void onActivePeriodStart(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void onActivePeriodEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 	}
@@ -196,10 +192,10 @@ public class Oadr20bVENEiEventControllerTest {
 		// POST without content
 		content = "mouaiccool";
 		MvcResult andReturn = this.oadrMockMvc
-				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT)
-						.with(VTN_SECURITY_SESSION).content(content))
+				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(VTN_SECURITY_SESSION).content(content))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		OadrResponseType unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), OadrResponseType.class);
+		OadrResponseType unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(),
+				OadrResponseType.class);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453),
 				unmarshal.getEiResponse().getResponseCode());
 	}
@@ -225,7 +221,8 @@ public class Oadr20bVENEiEventControllerTest {
 		EventDescriptorType eventDescriptorType = Oadr20bEiEventBuilders.newOadr20bEventDescriptorTypeBuilder(
 				createdTimespamp, eventId, modificationNumber, marketContext, status).build();
 
-		EiTargetType eiTargetType = new Oadr20bEiTargetTypeBuilder().addVenId(venConfig.getVenId()).build();
+		EiTargetType eiTargetType = new Oadr20bEiTargetTypeBuilder()
+				.addVenId(multiVtnConfig.getMultiConfig(vtnHttpId).getVenSessionConfig().getVenId()).build();
 		OadrEvent event = Oadr20bEiEventBuilders.newOadr20bDistributeEventOadrEventBuilder()
 				.withActivePeriod(activePeriod).withEventDescriptor(eventDescriptorType).withEiTarget(eiTargetType)
 				.build();

@@ -31,7 +31,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.OadrMockMvc;
 import com.avob.openadr.server.oadr20b.ven.VEN20bApplicationTest;
-import com.avob.openadr.server.oadr20b.ven.VenConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { VEN20bApplicationTest.class })
@@ -52,16 +51,13 @@ public class Oadr20bVENEiRegisterPartyControllerTest {
 	private OadrMockMvc oadrMockMvc;
 
 	@Resource
-	private VenConfig venConfig;
-
-	@Resource
 	private MultiVtnConfig multiVtnConfig;
-	
+
 	private Oadr20bJAXBContext jaxbContext;
-	
+
 	@Value("${oadr.vtn.myvtn.vtnid}")
 	private String vtnHttpId;
-	
+
 	@Before
 	public void setup() throws Exception {
 		jaxbContext = Oadr20bJAXBContext.getInstance();
@@ -97,14 +93,14 @@ public class Oadr20bVENEiRegisterPartyControllerTest {
 
 		// POST without content
 		content = "mouaiccool";
-		MvcResult andReturn = this.oadrMockMvc
-				.perform(MockMvcRequestBuilders.post(EIREGISTERPARTY_ENDPOINT)
-						.with(VTN_SECURITY_SESSION).content(content))
+		MvcResult andReturn = this.oadrMockMvc.perform(
+				MockMvcRequestBuilders.post(EIREGISTERPARTY_ENDPOINT).with(VTN_SECURITY_SESSION).content(content))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		OadrResponseType unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(), OadrResponseType.class);
+		OadrResponseType unmarshal = jaxbContext.unmarshal(andReturn.getResponse().getContentAsString(),
+				OadrResponseType.class);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453),
 				unmarshal.getEiResponse().getResponseCode());
-				
+
 	}
 
 }

@@ -35,11 +35,10 @@ import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrTransportType;
 import com.avob.openadr.security.exception.OadrSecurityException;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
-import com.avob.openadr.server.oadr20b.ven.VenConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 
 @Service
-public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
+public class Oadr20bVENEiRegisterPartyService implements Oadr20bVENEiService {
 
 	private static final String EI_SERVICE_NAME = "EiRegisterParty";
 
@@ -51,9 +50,6 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 	@Resource
 	private Oadr20bPollService oadrPollService;
 
-	@Resource
-	private VenConfig venConfig;
-
 	private Map<String, OadrCreatedPartyRegistrationType> registration = new ConcurrentHashMap<String, OadrCreatedPartyRegistrationType>();
 
 	private List<Oadr20bVENEiRegisterPartyServiceListener> listeners;
@@ -62,7 +58,8 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 		public void onRegistrationSuccess(VtnSessionConfiguration vtnConfiguration,
 				OadrCreatedPartyRegistrationType registration);
 
-		public void onRegistrationError(VtnSessionConfiguration vtnConfiguration, OadrCreatedPartyRegistrationType registration);
+		public void onRegistrationError(VtnSessionConfiguration vtnConfiguration,
+				OadrCreatedPartyRegistrationType registration);
 	}
 
 	public OadrResponseType oadrRequestReregistration(VtnSessionConfiguration vtnConfiguration,
@@ -110,7 +107,6 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 
 		String requestId = "0";
 
-
 		try {
 			if (vtnConfiguration.getVtnUrl() != null) {
 				OadrQueryRegistrationType queryRegistration = Oadr20bEiRegisterPartyBuilders
@@ -119,18 +115,23 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 
 				OadrCreatedPartyRegistrationType oadrQueryRegistrationType = multiVtnConfig
 						.getMultiHttpClientConfig(vtnConfiguration).oadrQueryRegistrationType(queryRegistration);
-				
+
 				this.oadrCreatedPartyRegistration(vtnConfiguration, oadrQueryRegistrationType);
 			} else {
 
-				OadrCreatePartyRegistrationType createPartyRegistration = Oadr20bEiRegisterPartyBuilders.newOadr20bCreatePartyRegistrationBuilder(requestId, venConfig.getVenId(), "xmpp")
+				OadrCreatePartyRegistrationType createPartyRegistration = Oadr20bEiRegisterPartyBuilders
+						.newOadr20bCreatePartyRegistrationBuilder(requestId,
+								vtnConfiguration.getVenSessionConfig().getVenId(), "xmpp")
 						.withOadrTransportName(OadrTransportType.XMPP)
-						.withOadrTransportAddress(multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).getConnectionJid())
-						.withOadrReportOnly(venConfig.getReportOnly()).withOadrVenName(venConfig.getVenName())
-						.withOadrXmlSignature(venConfig.getXmlSignature()).withOadrHttpPullModel(venConfig.getPullModel())
-						.build();
+						.withOadrTransportAddress(
+								multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).getConnectionJid())
+						.withOadrReportOnly(vtnConfiguration.getVenSessionConfig().getReportOnly())
+						.withOadrVenName(vtnConfiguration.getVenSessionConfig().getVenName())
+						.withOadrXmlSignature(vtnConfiguration.getVenSessionConfig().getXmlSignature())
+						.withOadrHttpPullModel(vtnConfiguration.getVenSessionConfig().getPullModel()).build();
 
-				multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).oadrCreatePartyRegistration(createPartyRegistration);
+				multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration)
+						.oadrCreatePartyRegistration(createPartyRegistration);
 			}
 
 		} catch (Oadr20bException | Oadr20bHttpLayerException | Oadr20bXMLSignatureException
@@ -145,10 +146,10 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 	}
 
 	public void register(VtnSessionConfiguration vtnConfiguration, OadrCreatedPartyRegistrationType registration) {
-		if(registration.getRegistrationID() != null) {
+		if (registration.getRegistrationID() != null) {
 			setRegistration(vtnConfiguration, registration);
-			
-			if(vtnConfiguration.getVenSessionConfig().getPullModel()) {
+
+			if (vtnConfiguration.getVenSessionConfig().getPullModel()) {
 				oadrPollService.initPoll(vtnConfiguration, registration.getOadrRequestedOadrPollFreq());
 			}
 
@@ -161,17 +162,15 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 				final OadrCreatedPartyRegistrationType reg = registration;
 				getListeners().forEach(listener -> listener.onRegistrationSuccess(vtnConfiguration, reg));
 			}
-		}
-		else {
+		} else {
 			LOGGER.info("Ven cannot register to vtn: " + vtnConfiguration.getVtnId());
-
 
 			if (getListeners() != null) {
 				final OadrCreatedPartyRegistrationType reg = registration;
 				getListeners().forEach(listener -> listener.onRegistrationError(vtnConfiguration, reg));
 			}
 		}
-		
+
 	}
 
 	public OadrCreatedPartyRegistrationType getRegistration(VtnSessionConfiguration vtnConfiguration) {
@@ -200,11 +199,11 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 
 	public void oadrCreatedPartyRegistration(VtnSessionConfiguration vtnConfig,
 			OadrCreatedPartyRegistrationType oadrCreatedPartyRegistrationType)
-					throws Oadr20bMarshalException, Oadr20bXMLSignatureException, OadrSecurityException, IOException {
+			throws Oadr20bMarshalException, Oadr20bXMLSignatureException, OadrSecurityException, IOException {
 
 		if (getRegistration(vtnConfig) != null && getRegistration(vtnConfig).getRegistrationID() != null
 				&& getRegistration(vtnConfig).getRegistrationID()
-				.equals(oadrCreatedPartyRegistrationType.getRegistrationID())) {
+						.equals(oadrCreatedPartyRegistrationType.getRegistrationID())) {
 			return;
 		} else if (oadrCreatedPartyRegistrationType.getRegistrationID() != null) {
 			this.register(vtnConfig, oadrCreatedPartyRegistrationType);
@@ -231,9 +230,9 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 			OadrTransportType transportType = OadrTransportType.SIMPLE_HTTP;
 
 			builder.withOadrHttpPullModel(pullModel).withOadrTransportAddress(transportAddress)
-			.withOadrReportOnly(reportOnly).withOadrTransportName(transportType).withOadrVenName(venName)
+					.withOadrReportOnly(reportOnly).withOadrTransportName(transportType).withOadrVenName(venName)
 
-			.withOadrXmlSignature(xmlSignature);
+					.withOadrXmlSignature(xmlSignature);
 
 		} else if (vtnConfig.getVtnXmppHost() != null && vtnConfig.getVtnXmppPort() != null) {
 
@@ -244,8 +243,8 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 			OadrTransportType transportType = OadrTransportType.XMPP;
 
 			builder.withOadrTransportAddress(transportAddress).withOadrReportOnly(reportOnly)
-			.withOadrHttpPullModel(false).withOadrTransportName(transportType).withOadrVenName(venName)
-			.withOadrXmlSignature(xmlSignature);
+					.withOadrHttpPullModel(false).withOadrTransportName(transportType).withOadrVenName(venName)
+					.withOadrXmlSignature(xmlSignature);
 
 		}
 
@@ -271,8 +270,7 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 
 	}
 
-	public Object request(VtnSessionConfiguration vtnConfig, Object unmarshal)  {
-
+	public Object request(VtnSessionConfiguration vtnConfig, Object unmarshal) {
 
 		if (unmarshal instanceof OadrRequestReregistrationType) {
 
@@ -296,7 +294,6 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 
 			LOGGER.info(vtnConfig.getVtnId() + " - OadrCreatedPartyRegistrationType");
 
-
 			this.register(vtnConfig, oadrCreatedPartyRegistrationType);
 
 			return null;
@@ -304,7 +301,8 @@ public class Oadr20bVENEiRegisterPartyService  implements Oadr20bVENEiService{
 		}
 
 		return Oadr20bResponseBuilders
-				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, vtnConfig.getVtnId())
+				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453,
+						vtnConfig.getVtnId())
 				.withDescription("Unknown payload type for service: " + this.getServiceName()).build();
 	}
 

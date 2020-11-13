@@ -37,7 +37,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
-import com.avob.openadr.server.oadr20b.ven.VenReportConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bInvalidReportRequestException;
 
@@ -53,9 +52,6 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 	protected static final String NO_GRANULARITY = "P0D";
 
 	@Resource
-	private VenReportConfig venReportConfig;
-
-	@Resource
 	private MultiVtnConfig multiVtnConfig;
 
 	private Map<String, Map<String, OadrReportRequestType>> venRequestReport = new HashMap<>();
@@ -68,7 +64,7 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 
 	public void registerReport(VtnSessionConfiguration vtnConfiguration) {
 
-		OadrRegisterReportType payload = venReportConfig.getVenRegisterReport();
+		OadrRegisterReportType payload = multiVtnConfig.getVenRegisterReport(vtnConfiguration);
 
 		try {
 			multiVtnConfig.oadrRegisterReport(vtnConfiguration, payload);
@@ -132,7 +128,7 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 							}
 						}
 					} else {
-						venReportConfig.checkReportSpecifier(requestID, reportRequestID, reportSpecifier);
+						multiVtnConfig.checkReportSpecifier(vtnConfig, requestID, reportRequestID, reportSpecifier);
 
 						addVenReportRequest(vtnConfig, request);
 					}

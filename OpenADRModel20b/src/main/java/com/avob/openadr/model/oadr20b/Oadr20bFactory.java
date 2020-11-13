@@ -69,6 +69,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreatedPartyRegistrationType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
+import com.avob.openadr.model.oadr20b.oadr.OadrGBItemBase;
 import com.avob.openadr.model.oadr20b.oadr.OadrLoadControlStateType;
 import com.avob.openadr.model.oadr20b.oadr.OadrLoadControlStateTypeType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayload;
@@ -156,6 +157,7 @@ public class Oadr20bFactory {
 	private static final com.avob.openadr.model.oadr20b.avob.ObjectFactory avobFactory = new com.avob.openadr.model.oadr20b.avob.ObjectFactory();
 
 	private Oadr20bFactory() {
+
 	}
 
 	public static XMLGregorianCalendar timestamptoXMLCalendar(long timestamp) {
@@ -398,7 +400,7 @@ public class Oadr20bFactory {
 		createOadrRequestEventType.setEiRequestEvent(eiRequestEvent);
 		return createOadrRequestEventType;
 	}
-	
+
 	public static OadrResponseType createOadrResponseType(String requestId, int responseCode) {
 		OadrResponseType createOadrResponseType = factory.createOadrResponseType();
 		EiResponseType eiResponse = Oadr20bFactory.createEiResponseType(requestId, responseCode);
@@ -548,7 +550,8 @@ public class Oadr20bFactory {
 		return createOadrCancelPartyRegistrationType;
 	}
 
-	public static OadrCanceledPartyRegistrationType createOadrCanceledPartyRegistrationType(EiResponseType eiResponse, String registrationId, String venId) {
+	public static OadrCanceledPartyRegistrationType createOadrCanceledPartyRegistrationType(EiResponseType eiResponse,
+			String registrationId, String venId) {
 		OadrCanceledPartyRegistrationType createOadrCanceledPartyRegistrationType = factory
 				.createOadrCanceledPartyRegistrationType();
 		createOadrCanceledPartyRegistrationType.setEiResponse(eiResponse);
@@ -1401,6 +1404,57 @@ public class Oadr20bFactory {
 	public static JAXBElement<PayloadAvobVenServiceRequestType> createPayloadAvobVenServiceRequest(
 			PayloadAvobVenServiceRequestType value) {
 		return avobFactory.createPayloadAvobVenServiceRequest(value);
+	}
+
+	public static JAXBElement<? extends ItemBaseType> createItemBase(ItemBaseType value) {
+
+		Class<? extends ItemBaseType> declaredType = value.getClass();
+		if (declaredType.equals(VoltageType.class)) {
+			return powerFactory.createVoltage((VoltageType) value);
+
+		} else if (declaredType.equals(EnergyApparentType.class)) {
+			return powerFactory.createEnergyApparent((EnergyApparentType) value);
+
+		} else if (declaredType.equals(EnergyReactiveType.class)) {
+			return powerFactory.createEnergyReactive((EnergyReactiveType) value);
+
+		} else if (declaredType.equals(EnergyRealType.class)) {
+			return powerFactory.createEnergyReal((EnergyRealType) value);
+
+		} else if (declaredType.equals(PowerApparentType.class)) {
+			return powerFactory.createPowerApparent((PowerApparentType) value);
+
+		} else if (declaredType.equals(PowerReactiveType.class)) {
+			return powerFactory.createPowerReactive((PowerReactiveType) value);
+
+		} else if (declaredType.equals(PowerRealType.class)) {
+			return powerFactory.createPowerReal((PowerRealType) value);
+
+		} else if (declaredType.equals(BaseUnitType.class)) {
+			return factory.createCustomUnit((BaseUnitType) value);
+
+		} else if (declaredType.equals(CurrencyType.class)) {
+			return factory.createCurrency((CurrencyType) value);
+
+		} else if (declaredType.equals(FrequencyType.class)) {
+			return factory.createFrequency((FrequencyType) value);
+
+		} else if (declaredType.equals(ThermType.class)) {
+			return factory.createTherm((ThermType) value);
+
+		} else if (declaredType.equals(TemperatureType.class)) {
+			return factory.createTemperature((TemperatureType) value);
+
+		} else if (declaredType.equals(PulseCountType.class)) {
+			return factory.createPulseCount((PulseCountType) value);
+
+		} else if (declaredType.equals(OadrGBItemBase.class)) {
+			return factory.createOadrGBDataDescription((OadrGBItemBase) value);
+		} else {
+			return emixFactory.createItemBase(value);
+		}
+
+		
 	}
 
 }
