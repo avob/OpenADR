@@ -223,5 +223,35 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>standalone</id>
+			<activation>
+				
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.apache.activemq</groupId>
+					<artifactId>activemq-broker</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>com.h2database</groupId>
+					<artifactId>h2</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>mysql</groupId>
+					<artifactId>mysql-connector-java</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>external</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.rabbitmq.jms</groupId>
+					<artifactId>rabbitmq-jms</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
 	</profiles>
 </project>

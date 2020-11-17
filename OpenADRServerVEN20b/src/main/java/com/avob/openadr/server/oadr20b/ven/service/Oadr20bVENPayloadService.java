@@ -69,8 +69,8 @@ public class Oadr20bVENPayloadService {
 	@Resource
 	private MultiVtnConfig multiVtnConfig;
 
-	public String event(String vtnId, String payload) {
-		VtnSessionConfiguration session = multiVtnConfig.getMultiConfig(vtnId);
+	public String event(String vtnId, String venPushUrl, String payload) {
+		VtnSessionConfiguration session = multiVtnConfig.getMultiConfig(vtnId, venPushUrl);
 		if (session == null) {
 			return vtnNotfoundError(vtnId);
 		}
@@ -84,8 +84,8 @@ public class Oadr20bVENPayloadService {
 
 	}
 
-	public String registerParty(String vtnId, String payload) {
-		VtnSessionConfiguration session = multiVtnConfig.getMultiConfig(vtnId);
+	public String registerParty(String vtnId, String venPushUrl, String payload) {
+		VtnSessionConfiguration session = multiVtnConfig.getMultiConfig(vtnId, venPushUrl);
 		if (session == null) {
 			return vtnNotfoundError(vtnId);
 		}
@@ -98,8 +98,8 @@ public class Oadr20bVENPayloadService {
 		}
 	}
 
-	public String report(String vtnId, String payload) {
-		VtnSessionConfiguration session = multiVtnConfig.getMultiConfig(vtnId);
+	public String report(String vtnId, String venPushUrl, String payload) {
+		VtnSessionConfiguration session = multiVtnConfig.getMultiConfig(vtnId, venPushUrl);
 		if (session == null) {
 			return vtnNotfoundError(vtnId);
 		}
@@ -112,8 +112,8 @@ public class Oadr20bVENPayloadService {
 		}
 	}
 
-	public void xmppRequest(String vtnId, String payload) {
-		VtnSessionConfiguration session = multiVtnConfig.getMultiConfig(vtnId);
+	public void xmppRequest(String vtnId, String venPushJid, String payload) {
+		VtnSessionConfiguration session = multiVtnConfig.getMultiConfig(vtnId, venPushJid);
 		String response = null;
 		if (session == null) {
 			LOGGER.warn("vtnID: " + vtnId + " is unknown");

@@ -221,7 +221,7 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 
 		String requestID = oadrRegisterReportType.getRequestID();
 
-		vtnRegisteredReport.put(vtnConfig.getVtnId(), oadrRegisterReportType);
+		vtnRegisteredReport.put(vtnConfig.getSessionKey(), oadrRegisterReportType);
 
 		vtnReportListeners.forEach(listener -> {
 			listener.onRegisterReport(vtnConfig, oadrRegisterReportType);
@@ -289,7 +289,7 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 	}
 
 	private List<String> getExistingVenReportRequest(VtnSessionConfiguration vtnConfig) {
-		Map<String, OadrReportRequestType> map = venRequestReport.get(vtnConfig.getVtnId());
+		Map<String, OadrReportRequestType> map = venRequestReport.get(vtnConfig.getSessionKey());
 		List<String> pending = new ArrayList<>();
 		if (map != null) {
 			pending = new ArrayList<>(map.keySet());
@@ -298,7 +298,7 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 	}
 
 	private void addVenReportRequest(VtnSessionConfiguration vtnConfig, OadrReportRequestType reportRequest) {
-		Map<String, OadrReportRequestType> map = venRequestReport.get(vtnConfig.getVtnId());
+		Map<String, OadrReportRequestType> map = venRequestReport.get(vtnConfig.getSessionKey());
 		if (map == null) {
 			map = new HashMap<>();
 		}
@@ -307,13 +307,13 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 	}
 
 	private void removeVenReportRequest(VtnSessionConfiguration vtnConfig, String reportRequestId) {
-		Map<String, OadrReportRequestType> map = venRequestReport.get(vtnConfig.getVtnId());
+		Map<String, OadrReportRequestType> map = venRequestReport.get(vtnConfig.getSessionKey());
 		if (map != null) {
 			map.remove(reportRequestId);
 			if (map.isEmpty()) {
-				venRequestReport.remove(vtnConfig.getVtnId());
+				venRequestReport.remove(vtnConfig.getSessionKey());
 			} else {
-				venRequestReport.put(vtnConfig.getVtnId(), map);
+				venRequestReport.put(vtnConfig.getSessionKey(), map);
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.Principal;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,11 +34,13 @@ public class Oadr20bVENEiRegisterPartyController {
 
 	@RequestMapping(value = Oadr20bUrlPath.EI_REGISTER_PARTY_SERVICE, method = RequestMethod.POST)
 	@ResponseBody
-	public String request(@RequestBody String payload, Principal principal)
+	public String request(@RequestBody String payload, Principal principal, HttpServletRequest request)
 			throws Oadr20bMarshalException, Oadr20bUnmarshalException, Oadr20bApplicationLayerException,
 			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException, IOException {
 
-		return oadr20bVENPayloadService.registerParty(principal.getName(), payload);
+		String req = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+
+		return oadr20bVENPayloadService.registerParty(principal.getName(), req, payload);
 	}
 
 }

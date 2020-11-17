@@ -163,6 +163,7 @@ public class DummyVENManager {
 	public void onRegisterReportMessage(final Message<String> message) throws JMSException {
 		VenReportDto fromJson = gson.fromJson(message.getPayload(), VenReportDto.class);
 		subscribe(fromJson);
+		LOGGER.info("Receive register from: " + fromJson.getUsername());
 
 	}
 

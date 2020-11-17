@@ -73,7 +73,7 @@ public class RequestedReportSimulator {
 			String reportSpecifierID = oadrReportRequestType.getReportSpecifier().getReportSpecifierID();
 
 			if (!METADATA_REPORT_SPECIFIER_ID.equals(reportSpecifierID)) {
-				Map<String, Map<String, OadrReportRequestType>> vtnMap = requestedReport.get(vtnConfig.getVtnId());
+				Map<String, Map<String, OadrReportRequestType>> vtnMap = requestedReport.get(vtnConfig.getSessionKey());
 				if (vtnMap == null) {
 					vtnMap = new ConcurrentHashMap<>();
 				}
@@ -83,8 +83,8 @@ public class RequestedReportSimulator {
 				}
 				reportRequestMap.put(reportSpecifierID, oadrReportRequestType);
 				vtnMap.put(reportRequestID, reportRequestMap);
-				requestedReport.put(vtnConfig.getVtnId(), vtnMap);
-				vtnSessionConfig.put(vtnConfig.getVtnId(), vtnConfig);
+				requestedReport.put(vtnConfig.getSessionKey(), vtnMap);
+				vtnSessionConfig.put(vtnConfig.getSessionKey(), vtnConfig);
 			}
 		}
 
@@ -122,7 +122,7 @@ public class RequestedReportSimulator {
 
 		OffsetDateTime start = OffsetDateTime.now().truncatedTo(ChronoUnit.MINUTES).plusMinutes(1);
 
-		requestedReport.forEach((vtnId, vtns) -> {
+		requestedReport.forEach((sessionKey, vtns) -> {
 			vtns.forEach((reportRequestId, specifiers) -> {
 				specifiers.forEach((reportSpecifierId, reportRequest) -> {
 
@@ -133,28 +133,28 @@ public class RequestedReportSimulator {
 
 					OffsetDateTime reportBackStart = start.plus(reportBackDurationToMillisecond, ChronoUnit.MILLIS);
 					ReportBackTask reportBackTask = new ReportBackTask(reportBackStart, reportBackDuration, granularity,
-							vtnId, reportRequestId);
+							sessionKey, reportRequestId);
 					ScheduledFuture<?> scheduleReportBack = executor.schedule(reportBackTask,
 							reportBackDurationToMillisecond, TimeUnit.MILLISECONDS);
 
-					Map<String, ScheduledFuture<?>> reportBackTaskVtn = reportBackTasks.get(vtnId);
+					Map<String, ScheduledFuture<?>> reportBackTaskVtn = reportBackTasks.get(sessionKey);
 					if (reportBackTaskVtn == null) {
 						reportBackTaskVtn = new ConcurrentHashMap<>();
 					}
 					reportBackTaskVtn.put(reportRequestId, scheduleReportBack);
-					reportBackTasks.put(vtnId, reportBackTaskVtn);
+					reportBackTasks.put(sessionKey, reportBackTaskVtn);
 
 					reportRequest.getReportSpecifier().getSpecifierPayload().forEach(specifier -> {
 						String rid = specifier.getRID();
 						Long granularityToMillisecond = Oadr20bFactory
 								.xmlDurationToMillisecond(granularity.getDuration());
 						SimulateRidReadingTask simulateRidReadingTask = new SimulateRidReadingTask(start, granularity,
-								vtnId, reportRequestId, reportSpecifierId, rid);
+								sessionKey, reportRequestId, reportSpecifierId, rid);
 						ScheduledFuture<?> scheduleGranularity = executor.schedule(simulateRidReadingTask,
 								granularityToMillisecond, TimeUnit.MILLISECONDS);
 
 						Map<String, Map<String, ScheduledFuture<?>>> granularityTaskVtn = simulateReadingTasks
-								.get(vtnId);
+								.get(sessionKey);
 						if (granularityTaskVtn == null) {
 							granularityTaskVtn = new ConcurrentHashMap<>();
 						}
@@ -164,7 +164,7 @@ public class RequestedReportSimulator {
 						}
 						map.put(reportSpecifierId, scheduleGranularity);
 						granularityTaskVtn.put(reportRequestId, map);
-						simulateReadingTasks.put(vtnId, granularityTaskVtn);
+						simulateReadingTasks.put(sessionKey, granularityTaskVtn);
 
 					});
 				});
@@ -179,33 +179,33 @@ public class RequestedReportSimulator {
 
 	private class ReportBackTask implements Runnable {
 
-		private String vtnId;
+		private String sessionKey;
 		private String reportRequestId;
 		private OffsetDateTime start;
 		private DurationPropType reportBackDuration;
 		private DurationPropType granularity;
 
 		public ReportBackTask(OffsetDateTime start, DurationPropType reportBackDuration, DurationPropType granularity,
-				String vtnId, String reportRequestId) {
+				String sessionKey, String reportRequestId) {
 			this.reportRequestId = reportRequestId;
 			this.reportBackDuration = reportBackDuration;
 			this.granularity = granularity;
 			this.start = start;
-			this.vtnId = vtnId;
+			this.sessionKey = sessionKey;
 		}
 
 		@Override
 		public void run() {
 
-			ScheduledFuture<?> scheduledFuture = reportBackTasks.get(vtnId).get(reportRequestId);
+			ScheduledFuture<?> scheduledFuture = reportBackTasks.get(sessionKey).get(reportRequestId);
 
 			if (scheduledFuture.isCancelled()) {
-				LOGGER.info(String.format("Cancel report back: %s %s", vtnId, reportRequestId));
-				reportBackTasks.get(vtnId).remove(reportRequestId);
+				LOGGER.info(String.format("Cancel report back: %s %s", sessionKey, reportRequestId));
+				reportBackTasks.get(sessionKey).remove(reportRequestId);
 				return;
 			}
 
-			LOGGER.info(String.format("Report back %s %s", vtnId, reportRequestId));
+			LOGGER.info(String.format("Report back %s %s", sessionKey, reportRequestId));
 
 			String reportId = "0";
 			String requestId = "0";
@@ -218,9 +218,9 @@ public class RequestedReportSimulator {
 			String duration = null;
 
 			Oadr20bUpdateReportBuilder newOadr20bUpdateReportBuilder = Oadr20bEiReportBuilders
-					.newOadr20bUpdateReportBuilder(requestId, multiVtnConfig.getMultiConfig(vtnId).getVenId());
+					.newOadr20bUpdateReportBuilder(requestId, multiVtnConfig.getMultiConfig(sessionKey).getVenId());
 
-			simulateReadingBuffer.get(vtnId).get(reportRequestId).forEach((reportSpecifierId, ridMap) -> {
+			simulateReadingBuffer.get(sessionKey).get(reportRequestId).forEach((reportSpecifierId, ridMap) -> {
 
 				Oadr20bUpdateReportOadrReportBuilder newOadr20bUpdateReportOadrReportBuilder = Oadr20bEiReportBuilders
 						.newOadr20bUpdateReportOadrReportBuilder(reportId, reportRequestId, reportSpecifierId,
@@ -244,11 +244,11 @@ public class RequestedReportSimulator {
 
 			});
 
-			simulateReadingBuffer.get(vtnId).get(reportRequestId).clear();
+			simulateReadingBuffer.get(sessionKey).get(reportRequestId).clear();
 
 			OadrUpdateReportType build = newOadr20bUpdateReportBuilder.build();
 
-			VtnSessionConfiguration vtnSessionConfiguration = vtnSessionConfig.get(vtnId);
+			VtnSessionConfiguration vtnSessionConfiguration = vtnSessionConfig.get(sessionKey);
 
 			oadr20bVENEiReportService.updateReport(vtnSessionConfiguration, build);
 
@@ -256,17 +256,17 @@ public class RequestedReportSimulator {
 					.xmlDurationToMillisecond(reportBackDuration.getDuration());
 			OffsetDateTime plus = start.plus(java.time.Duration.ofMillis(reportBackDurationToMillisecond));
 
-			ReportBackTask reportBackTask = new ReportBackTask(plus, reportBackDuration, reportBackDuration, vtnId,
+			ReportBackTask reportBackTask = new ReportBackTask(plus, reportBackDuration, reportBackDuration, sessionKey,
 					reportRequestId);
 			ScheduledFuture<?> scheduleReportBack = executor.schedule(reportBackTask, reportBackDurationToMillisecond,
 					TimeUnit.MILLISECONDS);
 
-			Map<String, ScheduledFuture<?>> reportBackTaskVtn = reportBackTasks.get(vtnId);
+			Map<String, ScheduledFuture<?>> reportBackTaskVtn = reportBackTasks.get(sessionKey);
 			if (reportBackTaskVtn == null) {
 				reportBackTaskVtn = new ConcurrentHashMap<>();
 			}
 			reportBackTaskVtn.put(reportRequestId, scheduleReportBack);
-			reportBackTasks.put(vtnId, reportBackTaskVtn);
+			reportBackTasks.put(sessionKey, reportBackTaskVtn);
 
 		}
 
@@ -279,34 +279,35 @@ public class RequestedReportSimulator {
 		private String rid;
 		private DurationPropType granularity;
 		private OffsetDateTime start;
-		private String vtnId;
+		private String sessionKey;
 
-		public SimulateRidReadingTask(OffsetDateTime start, DurationPropType granularity, String vtnId,
+		public SimulateRidReadingTask(OffsetDateTime start, DurationPropType granularity, String sessionKey,
 				String reportRequestId, String reportSpecifierId, String rid) {
 			this.start = start;
 			this.granularity = granularity;
 			this.reportRequestId = reportRequestId;
 			this.reportSpecifierId = reportSpecifierId;
 			this.rid = rid;
-			this.vtnId = vtnId;
+			this.sessionKey = sessionKey;
 		}
 
 		@Override
 		public void run() {
 
-			ScheduledFuture<?> scheduledFuture = simulateReadingTasks.get(vtnId).get(reportRequestId)
+			ScheduledFuture<?> scheduledFuture = simulateReadingTasks.get(sessionKey).get(reportRequestId)
 					.get(reportSpecifierId);
 
 			if (scheduledFuture.isCancelled()) {
-				LOGGER.info(
-						String.format("Cancel reading: %s %s %s %s", vtnId, reportRequestId, reportSpecifierId, rid));
-				simulateReadingTasks.get(vtnId).get(reportRequestId).remove(reportSpecifierId);
+				LOGGER.info(String.format("Cancel reading: %s %s %s %s", sessionKey, reportRequestId, reportSpecifierId,
+						rid));
+				simulateReadingTasks.get(sessionKey).get(reportRequestId).remove(reportSpecifierId);
 				return;
 			}
 
-			LOGGER.info(String.format("Simulate reading: %s %s %s %s", vtnId, reportRequestId, reportSpecifierId, rid));
+			LOGGER.info(String.format("Simulate reading: %s %s %s %s", sessionKey, reportRequestId, reportSpecifierId,
+					rid));
 
-			Map<String, Map<String, Map<String, TreeMap<Long, Float>>>> vtnMap = simulateReadingBuffer.get(vtnId);
+			Map<String, Map<String, Map<String, TreeMap<Long, Float>>>> vtnMap = simulateReadingBuffer.get(sessionKey);
 			if (vtnMap == null) {
 				vtnMap = new ConcurrentHashMap<>();
 			}
@@ -326,17 +327,17 @@ public class RequestedReportSimulator {
 			reportSpecifierMap.put(rid, ridMap);
 			reportRequestMap.put(reportSpecifierId, reportSpecifierMap);
 			vtnMap.put(reportRequestId, reportRequestMap);
-			simulateReadingBuffer.put(vtnId, vtnMap);
+			simulateReadingBuffer.put(sessionKey, vtnMap);
 
 			Long granularityToMillisecond = Oadr20bFactory.xmlDurationToMillisecond(granularity.getDuration());
 			OffsetDateTime plus = start.plus(java.time.Duration.ofMillis(granularityToMillisecond));
 
-			SimulateRidReadingTask simulateRidReadingTask = new SimulateRidReadingTask(plus, granularity, vtnId,
+			SimulateRidReadingTask simulateRidReadingTask = new SimulateRidReadingTask(plus, granularity, sessionKey,
 					reportRequestId, reportSpecifierId, rid);
 			ScheduledFuture<?> schedule = executor.schedule(simulateRidReadingTask, granularityToMillisecond,
 					TimeUnit.MILLISECONDS);
 
-			Map<String, Map<String, ScheduledFuture<?>>> simulateReadingTasksVtn = simulateReadingTasks.get(vtnId);
+			Map<String, Map<String, ScheduledFuture<?>>> simulateReadingTasksVtn = simulateReadingTasks.get(sessionKey);
 			if (simulateReadingTasksVtn == null) {
 				simulateReadingTasksVtn = new ConcurrentHashMap<>();
 			}
@@ -346,7 +347,7 @@ public class RequestedReportSimulator {
 			}
 			map.put(reportSpecifierId, schedule);
 			simulateReadingTasksVtn.put(reportRequestId, map);
-			simulateReadingTasks.put(vtnId, simulateReadingTasksVtn);
+			simulateReadingTasks.put(sessionKey, simulateReadingTasksVtn);
 
 		}
 

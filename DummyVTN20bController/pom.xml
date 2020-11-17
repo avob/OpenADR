@@ -157,7 +157,7 @@
 
 	<profiles>
 		<profile>
-			<id>in-memory</id>
+			<id>standalone</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>

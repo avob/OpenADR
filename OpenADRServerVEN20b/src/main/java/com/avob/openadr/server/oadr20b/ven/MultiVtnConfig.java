@@ -70,10 +70,10 @@ public class MultiVtnConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MultiVtnConfig.class);
 
 	@Resource
-	private XmppVenListener xmppVenListeners;
+	private VenConfig venConfig;
 
 	@Resource
-	private VenConfig venConfig;
+	private XmppVenListener xmppVenListeners;
 
 	@Autowired(required = false)
 	private List<OadrReportType> venRegisterReport;
@@ -88,6 +88,8 @@ public class MultiVtnConfig {
 	private Map<String, OadrXmppVenClient20b> multiXmppClientConfig = new HashMap<String, OadrXmppVenClient20b>();
 
 	private Map<String, Map<String, OadrReportType>> reports = new HashMap<>();
+
+	private List<String> knownVtnId = new ArrayList<>();
 
 	private void configureClient(VtnSessionConfiguration session)
 			throws OadrSecurityException, JAXBException, OadrVTNInitializationException {
@@ -124,14 +126,14 @@ public class MultiVtnConfig {
 		}
 
 		OadrHttpVenClient20b client = null;
-		if (venConfig.getXmlSignature()) {
+		if (session.getXmlSignature()) {
 			client = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build(), session.getVenPrivateKeyPath(),
 					session.getVenCertificatePath(), session.getReplayProtectAcceptedDelaySecond()));
 		} else {
 			client = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
 		}
 
-		getMultiHttpClientConfig().put(session.getVtnId(), client);
+		putMultiHttpClientConfig(session, client);
 	}
 
 	private void configureXMPPClient(VtnSessionConfiguration session)
@@ -158,12 +160,15 @@ public class MultiVtnConfig {
 			OadrXmppClient20b oadrXmppClient20b = builder.build();
 
 			OadrXmppVenClient20b venClient = null;
-			if (venConfig.getXmlSignature()) {
+			if (session.getXmlSignature()) {
 				venClient = new OadrXmppVenClient20b(oadrXmppClient20b, session.getVenPrivateKeyPath(),
 						session.getVenCertificatePath(), session.getReplayProtectAcceptedDelaySecond());
 			} else {
 				venClient = new OadrXmppVenClient20b(oadrXmppClient20b);
 			}
+			
+			String connectionJid = venClient.getBareConnectionJid();
+			session.setVenUrl(connectionJid);
 			putMultiXmppClientConfig(session, venClient);
 
 		} catch (OadrSecurityException | OadrXmppException e) {
@@ -211,7 +216,9 @@ public class MultiVtnConfig {
 				LOGGER.debug("Valid vtn configuration: " + entry.getKey());
 				LOGGER.info(session.toString());
 				configureClient(session);
-				getMultiConfig().put(session.getVtnId(), session);
+				multiConfig.put(getSessionKey(session.getVtnId(), session.getVenUrl()), session);
+
+				knownVtnId.add(session.getVtnId());
 
 			} catch (OadrSecurityException e) {
 				LOGGER.error("Dynamic Vtn conf key: " + entry.getKey() + " is not a valid vtn configuration", e);
@@ -224,7 +231,7 @@ public class MultiVtnConfig {
 
 		if (venRegisterReport != null) {
 
-			this.getMultiConfig().keySet().forEach(vtnId -> {
+			multiConfig.keySet().forEach(vtnId -> {
 				Map<String, OadrReportType> map = new HashMap<>();
 				venRegisterReport.forEach(report -> {
 					map.put(report.getReportSpecifierID(), report);
@@ -234,7 +241,7 @@ public class MultiVtnConfig {
 
 		}
 
-		if (getMultiConfig().isEmpty()) {
+		if (multiConfig.isEmpty()) {
 			throw new IllegalArgumentException("No Vtn configuration has been found");
 		}
 
@@ -255,8 +262,8 @@ public class MultiVtnConfig {
 			ReportSpecifierType reportSpecifier) throws Oadr20bInvalidReportRequestException {
 
 		String reportSpecifierID = reportSpecifier.getReportSpecifierID();
-		if (reports.get(vtnConfig.getVtnId()) == null
-				|| !reports.get(vtnConfig.getVtnId()).containsKey(reportSpecifierID)) {
+		if (reports.get(getSessionKey(vtnConfig.getVtnId(), vtnConfig.getVenUrl())) == null
+				|| !reports.get(getSessionKey(vtnConfig.getVtnId(), vtnConfig.getVenUrl())).containsKey(reportSpecifierID)) {
 			throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
 					.newOadr20bResponseBuilder(requestId, Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461,
 							vtnConfig.getVenId())
@@ -266,7 +273,7 @@ public class MultiVtnConfig {
 					.build());
 		}
 
-		OadrReportType report = reports.get(vtnConfig.getVtnId()).get(reportSpecifierID);
+		OadrReportType report = reports.get(getSessionKey(vtnConfig.getVtnId(), vtnConfig.getVenUrl())).get(reportSpecifierID);
 		Map<String, OadrReportDescriptionType> reportDescriptions = report.getOadrReportDescription().stream()
 				.collect(Collectors.toMap(desc -> {
 					return getReportDescriptionUID(desc);
@@ -373,40 +380,16 @@ public class MultiVtnConfig {
 		return builder.toString();
 	}
 
-	public Map<String, VtnSessionConfiguration> getMultiConfig() {
-		return multiConfig;
-	}
-
-	public VtnSessionConfiguration getMultiConfig(String vtnId) {
-		return multiConfig.get(vtnId);
-	}
-
-	private Map<String, OadrHttpVenClient20b> getMultiHttpClientConfig() {
-		return multiHttpClientConfig;
-	}
-
-	public OadrHttpVenClient20b getMultiHttpClientConfig(VtnSessionConfiguration vtnConfiguration) {
-		return multiHttpClientConfig.get(vtnConfiguration.getVtnId());
-	}
-
-	/**
-	 * only for test purpose
-	 * 
-	 * @param vtnConfiguration
-	 * @param client
-	 */
-	public void setMultiHttpClientConfigClient(VtnSessionConfiguration vtnConfiguration, OadrHttpVenClient20b client) {
-		multiHttpClientConfig.put(vtnConfiguration.getVtnId(), client);
-	}
-
 	public void oadrCreateReport(VtnSessionConfiguration vtnConfiguration, OadrCreateReportType payload)
 			throws Oadr20bException, Oadr20bHttpLayerException, Oadr20bXMLSignatureException,
 			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
 			Oadr20bMarshalException, InterruptedException {
 		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrCreateReport(payload);
+			multiHttpClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()))
+					.oadrCreateReport(payload);
 		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrCreateReport(payload);
+			multiXmppClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()))
+					.oadrCreateReport(payload);
 		}
 	}
 
@@ -415,9 +398,11 @@ public class MultiVtnConfig {
 			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
 			Oadr20bMarshalException, InterruptedException {
 		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrUpdateReport(payload);
+			multiHttpClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()))
+					.oadrUpdateReport(payload);
 		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrUpdateReport(payload);
+			multiXmppClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()))
+					.oadrUpdateReport(payload);
 		}
 	}
 
@@ -426,9 +411,11 @@ public class MultiVtnConfig {
 			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
 			Oadr20bMarshalException, InterruptedException {
 		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrCreateOpt(payload);
+			multiHttpClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()))
+					.oadrCreateOpt(payload);
 		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrCreateOpt(payload);
+			multiXmppClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()))
+					.oadrCreateOpt(payload);
 		}
 	}
 
@@ -437,9 +424,11 @@ public class MultiVtnConfig {
 			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
 			Oadr20bMarshalException, InterruptedException {
 		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrCancelOptType(payload);
+			multiHttpClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()))
+					.oadrCancelOptType(payload);
 		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrCancelOptType(payload);
+			multiXmppClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()))
+					.oadrCancelOptType(payload);
 		}
 	}
 
@@ -448,9 +437,11 @@ public class MultiVtnConfig {
 			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
 			Oadr20bMarshalException, InterruptedException {
 		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrRegisterReport(payload);
+			multiHttpClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()))
+					.oadrRegisterReport(payload);
 		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrRegisterReport(payload);
+			multiXmppClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()))
+					.oadrRegisterReport(payload);
 		}
 	}
 
@@ -459,22 +450,62 @@ public class MultiVtnConfig {
 			Oadr20bXMLSignatureValidationException, XmppStringprepException, NotConnectedException,
 			Oadr20bMarshalException, InterruptedException {
 		if (vtnConfiguration.getVtnUrl() != null) {
-			multiHttpClientConfig.get(vtnConfiguration.getVtnId()).oadrCreatedEvent(payload);
+			multiHttpClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()))
+					.oadrCreatedEvent(payload);
 		} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-			multiXmppClientConfig.get(vtnConfiguration.getVtnId()).oadrCreatedEvent(payload);
+			multiXmppClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()))
+					.oadrCreatedEvent(payload);
 		}
 	}
 
 	public OadrXmppVenClient20b getMultiXmppClientConfig(VtnSessionConfiguration vtnConfiguration) {
-		return multiXmppClientConfig.get(vtnConfiguration.getVtnId());
+		return multiXmppClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()));
 	}
 
 	public void putMultiXmppClientConfig(VtnSessionConfiguration vtnConfiguration, OadrXmppVenClient20b venClient) {
-		multiXmppClientConfig.put(vtnConfiguration.getVtnId(), venClient);
+		multiXmppClientConfig.put(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()), venClient);
+	}
+
+	public void putMultiHttpClientConfig(VtnSessionConfiguration vtnConfiguration, OadrHttpVenClient20b venClient) {
+		multiHttpClientConfig.put(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()), venClient);
 	}
 
 	public void setMultiXmppClientConfig(Map<String, OadrXmppVenClient20b> multiXmppClientConfig) {
 		this.multiXmppClientConfig = multiXmppClientConfig;
+	}
+
+	public Map<String, VtnSessionConfiguration> getMultiConfig() {
+		return multiConfig;
+	}
+
+//	public VtnSessionConfiguration getMultiConfig(String vtnId) {
+//		return multiConfig.get(vtnId);
+//	}
+
+	public OadrHttpVenClient20b getMultiHttpClientConfig(VtnSessionConfiguration vtnConfiguration) {
+		return multiHttpClientConfig.get(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()));
+	}
+
+	public void setMultiHttpClientConfigClient(VtnSessionConfiguration vtnConfiguration, OadrHttpVenClient20b client) {
+		multiHttpClientConfig.put(getSessionKey(vtnConfiguration.getVtnId(), vtnConfiguration.getVenUrl()), client);
+	}
+
+	public boolean isKnownVtnId(String vtnId) {
+		return knownVtnId.contains(vtnId);
+	}
+
+	public VtnSessionConfiguration getMultiConfig(String vtnId, String venPushUrl) {
+		return multiConfig.get(getSessionKey(vtnId, venPushUrl));
+	}
+	
+	public VtnSessionConfiguration getMultiConfig(String sessionKey) {
+		return multiConfig.get(sessionKey);
+	}
+	
+	
+
+	private String getSessionKey(String vtnId, String venPushUrl) {
+		return new StringBuilder().append(vtnId).append(venPushUrl).toString();
 	}
 
 }

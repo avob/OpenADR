@@ -403,6 +403,10 @@ public class VtnSessionConfiguration {
 	public String getSessionId() {
 		return sessionId;
 	}
+	
+	public String getSessionKey() {
+		return vtnId + venUrl;
+	}
 
 	public Long getPullFrequencySeconds() {
 		return pullFrequencySeconds;

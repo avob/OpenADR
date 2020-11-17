@@ -29,7 +29,10 @@ public class MultiVtnConfigTest {
 	private String vtnHttpId;
 
 	@Value("${oadr.vtn.myvtn.vtnUrl}")
-	private String venHttpUrl;
+	private String vtnUrl;
+
+	@Value("${oadr.vtn.myvtn.venUrl}")
+	private String venUrl;
 
 	@Value("${oadr.vtn.myxmppvtn.vtnid}")
 	private String vtnXmppId;
@@ -43,17 +46,17 @@ public class MultiVtnConfigTest {
 	@Test
 	public void test() {
 		// http client successfull init
-		VtnSessionConfiguration multiConfig = multiVtnConfig.getMultiConfig(vtnHttpId);
+		VtnSessionConfiguration multiConfig = multiVtnConfig.getMultiConfig(vtnHttpId, venUrl);
 		assertNotNull(multiConfig);
 		assertEquals(multiConfig.getVtnId(), vtnHttpId);
-		assertEquals(multiConfig.getVtnUrl(), venHttpUrl);
+		assertEquals(multiConfig.getVtnUrl(), vtnUrl);
 		assertNull(multiConfig.getVtnXmppHost());
 		assertNull(multiConfig.getVtnXmppPass());
 		OadrHttpVenClient20b multiHttpClientConfig = multiVtnConfig.getMultiHttpClientConfig(multiConfig);
 		assertNotNull(multiHttpClientConfig);
 
 		// xmpp client failed init
-		multiConfig = multiVtnConfig.getMultiConfig(vtnXmppId);
+		multiConfig = multiVtnConfig.getMultiConfig(vtnXmppId, venUrl);
 		assertNull(multiConfig);
 //		assertNotNull(multiConfig.getVtnId(), vtnXmppId);
 //		assertNull(multiConfig.getVtnUrl());

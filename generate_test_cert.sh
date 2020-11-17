@@ -202,7 +202,7 @@ gen_oadr20a_fingerprint $VEN3_NAME
 ###################################
 # VEN4
 ###################################
-gen_ecc_key_csr $VEN4_NAME $VEN4_NAME $CA_NAME 10 365
+gen_rsa_key_csr $VEN4_NAME $VEN4_NAME $CA_NAME 10 365
 gen_oadr20b_fingerprint $VEN4_NAME
 gen_oadr20a_fingerprint $VEN4_NAME
 

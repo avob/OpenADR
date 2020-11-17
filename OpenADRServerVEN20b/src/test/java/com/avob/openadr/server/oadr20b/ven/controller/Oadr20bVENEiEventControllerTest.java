@@ -78,6 +78,9 @@ public class Oadr20bVENEiEventControllerTest {
 	@Value("${oadr.vtn.myvtn.vtnid}")
 	private String vtnHttpId;
 
+	@Value("${oadr.vtn.myvtn.venUrl}")
+	private String venUrl;
+
 	@Before
 	public void setup() throws Exception {
 		jaxbContext = Oadr20bJAXBContext.getInstance();
@@ -151,7 +154,7 @@ public class Oadr20bVENEiEventControllerTest {
 
 		OadrHttpVenClient20b mock = Mockito.mock(OadrHttpVenClient20b.class);
 
-		multiVtnConfig.setMultiHttpClientConfigClient(multiVtnConfig.getMultiConfig(vtnHttpId), mock);
+		multiVtnConfig.setMultiHttpClientConfigClient(multiVtnConfig.getMultiConfig(vtnHttpId, venUrl), mock);
 
 		OadrCreatedEventType event = null;
 		OadrResponseType value = null;
@@ -222,16 +225,16 @@ public class Oadr20bVENEiEventControllerTest {
 				createdTimespamp, eventId, modificationNumber, marketContext, status).build();
 
 		EiTargetType eiTargetType = new Oadr20bEiTargetTypeBuilder()
-				.addVenId(multiVtnConfig.getMultiConfig(vtnHttpId).getVenId()).build();
+				.addVenId(multiVtnConfig.getMultiConfig(vtnHttpId, venUrl).getVenId()).build();
 		OadrEvent event = Oadr20bEiEventBuilders.newOadr20bDistributeEventOadrEventBuilder()
 				.withActivePeriod(activePeriod).withEventDescriptor(eventDescriptorType).withEiTarget(eiTargetType)
 				.build();
 
-		VtnSessionConfiguration multiConfig = multiVtnConfig.getMultiConfig(vtnHttpId);
+		VtnSessionConfiguration multiConfig = multiVtnConfig.getMultiConfig(vtnHttpId, venUrl);
 		assertEquals(oadr20bVENEiEventService.getOadrEvents(multiConfig).size(), 0);
 
 		OadrDistributeEventType build = Oadr20bEiEventBuilders
-				.newOadr20bDistributeEventBuilder(multiVtnConfig.getMultiConfig(vtnHttpId).getVtnId(), "0")
+				.newOadr20bDistributeEventBuilder(multiVtnConfig.getMultiConfig(vtnHttpId, venUrl).getVtnId(), "0")
 				.addOadrEvent(event).build();
 
 		// push dr event to VEN
@@ -251,7 +254,7 @@ public class Oadr20bVENEiEventControllerTest {
 		// update event
 		event.getEiEvent().getEventDescriptor().setModificationNumber(++modificationNumber);
 		build = Oadr20bEiEventBuilders
-				.newOadr20bDistributeEventBuilder(multiVtnConfig.getMultiConfig(vtnHttpId).getVtnId(), "0")
+				.newOadr20bDistributeEventBuilder(multiVtnConfig.getMultiConfig(vtnHttpId, venUrl).getVtnId(), "0")
 				.addOadrEvent(event).build();
 
 		postEiEventAndExpect = oadrMockMvc.postEiEventAndExpect(VTN_SECURITY_SESSION, build, HttpStatus.OK_200,
@@ -266,7 +269,8 @@ public class Oadr20bVENEiEventControllerTest {
 		assertEquals(1, oadr20bVENEiEventListener.size());
 
 		build = Oadr20bEiEventBuilders
-				.newOadr20bDistributeEventBuilder(multiVtnConfig.getMultiConfig(vtnHttpId).getVtnId(), "0").build();
+				.newOadr20bDistributeEventBuilder(multiVtnConfig.getMultiConfig(vtnHttpId, venUrl).getVtnId(), "0")
+				.build();
 
 		postEiEventAndExpect = oadrMockMvc.postEiEventAndExpect(VTN_SECURITY_SESSION, build, HttpStatus.OK_200,
 				OadrResponseType.class);

@@ -15,7 +15,7 @@ import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENPayloadService;
 
 @Service
 public class XmppVenListener implements StanzaListener {
-	
+
 	@Resource
 	private Oadr20bVENPayloadService oadr20bVENPayloadService;
 
@@ -25,16 +25,17 @@ public class XmppVenListener implements StanzaListener {
 		Message message = (Message) packet;
 
 		Jid from = packet.getFrom();
-		
+
+		Jid to = packet.getTo();
+
 		Localpart localpartOrThrow = from.getLocalpartOrThrow();
 
 		String vtnId = localpartOrThrow.asUnescapedString().toLowerCase();
 
 		String payload = message.getBody();
-		
-		oadr20bVENPayloadService.xmppRequest(vtnId, payload);
-		
-		
+
+		oadr20bVENPayloadService.xmppRequest(vtnId, to.asUnescapedString(), payload);
+
 	}
 
 }

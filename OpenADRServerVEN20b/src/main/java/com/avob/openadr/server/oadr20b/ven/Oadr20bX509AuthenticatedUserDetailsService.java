@@ -49,8 +49,7 @@ public class Oadr20bX509AuthenticatedUserDetailsService
 			throw new UsernameNotFoundException("", e);
 		}
 
-		VtnSessionConfiguration venSessionConfiguration = multiConfig.getMultiConfig(fingerprint);
-		if (venSessionConfiguration != null) {
+		if (multiConfig.isKnownVtnId(fingerprint)) {
 			return new User(fingerprint, "", VTN_AUTHORITY);
 		}
 

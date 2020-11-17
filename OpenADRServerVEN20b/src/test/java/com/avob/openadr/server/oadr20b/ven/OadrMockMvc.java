@@ -114,7 +114,7 @@ public class OadrMockMvc {
 		}
 
 		MvcResult andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(endpoint).content(content).with(authSession))
+				.perform(MockMvcRequestBuilders.post("https://localhost:8081/"+endpoint).content(content).with(authSession))
 				.andExpect(MockMvcResultMatchers.status().is(status)).andReturn();
 
 		Thread.sleep(200);

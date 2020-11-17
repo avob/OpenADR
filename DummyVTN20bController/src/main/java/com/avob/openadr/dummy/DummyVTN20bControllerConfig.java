@@ -165,7 +165,7 @@ public class DummyVTN20bControllerConfig {
 		return rmqConnectionFactory;
 	}
 
-	@Profile("in-memory")
+	@Profile("standalone")
 	@Bean
 	public ActiveMQSslConnectionFactory activeMQSslConnectionFactory() throws Exception {
 		ActiveMQSslConnectionFactory activeMQConnectionFactory = new ActiveMQSslConnectionFactory();

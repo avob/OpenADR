@@ -184,6 +184,10 @@ public class OadrXmppClient20b {
 	public String getClientJid() {
 		return this.connection.getUser().asEntityFullJidIfPossible().toString();
 	}
+	
+	public String getBareClientJid() {
+		return this.connection.getUser().asBareJid().asUnescapedString();
+	}
 
 
 	public DomainBareJid getDomainJid() {

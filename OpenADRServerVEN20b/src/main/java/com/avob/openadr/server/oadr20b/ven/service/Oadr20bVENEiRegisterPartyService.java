@@ -174,15 +174,15 @@ public class Oadr20bVENEiRegisterPartyService implements Oadr20bVENEiService {
 	}
 
 	public OadrCreatedPartyRegistrationType getRegistration(VtnSessionConfiguration vtnConfiguration) {
-		return registration.get(vtnConfiguration.getVtnId());
+		return registration.get(vtnConfiguration.getSessionId());
 	}
 
 	private void setRegistration(VtnSessionConfiguration vtnConfiguration,
 			OadrCreatedPartyRegistrationType registration) {
 		if (registration == null) {
-			this.registration.remove(vtnConfiguration.getVtnId());
+			this.registration.remove(vtnConfiguration.getSessionId());
 		} else {
-			this.registration.put(vtnConfiguration.getVtnId(), registration);
+			this.registration.put(vtnConfiguration.getSessionId(), registration);
 		}
 	}
 

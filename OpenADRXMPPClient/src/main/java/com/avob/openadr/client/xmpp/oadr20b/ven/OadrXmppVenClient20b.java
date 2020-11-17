@@ -149,6 +149,12 @@ public class OadrXmppVenClient20b {
 	public String getConnectionJid() {
 		return client.getClientJid().toString();
 	}
+	
+	public String getBareConnectionJid() {
+		return client.getBareClientJid().toString();
+	}
+	
+	
 
 	public void oadrCreatedReport(OadrCreatedReportType payload) throws Oadr20bException, Oadr20bHttpLayerException,
 	Oadr20bXMLSignatureException, Oadr20bXMLSignatureValidationException, XmppStringprepException,

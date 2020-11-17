@@ -3,6 +3,7 @@ package com.avob.openadr.server.oadr20b.ven.controller;
 import java.security.Principal;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,12 +34,14 @@ public class Oadr20bVENEiEventController {
 
 	@RequestMapping(value = Oadr20bUrlPath.EI_EVENT_SERVICE, method = RequestMethod.POST)
 	@ResponseBody
-	public String request(@RequestBody String payload, Principal principal)
+	public String request(@RequestBody String payload, Principal principal, HttpServletRequest request)
 			throws Oadr20bMarshalException, Oadr20bUnmarshalException, Oadr20bDistributeEventApplicationLayerException,
 			Oadr20bApplicationLayerException, Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException,
 			OadrSecurityException {
+		
+		String req = request.getScheme() + "://" + request.getServerName()+":"+request.getServerPort();
 
-		return oadr20bVENPayloadService.event(principal.getName(), payload);
+		return oadr20bVENPayloadService.event(principal.getName(), req, payload);
 	}
 
 }
