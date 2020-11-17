@@ -57,7 +57,7 @@ public class XmlSignatureService {
 			throws Oadr20bXMLSignatureValidationException {
 		long nowDate = System.currentTimeMillis();
 		OadrXMLSignatureHandler.validate(raw, payload, nowDate,
-				multiConfig.getVenSessionConfig().getReplayProtectAcceptedDelaySecond() * 1000L);
+				multiConfig.getReplayProtectAcceptedDelaySecond() * 1000L);
 	}
 
 }

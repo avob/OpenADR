@@ -126,8 +126,7 @@ public class MultiVtnConfig {
 		OadrHttpVenClient20b client = null;
 		if (venConfig.getXmlSignature()) {
 			client = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build(), session.getVenPrivateKeyPath(),
-					session.getVenCertificatePath(),
-					session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond()));
+					session.getVenCertificatePath(), session.getReplayProtectAcceptedDelaySecond()));
 		} else {
 			client = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
 		}
@@ -161,8 +160,7 @@ public class MultiVtnConfig {
 			OadrXmppVenClient20b venClient = null;
 			if (venConfig.getXmlSignature()) {
 				venClient = new OadrXmppVenClient20b(oadrXmppClient20b, session.getVenPrivateKeyPath(),
-						session.getVenCertificatePath(),
-						session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond());
+						session.getVenCertificatePath(), session.getReplayProtectAcceptedDelaySecond());
 			} else {
 				venClient = new OadrXmppVenClient20b(oadrXmppClient20b);
 			}

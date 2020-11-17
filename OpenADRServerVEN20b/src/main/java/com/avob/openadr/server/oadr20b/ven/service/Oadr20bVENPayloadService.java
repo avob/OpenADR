@@ -59,10 +59,10 @@ public class Oadr20bVENPayloadService {
 
 	@Resource
 	private Oadr20bVENEiReportService reportService;
-	
+
 	@Resource
 	private Oadr20bVENEiResponseService responseService;
-	
+
 	@Resource
 	private Oadr20bVENEiOptService optService;
 
@@ -71,7 +71,7 @@ public class Oadr20bVENPayloadService {
 
 	public String event(String vtnId, String payload) {
 		VtnSessionConfiguration session = multiVtnConfig.getMultiConfig(vtnId);
-		if(session == null) {
+		if (session == null) {
 			return vtnNotfoundError(vtnId);
 		}
 		try {
@@ -86,7 +86,7 @@ public class Oadr20bVENPayloadService {
 
 	public String registerParty(String vtnId, String payload) {
 		VtnSessionConfiguration session = multiVtnConfig.getMultiConfig(vtnId);
-		if(session == null) {
+		if (session == null) {
 			return vtnNotfoundError(vtnId);
 		}
 		try {
@@ -98,10 +98,9 @@ public class Oadr20bVENPayloadService {
 		}
 	}
 
-
 	public String report(String vtnId, String payload) {
 		VtnSessionConfiguration session = multiVtnConfig.getMultiConfig(vtnId);
-		if(session == null) {
+		if (session == null) {
 			return vtnNotfoundError(vtnId);
 		}
 		try {
@@ -116,33 +115,33 @@ public class Oadr20bVENPayloadService {
 	public void xmppRequest(String vtnId, String payload) {
 		VtnSessionConfiguration session = multiVtnConfig.getMultiConfig(vtnId);
 		String response = null;
-		if(session == null) {
-			LOGGER.warn("vtnID: " + vtnId +" is unknown");
+		if (session == null) {
+			LOGGER.warn("vtnID: " + vtnId + " is unknown");
 			return;
 		}
 		UnmarshalledPayload unsignedPayload;
 		try {
 			unsignedPayload = unmarshall(session, payload);
 		} catch (MarshallException e) {
-			LOGGER.warn("vtnID: " + vtnId +" sent an unparsable payload", e);
+			LOGGER.warn("vtnID: " + vtnId + " sent an unparsable payload", e);
 			return;
 		}
 		OadrXmppVenClient20b multiXmppClientConfig = multiVtnConfig.getMultiXmppClientConfig(session);
 
-		if(multiXmppClientConfig == null) {
-			LOGGER.warn("Session with vtnID: " + vtnId +" is not an XMPP session");
+		if (multiXmppClientConfig == null) {
+			LOGGER.warn("Session with vtnID: " + vtnId + " is not an XMPP session");
 			return;
 		}
 
 		Object payloadObject = unsignedPayload.getPayload();
 
 		try {
-			if ( payloadObject instanceof OadrRequestReregistrationType
+			if (payloadObject instanceof OadrRequestReregistrationType
 					|| payloadObject instanceof OadrCancelPartyRegistrationType
 					|| payloadObject instanceof OadrCreatedPartyRegistrationType) {
 
 				Object request = registerPartyService.request(session, unsignedPayload.getPayload());
-				if(request != null) {
+				if (request != null) {
 					response = marshall(session, request, unsignedPayload.isSigned());
 					multiXmppClientConfig.sendRegisterPartyMessage(response);
 				}
@@ -150,39 +149,33 @@ public class Oadr20bVENPayloadService {
 			} else if (payloadObject instanceof OadrDistributeEventType) {
 
 				Object request = eventService.request(session, unsignedPayload.getPayload());
-				if(request != null) {
+				if (request != null) {
 					response = marshall(session, request, unsignedPayload.isSigned());
 					multiXmppClientConfig.sendEventMessage(response);
 				}
 
-			}else if (payloadObject instanceof OadrCancelReportType
-					|| payloadObject instanceof OadrCreateReportType
-					|| payloadObject instanceof OadrRegisterReportType
-					|| payloadObject instanceof OadrUpdateReportType
-					|| payloadObject instanceof OadrCanceledReportType
-					|| payloadObject instanceof OadrCreatedReportType
+			} else if (payloadObject instanceof OadrCancelReportType || payloadObject instanceof OadrCreateReportType
+					|| payloadObject instanceof OadrRegisterReportType || payloadObject instanceof OadrUpdateReportType
+					|| payloadObject instanceof OadrCanceledReportType || payloadObject instanceof OadrCreatedReportType
 					|| payloadObject instanceof OadrRegisteredReportType
 					|| payloadObject instanceof OadrUpdatedReportType) {
 
 				Object request = reportService.request(session, unsignedPayload.getPayload());
-				if(request != null) {
+				if (request != null) {
 					response = marshall(session, request, unsignedPayload.isSigned());
 					multiXmppClientConfig.sendReportMessage(response);
 				}
 
-
-			}  else if (payloadObject instanceof OadrResponseType) {
+			} else if (payloadObject instanceof OadrResponseType) {
 
 				LOGGER.info(vtnId + " - OadrResponseType");
-
 
 			} else if (payloadObject instanceof OadrCreatedOptType) {
 
 				LOGGER.info(vtnId + " - OadrCreatedOptType");
 
-
 			} else {
-				LOGGER.warn("vtnID: " + vtnId +" sent an unexpected payload");
+				LOGGER.warn("vtnID: " + vtnId + " sent an unexpected payload");
 			}
 		} catch (XmppStringprepException | NotConnectedException | Oadr20bMarshalException | InterruptedException
 				| Oadr20bXMLSignatureException e) {
@@ -199,8 +192,8 @@ public class Oadr20bVENPayloadService {
 
 		OadrHttpVenClient20b multiHttpClientConfig = multiVtnConfig.getMultiHttpClientConfig(session);
 
-		if(multiHttpClientConfig == null) {
-			LOGGER.warn("Session with vtnID: " + vtnId +" is not an HTTP session");
+		if (multiHttpClientConfig == null) {
+			LOGGER.warn("Session with vtnID: " + vtnId + " is not an HTTP session");
 			return;
 		}
 
@@ -215,11 +208,10 @@ public class Oadr20bVENPayloadService {
 			} else if (payload instanceof OadrDistributeEventType) {
 				LOGGER.info("Retrieved OadrDistributeEventType");
 				OadrDistributeEventType val = (OadrDistributeEventType) payload;
-				
-				OadrResponseType response = eventService.oadrDistributeEvent(session, val);
-				
-				responseService.oadrResponse(session, response);
 
+				OadrResponseType response = eventService.oadrDistributeEvent(session, val);
+
+				responseService.oadrResponse(session, response);
 
 			} else if (payload instanceof OadrCancelPartyRegistrationType) {
 				LOGGER.info("Retrieved OadrCancelPartyRegistrationType");
@@ -228,27 +220,22 @@ public class Oadr20bVENPayloadService {
 				OadrCanceledPartyRegistrationType oadrCancelPartyRegistration = registerPartyService
 						.oadrCancelPartyRegistration(session, val);
 
+				OadrResponseType response = multiHttpClientConfig
+						.oadrCanceledPartyRegistrationType(oadrCancelPartyRegistration);
 
-				OadrResponseType response = multiHttpClientConfig.oadrCanceledPartyRegistrationType(oadrCancelPartyRegistration);
-				
 				responseService.oadrResponse(session, response);
-
-
-
 
 			} else if (payload instanceof OadrRequestReregistrationType) {
 				LOGGER.info("Retrieved OadrRequestReregistrationType");
 				OadrRequestReregistrationType val = (OadrRequestReregistrationType) payload;
 
-				OadrResponseType oadrRequestReregistration = registerPartyService
-						.oadrRequestReregistration(session, val);
+				OadrResponseType oadrRequestReregistration = registerPartyService.oadrRequestReregistration(session,
+						val);
 
 				OadrResponseType response = multiHttpClientConfig
 						.oadrResponseReregisterParty(oadrRequestReregistration);
-				
+
 				responseService.oadrResponse(session, response);
-
-
 
 			} else if (payload instanceof OadrCancelReportType) {
 				LOGGER.info("Retrieved OadrCancelReportType");
@@ -256,12 +243,9 @@ public class Oadr20bVENPayloadService {
 
 				OadrCanceledReportType oadrCancelReport = reportService.oadrCancelReport(session, val);
 
-				OadrResponseType response = multiHttpClientConfig
-						.oadrCanceledReport(oadrCancelReport);
-				
+				OadrResponseType response = multiHttpClientConfig.oadrCanceledReport(oadrCancelReport);
+
 				responseService.oadrResponse(session, response);
-
-
 
 			} else if (payload instanceof OadrCanceledReportType) {
 				LOGGER.info("Retrieved OadrCancelReportType");
@@ -269,21 +253,15 @@ public class Oadr20bVENPayloadService {
 
 				reportService.oadrCanceledReport(session, val);
 
-
-
-
-			}else if (payload instanceof OadrCreateReportType) {
+			} else if (payload instanceof OadrCreateReportType) {
 				LOGGER.info("Retrieved OadrCreateReportType");
 				OadrCreateReportType val = (OadrCreateReportType) payload;
 
 				OadrCreatedReportType oadrCreateReport = reportService.oadrCreateReport(session, val);
 
-				OadrResponseType response = multiHttpClientConfig
-						.oadrCreatedReport(oadrCreateReport);
-				
+				OadrResponseType response = multiHttpClientConfig.oadrCreatedReport(oadrCreateReport);
+
 				responseService.oadrResponse(session, response);
-
-
 
 			} else if (payload instanceof OadrCreatedReportType) {
 				LOGGER.info("Retrieved OadrCreateReportType");
@@ -291,27 +269,21 @@ public class Oadr20bVENPayloadService {
 
 				reportService.oadrCreatedReport(session, val);
 
-
 			} else if (payload instanceof OadrRegisterReportType) {
 				LOGGER.info("Retrieved OadrRegisterReportType");
 				OadrRegisterReportType val = (OadrRegisterReportType) payload;
 
-				OadrRegisteredReportType oadrRegisterReport = reportService.oadrRegisterReport(session,
-						val);
+				OadrRegisteredReportType oadrRegisterReport = reportService.oadrRegisterReport(session, val);
 
-				OadrResponseType response =  multiHttpClientConfig
-						.oadrRegisteredReport(oadrRegisterReport);
-				
+				OadrResponseType response = multiHttpClientConfig.oadrRegisteredReport(oadrRegisterReport);
+
 				responseService.oadrResponse(session, response);
-
-
 
 			} else if (payload instanceof OadrRegisteredReportType) {
 				LOGGER.info("Retrieved OadrRegisterReportType");
 				OadrRegisteredReportType val = (OadrRegisteredReportType) payload;
 
-				reportService.oadrRegisteredReport(session,
-						val);
+				reportService.oadrRegisteredReport(session, val);
 
 			} else if (payload instanceof OadrUpdateReportType) {
 				LOGGER.info("Retrieved OadrUpdateReportType");
@@ -319,32 +291,25 @@ public class Oadr20bVENPayloadService {
 
 				OadrUpdatedReportType oadrUpdateReport = reportService.oadrUpdateReport(session, val);
 
-				OadrResponseType response =multiHttpClientConfig
-						.oadrUpdatedReport(oadrUpdateReport);
-				
+				OadrResponseType response = multiHttpClientConfig.oadrUpdatedReport(oadrUpdateReport);
+
 				responseService.oadrResponse(session, response);
 
-
-
-			}else if (payload instanceof OadrUpdatedReportType) {
+			} else if (payload instanceof OadrUpdatedReportType) {
 				LOGGER.info("Retrieved OadrUpdateReportType");
 				OadrUpdatedReportType val = (OadrUpdatedReportType) payload;
 
 				reportService.oadrUpdatedReport(session, val);
 
-
 			} else if (payload instanceof OadrCreatedOptType) {
 
 				LOGGER.info(vtnId + " - OadrCreatedOptType");
 
-
 			} else if (payload instanceof OadrResponseType) {
 				LOGGER.info("Retrieved OadrResponseType");
 				OadrResponseType response = (OadrResponseType) payload;
-				
+
 				responseService.oadrResponse(session, response);
-
-
 
 			} else if (payload != null) {
 				LOGGER.warn("Unknown retrieved payload: " + payload.getClass().toString());
@@ -357,12 +322,7 @@ public class Oadr20bVENPayloadService {
 		}
 	}
 
-
-
-
-
-	private UnmarshalledPayload unmarshall(VtnSessionConfiguration session, String payload)
-			throws MarshallException {
+	private UnmarshalledPayload unmarshall(VtnSessionConfiguration session, String payload) throws MarshallException {
 
 		try {
 			Object unmarshal = oadr20bJAXBContext.unmarshal(payload);
@@ -376,11 +336,10 @@ public class Oadr20bVENPayloadService {
 			} else {
 				unsignedPayload = unmarshal;
 			}
-			if (session.getVenSessionConfig().getXmlSignature() != null && session.getVenSessionConfig().getXmlSignature() && !signed) {
+			if (session.getXmlSignature() != null && session.getXmlSignature() && !signed) {
 				throw new MarshallException(expectedSignatureError(session));
 
 			}
-
 
 			return new UnmarshalledPayload(unsignedPayload, signed);
 		} catch (Oadr20bUnmarshalException e) {
@@ -390,7 +349,7 @@ public class Oadr20bVENPayloadService {
 		}
 	}
 
-	private String marshall(VtnSessionConfiguration session,Object payload, boolean signed) {
+	private String marshall(VtnSessionConfiguration session, Object payload, boolean signed) {
 		try {
 			if (signed) {
 				return xmlSignatureService.sign(payload, session);
@@ -405,7 +364,7 @@ public class Oadr20bVENPayloadService {
 	}
 
 	private String expectedSignatureError(VtnSessionConfiguration session) {
-		boolean signed = (session.getVenSessionConfig().getXmlSignature() != null) ? session.getVenSessionConfig().getXmlSignature() : false;
+		boolean signed = (session.getXmlSignature() != null) ? session.getXmlSignature() : false;
 		EiResponseType xmlSignatureRequiredButAbsent = Oadr20bResponseBuilders
 				.newOadr20bEiResponseXmlSignatureRequiredButAbsentBuilder("", session.getVtnId());
 		OadrResponseType build = Oadr20bResponseBuilders
@@ -414,7 +373,7 @@ public class Oadr20bVENPayloadService {
 	}
 
 	private String signatureError(VtnSessionConfiguration session) {
-		boolean signed = (session.getVenSessionConfig().getXmlSignature() != null) ? session.getVenSessionConfig().getXmlSignature() : false;
+		boolean signed = (session.getXmlSignature() != null) ? session.getXmlSignature() : false;
 		OadrResponseType response = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.INVALID_DATA_454, session.getVtnId())
 				.withDescription("Can't validate payload xml signature").build();
@@ -422,7 +381,7 @@ public class Oadr20bVENPayloadService {
 	}
 
 	private String unmarshallError(VtnSessionConfiguration session) {
-		boolean signed = (session.getVenSessionConfig().getXmlSignature() != null) ? session.getVenSessionConfig().getXmlSignature() : false;
+		boolean signed = (session.getXmlSignature() != null) ? session.getXmlSignature() : false;
 		OadrResponseType response = Oadr20bResponseBuilders
 				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, session.getVtnId())
 				.withDescription("Can't unmarshall payload").build();
@@ -471,7 +430,5 @@ public class Oadr20bVENPayloadService {
 			return response;
 		}
 	}
-
-
 
 }

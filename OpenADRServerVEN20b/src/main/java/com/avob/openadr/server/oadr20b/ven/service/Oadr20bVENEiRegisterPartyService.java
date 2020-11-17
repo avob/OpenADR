@@ -125,10 +125,10 @@ public class Oadr20bVENEiRegisterPartyService implements Oadr20bVENEiService {
 						.withOadrTransportName(OadrTransportType.XMPP)
 						.withOadrTransportAddress(
 								multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).getConnectionJid())
-						.withOadrReportOnly(vtnConfiguration.getVenSessionConfig().getReportOnly())
+						.withOadrReportOnly(vtnConfiguration.getReportOnly())
 						.withOadrVenName(vtnConfiguration.getVenName())
-						.withOadrXmlSignature(vtnConfiguration.getVenSessionConfig().getXmlSignature())
-						.withOadrHttpPullModel(vtnConfiguration.getVenSessionConfig().getPullModel()).build();
+						.withOadrXmlSignature(vtnConfiguration.getXmlSignature())
+						.withOadrHttpPullModel(vtnConfiguration.getPullModel()).build();
 
 				multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration)
 						.oadrCreatePartyRegistration(createPartyRegistration);
@@ -149,14 +149,14 @@ public class Oadr20bVENEiRegisterPartyService implements Oadr20bVENEiService {
 		if (registration.getRegistrationID() != null) {
 			setRegistration(vtnConfiguration, registration);
 
-			if (vtnConfiguration.getVenSessionConfig().getPullModel()) {
+			if (vtnConfiguration.getPullModel()) {
 				oadrPollService.initPoll(vtnConfiguration, registration.getOadrRequestedOadrPollFreq());
 			}
 
 			LOGGER.info("Ven has successfully register using registrationId: " + registration.getRegistrationID());
-			LOGGER.debug("        xmlSignature: " + vtnConfiguration.getVenSessionConfig().getXmlSignature());
-			LOGGER.debug("        reportOnly  : " + vtnConfiguration.getVenSessionConfig().getReportOnly());
-			LOGGER.debug("        pullModel   : " + vtnConfiguration.getVenSessionConfig().getPullModel());
+			LOGGER.debug("        xmlSignature: " + vtnConfiguration.getXmlSignature());
+			LOGGER.debug("        reportOnly  : " + vtnConfiguration.getReportOnly());
+			LOGGER.debug("        pullModel   : " + vtnConfiguration.getPullModel());
 
 			if (getListeners() != null) {
 				final OadrCreatedPartyRegistrationType reg = registration;
@@ -211,8 +211,8 @@ public class Oadr20bVENEiRegisterPartyService implements Oadr20bVENEiService {
 
 		String venName = vtnConfig.getVenName();
 
-		boolean xmlSignature = vtnConfig.getVenSessionConfig().getXmlSignature();
-		boolean reportOnly = vtnConfig.getVenSessionConfig().getReportOnly();
+		boolean xmlSignature = vtnConfig.getXmlSignature();
+		boolean reportOnly = vtnConfig.getReportOnly();
 		String requestId = "";
 		Oadr20bCreatePartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatePartyRegistrationBuilder(requestId, vtnConfig.getVenId(),
@@ -221,7 +221,7 @@ public class Oadr20bVENEiRegisterPartyService implements Oadr20bVENEiService {
 
 		if (vtnConfig.getVtnUrl() != null) {
 
-			Boolean pullModel = vtnConfig.getVenSessionConfig().getPullModel();
+			Boolean pullModel = vtnConfig.getPullModel();
 			String transportAddress = null;
 			if (!pullModel) {
 				transportAddress = vtnConfig.getVenUrl();

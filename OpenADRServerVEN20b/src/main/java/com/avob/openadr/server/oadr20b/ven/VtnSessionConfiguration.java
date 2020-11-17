@@ -52,6 +52,13 @@ public class VtnSessionConfiguration {
 	private static final String PRIVATE_KEY = "oadr.vtn.security.ven.key";
 	private static final String CERTIFICATE = "oadr.vtn.security.ven.cert";
 
+	private static final String PULL_FREQUENCY = "oadr.pullFrequencySeconds";
+	private static final String REPORT_ONLY = "oadr.reportOnly";
+	private static final String XML_SIGNATURE = "oadr.xmlSignature";
+	private static final String PULL_MODEL = "oadr.pullModel";
+	private static final String REPLAY_PROTECTION_DELAY = "oadr.security.replayProtectAcceptedDelaySecond";
+	private static final String XSD_VALIDATION = "oadr.security.validateOadrPayloadAgainstXsdFilePath";
+
 	private String sessionId;
 	private String vtnId;
 	private String vtnUrl;
@@ -60,7 +67,6 @@ public class VtnSessionConfiguration {
 	private String vtnXmppDomain;
 	private String vtnXmppUser;
 	private String vtnXmppPass;
-	private VenConfig venSessionConfig;
 	private String contextPath;
 	private int port;
 	private String venId;
@@ -75,12 +81,31 @@ public class VtnSessionConfiguration {
 	private String digestUsername;
 	private String digestPassword;
 	private String digestRealm;
+	private Long pullFrequencySeconds;
+
+	private Boolean reportOnly;
+
+	private Boolean xmlSignature;
+
+	private Boolean pullModel;
+
+	private Long replayProtectAcceptedDelaySecond;
+
+	private Boolean validateOadrPayloadAgainstXsdFilePath;
 
 	private SSLContext sslContext;
 
 	public VtnSessionConfiguration(String sessionId, Properties properties, VenConfig defaultVenSessionConfig) {
 		this.sessionId = sessionId;
-		setVenSessionConfig(new VenConfig(defaultVenSessionConfig));
+
+		this.setReportOnly(defaultVenSessionConfig.getReportOnly());
+		this.setXmlSignature(defaultVenSessionConfig.getXmlSignature());
+		this.setPullModel(defaultVenSessionConfig.getPullModel());
+		this.setReplayProtectAcceptedDelaySecond(defaultVenSessionConfig.getReplayProtectAcceptedDelaySecond());
+		this.setValidateOadrPayloadAgainstXsdFilePath(
+				Boolean.valueOf(defaultVenSessionConfig.getValidateOadrPayloadAgainstXsdFilePath()));
+		this.setPullFrequencySeconds(defaultVenSessionConfig.getPullFrequencySeconds());
+		
 		for (Map.Entry<Object, Object> e : properties.entrySet()) {
 			String keyStr = (String) e.getKey();
 			String prop = (String) e.getValue();
@@ -132,6 +157,19 @@ public class VtnSessionConfiguration {
 				this.setVenCertificatePath(prop);
 			}
 
+			else if (PULL_FREQUENCY.equals(keyStr)) {
+				this.setPullFrequencySeconds(Long.valueOf(prop));
+			} else if (REPORT_ONLY.equals(keyStr)) {
+				this.setReportOnly(Boolean.valueOf(prop));
+			} else if (XML_SIGNATURE.equals(keyStr)) {
+				this.setXmlSignature(Boolean.valueOf(prop));
+			} else if (PULL_MODEL.equals(keyStr)) {
+				this.setPullModel(Boolean.valueOf(prop));
+			} else if (REPLAY_PROTECTION_DELAY.equals(keyStr)) {
+				this.setReplayProtectAcceptedDelaySecond(Long.valueOf(prop));
+			} else if (XSD_VALIDATION.equals(keyStr)) {
+				this.setValidateOadrPayloadAgainstXsdFilePath(Boolean.valueOf(prop));
+			}
 		}
 
 		String password = UUID.randomUUID().toString();
@@ -314,14 +352,6 @@ public class VtnSessionConfiguration {
 		return this.getBasicUsername() != null && this.getBasicPassword() != null;
 	}
 
-	public VenConfig getVenSessionConfig() {
-		return venSessionConfig;
-	}
-
-	public void setVenSessionConfig(VenConfig venSessionConfig) {
-		this.venSessionConfig = venSessionConfig;
-	}
-
 	public String getVtnXmppHost() {
 		return vtnXmppHost;
 	}
@@ -372,6 +402,54 @@ public class VtnSessionConfiguration {
 
 	public String getSessionId() {
 		return sessionId;
+	}
+
+	public Long getPullFrequencySeconds() {
+		return pullFrequencySeconds;
+	}
+
+	public void setPullFrequencySeconds(Long pullFrequencySeconds) {
+		this.pullFrequencySeconds = pullFrequencySeconds;
+	}
+
+	public Boolean getReportOnly() {
+		return reportOnly;
+	}
+
+	public void setReportOnly(Boolean reportOnly) {
+		this.reportOnly = reportOnly;
+	}
+
+	public Boolean getXmlSignature() {
+		return xmlSignature;
+	}
+
+	public void setXmlSignature(Boolean xmlSignature) {
+		this.xmlSignature = xmlSignature;
+	}
+
+	public Boolean getPullModel() {
+		return pullModel;
+	}
+
+	public void setPullModel(Boolean pullModel) {
+		this.pullModel = pullModel;
+	}
+
+	public Long getReplayProtectAcceptedDelaySecond() {
+		return replayProtectAcceptedDelaySecond;
+	}
+
+	public void setReplayProtectAcceptedDelaySecond(Long replayProtectAcceptedDelaySecond) {
+		this.replayProtectAcceptedDelaySecond = replayProtectAcceptedDelaySecond;
+	}
+
+	public Boolean getValidateOadrPayloadAgainstXsdFilePath() {
+		return validateOadrPayloadAgainstXsdFilePath;
+	}
+
+	public void setValidateOadrPayloadAgainstXsdFilePath(Boolean validateOadrPayloadAgainstXsdFilePath) {
+		this.validateOadrPayloadAgainstXsdFilePath = validateOadrPayloadAgainstXsdFilePath;
 	}
 
 }
