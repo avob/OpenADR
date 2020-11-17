@@ -57,7 +57,7 @@ public class Oadr20bPollService {
 		@Override
 		public void run() {
 
-			OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(vtnSession.getVenSessionConfig().getVenId())
+			OadrPollType poll = Oadr20bPollBuilders.newOadr20bPollBuilder(vtnSession.getVenId())
 					.build();
 
 			Object payload;

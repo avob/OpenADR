@@ -10,8 +10,8 @@ import org.springframework.jms.core.JmsTemplate;
 
 import com.rabbitmq.jms.admin.RMQConnectionFactory;
 
-@Configuration
 @Profile("external")
+@Configuration
 public class VtnConfigRabbitmqBroker {
 
 	@Resource

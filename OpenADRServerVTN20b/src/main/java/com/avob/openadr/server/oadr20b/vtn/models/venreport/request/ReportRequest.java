@@ -23,7 +23,6 @@ public abstract class ReportRequest {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 
-	@Column(unique = true)
 	private String reportRequestId;
 
 	private String granularity;

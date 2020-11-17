@@ -71,8 +71,7 @@ public class Oadr20bVENEiReportServiceTest {
 		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(reportId,
 				reportrequestId, reportSpecifierId, reportName, createdTimestamp, startTimestamp, duration).build();
 		OadrUpdateReportType oadrUpdateReport = Oadr20bEiReportBuilders
-				.newOadr20bUpdateReportBuilder("",
-						multiVtnConfig.getMultiConfig(vtnHttpId).getVenSessionConfig().getVenId())
+				.newOadr20bUpdateReportBuilder("", multiVtnConfig.getMultiConfig(vtnHttpId).getVenId())
 				.addReport(report).addReport(Lists.newArrayList(report)).build();
 
 		String request = oadr20bVENPayloadService.report(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrUpdateReport));
@@ -97,10 +96,8 @@ public class Oadr20bVENEiReportServiceTest {
 		String duration = "PT1S";
 		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(reportId,
 				reportRequestId, reportSpecifierId, reportName, createdTimestamp, startTimestamp, duration).build();
-		OadrRegisterReportType oadrRegisterReport = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportBuilder("",
-						multiVtnConfig.getMultiConfig(vtnHttpId).getVenSessionConfig().getVenId(), reportRequestId)
-				.addOadrReport(report).build();
+		OadrRegisterReportType oadrRegisterReport = Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder("",
+				multiVtnConfig.getMultiConfig(vtnHttpId).getVenId(), reportRequestId).addOadrReport(report).build();
 
 		String request = oadr20bVENPayloadService.report(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrRegisterReport));
 
@@ -114,8 +111,7 @@ public class Oadr20bVENEiReportServiceTest {
 			throws Oadr20bApplicationLayerException, Oadr20bMarshalException, Oadr20bUnmarshalException,
 			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException {
 		OadrCancelReportType oadrCancelReport = Oadr20bEiReportBuilders
-				.newOadr20bCancelReportBuilder("",
-						multiVtnConfig.getMultiConfig(vtnHttpId).getVenSessionConfig().getVenId(), false)
+				.newOadr20bCancelReportBuilder("", multiVtnConfig.getMultiConfig(vtnHttpId).getVenId(), false)
 				.addReportRequestId("").build();
 		String request = oadr20bVENPayloadService.report(vtnHttpId, oadr20bJAXBContext.marshalRoot(oadrCancelReport));
 

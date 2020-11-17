@@ -85,7 +85,7 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 						NO_GRANULARITY)
 				.addSpecifierPayload(null, ReadingTypeEnumeratedType.DIRECT_READ, METADATA_REPORT_RID).build();
 		OadrCreateReportType createReport = Oadr20bEiReportBuilders
-				.newOadr20bCreateReportBuilder(requestId, vtnConfiguration.getVenSessionConfig().getVenId())
+				.newOadr20bCreateReportBuilder(requestId, vtnConfiguration.getVenId())
 				.addReportRequest(oadrReportRequestType).build();
 
 		try {
@@ -147,7 +147,7 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 
 			return Oadr20bEiReportBuilders
 					.newOadr20bCreatedReportBuilder(requestID, HttpStatus.OK_200,
-							vtnConfig.getVenSessionConfig().getVenId())
+							vtnConfig.getVenId())
 					.addPendingReportRequestId(getExistingVenReportRequest(vtnConfig)).build();
 
 		} catch (Oadr20bInvalidReportRequestException e) {
@@ -171,7 +171,7 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 		if (!canceledReportRequest.isEmpty()) {
 			return Oadr20bEiReportBuilders
 					.newOadr20bCanceledReportBuilder(requestID, Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453,
-							vtnConfig.getVenSessionConfig().getVenId())
+							vtnConfig.getVenId())
 					.withResponseDescription(
 							String.format("Invalid cancel report - Report request id %s not recognized",
 									String.join(",", canceledReportRequest)))
@@ -188,7 +188,7 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 
 		return Oadr20bEiReportBuilders
 				.newOadr20bCanceledReportBuilder(requestID, HttpStatus.OK_200,
-						vtnConfig.getVenSessionConfig().getVenId())
+						vtnConfig.getVenId())
 				.addPendingReportRequestId(getExistingVenReportRequest(vtnConfig)).build();
 
 	}
@@ -228,7 +228,7 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 		});
 
 		return Oadr20bEiReportBuilders.newOadr20bRegisteredReportBuilder(requestID, HttpStatus.OK_200,
-				vtnConfig.getVenSessionConfig().getVenId()).build();
+				vtnConfig.getVenId()).build();
 
 	}
 
@@ -242,7 +242,7 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 		});
 
 		return Oadr20bEiReportBuilders.newOadr20bUpdatedReportBuilder(requestID, HttpStatus.OK_200,
-				vtnConfig.getVenSessionConfig().getVenId()).build();
+				vtnConfig.getVenId()).build();
 	}
 
 	public OadrResponseType oadrCreatedReport(VtnSessionConfiguration vtnConfig,

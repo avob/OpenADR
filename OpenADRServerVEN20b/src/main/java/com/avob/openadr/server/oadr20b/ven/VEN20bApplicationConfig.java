@@ -26,6 +26,9 @@ public class VEN20bApplicationConfig {
 	@Resource
 	private VenConfig venConfig;
 
+	@Resource
+	private MultiVtnConfig multiVtnConfig;
+
 	@Bean
 	@Profile("!test")
 	public Oadr20bJAXBContext jaxbContextProd() throws OadrSecurityException, JAXBException {
@@ -47,11 +50,8 @@ public class VEN20bApplicationConfig {
 
 	@Bean
 	public WebServerFactoryCustomizer<JettyServletWebServerFactory> servletContainerCustomizer() {
-		return new VENEmbeddedServletContainerCustomizer(venConfig.getPort(), venConfig.getContextPath(), venConfig.getSslContext(),
+		return new VENEmbeddedServletContainerCustomizer(multiVtnConfig.getMultiConfig(),
 				Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers());
 	}
-	
-	
-
 
 }

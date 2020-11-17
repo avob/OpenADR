@@ -3,7 +3,6 @@ package com.avob.openadr.dummy;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,7 +32,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.xcal.DurationPropType;
-import com.avob.openadr.server.oadr20b.ven.VenConfig;
+import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiReportService;
 
@@ -45,20 +44,20 @@ public class RequestedReportSimulator {
 	private static final Object METADATA_REPORT_SPECIFIER_ID = "METADATA";
 
 	@Resource
-	private VenConfig venConfig;
+	private MultiVtnConfig multiVtnConfig;
 
 	@Resource
 	private Oadr20bVENEiReportService oadr20bVENEiReportService;
 
 	private AtomicInteger currentValue = new AtomicInteger(Float.floatToIntBits(-1F));
 
-	private Map<String, Map<String, Map<String, OadrReportRequestType>>> requestedReport = new HashMap<>();
+	private Map<String, Map<String, Map<String, OadrReportRequestType>>> requestedReport = new ConcurrentHashMap<>();
 
 	private ScheduledExecutorService executor = Executors.newScheduledThreadPool(5);
-	private Map<String, Map<String, Map<String, ScheduledFuture<?>>>> simulateReadingTasks = new HashMap<>();
-	private Map<String, Map<String, ScheduledFuture<?>>> reportBackTasks = new HashMap<>();
-	private Map<String, Map<String, Map<String, Map<String, TreeMap<Long, Float>>>>> simulateReadingBuffer = new HashMap<>();
-	private Map<String, VtnSessionConfiguration> vtnSessionConfig = new HashMap<>();
+	private Map<String, Map<String, Map<String, ScheduledFuture<?>>>> simulateReadingTasks = new ConcurrentHashMap<>();
+	private Map<String, Map<String, ScheduledFuture<?>>> reportBackTasks = new ConcurrentHashMap<>();
+	private Map<String, Map<String, Map<String, Map<String, TreeMap<Long, Float>>>>> simulateReadingBuffer = new ConcurrentHashMap<>();
+	private Map<String, VtnSessionConfiguration> vtnSessionConfig = new ConcurrentHashMap<>();
 
 	public Float getCurrentValue() {
 		return Float.intBitsToFloat(currentValue.get());
@@ -76,11 +75,11 @@ public class RequestedReportSimulator {
 			if (!METADATA_REPORT_SPECIFIER_ID.equals(reportSpecifierID)) {
 				Map<String, Map<String, OadrReportRequestType>> vtnMap = requestedReport.get(vtnConfig.getVtnId());
 				if (vtnMap == null) {
-					vtnMap = new HashMap<>();
+					vtnMap = new ConcurrentHashMap<>();
 				}
 				Map<String, OadrReportRequestType> reportRequestMap = vtnMap.get(reportRequestID);
 				if (reportRequestMap == null) {
-					reportRequestMap = new HashMap<>();
+					reportRequestMap = new ConcurrentHashMap<>();
 				}
 				reportRequestMap.put(reportSpecifierID, oadrReportRequestType);
 				vtnMap.put(reportRequestID, reportRequestMap);
@@ -140,7 +139,7 @@ public class RequestedReportSimulator {
 
 					Map<String, ScheduledFuture<?>> reportBackTaskVtn = reportBackTasks.get(vtnId);
 					if (reportBackTaskVtn == null) {
-						reportBackTaskVtn = new HashMap<>();
+						reportBackTaskVtn = new ConcurrentHashMap<>();
 					}
 					reportBackTaskVtn.put(reportRequestId, scheduleReportBack);
 					reportBackTasks.put(vtnId, reportBackTaskVtn);
@@ -157,11 +156,11 @@ public class RequestedReportSimulator {
 						Map<String, Map<String, ScheduledFuture<?>>> granularityTaskVtn = simulateReadingTasks
 								.get(vtnId);
 						if (granularityTaskVtn == null) {
-							granularityTaskVtn = new HashMap<>();
+							granularityTaskVtn = new ConcurrentHashMap<>();
 						}
 						Map<String, ScheduledFuture<?>> map = granularityTaskVtn.get(reportRequestId);
 						if (map == null) {
-							map = new HashMap<>();
+							map = new ConcurrentHashMap<>();
 						}
 						map.put(reportSpecifierId, scheduleGranularity);
 						granularityTaskVtn.put(reportRequestId, map);
@@ -219,7 +218,7 @@ public class RequestedReportSimulator {
 			String duration = null;
 
 			Oadr20bUpdateReportBuilder newOadr20bUpdateReportBuilder = Oadr20bEiReportBuilders
-					.newOadr20bUpdateReportBuilder(requestId, venConfig.getVenId());
+					.newOadr20bUpdateReportBuilder(requestId, multiVtnConfig.getMultiConfig(vtnId).getVenId());
 
 			simulateReadingBuffer.get(vtnId).get(reportRequestId).forEach((reportSpecifierId, ridMap) -> {
 
@@ -264,7 +263,7 @@ public class RequestedReportSimulator {
 
 			Map<String, ScheduledFuture<?>> reportBackTaskVtn = reportBackTasks.get(vtnId);
 			if (reportBackTaskVtn == null) {
-				reportBackTaskVtn = new HashMap<>();
+				reportBackTaskVtn = new ConcurrentHashMap<>();
 			}
 			reportBackTaskVtn.put(reportRequestId, scheduleReportBack);
 			reportBackTasks.put(vtnId, reportBackTaskVtn);
@@ -339,7 +338,7 @@ public class RequestedReportSimulator {
 
 			Map<String, Map<String, ScheduledFuture<?>>> simulateReadingTasksVtn = simulateReadingTasks.get(vtnId);
 			if (simulateReadingTasksVtn == null) {
-				simulateReadingTasksVtn = new HashMap<>();
+				simulateReadingTasksVtn = new ConcurrentHashMap<>();
 			}
 			Map<String, ScheduledFuture<?>> map = simulateReadingTasksVtn.get(reportRequestId);
 			if (map == null) {

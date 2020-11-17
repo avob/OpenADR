@@ -1,22 +1,18 @@
 package com.avob.openadr.server.oadr20b.ven;
 
-import javax.net.ssl.SSLContext;
+import java.util.Map;
 
 import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 
 public class VENEmbeddedServletContainerCustomizer implements WebServerFactoryCustomizer<JettyServletWebServerFactory> {
 
-	private int port;
-	private SSLContext sslContext;
-	private String contextPath;
+	private Map<String, VtnSessionConfiguration> multiConfig;
 	private String[] protocols;
 	private String[] ciphers;
 
-	public VENEmbeddedServletContainerCustomizer(int port, String contextPath, SSLContext sslContext, String[] protocols, String[] ciphers) {
-		this.port = port;
-		this.sslContext = sslContext;
-		this.contextPath = contextPath;
+	public VENEmbeddedServletContainerCustomizer(Map<String, VtnSessionConfiguration> multiConfig, String[] protocols, String[] ciphers) {
+		this.multiConfig = multiConfig;
 		this.protocols = protocols;
 		this.ciphers = ciphers;
 	}
@@ -25,11 +21,8 @@ public class VENEmbeddedServletContainerCustomizer implements WebServerFactoryCu
 	public void customize(JettyServletWebServerFactory jettyFactory) {
 
 		jettyFactory.setRegisterDefaultServlet(false);
-		if (contextPath != null && !"".equals(contextPath.trim())) {
-			jettyFactory.setContextPath(contextPath);
-		}
 		jettyFactory.addServerCustomizers(
-				new VENJettyServerCustomizer(port, sslContext, protocols, ciphers));
+				new VENJettyServerCustomizer(multiConfig, protocols, ciphers));
 	}
 
 }

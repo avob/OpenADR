@@ -60,7 +60,6 @@ import org.springframework.boot.autoconfigure.integration.IntegrationAutoConfigu
 import org.springframework.boot.autoconfigure.jdbc.JndiDataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.XADataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jersey.JerseyAutoConfiguration;
-import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.JndiConnectionFactoryAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.artemis.ArtemisAutoConfiguration;
 import org.springframework.boot.autoconfigure.jooq.JooqAutoConfiguration;
@@ -164,7 +163,6 @@ import com.avob.openadr.server.common.vtn.VtnConfig;
 		IntegrationAutoConfiguration.class,
 		JdbcRepositoriesAutoConfiguration.class,
 		JerseyAutoConfiguration.class,
-		JmsAutoConfiguration.class,
 		JndiConnectionFactoryAutoConfiguration.class,
 		JndiDataSourceAutoConfiguration.class,
 		JooqAutoConfiguration.class,

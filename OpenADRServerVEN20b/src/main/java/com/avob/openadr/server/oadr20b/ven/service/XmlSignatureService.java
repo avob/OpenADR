@@ -46,8 +46,8 @@ public class XmlSignatureService {
 
 	public String sign(Object object, VtnSessionConfiguration multiConfig)
 			throws Oadr20bXMLSignatureException, OadrSecurityException {
-		PrivateKey loadKey = loadKey(multiConfig.getVenSessionConfig().getVenPrivateKeyPath());
-		X509Certificate loadCert = loadCert(multiConfig.getVenSessionConfig().getVenCertificatePath());
+		PrivateKey loadKey = loadKey(multiConfig.getVenPrivateKeyPath());
+		X509Certificate loadCert = loadCert(multiConfig.getVenCertificatePath());
 		String nonce = UUID.randomUUID().toString();
 		Long createdtimestamp = System.currentTimeMillis();
 		return OadrXMLSignatureHandler.sign(object, loadKey, loadCert, nonce, createdtimestamp);

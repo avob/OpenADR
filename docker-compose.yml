@@ -80,7 +80,10 @@ services:
       xmpp:
       http:
         aliases:
+          - ven1.oadr.com
           - ven2.oadr.com
+          - ven3.oadr.com
+          - ven4.oadr.com
   
   # nodered:
   #   build: .docker/nodered

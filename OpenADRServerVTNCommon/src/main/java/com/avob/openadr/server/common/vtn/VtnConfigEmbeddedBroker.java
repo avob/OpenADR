@@ -16,7 +16,7 @@ import org.springframework.jms.core.JmsTemplate;
 
 import com.avob.openadr.server.common.vtn.broker.activemq.ActiveMQAuthorizationPlugin;
 
-@Profile({ "test", "in-memory" })
+@Profile({ "test", "standalone" })
 @Configuration
 public class VtnConfigEmbeddedBroker {
 

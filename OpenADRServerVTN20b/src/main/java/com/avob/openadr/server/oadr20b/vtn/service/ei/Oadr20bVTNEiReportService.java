@@ -807,8 +807,8 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 			String reportSpecifierID = oadrReportType.getReportSpecifierID();
 			Intervals intervals = oadrReportType.getIntervals();
 
-			OtherReportRequest findByReportRequestId = otherReportRequestService
-					.findOneByReportRequestId(reportRequestID);
+			OtherReportRequest findByReportRequestId = otherReportRequestService.findOneBySourceAndReportRequestId(ven,
+					reportRequestID);
 
 			List<OtherReportRequestSpecifier> findByRequest = otherReportRequestSpecifierDao
 					.findByRequest(findByReportRequestId);
@@ -1269,7 +1269,8 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		otherReportCapabilityService.save(findByPayloadReportRequestId2);
 
-		OtherReportRequest findByReportRequestId = otherReportRequestService.findOneByReportRequestId(reportRequestID);
+		OtherReportRequest findByReportRequestId = otherReportRequestService.findOneBySourceAndReportRequestId(ven,
+				reportRequestID);
 		otherReportRequestSpecifierDao.deleteByRequest(findByReportRequestId);
 		otherReportRequestService.delete(findByReportRequestId.getId());
 

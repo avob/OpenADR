@@ -6,12 +6,16 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-
-import javax.net.ssl.SSLContext;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConfiguration.Customizer;
 import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -23,37 +27,42 @@ import com.avob.openadr.security.exception.OadrSecurityException;
 
 public class VENJettyServerCustomizer implements JettyServerCustomizer {
 
-	private int port;
-	private SSLContext sslContext;
+	private Map<String, VtnSessionConfiguration> multiConfig;
 	private String[] protocols;
 	private String[] ciphers;
 
-	public VENJettyServerCustomizer(int port, SSLContext sslContext, 
-			String[] protocols, String[] ciphers) {
-		this.port = port;
-		this.sslContext = sslContext;
+	public VENJettyServerCustomizer(Map<String, VtnSessionConfiguration> multiConfig, String[] protocols,
+			String[] ciphers) {
+		this.multiConfig = multiConfig;
 		this.protocols = protocols;
 		this.ciphers = ciphers;
 	}
 
-	private HttpConfiguration getHttpConfiguration() {
+	private HttpConfiguration getHttpConfiguration(VtnSessionConfiguration session) {
 		HttpConfiguration config = new HttpConfiguration();
 		config.setSecureScheme("https");
-		config.setSecurePort(port);
+		config.setSecurePort(session.getPort());
 		config.setSendXPoweredBy(false);
 		config.setSendServerVersion(false);
 		config.addCustomizer(new SecureRequestCustomizer());
+		config.addCustomizer(new Customizer() {
+
+			@Override
+			public void customize(Connector connector, HttpConfiguration channelConfig, Request request) {
+				request.setContextPath(session.getContextPath());
+				
+			}});
 
 		return config;
 	}
 
-	private SslContextFactory getSslContextFactory()
+	private SslContextFactory getSslContextFactory(VtnSessionConfiguration session)
 			throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException,
 			OadrSecurityException, UnrecoverableKeyException, KeyManagementException {
 		// SSL Context Factory
 		SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
 
-		sslContextFactory.setSslContext(sslContext);
+		sslContextFactory.setSslContext(session.getSslContext());
 
 		// jetty 9 silently exclude required oadr20a default
 		// cipher suite
@@ -73,17 +82,31 @@ public class VENJettyServerCustomizer implements JettyServerCustomizer {
 	public void customize(Server server) {
 
 		try {
-			HttpConfiguration config = getHttpConfiguration();
 
-			HttpConnectionFactory http1 = new HttpConnectionFactory(config);
+			List<Connector> connectorList = new ArrayList<>();
 
-			SslConnectionFactory ssl = new SslConnectionFactory(this.getSslContextFactory(), "http/1.1");
+			for (Entry<String, VtnSessionConfiguration> entry : multiConfig.entrySet()) {
 
-			ServerConnector connector = new ServerConnector(server, ssl, http1);
+				VtnSessionConfiguration session = entry.getValue();
 
-			connector.setPort(port);
-			Connector[] connectors = { connector };
+				HttpConfiguration config = getHttpConfiguration(session);
+				
+				HttpConnectionFactory http1 = new HttpConnectionFactory(config);
+				
+				SslConnectionFactory ssl = new SslConnectionFactory(this.getSslContextFactory(session), "http/1.1");
+
+				ServerConnector connector = new ServerConnector(server, ssl, http1);
+				
+				connector.setPort(session.getPort());
+												
+				connectorList.add(connector);
+			}
+
+			Connector[] connectors = new Connector[connectorList.size()];
+			connectors = connectorList.toArray(connectors);
+
 			server.setConnectors(connectors);
+			
 
 		} catch (OadrSecurityException e) {
 			throw new IllegalArgumentException(e);

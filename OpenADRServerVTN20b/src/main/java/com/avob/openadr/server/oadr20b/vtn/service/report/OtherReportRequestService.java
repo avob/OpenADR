@@ -21,8 +21,8 @@ public class OtherReportRequestService extends GenericService<OtherReportRequest
 	@Resource
 	private OtherReportRequestDao otherReportRequestDao;
 
-	public OtherReportRequest findOneByReportRequestId(String reportRequestId) {
-		return otherReportRequestDao.findOneByReportRequestId(reportRequestId);
+	public OtherReportRequest findOneBySourceAndReportRequestId(Ven ven,String reportRequestId) {
+		return otherReportRequestDao.findOneBySourceAndReportRequestId(ven, reportRequestId);
 	}
 
 	public List<OtherReportRequest> findBySourceAndReportRequestIdIn(Ven ven, List<String> reportRequestId) {

@@ -222,7 +222,7 @@ public class Oadr20bVENEiEventControllerTest {
 				createdTimespamp, eventId, modificationNumber, marketContext, status).build();
 
 		EiTargetType eiTargetType = new Oadr20bEiTargetTypeBuilder()
-				.addVenId(multiVtnConfig.getMultiConfig(vtnHttpId).getVenSessionConfig().getVenId()).build();
+				.addVenId(multiVtnConfig.getMultiConfig(vtnHttpId).getVenId()).build();
 		OadrEvent event = Oadr20bEiEventBuilders.newOadr20bDistributeEventOadrEventBuilder()
 				.withActivePeriod(activePeriod).withEventDescriptor(eventDescriptorType).withEiTarget(eiTargetType)
 				.build();

@@ -221,7 +221,7 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 			if(!eventResponses.isEmpty()) {
 				OadrCreatedEventType build = Oadr20bEiEventBuilders.newCreatedEventBuilder(
 						Oadr20bResponseBuilders.newOadr20bEiResponseBuilder(vtnRequestID, responseCode).build(),
-						vtnConfiguration.getVenSessionConfig().getVenId()).addEventResponse(eventResponses).build();
+						vtnConfiguration.getVenId()).addEventResponse(eventResponses).build();
 				try {
 					multiVtnConfig.oadrCreatedEvent(vtnConfiguration, build);
 				} catch (XmppStringprepException | NotConnectedException | Oadr20bException | Oadr20bHttpLayerException

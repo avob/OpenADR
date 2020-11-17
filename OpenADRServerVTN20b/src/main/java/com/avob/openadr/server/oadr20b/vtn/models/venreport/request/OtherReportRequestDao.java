@@ -36,4 +36,6 @@ public interface OtherReportRequestDao extends ReportRequestDao<OtherReportReque
 	@Transactional(readOnly = false)
 	public void deleteByRequestorAndOtherReportCapabilitySourceUsername(AbstractUser requestor, String username);
 
+	public OtherReportRequest findOneBySourceAndReportRequestId(Ven ven, String reportRequestId);
+
 }

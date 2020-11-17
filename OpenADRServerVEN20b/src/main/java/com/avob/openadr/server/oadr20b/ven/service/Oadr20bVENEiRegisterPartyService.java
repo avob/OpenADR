@@ -121,12 +121,12 @@ public class Oadr20bVENEiRegisterPartyService implements Oadr20bVENEiService {
 
 				OadrCreatePartyRegistrationType createPartyRegistration = Oadr20bEiRegisterPartyBuilders
 						.newOadr20bCreatePartyRegistrationBuilder(requestId,
-								vtnConfiguration.getVenSessionConfig().getVenId(), "xmpp")
+								vtnConfiguration.getVenId(), "xmpp")
 						.withOadrTransportName(OadrTransportType.XMPP)
 						.withOadrTransportAddress(
 								multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration).getConnectionJid())
 						.withOadrReportOnly(vtnConfiguration.getVenSessionConfig().getReportOnly())
-						.withOadrVenName(vtnConfiguration.getVenSessionConfig().getVenName())
+						.withOadrVenName(vtnConfiguration.getVenName())
 						.withOadrXmlSignature(vtnConfiguration.getVenSessionConfig().getXmlSignature())
 						.withOadrHttpPullModel(vtnConfiguration.getVenSessionConfig().getPullModel()).build();
 
@@ -209,13 +209,13 @@ public class Oadr20bVENEiRegisterPartyService implements Oadr20bVENEiService {
 			this.register(vtnConfig, oadrCreatedPartyRegistrationType);
 		}
 
-		String venName = vtnConfig.getVenSessionConfig().getVenName();
+		String venName = vtnConfig.getVenName();
 
 		boolean xmlSignature = vtnConfig.getVenSessionConfig().getXmlSignature();
 		boolean reportOnly = vtnConfig.getVenSessionConfig().getReportOnly();
 		String requestId = "";
 		Oadr20bCreatePartyRegistrationBuilder builder = Oadr20bEiRegisterPartyBuilders
-				.newOadr20bCreatePartyRegistrationBuilder(requestId, vtnConfig.getVenSessionConfig().getVenId(),
+				.newOadr20bCreatePartyRegistrationBuilder(requestId, vtnConfig.getVenId(),
 						SchemaVersionEnumeratedType.OADR_20B.value())
 				.withRegistrationId(oadrCreatedPartyRegistrationType.getRegistrationID());
 
@@ -224,7 +224,7 @@ public class Oadr20bVENEiRegisterPartyService implements Oadr20bVENEiService {
 			Boolean pullModel = vtnConfig.getVenSessionConfig().getPullModel();
 			String transportAddress = null;
 			if (!pullModel) {
-				transportAddress = vtnConfig.getVenSessionConfig().getVenUrl();
+				transportAddress = vtnConfig.getVenUrl();
 			}
 
 			OadrTransportType transportType = OadrTransportType.SIMPLE_HTTP;

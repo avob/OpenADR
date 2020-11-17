@@ -76,7 +76,7 @@ public class DummyVEN20bEiRegisterPartyListener implements Oadr20bVENEiRegisterP
 		String requestId = UUID.randomUUID().toString();
 		String optId = "0";
 		OadrCreateOptType oadrCreateOptType = Oadr20bEiOptBuilders.newOadr20bCreateOptBuilder(requestId,
-				vtnConfiguration.getVenSessionConfig().getVenId(), System.currentTimeMillis(), Oadr20bEiOptBuilders
+				vtnConfiguration.getVenId(), System.currentTimeMillis(), Oadr20bEiOptBuilders
 						.newOadr20bVavailabilityBuilder().addPeriod(System.currentTimeMillis(), "PT24H").build(),
 				optId, OptTypeType.OPT_OUT, OptReasonEnumeratedType.NOT_PARTICIPATING).build();
 

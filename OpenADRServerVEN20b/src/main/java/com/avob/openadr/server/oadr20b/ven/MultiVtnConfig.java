@@ -96,37 +96,38 @@ public class MultiVtnConfig {
 			configureXMPPClient(session);
 		} else if (session.getVtnUrl() != null) {
 			configureHTTPClient(session);
+		} else {
+			throw new IllegalStateException(String.format(
+					"Invalid config: %s - vtnUrl must be defined for HTTP ven, xmppHost and xmppPort for XMPP ven",
+					session.getSessionId()));
 		}
 	}
 
 	private void configureHTTPClient(VtnSessionConfiguration session)
 			throws OadrSecurityException, JAXBException, OadrVTNInitializationException {
+		LOGGER.info("Init HTTP VEN client");
 		OadrHttpClientBuilder builder = new OadrHttpClientBuilder().withDefaultHost(session.getVtnUrl())
-				.withTrustedCertificate(new ArrayList<String>(session.getVenSessionConfig().getTrustCertificates()))
-				.withPooling(1, 1).withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers());
+				.withTrustedCertificate(new ArrayList<String>(session.getTrustCertificates())).withPooling(1, 1)
+				.withProtocol(Oadr20bSecurity.getProtocols(), Oadr20bSecurity.getCiphers());
 
 		if (session.isBasicAuthenticationConfigured()) {
-			LOGGER.info("Init HTTP VEN client with basic authentication");
-			builder.withDefaultBasicAuthentication(session.getVtnUrl(),
-					session.getVenSessionConfig().getBasicUsername(), session.getVenSessionConfig().getBasicPassword());
+
+			builder.withDefaultBasicAuthentication(session.getVtnUrl(), session.getBasicUsername(),
+					session.getBasicPassword());
 
 		} else if (session.isDigestAuthenticationConfigured()) {
-			LOGGER.info("Init HTTP VEN client with digest authentication");
-			builder.withDefaultDigestAuthentication(session.getVtnUrl(), session.getVenSessionConfig().getDigestRealm(),
-					"", session.getVenSessionConfig().getDigestUsername(),
-					session.getVenSessionConfig().getDigestPassword());
+			builder.withDefaultDigestAuthentication(session.getVtnUrl(), session.getDigestRealm(), "",
+					session.getDigestUsername(), session.getDigestPassword());
 
 		} else {
-			builder.withX509Authentication(session.getVenSessionConfig().getVenPrivateKeyPath(),
-					session.getVenSessionConfig().getVenCertificatePath());
+			builder.withX509Authentication(session.getVenPrivateKeyPath(), session.getVenCertificatePath());
 		}
 
 		OadrHttpVenClient20b client = null;
 		if (venConfig.getXmlSignature()) {
-			client = new OadrHttpVenClient20b(
-					new OadrHttpClient20b(builder.build(), session.getVenSessionConfig().getVenPrivateKeyPath(),
-							session.getVenSessionConfig().getVenCertificatePath(),
-							session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond()));
+			client = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build(), session.getVenPrivateKeyPath(),
+					session.getVenCertificatePath(),
+					session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond()));
 		} else {
 			client = new OadrHttpVenClient20b(new OadrHttpClient20b(builder.build()));
 		}
@@ -137,16 +138,15 @@ public class MultiVtnConfig {
 	private void configureXMPPClient(VtnSessionConfiguration session)
 			throws OadrSecurityException, JAXBException, OadrVTNInitializationException {
 		try {
+
+			LOGGER.info("Init XMPP VEN client");
 			String password = UUID.randomUUID().toString();
-			SSLContext sslContext = OadrPKISecurity.createSSLContext(
-					session.getVenSessionConfig().getVenPrivateKeyPath(),
-					session.getVenSessionConfig().getVenCertificatePath(),
-					session.getVenSessionConfig().getTrustCertificates(), password);
+			SSLContext sslContext = OadrPKISecurity.createSSLContext(session.getVenPrivateKeyPath(),
+					session.getVenCertificatePath(), session.getTrustCertificates(), password);
 
 			OadrXmppClient20bBuilder builder = new OadrXmppClient20bBuilder()
-					.withHostAndPort(session.getVtnXmppHost(), session.getVtnXmppPort())
-					.withVenID(session.getVenSessionConfig().getVenId()).withResource("client")
-					.withSSLContext(sslContext).withListener(xmppVenListeners);
+					.withHostAndPort(session.getVtnXmppHost(), session.getVtnXmppPort()).withVenID(session.getVenId())
+					.withResource("client").withSSLContext(sslContext).withListener(xmppVenListeners);
 
 			if (session.getVtnXmppDomain() != null) {
 				builder.withDomain(session.getVtnXmppDomain());
@@ -160,9 +160,8 @@ public class MultiVtnConfig {
 
 			OadrXmppVenClient20b venClient = null;
 			if (venConfig.getXmlSignature()) {
-				venClient = new OadrXmppVenClient20b(oadrXmppClient20b,
-						session.getVenSessionConfig().getVenPrivateKeyPath(),
-						session.getVenSessionConfig().getVenCertificatePath(),
+				venClient = new OadrXmppVenClient20b(oadrXmppClient20b, session.getVenPrivateKeyPath(),
+						session.getVenCertificatePath(),
 						session.getVenSessionConfig().getReplayProtectAcceptedDelaySecond());
 			} else {
 				venClient = new OadrXmppVenClient20b(oadrXmppClient20b);
@@ -209,7 +208,8 @@ public class MultiVtnConfig {
 		for (Entry<String, Properties> entry : loadVtnConf.entrySet()) {
 
 			try {
-				VtnSessionConfiguration session = new VtnSessionConfiguration(entry.getValue(), venConfig);
+				VtnSessionConfiguration session = new VtnSessionConfiguration(entry.getKey(), entry.getValue(),
+						venConfig);
 				LOGGER.debug("Valid vtn configuration: " + entry.getKey());
 				LOGGER.info(session.toString());
 				configureClient(session);
@@ -246,7 +246,7 @@ public class MultiVtnConfig {
 		String requestId = UUID.randomUUID().toString();
 		String reportRequestId = UUID.randomUUID().toString();
 		Oadr20bRegisterReportBuilder builder = Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder(requestId,
-				vtnConfig.getVenSessionConfig().getVenId(), reportRequestId);
+				vtnConfig.getVenId(), reportRequestId);
 		if (venRegisterReport != null) {
 			builder.addOadrReport(venRegisterReport);
 		}
@@ -261,7 +261,7 @@ public class MultiVtnConfig {
 				|| !reports.get(vtnConfig.getVtnId()).containsKey(reportSpecifierID)) {
 			throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
 					.newOadr20bResponseBuilder(requestId, Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461,
-							vtnConfig.getVenSessionConfig().getVenId())
+							vtnConfig.getVenId())
 					.withDescription(
 							String.format("Invalid create report request: %s - report specifier %s not suported",
 									reportRequestId, reportSpecifierID))
@@ -283,7 +283,7 @@ public class MultiVtnConfig {
 		if (reportBackDurationMillis < granularityMillis) {
 			throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
 					.newOadr20bResponseBuilder(requestId, Oadr20bApplicationLayerErrorCode.INVALID_DATA_454,
-							vtnConfig.getVenSessionConfig().getVenId())
+							vtnConfig.getVenId())
 					.withDescription(String.format(
 							"Invalid create report request: %s - Granularity duration must be less than report back duration",
 							reportRequestId))
@@ -297,7 +297,7 @@ public class MultiVtnConfig {
 			if (!reportDescriptions.containsKey(reportDescriptionUID)) {
 				throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
 						.newOadr20bResponseBuilder(requestId, Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461,
-								vtnConfig.getVenSessionConfig().getVenId())
+								vtnConfig.getVenId())
 						.withDescription(
 								String.format("Invalid create report request: %s - report specifier %s not suported",
 										reportRequestId, reportSpecifierID))
@@ -317,8 +317,7 @@ public class MultiVtnConfig {
 					if (granularityMillis < minSamplingRateMillis) {
 						throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
 								.newOadr20bResponseBuilder(requestId,
-										Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461,
-										vtnConfig.getVenSessionConfig().getVenId())
+										Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461, vtnConfig.getVenId())
 								.withDescription(String.format(
 										"Invalid create report request: %s - granularity must be greater than every report description oadrMinPeriod if defined",
 										reportRequestId, reportSpecifierID))
@@ -331,8 +330,7 @@ public class MultiVtnConfig {
 					if (reportBackDurationMillis > maxSamplingRateMillis) {
 						throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
 								.newOadr20bResponseBuilder(requestId,
-										Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461,
-										vtnConfig.getVenSessionConfig().getVenId())
+										Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461, vtnConfig.getVenId())
 								.withDescription(String.format(
 										"Invalid create report request: %s - report back duration must be greater than every report description oadrMaxPeriod if defined",
 										reportRequestId, reportSpecifierID))
@@ -345,7 +343,7 @@ public class MultiVtnConfig {
 			if (!oadrOnChange && (granularityMillis == 0 || reportBackDurationMillis == 0)) {
 				throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
 						.newOadr20bResponseBuilder(requestId, Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461,
-								vtnConfig.getVenSessionConfig().getVenId())
+								vtnConfig.getVenId())
 						.withDescription(String.format(
 								"Invalid create report request: %s - granularity and report back duration equals 0 while at least on report description do not support oadrOnChange",
 								reportRequestId, reportSpecifierID))

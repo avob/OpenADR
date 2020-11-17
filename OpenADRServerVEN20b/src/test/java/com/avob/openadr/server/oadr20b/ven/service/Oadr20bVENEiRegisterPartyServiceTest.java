@@ -68,13 +68,13 @@ public class Oadr20bVENEiRegisterPartyServiceTest {
 		OadrCreatedPartyRegistrationType createdpartyRegistration = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCreatedPartyRegistrationBuilder(
 						Oadr20bResponseBuilders.newOadr20bEiResponseBuilder("0", 200).build(),
-						multiVtnConfig.getMultiConfig(vtnHttpId).getVenSessionConfig().getVenId(), vtnHttpId)
+						multiVtnConfig.getMultiConfig(vtnHttpId).getVenId(), vtnHttpId)
 				.withRegistrationId(registrationId).build();
 
 		OadrCanceledPartyRegistrationType canceledPartyRegistration = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCanceledPartyRegistrationBuilder(
 						Oadr20bResponseBuilders.newOadr20bEiResponseBuilder("", HttpStatus.OK_200).build(),
-						registrationId, multiVtnConfig.getMultiConfig(vtnHttpId).getVenSessionConfig().getVenId())
+						registrationId, multiVtnConfig.getMultiConfig(vtnHttpId).getVenId())
 				.build();
 
 		Mockito.when(client.oadrQueryRegistrationType(Mockito.any())).thenReturn(createdpartyRegistration);
@@ -90,7 +90,7 @@ public class Oadr20bVENEiRegisterPartyServiceTest {
 			Oadr20bXMLSignatureValidationException, Oadr20bXMLSignatureException, OadrSecurityException, IOException {
 		OadrRequestReregistrationType oadrRequestReregistrationType = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bRequestReregistrationBuilder(
-						multiVtnConfig.getMultiConfig(vtnHttpId).getVenSessionConfig().getVenId())
+						multiVtnConfig.getMultiConfig(vtnHttpId).getVenId())
 				.build();
 
 		String request = oadr20bVENPayloadService.registerParty(vtnHttpId,
@@ -114,7 +114,7 @@ public class Oadr20bVENEiRegisterPartyServiceTest {
 		OadrCancelPartyRegistrationType cancelPartyRegistration = Oadr20bEiRegisterPartyBuilders
 				.newOadr20bCancelPartyRegistrationBuilder("0",
 						oadr20bVENEiRegisterPartyService.getRegistration(multiConfig).getRegistrationID(),
-						multiVtnConfig.getMultiConfig(vtnHttpId).getVenSessionConfig().getVenId())
+						multiVtnConfig.getMultiConfig(vtnHttpId).getVenId())
 				.build();
 
 		String request = oadr20bVENPayloadService.registerParty(vtnHttpId,

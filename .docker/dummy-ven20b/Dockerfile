@@ -8,7 +8,7 @@ COPY --from=openadr_build:latest /opt/oadr/cert /opt/oadr-ven20b/cert
 COPY --from=openadr_build:latest /opt/oadr/dummy-ven20b/*.jar /opt/oadr-ven20b/
 
 # COPY http.properties /opt/oadr-ven20b/application.properties
-COPY xmpp.properties /opt/oadr-ven20b/application.properties
+COPY application.properties /opt/oadr-ven20b/application.properties
 RUN mv /opt/oadr-ven20b/*.jar /opt/oadr-ven20b/oadr-ven20b.jar
 
 COPY wait-for-it.sh /opt/oadr-ven20b/wait-for-it.sh
