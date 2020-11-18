@@ -7,7 +7,7 @@ RUN mkdir /var/run/oadr-ven20b
 COPY --from=openadr_build:latest /opt/oadr/cert /opt/oadr-ven20b/cert
 COPY --from=openadr_build:latest /opt/oadr/dummy-ven20b/*.jar /opt/oadr-ven20b/
 
-# COPY http.properties /opt/oadr-ven20b/application.properties
+COPY realEnergy.registerReport.xml /opt/oadr-ven20b/realEnergy.registerReport.xml
 COPY application.properties /opt/oadr-ven20b/application.properties
 RUN mv /opt/oadr-ven20b/*.jar /opt/oadr-ven20b/oadr-ven20b.jar
 

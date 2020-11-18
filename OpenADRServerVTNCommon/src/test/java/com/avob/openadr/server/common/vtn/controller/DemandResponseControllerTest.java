@@ -526,7 +526,7 @@ public class DemandResponseControllerTest {
 				.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).content(contentStr).with(adminSession))
 		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
-		// invalid update: signals not set
+		// valid update: target not set
 		updateDto = new DemandResponseEventUpdateDto();
 		updateDto.setPublished(false);
 		updateDto.getSignals().add(signalModerate);
@@ -535,7 +535,7 @@ public class DemandResponseControllerTest {
 		contentStr = mapper.writeValueAsString(updateDto);
 		this.mockMvc.perform(MockMvcRequestBuilders.put(DEMAND_RESPONSE_EVENT_URL + event1.getId())
 				.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).content(contentStr).with(adminSession))
-		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
 
 		// invalid update: published null
 		updateDto = new DemandResponseEventUpdateDto();
