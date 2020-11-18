@@ -45,10 +45,6 @@ public class DemandResponseEventDtoValidator {
 			errors.rejectValue("signals", "field.required", "At least one signal must be configured");
 		}
 
-		if (dto.getTargets().isEmpty()) {
-			errors.rejectValue("targets", "field.required", "At least one target must be configured");
-		}
-
 	}
 
 	protected void validateDescriptor(DemandResponseEventDto dto, Errors errors) {

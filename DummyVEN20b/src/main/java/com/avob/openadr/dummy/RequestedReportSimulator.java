@@ -3,6 +3,7 @@ package com.avob.openadr.dummy;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,8 +14,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
+import javax.xml.bind.JAXBElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +28,19 @@ import com.avob.openadr.model.oadr20b.builders.Oadr20bEiBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
 import com.avob.openadr.model.oadr20b.builders.eireport.Oadr20bUpdateReportBuilder;
 import com.avob.openadr.model.oadr20b.builders.eireport.Oadr20bUpdateReportOadrReportBuilder;
+import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
+import com.avob.openadr.model.oadr20b.ei.PayloadBaseType;
+import com.avob.openadr.model.oadr20b.ei.PayloadFloatType;
 import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
+import com.avob.openadr.model.oadr20b.ei.SignalPayloadType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
+import com.avob.openadr.model.oadr20b.power.EndDeviceAssetType;
+import com.avob.openadr.model.oadr20b.strm.StreamPayloadBaseType;
 import com.avob.openadr.model.oadr20b.xcal.DurationPropType;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
@@ -39,17 +49,19 @@ import com.avob.openadr.server.oadr20b.ven.service.Oadr20bVENEiReportService;
 @Service
 public class RequestedReportSimulator {
 
+	private static final String DEFAULT_ENDDEVICE_ASSET = "DEFAULT_ENDDEVICE_ASSET";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(DummyVEN20bEiReportListener.class);
 
 	private static final Object METADATA_REPORT_SPECIFIER_ID = "METADATA";
+
+	private static final Float DEFAULT_VALUE = -1F;
 
 	@Resource
 	private MultiVtnConfig multiVtnConfig;
 
 	@Resource
 	private Oadr20bVENEiReportService oadr20bVENEiReportService;
-
-	private AtomicInteger currentValue = new AtomicInteger(Float.floatToIntBits(-1F));
 
 	private Map<String, Map<String, Map<String, OadrReportRequestType>>> requestedReport = new ConcurrentHashMap<>();
 
@@ -59,12 +71,24 @@ public class RequestedReportSimulator {
 	private Map<String, Map<String, Map<String, Map<String, TreeMap<Long, Float>>>>> simulateReadingBuffer = new ConcurrentHashMap<>();
 	private Map<String, VtnSessionConfiguration> vtnSessionConfig = new ConcurrentHashMap<>();
 
-	public Float getCurrentValue() {
-		return Float.intBitsToFloat(currentValue.get());
-	}
+	private Map<String, Map<String, Map<String, ActiveSignal>>> activeSignals = new ConcurrentHashMap<>();
 
-	public void setCurrentValue(Float currentValue) {
-		this.currentValue.set(Float.floatToIntBits(currentValue));
+	public Float getCurrentValue(VtnSessionConfiguration vtnConfiguration, String endDeviceAsset) {
+		Float currentValue = DEFAULT_VALUE;
+		Map<String, Map<String, ActiveSignal>> perSession = activeSignals.get(vtnConfiguration.getSessionKey());
+		if (perSession != null) {
+			Map<String, ActiveSignal> perEndDeviceAsset = perSession.get(endDeviceAsset);
+			if (perEndDeviceAsset != null) {
+				List<ActiveSignal> keySet = new ArrayList<>(perEndDeviceAsset.values());
+				if (!keySet.isEmpty()) {
+					Collections.sort(keySet);
+					ActiveSignal activeSignal = keySet.get(0);
+					currentValue = activeSignal.getValue();
+				}
+
+			}
+		}
+		return currentValue;
 	}
 
 	public void create(VtnSessionConfiguration vtnConfig, OadrCreateReportType oadrCreateReportType) {
@@ -93,29 +117,115 @@ public class RequestedReportSimulator {
 
 	public void cancel(VtnSessionConfiguration vtnConfig, OadrCancelReportType oadrCancelReportType) {
 		oadrCancelReportType.getReportRequestID().forEach(reportRequestId -> {
-			if (requestedReport.get(vtnConfig.getVtnId()) != null) {
-				requestedReport.get(vtnConfig.getVtnId()).remove(reportRequestId);
+			if (requestedReport.get(vtnConfig.getSessionKey()) != null) {
+				requestedReport.get(vtnConfig.getSessionKey()).remove(reportRequestId);
 			}
-			Map<String, ScheduledFuture<?>> map = simulateReadingTasks.get(vtnConfig.getVtnId()).get(reportRequestId);
-			if (simulateReadingTasks.get(vtnConfig.getVtnId()) != null && map != null) {
+			Map<String, ScheduledFuture<?>> map = simulateReadingTasks.get(vtnConfig.getSessionKey()).get(reportRequestId);
+			if (simulateReadingTasks.get(vtnConfig.getSessionKey()) != null && map != null) {
 				map.forEach((reportSpecifierId, schedule) -> {
 					schedule.cancel(false);
 				});
-				simulateReadingTasks.get(vtnConfig.getVtnId()).remove(reportRequestId);
+				simulateReadingTasks.get(vtnConfig.getSessionKey()).remove(reportRequestId);
 			}
-			if (reportBackTasks.get(vtnConfig.getVtnId()) != null
-					&& reportBackTasks.get(vtnConfig.getVtnId()).get(reportRequestId) != null) {
-				reportBackTasks.get(vtnConfig.getVtnId()).get(reportRequestId).cancel(false);
-				reportBackTasks.get(vtnConfig.getVtnId()).remove(reportRequestId);
+			if (reportBackTasks.get(vtnConfig.getSessionKey()) != null
+					&& reportBackTasks.get(vtnConfig.getSessionKey()).get(reportRequestId) != null) {
+				reportBackTasks.get(vtnConfig.getSessionKey()).get(reportRequestId).cancel(false);
+				reportBackTasks.get(vtnConfig.getSessionKey()).remove(reportRequestId);
 			}
-			if (simulateReadingBuffer.get(vtnConfig.getVtnId()) != null
-					&& simulateReadingBuffer.get(vtnConfig.getVtnId()).get(reportRequestId) != null) {
-				simulateReadingBuffer.get(vtnConfig.getVtnId()).remove(reportRequestId);
+			if (simulateReadingBuffer.get(vtnConfig.getSessionKey()) != null
+					&& simulateReadingBuffer.get(vtnConfig.getSessionKey()).get(reportRequestId) != null) {
+				simulateReadingBuffer.get(vtnConfig.getSessionKey()).remove(reportRequestId);
 			}
 
 		});
 
 		this.refreshSimulator();
+	}
+
+	public void onIntervalStart(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+			EiEventSignalType eiEventSignalType, IntervalType intervalType) {
+
+		Float value = null;
+		Long priority = event.getEiEvent().getEventDescriptor().getPriority();
+		String eventId = event.getEiEvent().getEventDescriptor().getEventID();
+		String signalId = eiEventSignalType.getSignalID();
+		String intervalId = intervalType.getUid().getText();
+		String activeSignalUUID = String.format("%s-%s-%s", eventId, signalId, intervalId);
+
+		List<String> collect;
+		if (eiEventSignalType.getEiTarget() != null && eiEventSignalType.getEiTarget().getEndDeviceAsset() != null
+				&& !eiEventSignalType.getEiTarget().getEndDeviceAsset().isEmpty()) {
+			collect = eiEventSignalType.getEiTarget().getEndDeviceAsset().stream().map(EndDeviceAssetType::getMrid)
+					.collect(Collectors.toList());
+		} else {
+			collect = new ArrayList<>();
+			collect.add(DEFAULT_ENDDEVICE_ASSET);
+		}
+
+		for (JAXBElement<? extends StreamPayloadBaseType> payload : intervalType.getStreamPayloadBase()) {
+			if (payload.getDeclaredType().equals(SignalPayloadType.class)) {
+
+				SignalPayloadType reportPayload = (SignalPayloadType) payload.getValue();
+
+				JAXBElement<? extends PayloadBaseType> payloadBase = reportPayload.getPayloadBase();
+				if (payloadBase.getDeclaredType().equals(PayloadFloatType.class)) {
+
+					PayloadFloatType payloadFloat = (PayloadFloatType) payloadBase.getValue();
+
+					value = payloadFloat.getValue();
+
+					Map<String, Map<String, ActiveSignal>> perEndDevideAsset = activeSignals
+							.get(vtnConfiguration.getSessionKey());
+					if (perEndDevideAsset == null) {
+						perEndDevideAsset = new ConcurrentHashMap<>();
+					}
+					for (String endDeviceAsset : collect) {
+						Map<String, ActiveSignal> listActiveSignal = perEndDevideAsset.get(endDeviceAsset);
+						if (listActiveSignal == null) {
+							listActiveSignal = new ConcurrentHashMap<>();
+						}
+						listActiveSignal.put(activeSignalUUID, new ActiveSignal(value, priority));
+						perEndDevideAsset.put(endDeviceAsset, listActiveSignal);
+					}
+					activeSignals.put(vtnConfiguration.getSessionKey(), perEndDevideAsset);
+
+				}
+			}
+		}
+
+	}
+
+	public void onIntervalEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+			EiEventSignalType eiEventSignalType, IntervalType intervalType) {
+		String eventId = event.getEiEvent().getEventDescriptor().getEventID();
+		String signalId = eiEventSignalType.getSignalID();
+		String intervalId = intervalType.getUid().getText();
+		String activeSignalUUID = String.format("%s-%s-%s", eventId, signalId, intervalId);
+
+		Map<String, Map<String, ActiveSignal>> perEndDevideAsset = activeSignals.get(vtnConfiguration.getSessionKey());
+
+		if (perEndDevideAsset != null) {
+			perEndDevideAsset.remove(activeSignalUUID);
+		}
+	}
+
+	private class ActiveSignal implements Comparable<ActiveSignal> {
+		private AtomicInteger value;
+		private Long priority;
+
+		public ActiveSignal(Float value, Long priority) {
+			this.value = new AtomicInteger(Float.floatToIntBits(value));
+			this.priority = priority;
+		}
+
+		@Override
+		public int compareTo(ActiveSignal o) {
+			return this.priority.compareTo(o.priority);
+		}
+
+		public Float getValue() {
+			return Float.intBitsToFloat(value.get());
+		}
 	}
 
 	private void refreshSimulator() {
@@ -294,18 +404,20 @@ public class RequestedReportSimulator {
 		@Override
 		public void run() {
 
+			VtnSessionConfiguration multiConfig = multiVtnConfig.getMultiConfig(sessionKey);
+
 			ScheduledFuture<?> scheduledFuture = simulateReadingTasks.get(sessionKey).get(reportRequestId)
 					.get(reportSpecifierId);
 
 			if (scheduledFuture.isCancelled()) {
-				LOGGER.info(String.format("Cancel reading: %s %s %s %s", sessionKey, reportRequestId, reportSpecifierId,
-						rid));
+				LOGGER.info(String.format("Cancel reading: %s %s %s %s", multiConfig.getVenName(), reportRequestId,
+						reportSpecifierId, rid));
 				simulateReadingTasks.get(sessionKey).get(reportRequestId).remove(reportSpecifierId);
 				return;
 			}
 
-			LOGGER.info(String.format("Simulate reading: %s %s %s %s", sessionKey, reportRequestId, reportSpecifierId,
-					rid));
+			LOGGER.info(String.format("Simulate reading: %s %s %s %s", multiConfig.getVenName(), reportRequestId,
+					reportSpecifierId, rid));
 
 			Map<String, Map<String, Map<String, TreeMap<Long, Float>>>> vtnMap = simulateReadingBuffer.get(sessionKey);
 			if (vtnMap == null) {
@@ -323,7 +435,9 @@ public class RequestedReportSimulator {
 			if (ridMap == null) {
 				ridMap = new TreeMap<>();
 			}
-			ridMap.put(start.toInstant().toEpochMilli(), getCurrentValue());
+
+			ridMap.put(start.toInstant().toEpochMilli(), getCurrentValue(multiConfig, DEFAULT_ENDDEVICE_ASSET));
+
 			reportSpecifierMap.put(rid, ridMap);
 			reportRequestMap.put(reportSpecifierId, reportSpecifierMap);
 			vtnMap.put(reportRequestId, reportRequestMap);

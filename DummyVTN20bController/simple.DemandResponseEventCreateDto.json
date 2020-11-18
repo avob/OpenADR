@@ -1,0 +1,28 @@
+ {
+ 	"activePeriod": {
+ 		"duration": "PT2M",
+ 		"notificationDuration": "P1D",
+ 		"toleranceDuration": "PT5M"
+ 	},
+ 	"descriptor": {
+ 		"marketContext": "DummyMarketContext",
+ 		"oadrProfile": "OADR20B",
+ 		"responseRequired": "ALWAYS",
+ 		"state": "ACTIVE"
+ 	},
+ 	"signals": [{
+ 		"intervals": [{
+ 			"duration": "PT1M",
+ 			"value": 0.0
+ 		}, {
+ 			"duration": "PT1M",
+ 			"value": 1.0
+ 		}],
+ 		"signalName": "SIMPLE",
+ 		"signalType": "LEVEL",
+ 		"targets": [{
+ 			"targetId": "Smart_Energy_Module",
+ 			"targetType": "ENDDEVICE_ASSET"
+ 		}]
+ 	}]
+ }

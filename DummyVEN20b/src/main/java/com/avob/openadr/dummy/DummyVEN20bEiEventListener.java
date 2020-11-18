@@ -42,32 +42,8 @@ public class DummyVEN20bEiEventListener implements EventTimelineListener {
 				, event.getEiEvent().getEventDescriptor().getEventID()
 				, eiEventSignalType.getSignalID()
 				, intervalType.getUid().getText()));
-
-
-		Float value = null;
-		for(JAXBElement<? extends StreamPayloadBaseType> payload : intervalType.getStreamPayloadBase()) {
-			if (payload.getDeclaredType().equals(SignalPayloadType.class)) {
-
-				SignalPayloadType reportPayload = (SignalPayloadType) payload.getValue();
-
-				JAXBElement<? extends PayloadBaseType> payloadBase = reportPayload.getPayloadBase();
-				if (payloadBase.getDeclaredType().equals(PayloadFloatType.class)) {
-
-					PayloadFloatType payloadFloat = (PayloadFloatType) payloadBase.getValue();
-
-					value = payloadFloat.getValue();
-
-				}
-			}
-		}
-
-		if(value != null) {
-			LOGGER.info(String.format("Change simulated reading from: %s to: %s"
-					, String.valueOf(requestedReportSimulator.getCurrentValue())
-					, String .valueOf(value)));
-			requestedReportSimulator.setCurrentValue(value);
-			
-		}
+		
+		requestedReportSimulator.onIntervalStart(vtnConfiguration, event, eiEventSignalType, intervalType);
 
 	}
 
@@ -93,6 +69,8 @@ public class DummyVEN20bEiEventListener implements EventTimelineListener {
 				, event.getEiEvent().getEventDescriptor().getEventID()
 				, eiEventSignalType.getSignalID()
 				, intervalType.getUid().getText()));
+		
+		requestedReportSimulator.onIntervalEnd(vtnConfiguration, event, eiEventSignalType, intervalType);
 
 	}
 

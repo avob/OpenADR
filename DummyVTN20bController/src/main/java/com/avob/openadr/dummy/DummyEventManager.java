@@ -32,7 +32,9 @@ import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalDto.SignalNameE
 import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalDto.SignalTypeEnum;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalIntervalDto;
 import com.avob.server.oadrvtn20b.model.TargetDto;
+import com.avob.server.oadrvtn20b.model.TargetDto.TargetTypeEnum;
 import com.avob.server.oadrvtn20b.model.VenMarketContextDto;
+import com.google.gson.Gson;
 
 @Service
 public class DummyEventManager {
@@ -162,8 +164,12 @@ public class DummyEventManager {
 				.responseRequired(ResponseRequiredEnum.ALWAYS);
 		event.descriptor(descriptor);
 
+		TargetDto target = new TargetDto();
+		target.setTargetType(TargetTypeEnum.ENDDEVICE_ASSET);
+		String endDeviceMrid = "Smart_Energy_Module";
+		target.setTargetId(endDeviceMrid);
 		DemandResponseEventSignalDto signalsItem = new DemandResponseEventSignalDto().signalName(SignalNameEnum.SIMPLE)
-				.signalType(SignalTypeEnum.LEVEL);
+				.signalType(SignalTypeEnum.LEVEL).addTargetsItem(target);
 
 		String intervalDuration = "PT1M";
 		for (int i = 0; i < 2; i++) {
@@ -174,9 +180,11 @@ public class DummyEventManager {
 		}
 		event.addSignalsItem(signalsItem);
 
-		TargetDto targetsItem = new TargetDto();
-		event.addTargetsItem(targetsItem);
+		
+		event.setTargets(new ArrayList<>());
 
+		Gson gson = new Gson();
+		LOGGER.info(gson.toJson(event));
 		return event;
 	}
 
