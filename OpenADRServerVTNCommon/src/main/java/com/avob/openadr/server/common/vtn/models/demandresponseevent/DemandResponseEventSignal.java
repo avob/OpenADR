@@ -12,6 +12,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
+import com.avob.openadr.server.common.vtn.models.Target;
+import com.avob.openadr.server.common.vtn.models.ItemBase;
+
 @Entity
 @Table(name = "demandresponseeventsignal")
 public class DemandResponseEventSignal {
@@ -29,6 +35,12 @@ public class DemandResponseEventSignal {
 	@ElementCollection(fetch = FetchType.EAGER)
 	private List<DemandResponseEventSignalInterval> intervals;
 	private Float currentValue;
+
+	private ItemBase itemBase;
+
+	@ElementCollection
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private List<Target> targets;
 
 	/**
 	 * Related event
@@ -92,4 +104,21 @@ public class DemandResponseEventSignal {
 	public void setEvent(DemandResponseEvent event) {
 		this.event = event;
 	}
+
+	public ItemBase getItemBase() {
+		return itemBase;
+	}
+
+	public void setItemBase(ItemBase itemBase) {
+		this.itemBase = itemBase;
+	}
+
+	public List<Target> getTargets() {
+		return targets;
+	}
+
+	public void setTargets(List<Target> targets) {
+		this.targets = targets;
+	}
+
 }

@@ -35,6 +35,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.avob.openadr.server.common.vtn.ApplicationTest;
+import com.avob.openadr.server.common.vtn.models.TargetDto;
+import com.avob.openadr.server.common.vtn.models.TargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
@@ -42,13 +44,11 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalIntervalDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDto;
@@ -91,8 +91,8 @@ public class DemandResponseControllerTest {
 	private static final String GROUP1 = "group1";
 	private static final String UNKNOWN_MARKETCONTEXT_NAME = "mouaiccool";
 	private static final String MARKETCONTEXT_NAME = "http://oadr.avob.com";
-	private static final DemandResponseEventTargetTypeEnum GROUP_PARAM = DemandResponseEventTargetTypeEnum.GROUP;
-	private static final DemandResponseEventTargetTypeEnum VEN_PARAM = DemandResponseEventTargetTypeEnum.VEN;
+	private static final TargetTypeEnum GROUP_PARAM = TargetTypeEnum.GROUP;
+	private static final TargetTypeEnum VEN_PARAM = TargetTypeEnum.VEN;
 
 	private static final DemandResponseEventSignalTypeEnum LEVEL_SIGNAL_TYPE = DemandResponseEventSignalTypeEnum.LEVEL;
 	private static final DemandResponseEventSignalNameEnum SIMPLE_SIGNAL_NAME = DemandResponseEventSignalNameEnum.SIMPLE;
@@ -183,8 +183,8 @@ public class DemandResponseControllerTest {
 		dto.getActivePeriod().setDuration(DURATION);
 		dto.getActivePeriod().setToleranceDuration(TOLERANCE_DURATION);
 		dto.getActivePeriod().setNotificationDuration(NOTIFICATION_DURATION);
-		dto.getTargets().add(new DemandResponseEventTargetDto(VEN_PARAM, VEN1));
-		dto.getTargets().add(new DemandResponseEventTargetDto(VEN_PARAM, VEN2));
+		dto.getTargets().add(new TargetDto(VEN_PARAM, VEN1));
+		dto.getTargets().add(new TargetDto(VEN_PARAM, VEN2));
 		dto.getSignals().add(signal);
 
 		event1 = demandResponseEventService.create(dto);
@@ -198,7 +198,7 @@ public class DemandResponseControllerTest {
 		dto.getActivePeriod().setDuration(DURATION);
 		dto.getActivePeriod().setToleranceDuration(TOLERANCE_DURATION);
 		dto.getActivePeriod().setNotificationDuration(NOTIFICATION_DURATION);
-		dto.getTargets().add(new DemandResponseEventTargetDto(VEN_PARAM, VEN2));
+		dto.getTargets().add(new TargetDto(VEN_PARAM, VEN2));
 		dto.getSignals().add(signal);
 		event2 = demandResponseEventService.create(dto);
 		events.add(event2);
@@ -211,7 +211,7 @@ public class DemandResponseControllerTest {
 		dto.getActivePeriod().setDuration(DURATION);
 		dto.getActivePeriod().setToleranceDuration(TOLERANCE_DURATION);
 		dto.getActivePeriod().setNotificationDuration(NOTIFICATION_DURATION);
-		dto.getTargets().add(new DemandResponseEventTargetDto(GROUP_PARAM, GROUP1));
+		dto.getTargets().add(new TargetDto(GROUP_PARAM, GROUP1));
 		dto.getSignals().add(signal);
 		event3 = demandResponseEventService.create(dto);
 		events.add(event3);
@@ -242,7 +242,7 @@ public class DemandResponseControllerTest {
 		toCreate.getActivePeriod().setDuration(DURATION);
 		toCreate.getActivePeriod().setToleranceDuration(TOLERANCE_DURATION);
 		toCreate.getActivePeriod().setNotificationDuration(NOTIFICATION_DURATION);
-		toCreate.getTargets().add(new DemandResponseEventTargetDto(VEN_PARAM, VEN1));
+		toCreate.getTargets().add(new TargetDto(VEN_PARAM, VEN1));
 		return toCreate;
 	}
 
@@ -513,8 +513,8 @@ public class DemandResponseControllerTest {
 		signalModerate.setSignalName(SIMPLE_SIGNAL_NAME);
 		signalModerate.setSignalType(LEVEL_SIGNAL_TYPE);
 
-		List<DemandResponseEventTargetDto> targets = new ArrayList<>();
-		targets.add(new DemandResponseEventTargetDto(VEN_PARAM, VEN2));
+		List<TargetDto> targets = new ArrayList<>();
+		targets.add(new TargetDto(VEN_PARAM, VEN2));
 		// invalid update: signals not set
 		DemandResponseEventUpdateDto updateDto = new DemandResponseEventUpdateDto();
 		updateDto.setPublished(false);
@@ -604,7 +604,7 @@ public class DemandResponseControllerTest {
 		updateDto.setPublished(true);
 		updateDto.getSignals().add(signalNormal);
 		targets = new ArrayList<>();
-		targets.add(new DemandResponseEventTargetDto(GROUP_PARAM, GROUP1));
+		targets.add(new TargetDto(GROUP_PARAM, GROUP1));
 		updateDto.setTargets(targets);
 
 		contentStr = mapper.writeValueAsString(updateDto);

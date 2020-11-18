@@ -15,6 +15,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import com.avob.openadr.model.oadr20b.atom.FeedType;
 import com.avob.openadr.model.oadr20b.avob.KeyTokenType;
 import com.avob.openadr.model.oadr20b.avob.PayloadAvobVenServiceRequestType;
 import com.avob.openadr.model.oadr20b.avob.PayloadKeyTokenType;
@@ -53,6 +54,7 @@ import com.avob.openadr.model.oadr20b.iso.ISO3AlphaCurrencyCodeContentType;
 import com.avob.openadr.model.oadr20b.oadr.BaseUnitType;
 import com.avob.openadr.model.oadr20b.oadr.CurrencyItemDescriptionType;
 import com.avob.openadr.model.oadr20b.oadr.CurrencyType;
+import com.avob.openadr.model.oadr20b.oadr.CurrentType;
 import com.avob.openadr.model.oadr20b.oadr.FrequencyType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelOptType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelPartyRegistrationType;
@@ -661,8 +663,8 @@ public class Oadr20bFactory {
 		return createOadrReportRequestType;
 	}
 
-	public static OadrReportType createOadrUpdateReportOadrReportType(String reportId,String reportSpecifierId, String reportrequestId,
-			 ReportNameEnumeratedType reportName, long createdTimestamp, Long startTimestamp,
+	public static OadrReportType createOadrUpdateReportOadrReportType(String reportId, String reportSpecifierId,
+			String reportrequestId, ReportNameEnumeratedType reportName, long createdTimestamp, Long startTimestamp,
 			String duration) {
 		OadrReportType createOadrReportType = factory.createOadrReportType();
 		createOadrReportType.setReportRequestID(reportrequestId);
@@ -691,7 +693,7 @@ public class Oadr20bFactory {
 		createOadrReportType.setReportRequestID("0");
 		return createOadrReportType;
 	}
-	
+
 	public static OadrReportType createOadrUpdateReportOadrReportType(String reportSpecifierId, String reportRequestId,
 			ReportNameEnumeratedType reportName, long createdTimestamp) {
 		OadrReportType createOadrReportType = factory.createOadrReportType();
@@ -843,6 +845,10 @@ public class Oadr20bFactory {
 
 	public static JAXBElement<PulseCountType> createPulseCount(PulseCountType value) {
 		return factory.createPulseCount(value);
+	}
+
+	public static JAXBElement<OadrGBItemBase> createGBItemBase(OadrGBItemBase value) {
+		return factory.createOadrGBDataDescription(value);
 	}
 
 	public static EventResponses createEventResponses() {
@@ -1172,6 +1178,20 @@ public class Oadr20bFactory {
 		return createVoltageType;
 	}
 
+	public static OadrGBItemBase createGBItemBaseType(FeedType feed) {
+		OadrGBItemBase createOadrGBItemBase = factory.createOadrGBItemBase();
+		createOadrGBItemBase.setFeed(feed);
+		return createOadrGBItemBase;
+
+	}
+
+	public static CurrentType createCurrentType(SiScaleCodeType siscaleCode) {
+		CurrentType createCurrentType = factory.createCurrentType();
+		createCurrentType.setSiScaleCode(siscaleCode);
+		return createCurrentType;
+
+	}
+
 	public static EnergyApparentType createEnergyApparentType(SiScaleCodeType siscaleCode) {
 		EnergyApparentType createEnergyApparentType = powerFactory.createEnergyApparentType();
 		createEnergyApparentType.setSiScaleCode(siscaleCode);
@@ -1239,6 +1259,10 @@ public class Oadr20bFactory {
 
 	public static JAXBElement<VoltageType> createVoltage(VoltageType value) {
 		return powerFactory.createVoltage(value);
+	}
+
+	public static JAXBElement<CurrentType> createCurrent(CurrentType value) {
+		return factory.createCurrent(value);
 	}
 
 	public static JAXBElement<EnergyApparentType> createEnergyApparent(EnergyApparentType value) {

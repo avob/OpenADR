@@ -34,8 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
 import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
+import com.avob.openadr.server.common.vtn.models.Target;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTarget;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
@@ -185,7 +185,7 @@ public class VenController {
 				search = demandResponseEventService.search(filters, start, null);
 				for (DemandResponseEvent event : search.getContent()) {
 					boolean targeted = false;
-					for (DemandResponseEventTarget target : event.getTargets()) {
+					for (Target target : event.getTargets()) {
 
 						switch (target.getTargetType()) {
 						case GROUP:

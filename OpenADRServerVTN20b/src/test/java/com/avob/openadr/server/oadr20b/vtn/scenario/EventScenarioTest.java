@@ -43,6 +43,8 @@ import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
 import com.avob.openadr.model.oadr20b.oadr.OadrRequestEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.oadr.ResponseRequiredType;
+import com.avob.openadr.server.common.vtn.models.TargetDto;
+import com.avob.openadr.server.common.vtn.models.TargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
@@ -50,12 +52,10 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalIntervalDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.ven.VenDto;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDto;
@@ -192,7 +192,7 @@ public class EventScenarioTest {
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
 		// ensure event status is "active"
 		dto.getActivePeriod().setStart(System.currentTimeMillis() - 10);
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, mockVen.getVenId()));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, mockVen.getVenId()));
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		dto.setPublished(true);
 		DemandResponseEventReadDto eventActive = oadrMockHttpDemandResponseEventMvc
@@ -216,7 +216,7 @@ public class EventScenarioTest {
 		dto.getActivePeriod().setToleranceDuration("P1D");
 		dto.getSignals().add(signal);
 		dto.getActivePeriod().setStart(System.currentTimeMillis() - 10);
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, mockVen.getVenId()));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, mockVen.getVenId()));
 		dto.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		dto.setPublished(true);
 		DemandResponseEventReadDto eventCanceled = oadrMockHttpDemandResponseEventMvc
@@ -417,7 +417,7 @@ public class EventScenarioTest {
 
 		// create and send DR Event to DemandResponseEvent API
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, mockVen.getVenId()));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, mockVen.getVenId()));
 
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
@@ -607,7 +607,7 @@ public class EventScenarioTest {
 		// create 'none' and send DR Event to DemandResponseEvent API
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, mockVen.getVenId()));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, mockVen.getVenId()));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		dto.getActivePeriod().setToleranceDuration("P1D");
@@ -644,7 +644,7 @@ public class EventScenarioTest {
 		dto = new DemandResponseEventCreateDto();
 		dto.setPublished(true);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, mockVen.getVenId()));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, mockVen.getVenId()));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -672,7 +672,7 @@ public class EventScenarioTest {
 		dto = new DemandResponseEventCreateDto();
 		dto.setPublished(true);
 		dto.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20B);
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, mockVen.getVenId()));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, mockVen.getVenId()));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -699,7 +699,7 @@ public class EventScenarioTest {
 		// create 'active' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
 		dto.setPublished(true);
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, mockVen.getVenId()));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, mockVen.getVenId()));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -727,7 +727,7 @@ public class EventScenarioTest {
 		// create 'completed' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
 		dto.setPublished(true);
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, mockVen.getVenId()));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, mockVen.getVenId()));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -756,7 +756,7 @@ public class EventScenarioTest {
 		// unpublished event are not send to ven
 		dto = new DemandResponseEventCreateDto();
 		dto.setPublished(false);
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, mockVen.getVenId()));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, mockVen.getVenId()));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");

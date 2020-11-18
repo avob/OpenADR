@@ -17,9 +17,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
+import com.avob.openadr.server.common.vtn.models.Target;
+import com.avob.openadr.server.common.vtn.models.TargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTarget;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenDao;
@@ -203,14 +203,14 @@ public class VenService extends AbstractUserService<Ven> {
 	public boolean isVenTargetedBy(Ven ven, DemandResponseEvent event) {
 		
 		boolean targeted = false;
-		for(DemandResponseEventTarget target : event.getTargets()) {
-			if(DemandResponseEventTargetTypeEnum.VEN.equals(target.getTargetType())) {
+		for(Target target : event.getTargets()) {
+			if(TargetTypeEnum.VEN.equals(target.getTargetType())) {
 				
 				if( ven.getUsername().equals(target.getTargetId())) {
 					targeted = true;
 				}
 				
-			} else if(DemandResponseEventTargetTypeEnum.GROUP.equals(target.getTargetType())) {
+			} else if(TargetTypeEnum.GROUP.equals(target.getTargetType())) {
 				
 				
 				Set<VenGroup> venGroups = ven.getVenGroups();

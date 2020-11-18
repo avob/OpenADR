@@ -5116,7 +5116,7 @@
                 "targets": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/DemandResponseEventTargetDto"
+                        "$ref": "#/definitions/TargetDto"
                     }
                 }
             },
@@ -5218,7 +5218,7 @@
                 "targets": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/DemandResponseEventTargetDto"
+                        "$ref": "#/definitions/TargetDto"
                     }
                 }
             },
@@ -5236,6 +5236,9 @@
                     "items": {
                         "$ref": "#/definitions/DemandResponseEventSignalIntervalDto"
                     }
+                },
+                "itemBase": {
+                    "$ref": "#/definitions/ItemBaseDto"
                 },
                 "signalName": {
                     "type": "string",
@@ -5268,6 +5271,12 @@
                         "X_LOAD_CONTROL_PERCENT_OFFSET",
                         "X_LOAD_CONTROL_SETPOINT"
                     ]
+                },
+                "targets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TargetDto"
+                    }
                 }
             },
             "title": "DemandResponseEventSignalDto"
@@ -5285,23 +5294,6 @@
             },
             "title": "DemandResponseEventSignalIntervalDto"
         },
-        "DemandResponseEventTargetDto": {
-            "type": "object",
-            "properties": {
-                "targetId": {
-                    "type": "string"
-                },
-                "targetType": {
-                    "type": "string",
-                    "enum": [
-                        "VEN",
-                        "GROUP",
-                        "MARKET_CONTEXT"
-                    ]
-                }
-            },
-            "title": "DemandResponseEventTargetDto"
-        },
         "DemandResponseEventUpdateDto": {
             "type": "object",
             "properties": {
@@ -5317,7 +5309,7 @@
                 "targets": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/DemandResponseEventTargetDto"
+                        "$ref": "#/definitions/TargetDto"
                     }
                 }
             },
@@ -5410,6 +5402,24 @@
                 }
             },
             "title": "InputStreamResource"
+        },
+        "ItemBaseDto": {
+            "type": "object",
+            "properties": {
+                "itemDescription": {
+                    "type": "string"
+                },
+                "itemUnits": {
+                    "type": "string"
+                },
+                "siScaleCode": {
+                    "type": "string"
+                },
+                "xmlType": {
+                    "type": "string"
+                }
+            },
+            "title": "ItemBaseDto"
         },
         "KeyTokenType": {
             "type": "object",
@@ -6179,6 +6189,23 @@
                 }
             },
             "title": "ReportRequestDto"
+        },
+        "TargetDto": {
+            "type": "object",
+            "properties": {
+                "targetId": {
+                    "type": "string"
+                },
+                "targetType": {
+                    "type": "string",
+                    "enum": [
+                        "VEN",
+                        "GROUP",
+                        "ENDDEVICE_ASSET"
+                    ]
+                }
+            },
+            "title": "TargetDto"
         },
         "URI": {
             "type": "object",

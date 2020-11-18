@@ -1,8 +1,11 @@
 package com.avob.openadr.server.oadr20b.vtn.models.venreport.capability;
 
+import java.util.List;
+
 import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportEnumeratedType;
-import com.avob.openadr.model.oadr20b.siscale.SiScaleCodeType;
+import com.avob.openadr.server.common.vtn.models.ItemBaseDto;
+import com.avob.openadr.server.common.vtn.models.TargetDto;
 
 public class ReportCapabilityDescriptionDto {
 
@@ -20,11 +23,11 @@ public class ReportCapabilityDescriptionDto {
 
 	private boolean oadrOnChange;
 
-	private String itemDescription;
+	private ItemBaseDto itemBase;
 
-	private String itemUnits;
+	private List<TargetDto> eiDatasource;
 
-	private SiScaleCodeType siScaleCode;
+	private List<TargetDto> eiSubject;
 
 	public long getId() {
 		return id;
@@ -82,28 +85,28 @@ public class ReportCapabilityDescriptionDto {
 		this.oadrOnChange = oadrOnChange;
 	}
 
-	public String getItemDescription() {
-		return itemDescription;
+	public ItemBaseDto getItemBase() {
+		return itemBase;
 	}
 
-	public void setItemDescription(String itemDescription) {
-		this.itemDescription = itemDescription;
+	public void setItemBase(ItemBaseDto itemBase) {
+		this.itemBase = itemBase;
 	}
 
-	public String getItemUnits() {
-		return itemUnits;
+	public List<TargetDto> getEiDatasource() {
+		return eiDatasource;
 	}
 
-	public void setItemUnits(String itemUnits) {
-		this.itemUnits = itemUnits;
+	public void setEiDatasource(List<TargetDto> eiDatasource) {
+		this.eiDatasource = eiDatasource;
 	}
 
-	public SiScaleCodeType getSiScaleCode() {
-		return siScaleCode;
+	public List<TargetDto> getEiSubject() {
+		return eiSubject;
 	}
 
-	public void setSiScaleCode(SiScaleCodeType siScaleCode) {
-		this.siScaleCode = siScaleCode;
+	public void setEiSubject(List<TargetDto> eiSubject) {
+		this.eiSubject = eiSubject;
 	}
 
 }

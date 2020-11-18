@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
+import com.avob.openadr.server.common.vtn.models.Target;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 
 /**
@@ -54,7 +55,7 @@ public class DemandResponseEvent {
 
 	@ElementCollection
 	@LazyCollection(LazyCollectionOption.FALSE)
-	private List<DemandResponseEventTarget> targets;
+	private List<Target> targets;
 
 	public Long getId() {
 		return id;
@@ -110,11 +111,11 @@ public class DemandResponseEvent {
 		this.signals = signals;
 	}
 
-	public List<DemandResponseEventTarget> getTargets() {
+	public List<Target> getTargets() {
 		return targets;
 	}
 
-	public void setTargets(List<DemandResponseEventTarget> targets) {
+	public void setTargets(List<Target> targets) {
 		this.targets = targets;
 	}
 

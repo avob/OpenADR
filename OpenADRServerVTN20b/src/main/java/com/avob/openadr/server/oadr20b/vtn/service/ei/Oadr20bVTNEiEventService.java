@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Resource;
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.eclipse.jetty.http.HttpStatus;
@@ -34,6 +35,7 @@ import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.ei.QualifiedEventIDType;
 import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
+import com.avob.openadr.model.oadr20b.emix.ItemBaseType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedEventType;
@@ -259,7 +261,7 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 	private List<EiEventSignalType> createEventSignal(DemandResponseEvent drEvent, EventDescriptorType descriptor) {
 
 		List<EiEventSignalType> res = new ArrayList<>();
-		
+
 		int signalId = 0;
 		;
 		// signal name: MUST be 'simple' for 20a spec
@@ -279,22 +281,34 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 							SignalTypeEnumeratedType.fromValue(demandResponseEventSignal.getSignalType().getLabel()),
 							currentValue);
 
-			
+			if (demandResponseEventSignal.getTargets() != null) {
+				EiTargetType eiTarget = Oadr20bVTNEiServiceUtils.createEiTarget(demandResponseEventSignal.getTargets());
+				newOadr20bEiEventSignalTypeBuilder.withEiTarget(eiTarget);
+			}
+
+			if (demandResponseEventSignal.getItemBase() != null) {
+				JAXBElement<? extends ItemBaseType> itemBase = Oadr20bVTNEiServiceUtils
+						.createItemBase(demandResponseEventSignal.getItemBase());
+				newOadr20bEiEventSignalTypeBuilder.withItemBase(itemBase);
+			}
+
 			if (demandResponseEventSignal.getIntervals() != null
 					&& !demandResponseEventSignal.getIntervals().isEmpty()) {
-				
+
 				Long temp = start;
 				int intervalId = 0;
 				for (DemandResponseEventSignalInterval demandResponseEventSignalInterval : demandResponseEventSignal
 						.getIntervals()) {
 
-					temp = Oadr20bFactory.addXMLDurationToTimestamp(temp, demandResponseEventSignalInterval.getDuration());
-					IntervalType interval = Oadr20bEiBuilders.newOadr20bSignalIntervalTypeBuilder("" + intervalId,
-							temp, demandResponseEventSignalInterval.getDuration(), demandResponseEventSignalInterval.getValue()).build();
+					temp = Oadr20bFactory.addXMLDurationToTimestamp(temp,
+							demandResponseEventSignalInterval.getDuration());
+					IntervalType interval = Oadr20bEiBuilders.newOadr20bSignalIntervalTypeBuilder("" + intervalId, temp,
+							demandResponseEventSignalInterval.getDuration(),
+							demandResponseEventSignalInterval.getValue()).build();
 					intervalId++;
 					newOadr20bEiEventSignalTypeBuilder.addInterval(interval);
 				}
-				
+
 			} else {
 				int intervalId = 0;
 				IntervalType interval = Oadr20bEiBuilders
@@ -354,7 +368,6 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 
 		return status;
 	}
-
 
 	/**
 	 * Create DREvent descriptor from DemandResponseEvent

@@ -30,6 +30,7 @@ import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.builders.eireport.Oadr20bCreateReportBuilder;
 import com.avob.openadr.model.oadr20b.builders.eireport.Oadr20bReportRequestTypeBuilder;
 import com.avob.openadr.model.oadr20b.ei.EiResponseType;
+import com.avob.openadr.model.oadr20b.ei.EiTargetType;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
 import com.avob.openadr.model.oadr20b.ei.PayloadBaseType;
 import com.avob.openadr.model.oadr20b.ei.PayloadFloatType;
@@ -82,6 +83,8 @@ import com.avob.openadr.model.oadr20b.xcal.DurationPropType;
 import com.avob.openadr.model.oadr20b.xcal.Properties;
 import com.avob.openadr.model.oadr20b.xcal.WsCalendarIntervalType;
 import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
+import com.avob.openadr.server.common.vtn.models.ItemBase;
+import com.avob.openadr.server.common.vtn.models.Target;
 import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
@@ -295,15 +298,9 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 				String itemDescription = null;
 				String itemUnits = null;
 				SiScaleCodeType siScaleCode = null;
+				String xmlType = null;
 				if (oadrReportDescriptionType.getItemBase() != null) {
 
-					String marshal;
-					try {
-						marshal = jaxbContext.marshal(oadrReportDescriptionType.getItemBase());
-						description.setItemBase(marshal);
-					} catch (Oadr20bMarshalException e) {
-						LOGGER.error("Can't marshall report description item base", e);
-					}
 
 					ItemBaseType value = oadrReportDescriptionType.getItemBase().getValue();
 					Class<? extends ItemBaseType> declaredType = oadrReportDescriptionType.getItemBase()
@@ -314,83 +311,97 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 						itemDescription = el.getItemDescription();
 						itemUnits = el.getItemUnits();
 						siScaleCode = el.getSiScaleCode();
+						xmlType = VoltageType.class.getSimpleName();
 
 					} else if (declaredType.equals(EnergyApparentType.class)) {
 						EnergyApparentType el = (EnergyApparentType) value;
 						itemDescription = el.getItemDescription();
 						itemUnits = el.getItemUnits();
 						siScaleCode = el.getSiScaleCode();
+						xmlType = EnergyApparentType.class.getSimpleName();
 
 					} else if (declaredType.equals(EnergyReactiveType.class)) {
 						EnergyReactiveType el = (EnergyReactiveType) value;
 						itemDescription = el.getItemDescription();
 						itemUnits = el.getItemUnits();
 						siScaleCode = el.getSiScaleCode();
+						xmlType = EnergyReactiveType.class.getSimpleName();
 
 					} else if (declaredType.equals(EnergyRealType.class)) {
 						EnergyRealType el = (EnergyRealType) value;
 						itemDescription = el.getItemDescription();
 						itemUnits = el.getItemUnits();
 						siScaleCode = el.getSiScaleCode();
+						xmlType = EnergyRealType.class.getSimpleName();
 
 					} else if (declaredType.equals(PowerApparentType.class)) {
 						PowerApparentType el = (PowerApparentType) value;
 						itemDescription = el.getItemDescription();
 						itemUnits = el.getItemUnits();
 						siScaleCode = el.getSiScaleCode();
+						xmlType = PowerApparentType.class.getSimpleName();
 
 					} else if (declaredType.equals(PowerReactiveType.class)) {
 						PowerReactiveType el = (PowerReactiveType) value;
 						itemDescription = el.getItemDescription();
 						itemUnits = el.getItemUnits();
 						siScaleCode = el.getSiScaleCode();
+						xmlType = PowerReactiveType.class.getSimpleName();
 
 					} else if (declaredType.equals(PowerRealType.class)) {
 						PowerRealType el = (PowerRealType) value;
 						itemDescription = el.getItemDescription();
 						itemUnits = el.getItemUnits();
 						siScaleCode = el.getSiScaleCode();
+						xmlType = PowerRealType.class.getSimpleName();
 
 					} else if (declaredType.equals(BaseUnitType.class)) {
 						BaseUnitType el = (BaseUnitType) value;
 						itemDescription = el.getItemDescription();
 						itemUnits = el.getItemUnits();
 						siScaleCode = el.getSiScaleCode();
+						xmlType = BaseUnitType.class.getSimpleName();
 
 					} else if (declaredType.equals(CurrencyType.class)) {
 						CurrencyType el = (CurrencyType) value;
 						itemDescription = el.getItemDescription().value();
 						itemUnits = el.getItemUnits().value();
 						siScaleCode = el.getSiScaleCode();
+						xmlType = CurrencyType.class.getSimpleName();
 
 					} else if (declaredType.equals(FrequencyType.class)) {
 						FrequencyType el = (FrequencyType) value;
 						itemDescription = el.getItemDescription();
 						itemUnits = el.getItemUnits();
 						siScaleCode = el.getSiScaleCode();
+						xmlType = FrequencyType.class.getSimpleName();
 
 					} else if (declaredType.equals(ThermType.class)) {
 						ThermType el = (ThermType) value;
 						itemDescription = el.getItemDescription();
 						itemUnits = el.getItemUnits();
 						siScaleCode = el.getSiScaleCode();
+						xmlType = ThermType.class.getSimpleName();
 
 					} else if (declaredType.equals(TemperatureType.class)) {
 						TemperatureType el = (TemperatureType) value;
 						itemDescription = el.getItemDescription();
 						itemUnits = el.getItemUnits().value();
 						siScaleCode = el.getSiScaleCode();
+						xmlType = TemperatureType.class.getSimpleName();
 
 					} else if (declaredType.equals(PulseCountType.class)) {
 						PulseCountType el = (PulseCountType) value;
 						itemDescription = el.getItemDescription();
 						itemUnits = el.getItemUnits();
 						siScaleCode = SiScaleCodeType.NONE;
+						xmlType = PulseCountType.class.getSimpleName();
 
 					} else if (declaredType.equals(OadrGBItemBase.class)) {
 						itemDescription = "OadrGBItemBase";
 						itemUnits = "OadrGBItemBase";
 						siScaleCode = SiScaleCodeType.NONE;
+						xmlType = "oadrGBItemBase";
 					}
 				}
 
@@ -398,9 +409,14 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 				description.setRid(rid);
 				description.setReportType(ReportEnumeratedType.fromValue(reportType));
 				description.setReadingType(ReadingTypeEnumeratedType.fromValue(readingType));
-				description.setItemDescription(itemDescription);
-				description.setItemUnits(itemUnits);
-				description.setSiScaleCode(siScaleCode);
+
+				ItemBase itemBase = new ItemBase();
+				itemBase.setItemDescription(itemDescription);
+				itemBase.setItemUnits(itemUnits);
+				itemBase.setSiScaleCode(siScaleCode.value());
+				itemBase.setXmlType(xmlType);
+				description.setItemBase(itemBase);
+				
 				description.setOadrMaxPeriod(oadrMaxPeriod);
 				description.setOadrMinPeriod(oadrMinPeriod);
 				description.setOadrOnChange(oadrOnChange);
@@ -411,27 +427,21 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 				}
 
 				if (oadrReportDescriptionType.getReportSubject() != null) {
-					String marshal;
-					try {
 
-						marshal = jaxbContext
-								.marshal(Oadr20bFactory.createEiTarget(oadrReportDescriptionType.getReportSubject()));
-						description.setEiSubject(marshal);
-					} catch (Oadr20bMarshalException e) {
-						LOGGER.error("Can't marshall report description report subject", e);
-					}
+					EiTargetType reportSubject = oadrReportDescriptionType.getReportSubject();
+
+					List<Target> createTargetList = Oadr20bVTNEiServiceUtils.createTargetList(reportSubject);
+					description.setEiSubject(createTargetList);
+
 				}
 
 				if (oadrReportDescriptionType.getReportDataSource() != null) {
-					String marshal;
-					try {
 
-						marshal = jaxbContext.marshal(
-								Oadr20bFactory.createEiTarget(oadrReportDescriptionType.getReportDataSource()));
-						description.setEiDatasource(marshal);
-					} catch (Oadr20bMarshalException e) {
-						LOGGER.error("Can't marshall report description report datasource", e);
-					}
+					EiTargetType reportDataSource = oadrReportDescriptionType.getReportDataSource();
+
+					List<Target> createTargetList = Oadr20bVTNEiServiceUtils.createTargetList(reportDataSource);
+					description.setEiSubject(createTargetList);
+
 				}
 
 				descriptionDto.add(oadr20bDtoMapper.map(description, ReportCapabilityDescriptionDto.class));
@@ -452,9 +462,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		}
 		venReportDto.setCapabilities(capabilitiesDto);
 
-//		List<OtherReportCapabilityDescription> findByOtherReportCapability = otherReportCapabilityDescriptionService
-//				.findByOtherReportCapability(capabilities.get(0));
-
 		Collection<OtherReportCapabilityDescription> toDeleteDesc = currentVenCapabilityDescriptionMap.values();
 		toDeleteDesc.removeAll(descriptions);
 		if (!toDeleteDesc.isEmpty()) {
@@ -465,9 +472,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 			}
 
 		}
-
-//		findByOtherReportCapability = otherReportCapabilityDescriptionService
-//				.findByOtherReportCapability(capabilities.get(0));
 
 		Collection<OtherReportCapability> toDeleteCap = currentVenCapabilityMap.values();
 		toDeleteCap.removeAll(capabilities);
@@ -482,7 +486,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		oadr20bAppNotificationPublisher.notifyRegisterReport(venReportDto, venID);
 
-//		otherReportCapabilityService.de
 
 		otherReportCapabilityService.save(capabilities);
 		otherReportCapabilityDescriptionService.save(descriptions);
@@ -1060,15 +1063,9 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 					JAXBElement<? extends ItemBaseType> createItemBase = null;
 					if (otherReportCapabilityDescription.getItemBase() != null) {
-						try {
-							ItemBaseType baseItem = jaxbContext
-									.unmarshal(otherReportCapabilityDescription.getItemBase(), ItemBaseType.class);
-
-							createItemBase = Oadr20bFactory.createItemBase(baseItem);
-
-						} catch (Oadr20bUnmarshalException e) {
-							LOGGER.error("Can't unmarshal report description item base", e);
-						}
+						
+						createItemBase = Oadr20bVTNEiServiceUtils.createItemBase(otherReportCapabilityDescription.getItemBase());
+						
 					}
 
 					reportRequestBuilder.addSpecifierPayload(createItemBase,

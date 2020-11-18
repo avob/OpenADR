@@ -18,16 +18,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.avob.openadr.server.common.vtn.ApplicationTest;
+import com.avob.openadr.server.common.vtn.models.TargetDto;
+import com.avob.openadr.server.common.vtn.models.TargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalNameEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.filter.VenFilter;
@@ -233,8 +233,8 @@ public class VenServiceTest {
 		dto.getDescriptor().setMarketContext(marketContext.getName());
 		dto.getActivePeriod().setDuration(duration);
 		dto.getActivePeriod().setNotificationDuration(notificationDuration);
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, "ven1"));
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, "ven2"));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, "ven1"));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, "ven2"));
 		dto.getSignals().add(signal);
 		dto.setPublished(true);
 		event1 = demandResponseEventService.create(dto);
@@ -250,7 +250,7 @@ public class VenServiceTest {
 		dto.getActivePeriod().setRampUpDuration("PT1H");
 		dto.getActivePeriod().setRecoveryDuration("PT1H");
 		dto.getDescriptor().setVtnComment("comment");
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, "ven2"));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, "ven2"));
 		dto.getSignals().add(signal);
 		dto.setPublished(true);
 		event2 = demandResponseEventService.create(dto);
@@ -263,7 +263,7 @@ public class VenServiceTest {
 		dto.getDescriptor().setMarketContext(marketContext.getName());
 		dto.getActivePeriod().setDuration(duration);
 		dto.getActivePeriod().setNotificationDuration(notificationDuration);
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, "ven3"));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, "ven3"));
 		dto.getSignals().add(signal);
 		dto.setPublished(true);
 		event3 = demandResponseEventService.create(dto);

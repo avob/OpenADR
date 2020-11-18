@@ -52,6 +52,8 @@ import com.avob.openadr.model.oadr20a.oadr.OadrRequestEvent;
 import com.avob.openadr.model.oadr20a.oadr.OadrResponse;
 import com.avob.openadr.model.oadr20a.oadr.ResponseRequiredType;
 import com.avob.openadr.model.oadr20a.pyld.EiRequestEvent;
+import com.avob.openadr.server.common.vtn.models.TargetDto;
+import com.avob.openadr.server.common.vtn.models.TargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
@@ -60,11 +62,9 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
@@ -262,7 +262,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		eventActive.getSignals().add(signal);
 		// ensure event status is "active"
 		eventActive.getActivePeriod().setStart(System.currentTimeMillis() - 10);
-		eventActive.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, VEN));
+		eventActive.getTargets().add(new TargetDto(TargetTypeEnum.VEN, VEN));
 		eventActive.getDescriptor().setState(DemandResponseEventStateEnum.ACTIVE);
 		eventActive.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		eventActive.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
@@ -277,7 +277,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		eventCanceled.getSignals().add(signal);
 
 		eventCanceled.getActivePeriod().setStart(System.currentTimeMillis() - 10);
-		eventCanceled.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, VEN));
+		eventCanceled.getTargets().add(new TargetDto(TargetTypeEnum.VEN, VEN));
 		eventCanceled.getDescriptor().setState(DemandResponseEventStateEnum.CANCELLED);
 		eventCanceled.getDescriptor().setResponseRequired(DemandResponseEventResponseRequiredEnum.ALWAYS);
 		eventCanceled.getDescriptor().setOadrProfile(DemandResponseEventOadrProfileEnum.OADR20A);
@@ -466,7 +466,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		signal.setSignalType(DemandResponseEventSignalTypeEnum.LEVEL);
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -673,7 +673,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		signal.setSignalType(DemandResponseEventSignalTypeEnum.LEVEL);
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setNotificationDuration("P1D");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
@@ -708,7 +708,7 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create 'far' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -744,7 +744,7 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create 'near' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -780,7 +780,7 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create 'active' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -814,7 +814,7 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create 'completed' and send DR Event to DemandResponseEvent API
 		dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");
@@ -850,7 +850,7 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// create unpublished event not to be found by ven
 		dto = new DemandResponseEventCreateDto();
-		dto.getTargets().add(new DemandResponseEventTargetDto(DemandResponseEventTargetTypeEnum.VEN, venId));
+		dto.getTargets().add(new TargetDto(TargetTypeEnum.VEN, venId));
 		dto.getActivePeriod().setDuration("PT1H");
 		dto.getActivePeriod().setToleranceDuration("PT5M");
 		dto.getActivePeriod().setNotificationDuration("P1D");

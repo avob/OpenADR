@@ -26,6 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
+import com.avob.openadr.server.common.vtn.models.Target;
+import com.avob.openadr.server.common.vtn.models.TargetDto;
+import com.avob.openadr.server.common.vtn.models.TargetInterface;
+import com.avob.openadr.server.common.vtn.models.TargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDao;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
@@ -34,12 +38,8 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalDao;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSpecification;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTarget;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetInterface;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventTargetDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenDao;
@@ -94,12 +94,12 @@ public class DemandResponseEventService {
 	
 
 	private List<Ven> findVenForTarget(DemandResponseEvent event,
-			List<? extends DemandResponseEventTargetInterface> targets) {
+			List<? extends TargetInterface> targets) {
 		Specification<Ven> targetedSpecification = null;
 		if (targets != null) {
 
-			for (DemandResponseEventTargetInterface target : targets) {
-				if (DemandResponseEventTargetTypeEnum.VEN.equals(target.getTargetType())) {
+			for (TargetInterface target : targets) {
+				if (TargetTypeEnum.VEN.equals(target.getTargetType())) {
 					if (targetedSpecification == null) {
 						targetedSpecification = VenSpecification.hasVenIdEquals(target.getTargetId());
 					} else {
@@ -107,7 +107,7 @@ public class DemandResponseEventService {
 								.or(VenSpecification.hasVenIdEquals(target.getTargetId()));
 					}
 
-				} else if (DemandResponseEventTargetTypeEnum.GROUP.equals(target.getTargetType())) {
+				} else if (TargetTypeEnum.GROUP.equals(target.getTargetType())) {
 					if (targetedSpecification == null) {
 						targetedSpecification = VenSpecification.hasGroup(target.getTargetId());
 					} else {
@@ -188,11 +188,11 @@ public class DemandResponseEventService {
 	@Transactional(readOnly = false)
 	public DemandResponseEvent update(DemandResponseEvent event, DemandResponseEventUpdateDto dto) {
 
-		List<DemandResponseEventTarget> toKeep = new ArrayList<>();
-		List<DemandResponseEventTargetDto> toAdd = new ArrayList<>();
-		for (DemandResponseEventTargetDto updateTarget : dto.getTargets()) {
+		List<Target> toKeep = new ArrayList<>();
+		List<TargetDto> toAdd = new ArrayList<>();
+		for (TargetDto updateTarget : dto.getTargets()) {
 			boolean found = false;
-			for (DemandResponseEventTarget target : event.getTargets()) {
+			for (Target target : event.getTargets()) {
 				if (target.getTargetType().equals(updateTarget.getTargetType())
 						&& target.getTargetId().equals(updateTarget.getTargetId())) {
 					found = true;
@@ -217,7 +217,7 @@ public class DemandResponseEventService {
 
 		}
 
-		Set<DemandResponseEventTarget> actualSet = new HashSet<DemandResponseEventTarget>(event.getTargets());
+		Set<Target> actualSet = new HashSet<Target>(event.getTargets());
 		actualSet.removeAll(toKeep);
 		// unlink removed target
 		if (!actualSet.isEmpty()) {

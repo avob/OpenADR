@@ -1,5 +1,8 @@
 package com.avob.openadr.server.oadr20b.vtn.models.venreport.capability;
 
+import java.util.List;
+
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -8,11 +11,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.Lob;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportEnumeratedType;
-import com.avob.openadr.model.oadr20b.siscale.SiScaleCodeType;
+import com.avob.openadr.server.common.vtn.models.ItemBase;
+import com.avob.openadr.server.common.vtn.models.Target;
 
 /**
  * @author bzanni
@@ -43,21 +49,15 @@ public class ReportCapabilityDescription {
 
 	private boolean oadrOnChange;
 
-	private String itemDescription;
+	private ItemBase itemBase;
 
-	private String itemUnits;
+	@ElementCollection
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private List<Target> eiDatasource;
 
-	@Lob
-	private String itemBase;
-
-	@Lob
-	private String eiDatasource;
-
-	@Lob
-	private String eiSubject;
-
-	@Enumerated(EnumType.STRING)
-	private SiScaleCodeType siScaleCode;
+	@ElementCollection
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private List<Target> eiSubject;
 
 	public Long getId() {
 		return id;
@@ -115,51 +115,27 @@ public class ReportCapabilityDescription {
 		this.oadrOnChange = oadrOnChange;
 	}
 
-	public String getItemDescription() {
-		return itemDescription;
-	}
-
-	public void setItemDescription(String itemDescription) {
-		this.itemDescription = itemDescription;
-	}
-
-	public String getItemUnits() {
-		return itemUnits;
-	}
-
-	public void setItemUnits(String itemUnits) {
-		this.itemUnits = itemUnits;
-	}
-
-	public SiScaleCodeType getSiScaleCode() {
-		return siScaleCode;
-	}
-
-	public void setSiScaleCode(SiScaleCodeType siScaleCode) {
-		this.siScaleCode = siScaleCode;
-	}
-
-	public String getItemBase() {
+	public ItemBase getItemBase() {
 		return itemBase;
 	}
 
-	public void setItemBase(String itemBase) {
+	public void setItemBase(ItemBase itemBase) {
 		this.itemBase = itemBase;
 	}
 
-	public String getEiDatasource() {
+	public List<Target> getEiDatasource() {
 		return eiDatasource;
 	}
 
-	public void setEiDatasource(String eiDatasource) {
+	public void setEiDatasource(List<Target> eiDatasource) {
 		this.eiDatasource = eiDatasource;
 	}
 
-	public String getEiSubject() {
+	public List<Target> getEiSubject() {
 		return eiSubject;
 	}
 
-	public void setEiSubject(String eiSubject) {
+	public void setEiSubject(List<Target> eiSubject) {
 		this.eiSubject = eiSubject;
 	}
 }

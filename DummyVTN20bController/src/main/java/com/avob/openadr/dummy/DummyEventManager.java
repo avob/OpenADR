@@ -31,8 +31,7 @@ import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalDto;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalDto.SignalNameEnum;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalDto.SignalTypeEnum;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalIntervalDto;
-import com.avob.server.oadrvtn20b.model.DemandResponseEventTargetDto;
-import com.avob.server.oadrvtn20b.model.DemandResponseEventTargetDto.TargetTypeEnum;
+import com.avob.server.oadrvtn20b.model.TargetDto;
 import com.avob.server.oadrvtn20b.model.VenMarketContextDto;
 
 @Service
@@ -52,32 +51,38 @@ public class DummyEventManager {
 	public void init() {
 		Long marketcontextId;
 		try {
-			VenMarketContextDto findMarketContextByNameUsingGET = marketContextControllerApi.findMarketContextByNameUsingGET(DummyVTN20bControllerConfig.MARKET_CONTEXT);
+			VenMarketContextDto findMarketContextByNameUsingGET = marketContextControllerApi
+					.findMarketContextByNameUsingGET(DummyVTN20bControllerConfig.MARKET_CONTEXT);
 			marketcontextId = findMarketContextByNameUsingGET.getId();
-			LOGGER.warn("Ven market context: "+DummyVTN20bControllerConfig.MARKET_CONTEXT+ " is already provisioned");
+			LOGGER.warn(
+					"Ven market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT + " is already provisioned");
 		} catch (ApiException e) {
-			if(e.getCode() !=  HttpStatus.SC_NOT_FOUND) {
-				LOGGER.error("Ven market context: "+DummyVTN20bControllerConfig.MARKET_CONTEXT+ " can't be provisioned", e);
+			if (e.getCode() != HttpStatus.SC_NOT_FOUND) {
+				LOGGER.error(
+						"Ven market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT + " can't be provisioned",
+						e);
 				return;
 			} else {
 				VenMarketContextDto dto = new VenMarketContextDto();
 				dto.setName(DummyVTN20bControllerConfig.MARKET_CONTEXT);
 				dto.setDescription(DummyVTN20bControllerConfig.MARKET_CONTEXT_DESCRIPTION);
 				try {
-					VenMarketContextDto createMarketContextUsingPOST = marketContextControllerApi.createMarketContextUsingPOST(dto );
+					VenMarketContextDto createMarketContextUsingPOST = marketContextControllerApi
+							.createMarketContextUsingPOST(dto);
 					marketcontextId = createMarketContextUsingPOST.getId();
 				} catch (ApiException e1) {
-					LOGGER.error("Ven market context: "+DummyVTN20bControllerConfig.MARKET_CONTEXT+ " can't be provisioned", e1);
+					LOGGER.error("Ven market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT
+							+ " can't be provisioned", e1);
 					return;
 				}
 			}
 		}
 
-		if(marketcontextId == null) {
-			LOGGER.error("Ven market context: "+DummyVTN20bControllerConfig.MARKET_CONTEXT+ " can't be provisioned");
+		if (marketcontextId == null) {
+			LOGGER.error("Ven market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT + " can't be provisioned");
 			return;
 		}
-		
+
 		List<DemandResponseEventReadDto> events = new ArrayList<>();
 		DemandResponseEventFilter filter = new DemandResponseEventFilter();
 		filter.setType(TypeEnum.MARKET_CONTEXT);
@@ -88,7 +93,7 @@ public class DummyEventManager {
 		Long start = truncatedTo.toEpochSecond() * 1000;
 		Long end = truncatedTo.plusHours(6).toEpochSecond() * 1000;
 		Integer totalCount;
-		int page= 0;
+		int page = 0;
 		try {
 
 			do {
@@ -97,49 +102,47 @@ public class DummyEventManager {
 						.searchUsingPOSTWithHttpInfo(Arrays.asList(filter), end, page, null, start);
 				totalCount = Integer.valueOf(response.getHeaders().get(X_TOTAL_COUNT).get(0));
 				page++;
-			} while(events.size() < totalCount);
+			} while (events.size() < totalCount);
 
 			events.forEach(event -> {
 				LOGGER.info(String.format("%s", String.valueOf(event.getId())));
 			});
 
-
 		} catch (ApiException e) {
-			LOGGER.error("Market context: "+DummyVTN20bControllerConfig.MARKET_CONTEXT+ " events can't be retrieved", e);
+			LOGGER.error("Market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT + " events can't be retrieved",
+					e);
 			return;
 		}
 
-
-
 		this.ensureEventAreCreatedForNextHour(truncatedTo, events);
-
 
 	}
 
-	private void ensureEventAreCreatedForNextHour(OffsetDateTime start, List<DemandResponseEventReadDto> existingEvents) {
-
+	private void ensureEventAreCreatedForNextHour(OffsetDateTime start,
+			List<DemandResponseEventReadDto> existingEvents) {
 
 		OffsetDateTime temp = start;
 		List<Long> existingStart = new ArrayList<>();
-		for(DemandResponseEventReadDto event : existingEvents) {
+		for (DemandResponseEventReadDto event : existingEvents) {
 			existingStart.add(event.getActivePeriod().getStart());
 		}
 
-		for(int i=0; i<5 * 6 * 2; i++) {
-			if(!existingStart.contains(temp.toEpochSecond()*1000)) {
-				DemandResponseEventCreateDto createEvent = this.createEvent(temp.toEpochSecond()*1000);
+		for (int i = 0; i < 5 * 6 * 2; i++) {
+			if (!existingStart.contains(temp.toEpochSecond() * 1000)) {
+				DemandResponseEventCreateDto createEvent = this.createEvent(temp.toEpochSecond() * 1000);
 				try {
-					DemandResponseEventReadDto createUsingPOST = demandResponseControllerApi.createUsingPOST(createEvent );
-					
+					DemandResponseEventReadDto createUsingPOST = demandResponseControllerApi
+							.createUsingPOST(createEvent);
+
 					demandResponseControllerApi.publishUsingPOST(createUsingPOST.getId());
 
 				} catch (ApiException e) {
 					LOGGER.error("Event can't be created", e);
-				};
+				}
+				;
 			}
 			temp = temp.plusMinutes(2);
 		}
-
 
 	}
 
@@ -149,38 +152,30 @@ public class DummyEventManager {
 		String duration = "PT2M";
 		String notificationDuration = "P1D";
 		String toleranceDuration = "PT5M";
-		DemandResponseEventActivePeriodDto activePeriod = new DemandResponseEventActivePeriodDto()
-				.start(start)
-				.notificationDuration(notificationDuration )
-				.toleranceDuration(toleranceDuration )
-				.duration(duration);
-		
+		DemandResponseEventActivePeriodDto activePeriod = new DemandResponseEventActivePeriodDto().start(start)
+				.notificationDuration(notificationDuration).toleranceDuration(toleranceDuration).duration(duration);
+
 		event.activePeriod(activePeriod);
 
-		DemandResponseEventDescriptorDto descriptor = new DemandResponseEventDescriptorDto()
-				.state(StateEnum.ACTIVE)
-				.marketContext(DummyVTN20bControllerConfig.MARKET_CONTEXT)
-				.oadrProfile(OadrProfileEnum.OADR20B)
+		DemandResponseEventDescriptorDto descriptor = new DemandResponseEventDescriptorDto().state(StateEnum.ACTIVE)
+				.marketContext(DummyVTN20bControllerConfig.MARKET_CONTEXT).oadrProfile(OadrProfileEnum.OADR20B)
 				.responseRequired(ResponseRequiredEnum.ALWAYS);
-		event.descriptor(descriptor );
+		event.descriptor(descriptor);
 
-		DemandResponseEventSignalDto signalsItem = new DemandResponseEventSignalDto()
-				.signalName(SignalNameEnum.SIMPLE)
+		DemandResponseEventSignalDto signalsItem = new DemandResponseEventSignalDto().signalName(SignalNameEnum.SIMPLE)
 				.signalType(SignalTypeEnum.LEVEL);
 
 		String intervalDuration = "PT1M";
-		for(int i=0; i < 2; i++) {
+		for (int i = 0; i < 2; i++) {
 			Float value = Float.valueOf(i);
 			DemandResponseEventSignalIntervalDto intervalsItem = new DemandResponseEventSignalIntervalDto()
-					.duration(intervalDuration )
-					.value(value );
-			signalsItem.addIntervalsItem(intervalsItem );
+					.duration(intervalDuration).value(value);
+			signalsItem.addIntervalsItem(intervalsItem);
 		}
-		event.addSignalsItem(signalsItem );
+		event.addSignalsItem(signalsItem);
 
-
-		DemandResponseEventTargetDto targetsItem = new DemandResponseEventTargetDto();
-		event.addTargetsItem(targetsItem );
+		TargetDto targetsItem = new TargetDto();
+		event.addTargetsItem(targetsItem);
 
 		return event;
 	}

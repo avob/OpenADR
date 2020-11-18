@@ -2,6 +2,8 @@ package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedd
 
 import java.util.List;
 
+import com.avob.openadr.server.common.vtn.models.TargetDto;
+import com.avob.openadr.server.common.vtn.models.ItemBaseDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalNameEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
 
@@ -10,6 +12,8 @@ public class DemandResponseEventSignalDto {
 	private DemandResponseEventSignalTypeEnum signalType;
 	private List<DemandResponseEventSignalIntervalDto> intervals;
 	private Float currentValue;
+	private ItemBaseDto itemBase;
+	private List<TargetDto> targets; 
 
 	public DemandResponseEventSignalNameEnum getSignalName() {
 		return signalName;
@@ -41,5 +45,21 @@ public class DemandResponseEventSignalDto {
 
 	public void setCurrentValue(Float currentValue) {
 		this.currentValue = currentValue;
+	}
+
+	public ItemBaseDto getItemBase() {
+		return itemBase;
+	}
+
+	public void setItemBase(ItemBaseDto itemBase) {
+		this.itemBase = itemBase;
+	}
+
+	public List<TargetDto> getTargets() {
+		return targets;
+	}
+
+	public void setTargets(List<TargetDto> targets) {
+		this.targets = targets;
 	}
 }
