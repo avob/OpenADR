@@ -12,5 +12,4 @@ public interface ReportCapabilityDao<T extends ReportCapability> extends PagingA
 
 	public List<T> findByReportSpecifierIdStartingWith(String reportSpecifierId);
 
-	public List<T> findByReportRequestIdIn(List<String> reportRequestId);
 }

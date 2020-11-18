@@ -47,9 +47,8 @@ public class Oadr20bRegisterReportTest {
 
 		String requestId = null;
 		String venId = "venId";
-		String reportRequestId = "reportRequestId";
-		OadrRegisterReportType request = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportBuilder(requestId, venId, reportRequestId).build();
+		OadrRegisterReportType request = Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder(requestId, venId)
+				.build();
 
 		boolean assertion = false;
 		try {
@@ -126,7 +125,6 @@ public class Oadr20bRegisterReportTest {
 	public void testDifferentReportDescriptionMarshalling() throws Oadr20bMarshalException, Oadr20bUnmarshalException {
 		String requestId = "requestId";
 		String venId = "venId";
-		String reportRequestId = "reportRequestId";
 		String reportSpecifierId = "reportSpecifierId";
 		ReportNameEnumeratedType reportName = ReportNameEnumeratedType.METADATA_TELEMETRY_USAGE;
 		long createdTimestamp = System.currentTimeMillis();
@@ -135,8 +133,7 @@ public class Oadr20bRegisterReportTest {
 		String marketContextName = "http://oadr.avob.com";
 
 		OadrReportType build = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportOadrReportBuilder(reportSpecifierId, reportRequestId, reportName,
-						createdTimestamp)
+				.newOadr20bRegisterReportOadrReportBuilder(reportSpecifierId, reportName, createdTimestamp)
 				.addReportDescription(Oadr20bEiReportBuilders
 						.newOadr20bOadrReportDescriptionBuilder("rid", ReportEnumeratedType.READING,
 								ReadingTypeEnumeratedType.DIRECT_READ)
@@ -241,8 +238,8 @@ public class Oadr20bRegisterReportTest {
 						.newOadr20bReportIntervalTypeBuilder("intervalId", 0L, "PT1H", "rid", 0L, 0F, 0F).build()))
 				.withStart(start).withDuration(duration).build();
 
-		OadrRegisterReportType request = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportBuilder(requestId, venId, reportRequestId).addOadrReport(build).build();
+		OadrRegisterReportType request = Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder(requestId, venId)
+				.addOadrReport(build).build();
 
 		String marshalRoot = jaxbContext.marshalRoot(request, true);
 		Object unmarshal = jaxbContext.unmarshal(marshalRoot, true);

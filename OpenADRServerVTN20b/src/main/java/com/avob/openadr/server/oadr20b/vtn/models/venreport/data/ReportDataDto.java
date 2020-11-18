@@ -5,6 +5,8 @@ public class ReportDataDto {
 	private long id;
 
 	private String reportSpecifierId;
+	
+	private String reportRequestId;
 
 	private String rid;
 
@@ -70,6 +72,14 @@ public class ReportDataDto {
 
 	public void setDuration(String duration) {
 		this.duration = duration;
+	}
+
+	public String getReportRequestId() {
+		return reportRequestId;
+	}
+
+	public void setReportRequestId(String reportRequestId) {
+		this.reportRequestId = reportRequestId;
 	}
 
 }

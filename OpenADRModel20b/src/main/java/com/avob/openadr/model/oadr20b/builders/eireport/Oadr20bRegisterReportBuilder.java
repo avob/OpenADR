@@ -11,8 +11,8 @@ public class Oadr20bRegisterReportBuilder {
 
     private OadrRegisterReportType oadrRegisterReportType;
 
-    public Oadr20bRegisterReportBuilder(String requestId, String venId, String reportRequestId) {
-        oadrRegisterReportType = Oadr20bFactory.createOadrRegisterReportType(requestId, venId, reportRequestId);
+    public Oadr20bRegisterReportBuilder(String requestId, String venId) {
+        oadrRegisterReportType = Oadr20bFactory.createOadrRegisterReportType(requestId, venId);
     }
 
     public Oadr20bRegisterReportBuilder addOadrReport(List<OadrReportType> oadrReportType) {

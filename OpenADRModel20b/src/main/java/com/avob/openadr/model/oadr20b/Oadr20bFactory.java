@@ -507,12 +507,11 @@ public class Oadr20bFactory {
 		return createOadrCreatedReportType;
 	}
 
-	public static OadrRegisterReportType createOadrRegisterReportType(String requestId, String venId,
-			String reportRequestId) {
+	public static OadrRegisterReportType createOadrRegisterReportType(String requestId, String venId) {
 		OadrRegisterReportType createOadrRegisterReportType = factory.createOadrRegisterReportType();
 		createOadrRegisterReportType.setRequestID(requestId);
 		createOadrRegisterReportType.setVenID(venId);
-		createOadrRegisterReportType.setReportRequestID(reportRequestId);
+		createOadrRegisterReportType.setReportRequestID("0");
 		return createOadrRegisterReportType;
 	}
 
@@ -662,8 +661,8 @@ public class Oadr20bFactory {
 		return createOadrReportRequestType;
 	}
 
-	public static OadrReportType createOadrUpdateReportOadrReportType(String reportId, String reportrequestId,
-			String reportSpecifierId, ReportNameEnumeratedType reportName, long createdTimestamp, Long startTimestamp,
+	public static OadrReportType createOadrUpdateReportOadrReportType(String reportId,String reportSpecifierId, String reportrequestId,
+			 ReportNameEnumeratedType reportName, long createdTimestamp, Long startTimestamp,
 			String duration) {
 		OadrReportType createOadrReportType = factory.createOadrReportType();
 		createOadrReportType.setReportRequestID(reportrequestId);
@@ -684,7 +683,17 @@ public class Oadr20bFactory {
 	}
 
 	public static OadrReportType createOadrRegisterReportOadrReportType(String reportSpecifierId,
-			String reportRequestId, ReportNameEnumeratedType reportName, long createdTimestamp) {
+			ReportNameEnumeratedType reportName, long createdTimestamp) {
+		OadrReportType createOadrReportType = factory.createOadrReportType();
+		createOadrReportType.setReportSpecifierID(reportSpecifierId);
+		createOadrReportType.setReportName(reportName.value());
+		createOadrReportType.setCreatedDateTime(timestamptoXMLCalendar(createdTimestamp));
+		createOadrReportType.setReportRequestID("0");
+		return createOadrReportType;
+	}
+	
+	public static OadrReportType createOadrUpdateReportOadrReportType(String reportSpecifierId, String reportRequestId,
+			ReportNameEnumeratedType reportName, long createdTimestamp) {
 		OadrReportType createOadrReportType = factory.createOadrReportType();
 		createOadrReportType.setReportSpecifierID(reportSpecifierId);
 		createOadrReportType.setReportName(reportName.value());
@@ -1454,7 +1463,6 @@ public class Oadr20bFactory {
 			return emixFactory.createItemBase(value);
 		}
 
-		
 	}
 
 }

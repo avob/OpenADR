@@ -55,9 +55,8 @@ public class Oadr20bEiReportBuilders {
 				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
 	}
 
-	public static Oadr20bRegisterReportBuilder newOadr20bRegisterReportBuilder(String requestId, String venId,
-			String reportRequestId) {
-		return new Oadr20bRegisterReportBuilder(requestId, venId, reportRequestId)
+	public static Oadr20bRegisterReportBuilder newOadr20bRegisterReportBuilder(String requestId, String venId) {
+		return new Oadr20bRegisterReportBuilder(requestId, venId)
 				.withSchemaVersion(SchemaVersionEnumeratedType.OADR_20B.value());
 	}
 
@@ -77,10 +76,10 @@ public class Oadr20bEiReportBuilders {
 		return new Oadr20bReportRequestTypeBuilder(reportRequestId, reportSpecifierId, granularity, reportBackDuration);
 	}
 
-	public static Oadr20bUpdateReportOadrReportBuilder newOadr20bUpdateReportOadrReportBuilder(String reportId,
-			String reportrequestId, String reportSpecifierId, ReportNameEnumeratedType reportName,
+	public static Oadr20bUpdateReportOadrReportBuilder newOadr20bUpdateReportOadrReportBuilder(String reportId, String reportSpecifierId,
+			String reportrequestId, ReportNameEnumeratedType reportName,
 			long createdTimestamp, Long startTimestamp, String duration) {
-		return new Oadr20bUpdateReportOadrReportBuilder(reportId, reportrequestId, reportSpecifierId, reportName,
+		return new Oadr20bUpdateReportOadrReportBuilder(reportId, reportSpecifierId, reportrequestId, reportName,
 				createdTimestamp, startTimestamp, duration);
 	}
 
@@ -90,9 +89,9 @@ public class Oadr20bEiReportBuilders {
 	}
 
 	public static Oadr20bRegisterReportOadrReportBuilder newOadr20bRegisterReportOadrReportBuilder(
-			String reportSpecifierId, String reportRequestId, ReportNameEnumeratedType reportName,
+			String reportSpecifierId,  ReportNameEnumeratedType reportName,
 			long createdTimestamp) {
-		return new Oadr20bRegisterReportOadrReportBuilder(reportSpecifierId, reportRequestId, reportName,
+		return new Oadr20bRegisterReportOadrReportBuilder(reportSpecifierId, reportName,
 				createdTimestamp);
 	}
 }

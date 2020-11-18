@@ -29,6 +29,9 @@ public class ReportData {
 
 	@NotNull
 	private String reportSpecifierId;
+	
+	@NotNull
+	private String reportRequestId;
 
 	@NotNull
 	private String rid;
@@ -103,6 +106,14 @@ public class ReportData {
 
 	public void setVenId(String venId) {
 		this.venId = venId;
+	}
+
+	public String getReportRequestId() {
+		return reportRequestId;
+	}
+
+	public void setReportRequestId(String reportRequestId) {
+		this.reportRequestId = reportRequestId;
 	}
 
 }

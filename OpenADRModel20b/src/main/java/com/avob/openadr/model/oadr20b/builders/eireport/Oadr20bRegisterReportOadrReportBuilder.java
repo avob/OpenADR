@@ -13,9 +13,9 @@ public class Oadr20bRegisterReportOadrReportBuilder {
 
 	private OadrReportType report;
 
-	public Oadr20bRegisterReportOadrReportBuilder(String reportSpecifierId, String reportRequestId,
+	public Oadr20bRegisterReportOadrReportBuilder(String reportSpecifierId, 
 			ReportNameEnumeratedType reportName, long createdTimestamp) {
-		report = Oadr20bFactory.createOadrRegisterReportOadrReportType(reportSpecifierId, reportRequestId, reportName,
+		report = Oadr20bFactory.createOadrRegisterReportOadrReportType(reportSpecifierId, reportName,
 				createdTimestamp);
 	}
 

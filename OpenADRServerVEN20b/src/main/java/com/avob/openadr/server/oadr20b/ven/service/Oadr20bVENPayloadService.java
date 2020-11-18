@@ -77,7 +77,8 @@ public class Oadr20bVENPayloadService {
 		try {
 			UnmarshalledPayload unsignedPayload = unmarshall(session, payload);
 			Object request = eventService.request(session, unsignedPayload.getPayload());
-			return marshall(session, request, unsignedPayload.isSigned());
+//			return marshall(session, request, unsignedPayload.isSigned());
+			return marshall(session, request, session.getXmlSignature());
 		} catch (MarshallException e) {
 			return e.getResponse();
 		}
@@ -92,7 +93,8 @@ public class Oadr20bVENPayloadService {
 		try {
 			UnmarshalledPayload unsignedPayload = unmarshall(session, payload);
 			Object request = registerPartyService.request(session, unsignedPayload.getPayload());
-			return marshall(session, request, unsignedPayload.isSigned());
+//			return marshall(session, request, unsignedPayload.isSigned());
+			return marshall(session, request, session.getXmlSignature());
 		} catch (MarshallException e) {
 			return e.getResponse();
 		}
@@ -106,7 +108,8 @@ public class Oadr20bVENPayloadService {
 		try {
 			UnmarshalledPayload unsignedPayload = unmarshall(session, payload);
 			Object request = reportService.request(session, unsignedPayload.getPayload());
-			return marshall(session, request, unsignedPayload.isSigned());
+//			return marshall(session, request, unsignedPayload.isSigned());
+			return marshall(session, request, session.getXmlSignature());
 		} catch (MarshallException e) {
 			return e.getResponse();
 		}

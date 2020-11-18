@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -203,6 +204,7 @@ public class DummyVENManager {
 		venReport.getCapabilities().forEach(cap -> {
 			OtherReportRequestDtoCreateSubscriptionDto sub = new OtherReportRequestDtoCreateSubscriptionDto();
 			sub.setReportSpecifierId(cap.getReportSpecifierId());
+			sub.setReportRequestId(UUID.randomUUID().toString());
 			sub.setGranularity("PT10S");
 			sub.setReportBackDuration("PT1M");
 			Map<String, Boolean> rids = new HashMap<>();

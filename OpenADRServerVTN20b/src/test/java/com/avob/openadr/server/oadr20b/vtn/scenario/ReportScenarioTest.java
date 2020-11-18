@@ -244,8 +244,7 @@ public class ReportScenarioTest {
 		String minPeriod = "PT15M";
 		String maxPeriod = "PT1H";
 		OadrReportType report = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportOadrReportBuilder(REPORT_SPECIFIER_ID, REPORT_REQUEST_ID, reportName,
-						createdTimestamp)
+				.newOadr20bRegisterReportOadrReportBuilder(REPORT_SPECIFIER_ID, reportName, createdTimestamp)
 				.withDuration("PT1H").withStart(System.currentTimeMillis())
 				.addReportDescription(Oadr20bEiReportBuilders
 						.newOadr20bOadrReportDescriptionBuilder(rid, reportType, readingType)
@@ -319,7 +318,7 @@ public class ReportScenarioTest {
 		// EI REPORT CONTROLLER - invalid mismatch payload venID and username auth
 		// session
 		OadrRegisterReportType oadrRegisterReportType = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportBuilder(REQUEST_ID, "mouaiccool", null).addOadrReport(report).build();
+				.newOadr20bRegisterReportBuilder(REQUEST_ID, "mouaiccool").addOadrReport(report).build();
 
 		OadrRegisteredReportType oadrRegisteredReportType = mockVen.report(oadrRegisterReportType, HttpStatus.OK_200,
 				OadrRegisteredReportType.class);
@@ -327,8 +326,8 @@ public class ReportScenarioTest {
 				oadrRegisteredReportType.getEiResponse().getResponseCode());
 
 		// EI REPORT CONTROLLER - send OadrRegisteredReportType
-		oadrRegisterReportType = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportBuilder(REQUEST_ID, mockVen.getVenId(), null).addOadrReport(report).build();
+		oadrRegisterReportType = Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder(REQUEST_ID, mockVen.getVenId())
+				.addOadrReport(report).build();
 		oadrRegisteredReportType = mockVen.report(oadrRegisterReportType, HttpStatus.OK_200,
 				OadrRegisteredReportType.class);
 
@@ -358,8 +357,7 @@ public class ReportScenarioTest {
 
 		// update register report
 		report = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportOadrReportBuilder(REPORT_SPECIFIER_ID, REPORT_REQUEST_ID, reportName,
-						createdTimestamp)
+				.newOadr20bRegisterReportOadrReportBuilder(REPORT_SPECIFIER_ID, reportName, createdTimestamp)
 				.addReportDescription(Oadr20bEiReportBuilders
 						.newOadr20bOadrReportDescriptionBuilder(rid, reportType, readingType)
 						.withCurrencyBase(CurrencyItemDescriptionType.CURRENCY, ISO3AlphaCurrencyCodeContentType.EUR,
@@ -373,8 +371,8 @@ public class ReportScenarioTest {
 						.withOadrSamplingRate(minPeriod, maxPeriod, false).build())
 
 				.build();
-		oadrRegisterReportType = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportBuilder(REQUEST_ID, mockVen.getVenId(), null).addOadrReport(report).build();
+		oadrRegisterReportType = Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder(REQUEST_ID, mockVen.getVenId())
+				.addOadrReport(report).build();
 
 		// EI REPORT CONTROLLER - send OadrRegisteredReportType
 		oadrRegisteredReportType = mockVen.report(oadrRegisterReportType, HttpStatus.OK_200,
@@ -475,6 +473,7 @@ public class ReportScenarioTest {
 		// VEN CONTROLLER - subscribe
 		List<OtherReportRequestDtoCreateSubscriptionDto> subscriptions = new ArrayList<>();
 		OtherReportRequestDtoCreateSubscriptionDto subscription = new OtherReportRequestDtoCreateSubscriptionDto();
+		subscription.setReportRequestId(REPORT_REQUEST_ID);
 		subscription.setGranularity(minPeriod);
 		subscription.setReportBackDuration(maxPeriod);
 		subscription.setReportSpecifierId(reportCapability.getReportSpecifierId());
@@ -504,8 +503,7 @@ public class ReportScenarioTest {
 		assertNotNull(venReportRequested);
 		assertEquals(1, venReportRequested.size());
 
-		String reportRequestId = venReportRequested.get(0).getReportRequestId();
-		params = OadrParamBuilder.builder().addReportRequestId(reportRequestId).build();
+		params = OadrParamBuilder.builder().addReportRequestId(REPORT_REQUEST_ID).build();
 		venReportRequested = oadrMockHttpVenMvc.getVenReportRequested(OadrDataBaseSetup.ADMIN_SECURITY_SESSION,
 				mockVen.getVenId(), params, HttpStatus.OK_200);
 		assertNotNull(venReportRequested);
@@ -530,7 +528,7 @@ public class ReportScenarioTest {
 		assertEquals(reportCapabilityDescription.getRid(), searchVenReportRequestedSpecifier.get(0).getRid());
 
 		criteria = new OtherReportRequestSpecifierSearchCriteria();
-		criteria.setReportRequestId(Lists.newArrayList(reportRequestId));
+		criteria.setReportRequestId(Lists.newArrayList(REPORT_REQUEST_ID));
 		searchVenReportRequestedSpecifier = oadrMockHttpVenMvc.searchVenReportRequestedSpecifier(
 				OadrDataBaseSetup.ADMIN_SECURITY_SESSION, mockVen.getVenId(), criteria, HttpStatus.OK_200);
 		assertNotNull(searchVenReportRequestedSpecifier);
@@ -562,16 +560,16 @@ public class ReportScenarioTest {
 		// EI REPORT CONTROLLER - invalid mismatch payload venID and username auth
 		// session
 		OadrCreatedReportType oadrCreatedReportType = Oadr20bEiReportBuilders
-				.newOadr20bCreatedReportBuilder(reportRequestId, HttpStatus.OK_200, "mouaiccool")
-				.addPendingReportRequestId(reportRequestId).build();
+				.newOadr20bCreatedReportBuilder("requestId", HttpStatus.OK_200, "mouaiccool")
+				.addPendingReportRequestId(REPORT_REQUEST_ID).build();
 		OadrResponseType response = mockVen.report(oadrCreatedReportType, HttpStatus.OK_200, OadrResponseType.class);
 		assertEquals(String.valueOf(Oadr20bApplicationLayerErrorCode.TARGET_MISMATCH_462),
 				response.getEiResponse().getResponseCode());
 
 		// EI REPORT CONTROLLER - send OadrCreatedReportType
 		oadrCreatedReportType = Oadr20bEiReportBuilders
-				.newOadr20bCreatedReportBuilder(reportRequestId, HttpStatus.OK_200, mockVen.getVenId())
-				.addPendingReportRequestId(reportRequestId).build();
+				.newOadr20bCreatedReportBuilder("requestId", HttpStatus.OK_200, mockVen.getVenId())
+				.addPendingReportRequestId(REPORT_REQUEST_ID).build();
 		response = mockVen.report(oadrCreatedReportType, HttpStatus.OK_200, OadrResponseType.class);
 		assertNotNull(response);
 		assertEquals(String.valueOf(HttpStatus.OK_200), response.getEiResponse().getResponseCode());
@@ -585,7 +583,7 @@ public class ReportScenarioTest {
 		assertTrue(reportRequestList.get(0).isAcked());
 		assertEquals(minPeriod, reportRequestList.get(0).getGranularity());
 		assertEquals(maxPeriod, reportRequestList.get(0).getReportBackDuration());
-		assertEquals(reportRequestId, reportRequestList.get(0).getReportRequestId());
+		assertEquals(REPORT_REQUEST_ID, reportRequestList.get(0).getReportRequestId());
 		assertNull(reportRequestList.get(0).getRequestorUsername());
 
 		// create VEN oadrUpdateReport float payload
@@ -595,9 +593,10 @@ public class ReportScenarioTest {
 		Long confidence = 80L;
 		Float accuracy = 1F;
 		Float value = 3F;
+		String reportId = "reportId";
 		OadrReportType reportUpdate = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportOadrReportBuilder(REPORT_SPECIFIER_ID, reportRequestId, reportName,
-						createdTimestamp)
+				.newOadr20bUpdateReportOadrReportBuilder(reportId, REPORT_SPECIFIER_ID, REPORT_REQUEST_ID, reportName,
+						createdTimestamp, start, xmlDuration)
 				.addInterval(Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration, rid,
 						confidence, accuracy, value).build())
 				.build();
@@ -659,9 +658,11 @@ public class ReportScenarioTest {
 		OadrPayloadResourceStatusType createOadrPayloadResourceStatusType = Oadr20bFactory
 				.createOadrPayloadResourceStatusType(createOadrLoadControlStateType, manualOverride, online);
 
+		
+		
 		reportUpdate = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportOadrReportBuilder(REPORT_SPECIFIER_ID, reportRequestId, reportName,
-						createdTimestamp)
+				.newOadr20bUpdateReportOadrReportBuilder(reportId, REPORT_SPECIFIER_ID, REPORT_REQUEST_ID, reportName,
+						createdTimestamp, start, xmlDuration)
 				.addInterval(Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration, rid,
 						confidence, accuracy, createOadrPayloadResourceStatusType).build())
 				.build();
@@ -703,8 +704,8 @@ public class ReportScenarioTest {
 		tokens.getTokens().add(token);
 
 		reportUpdate = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportOadrReportBuilder(REPORT_SPECIFIER_ID, reportRequestId, reportName,
-						createdTimestamp)
+				.newOadr20bUpdateReportOadrReportBuilder(reportId, REPORT_SPECIFIER_ID, REPORT_REQUEST_ID, reportName,
+						createdTimestamp, start, xmlDuration)
 				.addInterval(Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration, rid,
 						confidence, accuracy, tokens).build())
 				.build();
@@ -878,14 +879,11 @@ public class ReportScenarioTest {
 		assertEquals(String.valueOf(HttpStatus.OK_200), report.getEiResponse().getResponseCode());
 
 		// create available (self) report on VTN
-		String selfPayloadReportRequestId = REPORT_REQUEST_ID;
-		String selfReportSpecifierId = "selfReportSpecifierId";
 		String duration = "P1D";
 		ReportNameEnumeratedType metadataTelemetryUsage = ReportNameEnumeratedType.METADATA_TELEMETRY_USAGE;
 		SelfReportCapability selfReportCapability = new SelfReportCapability();
-		selfReportCapability.setReportRequestId(selfPayloadReportRequestId);
 		selfReportCapability.setReportName(metadataTelemetryUsage);
-		selfReportCapability.setReportSpecifierId(selfReportSpecifierId);
+		selfReportCapability.setReportSpecifierId(REPORT_REQUEST_ID);
 		selfReportCapability.setDuration(duration);
 
 		selfReportCapabilityservice.save(selfReportCapability);
@@ -913,7 +911,7 @@ public class ReportScenarioTest {
 		Long selfCapPrivateId = vtnReportAvailable.get(0).getId();
 
 		List<ReportCapabilityDescriptionDto> vtnReportAvailableDescription = oadrMockHttpVtnMvc
-				.getVtnReportAvailableDescription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, selfReportSpecifierId,
+				.getVtnReportAvailableDescription(OadrDataBaseSetup.ADMIN_SECURITY_SESSION, REPORT_REQUEST_ID,
 						HttpStatus.OK_200);
 		assertEquals(1, vtnReportAvailableDescription.size());
 		Long selfCapDescriptionPrivateId = vtnReportAvailableDescription.get(0).getId();
@@ -940,9 +938,9 @@ public class ReportScenarioTest {
 		assertEquals(1, thirdPoll.getOadrReport().size());
 
 		OadrReportType oadrReportType = thirdPoll.getOadrReport().get(0);
-		assertEquals(selfReportSpecifierId, oadrReportType.getReportSpecifierID());
+		assertEquals(REPORT_REQUEST_ID, oadrReportType.getReportSpecifierID());
 		assertEquals(metadataTelemetryUsage.value(), oadrReportType.getReportName());
-		assertEquals(selfPayloadReportRequestId, oadrReportType.getReportRequestID());
+		assertEquals("0", oadrReportType.getReportRequestID());
 		assertEquals(duration, oadrReportType.getDuration().getDuration());
 		assertEquals(1, oadrReportType.getOadrReportDescription().size());
 		OadrReportDescriptionType description = oadrReportType.getOadrReportDescription().get(0);
@@ -962,7 +960,7 @@ public class ReportScenarioTest {
 		// session
 		OadrCreateReportType build = Oadr20bEiReportBuilders.newOadr20bCreateReportBuilder("", "mouaiccool")
 				.addReportRequest(Oadr20bEiReportBuilders
-						.newOadr20bReportRequestTypeBuilder(reportRequestId, selfReportSpecifierId, "P0D", "P0D")
+						.newOadr20bReportRequestTypeBuilder(reportRequestId, REPORT_REQUEST_ID, "P0D", "P0D")
 						.addSpecifierPayload(Oadr20bFactory.createTemperature(temperature), readingType, rid).build())
 				.build();
 
@@ -973,7 +971,7 @@ public class ReportScenarioTest {
 		// EI REPORT CONTROLLER - send OadrCreateReportType
 		build = Oadr20bEiReportBuilders.newOadr20bCreateReportBuilder("", mockVen.getVenId())
 				.addReportRequest(Oadr20bEiReportBuilders
-						.newOadr20bReportRequestTypeBuilder(reportRequestId, selfReportSpecifierId, "P0D", "P0D")
+						.newOadr20bReportRequestTypeBuilder(reportRequestId, REPORT_REQUEST_ID, "P0D", "P0D")
 						.addSpecifierPayload(Oadr20bFactory.createTemperature(temperature), readingType, rid).build())
 				.build();
 		oadrCreatedReportType = mockVen.report(build, HttpStatus.OK_200, OadrCreatedReportType.class);

@@ -1,6 +1,7 @@
 package com.avob.openadr.server.oadr20b.vtn.controller;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -402,6 +403,10 @@ public class Oadr20bVenController {
 
 		checkVen(venID);
 		checkOtherReportCapability(venID, reportSpecifierId);
+
+		Iterable<OtherReportDataFloat> findAll = otherReportDataService.findAll();
+		List<OtherReportDataFloat> list = new ArrayList<>();
+		findAll.forEach(el -> list.add(el));
 
 		List<OtherReportDataFloat> findByReportSpecifierId = otherReportDataService.findByReportSpecifierId(venID,
 				reportSpecifierId);

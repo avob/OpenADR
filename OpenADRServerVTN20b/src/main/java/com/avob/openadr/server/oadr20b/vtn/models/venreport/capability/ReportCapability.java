@@ -29,8 +29,6 @@ public abstract class ReportCapability {
 
 	private String reportSpecifierId;
 
-	private String reportRequestId;
-
 	private String reportId;
 
 	@Enumerated(EnumType.STRING)
@@ -72,14 +70,6 @@ public abstract class ReportCapability {
 
 	public void setDuration(String duration) {
 		this.duration = duration;
-	}
-
-	public String getReportRequestId() {
-		return reportRequestId;
-	}
-
-	public void setReportRequestId(String reportRequestId) {
-		this.reportRequestId = reportRequestId;
 	}
 
 	public Long getCreatedDatetime() {

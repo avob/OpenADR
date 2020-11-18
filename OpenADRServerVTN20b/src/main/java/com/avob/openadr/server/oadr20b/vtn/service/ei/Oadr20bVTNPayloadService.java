@@ -85,7 +85,6 @@ public class Oadr20bVTNPayloadService {
 		}
 		if (ven.getXmlSignature() != null && ven.getXmlSignature() && !signed) {
 			throw new MarshallException(expectedSignatureError(ven));
-			
 		}
 
 		return new UnmarshalledPayload(unsignedPayload, signed);

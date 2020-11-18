@@ -70,13 +70,10 @@ public class MultiVtnConfig {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MultiVtnConfig.class);
 
 	@Resource
-	private VenConfig venConfig;
-
-	@Resource
 	private XmppVenListener xmppVenListeners;
 
-	@Autowired(required = false)
-	private List<OadrReportType> venRegisterReport;
+	@Resource
+	private VtnSessionFactory vtnSessionFactory;
 
 	@Autowired
 	private Environment env;
@@ -166,7 +163,7 @@ public class MultiVtnConfig {
 			} else {
 				venClient = new OadrXmppVenClient20b(oadrXmppClient20b);
 			}
-			
+
 			String connectionJid = venClient.getBareConnectionJid();
 			session.setVenUrl(connectionJid);
 			putMultiXmppClientConfig(session, venClient);
@@ -211,14 +208,26 @@ public class MultiVtnConfig {
 		for (Entry<String, Properties> entry : loadVtnConf.entrySet()) {
 
 			try {
-				VtnSessionConfiguration session = new VtnSessionConfiguration(entry.getKey(), entry.getValue(),
-						venConfig);
+				VtnSessionConfiguration session = vtnSessionFactory.createVtnSession(entry.getKey(), entry.getValue());
+
 				LOGGER.debug("Valid vtn configuration: " + entry.getKey());
 				LOGGER.info(session.toString());
 				configureClient(session);
 				multiConfig.put(getSessionKey(session.getVtnId(), session.getVenUrl()), session);
 
 				knownVtnId.add(session.getVtnId());
+
+				if (session.getVenRegisterReport() != null) {
+
+					multiConfig.keySet().forEach(vtnId -> {
+						Map<String, OadrReportType> map = new HashMap<>();
+						session.getVenRegisterReport().forEach(report -> {
+							map.put(report.getReportSpecifierID(), report);
+						});
+						reports.put(vtnId, map);
+					});
+
+				}
 
 			} catch (OadrSecurityException e) {
 				LOGGER.error("Dynamic Vtn conf key: " + entry.getKey() + " is not a valid vtn configuration", e);
@@ -229,18 +238,6 @@ public class MultiVtnConfig {
 			}
 		}
 
-		if (venRegisterReport != null) {
-
-			multiConfig.keySet().forEach(vtnId -> {
-				Map<String, OadrReportType> map = new HashMap<>();
-				venRegisterReport.forEach(report -> {
-					map.put(report.getReportSpecifierID(), report);
-				});
-				reports.put(vtnId, map);
-			});
-
-		}
-
 		if (multiConfig.isEmpty()) {
 			throw new IllegalArgumentException("No Vtn configuration has been found");
 		}
@@ -249,11 +246,10 @@ public class MultiVtnConfig {
 
 	public OadrRegisterReportType getVenRegisterReport(VtnSessionConfiguration vtnConfig) {
 		String requestId = UUID.randomUUID().toString();
-		String reportRequestId = UUID.randomUUID().toString();
 		Oadr20bRegisterReportBuilder builder = Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder(requestId,
-				vtnConfig.getVenId(), reportRequestId);
-		if (venRegisterReport != null) {
-			builder.addOadrReport(venRegisterReport);
+				vtnConfig.getVenId());
+		if (vtnConfig.getVenRegisterReport() != null) {
+			builder.addOadrReport(vtnConfig.getVenRegisterReport());
 		}
 		return builder.build();
 	}
@@ -262,8 +258,8 @@ public class MultiVtnConfig {
 			ReportSpecifierType reportSpecifier) throws Oadr20bInvalidReportRequestException {
 
 		String reportSpecifierID = reportSpecifier.getReportSpecifierID();
-		if (reports.get(getSessionKey(vtnConfig.getVtnId(), vtnConfig.getVenUrl())) == null
-				|| !reports.get(getSessionKey(vtnConfig.getVtnId(), vtnConfig.getVenUrl())).containsKey(reportSpecifierID)) {
+		if (reports.get(getSessionKey(vtnConfig.getVtnId(), vtnConfig.getVenUrl())) == null || !reports
+				.get(getSessionKey(vtnConfig.getVtnId(), vtnConfig.getVenUrl())).containsKey(reportSpecifierID)) {
 			throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
 					.newOadr20bResponseBuilder(requestId, Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461,
 							vtnConfig.getVenId())
@@ -273,7 +269,8 @@ public class MultiVtnConfig {
 					.build());
 		}
 
-		OadrReportType report = reports.get(getSessionKey(vtnConfig.getVtnId(), vtnConfig.getVenUrl())).get(reportSpecifierID);
+		OadrReportType report = reports.get(getSessionKey(vtnConfig.getVtnId(), vtnConfig.getVenUrl()))
+				.get(reportSpecifierID);
 		Map<String, OadrReportDescriptionType> reportDescriptions = report.getOadrReportDescription().stream()
 				.collect(Collectors.toMap(desc -> {
 					return getReportDescriptionUID(desc);
@@ -318,7 +315,7 @@ public class MultiVtnConfig {
 			if (oadrSamplingRate != null) {
 				if (oadrSamplingRate.getOadrMinPeriod() != null) {
 					minSamplingRateMillis = Oadr20bFactory
-							.xmlDurationToMillisecond(oadrSamplingRate.getOadrMaxPeriod());
+							.xmlDurationToMillisecond(oadrSamplingRate.getOadrMinPeriod());
 					if (granularityMillis < minSamplingRateMillis) {
 						throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
 								.newOadr20bResponseBuilder(requestId,
@@ -497,12 +494,10 @@ public class MultiVtnConfig {
 	public VtnSessionConfiguration getMultiConfig(String vtnId, String venPushUrl) {
 		return multiConfig.get(getSessionKey(vtnId, venPushUrl));
 	}
-	
+
 	public VtnSessionConfiguration getMultiConfig(String sessionKey) {
 		return multiConfig.get(sessionKey);
 	}
-	
-	
 
 	private String getSessionKey(String vtnId, String venPushUrl) {
 		return new StringBuilder().append(vtnId).append(venPushUrl).toString();

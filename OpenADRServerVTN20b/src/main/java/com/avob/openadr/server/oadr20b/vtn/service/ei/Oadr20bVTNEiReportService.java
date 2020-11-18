@@ -1,7 +1,6 @@
 package com.avob.openadr.server.oadr20b.vtn.service.ei;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -240,7 +239,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 			XMLGregorianCalendar createdDateTime = oadrReportType.getCreatedDateTime();
 			String reportId = oadrReportType.getEiReportID();
 			String reportName = oadrReportType.getReportName();
-			String reportRequestID = oadrReportType.getReportRequestID();
 			String reportSpecifierID = oadrReportType.getReportSpecifierID();
 			if (METADATA_REPORT_SPECIFIER_ID.equals(reportSpecifierID)) {
 				hasMetadataReport = true;
@@ -257,7 +255,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 			otherReportCapability.setReportId(reportId);
 			otherReportCapability.setReportName(ReportNameEnumeratedType.fromValue(reportName));
 			otherReportCapability.setReportSpecifierId(reportSpecifierID);
-			otherReportCapability.setReportRequestId(reportRequestID);
 
 			if (duration != null) {
 				otherReportCapability.setDuration(duration.getDuration());
@@ -586,15 +583,14 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 			OadrReportType oadrReportType = Oadr20bEiReportBuilders
 					.newOadr20bRegisterReportOadrReportBuilder(selfReportCapability.getReportSpecifierId(),
-							selfReportCapability.getReportRequestId(), selfReportCapability.getReportName(),
-							System.currentTimeMillis())
+							selfReportCapability.getReportName(), System.currentTimeMillis())
 					.withDuration(selfReportCapability.getDuration()).addReportDescription(oadrReportDescriptionType)
 					.build();
 			reports.add(oadrReportType);
 		}
 
 		OadrRegisterReportType oadrRegisterReportType = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportBuilder("", null, "").addOadrReport(reports).build();
+				.newOadr20bRegisterReportBuilder("", null).addOadrReport(reports).build();
 
 		try {
 			venDistributeService.distribute(ven, oadrRegisterReportType);
@@ -803,12 +799,12 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		List<OtherReportDataKeyToken> listPayloadKeyToken = Lists.newArrayList();
 		List<OtherReportDataKeyToken> listPayloadKeyTokenToSave = Lists.newArrayList();
 		for (OadrReportType oadrReportType : payload.getOadrReport()) {
-			String reportRequestID = oadrReportType.getReportRequestID();
+			String reportRequestId = oadrReportType.getReportRequestID();
 			String reportSpecifierID = oadrReportType.getReportSpecifierID();
 			Intervals intervals = oadrReportType.getIntervals();
 
 			OtherReportRequest findByReportRequestId = otherReportRequestService.findOneBySourceAndReportRequestId(ven,
-					reportRequestID);
+					reportRequestId);
 
 			List<OtherReportRequestSpecifier> findByRequest = otherReportRequestSpecifierDao
 					.findByRequest(findByReportRequestId);
@@ -848,6 +844,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 							otherReportData.setDuration(durationInterval);
 							otherReportData.setVenId(venID);
 							otherReportData.setReportSpecifierId(reportSpecifierID);
+							otherReportData.setReportRequestId(reportRequestId);
 							otherReportData.setRid(rid);
 							otherReportData.setConfidence(confidence);
 							otherReportData.setAccuracy(accuracy);
@@ -883,6 +880,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 							otherReportData.setDuration(durationInterval);
 							otherReportData.setVenId(venID);
 							otherReportData.setReportSpecifierId(reportSpecifierID);
+							otherReportData.setReportRequestId(reportRequestId);
 							otherReportData.setRid(rid);
 							otherReportData.setConfidence(confidence);
 							otherReportData.setAccuracy(accuracy);
@@ -922,6 +920,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 							otherReportData.setDuration(durationInterval);
 							otherReportData.setVenId(venID);
 							otherReportData.setReportSpecifierId(reportSpecifierID);
+							otherReportData.setReportRequestId(reportRequestId);
 							otherReportData.setRid(rid);
 							otherReportData.setConfidence(confidence);
 							otherReportData.setAccuracy(accuracy);
@@ -1172,14 +1171,13 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 					.findOneBySourceUsernameAndReportSpecifierId(ven.getUsername(),
 							subscription.getReportSpecifierId());
 
-			String reportRequestId = reportCapability.getReportRequestId();
 			OtherReportRequest otherReportRequest = new OtherReportRequest();
 			otherReportRequest.setGranularity(subscription.getGranularity());
 			otherReportRequest.setReportBackDuration(subscription.getReportBackDuration());
 			otherReportRequest.setSource(ven);
 			otherReportRequest.setOtherReportCapability(reportCapability);
-			otherReportRequest.setReportRequestId(reportRequestId);
 			otherReportRequest.setRequestor(requestor);
+			otherReportRequest.setReportRequestId(subscription.getReportRequestId());
 
 			List<OtherReportCapabilityDescription> findByOtherReportCapability = otherReportCapabilityDescriptionService
 					.findByOtherReportCapability(reportCapability);
@@ -1263,11 +1261,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 	public void unsubscribe(Ven ven, String reportRequestID)
 			throws OadrElementNotFoundException, Oadr20bApplicationLayerException {
-
-		Iterable<OtherReportCapability> findByPayloadReportRequestId2 = otherReportCapabilityService
-				.findByReportRequestId(Arrays.asList(reportRequestID));
-
-		otherReportCapabilityService.save(findByPayloadReportRequestId2);
 
 		OtherReportRequest findByReportRequestId = otherReportRequestService.findOneBySourceAndReportRequestId(ven,
 				reportRequestID);

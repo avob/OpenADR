@@ -6,6 +6,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.web.embedded.jetty.JettyServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
@@ -23,8 +24,8 @@ import com.avob.openadr.security.exception.OadrSecurityException;
 @ComponentScan(basePackages = { "com.avob.openadr.server.oadr20b.ven" })
 public class VEN20bApplicationConfig {
 
-	@Resource
-	private VenConfig venConfig;
+	@Value("${oadr.security.validateOadrPayloadAgainstXsdFilePath:#{null}}")
+	private String validateOadrPayloadAgainstXsdFilePath;
 
 	@Resource
 	private MultiVtnConfig multiVtnConfig;
@@ -32,8 +33,8 @@ public class VEN20bApplicationConfig {
 	@Bean
 	@Profile("!test")
 	public Oadr20bJAXBContext jaxbContextProd() throws OadrSecurityException, JAXBException {
-		if (venConfig.getValidateOadrPayloadAgainstXsdFilePath() != null) {
-			return Oadr20bJAXBContext.getInstance(venConfig.getValidateOadrPayloadAgainstXsdFilePath());
+		if (validateOadrPayloadAgainstXsdFilePath != null) {
+			return Oadr20bJAXBContext.getInstance(validateOadrPayloadAgainstXsdFilePath);
 		}
 		return Oadr20bJAXBContext.getInstance();
 	};

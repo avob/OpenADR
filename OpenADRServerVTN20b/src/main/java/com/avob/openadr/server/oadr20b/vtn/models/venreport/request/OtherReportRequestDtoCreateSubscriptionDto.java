@@ -5,6 +5,8 @@ import java.util.Map;
 public class OtherReportRequestDtoCreateSubscriptionDto {
 
 	private String reportSpecifierId;
+	
+	private String reportRequestId;
 
 	private Map<String, Boolean> rid;
 
@@ -42,5 +44,13 @@ public class OtherReportRequestDtoCreateSubscriptionDto {
 
 	public void setReportBackDuration(String reportBackDuration) {
 		this.reportBackDuration = reportBackDuration;
+	}
+
+	public String getReportRequestId() {
+		return reportRequestId;
+	}
+
+	public void setReportRequestId(String reportRequestId) {
+		this.reportRequestId = reportRequestId;
 	}
 }

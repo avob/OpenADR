@@ -640,8 +640,8 @@ public class OadrXMLSignatureHandlerTest {
 	public void testOadrRegisterReportType()
 			throws Oadr20bXMLSignatureException, Oadr20bUnmarshalException, Oadr20bXMLSignatureValidationException {
 
-		OadrRegisterReportType request = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportBuilder(REQUEST_ID, VEN_ID, REPORT_REQUEST_ID).build();
+		OadrRegisterReportType request = Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder(REQUEST_ID, VEN_ID)
+				.build();
 
 		String sign = OadrXMLSignatureHandler.sign(request, privateKey, certificate, NONCE, 0L);
 		validate(sign);
@@ -688,7 +688,7 @@ public class OadrXMLSignatureHandlerTest {
 		long startTimestamp = 12L;
 		String duration = "PT1H";
 		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(REPORT_ID,
-				REPORT_REQUEST_ID, REPORT_SPECIFIER_ID, reportName, createdTimestamp, startTimestamp, duration)
+				REPORT_SPECIFIER_ID, REPORT_REQUEST_ID, reportName, createdTimestamp, startTimestamp, duration)
 				.addInterval(interval).build();
 
 		String requestId = "requestId";
@@ -727,7 +727,7 @@ public class OadrXMLSignatureHandlerTest {
 		long startTimestamp = 12L;
 		String duration = "PT1H";
 		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(REPORT_ID,
-				REPORT_REQUEST_ID, REPORT_SPECIFIER_ID, reportName, createdTimestamp, startTimestamp, duration)
+				REPORT_SPECIFIER_ID, REPORT_REQUEST_ID, reportName, createdTimestamp, startTimestamp, duration)
 				.addInterval(interval).build();
 
 		String requestId = "requestId";
@@ -767,7 +767,7 @@ public class OadrXMLSignatureHandlerTest {
 		long startTimestamp = 12L;
 		String duration = "PT1H";
 		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(REPORT_ID,
-				REPORT_REQUEST_ID, REPORT_SPECIFIER_ID, reportName, createdTimestamp, startTimestamp, duration)
+				REPORT_SPECIFIER_ID, REPORT_REQUEST_ID, reportName, createdTimestamp, startTimestamp, duration)
 				.addInterval(interval).build();
 
 		String requestId = "requestId";
@@ -815,7 +815,7 @@ public class OadrXMLSignatureHandlerTest {
 		long startTimestamp = 12L;
 		String duration = "PT1H";
 		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(REPORT_ID,
-				REPORT_REQUEST_ID, REPORT_SPECIFIER_ID, reportName, createdTimestamp, startTimestamp, duration)
+				REPORT_SPECIFIER_ID, REPORT_REQUEST_ID, reportName, createdTimestamp, startTimestamp, duration)
 				.addInterval(interval).build();
 
 		String requestId = "requestId";

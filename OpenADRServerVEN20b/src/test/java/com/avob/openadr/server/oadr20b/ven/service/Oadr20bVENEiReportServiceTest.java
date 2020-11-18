@@ -72,7 +72,7 @@ public class Oadr20bVENEiReportServiceTest {
 		Long startTimestamp = 0L;
 		String duration = "PT1S";
 		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(reportId,
-				reportrequestId, reportSpecifierId, reportName, createdTimestamp, startTimestamp, duration).build();
+				reportSpecifierId,reportrequestId,  reportName, createdTimestamp, startTimestamp, duration).build();
 		OadrUpdateReportType oadrUpdateReport = Oadr20bEiReportBuilders
 				.newOadr20bUpdateReportBuilder("", multiVtnConfig.getMultiConfig(vtnHttpId, venUrl).getVenId())
 				.addReport(report).addReport(Lists.newArrayList(report)).build();
@@ -99,10 +99,10 @@ public class Oadr20bVENEiReportServiceTest {
 		Long startTimestamp = 0L;
 		String duration = "PT1S";
 		OadrReportType report = Oadr20bEiReportBuilders.newOadr20bUpdateReportOadrReportBuilder(reportId,
-				reportRequestId, reportSpecifierId, reportName, createdTimestamp, startTimestamp, duration).build();
-		OadrRegisterReportType oadrRegisterReport = Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder("",
-				multiVtnConfig.getMultiConfig(vtnHttpId, venUrl).getVenId(), reportRequestId).addOadrReport(report)
-				.build();
+				reportSpecifierId, reportRequestId, reportName, createdTimestamp, startTimestamp, duration).build();
+		OadrRegisterReportType oadrRegisterReport = Oadr20bEiReportBuilders
+				.newOadr20bRegisterReportBuilder("", multiVtnConfig.getMultiConfig(vtnHttpId, venUrl).getVenId())
+				.addOadrReport(report).build();
 
 		String request = oadr20bVENPayloadService.report(vtnHttpId, venUrl,
 				oadr20bJAXBContext.marshalRoot(oadrRegisterReport));

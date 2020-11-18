@@ -1,63 +1,12 @@
 package com.avob.openadr.server.oadr20b.ven;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.UUID;
-import java.util.stream.Stream;
 
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 
-import com.avob.openadr.security.OadrPKISecurity;
-import com.avob.openadr.security.exception.OadrSecurityException;
+import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 
 public class VtnSessionConfiguration {
-
-	private static final String VTN_ID = "oadr.vtn.vtnid";
-	private static final String VTN_ID_FILE = "oadr.vtn.vtnid.file";
-	private static final String VTN_URL = "oadr.vtn.vtnUrl";
-
-	private static final String VTN_XMPP_HOST = "oadr.vtn.xmpp.host";
-	private static final String VTN_XMPP_PORT = "oadr.vtn.xmpp.port";
-	private static final String VTN_XMPP_DOMAIN = "oadr.vtn.xmpp.domain";
-
-	private static final String AUTHENTIFICATION_BASIC_USER = "oadr.vtn.security.authentication.basic.username";
-	private static final String AUTHENTIFICATION_BASIC_PASS = "oadr.vtn.security.authentication.basic.password";
-	private static final String AUTHENTIFICATION_DIGEST_USER = "oadr.vtn.security.authentication.digest.username";
-	private static final String AUTHENTIFICATION_DIGEST_PASS = "oadr.vtn.security.authentication.digest.password";
-	private static final String AUTHENTIFICATION_DIGEST_REALM = "oadr.vtn.security.authentication.digest.realm";
-
-	private static final String AUTHENTIFICATION_XMPP_USER = "oadr.vtn.security.authentication.xmpp.username";
-	private static final String AUTHENTIFICATION_XMPP_PASS = "oadr.vtn.security.authentication.xmpp.password";
-
-	private static final String CONTEXT_PATH = "oadr.vtn.server.context_path";
-	private static final String PORT = "oadr.vtn.server.port";
-	private static final String VEN_ID = "oadr.vtn.venid";
-	private static final String VEN_ID_FILE = "oadr.vtn.venid.file";
-	private static final String VEN_NAME = "oadr.vtn.venName";
-	private static final String VEN_URL = "oadr.vtn.venUrl";
-	private static final String TRUST_CERTIFICATES = "oadr.vtn.security.vtn.trustcertificate";
-	private static final String PRIVATE_KEY = "oadr.vtn.security.ven.key";
-	private static final String CERTIFICATE = "oadr.vtn.security.ven.cert";
-
-	private static final String PULL_FREQUENCY = "oadr.pullFrequencySeconds";
-	private static final String REPORT_ONLY = "oadr.reportOnly";
-	private static final String XML_SIGNATURE = "oadr.xmlSignature";
-	private static final String PULL_MODEL = "oadr.pullModel";
-	private static final String REPLAY_PROTECTION_DELAY = "oadr.security.replayProtectAcceptedDelaySecond";
-	private static final String XSD_VALIDATION = "oadr.security.validateOadrPayloadAgainstXsdFilePath";
 
 	private String sessionId;
 	private String vtnId;
@@ -82,139 +31,12 @@ public class VtnSessionConfiguration {
 	private String digestPassword;
 	private String digestRealm;
 	private Long pullFrequencySeconds;
-
 	private Boolean reportOnly;
-
 	private Boolean xmlSignature;
-
 	private Boolean pullModel;
-
 	private Long replayProtectAcceptedDelaySecond;
-
-	private Boolean validateOadrPayloadAgainstXsdFilePath;
-
 	private SSLContext sslContext;
-
-	public VtnSessionConfiguration(String sessionId, Properties properties, VenConfig defaultVenSessionConfig) {
-		this.sessionId = sessionId;
-
-		this.setReportOnly(defaultVenSessionConfig.getReportOnly());
-		this.setXmlSignature(defaultVenSessionConfig.getXmlSignature());
-		this.setPullModel(defaultVenSessionConfig.getPullModel());
-		this.setReplayProtectAcceptedDelaySecond(defaultVenSessionConfig.getReplayProtectAcceptedDelaySecond());
-		this.setValidateOadrPayloadAgainstXsdFilePath(
-				Boolean.valueOf(defaultVenSessionConfig.getValidateOadrPayloadAgainstXsdFilePath()));
-		this.setPullFrequencySeconds(defaultVenSessionConfig.getPullFrequencySeconds());
-		
-		for (Map.Entry<Object, Object> e : properties.entrySet()) {
-			String keyStr = (String) e.getKey();
-			String prop = (String) e.getValue();
-			if (VTN_ID.equals(keyStr)) {
-				this.setVtnId(prop);
-			} else if (VTN_ID_FILE.equals(keyStr)) {
-				this.setVtnId(getIdFromFile(prop));
-			} else if (VTN_URL.equals(keyStr)) {
-				this.setVtnUrl(prop);
-			} else if (VTN_XMPP_HOST.equals(keyStr)) {
-				this.setVtnXmppHost(prop);
-			} else if (VTN_XMPP_PORT.equals(keyStr)) {
-				this.setVtnXmppPort(Integer.parseInt(prop));
-			} else if (VTN_XMPP_DOMAIN.equals(keyStr)) {
-				this.setVtnXmppDomain(prop);
-			} else if (AUTHENTIFICATION_BASIC_USER.equals(keyStr)) {
-				this.setBasicUsername(prop);
-			} else if (AUTHENTIFICATION_BASIC_PASS.equals(keyStr)) {
-				this.setBasicPassword(prop);
-			} else if (AUTHENTIFICATION_DIGEST_USER.equals(keyStr)) {
-				this.setDigestUsername(prop);
-			} else if (AUTHENTIFICATION_DIGEST_PASS.equals(keyStr)) {
-				this.setDigestPassword(prop);
-			} else if (AUTHENTIFICATION_DIGEST_REALM.equals(keyStr)) {
-				this.setDigestRealm(prop);
-			} else if (AUTHENTIFICATION_XMPP_USER.equals(keyStr)) {
-				this.setVtnXmppUser(prop);
-			} else if (AUTHENTIFICATION_XMPP_PASS.equals(keyStr)) {
-				this.setVtnXmppPass(prop);
-			}
-
-			else if (CONTEXT_PATH.equals(keyStr)) {
-				this.setContextPath(prop);
-			} else if (PORT.equals(keyStr)) {
-				this.setPort(Integer.valueOf(prop));
-			} else if (VEN_ID.equals(keyStr)) {
-				this.setVenId(prop);
-			} else if (VEN_ID_FILE.equals(keyStr)) {
-				this.setVenId(getIdFromFile(prop));
-			} else if (VEN_NAME.equals(keyStr)) {
-				this.setVenName(prop);
-			} else if (VEN_URL.equals(keyStr)) {
-				this.setVenUrl(prop);
-			} else if (TRUST_CERTIFICATES.equals(keyStr)) {
-				this.setTrustCertificates(Arrays.asList(prop.split(",")));
-			} else if (PRIVATE_KEY.equals(keyStr)) {
-				this.setVenPrivateKeyPath(prop);
-			} else if (CERTIFICATE.equals(keyStr)) {
-				this.setVenCertificatePath(prop);
-			}
-
-			else if (PULL_FREQUENCY.equals(keyStr)) {
-				this.setPullFrequencySeconds(Long.valueOf(prop));
-			} else if (REPORT_ONLY.equals(keyStr)) {
-				this.setReportOnly(Boolean.valueOf(prop));
-			} else if (XML_SIGNATURE.equals(keyStr)) {
-				this.setXmlSignature(Boolean.valueOf(prop));
-			} else if (PULL_MODEL.equals(keyStr)) {
-				this.setPullModel(Boolean.valueOf(prop));
-			} else if (REPLAY_PROTECTION_DELAY.equals(keyStr)) {
-				this.setReplayProtectAcceptedDelaySecond(Long.valueOf(prop));
-			} else if (XSD_VALIDATION.equals(keyStr)) {
-				this.setValidateOadrPayloadAgainstXsdFilePath(Boolean.valueOf(prop));
-			}
-		}
-
-		String password = UUID.randomUUID().toString();
-		TrustManagerFactory trustManagerFactory;
-		try {
-			trustManagerFactory = OadrPKISecurity.createTrustManagerFactory(this.getTrustCertificates());
-			KeyManagerFactory keyManagerFactory = OadrPKISecurity.createKeyManagerFactory(this.getVenPrivateKeyPath(),
-					this.getVenCertificatePath(), password);
-
-			// SSL Context Factory
-			sslContext = SSLContext.getInstance("TLS");
-
-			// init ssl context
-			String seed = UUID.randomUUID().toString();
-			sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(),
-					new SecureRandom(seed.getBytes()));
-		} catch (OadrSecurityException | NoSuchAlgorithmException | KeyManagementException e) {
-			throw new IllegalStateException(e);
-		}
-
-	}
-
-	private String getIdFromFile(String filePath) {
-		// set vtnId by reading vtnIdFile path first line
-		Path path = Paths.get(filePath);
-		File file = path.toFile();
-		if (!file.exists()) {
-			throw new IllegalArgumentException(
-					"oadr.vtnid.file must be a valid file path containing venId as it's first line");
-		}
-		try (Stream<String> lines = Files.lines(path);) {
-			Optional<String> findFirst = lines.findFirst();
-			if (!findFirst.isPresent()) {
-				throw new IllegalArgumentException(
-						"oadr.vtnid.file must be a valid file path containing venId as it's first line");
-
-			}
-			return findFirst.get().trim();
-
-		} catch (IOException exp) {
-			throw new IllegalArgumentException(
-					"oadr.vtnid.file must be a valid file path containing venId as it's first line", exp);
-
-		}
-	}
+	private List<OadrReportType> venRegisterReport;
 
 	public String getContextPath() {
 		return contextPath;
@@ -403,7 +225,7 @@ public class VtnSessionConfiguration {
 	public String getSessionId() {
 		return sessionId;
 	}
-	
+
 	public String getSessionKey() {
 		return vtnId + venUrl;
 	}
@@ -448,12 +270,16 @@ public class VtnSessionConfiguration {
 		this.replayProtectAcceptedDelaySecond = replayProtectAcceptedDelaySecond;
 	}
 
-	public Boolean getValidateOadrPayloadAgainstXsdFilePath() {
-		return validateOadrPayloadAgainstXsdFilePath;
+	public List<OadrReportType> getVenRegisterReport() {
+		return venRegisterReport;
 	}
 
-	public void setValidateOadrPayloadAgainstXsdFilePath(Boolean validateOadrPayloadAgainstXsdFilePath) {
-		this.validateOadrPayloadAgainstXsdFilePath = validateOadrPayloadAgainstXsdFilePath;
+	public void setVenRegisterReport(List<OadrReportType> venRegisterReport) {
+		this.venRegisterReport = venRegisterReport;
+	}
+
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
 	}
 
 }

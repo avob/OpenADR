@@ -46,7 +46,7 @@ public class Oadr20bUpdateReportTest {
 		Long startTimestamp = 0L;
 		String duration = "PT1H";
 		OadrReportType reportType = Oadr20bEiReportBuilders
-				.newOadr20bUpdateReportOadrReportBuilder(reportId, reportrequestId, reportSpecifierId, reportName,
+				.newOadr20bUpdateReportOadrReportBuilder(reportId, reportSpecifierId, reportrequestId, reportName,
 						createdTimestamp, startTimestamp, duration)
 				.addInterval(Oadr20bEiBuilders
 						.newOadr20bReportIntervalTypeBuilder("intervalId", 0L, "PT1H", "rid", 0L, 0F, 0F).build())
@@ -93,8 +93,9 @@ public class Oadr20bUpdateReportTest {
 	public void testValidOadrPayloadResourceStatusType() throws Oadr20bMarshalException {
 		String venId = "venId";
 		String requestId = "requestId";
-		String reportRequestId = "0";
 		String reportSpecifierId = "reportSpecifierId";
+		String reportId = "reportId";
+		String reportRequestId = "reportRequestId";
 		String rid = "rid";
 		ReportNameEnumeratedType reportName = ReportNameEnumeratedType.METADATA_TELEMETRY_USAGE;
 		long createdTimestamp = System.currentTimeMillis();
@@ -116,8 +117,8 @@ public class Oadr20bUpdateReportTest {
 				.createOadrPayloadResourceStatusType(createOadrLoadControlStateType, manualOverride, online);
 
 		OadrReportType reportUpdate = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportOadrReportBuilder(reportSpecifierId, reportRequestId, reportName,
-						createdTimestamp)
+				.newOadr20bUpdateReportOadrReportBuilder(reportId, reportSpecifierId, reportRequestId, reportName,
+						createdTimestamp, start, xmlDuration)
 				.addInterval(Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration, rid,
 						confidence, accuracy, createOadrPayloadResourceStatusType).build())
 				.build();
@@ -130,8 +131,9 @@ public class Oadr20bUpdateReportTest {
 	public void testValidPayloadFloat() throws Oadr20bMarshalException {
 		String venId = "venId";
 		String requestId = "requestId";
-		String reportRequestId = "0";
 		String reportSpecifierId = "reportSpecifierId";
+		String reportId = "reportId";
+		String reportRequestId = "reportRequestId";
 		String rid = "rid";
 		ReportNameEnumeratedType reportName = ReportNameEnumeratedType.METADATA_TELEMETRY_USAGE;
 		long createdTimestamp = System.currentTimeMillis();
@@ -143,8 +145,8 @@ public class Oadr20bUpdateReportTest {
 		Float value = 3f;
 
 		OadrReportType reportUpdate = Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportOadrReportBuilder(reportSpecifierId, reportRequestId, reportName,
-						createdTimestamp)
+				.newOadr20bUpdateReportOadrReportBuilder(reportId, reportSpecifierId, reportRequestId, reportName,
+						createdTimestamp, start, xmlDuration)
 				.addInterval(Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, start, xmlDuration, rid,
 						confidence, accuracy, value).build())
 				.build();

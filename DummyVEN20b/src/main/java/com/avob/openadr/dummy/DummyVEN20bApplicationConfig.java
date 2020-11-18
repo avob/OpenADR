@@ -23,8 +23,6 @@ public class DummyVEN20bApplicationConfig {
 	@Bean
 	public List<OadrReportType> venRegisterReport() {
 
-//		String requestId = UUID.randomUUID().toString();
-		String reportRequestId = UUID.randomUUID().toString();
 		String reportSpecifiedId = "reportSpecifiedId";
 		String rid = "real_energy";
 		String endDeviseAssetMrid = "Smart_Energy_Module";
@@ -40,7 +38,7 @@ public class DummyVEN20bApplicationConfig {
 		boolean onChange = false;
 
 		return Arrays.asList(Oadr20bEiReportBuilders
-				.newOadr20bRegisterReportOadrReportBuilder(reportSpecifiedId, reportRequestId,
+				.newOadr20bRegisterReportOadrReportBuilder(reportSpecifiedId,
 						ReportNameEnumeratedType.METADATA_TELEMETRY_USAGE, System.currentTimeMillis())
 				.addReportDescription(Oadr20bEiReportBuilders
 						.newOadr20bOadrReportDescriptionBuilder(rid, ReportEnumeratedType.USAGE,

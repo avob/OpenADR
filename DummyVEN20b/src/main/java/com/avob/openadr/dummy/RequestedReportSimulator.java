@@ -223,7 +223,7 @@ public class RequestedReportSimulator {
 			simulateReadingBuffer.get(sessionKey).get(reportRequestId).forEach((reportSpecifierId, ridMap) -> {
 
 				Oadr20bUpdateReportOadrReportBuilder newOadr20bUpdateReportOadrReportBuilder = Oadr20bEiReportBuilders
-						.newOadr20bUpdateReportOadrReportBuilder(reportId, reportRequestId, reportSpecifierId,
+						.newOadr20bUpdateReportOadrReportBuilder(reportId, reportSpecifierId, reportRequestId,
 								reportName, createdTimestamp, startTimestamp, duration);
 
 				ridMap.forEach((rid, intervals) -> {
