@@ -36,7 +36,6 @@ import com.avob.openadr.server.common.vtn.exception.GenerateX509VenException;
 import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTarget;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventTargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
@@ -74,10 +73,9 @@ public class VenController {
 
 	@Resource
 	private VenMarketContextService venMarketContextService;
-	
+
 	@Resource
 	private DemandResponseEventService demandResponseEventService;
-
 
 	@Resource
 	private DtoMapper dtoMapper;
@@ -111,8 +109,7 @@ public class VenController {
 					.contentType(MediaType.parseMediaType("application/octet-stream")).body(null);
 		}
 		Ven prepare = venService.prepare(dto);
-		
-		
+
 		ResponseEntity<InputStreamResource> body = null;
 		try {
 			Optional<File> generateCertificateIfRequired = venService.generateCertificateIfRequired(dto, prepare);
@@ -129,60 +126,56 @@ public class VenController {
 				body = ResponseEntity.status(HttpStatus.CREATED_201).header("x-venID", prepare.getUsername())
 						.body(null);
 			}
-			
-			
-			if(dto.getMarketContexts() != null) {
+
+			if (dto.getMarketContexts() != null) {
 				List<VenMarketContext> findByNameIn = venMarketContextService.findByNameIn(dto.getMarketContexts());
-				
-				if(dto.getMarketContexts().size() != findByNameIn.size()) {
-					List<String> collect = findByNameIn.stream().map(VenMarketContext::getName).collect(Collectors.toList());
+
+				if (dto.getMarketContexts().size() != findByNameIn.size()) {
+					List<String> collect = findByNameIn.stream().map(VenMarketContext::getName)
+							.collect(Collectors.toList());
 					List<String> missing = new ArrayList<>(dto.getMarketContexts());
 					missing.removeAll(collect);
-					
-					throw new OadrElementNotFoundException("Unknown market contexts: "+ String.join(",", missing));
-					
-					
+
+					throw new OadrElementNotFoundException("Unknown market contexts: " + String.join(",", missing));
+
 				}
-				
+
 				prepare.setVenMarketContexts(new HashSet<VenMarketContext>(findByNameIn));
 			}
-			
-			if(dto.getGroups() != null) {
+
+			if (dto.getGroups() != null) {
 				List<VenGroup> findByNameIn = venGroupService.findByNameIn(dto.getGroups());
-				
-				if(dto.getGroups().size() != findByNameIn.size()) {
+
+				if (dto.getGroups().size() != findByNameIn.size()) {
 					List<String> collect = findByNameIn.stream().map(VenGroup::getName).collect(Collectors.toList());
 					List<String> missing = new ArrayList<>(dto.getGroups());
 					missing.removeAll(collect);
-					
-					throw new OadrElementNotFoundException("Unknown groups: "+ String.join(",", missing));
-					
-					
+
+					throw new OadrElementNotFoundException("Unknown groups: " + String.join(",", missing));
+
 				}
-				
+
 				prepare.setVenGroup(new HashSet<VenGroup>(findByNameIn));
 			}
-			
-			if(dto.getResources() != null) {
+
+			if (dto.getResources() != null) {
 				List<VenResource> findByNameIn = venResourceService.findByNameIn(dto.getResources());
-				
-				if(dto.getResources().size() != findByNameIn.size()) {
+
+				if (dto.getResources().size() != findByNameIn.size()) {
 					List<String> collect = findByNameIn.stream().map(VenResource::getName).collect(Collectors.toList());
 					List<String> missing = new ArrayList<>(dto.getGroups());
 					missing.removeAll(collect);
-					
-					throw new OadrElementNotFoundException("Unknown resources: "+ String.join(",", missing));
-					
-					
+
+					throw new OadrElementNotFoundException("Unknown resources: " + String.join(",", missing));
+
 				}
-				
+
 				prepare.setVenResources(new HashSet<VenResource>(findByNameIn));
 			}
-			
-			
+
 			Ven ven = venService.save(prepare);
 			LOGGER.info("Create Ven: " + prepare.getUsername());
-			
+
 			List<DemandResponseEventFilter> filters = new ArrayList<>();
 			OffsetDateTime now = OffsetDateTime.now();
 			Long start = now.toEpochSecond() * 1000;
@@ -190,46 +183,50 @@ public class VenController {
 			int page = 0;
 			do {
 				search = demandResponseEventService.search(filters, start, null);
-				for(DemandResponseEvent event: search.getContent()) {
+				for (DemandResponseEvent event : search.getContent()) {
 					boolean targeted = false;
-					for(DemandResponseEventTarget target : event.getTargets()) {
-						if(DemandResponseEventTargetTypeEnum.VEN.equals(target.getTargetType())) {
-							
-							if( ven.getUsername().equals(target.getTargetId())) {
-								targeted = true;
-							}
-							
-						} else if(DemandResponseEventTargetTypeEnum.GROUP.equals(target.getTargetType())) {
-							
-							
+					for (DemandResponseEventTarget target : event.getTargets()) {
+
+						switch (target.getTargetType()) {
+						case GROUP:
 							Set<VenGroup> venGroups = prepare.getVenGroups();
-							if(venGroups != null) {
-								for(VenGroup group : venGroups) {
-									if(group.getName().equals(target.getTargetId())) {
+							if (venGroups != null) {
+								for (VenGroup group : venGroups) {
+									if (group.getName().equals(target.getTargetId())) {
 										targeted = true;
 									}
 								}
 							}
-							
-							
-						} else if(DemandResponseEventTargetTypeEnum.MARKET_CONTEXT.equals(target.getTargetType())) {
-							Set<VenMarketContext> venMarketContext =  prepare.getVenMarketContexts();
-							if(venMarketContext != null) {
-								for(VenMarketContext marketContext : venMarketContext) {
-									if(marketContext.getName().equals(target.getTargetId())) {
-										targeted = true;
-									}
+							break;
+						case VEN:
+							if (ven.getUsername().equals(target.getTargetId())) {
+								targeted = true;
+							}
+							break;
+						default:
+							break;
+
+						}
+
+					}
+					if (event.getDescriptor().getMarketContext() != null) {
+						Set<VenMarketContext> venMarketContext = prepare.getVenMarketContexts();
+						if (venMarketContext != null) {
+							for (VenMarketContext marketContext : venMarketContext) {
+								if (marketContext.getName()
+										.equals(event.getDescriptor().getMarketContext().getName())) {
+									targeted = true;
 								}
 							}
 						}
 					}
-					if(targeted) {
+					if (targeted) {
 						venService.addVenDemandResponseEvent(ven, event);
 					}
 				}
-				
+
 				page++;
-			} while(page < search.getTotalPages());
+			} while (page < search.getTotalPages());
 
 		} catch (GenerateX509VenException | OadrElementNotFoundException e) {
 			LOGGER.warn("Invalid ven create dto", e);
@@ -237,11 +234,7 @@ public class VenController {
 		} catch (FileNotFoundException e) {
 			LOGGER.error("", e);
 			response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
-		} 
-
-		
-		
-		
+		}
 
 		return body;
 	}

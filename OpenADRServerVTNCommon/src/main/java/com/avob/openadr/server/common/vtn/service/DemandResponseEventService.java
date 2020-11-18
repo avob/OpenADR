@@ -114,14 +114,7 @@ public class DemandResponseEventService {
 						targetedSpecification = targetedSpecification
 								.or(VenSpecification.hasGroup(target.getTargetId()));
 					}
-				} else if (DemandResponseEventTargetTypeEnum.MARKET_CONTEXT.equals(target.getTargetType())) {
-					if (targetedSpecification == null) {
-						targetedSpecification = VenSpecification.hasMarketContext(target.getTargetId());
-					} else {
-						targetedSpecification = targetedSpecification
-								.or(VenSpecification.hasMarketContext(target.getTargetId()));
-					}
-				}
+				} 
 			}
 
 		}

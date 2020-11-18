@@ -179,9 +179,7 @@ public class DummyEventManager {
 		event.addSignalsItem(signalsItem );
 
 
-		DemandResponseEventTargetDto targetsItem = new DemandResponseEventTargetDto()
-				.targetType(TargetTypeEnum.MARKET_CONTEXT)
-				.targetId(DummyVTN20bControllerConfig.MARKET_CONTEXT);
+		DemandResponseEventTargetDto targetsItem = new DemandResponseEventTargetDto();
 		event.addTargetsItem(targetsItem );
 
 		return event;

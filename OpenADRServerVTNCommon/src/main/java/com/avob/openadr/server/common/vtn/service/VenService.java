@@ -223,16 +223,21 @@ public class VenService extends AbstractUserService<Ven> {
 				}
 				
 				
-			} else if(DemandResponseEventTargetTypeEnum.MARKET_CONTEXT.equals(target.getTargetType())) {
+			} 
+			
+			if(event.getDescriptor().getMarketContext() != null) {
+
+				
 				Set<VenMarketContext> venMarketContext =  ven.getVenMarketContexts();
 				if(venMarketContext != null) {
 					for(VenMarketContext marketContext : venMarketContext) {
-						if(marketContext.getName().equals(target.getTargetId())) {
+						if(marketContext.getName().equals(event.getDescriptor().getMarketContext().getName())) {
 							targeted = true;
 						}
 					}
 				}
 			}
+			
 		}
 
 		return targeted;

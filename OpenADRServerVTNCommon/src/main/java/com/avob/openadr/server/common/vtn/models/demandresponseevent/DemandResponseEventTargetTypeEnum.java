@@ -2,7 +2,7 @@ package com.avob.openadr.server.common.vtn.models.demandresponseevent;
 
 public enum DemandResponseEventTargetTypeEnum {
 	
-	VEN("ven"), GROUP("group"), MARKET_CONTEXT("market_context");
+	VEN("ven"), GROUP("group");
 	
 	private String label;
 	
