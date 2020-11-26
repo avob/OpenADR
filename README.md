@@ -99,7 +99,7 @@ The VTN controller is notified by VTN using AMQP when VTN receive payload from V
 
 </details>
 
-![](demo_component_diagram.svg)
+![](demo_component_diagram.png)
 
 ### Sequence diagram
 
@@ -146,7 +146,7 @@ The VTN controller is notified by VTN using AMQP when VTN receive payload from V
 	```
 </details>
 
-![](demo_sequence_diagram.svg)
+![](demo_sequence_diagram.png)
 
 
 ## Test / build project

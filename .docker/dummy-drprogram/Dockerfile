@@ -1,17 +1,18 @@
 FROM openjdk:11.0.9-jre-slim
 
-RUN mkdir /opt/oadr-vtn20b-controller
-RUN mkdir /var/log/oadr-vtn20b-controller
-RUN mkdir /var/run/oadr-vtn20b-controller
+RUN mkdir /opt/dummy-drprogram
+RUN mkdir /var/log/dummy-drprogram
+RUN mkdir /var/run/dummy-drprogram
 
-COPY --from=openadr_build:latest /opt/oadr/cert /opt/oadr-vtn20b-controller/cert
-COPY --from=openadr_build:latest /opt/oadr/dummy-vtn20b-controller/*.jar /opt/oadr-vtn20b-controller/
+COPY --from=openadr_build:latest /opt/oadr/cert /opt/dummy-drprogram/cert
+COPY --from=openadr_build:latest /opt/oadr/dummy-drprogram/*.jar /opt/dummy-drprogram/
 
-COPY application.properties /opt/oadr-vtn20b-controller/application.properties
-RUN mv /opt/oadr-vtn20b-controller/*.jar /opt/oadr-vtn20b-controller/oadr-vtn20b-controller.jar
+COPY application.properties /opt/dummy-drprogram/application.properties
+COPY simple.DemandResponseEventCreateDto.json /opt/dummy-drprogram/simple.DemandResponseEventCreateDto.json
+RUN mv /opt/dummy-drprogram/*.jar /opt/dummy-drprogram/dummy-drprogram.jar
 
-COPY wait-for-it.sh /opt/oadr-vtn20b-controller/wait-for-it.sh
-RUN chmod +x /opt/oadr-vtn20b-controller/wait-for-it.sh
+COPY wait-for-it.sh /opt/dummy-drprogram/wait-for-it.sh
+RUN chmod +x /opt/dummy-drprogram/wait-for-it.sh
 
-CMD ["/opt/oadr-vtn20b-controller/wait-for-it.sh", "vtn.oadr.com:8081", "-t", "45", "--" \
-	, "java", "-jar", "/opt/oadr-vtn20b-controller/oadr-vtn20b-controller.jar", "--spring.config.location=/opt/oadr-vtn20b-controller/application.properties"]
+CMD ["/opt/dummy-drprogram/wait-for-it.sh", "vtn.oadr.com:8081", "-t", "60", "--" \
+	, "java", "-jar", "/opt/dummy-drprogram/dummy-drprogram.jar", "--spring.config.location=/opt/dummy-drprogram/application.properties"]

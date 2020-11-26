@@ -201,7 +201,7 @@
 		<module>./OpenADRServerVEN20b</module>
 		<module>./OpenADRServerVTN20b</module>
 		<module>./DummyVEN20b</module>
-		<module>./DummyVTN20bController</module>
+		<module>./DummyDRProgram</module>
 
 	</modules>
 

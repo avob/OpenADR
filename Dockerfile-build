@@ -4,7 +4,7 @@ RUN mkdir /opt/oadr
 RUN mkdir /opt/oadr/lib
 RUN mkdir /opt/oadr/vtn20b
 RUN mkdir /opt/oadr/dummy-ven20b
-RUN mkdir /opt/oadr/dummy-vtn20b-controller
+RUN mkdir /opt/oadr/dummy-drprogram
 RUN mkdir /usr/src/openadr
 
 COPY cert /opt/oadr/cert
@@ -20,7 +20,7 @@ RUN if [ ! -f /usr/src/openadr/OpenADRServerVTN20b/target/OpenADRServerVTN20b-0.
 
 RUN mv /usr/src/openadr/OpenADRServerVTN20b/target/*.jar /opt/oadr/vtn20b/;
 RUN mv /usr/src/openadr/DummyVEN20b/target/*.jar /opt/oadr/dummy-ven20b/;
-RUN mv /usr/src/openadr/DummyVTN20bController/target/*.jar /opt/oadr/dummy-vtn20b-controller/;
+RUN mv /usr/src/openadr/DummyDRProgram/target/*.jar /opt/oadr/dummy-drprogram/;
 
 RUN rm -rf /usr/src/openadr
 

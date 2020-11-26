@@ -15,4 +15,10 @@ COPY log4j2.xml /opt/oadr-vtn20b/log4j2.xml
 COPY oadr-vtn20b.conf /opt/oadr-vtn20b/oadr-vtn20b.conf
 RUN mv /opt/oadr-vtn20b/*.jar /opt/oadr-vtn20b/oadr-vtn20b.jar
 
+COPY wait-for-it.sh /opt/oadr-vtn20b/wait-for-it.sh
+RUN chmod +x /opt/oadr-vtn20b/wait-for-it.sh
+
+CMD ["/opt/oadr-vtn20b/wait-for-it.sh", "rabbitmq:5672", "-t", "60", "--" \
+	, "java", "-jar", "/opt/oadr-ven20b/oadr-ven20b.jar", "--spring.config.location=/opt/oadr-ven20b/application.properties"]
+
 CMD ["/opt/oadr-vtn20b/oadr-vtn20b.jar"]
