@@ -1,5 +1,7 @@
 package com.avob.openadr.dummy;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -18,23 +20,13 @@ import com.avob.server.oadrvtn20b.api.DemandResponseControllerApi;
 import com.avob.server.oadrvtn20b.api.MarketContextControllerApi;
 import com.avob.server.oadrvtn20b.handler.ApiException;
 import com.avob.server.oadrvtn20b.handler.ApiResponse;
-import com.avob.server.oadrvtn20b.model.DemandResponseEventActivePeriodDto;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventCreateDto;
-import com.avob.server.oadrvtn20b.model.DemandResponseEventDescriptorDto;
-import com.avob.server.oadrvtn20b.model.DemandResponseEventDescriptorDto.OadrProfileEnum;
-import com.avob.server.oadrvtn20b.model.DemandResponseEventDescriptorDto.ResponseRequiredEnum;
-import com.avob.server.oadrvtn20b.model.DemandResponseEventDescriptorDto.StateEnum;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventFilter;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventFilter.TypeEnum;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventReadDto;
-import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalDto;
-import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalDto.SignalNameEnum;
-import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalDto.SignalTypeEnum;
-import com.avob.server.oadrvtn20b.model.DemandResponseEventSignalIntervalDto;
-import com.avob.server.oadrvtn20b.model.TargetDto;
-import com.avob.server.oadrvtn20b.model.TargetDto.TargetTypeEnum;
 import com.avob.server.oadrvtn20b.model.VenMarketContextDto;
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 
 @Service
 public class DummyEventManager {
@@ -48,6 +40,11 @@ public class DummyEventManager {
 
 	@Resource
 	private DemandResponseControllerApi demandResponseControllerApi;
+
+	@Resource
+	private DummyVTN20bControllerConfig dummyVTN20bControllerConfig;
+
+	private List<DemandResponseEventCreateDto> eventTemplate = new ArrayList<>();;
 
 	@PostConstruct
 	public void init() {
@@ -83,6 +80,21 @@ public class DummyEventManager {
 		if (marketcontextId == null) {
 			LOGGER.error("Ven market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT + " can't be provisioned");
 			return;
+		}
+
+		Gson gson = new Gson();
+
+		for (String filePath : dummyVTN20bControllerConfig.getEventTemplate()) {
+			JsonReader reader;
+			try {
+				reader = new JsonReader(new FileReader(filePath));
+				DemandResponseEventCreateDto fromJson = gson.fromJson(reader, DemandResponseEventCreateDto.class);
+				eventTemplate.add(fromJson);
+			} catch (FileNotFoundException e) {
+				LOGGER.error("Event template: " + filePath + " cannot be parsed", e);
+				return;
+			}
+
 		}
 
 		List<DemandResponseEventReadDto> events = new ArrayList<>();
@@ -131,61 +143,32 @@ public class DummyEventManager {
 
 		for (int i = 0; i < 5 * 6 * 2; i++) {
 			if (!existingStart.contains(temp.toEpochSecond() * 1000)) {
-				DemandResponseEventCreateDto createEvent = this.createEvent(temp.toEpochSecond() * 1000);
-				try {
-					DemandResponseEventReadDto createUsingPOST = demandResponseControllerApi
-							.createUsingPOST(createEvent);
+				List<DemandResponseEventCreateDto> events = this.createEvent(temp.toEpochSecond() * 1000);
+				for (DemandResponseEventCreateDto createEvent : events) {
+					try {
+						DemandResponseEventReadDto createUsingPOST = demandResponseControllerApi
+								.createUsingPOST(createEvent);
 
-					demandResponseControllerApi.publishUsingPOST(createUsingPOST.getId());
+						demandResponseControllerApi.publishUsingPOST(createUsingPOST.getId());
 
-				} catch (ApiException e) {
-					LOGGER.error("Event can't be created", e);
+					} catch (ApiException e) {
+						LOGGER.error("Event can't be created", e);
+					}
 				}
-				;
+
 			}
 			temp = temp.plusMinutes(2);
 		}
 
 	}
 
-	private DemandResponseEventCreateDto createEvent(Long start) {
-		DemandResponseEventCreateDto event = new DemandResponseEventCreateDto();
-
-		String duration = "PT2M";
-		String notificationDuration = "P1D";
-		String toleranceDuration = "PT5M";
-		DemandResponseEventActivePeriodDto activePeriod = new DemandResponseEventActivePeriodDto().start(start)
-				.notificationDuration(notificationDuration).toleranceDuration(toleranceDuration).duration(duration);
-
-		event.activePeriod(activePeriod);
-
-		DemandResponseEventDescriptorDto descriptor = new DemandResponseEventDescriptorDto().state(StateEnum.ACTIVE)
-				.marketContext(DummyVTN20bControllerConfig.MARKET_CONTEXT).oadrProfile(OadrProfileEnum.OADR20B)
-				.responseRequired(ResponseRequiredEnum.ALWAYS);
-		event.descriptor(descriptor);
-
-		TargetDto target = new TargetDto();
-		target.setTargetType(TargetTypeEnum.ENDDEVICE_ASSET);
-		String endDeviceMrid = "Smart_Energy_Module";
-		target.setTargetId(endDeviceMrid);
-		DemandResponseEventSignalDto signalsItem = new DemandResponseEventSignalDto().signalName(SignalNameEnum.SIMPLE)
-				.signalType(SignalTypeEnum.LEVEL).addTargetsItem(target);
-
-		String intervalDuration = "PT1M";
-		for (int i = 0; i < 2; i++) {
-			Float value = Float.valueOf(i);
-			DemandResponseEventSignalIntervalDto intervalsItem = new DemandResponseEventSignalIntervalDto()
-					.duration(intervalDuration).value(value);
-			signalsItem.addIntervalsItem(intervalsItem);
-		}
-		event.addSignalsItem(signalsItem);
-
-		
-		event.setTargets(new ArrayList<>());
-
-		Gson gson = new Gson();
-		LOGGER.info(gson.toJson(event));
-		return event;
+	private List<DemandResponseEventCreateDto> createEvent(Long start) {
+		List<DemandResponseEventCreateDto> events = new ArrayList<>();
+		eventTemplate.forEach(template -> {
+			template.getActivePeriod().setStart(start);
+			events.add(template);
+		});
+		return events;
 	}
 
 }

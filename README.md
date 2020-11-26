@@ -59,8 +59,6 @@ The VTN controller is notified by VTN using AMQP when VTN receive payload from V
 - VTN Control UI: https://vtn.oadr.com:8181/testvtn/
 - VTN RabbitMQ Management UI: http://localhost:15672
 - VTN Openfire Management UI: http://localhost:9090
-- Nodered Terminal: http://localhost:1880 
-- Ven1 Nodered Dashboard: http://localhost:1880/ui/#!/0
 
 ### Components diagram
 
@@ -81,7 +79,7 @@ The VTN controller is notified by VTN using AMQP when VTN receive payload from V
 	}
 
 	package "DemandResponseProgram" {
-	    rectangle "dummy-vtn20b-controller" as dummyVtnController #FFF
+	    rectangle "dummy-drprogram" as dummyDRProgram #FFF
 	}
 
 
@@ -93,8 +91,8 @@ The VTN controller is notified by VTN using AMQP when VTN receive payload from V
 	openfire -> postgres #black;line.dotted;text:black
 	vtn -> postgres #black;line.dotted;text:black
 	rabbitmq -down-> vtn #green;line.bold;text:green : AUTH(HTTP)
-	dummyVtnController -up-> vtn #green;line.bold;text:green : DATA(HTTP)
-	dummyVtnController <-- rabbitmq #blue;line.bold;text:blue   : DATA(AMQP)
+	dummyDRProgram -up-> vtn #green;line.bold;text:green : DATA(HTTP)
+	dummyDRProgram <-- rabbitmq #blue;line.bold;text:blue   : DATA(AMQP)
 
 	@enduml
 	```
@@ -112,34 +110,34 @@ The VTN controller is notified by VTN using AMQP when VTN receive payload from V
 
 	participant "dummy-ven20b" as dummyVen #FFF
 	participant "vtn20b" as vtn #FFF
-	participant "dummy-vtn20b-controller" as dummyVtnController #FFF
+	participant "dummy-drprogram" as dummyDRProgram #FFF
 
 	group Device provisionning
-	dummyVtnController -[#green]> vtn: Creates MarketContext / VEN
-	dummyVtnController -[#green]> vtn: Enrolls VEN to MarketContext
+	dummyDRProgram -[#green]> vtn: Creates MarketContext / VEN
+	dummyDRProgram -[#green]> vtn: Enrolls VEN to MarketContext
 	end 
 
 	group Device registration
 	dummyVen -[#red]> vtn: Creates registration party
-	vtn -[#blue]> dummyVtnController: Notify registration
+	vtn -[#blue]> dummyDRProgram: Notify registration
 
 
 
 	dummyVen -[#red]> vtn: Registers reports
-	vtn -[#blue]> dummyVtnController: Notify register reports
-	dummyVtnController-[#green]> vtn: Subscribes reports
+	vtn -[#blue]> dummyDRProgram: Notify register reports
+	dummyDRProgram-[#green]> vtn: Subscribes reports
 	vtn -[#red]> dummyVen: Creates reports subscription
 	end
 
 	group Normal workflow
 	group DRProgram
-	dummyVtnController -[#green]> vtn: Creates DREvents in MarketContext
+	dummyDRProgram -[#green]> vtn: Creates DREvents in MarketContext
 	dummyVen <[#red]- vtn: Send DREvents
 	end
 	group Data reading
 	dummyVen -[#black]-> dummyVen: Simulate data readings\n based on received DREvents
 	dummyVen -[#red]> vtn: Updates reports
-	vtn -[#blue]> dummyVtnController: Notify data update
+	vtn -[#blue]> dummyDRProgram: Notify data update
 	end
 
 	end

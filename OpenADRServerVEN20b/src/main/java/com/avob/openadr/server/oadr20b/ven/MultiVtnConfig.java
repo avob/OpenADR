@@ -221,7 +221,7 @@ public class MultiVtnConfig {
 
 					multiConfig.keySet().forEach(vtnId -> {
 						Map<String, OadrReportType> map = new HashMap<>();
-						session.getVenRegisterReport().forEach(report -> {
+						session.getVenRegisterReport().values().forEach(report -> {
 							map.put(report.getReportSpecifierID(), report);
 						});
 						reports.put(vtnId, map);
@@ -249,7 +249,7 @@ public class MultiVtnConfig {
 		Oadr20bRegisterReportBuilder builder = Oadr20bEiReportBuilders.newOadr20bRegisterReportBuilder(requestId,
 				vtnConfig.getVenId());
 		if (vtnConfig.getVenRegisterReport() != null) {
-			builder.addOadrReport(vtnConfig.getVenRegisterReport());
+			builder.addOadrReport(new ArrayList<>(vtnConfig.getVenRegisterReport().values()));
 		}
 		return builder.build();
 	}

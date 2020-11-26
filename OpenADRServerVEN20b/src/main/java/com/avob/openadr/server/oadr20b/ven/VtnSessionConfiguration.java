@@ -1,9 +1,13 @@
 package com.avob.openadr.server.oadr20b.ven;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
 
+import com.avob.openadr.model.oadr20b.oadr.OadrReportDescriptionType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 
 public class VtnSessionConfiguration {
@@ -36,7 +40,7 @@ public class VtnSessionConfiguration {
 	private Boolean pullModel;
 	private Long replayProtectAcceptedDelaySecond;
 	private SSLContext sslContext;
-	private List<OadrReportType> venRegisterReport;
+	private Map<String, OadrReportType> venRegisterReport;
 
 	public String getContextPath() {
 		return contextPath;
@@ -270,11 +274,25 @@ public class VtnSessionConfiguration {
 		this.replayProtectAcceptedDelaySecond = replayProtectAcceptedDelaySecond;
 	}
 
-	public List<OadrReportType> getVenRegisterReport() {
+	public Map<String, OadrReportType> getVenRegisterReport() {
 		return venRegisterReport;
 	}
 
-	public void setVenRegisterReport(List<OadrReportType> venRegisterReport) {
+	public Optional<OadrReportDescriptionType> getReportDescription(String reportSpecifierId, String rid) {
+
+		Optional<OadrReportDescriptionType> desc = Optional.empty();
+		OadrReportType oadrReportType = this.getVenRegisterReport().get(reportSpecifierId);
+		if (oadrReportType != null) {
+			List<OadrReportDescriptionType> collect = oadrReportType.getOadrReportDescription().stream()
+					.filter(description -> rid.equals(description.getRID())).collect(Collectors.toList());
+			if(collect.size() == 1) {
+				desc = Optional.of(collect.get(0));
+			}
+		}
+		return desc;
+	}
+
+	public void setVenRegisterReport(Map<String, OadrReportType> venRegisterReport) {
 		this.venRegisterReport = venRegisterReport;
 	}
 

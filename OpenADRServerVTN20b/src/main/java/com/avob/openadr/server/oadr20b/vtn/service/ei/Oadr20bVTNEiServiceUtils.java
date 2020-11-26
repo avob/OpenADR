@@ -22,6 +22,7 @@ import com.avob.openadr.model.oadr20b.oadr.PulseCountType;
 import com.avob.openadr.model.oadr20b.oadr.TemperatureType;
 import com.avob.openadr.model.oadr20b.oadr.TemperatureUnitType;
 import com.avob.openadr.model.oadr20b.oadr.ThermType;
+import com.avob.openadr.model.oadr20b.power.EndDeviceAssetType;
 import com.avob.openadr.model.oadr20b.power.EnergyApparentType;
 import com.avob.openadr.model.oadr20b.power.EnergyReactiveType;
 import com.avob.openadr.model.oadr20b.power.EnergyRealType;
@@ -43,6 +44,11 @@ public class Oadr20bVTNEiServiceUtils {
 				break;
 			case VEN:
 				newOadr20bEiTargetTypeBuilder.addVenId(target.getTargetId());
+				break;
+			case ENDDEVICE_ASSET:
+				EndDeviceAssetType endDeviceAssetType = new EndDeviceAssetType();
+				endDeviceAssetType.setMrid(target.getTargetId());
+				newOadr20bEiTargetTypeBuilder.addEndDeviceAsset(endDeviceAssetType);
 				break;
 			default:
 				break;

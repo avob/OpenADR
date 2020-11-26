@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Resource;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import com.avob.openadr.model.oadr20b.Oadr20bJAXBContext;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
+import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 import com.avob.openadr.security.OadrPKISecurity;
 import com.avob.openadr.security.exception.OadrSecurityException;
 
@@ -64,7 +66,7 @@ public class VtnSessionFactory {
 	private static final String REPORT_ONLY = "oadr.reportOnly";
 	private static final String XML_SIGNATURE = "oadr.xmlSignature";
 	private static final String PULL_MODEL = "oadr.pullModel";
-	private static final String REPLAY_PROTECTION_DELAY = "oadr.security.replayProtectAcceptedDelaySecond";	
+	private static final String REPLAY_PROTECTION_DELAY = "oadr.security.replayProtectAcceptedDelaySecond";
 	private static final String VEN_REGISTER_REPORT_FILE = "oadr.vtn.venRegisterReport.file";
 
 	@Resource
@@ -154,7 +156,8 @@ public class VtnSessionFactory {
 				session.setReplayProtectAcceptedDelaySecond(Long.valueOf(prop));
 			} else if (VEN_REGISTER_REPORT_FILE.equals(keyStr)) {
 				OadrRegisterReportType registerReportFromFile = getRegisterReportFromFile(prop);
-				session.setVenRegisterReport(registerReportFromFile.getOadrReport());
+				session.setVenRegisterReport(registerReportFromFile.getOadrReport().stream()
+						.collect(Collectors.toMap((OadrReportType r) -> r.getReportSpecifierID(), r -> r)));
 			}
 
 		}

@@ -55,8 +55,8 @@ services:
         aliases:
           - vtn.oadr.com
 
-  dummy-vtn20b-controller:
-    build: .docker/dummy-vtn20b-controller
+  dummy-drprogram:
+    build: .docker/dummy-drprogram
     restart: always
     depends_on:
       - "build"
@@ -75,7 +75,7 @@ services:
       - "build"
       - "openfire"
       - "vtn20b"
-      - "dummy-vtn20b-controller"
+      - "dummy-drprogram"
     networks:
       xmpp:
       http:

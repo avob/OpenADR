@@ -41,32 +41,32 @@ import com.squareup.okhttp.OkHttpClient;
 
 @Configuration
 public class DummyVTN20bControllerConfig {
+	
 	public static final String PRIVATE_KEY_CONF = "oadr.security.dummy.key";
 	public static final String CERTIFICATE_CONF = "oadr.security.dummy.cert";
 	public static final String TRUSTED_CERTIFICATES_CONF = "oadr.security.dummy.trustcertificate";
-
 	public static final String BROKER_USER_CONF = "oadr.broker.user";
 	public static final String BROKER_PASS_CONF = "oadr.broker.password";
 	public static final String BROKER_PORT_CONF = "oadr.broker.port";
 	public static final String BROKER_HOST_CONF = "oadr.broker.host";
-
 	public static final String VTN_URL = "oadr.vtn.url";
+	public static final String CONTROLLED_VEN_CERTIFICATES = "oadr.ven.certificate";
+	public static final String EVENT_TEMPLATE = "oadr.event";
 	
 	public static final String MARKET_CONTEXT = "DummyMarketContext";
-
 	public static final String MARKET_CONTEXT_DESCRIPTION = "DummyVTN20bController Market Context";
-
 	public static final String OADR_APP_NOTIFICATION_REGISTER_REPORT_TOPIC = "topic.app.notification.registerReport.*";
 	public static final String OADR_APP_NOTIFICATION_UPDATE_REPORT_TOPIC_FLOAT = "topic.app.notification.updateReport.float.*";
 	public static final String OADR_APP_NOTIFICATION_UPDATE_REPORT_TOPIC_RESOURCESTATUS = "topic.app.notification.updateReport.resourcestatus.*";
 	public static final String OADR_APP_NOTIFICATION_UPDATE_REPORT_TOPIC_KEYTOKEN = "topic.app.notification.updateReport.keytoken.*";
+	
 
 	public static final DateTimeFormatter DATE_FORMATTER =  DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 	public static final Type floatListType = new TypeToken<ArrayList<OtherReportDataFloatDto>>() {
 		private static final long serialVersionUID = 1L;
 	}.getType();
 
-	public static final String CONTROLLED_VEN_CERTIFICATES = "oadr.ven.certificate";
+	
 
 
 	@Value("${" + CONTROLLED_VEN_CERTIFICATES + "}")
@@ -95,6 +95,9 @@ public class DummyVTN20bControllerConfig {
 
 	@Value("${" + VTN_URL + "}")
 	private String oadrVtnUrl;
+	
+	@Value("${" + EVENT_TEMPLATE + "}")
+	private String eventTemplate;
 
 	@Bean
 	public ApiClient apiClient() throws OadrSecurityException {
@@ -148,6 +151,15 @@ public class DummyVTN20bControllerConfig {
 	public List<String> getControlledVenCertificates() {
 		if (controlledVenCertificates != null) {
 			return Arrays.asList(controlledVenCertificates.split(","));
+		} else {
+			return new ArrayList<>();
+		}
+	}
+	
+	public List<String> getEventTemplate() {
+		// load coma separated trust certificate list
+		if (eventTemplate != null) {
+			return Arrays.asList(eventTemplate.split(","));
 		} else {
 			return new ArrayList<>();
 		}
@@ -211,4 +223,8 @@ public class DummyVTN20bControllerConfig {
 			return new ArrayList<>();
 		}
 	}
+	
+	
+	
+	
 }
