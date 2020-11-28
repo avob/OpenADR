@@ -7,11 +7,11 @@ import javax.validation.constraints.NotNull;
 @Embeddable
 public class DemandResponseEventActivePeriod {
 
-	@Column(name = "startEvent")
+	@Column(name = "activePeriodStart")
 	@NotNull
 	private Long start;
 
-	@Column(name = "endEvent")
+	@Column(name = "activePeriodEnd")
 	private Long end;
 
 	@NotNull

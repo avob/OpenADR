@@ -31,6 +31,7 @@ import com.avob.openadr.server.common.vtn.models.TargetDto;
 import com.avob.openadr.server.common.vtn.models.TargetInterface;
 import com.avob.openadr.server.common.vtn.models.TargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventBaselineDao;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDao;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
@@ -84,17 +85,17 @@ public class DemandResponseEventService {
 	@Resource
 	private DtoMapper dtoMapper;
 
+	@Resource
+	private DemandResponseEventBaselineDao demandResponseEventBaselineDao;
+
 	private DatatypeFactory datatypeFactory;
 
 	@PostConstruct
 	public void init() throws DatatypeConfigurationException {
 		datatypeFactory = DatatypeFactory.newInstance();
 	}
-	
-	
 
-	private List<Ven> findVenForTarget(DemandResponseEvent event,
-			List<? extends TargetInterface> targets) {
+	private List<Ven> findVenForTarget(DemandResponseEvent event, List<? extends TargetInterface> targets) {
 		Specification<Ven> targetedSpecification = null;
 		if (targets != null) {
 
@@ -114,7 +115,7 @@ public class DemandResponseEventService {
 						targetedSpecification = targetedSpecification
 								.or(VenSpecification.hasGroup(target.getTargetId()));
 					}
-				} 
+				}
 			}
 
 		}
@@ -161,6 +162,9 @@ public class DemandResponseEventService {
 		// save event
 		DemandResponseEvent save = demandResponseEventDao.save(event);
 
+		if (event.getBaseline() != null) {
+			demandResponseEventBaselineDao.save(event.getBaseline());
+		}
 		// link targets
 		List<Ven> findByUsernameIn = findVenForTarget(event, dto.getTargets());
 
@@ -330,7 +334,7 @@ public class DemandResponseEventService {
 	@Transactional(readOnly = false)
 	public void delete(Iterable<DemandResponseEvent> entities) {
 		List<Long> ids = new ArrayList<>();
-		for(DemandResponseEvent event: entities) {
+		for (DemandResponseEvent event : entities) {
 			ids.add(event.getId());
 		}
 		demandResponseEventSignalDao.deleteByEventIn(Lists.newArrayList(entities));
@@ -457,7 +461,5 @@ public class DemandResponseEventService {
 
 		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size, SORT_ASC_ACTIVEPERIOD));
 	}
-	
-	
 
 }

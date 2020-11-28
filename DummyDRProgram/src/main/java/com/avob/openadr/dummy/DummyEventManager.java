@@ -166,6 +166,10 @@ public class DummyEventManager {
 		List<DemandResponseEventCreateDto> events = new ArrayList<>();
 		eventTemplate.forEach(template -> {
 			template.getActivePeriod().setStart(start);
+			if(template.getBaseline() != null) {
+				template.getBaseline().setStart(start);
+			}
+			
 			events.add(template);
 		});
 		return events;

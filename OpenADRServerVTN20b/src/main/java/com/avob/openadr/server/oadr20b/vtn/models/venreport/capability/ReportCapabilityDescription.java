@@ -43,11 +43,7 @@ public class ReportCapabilityDescription {
 	@Enumerated(EnumType.STRING)
 	private ReadingTypeEnumeratedType readingType;
 
-	private String oadrMaxPeriod;
-
-	private String oadrMinPeriod;
-
-	private boolean oadrOnChange;
+	private SamplingRate samplingRate;
 
 	private ItemBase itemBase;
 
@@ -91,30 +87,6 @@ public class ReportCapabilityDescription {
 		this.readingType = readingType;
 	}
 
-	public String getOadrMaxPeriod() {
-		return oadrMaxPeriod;
-	}
-
-	public void setOadrMaxPeriod(String oadrMaxPeriod) {
-		this.oadrMaxPeriod = oadrMaxPeriod;
-	}
-
-	public String getOadrMinPeriod() {
-		return oadrMinPeriod;
-	}
-
-	public void setOadrMinPeriod(String oadrMinPeriod) {
-		this.oadrMinPeriod = oadrMinPeriod;
-	}
-
-	public boolean isOadrOnChange() {
-		return oadrOnChange;
-	}
-
-	public void setOadrOnChange(boolean oadrOnChange) {
-		this.oadrOnChange = oadrOnChange;
-	}
-
 	public ItemBase getItemBase() {
 		return itemBase;
 	}
@@ -137,5 +109,13 @@ public class ReportCapabilityDescription {
 
 	public void setEiSubject(List<Target> eiSubject) {
 		this.eiSubject = eiSubject;
+	}
+
+	public SamplingRate getSamplingRate() {
+		return samplingRate;
+	}
+
+	public void setSamplingRate(SamplingRate samplingRate) {
+		this.samplingRate = samplingRate;
 	}
 }

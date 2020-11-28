@@ -40,11 +40,9 @@ import com.avob.openadr.server.oadr20b.ven.timeline.Timeline;
 import com.avob.openadr.server.oadr20b.ven.timeline.Timeline.EventTimelineListener;
 
 @Service
-public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
+public class Oadr20bVENEiEventService implements Oadr20bVENEiService {
 
 	private static final String EI_SERVICE_NAME = "EiEvent";
-
-//	private static final long DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS = 1;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Oadr20bVENEiEventService.class);
 
@@ -60,8 +58,8 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 
 		@Override
 		public void onActivePeriodStart(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
-			if(listeners != null) {
-				for(EventTimelineListener listener : listeners) {
+			if (listeners != null) {
+				for (EventTimelineListener listener : listeners) {
 					listener.onActivePeriodStart(vtnConfiguration, event);
 				}
 			}
@@ -69,8 +67,8 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 
 		@Override
 		public void onActivePeriodEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
-			if(listeners != null) {
-				for(EventTimelineListener listener : listeners) {
+			if (listeners != null) {
+				for (EventTimelineListener listener : listeners) {
 					listener.onActivePeriodEnd(vtnConfiguration, event);
 				}
 			}
@@ -80,8 +78,8 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 		@Override
 		public void onIntervalStart(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
 				EiEventSignalType eiEventSignalType, IntervalType intervalType) {
-			if(listeners != null) {
-				for(EventTimelineListener listener : listeners) {
+			if (listeners != null) {
+				for (EventTimelineListener listener : listeners) {
 					listener.onIntervalStart(vtnConfiguration, event, eiEventSignalType, intervalType);
 				}
 			}
@@ -91,8 +89,8 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 		@Override
 		public void onIntervalEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
 				EiEventSignalType eiEventSignalType, IntervalType intervalType) {
-			if(listeners != null) {
-				for(EventTimelineListener listener : listeners) {
+			if (listeners != null) {
+				for (EventTimelineListener listener : listeners) {
 					listener.onIntervalEnd(vtnConfiguration, event, eiEventSignalType, intervalType);
 				}
 			}
@@ -101,8 +99,8 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 
 		@Override
 		public void onCreatedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
-			if(listeners != null) {
-				for(EventTimelineListener listener : listeners) {
+			if (listeners != null) {
+				for (EventTimelineListener listener : listeners) {
 					listener.onCreatedEvent(vtnConfiguration, event);
 				}
 			}
@@ -110,8 +108,8 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 
 		@Override
 		public void onDeletedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
-			if(listeners != null) {
-				for(EventTimelineListener listener : listeners) {
+			if (listeners != null) {
+				for (EventTimelineListener listener : listeners) {
 					listener.onDeletedEvent(vtnConfiguration, event);
 				}
 			}
@@ -119,65 +117,33 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 
 		@Override
 		public void onUpdatedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
-			if(listeners != null) {
-				for(EventTimelineListener listener : listeners) {
+			if (listeners != null) {
+				for (EventTimelineListener listener : listeners) {
 					listener.onUpdatedEvent(vtnConfiguration, event);
 				}
 			}
-		}});
+		}
 
-//	private static class OadrCreatedEventTask implements Runnable {
-//
-//		private static final Logger LOGGER = LoggerFactory.getLogger(OadrCreatedEventTask.class);
-//
-//		private OadrCreatedEventType payload;
-//
-//		private OadrHttpVenClient20b httpClient;
-//
-//		private OadrXmppVenClient20b xmppClient;
-//
-//		public OadrCreatedEventTask(OadrHttpVenClient20b client, OadrCreatedEventType payload) {
-//			this.payload = payload;
-//			this.httpClient = client;
-//		}
-//
-//		public OadrCreatedEventTask(OadrXmppVenClient20b client, OadrCreatedEventType payload) {
-//			this.payload = payload;
-//			this.xmppClient = client;
-//		}
-//
-//		@Override
-//		public void run() {
-//
-//			try {
-//
-//				if (httpClient != null) {
-//					OadrResponseType response = httpClient.oadrCreatedEvent(payload);
-//
-//					String responseCode = response.getEiResponse().getResponseCode();
-//
-//					if (HttpStatus.OK_200 != Integer.valueOf(responseCode)) {
-//						LOGGER.error("Fail oadrCreatedEvent: " + responseCode
-//								+ response.getEiResponse().getResponseDescription());
-//					} else {
-//						LOGGER.info("oadrCreatedEvent: " + responseCode);
-//					}
-//				} else if (xmppClient != null) {
-//					xmppClient.oadrCreatedEvent(payload);
-//				}
-//
-//			} catch (Oadr20bException | Oadr20bHttpLayerException | Oadr20bXMLSignatureException
-//					| Oadr20bXMLSignatureValidationException | XmppStringprepException | NotConnectedException
-//					| Oadr20bMarshalException e) {
-//				LOGGER.error("", e);
-//			} catch (InterruptedException e) {
-//				LOGGER.error("", e);
-//				Thread.currentThread().interrupt();
-//			}
-//		}
-//
-//	}
+		@Override
+		public void onBaselineIntervalStart(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+				IntervalType intervalType) {
+			if (listeners != null) {
+				for (EventTimelineListener listener : listeners) {
+					listener.onBaselineIntervalStart(vtnConfiguration, event, intervalType);
+				}
+			}
+		}
 
+		@Override
+		public void onBaselineIntervalEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+				IntervalType intervalType) {
+			if (listeners != null) {
+				for (EventTimelineListener listener : listeners) {
+					listener.onBaselineIntervalEnd(vtnConfiguration, event, intervalType);
+				}
+			}
+		}
+	});
 
 	private Optional<EventResponse> processOadrEvent(VtnSessionConfiguration vtnConfiguration, String requestId,
 			OadrEvent event) throws Oadr20bDistributeEventApplicationLayerException {
@@ -197,15 +163,14 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 		return Optional.empty();
 	}
 
-	public OadrResponseType oadrDistributeEvent(VtnSessionConfiguration vtnConfiguration, OadrDistributeEventType event) {
+	public OadrResponseType oadrDistributeEvent(VtnSessionConfiguration vtnConfiguration,
+			OadrDistributeEventType event) {
 
 		String vtnRequestID = event.getRequestID();
 
-
-
 		int responseCode = HttpStatus.OK_200;
 
-		try {	
+		try {
 			timeline.synchronizeOadrDistributeEvent(vtnConfiguration, event);
 			List<EventResponse> eventResponses = new ArrayList<>();
 			for (Iterator<OadrEvent> iterator = event.getOadrEvent().iterator(); iterator.hasNext();) {
@@ -217,8 +182,8 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 					eventResponses.add(processOadrEvent.get());
 				}
 			}
-			
-			if(!eventResponses.isEmpty()) {
+
+			if (!eventResponses.isEmpty()) {
 				OadrCreatedEventType build = Oadr20bEiEventBuilders.newCreatedEventBuilder(
 						Oadr20bResponseBuilders.newOadr20bEiResponseBuilder(vtnRequestID, responseCode).build(),
 						vtnConfiguration.getVenId()).addEventResponse(eventResponses).build();
@@ -230,34 +195,12 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 					LOGGER.error("Can't send oadrCreatedEvent", e);
 				}
 			}
-			
-//			if (!eventResponses.isEmpty()) {
-//				OadrCreatedEventType build = Oadr20bEiEventBuilders.newCreatedEventBuilder(
-//						Oadr20bResponseBuilders.newOadr20bEiResponseBuilder(vtnRequestID, responseCode).build(),
-//						vtnConfiguration.getVenSessionConfig().getVenId()).addEventResponse(eventResponses).build();
-//
-//				if (vtnConfiguration.getVtnUrl() != null) {
-//
-//					OadrHttpVenClient20b multiHttpClientConfig = multiVtnConfig.getMultiHttpClientConfig(vtnConfiguration);
-//
-//					scheduledExecutorService.schedule(new OadrCreatedEventTask(multiHttpClientConfig, build),
-//							DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS, TimeUnit.SECONDS);
-//
-//				} else if (vtnConfiguration.getVtnXmppHost() != null && vtnConfiguration.getVtnXmppPort() != null) {
-//
-//					OadrXmppVenClient20b multiXmppClientConfig = multiVtnConfig.getMultiXmppClientConfig(vtnConfiguration);
-//
-//					scheduledExecutorService.schedule(new OadrCreatedEventTask(multiXmppClientConfig, build),
-//							DISTRIBUTE_EVENT_RESPONSE_DELAY_SECONDS, TimeUnit.SECONDS);
-//				}
 
-//			}
 			return Oadr20bResponseBuilders.newOadr20bResponseBuilder(vtnRequestID, responseCode, "").build();
 
 		} catch (Oadr20bDistributeEventApplicationLayerException e) {
 			return e.getResponse();
 		}
-
 
 	}
 
@@ -270,7 +213,6 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 
 	public Object request(VtnSessionConfiguration multiConfig, Object unmarshal) {
 
-
 		if (unmarshal instanceof OadrDistributeEventType) {
 
 			OadrDistributeEventType oadrDistributeEvent = (OadrDistributeEventType) unmarshal;
@@ -279,11 +221,11 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 
 			return oadrDistributeEvent(multiConfig, oadrDistributeEvent);
 
-
 		}
 
 		return Oadr20bResponseBuilders
-				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453, multiConfig.getVtnId())
+				.newOadr20bResponseBuilder("0", Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453,
+						multiConfig.getVtnId())
 				.withDescription("Unknown payload type for service: " + this.getServiceName()).build();
 	}
 
@@ -298,7 +240,7 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService{
 
 	public void clearOadrEvents() {
 		timeline.clear();
-		
+
 	}
 
 }

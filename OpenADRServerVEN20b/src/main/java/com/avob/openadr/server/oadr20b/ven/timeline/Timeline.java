@@ -38,8 +38,8 @@ import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bDistributeEventAppli
 
 public class Timeline {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Timeline.class);
-	
-	private static final DateTimeFormatter DATE_FORMATTER =  DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+
+	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 
 	private TreeMap<Long, Map<String, List<TimelineEvent>>> timeline = new TreeMap<>();
 
@@ -52,25 +52,25 @@ public class Timeline {
 
 	private EventTimelineListener listener;
 
-
 	public Timeline(EventTimelineListener listener) {
 		this.listener = listener;
 	}
 
-	public synchronized void synchronizeOadrDistributeEvent(VtnSessionConfiguration vtnConfiguration,  OadrDistributeEventType event)  throws Oadr20bDistributeEventApplicationLayerException {
+	public synchronized void synchronizeOadrDistributeEvent(VtnSessionConfiguration vtnConfiguration,
+			OadrDistributeEventType event) throws Oadr20bDistributeEventApplicationLayerException {
 		this.cancelNextTick();
 
 		String requestID = event.getRequestID();
 		List<String> knownEventIdList = new ArrayList<>(getEvents(vtnConfiguration).keySet());
 		Iterator<OadrEvent> iterator = event.getOadrEvent().iterator();
 		List<String> eventIdList = new ArrayList<>();
-		while(iterator.hasNext()) {
+		while (iterator.hasNext()) {
 			OadrEvent next = iterator.next();
 			if (!isKnownEvent(vtnConfiguration, next)) {
 				vtnConfigurations.put(vtnConfiguration.getVtnId(), vtnConfiguration);
 				putEvent(vtnConfiguration, next);
 				addEventTotimeline(vtnConfiguration, next);
-				
+
 				listener.onCreatedEvent(vtnConfiguration, next);
 
 			} else {
@@ -79,21 +79,21 @@ public class Timeline {
 					putEvent(vtnConfiguration, next);
 					removeEventFromtimeline(vtnConfiguration, next);
 					addEventTotimeline(vtnConfiguration, next);
-					
+
 					listener.onUpdatedEvent(vtnConfiguration, next);
 				}
 			}
 		}
-		
+
 		knownEventIdList.removeAll(eventIdList);
 		knownEventIdList.forEach(deletedOadrEventId -> {
 			OadrEvent oadrEvent = getEvents(vtnConfiguration).get(deletedOadrEventId);
 			removeEvent(vtnConfiguration, oadrEvent);
 			removeEventFromtimeline(vtnConfiguration, oadrEvent);
-			
+
 			listener.onDeletedEvent(vtnConfiguration, oadrEvent);
 		});
-		
+
 		this.scheduleNextTick();
 	}
 
@@ -128,7 +128,7 @@ public class Timeline {
 			throw new Oadr20bDistributeEventApplicationLayerException(
 					"registred event " + eventID + " has a modification number higher than retrieved event",
 					Oadr20bResponseBuilders.newOadr20bResponseBuilder(requestId, HttpStatus.NOT_ACCEPTABLE_406, "")
-					.build());
+							.build());
 		}
 
 		return modificationNumber > knownModificationNumber;
@@ -166,6 +166,13 @@ public class Timeline {
 
 		putActivePeriodOnTimeline(vtnConfiguration, event);
 
+		if (event.getEiEvent().getEiEventSignals().getEiEventBaseline() != null) {
+			event.getEiEvent().getEiEventSignals().getEiEventBaseline().getIntervals().getInterval()
+					.forEach(interval -> {
+						putBaselineIntervalOnTimeline(vtnConfiguration, event, interval);
+					});
+		}
+
 		event.getEiEvent().getEiEventSignals().getEiEventSignal().forEach(signal -> {
 
 			Intervals intervals = signal.getIntervals();
@@ -178,58 +185,80 @@ public class Timeline {
 
 	}
 
-	private void removeEventFromtimeline(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {	
+	private void removeEventFromtimeline(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
 		timeline.forEach((date, timelineEventMap) -> {
 			timelineEventMap.remove(getInnerTimelineKey(vtnConfiguration, event));
-		}); 
+		});
 	}
 
 	private void putActivePeriodOnTimeline(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
 		EiEventType eiEvent = event.getEiEvent();
 		Properties properties = eiEvent.getEiActivePeriod().getProperties();
 		Long activePeriodStart = Oadr20bFactory.xmlCalendarToTimestamp(properties.getDtstart().getDateTime());
-		Long activePeriodEnd = Oadr20bFactory.addXMLDurationToTimestamp(activePeriodStart, properties.getDuration().getDuration());
+		Long activePeriodEnd = Oadr20bFactory.addXMLDurationToTimestamp(activePeriodStart,
+				properties.getDuration().getDuration());
 
-		TimelineEvent startTimelineEvent = new TimelineEvent(TimelineEventType.EVENT_ACTIVE_PERIOD_STARTED, vtnConfiguration.getVtnId()
-				, event.getEiEvent().getEventDescriptor().getEventID(), null, null);
+		TimelineEvent startTimelineEvent = new TimelineEvent(TimelineEventType.EVENT_ACTIVE_PERIOD_STARTED,
+				vtnConfiguration.getVtnId(), event.getEiEvent().getEventDescriptor().getEventID(), null, null);
 		putOnTimeline(activePeriodStart, startTimelineEvent);
 
-		TimelineEvent endTimelineEvent = new TimelineEvent(TimelineEventType.EVENT_ACTIVE_PERIOD_ENDED, vtnConfiguration.getVtnId()
-				, event.getEiEvent().getEventDescriptor().getEventID(), null, null);
+		TimelineEvent endTimelineEvent = new TimelineEvent(TimelineEventType.EVENT_ACTIVE_PERIOD_ENDED,
+				vtnConfiguration.getVtnId(), event.getEiEvent().getEventDescriptor().getEventID(), null, null);
 		putOnTimeline(activePeriodEnd, endTimelineEvent);
-
 
 	}
 
-	private void putIntervalOnTimeline(VtnSessionConfiguration vtnConfiguration, OadrEvent event, EiEventSignalType signal, IntervalType interval) {
+	private void putBaselineIntervalOnTimeline(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+			IntervalType interval) {
 		Long intervalStart = Oadr20bFactory.xmlCalendarToTimestamp(interval.getDtstart().getDateTime());
-		Long intervalEnd = Oadr20bFactory.addXMLDurationToTimestamp(intervalStart, interval.getDuration().getDuration());
+		Long intervalEnd = Oadr20bFactory.addXMLDurationToTimestamp(intervalStart,
+				interval.getDuration().getDuration());
 
-		TimelineEvent startTimelineEvent = new TimelineEvent(TimelineEventType.INTERVAL_STARTED, vtnConfiguration.getVtnId()
-				, event.getEiEvent().getEventDescriptor().getEventID(), signal.getSignalID(), interval.getUid().getText());
+		TimelineEvent startTimelineEvent = new TimelineEvent(TimelineEventType.BASELINE_INTERVAL_STARTED,
+				vtnConfiguration.getVtnId(), event.getEiEvent().getEventDescriptor().getEventID(), null,
+				interval.getUid().getText());
 		putOnTimeline(intervalStart, startTimelineEvent);
 
-		TimelineEvent endTimelineEvent = new TimelineEvent(TimelineEventType.INTERVAL_ENDED, vtnConfiguration.getVtnId()
-				, event.getEiEvent().getEventDescriptor().getEventID(), signal.getSignalID(), interval.getUid().getText());
+		TimelineEvent endTimelineEvent = new TimelineEvent(TimelineEventType.BASELINE_INTERVAL_ENDED,
+				vtnConfiguration.getVtnId(), event.getEiEvent().getEventDescriptor().getEventID(), null,
+				interval.getUid().getText());
 		putOnTimeline(intervalEnd, endTimelineEvent);
 
+	}
+
+	private void putIntervalOnTimeline(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+			EiEventSignalType signal, IntervalType interval) {
+		Long intervalStart = Oadr20bFactory.xmlCalendarToTimestamp(interval.getDtstart().getDateTime());
+		Long intervalEnd = Oadr20bFactory.addXMLDurationToTimestamp(intervalStart,
+				interval.getDuration().getDuration());
+
+		TimelineEvent startTimelineEvent = new TimelineEvent(TimelineEventType.INTERVAL_STARTED,
+				vtnConfiguration.getVtnId(), event.getEiEvent().getEventDescriptor().getEventID(), signal.getSignalID(),
+				interval.getUid().getText());
+		putOnTimeline(intervalStart, startTimelineEvent);
+
+		TimelineEvent endTimelineEvent = new TimelineEvent(TimelineEventType.INTERVAL_ENDED,
+				vtnConfiguration.getVtnId(), event.getEiEvent().getEventDescriptor().getEventID(), signal.getSignalID(),
+				interval.getUid().getText());
+		putOnTimeline(intervalEnd, endTimelineEvent);
 
 	}
 
 	private void putOnTimeline(Long date, TimelineEvent timelineEvent) {
 		Long now = System.currentTimeMillis();
-		if(date < now) {
-			LOGGER.warn(String.format("%s can't be added to timeline because it already happened (date in past)", timelineEvent.toString()));
+		if (date < now) {
+			LOGGER.warn(String.format("%s can't be added to timeline because it already happened (date in past)",
+					timelineEvent.toString()));
 			return;
 		}
 
 		Map<String, List<TimelineEvent>> map = timeline.get(date);
-		if(map == null) {
+		if (map == null) {
 			map = new HashMap<>();
 		}
 		String key = getInnerTimelineKey(timelineEvent);
 		List<TimelineEvent> list = map.get(key);
-		if(list == null) {
+		if (list == null) {
 			list = new ArrayList<>();
 		}
 		list.add(timelineEvent);
@@ -238,15 +267,15 @@ public class Timeline {
 	}
 
 	private String getInnerTimelineKey(TimelineEvent timelineEvent) {
-		return timelineEvent.vtnId + ":"+ timelineEvent.eventId;
+		return timelineEvent.vtnId + ":" + timelineEvent.eventId;
 	}
 
 	private String getInnerTimelineKey(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
-		return vtnConfiguration.getVtnId() + ":"+ event.getEiEvent().getEventDescriptor().getEventID();
+		return vtnConfiguration.getVtnId() + ":" + event.getEiEvent().getEventDescriptor().getEventID();
 	}
 
 	private void cancelNextTick() {
-		if(scheduledNextTick == null) {
+		if (scheduledNextTick == null) {
 			LOGGER.warn("No schedule du cancel");
 			return;
 		}
@@ -254,14 +283,14 @@ public class Timeline {
 	}
 
 	private void scheduleNextTick() {
-		
-		if(timeline.isEmpty()) {
+
+		if (timeline.isEmpty()) {
 			LOGGER.warn("Timeline empty, no tick to schedule");
 			return;
 		}
 		Long date = timeline.firstKey();
 		Long now = System.currentTimeMillis();
-		if(date < now) {
+		if (date < now) {
 			timeline.pollFirstEntry();
 			scheduleNextTick();
 			return;
@@ -270,7 +299,8 @@ public class Timeline {
 		long delay = date - now;
 		OffsetDateTime ofInstant = OffsetDateTime.ofInstant(Instant.ofEpochMilli(date), ZoneId.systemDefault());
 		LOGGER.info("Schedule next tick at :" + DATE_FORMATTER.format(ofInstant));
-		scheduledNextTick = scheduledExecutorService.schedule(new TimelineEventTask(date), delay, TimeUnit.MILLISECONDS);
+		scheduledNextTick = scheduledExecutorService.schedule(new TimelineEventTask(date), delay,
+				TimeUnit.MILLISECONDS);
 	}
 
 	private class TimelineEvent implements Comparable<TimelineEvent> {
@@ -298,17 +328,15 @@ public class Timeline {
 
 		@Override
 		public int compareTo(TimelineEvent o) {
-			return  Integer.compare(this.type.getEmitPriority(), o.type.getEmitPriority());
+			return Integer.compare(this.type.getEmitPriority(), o.type.getEmitPriority());
 		}
 
 	}
 
-	
 	private enum TimelineEventType {
 
-
-
-		EVENT_ACTIVE_PERIOD_STARTED(2), INTERVAL_STARTED(3), INTERVAL_ENDED(0), EVENT_ACTIVE_PERIOD_ENDED(1);
+		EVENT_ACTIVE_PERIOD_STARTED(3), INTERVAL_STARTED(5), INTERVAL_ENDED(0), EVENT_ACTIVE_PERIOD_ENDED(2),
+		BASELINE_INTERVAL_STARTED(4), BASELINE_INTERVAL_ENDED(1);
 
 		private int emitPriority;
 
@@ -333,90 +361,124 @@ public class Timeline {
 		@Override
 		public void run() {
 			try {
-			Map<String, List<TimelineEvent>> map = timeline.get(tick);
+				Map<String, List<TimelineEvent>> map = timeline.get(tick);
 
+				List<TimelineEvent> collect = map.values().stream().flatMap(Collection::stream)
+						.collect(Collectors.toList());
 
-			List<TimelineEvent> collect = map.values()
-					.stream()
-					.flatMap(Collection::stream)
-					.collect(Collectors.toList());  
+				Collections.sort(collect);
 
-			Collections.sort(collect);
+				for (TimelineEvent timelineEvent : collect) {
+					String vtnId = timelineEvent.vtnId;
+					String eventId = timelineEvent.eventId;
 
-			for(TimelineEvent timelineEvent : collect) {
-				String vtnId = timelineEvent.vtnId;
-				String eventId = timelineEvent.eventId;
+					VtnSessionConfiguration vtnSessionConfiguration = vtnConfigurations.get(vtnId);
+					OadrEvent oadrEvent = getEvents(vtnSessionConfiguration).get(eventId);
 
-				VtnSessionConfiguration vtnSessionConfiguration = vtnConfigurations.get(vtnId);
-				OadrEvent oadrEvent = getEvents(vtnSessionConfiguration).get(eventId);
+					switch (timelineEvent.type) {
+					case EVENT_ACTIVE_PERIOD_ENDED:
+						listener.onActivePeriodEnd(vtnSessionConfiguration, oadrEvent);
+						break;
+					case EVENT_ACTIVE_PERIOD_STARTED:
+						listener.onActivePeriodStart(vtnSessionConfiguration, oadrEvent);
+						break;
+					case INTERVAL_ENDED:
+					case INTERVAL_STARTED:
+						List<EiEventSignalType> signals = oadrEvent.getEiEvent().getEiEventSignals().getEiEventSignal()
+								.stream().filter(signal -> signal.getSignalID().equals(timelineEvent.signalId))
+								.collect(Collectors.toList());
+						EiEventSignalType eiEventSignalType = null;
+						IntervalType intervalType = null;
+						if (signals != null && !signals.isEmpty()) {
 
-				switch(timelineEvent.type) {
-				case EVENT_ACTIVE_PERIOD_ENDED:
-					listener.onActivePeriodEnd(vtnSessionConfiguration, oadrEvent);
-					break;
-				case EVENT_ACTIVE_PERIOD_STARTED:
-					listener.onActivePeriodStart(vtnSessionConfiguration, oadrEvent);
-					break;
-				case INTERVAL_ENDED:
-				case INTERVAL_STARTED:
-					List<EiEventSignalType> signals = oadrEvent.getEiEvent().getEiEventSignals().getEiEventSignal()
-					.stream().filter(signal -> signal.getSignalID().equals(timelineEvent.signalId)).collect(Collectors.toList());
-					EiEventSignalType eiEventSignalType = null;
-					IntervalType intervalType = null;
-					if(signals != null && !signals.isEmpty()) {
+							if (signals.size() == 1) {
 
-						if(signals.size() == 1) {
+								eiEventSignalType = signals.get(0);
 
-							eiEventSignalType = signals.get(0);
+								List<IntervalType> intervals = eiEventSignalType
+										.getIntervals().getInterval().stream().filter(interval -> interval.getUid()
+												.getText().equals(timelineEvent.intervalId))
+										.collect(Collectors.toList());
 
-							List<IntervalType> intervals = eiEventSignalType.getIntervals().getInterval()
-									.stream().filter(interval -> interval.getUid().getText().equals(timelineEvent.intervalId)).collect(Collectors.toList());
+								if (intervals != null && !intervals.isEmpty()) {
 
-							if(intervals != null && !intervals.isEmpty()) {
+									if (intervals.size() == 1) {
 
-								if(intervals.size() == 1) {
+										intervalType = intervals.get(0);
 
-									intervalType = intervals.get(0);
+									} else {
+										LOGGER.warn("Multiple intervals with intervalId for timeline event: "
+												+ timelineEvent.toString());
+									}
 
 								} else {
-									LOGGER.warn("Multiple intervals with intervalId for timeline event: " + timelineEvent.toString());
+									LOGGER.warn("Unknown intervalId for timeline event: " + timelineEvent.toString());
 								}
 
 							} else {
-								LOGGER.warn("Unknown intervalId for timeline event: " + timelineEvent.toString());
+								LOGGER.warn("Multiple signals with signalId for timeline event: "
+										+ timelineEvent.toString());
 							}
 
 						} else {
-							LOGGER.warn("Multiple signals with signalId for timeline event: " + timelineEvent.toString());
+							LOGGER.warn("Unknown signalId for timeline event: " + timelineEvent.toString());
 						}
 
-					} else {
-						LOGGER.warn("Unknown signalId for timeline event: " + timelineEvent.toString());
+						if (eiEventSignalType != null && intervalType != null) {
+
+							if (timelineEvent.type.equals(TimelineEventType.INTERVAL_STARTED)) {
+								listener.onIntervalStart(vtnSessionConfiguration, oadrEvent, eiEventSignalType,
+										intervalType);
+							} else if (timelineEvent.type.equals(TimelineEventType.INTERVAL_ENDED)) {
+								listener.onIntervalEnd(vtnSessionConfiguration, oadrEvent, eiEventSignalType,
+										intervalType);
+							}
+						}
+
+						break;
+					case BASELINE_INTERVAL_ENDED:
+					case BASELINE_INTERVAL_STARTED:
+						List<IntervalType> baselineIntervals = oadrEvent.getEiEvent().getEiEventSignals()
+								.getEiEventBaseline().getIntervals().getInterval().stream()
+								.filter(interval -> interval.getUid().getText().equals(timelineEvent.intervalId))
+								.collect(Collectors.toList());
+
+						if (baselineIntervals != null && !baselineIntervals.isEmpty()) {
+
+							if (baselineIntervals.size() == 1) {
+
+								IntervalType activeBaselineInterval = baselineIntervals.get(0);
+
+								if (timelineEvent.type.equals(TimelineEventType.BASELINE_INTERVAL_STARTED)) {
+									listener.onBaselineIntervalStart(vtnSessionConfiguration, oadrEvent,
+											activeBaselineInterval);
+								} else if (timelineEvent.type.equals(TimelineEventType.BASELINE_INTERVAL_ENDED)) {
+									listener.onBaselineIntervalEnd(vtnSessionConfiguration, oadrEvent,
+											activeBaselineInterval);
+								}
+
+							} else {
+								LOGGER.warn("Multiple baseline intervals with IntervalId for timeline event: "
+										+ timelineEvent.toString());
+							}
+
+						} else {
+							LOGGER.warn("Unknown baseline IntervalId for timeline event: " + timelineEvent.toString());
+						}
+
+						break;
+					default:
+						break;
+
 					}
-
-					if(eiEventSignalType != null && intervalType != null ) {
-
-						if(timelineEvent.type.equals(TimelineEventType.INTERVAL_STARTED)) {
-							listener.onIntervalStart(vtnSessionConfiguration, oadrEvent, eiEventSignalType, intervalType);
-						} else if(timelineEvent.type.equals(TimelineEventType.INTERVAL_ENDED)) {
-							listener.onIntervalEnd(vtnSessionConfiguration, oadrEvent, eiEventSignalType, intervalType);
-						}
-					} 
-
-					break;
-				default:
-					break;
-
 				}
-			}
-			
-			timeline.remove(tick);
 
-			scheduleNextTick();
-			} catch(Exception e) {
+				timeline.remove(tick);
+
+				scheduleNextTick();
+			} catch (Exception e) {
 				LOGGER.error("Can't process tick", e);
 			}
-
 
 		}
 
@@ -433,9 +495,15 @@ public class Timeline {
 
 		void onIntervalEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
 				EiEventSignalType eiEventSignalType, IntervalType intervalType);
-		
+
+		void onBaselineIntervalStart(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+				IntervalType intervalType);
+
+		void onBaselineIntervalEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+				IntervalType intervalType);
+
 		void onCreatedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event);
-		
+
 		void onDeletedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event);
 
 		void onUpdatedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event);
@@ -447,7 +515,7 @@ public class Timeline {
 		events.clear();
 		vtnConfigurations.clear();
 		timeline.clear();
-		
+
 	}
 
 }

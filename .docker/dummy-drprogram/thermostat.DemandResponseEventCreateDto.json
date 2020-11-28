@@ -1,0 +1,56 @@
+ {
+ 	"activePeriod": {
+ 		"duration": "PT2M",
+ 		"notificationDuration": "P1D",
+ 		"toleranceDuration": "PT5M"
+ 	},
+ 	"descriptor": {
+ 		"marketContext": "DummyMarketContext",
+ 		"oadrProfile": "OADR20B",
+ 		"responseRequired": "ALWAYS",
+ 		"state": "ACTIVE"
+ 	},
+ 	"baseline": {
+ 		"baselineId": "0",
+ 		"baselineName": "Ideal temperature",
+ 		"itemBase": {
+ 			"itemDescription": "temperature",
+ 			"itemUnits": "C",
+ 			"siScaleCode": "none"
+ 		},
+ 		"intervals": [{
+ 			"duration": "PT2M",
+ 			"value": 21.0
+ 		}]
+ 	},
+ 	"signals": [{
+ 		"signalName": "SIMPLE",
+ 		"signalType": "LEVEL",
+ 		"targets": [{
+ 			"targetId": "Thermostat",
+ 			"targetType": "ENDDEVICE_ASSET"
+ 		}],
+ 		"intervals": [{
+ 			"duration": "PT1M",
+ 			"value": 1.0
+ 		}, {
+ 			"duration": "PT1M",
+ 			"value": 2.0
+ 		}]
+ 		
+ 	}, {
+ 		"signalName": "LOAD_CONTROL",
+ 		"signalType": "X_LOAD_CONTROL_LEVEL_OFFSET",
+ 		"targets": [{
+ 			"targetId": "Thermostat",
+ 			"targetType": "ENDDEVICE_ASSET"
+ 		}],
+ 		"intervals": [{
+ 			"duration": "PT1M",
+ 			"value": 1.0
+ 		}, {
+ 			"duration": "PT1M",
+ 			"value": 2.0
+ 		}]
+ 	}]
+ }

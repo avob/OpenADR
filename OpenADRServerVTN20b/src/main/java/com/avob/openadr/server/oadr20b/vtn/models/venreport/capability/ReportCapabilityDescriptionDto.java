@@ -17,11 +17,7 @@ public class ReportCapabilityDescriptionDto {
 
 	private ReadingTypeEnumeratedType readingType;
 
-	private String oadrMaxPeriod;
-
-	private String oadrMinPeriod;
-
-	private boolean oadrOnChange;
+	private SamplingRateDto samplingRate;
 
 	private ItemBaseDto itemBase;
 
@@ -61,30 +57,6 @@ public class ReportCapabilityDescriptionDto {
 		this.readingType = readingType;
 	}
 
-	public String getOadrMaxPeriod() {
-		return oadrMaxPeriod;
-	}
-
-	public void setOadrMaxPeriod(String oadrMaxPeriod) {
-		this.oadrMaxPeriod = oadrMaxPeriod;
-	}
-
-	public String getOadrMinPeriod() {
-		return oadrMinPeriod;
-	}
-
-	public void setOadrMinPeriod(String oadrMinPeriod) {
-		this.oadrMinPeriod = oadrMinPeriod;
-	}
-
-	public boolean isOadrOnChange() {
-		return oadrOnChange;
-	}
-
-	public void setOadrOnChange(boolean oadrOnChange) {
-		this.oadrOnChange = oadrOnChange;
-	}
-
 	public ItemBaseDto getItemBase() {
 		return itemBase;
 	}
@@ -107,6 +79,14 @@ public class ReportCapabilityDescriptionDto {
 
 	public void setEiSubject(List<TargetDto> eiSubject) {
 		this.eiSubject = eiSubject;
+	}
+
+	public SamplingRateDto getSamplingRate() {
+		return samplingRate;
+	}
+
+	public void setSamplingRate(SamplingRateDto samplingRate) {
+		this.samplingRate = samplingRate;
 	}
 
 }

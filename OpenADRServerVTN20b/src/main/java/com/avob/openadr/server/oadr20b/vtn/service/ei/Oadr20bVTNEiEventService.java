@@ -21,9 +21,11 @@ import com.avob.openadr.model.oadr20b.builders.Oadr20bEiEventBuilders;
 import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bDistributeEventBuilder;
 import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bEiActivePeriodTypeBuilder;
+import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bEiEventBaselineTypeBuilder;
 import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bEiEventSignalTypeBuilder;
 import com.avob.openadr.model.oadr20b.builders.eipayload.Oadr20bEiTargetTypeBuilder;
 import com.avob.openadr.model.oadr20b.ei.EiActivePeriodType;
+import com.avob.openadr.model.oadr20b.ei.EiEventBaselineType;
 import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
 import com.avob.openadr.model.oadr20b.ei.EiResponseType;
 import com.avob.openadr.model.oadr20b.ei.EiTargetType;
@@ -45,6 +47,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrResponseType;
 import com.avob.openadr.model.oadr20b.pyld.EiCreatedEvent;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventBaseline;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignal;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalInterval;
@@ -202,11 +205,36 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 			builder.addOadrEvent(Oadr20bEiEventBuilders.newOadr20bDistributeEventOadrEventBuilder()
 					.withEventDescriptor(createEventDescriptor).withActivePeriod(createActivePeriod(drEvent))
 					.addEiEventSignal(createEventSignal(drEvent, createEventDescriptor))
-					.withEiTarget(createEventTarget(venId)).withResponseRequired(needResponse).build());
+					.withEiTarget(createEventTarget(venId)).withResponseRequired(needResponse)
+					.withEiEventBaseline(createBaseline(drEvent)).build());
 
 		}
 
 		return builder.build();
+	}
+
+	private EiEventBaselineType createBaseline(DemandResponseEvent drEvent) {
+		EiEventBaselineType res = null;
+		if (drEvent.getBaseline() != null) {
+			DemandResponseEventBaseline baseline = drEvent.getBaseline();
+			Oadr20bEiEventBaselineTypeBuilder builder = Oadr20bEiEventBuilders
+					.newOadr20bEiEventBaselineTypeBuilder(baseline.getBaselineId(), baseline.getBaselineName(),
+							baseline.getStart(), baseline.getDuration())
+					.withItemBase(Oadr20bVTNEiServiceUtils.createItemBase(baseline.getItemBase()));
+
+			Long start = baseline.getStart();
+			Long temp = start;
+			Long intervalId = 0L;
+			for (DemandResponseEventSignalInterval interval : baseline.getIntervals()) {
+				builder.addInterval(Oadr20bEiBuilders.newOadr20bSignalIntervalTypeBuilder("" + intervalId, temp,
+						interval.getDuration(), interval.getValue()).build());
+				intervalId++;
+				temp = Oadr20bFactory.addXMLDurationToTimestamp(temp, interval.getDuration());
+			}
+
+			res = builder.build();
+		}
+		return res;
 	}
 
 	/**
@@ -300,11 +328,13 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 				for (DemandResponseEventSignalInterval demandResponseEventSignalInterval : demandResponseEventSignal
 						.getIntervals()) {
 
-					temp = Oadr20bFactory.addXMLDurationToTimestamp(temp,
-							demandResponseEventSignalInterval.getDuration());
+					
 					IntervalType interval = Oadr20bEiBuilders.newOadr20bSignalIntervalTypeBuilder("" + intervalId, temp,
 							demandResponseEventSignalInterval.getDuration(),
 							demandResponseEventSignalInterval.getValue()).build();
+					
+					temp = Oadr20bFactory.addXMLDurationToTimestamp(temp,
+							demandResponseEventSignalInterval.getDuration());
 					intervalId++;
 					newOadr20bEiEventSignalTypeBuilder.addInterval(interval);
 				}

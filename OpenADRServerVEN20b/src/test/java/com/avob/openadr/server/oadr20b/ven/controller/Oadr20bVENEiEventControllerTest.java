@@ -145,6 +145,20 @@ public class Oadr20bVENEiEventControllerTest {
 
 		}
 
+		@Override
+		public void onBaselineIntervalStart(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+				IntervalType intervalType) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onBaselineIntervalEnd(VtnSessionConfiguration vtnConfiguration, OadrEvent event,
+				IntervalType intervalType) {
+			// TODO Auto-generated method stub
+
+		}
+
 	}
 
 	@PostConstruct

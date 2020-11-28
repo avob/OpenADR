@@ -5095,11 +5095,48 @@
             },
             "title": "DemandResponseEventActivePeriodDto"
         },
+        "DemandResponseEventBaselineDto": {
+            "type": "object",
+            "properties": {
+                "baselineId": {
+                    "type": "string"
+                },
+                "baselineName": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "intervals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DemandResponseEventSignalIntervalDto"
+                    }
+                },
+                "itemBase": {
+                    "$ref": "#/definitions/ItemBaseDto"
+                },
+                "resourceId": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "start": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            },
+            "title": "DemandResponseEventBaselineDto"
+        },
         "DemandResponseEventCreateDto": {
             "type": "object",
             "properties": {
                 "activePeriod": {
                     "$ref": "#/definitions/DemandResponseEventActivePeriodDto"
+                },
+                "baseline": {
+                    "$ref": "#/definitions/DemandResponseEventBaselineDto"
                 },
                 "descriptor": {
                     "$ref": "#/definitions/DemandResponseEventDescriptorDto"
@@ -5190,6 +5227,9 @@
             "properties": {
                 "activePeriod": {
                     "$ref": "#/definitions/DemandResponseEventActivePeriodDto"
+                },
+                "baseline": {
+                    "$ref": "#/definitions/DemandResponseEventBaselineDto"
                 },
                 "createdTimestamp": {
                     "type": "integer",
@@ -5563,24 +5603,24 @@
         "OtherReportCapabilityDescriptionDto": {
             "type": "object",
             "properties": {
+                "eiDatasource": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TargetDto"
+                    }
+                },
+                "eiSubject": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TargetDto"
+                    }
+                },
                 "id": {
                     "type": "integer",
                     "format": "int64"
                 },
-                "itemDescription": {
-                    "type": "string"
-                },
-                "itemUnits": {
-                    "type": "string"
-                },
-                "oadrMaxPeriod": {
-                    "type": "string"
-                },
-                "oadrMinPeriod": {
-                    "type": "string"
-                },
-                "oadrOnChange": {
-                    "type": "boolean"
+                "itemBase": {
+                    "$ref": "#/definitions/ItemBaseDto"
                 },
                 "readingType": {
                     "type": "string",
@@ -5635,21 +5675,8 @@
                 "rid": {
                     "type": "string"
                 },
-                "siScaleCode": {
-                    "type": "string",
-                    "enum": [
-                        "PICO",
-                        "NANO",
-                        "MICRO",
-                        "MILLI",
-                        "CENTI",
-                        "DECI",
-                        "KILO",
-                        "MEGA",
-                        "GIGA",
-                        "TERA",
-                        "NONE"
-                    ]
+                "samplingRate": {
+                    "$ref": "#/definitions/SamplingRateDto"
                 },
                 "venId": {
                     "type": "string"
@@ -6022,24 +6049,24 @@
         "ReportCapabilityDescriptionDto": {
             "type": "object",
             "properties": {
+                "eiDatasource": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TargetDto"
+                    }
+                },
+                "eiSubject": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TargetDto"
+                    }
+                },
                 "id": {
                     "type": "integer",
                     "format": "int64"
                 },
-                "itemDescription": {
-                    "type": "string"
-                },
-                "itemUnits": {
-                    "type": "string"
-                },
-                "oadrMaxPeriod": {
-                    "type": "string"
-                },
-                "oadrMinPeriod": {
-                    "type": "string"
-                },
-                "oadrOnChange": {
-                    "type": "boolean"
+                "itemBase": {
+                    "$ref": "#/definitions/ItemBaseDto"
                 },
                 "readingType": {
                     "type": "string",
@@ -6091,21 +6118,8 @@
                 "rid": {
                     "type": "string"
                 },
-                "siScaleCode": {
-                    "type": "string",
-                    "enum": [
-                        "PICO",
-                        "NANO",
-                        "MICRO",
-                        "MILLI",
-                        "CENTI",
-                        "DECI",
-                        "KILO",
-                        "MEGA",
-                        "GIGA",
-                        "TERA",
-                        "NONE"
-                    ]
+                "samplingRate": {
+                    "$ref": "#/definitions/SamplingRateDto"
                 }
             },
             "title": "ReportCapabilityDescriptionDto"
@@ -6189,6 +6203,21 @@
                 }
             },
             "title": "ReportRequestDto"
+        },
+        "SamplingRateDto": {
+            "type": "object",
+            "properties": {
+                "oadrMaxPeriod": {
+                    "type": "string"
+                },
+                "oadrMinPeriod": {
+                    "type": "string"
+                },
+                "oadrOnChange": {
+                    "type": "boolean"
+                }
+            },
+            "title": "SamplingRateDto"
         },
         "TargetDto": {
             "type": "object",

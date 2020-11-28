@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -49,6 +50,9 @@ public class DemandResponseEvent {
 	private DemandResponseEventDescriptor descriptor;
 
 	private DemandResponseEventActivePeriod activePeriod;
+
+	@OneToOne(fetch = FetchType.EAGER)
+	private DemandResponseEventBaseline baseline;
 
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "event")
 	private Set<DemandResponseEventSignal> signals;
@@ -125,6 +129,14 @@ public class DemandResponseEvent {
 
 	public void setPublished(boolean published) {
 		this.published = published;
+	}
+
+	public DemandResponseEventBaseline getBaseline() {
+		return baseline;
+	}
+
+	public void setBaseline(DemandResponseEventBaseline baseline) {
+		this.baseline = baseline;
 	}
 
 }

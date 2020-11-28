@@ -278,6 +278,16 @@ public class VtnSessionConfiguration {
 		return venRegisterReport;
 	}
 
+	public Optional<OadrReportType> getReport(String reportSpecifierId) {
+
+		Optional<OadrReportType> desc = Optional.empty();
+		OadrReportType oadrReportType = this.getVenRegisterReport().get(reportSpecifierId);
+		if (oadrReportType != null) {
+			desc = Optional.of(oadrReportType);
+		}
+		return desc;
+	}
+
 	public Optional<OadrReportDescriptionType> getReportDescription(String reportSpecifierId, String rid) {
 
 		Optional<OadrReportDescriptionType> desc = Optional.empty();
@@ -285,7 +295,7 @@ public class VtnSessionConfiguration {
 		if (oadrReportType != null) {
 			List<OadrReportDescriptionType> collect = oadrReportType.getOadrReportDescription().stream()
 					.filter(description -> rid.equals(description.getRID())).collect(Collectors.toList());
-			if(collect.size() == 1) {
+			if (collect.size() == 1) {
 				desc = Optional.of(collect.get(0));
 			}
 		}

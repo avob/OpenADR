@@ -22,6 +22,7 @@ import com.avob.openadr.model.oadr20b.avob.PayloadKeyTokenType;
 import com.avob.openadr.model.oadr20b.builders.eireport.PowerRealUnitType;
 import com.avob.openadr.model.oadr20b.ei.CurrentValueType;
 import com.avob.openadr.model.oadr20b.ei.EiActivePeriodType;
+import com.avob.openadr.model.oadr20b.ei.EiEventBaselineType;
 import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
 import com.avob.openadr.model.oadr20b.ei.EiEventSignalsType;
 import com.avob.openadr.model.oadr20b.ei.EiEventType;
@@ -1487,6 +1488,10 @@ public class Oadr20bFactory {
 			return emixFactory.createItemBase(value);
 		}
 
+	}
+
+	public static EiEventBaselineType createEiEventBaselineType() {
+		return eiFactory.createEiEventBaselineType();
 	}
 
 }

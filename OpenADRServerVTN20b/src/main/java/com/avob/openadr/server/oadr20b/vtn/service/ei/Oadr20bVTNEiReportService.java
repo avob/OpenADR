@@ -93,6 +93,7 @@ import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapabilityDescription;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.ReportCapabilityDescriptionDto;
+import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SamplingRate;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapability;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.SelfReportCapabilityDescription;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.VenReportCapabilityDto;
@@ -301,7 +302,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 				String xmlType = null;
 				if (oadrReportDescriptionType.getItemBase() != null) {
 
-
 					ItemBaseType value = oadrReportDescriptionType.getItemBase().getValue();
 					Class<? extends ItemBaseType> declaredType = oadrReportDescriptionType.getItemBase()
 							.getDeclaredType();
@@ -410,16 +410,21 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 				description.setReportType(ReportEnumeratedType.fromValue(reportType));
 				description.setReadingType(ReadingTypeEnumeratedType.fromValue(readingType));
 
-				ItemBase itemBase = new ItemBase();
-				itemBase.setItemDescription(itemDescription);
-				itemBase.setItemUnits(itemUnits);
-				itemBase.setSiScaleCode(siScaleCode.value());
-				itemBase.setXmlType(xmlType);
-				description.setItemBase(itemBase);
-				
-				description.setOadrMaxPeriod(oadrMaxPeriod);
-				description.setOadrMinPeriod(oadrMinPeriod);
-				description.setOadrOnChange(oadrOnChange);
+				if (itemDescription != null && itemUnits != null && siScaleCode != null && xmlType != null) {
+					ItemBase itemBase = new ItemBase();
+					itemBase.setItemDescription(itemDescription);
+					itemBase.setItemUnits(itemUnits);
+					itemBase.setSiScaleCode(siScaleCode.value());
+					itemBase.setXmlType(xmlType);
+					description.setItemBase(itemBase);
+				}
+
+				SamplingRate samplingRate = new SamplingRate();
+				samplingRate.setOadrMaxPeriod(oadrMaxPeriod);
+				samplingRate.setOadrMinPeriod(oadrMinPeriod);
+				samplingRate.setOadrOnChange(oadrOnChange);
+
+				description.setSamplingRate(samplingRate);
 
 				if (marketContext != null) {
 					VenMarketContext findOneByName = venMarketContextService.findOneByName(marketContext);
@@ -485,7 +490,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		}
 
 		oadr20bAppNotificationPublisher.notifyRegisterReport(venReportDto, venID);
-
 
 		otherReportCapabilityService.save(capabilities);
 		otherReportCapabilityDescriptionService.save(descriptions);
@@ -1063,9 +1067,10 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 					JAXBElement<? extends ItemBaseType> createItemBase = null;
 					if (otherReportCapabilityDescription.getItemBase() != null) {
-						
-						createItemBase = Oadr20bVTNEiServiceUtils.createItemBase(otherReportCapabilityDescription.getItemBase());
-						
+
+						createItemBase = Oadr20bVTNEiServiceUtils
+								.createItemBase(otherReportCapabilityDescription.getItemBase());
+
 					}
 
 					reportRequestBuilder.addSpecifierPayload(createItemBase,

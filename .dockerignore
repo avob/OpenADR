@@ -1,4 +1,9 @@
-.docker
+.docker/dummy*
+.docker/nodered
+.docker/openfire
+.docker/postgres
+.docker/rabbitmq
+.docker/vtn20b
 .vagrant
 .settings
 docker-compose.yml

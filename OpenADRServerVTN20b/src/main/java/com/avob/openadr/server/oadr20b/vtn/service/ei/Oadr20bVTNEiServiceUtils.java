@@ -89,6 +89,10 @@ public class Oadr20bVTNEiServiceUtils {
 
 	public static JAXBElement<? extends ItemBaseType> createItemBase(ItemBase itemBase) {
 
+		if(itemBase.getXmlType() == null) {
+			return null;
+		}
+		
 		SiScaleCodeType siscaleCode = SiScaleCodeType.fromValue(itemBase.getSiScaleCode());
 
 		ItemBaseXmlTypeEnum xmlType = ItemBaseXmlTypeEnum.fromXmlType(itemBase.getXmlType());

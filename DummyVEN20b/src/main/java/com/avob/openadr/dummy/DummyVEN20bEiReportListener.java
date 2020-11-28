@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.avob.openadr.dummy.simulator.DummyVEN20bSimulator;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
@@ -27,7 +28,7 @@ public class DummyVEN20bEiReportListener
 	private static final Logger LOGGER = LoggerFactory.getLogger(DummyVEN20bEiReportListener.class);
 
 	@Resource
-	private RequestedReportSimulator requestedReportSimulator;
+	private DummyVEN20bSimulator requestedReportSimulator;
 
 	@Resource
 	private Oadr20bVENEiReportService oadr20bVENEiReportService;
@@ -38,41 +39,41 @@ public class DummyVEN20bEiReportListener
 		oadr20bVENEiReportService.addVtnListener(this);
 	}
 
-	public void onCreateReport(VtnSessionConfiguration vtnConfiguration, OadrCreateReportType oadrCreateReportType) {
-		LOGGER.info("Dummy received: OadrCreateReportType");
-		requestedReportSimulator.create(vtnConfiguration, oadrCreateReportType);
+	public void onCreateReport(VtnSessionConfiguration vtnConfiguration, OadrCreateReportType oadrCreateReport) {
+		LOGGER.info("Dummy received: oadrCreateReport");
+		requestedReportSimulator.create(vtnConfiguration, oadrCreateReport);
 
 	}
 
 	@Override
-	public void onCancelReport(VtnSessionConfiguration vtnConfiguration, OadrCancelReportType oadrCreateReportType) {
-		LOGGER.info("Dummy received: OadrCancelReportType");
-		requestedReportSimulator.cancel(vtnConfiguration, oadrCreateReportType);
+	public void onCancelReport(VtnSessionConfiguration vtnConfiguration, OadrCancelReportType oadrCancelReport) {
+		LOGGER.info("Dummy received: oadrCancelReport");
+		requestedReportSimulator.cancel(vtnConfiguration, oadrCancelReport);
 
 	}
 
 	@Override
 	public void onRegisteredReport(VtnSessionConfiguration vtnConfiguration,
-			OadrRegisteredReportType registeredreport) {
-		LOGGER.info("Dummy received: OadrRegisteredReportType");
+			OadrRegisteredReportType oadrRegisteredreport) {
+		LOGGER.info("Dummy received: registeredreport");
 
 	}
 
 	@Override
-	public void onUpdatedReport(VtnSessionConfiguration vtnConfiguration, OadrUpdatedReportType registeredreport) {
-		LOGGER.info("Dummy received: oadrCreateReport");
+	public void onUpdatedReport(VtnSessionConfiguration vtnConfiguration, OadrUpdatedReportType oadrUpdatedReport) {
+		LOGGER.info("Dummy received: oadrUpdatedReport");
 
 	}
 
 	@Override
 	public void onRegisterReport(VtnSessionConfiguration vtnConfiguration, OadrRegisterReportType registerReport) {
-		LOGGER.info("Dummy received: OadrRegisterReportType");
+		LOGGER.info("Dummy received: OadrRegisterReport");
 
 	}
 
 	@Override
 	public void onUpdateReport(VtnSessionConfiguration vtnConfiguration, OadrUpdateReportType updateReport) {
-		LOGGER.info("Dummy received: OadrUpdateReportType");
+		LOGGER.info("Dummy received: OadrUpdateReport");
 
 	}
 

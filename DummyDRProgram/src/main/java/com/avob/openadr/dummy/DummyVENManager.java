@@ -40,6 +40,7 @@ import com.avob.server.oadrvtn20b.handler.ApiException;
 import com.avob.server.oadrvtn20b.model.OtherReportDataFloatDto;
 import com.avob.server.oadrvtn20b.model.OtherReportRequestDto;
 import com.avob.server.oadrvtn20b.model.OtherReportRequestDtoCreateSubscriptionDto;
+import com.avob.server.oadrvtn20b.model.SamplingRateDto;
 import com.avob.server.oadrvtn20b.model.VenCreateDto;
 import com.avob.server.oadrvtn20b.model.VenDto;
 import com.avob.server.oadrvtn20b.model.VenMarketContextDto;
@@ -78,29 +79,35 @@ public class DummyVENManager {
 		Long marketcontextId;
 
 		try {
-			VenMarketContextDto findMarketContextByNameUsingGET = marketContextControllerApi.findMarketContextByNameUsingGET(DummyVTN20bControllerConfig.MARKET_CONTEXT);
+			VenMarketContextDto findMarketContextByNameUsingGET = marketContextControllerApi
+					.findMarketContextByNameUsingGET(DummyVTN20bControllerConfig.MARKET_CONTEXT);
 			marketcontextId = findMarketContextByNameUsingGET.getId();
-			LOGGER.warn("Ven market context: "+DummyVTN20bControllerConfig.MARKET_CONTEXT+ " is already provisioned");
+			LOGGER.warn(
+					"Ven market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT + " is already provisioned");
 		} catch (ApiException e) {
-			if(e.getCode() != HttpStatus.SC_NOT_FOUND) {
-				LOGGER.error("Ven market context: "+DummyVTN20bControllerConfig.MARKET_CONTEXT+ " can't be provisioned", e);
+			if (e.getCode() != HttpStatus.SC_NOT_FOUND) {
+				LOGGER.error(
+						"Ven market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT + " can't be provisioned",
+						e);
 				return;
 			} else {
 				VenMarketContextDto dto = new VenMarketContextDto();
 				dto.setName(DummyVTN20bControllerConfig.MARKET_CONTEXT);
 				dto.setDescription(DummyVTN20bControllerConfig.MARKET_CONTEXT_DESCRIPTION);
 				try {
-					VenMarketContextDto createMarketContextUsingPOST = marketContextControllerApi.createMarketContextUsingPOST(dto );
+					VenMarketContextDto createMarketContextUsingPOST = marketContextControllerApi
+							.createMarketContextUsingPOST(dto);
 					marketcontextId = createMarketContextUsingPOST.getId();
 				} catch (ApiException e1) {
-					LOGGER.error("Ven market context: "+DummyVTN20bControllerConfig.MARKET_CONTEXT+ " can't be provisioned", e1);
+					LOGGER.error("Ven market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT
+							+ " can't be provisioned", e1);
 					return;
 				}
 			}
 		}
 
-		if(marketcontextId == null) {
-			LOGGER.error("Ven market context: "+DummyVTN20bControllerConfig.MARKET_CONTEXT+ " can't be provisioned");
+		if (marketcontextId == null) {
+			LOGGER.error("Ven market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT + " can't be provisioned");
 			return;
 		}
 
@@ -117,48 +124,45 @@ public class DummyVENManager {
 				name = IETFUtils.valueToString(cn.getFirst().getValue());
 				oadr20bFingerprint = OadrFingerprintSecurity.getOadr20bFingerprint(parseCertificate);
 			} catch (OadrSecurityException | CertificateEncodingException e) {
-				LOGGER.error("Ven certificate: "+crt+ " can't be provisioned", e);
+				LOGGER.error("Ven certificate: " + crt + " can't be provisioned", e);
 				return;
 			}
 
 			try {
 				VenDto findVenByUsernameUsingGET = venControllerApi.findVenByUsernameUsingGET(oadr20bFingerprint);
-				LOGGER.warn("Ven certificate: "+crt+" is already provisioned");
-				if(findVenByUsernameUsingGET.getRegistrationId() != null) {
+				LOGGER.warn("Ven certificate: " + crt + " is already provisioned");
+				if (findVenByUsernameUsingGET.getRegistrationId() != null) {
 					oadr20bVenControllerApi.requestRegisterReportUsingPOST(oadr20bFingerprint);
 				}
 				return;
 			} catch (ApiException e) {
-				if(e.getCode() != org.apache.http.HttpStatus.SC_NOT_FOUND) {
-					LOGGER.error("Ven certificate: "+crt+ " can't be provisioned", e);
+				if (e.getCode() != org.apache.http.HttpStatus.SC_NOT_FOUND) {
+					LOGGER.error("Ven certificate: " + crt + " can't be provisioned", e);
 					return;
 				} else {
 					try {
 						VenCreateDto dto = new VenCreateDto();
 						dto.setHttpPullModel(false);
 						dto.setTransport("http");
-						dto.setPushUrl("https://"+name);
+						dto.setPushUrl("https://" + name);
 						dto.setOadrProfil("20b");
 						dto.setCommonName(name);
 						dto.setOadrName(name);
-						dto.setUsername(oadr20bFingerprint);	
-						
+						dto.setUsername(oadr20bFingerprint);
+
 						dto.setAuthenticationType("x509");
 						dto.setMarketContexts(Arrays.asList(DummyVTN20bControllerConfig.MARKET_CONTEXT));
-						venControllerApi.createVenUsingPOST(dto );
-						
-					} catch (ApiException  e1) {
-						LOGGER.error("Ven certificate: "+crt+ " can't be provisioned", e1);
+						venControllerApi.createVenUsingPOST(dto);
+
+					} catch (ApiException e1) {
+						LOGGER.error("Ven certificate: " + crt + " can't be provisioned", e1);
 						return;
 					}
 				}
 			}
 
-	
 		});
 	}
-
-
 
 	@JmsListener(destination = DummyVTN20bControllerConfig.OADR_APP_NOTIFICATION_REGISTER_REPORT_TOPIC)
 	public void onRegisterReportMessage(final Message<String> message) throws JMSException {
@@ -168,15 +172,17 @@ public class DummyVENManager {
 
 	}
 
-
 	@JmsListener(destination = DummyVTN20bControllerConfig.OADR_APP_NOTIFICATION_UPDATE_REPORT_TOPIC_FLOAT)
 	public void onUpdateReportFloatMessage(final Message<String> message) throws JMSException {
-		List<OtherReportDataFloatDto> fromJson = gson.fromJson(message.getPayload(), DummyVTN20bControllerConfig.floatListType);
+		List<OtherReportDataFloatDto> fromJson = gson.fromJson(message.getPayload(),
+				DummyVTN20bControllerConfig.floatListType);
 		fromJson.forEach(updateReport -> {
 			Instant ofEpochMilli = Instant.ofEpochMilli(updateReport.getStart());
 
 			OffsetDateTime ofInstant = OffsetDateTime.ofInstant(ofEpochMilli, ZoneId.systemDefault());
-			LOGGER.info(String.format("%s - %s %s %s", DummyVTN20bControllerConfig.DATE_FORMATTER.format(ofInstant), updateReport.getReportSpecifierId(), updateReport.getRid(), String.valueOf(updateReport.getValue())));
+			LOGGER.info(String.format("%s - %s %s %s", DummyVTN20bControllerConfig.DATE_FORMATTER.format(ofInstant),
+					updateReport.getReportSpecifierId(), updateReport.getRid(),
+					String.valueOf(updateReport.getValue())));
 		});
 
 	}
@@ -185,10 +191,12 @@ public class DummyVENManager {
 
 		List<OtherReportRequestDto> viewReportRequestUsingGET;
 		try {
-			viewReportRequestUsingGET = oadr20bVenControllerApi.viewReportRequestUsingGET(venReport.getUsername(), null, null);
+			viewReportRequestUsingGET = oadr20bVenControllerApi.viewReportRequestUsingGET(venReport.getUsername(), null,
+					null);
 			viewReportRequestUsingGET.forEach(request -> {
 				try {
-					oadr20bVenControllerApi.cancelReportUsingPOST(request.getReportRequestId(), venReport.getUsername());
+					oadr20bVenControllerApi.cancelReportUsingPOST(request.getReportRequestId(),
+							venReport.getUsername());
 				} catch (ApiException e) {
 					LOGGER.error("Can't subcribe", e);
 				}
@@ -198,31 +206,51 @@ public class DummyVENManager {
 			LOGGER.error("Can't subcribe", e);
 		}
 
-
-
 		List<OtherReportRequestDtoCreateSubscriptionDto> subscriptions = new ArrayList<>();
 		venReport.getCapabilities().forEach(cap -> {
-			OtherReportRequestDtoCreateSubscriptionDto sub = new OtherReportRequestDtoCreateSubscriptionDto();
-			sub.setReportSpecifierId(cap.getReportSpecifierId());
-			sub.setReportRequestId(UUID.randomUUID().toString());
-			sub.setGranularity("PT10S");
-			sub.setReportBackDuration("PT1M");
-			Map<String, Boolean> rids = new HashMap<>();
+
+			Map<String, SamplingRateDto> rates = new HashMap<>();
+			Map<String, List<String>> groupedRid = new HashMap<>();
 			cap.getDescriptions().forEach(desc -> {
-				rids.put(desc.getRid(), true);
+				SamplingRateDto samplingRateDto = desc.getSamplingRate();
+				String samplingRateToKey = samplingRateToKey(samplingRateDto);
+				rates.put(samplingRateToKey, samplingRateDto);
+				List<String> list = groupedRid.get(samplingRateToKey);
+				if (list == null) {
+					list = new ArrayList<>();
+				}
+				list.add(desc.getRid());
+				groupedRid.put(samplingRateToKey, list);
 			});
-			sub.setRid(rids);
-			subscriptions.add(sub);
+
+			groupedRid.entrySet().forEach(entry -> {
+				SamplingRateDto samplingRateDto = rates.get(entry.getKey());
+				OtherReportRequestDtoCreateSubscriptionDto sub = new OtherReportRequestDtoCreateSubscriptionDto();
+				sub.setReportSpecifierId(cap.getReportSpecifierId());
+				sub.setReportRequestId(UUID.randomUUID().toString());
+				sub.setGranularity(samplingRateDto.getOadrMinPeriod());
+				sub.setReportBackDuration(samplingRateDto.getOadrMaxPeriod());
+				Map<String, Boolean> rids = new HashMap<>();
+				entry.getValue().forEach(rid -> {
+					rids.put(rid, true);
+				});
+				sub.setRid(rids);
+				subscriptions.add(sub);
+			});
+
 		});
 
-
 		try {
-			oadr20bVenControllerApi.subscribeOtherReportCapabilityDescriptionRidUsingPOST(subscriptions, venReport.getUsername());
+			oadr20bVenControllerApi.subscribeOtherReportCapabilityDescriptionRidUsingPOST(subscriptions,
+					venReport.getUsername());
 		} catch (ApiException e) {
 			LOGGER.error("Can't subcribe", e);
 		}
 	}
 
-	
+	private String samplingRateToKey(SamplingRateDto samplingRateDto) {
+		return new StringBuilder().append(samplingRateDto.getOadrMaxPeriod()).append(samplingRateDto.getOadrMinPeriod())
+				.append(samplingRateDto.getOadrOnChange()).toString();
+	}
 
 }

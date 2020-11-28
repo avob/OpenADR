@@ -11,12 +11,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
-import com.avob.openadr.server.common.vtn.models.Target;
 import com.avob.openadr.server.common.vtn.models.ItemBase;
+import com.avob.openadr.server.common.vtn.models.Target;
 
 @Entity
 @Table(name = "demandresponseeventsignal")
@@ -28,12 +29,15 @@ public class DemandResponseEventSignal {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	@NotNull
 	private DemandResponseEventSignalNameEnum signalName;
+
+	@NotNull
 	private DemandResponseEventSignalTypeEnum signalType;
-	private String unitType;
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	private List<DemandResponseEventSignalInterval> intervals;
+
 	private Float currentValue;
 
 	private ItemBase itemBase;
@@ -63,14 +67,6 @@ public class DemandResponseEventSignal {
 
 	public void setSignalType(DemandResponseEventSignalTypeEnum signalType) {
 		this.signalType = signalType;
-	}
-
-	public String getUnitType() {
-		return unitType;
-	}
-
-	public void setUnitType(String unitType) {
-		this.unitType = unitType;
 	}
 
 	public List<DemandResponseEventSignalInterval> getIntervals() {

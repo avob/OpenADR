@@ -23,7 +23,6 @@ import com.avob.openadr.model.oadr20b.builders.Oadr20bEiReportBuilders;
 import com.avob.openadr.model.oadr20b.builders.eireport.Oadr20bUpdateReportBuilder;
 import com.avob.openadr.model.oadr20b.builders.eireport.Oadr20bUpdateReportOadrReportBuilder;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
-import com.avob.openadr.model.oadr20b.ei.ReportEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SpecifierPayloadType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
@@ -31,6 +30,7 @@ import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayloadResourceStatusType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportDescriptionType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportRequestType;
+import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.xcal.DurationPropType;
 import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
@@ -53,10 +53,8 @@ public class UpdateReportOrchestratorService {
 	private Map<String, ReportRequestOrchestration> reportRequestOrchestration = new ConcurrentHashMap<>();
 
 	public interface UpdateReportOrchestratorListener {
-		Float onMetricReportDataRead(OadrReportRequestType reportRequest, OadrReportDescriptionType description);
+		BufferValue readReportData(OadrReportType report, OadrReportDescriptionType description);
 
-		OadrPayloadResourceStatusType onStatusReportDataRead(OadrReportRequestType reportRequest,
-				OadrReportDescriptionType description);
 	}
 
 	public void create(VtnSessionConfiguration vtnConfig, OadrCreateReportType oadrCreateReportType,
@@ -206,34 +204,19 @@ public class UpdateReportOrchestratorService {
 				return;
 			}
 
-			LOGGER.info(String.format("Simulate reading: %s %s %s %s", multiConfig.getVenName(), reportRequestId,
-					reportSpecifierId, rid));
-
 			TreeMap<Long, BufferValue> ridMap = orchestration.simulateReadingBuffer.get(rid);
 			if (ridMap == null) {
 				ridMap = new TreeMap<>();
 			}
 
+			Optional<OadrReportType> report = orchestration.vtnConfig.getReport(reportSpecifierId);
+
 			Optional<OadrReportDescriptionType> reportDescription = orchestration.vtnConfig
 					.getReportDescription(reportSpecifierId, rid);
 
-			if (reportDescription.isPresent()) {
+			if (report.isPresent() && reportDescription.isPresent()) {
 
-				OadrReportDescriptionType oadrReportDescriptionType = reportDescription.get();
-
-				String reportType = oadrReportDescriptionType.getReportType();
-
-				BufferValue value = null;
-
-				if (ReportEnumeratedType.X_RESOURCE_STATUS.value().equals(reportType)) {
-					OadrPayloadResourceStatusType onStatusReportDataRead = orchestration.listener
-							.onStatusReportDataRead(orchestration.reportRequest, oadrReportDescriptionType);
-					value = new BufferValue(onStatusReportDataRead);
-				} else {
-					Float onMetricReportDataRead = orchestration.listener
-							.onMetricReportDataRead(orchestration.reportRequest, oadrReportDescriptionType);
-					value = new BufferValue(onMetricReportDataRead);
-				}
+				BufferValue value = orchestration.listener.readReportData(report.get(), reportDescription.get());
 
 				ridMap.put(start.toInstant().toEpochMilli(), value);
 
@@ -248,26 +231,30 @@ public class UpdateReportOrchestratorService {
 
 				orchestration.simulateReadingTask.put(rid, schedule);
 
+				LOGGER.info(String.format("Reading: %s %s %s", reportSpecifierId, rid, value.toString()));
+
+			} else {
+				LOGGER.warn(String.format("Unknown report reportSpecifierID: %s rID: %s", reportSpecifierId, rid));
 			}
 
 		}
 
 	}
 
-	private class BufferValue {
+	static public class BufferValue {
 
 		private Float floatValue;
 		private OadrPayloadResourceStatusType statusValue;
 
-		public BufferValue(Float floatValue) {
+		private BufferValue(Float floatValue) {
 			this.floatValue = floatValue;
 		}
 
-		public BufferValue(OadrPayloadResourceStatusType statusValue) {
+		private BufferValue(OadrPayloadResourceStatusType statusValue) {
 			this.statusValue = statusValue;
 		}
 
-		public IntervalType toInterval(String intervalId, Long start, String rid, String duration, Long confidence,
+		public IntervalType toInterval(String intervalId, Long start, String duration, String rid, Long confidence,
 				Float accuracy) {
 			if (floatValue != null) {
 				return Oadr20bEiBuilders.newOadr20bReportIntervalTypeBuilder(intervalId, start, duration, rid,
@@ -277,6 +264,22 @@ public class UpdateReportOrchestratorService {
 						confidence, accuracy, statusValue).build();
 			}
 
+		}
+
+		public String toString() {
+			if (floatValue != null) {
+				return String.valueOf(floatValue);
+			} else {
+				return "<oadrPayloadResourceStatus>";
+			}
+		}
+
+		public static BufferValue of(Float value) {
+			return new BufferValue(value);
+		}
+		
+		public static BufferValue of(OadrPayloadResourceStatusType value) {
+			return new BufferValue(value);
 		}
 
 	}

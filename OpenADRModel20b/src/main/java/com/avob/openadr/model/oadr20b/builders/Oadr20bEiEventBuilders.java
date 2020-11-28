@@ -5,6 +5,7 @@ import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bCreatedEventEventR
 import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bDistributeEventBuilder;
 import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bDistributeEventOadrEventBuilder;
 import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bEiActivePeriodTypeBuilder;
+import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bEiEventBaselineTypeBuilder;
 import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bEiEventSignalTypeBuilder;
 import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bEventDescriptorTypeBuilder;
 import com.avob.openadr.model.oadr20b.builders.eievent.Oadr20bRequestEventBuilder;
@@ -48,6 +49,11 @@ public class Oadr20bEiEventBuilders {
 	public static Oadr20bEiEventSignalTypeBuilder newOadr20bEiEventSignalTypeBuilder(String signalId,
 			SignalNameEnumeratedType signalName, SignalTypeEnumeratedType signalType, float currentValue) {
 		return new Oadr20bEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue);
+	}
+
+	public static Oadr20bEiEventBaselineTypeBuilder newOadr20bEiEventBaselineTypeBuilder(String baselineId,
+			String baselineName, long baselineStart, String baselineDuration) {
+		return new Oadr20bEiEventBaselineTypeBuilder(baselineId, baselineName, baselineStart, baselineDuration);
 	}
 
 	public static Oadr20bEiActivePeriodTypeBuilder newOadr20bEiActivePeriodTypeBuilder(long timestampStart,
