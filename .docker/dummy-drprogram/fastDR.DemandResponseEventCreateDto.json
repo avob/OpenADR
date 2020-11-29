@@ -10,18 +10,33 @@
  		"responseRequired": "ALWAYS"
  	},
  	"signals": [{
- 		"intervals": [{
- 			"duration": "PT1M",
- 			"value": 0.0
- 		}, {
- 			"duration": "PT1M",
- 			"value": 1.0
- 		}],
  		"signalName": "SIMPLE",
  		"signalType": "LEVEL",
  		"targets": [{
  			"targetId": "Smart_Energy_Module",
  			"targetType": "ENDDEVICE_ASSET"
+ 		}],
+ 		"intervals": [{
+ 			"duration": "PT1M",
+ 			"value": 1.0
+ 		}, {
+ 			"duration": "PT1M",
+ 			"value": 2.0
+ 		}]
+ 		
+ 	}, {
+ 		"signalName": "LOAD_DISPATCH",
+ 		"signalType": "SETPOINT",
+ 		"targets": [{
+ 			"targetId": "Smart_Energy_Module",
+ 			"targetType": "ENDDEVICE_ASSET"
+ 		}],
+ 		"intervals": [{
+ 			"duration": "PT1M",
+ 			"value": 800
+ 		}, {
+ 			"duration": "PT1M",
+ 			"value": 900
  		}]
  	}]
  }

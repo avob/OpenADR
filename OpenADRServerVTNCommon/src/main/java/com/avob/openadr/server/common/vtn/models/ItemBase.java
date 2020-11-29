@@ -1,6 +1,7 @@
 package com.avob.openadr.server.common.vtn.models;
 
 import javax.persistence.Embeddable;
+import javax.persistence.Lob;
 
 @Embeddable
 public class ItemBase {
@@ -10,8 +11,11 @@ public class ItemBase {
 	private String itemUnits;
 
 	private String siScaleCode;
-	
+
 	private String xmlType;
+
+	@Lob
+	private String attributes;
 
 	public String getItemDescription() {
 		return itemDescription;
@@ -43,6 +47,14 @@ public class ItemBase {
 
 	public void setXmlType(String xmlType) {
 		this.xmlType = xmlType;
+	}
+
+	public String getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(String attributes) {
+		this.attributes = attributes;
 	}
 
 }

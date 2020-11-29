@@ -9,8 +9,11 @@ COPY --from=openadr_build:latest /opt/oadr/cert /opt/oadr-ven20b/cert
 COPY --from=openadr_build:latest /opt/oadr/dummy-ven20b/*.jar /opt/oadr-ven20b/
 
 COPY realEnergy.registerReport.xml /opt/oadr-ven20b/realEnergy.registerReport.xml
+COPY smartEnergyModule.registerReport.xml /opt/oadr-ven20b/smartEnergyModule.registerReport.xml
 COPY thermostat.registerReport.xml /opt/oadr-ven20b/thermostat.registerReport.xml
 COPY thermostat.full.registerReport.xml /opt/oadr-ven20b/thermostat.full.registerReport.xml
+
+
 COPY application.properties /opt/oadr-ven20b/application.properties
 RUN mv /opt/oadr-ven20b/*.jar /opt/oadr-ven20b/oadr-ven20b.jar
 

@@ -46,14 +46,10 @@ import com.avob.openadr.model.oadr20b.exception.Oadr20bException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bUnmarshalException;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bXMLSignatureException;
-import com.avob.openadr.model.oadr20b.oadr.BaseUnitType;
-import com.avob.openadr.model.oadr20b.oadr.CurrencyType;
-import com.avob.openadr.model.oadr20b.oadr.FrequencyType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCancelReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCanceledReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrCreatedReportType;
-import com.avob.openadr.model.oadr20b.oadr.OadrGBItemBase;
 import com.avob.openadr.model.oadr20b.oadr.OadrLoadControlStateTypeType;
 import com.avob.openadr.model.oadr20b.oadr.OadrPayloadResourceStatusType;
 import com.avob.openadr.model.oadr20b.oadr.OadrRegisterReportType;
@@ -65,17 +61,6 @@ import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrSamplingRateType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdateReportType;
 import com.avob.openadr.model.oadr20b.oadr.OadrUpdatedReportType;
-import com.avob.openadr.model.oadr20b.oadr.PulseCountType;
-import com.avob.openadr.model.oadr20b.oadr.TemperatureType;
-import com.avob.openadr.model.oadr20b.oadr.ThermType;
-import com.avob.openadr.model.oadr20b.power.EnergyApparentType;
-import com.avob.openadr.model.oadr20b.power.EnergyReactiveType;
-import com.avob.openadr.model.oadr20b.power.EnergyRealType;
-import com.avob.openadr.model.oadr20b.power.PowerApparentType;
-import com.avob.openadr.model.oadr20b.power.PowerReactiveType;
-import com.avob.openadr.model.oadr20b.power.PowerRealType;
-import com.avob.openadr.model.oadr20b.power.VoltageType;
-import com.avob.openadr.model.oadr20b.siscale.SiScaleCodeType;
 import com.avob.openadr.model.oadr20b.strm.Intervals;
 import com.avob.openadr.model.oadr20b.strm.StreamPayloadBaseType;
 import com.avob.openadr.model.oadr20b.xcal.Dtstart;
@@ -296,128 +281,19 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 					oadrMinPeriod = oadrSamplingRate.getOadrMinPeriod();
 					oadrOnChange = oadrSamplingRate.isOadrOnChange();
 				}
-				String itemDescription = null;
-				String itemUnits = null;
-				SiScaleCodeType siScaleCode = null;
-				String xmlType = null;
+
 				if (oadrReportDescriptionType.getItemBase() != null) {
 
-					ItemBaseType value = oadrReportDescriptionType.getItemBase().getValue();
-					Class<? extends ItemBaseType> declaredType = oadrReportDescriptionType.getItemBase()
-							.getDeclaredType();
+					ItemBase createItemBase = Oadr20bVTNEiServiceUtils
+							.createItemBase(oadrReportDescriptionType.getItemBase());
+					description.setItemBase(createItemBase);
 
-					if (declaredType.equals(VoltageType.class)) {
-						VoltageType el = (VoltageType) value;
-						itemDescription = el.getItemDescription();
-						itemUnits = el.getItemUnits();
-						siScaleCode = el.getSiScaleCode();
-						xmlType = VoltageType.class.getSimpleName();
-
-					} else if (declaredType.equals(EnergyApparentType.class)) {
-						EnergyApparentType el = (EnergyApparentType) value;
-						itemDescription = el.getItemDescription();
-						itemUnits = el.getItemUnits();
-						siScaleCode = el.getSiScaleCode();
-						xmlType = EnergyApparentType.class.getSimpleName();
-
-					} else if (declaredType.equals(EnergyReactiveType.class)) {
-						EnergyReactiveType el = (EnergyReactiveType) value;
-						itemDescription = el.getItemDescription();
-						itemUnits = el.getItemUnits();
-						siScaleCode = el.getSiScaleCode();
-						xmlType = EnergyReactiveType.class.getSimpleName();
-
-					} else if (declaredType.equals(EnergyRealType.class)) {
-						EnergyRealType el = (EnergyRealType) value;
-						itemDescription = el.getItemDescription();
-						itemUnits = el.getItemUnits();
-						siScaleCode = el.getSiScaleCode();
-						xmlType = EnergyRealType.class.getSimpleName();
-
-					} else if (declaredType.equals(PowerApparentType.class)) {
-						PowerApparentType el = (PowerApparentType) value;
-						itemDescription = el.getItemDescription();
-						itemUnits = el.getItemUnits();
-						siScaleCode = el.getSiScaleCode();
-						xmlType = PowerApparentType.class.getSimpleName();
-
-					} else if (declaredType.equals(PowerReactiveType.class)) {
-						PowerReactiveType el = (PowerReactiveType) value;
-						itemDescription = el.getItemDescription();
-						itemUnits = el.getItemUnits();
-						siScaleCode = el.getSiScaleCode();
-						xmlType = PowerReactiveType.class.getSimpleName();
-
-					} else if (declaredType.equals(PowerRealType.class)) {
-						PowerRealType el = (PowerRealType) value;
-						itemDescription = el.getItemDescription();
-						itemUnits = el.getItemUnits();
-						siScaleCode = el.getSiScaleCode();
-						xmlType = PowerRealType.class.getSimpleName();
-
-					} else if (declaredType.equals(BaseUnitType.class)) {
-						BaseUnitType el = (BaseUnitType) value;
-						itemDescription = el.getItemDescription();
-						itemUnits = el.getItemUnits();
-						siScaleCode = el.getSiScaleCode();
-						xmlType = BaseUnitType.class.getSimpleName();
-
-					} else if (declaredType.equals(CurrencyType.class)) {
-						CurrencyType el = (CurrencyType) value;
-						itemDescription = el.getItemDescription().value();
-						itemUnits = el.getItemUnits().value();
-						siScaleCode = el.getSiScaleCode();
-						xmlType = CurrencyType.class.getSimpleName();
-
-					} else if (declaredType.equals(FrequencyType.class)) {
-						FrequencyType el = (FrequencyType) value;
-						itemDescription = el.getItemDescription();
-						itemUnits = el.getItemUnits();
-						siScaleCode = el.getSiScaleCode();
-						xmlType = FrequencyType.class.getSimpleName();
-
-					} else if (declaredType.equals(ThermType.class)) {
-						ThermType el = (ThermType) value;
-						itemDescription = el.getItemDescription();
-						itemUnits = el.getItemUnits();
-						siScaleCode = el.getSiScaleCode();
-						xmlType = ThermType.class.getSimpleName();
-
-					} else if (declaredType.equals(TemperatureType.class)) {
-						TemperatureType el = (TemperatureType) value;
-						itemDescription = el.getItemDescription();
-						itemUnits = el.getItemUnits().value();
-						siScaleCode = el.getSiScaleCode();
-						xmlType = TemperatureType.class.getSimpleName();
-
-					} else if (declaredType.equals(PulseCountType.class)) {
-						PulseCountType el = (PulseCountType) value;
-						itemDescription = el.getItemDescription();
-						itemUnits = el.getItemUnits();
-						siScaleCode = SiScaleCodeType.NONE;
-						xmlType = PulseCountType.class.getSimpleName();
-
-					} else if (declaredType.equals(OadrGBItemBase.class)) {
-						itemDescription = "OadrGBItemBase";
-						itemUnits = "OadrGBItemBase";
-						siScaleCode = SiScaleCodeType.NONE;
-						xmlType = "oadrGBItemBase";
-					}
 				}
 
 				String marketContext = oadrReportDescriptionType.getMarketContext();
 				description.setRid(rid);
 				description.setReportType(ReportEnumeratedType.fromValue(reportType));
 				description.setReadingType(ReadingTypeEnumeratedType.fromValue(readingType));
-
-				if (itemDescription != null && itemUnits != null && siScaleCode != null && xmlType != null) {
-					ItemBase itemBase = new ItemBase();
-					itemBase.setItemDescription(itemDescription);
-					itemBase.setItemUnits(itemUnits);
-					itemBase.setSiScaleCode(siScaleCode.value());
-					itemBase.setXmlType(xmlType);
-					description.setItemBase(itemBase);
-				}
 
 				SamplingRate samplingRate = new SamplingRate();
 				samplingRate.setOadrMaxPeriod(oadrMaxPeriod);

@@ -9,6 +9,7 @@ COPY --from=openadr_build:latest /opt/oadr/cert /opt/dummy-drprogram/cert
 COPY --from=openadr_build:latest /opt/oadr/dummy-drprogram/*.jar /opt/dummy-drprogram/
 
 COPY simple.DemandResponseEventCreateDto.json /opt/dummy-drprogram/simple.DemandResponseEventCreateDto.json
+COPY fastDR.DemandResponseEventCreateDto.json /opt/dummy-drprogram/fastDR.DemandResponseEventCreateDto.json
 COPY thermostat.DemandResponseEventCreateDto.json /opt/dummy-drprogram/thermostat.DemandResponseEventCreateDto.json
 
 COPY application.properties /opt/dummy-drprogram/application.properties

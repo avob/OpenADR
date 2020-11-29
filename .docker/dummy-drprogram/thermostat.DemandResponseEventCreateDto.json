@@ -7,8 +7,7 @@
  	"descriptor": {
  		"marketContext": "DummyMarketContext",
  		"oadrProfile": "OADR20B",
- 		"responseRequired": "ALWAYS",
- 		"state": "ACTIVE"
+ 		"responseRequired": "ALWAYS"
  	},
  	"baseline": {
  		"baselineId": "0",

@@ -52,7 +52,7 @@ public class DummyVEN20bSimulator {
 	private Map<String, Map<String, Map<String, ActiveSignal>>> activeSignals = new ConcurrentHashMap<>();
 	private Map<String, Map<String, ActiveBaseline>> baselineActiveSignal = new ConcurrentHashMap<>();
 
-	private List<Simulator> simulators = Arrays.asList(new ThermostatSimulator());
+	private List<Simulator> simulators = Arrays.asList(new ThermostatSimulator(), new SmartEnergyModuleSimulator());
 
 	public interface Simulator {
 		BufferValue readReportData(OadrReportType report, OadrReportDescriptionType description,

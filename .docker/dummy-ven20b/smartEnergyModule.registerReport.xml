@@ -7,8 +7,40 @@
 	xmlns:pyld="http://docs.oasis-open.org/ns/energyinterop/201110/payloads"
 	xmlns:oadr="http://openadr.org/oadr-2.0b/2012/07" xmlns:gml="http://www.opengis.net/gml/3.2"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:atom="http://www.w3.org/2005/Atom"
-	xmlns:xcal="urn:ietf:params:xml:ns:icalendar-2.0" xmlns:strm="urn:ietf:params:xml:ns:icalendar-2.0:stream">
+	xmlns:xcal="urn:ietf:params:xml:ns:icalendar-2.0" xmlns:strm="urn:ietf:params:xml:ns:icalendar-2.0:stream">>
 	<oadr:oadrReport>
+		<xcal:duration>
+			<xcal:duration>PT10M</xcal:duration>
+		</xcal:duration>
+		<oadr:oadrReportDescription>
+			<ei:rID>real_power</ei:rID>
+			<ei:reportSubject>
+                <power:endDeviceAsset>
+                    <power:mrid>Smart_Energy_Module</power:mrid>
+                </power:endDeviceAsset>
+            </ei:reportSubject>
+			<ei:reportDataSource>
+				<ei:resourceID>resource1</ei:resourceID>
+			</ei:reportDataSource>
+			<ei:reportType>usage</ei:reportType>
+			<power:powerReal>
+				<power:itemDescription>RealPower</power:itemDescription>
+				<power:itemUnits>W</power:itemUnits>
+				<scale:siScaleCode>k</scale:siScaleCode>
+				<power:powerAttributes>
+					<power:hertz>60.0</power:hertz>
+					<power:voltage>220.0</power:voltage>
+					<power:ac>true</power:ac>
+				</power:powerAttributes>
+			</power:powerReal>
+			<ei:readingType>Direct Read</ei:readingType>
+			<emix:marketContext>http://MarketContext1</emix:marketContext>
+			<oadr:oadrSamplingRate>
+				<oadr:oadrMinPeriod>PT10S</oadr:oadrMinPeriod>
+				<oadr:oadrMaxPeriod>PT1M</oadr:oadrMaxPeriod>
+				<oadr:oadrOnChange>false</oadr:oadrOnChange>
+			</oadr:oadrSamplingRate>
+		</oadr:oadrReportDescription>
 		<oadr:oadrReportDescription>
 			<ei:rID>real_energy</ei:rID>
 			<ei:reportSubject>
@@ -16,6 +48,9 @@
 					<power:mrid>Smart_Energy_Module</power:mrid>
 				</power:endDeviceAsset>
 			</ei:reportSubject>
+			<ei:reportDataSource>
+				<ei:resourceID>resource1</ei:resourceID>
+			</ei:reportDataSource>
 			<ei:reportType>usage</ei:reportType>
 			<power:energyReal>
 				<power:itemDescription>RealEnergy</power:itemDescription>
@@ -29,8 +64,7 @@
 				<oadr:oadrOnChange>false</oadr:oadrOnChange>
 			</oadr:oadrSamplingRate>
 		</oadr:oadrReportDescription>
-		<ei:reportRequestID>0</ei:reportRequestID>
-		<ei:reportSpecifierID>RS_12345</ei:reportSpecifierID>
+		<ei:reportSpecifierID>ReportSpecID120615_122512_481_2</ei:reportSpecifierID>
 		<ei:reportName>METADATA_TELEMETRY_USAGE</ei:reportName>
 		<ei:createdDateTime>2020-01-01T00:00:00Z</ei:createdDateTime>
 	</oadr:oadrReport>

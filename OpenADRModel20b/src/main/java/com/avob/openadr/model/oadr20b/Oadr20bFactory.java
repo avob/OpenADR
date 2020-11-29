@@ -1258,6 +1258,10 @@ public class Oadr20bFactory {
 		return createPowerAttributesType;
 	}
 
+	public static JAXBElement<PowerAttributesType> createPowerAttributes(PowerAttributesType value) {
+		return powerFactory.createPowerAttributes(value);
+	}
+
 	public static JAXBElement<VoltageType> createVoltage(VoltageType value) {
 		return powerFactory.createVoltage(value);
 	}
