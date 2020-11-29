@@ -1,8 +1,0 @@
----
-  - name: Download postgres connector jar
-    get_url:
-      url: https://jdbc.postgresql.org/download/postgresql-42.2.5.jar
-      dest: /opt/oadr-vtn20b/lib/postgresql-42.2.5.jar
-      owner: oadr-vtn20b
-      group: oadr-vtn20b
-

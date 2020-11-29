@@ -1,8 +1,0 @@
---- # provisioning/roles/nodejs/tasks/main.yml
-  - name: add more recent repo for nodejs
-    shell: curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - >> ~/ansible-nodejs-log
-    args:
-            creates: ~/ansible-nodejs-log 
-
-  - name: make sure nodejs is installed
-    apt: name=nodejs state=present
