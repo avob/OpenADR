@@ -1,7 +1,9 @@
 package com.avob.openadr.dummy.simulator;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import com.avob.openadr.dummy.simulator.DummyVEN20bSimulator.ActiveBaseline;
 import com.avob.openadr.dummy.simulator.DummyVEN20bSimulator.ActiveSignal;
@@ -22,7 +24,7 @@ public class ThermostatSimulator implements Simulator {
 	private static final String END_DEVICE_ASSET = "Thermostat";
 
 	private static final Float OPERATING_STATE_DEFAULT_VALUE = 0F;
-	
+
 	private static final Float HUMIDITY_DEFAULT_VALUE = 80F;
 
 	private static final Float TEMPERATURE_SIMPLE_LEVEL_0 = 21F;
@@ -33,6 +35,11 @@ public class ThermostatSimulator implements Simulator {
 	private static final Float NORMAL_OFFSET = 0F;
 	private static final Float MIN_OFFSET = 0F;
 	private static final Float MAX_OFFSET = 6F;
+
+	private static final int MOVING_AVERAGE_SIZE = 5;
+
+	private final Queue<Float> movingAverage = new LinkedList<Float>();
+	private Float sum = 0F;
 
 	@Override
 	public BufferValue readReportData(OadrReportType report, OadrReportDescriptionType description,
@@ -111,15 +118,16 @@ public class ThermostatSimulator implements Simulator {
 
 				if (TemperatureType.class.equals(description.getItemBase().getDeclaredType())) {
 
-					value = BufferValue.of(appliedTemperature);
-					
+					addData(appliedTemperature);
+
+					value = BufferValue.of(getMean());
+
 				} else if (BaseUnitType.class.equals(description.getItemBase().getDeclaredType())) {
 
 					value = BufferValue.of(HUMIDITY_DEFAULT_VALUE);
-					
+
 				}
 			}
-			
 
 		} else if (ReportEnumeratedType.SET_POINT.value().equals(description.getReportType())) {
 
@@ -132,6 +140,20 @@ public class ThermostatSimulator implements Simulator {
 	@Override
 	public String endDeviceAssetCompatibility() {
 		return END_DEVICE_ASSET;
+	}
+
+	private void addData(Float num) {
+		sum += num;
+		movingAverage.add(num);
+
+		if (movingAverage.size() > MOVING_AVERAGE_SIZE) {
+			sum -= movingAverage.remove();
+		}
+	}
+
+	// function to calculate mean
+	private Float getMean() {
+		return Math.round(100F * sum / MOVING_AVERAGE_SIZE) / 100F;
 	}
 
 }

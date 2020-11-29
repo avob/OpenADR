@@ -219,13 +219,11 @@ public class MultiVtnConfig {
 
 				if (session.getVenRegisterReport() != null) {
 
-					multiConfig.keySet().forEach(vtnId -> {
-						Map<String, OadrReportType> map = new HashMap<>();
-						session.getVenRegisterReport().values().forEach(report -> {
-							map.put(report.getReportSpecifierID(), report);
-						});
-						reports.put(vtnId, map);
+					Map<String, OadrReportType> map = new HashMap<>();
+					session.getVenRegisterReport().values().forEach(report -> {
+						map.put(report.getReportSpecifierID(), report);
 					});
+					reports.put(getSessionKey(session.getVtnId(), session.getVenUrl()), map);
 
 				}
 

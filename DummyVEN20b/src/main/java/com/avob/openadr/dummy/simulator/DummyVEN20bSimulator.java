@@ -11,11 +11,8 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBElement;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.avob.openadr.dummy.DummyVEN20bEiReportListener;
 import com.avob.openadr.model.oadr20b.ei.EiEventBaselineType;
 import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
@@ -37,7 +34,7 @@ import com.avob.openadr.server.oadr20b.ven.service.UpdateReportOrchestratorServi
 @Service
 public class DummyVEN20bSimulator {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DummyVEN20bEiReportListener.class);
+//	private static final Logger LOGGER = LoggerFactory.getLogger(DummyVEN20bEiReportListener.class);
 
 	protected static final Float DEFAULT_VALUE = -1F;
 

@@ -1,6 +1,5 @@
 package com.avob.openadr.dummy.simulator;
 
-import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,8 +17,6 @@ import com.avob.openadr.server.oadr20b.ven.service.UpdateReportOrchestratorServi
 public class SmartEnergyModuleSimulator implements Simulator {
 
 	private static final String END_DEVICE_ASSET = "Smart_Energy_Module";
-	
-	private static DecimalFormat df = new DecimalFormat("0.00");
 
 	private static final Float DEFAULT_VOLTAGE = 1000F;
 
@@ -68,8 +65,6 @@ public class SmartEnergyModuleSimulator implements Simulator {
 			}
 		}
 
-		
-
 		BufferValue value = BufferValue.of(DummyVEN20bSimulator.DEFAULT_VALUE);
 		if (description.getItemBase() != null) {
 			if (description.getItemBase().getDeclaredType().equals(PowerRealType.class)) {
@@ -77,17 +72,18 @@ public class SmartEnergyModuleSimulator implements Simulator {
 				value = BufferValue.of(appliedVoltage);
 
 			} else if (description.getItemBase().getDeclaredType().equals(EnergyRealType.class)) {
-				
+
 				Long durationMillis = System.currentTimeMillis() - lastObservedDate;
-				
-				Float observedEnergy = Math.round(100 * (Float.valueOf( durationMillis) * lastObservedVoltage  / 1000 / 3600)) / 100F;
-				
+
+				Float observedEnergy = Math
+						.round(100 * (Float.valueOf(durationMillis) * lastObservedVoltage / 1000 / 3600)) / 100F;
+
 				value = BufferValue.of(observedEnergy);
-				
+
 				lastObservedDate = System.currentTimeMillis();
-				
+
 				lastObservedVoltage = appliedVoltage;
-				
+
 			}
 		}
 
