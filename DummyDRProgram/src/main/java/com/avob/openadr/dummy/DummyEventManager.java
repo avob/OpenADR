@@ -129,7 +129,7 @@ public class DummyEventManager {
 			return;
 		}
 
-		this.ensureEventAreCreatedForNextHour(truncatedTo, events, 4);
+		this.ensureEventAreCreatedForNextHour(truncatedTo, events, 24);
 
 	}
 

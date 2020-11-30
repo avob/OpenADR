@@ -3,8 +3,6 @@ package com.avob.openadr.dummy.simulator;
 import java.util.Collections;
 import java.util.List;
 
-import com.avob.openadr.dummy.simulator.DummyVEN20bSimulator.ActiveBaseline;
-import com.avob.openadr.dummy.simulator.DummyVEN20bSimulator.ActiveSignal;
 import com.avob.openadr.dummy.simulator.DummyVEN20bSimulator.Simulator;
 import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
@@ -13,6 +11,8 @@ import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 import com.avob.openadr.model.oadr20b.power.EnergyRealType;
 import com.avob.openadr.model.oadr20b.power.PowerRealType;
 import com.avob.openadr.server.oadr20b.ven.service.UpdateReportOrchestratorService.BufferValue;
+import com.avob.openadr.server.oadr20b.ven.timeline.Timeline.ActiveBaselineSignal;
+import com.avob.openadr.server.oadr20b.ven.timeline.Timeline.ActiveSignal;
 
 public class SmartEnergyModuleSimulator implements Simulator {
 
@@ -30,7 +30,7 @@ public class SmartEnergyModuleSimulator implements Simulator {
 
 	@Override
 	public BufferValue readReportData(OadrReportType report, OadrReportDescriptionType description,
-			List<ActiveSignal> activeSignal, List<ActiveBaseline> activeBaseline) {
+			List<ActiveSignal> activeSignal, List<ActiveBaselineSignal> activeBaseline) {
 
 		ActiveSignal toBeAppliedSignalSetPoint = null;
 		ActiveSignal toBeAppliedSignalLevel = null;

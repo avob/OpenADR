@@ -37,6 +37,8 @@ import com.avob.openadr.server.oadr20b.ven.MultiVtnConfig;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bDistributeEventApplicationLayerException;
 import com.avob.openadr.server.oadr20b.ven.timeline.Timeline;
+import com.avob.openadr.server.oadr20b.ven.timeline.Timeline.ActiveBaselineSignal;
+import com.avob.openadr.server.oadr20b.ven.timeline.Timeline.ActiveSignal;
 import com.avob.openadr.server.oadr20b.ven.timeline.Timeline.EventTimelineListener;
 
 @Service
@@ -236,6 +238,14 @@ public class Oadr20bVENEiEventService implements Oadr20bVENEiService {
 
 	public Map<String, OadrEvent> getOadrEvents(VtnSessionConfiguration multiConfig) {
 		return timeline.getEvents(multiConfig);
+	}
+
+	public List<ActiveSignal> getActiveSignals(VtnSessionConfiguration multiConfig) {
+		return timeline.getActiveSignals(multiConfig);
+	}
+
+	public List<ActiveBaselineSignal> getActiveBaselineSignals(VtnSessionConfiguration multiConfig) {
+		return timeline.getActiveBaselineSignals(multiConfig);
 	}
 
 	public void clearOadrEvents() {

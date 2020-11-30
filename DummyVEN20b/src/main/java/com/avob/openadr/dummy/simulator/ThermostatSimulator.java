@@ -5,8 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import com.avob.openadr.dummy.simulator.DummyVEN20bSimulator.ActiveBaseline;
-import com.avob.openadr.dummy.simulator.DummyVEN20bSimulator.ActiveSignal;
 import com.avob.openadr.dummy.simulator.DummyVEN20bSimulator.Simulator;
 import com.avob.openadr.model.oadr20b.ei.ReportEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
@@ -18,6 +16,8 @@ import com.avob.openadr.model.oadr20b.oadr.OadrReportDescriptionType;
 import com.avob.openadr.model.oadr20b.oadr.OadrReportType;
 import com.avob.openadr.model.oadr20b.oadr.TemperatureType;
 import com.avob.openadr.server.oadr20b.ven.service.UpdateReportOrchestratorService.BufferValue;
+import com.avob.openadr.server.oadr20b.ven.timeline.Timeline.ActiveBaselineSignal;
+import com.avob.openadr.server.oadr20b.ven.timeline.Timeline.ActiveSignal;
 
 public class ThermostatSimulator implements Simulator {
 
@@ -43,9 +43,9 @@ public class ThermostatSimulator implements Simulator {
 
 	@Override
 	public BufferValue readReportData(OadrReportType report, OadrReportDescriptionType description,
-			List<ActiveSignal> activeSignal, List<ActiveBaseline> activeBaseline) {
+			List<ActiveSignal> activeSignal, List<ActiveBaselineSignal> activeBaseline) {
 
-		ActiveBaseline toBeAppliedBaseline = null;
+		ActiveBaselineSignal toBeAppliedBaseline = null;
 		if (activeBaseline != null && !activeBaseline.isEmpty()) {
 			toBeAppliedBaseline = activeBaseline.get(0);
 		}

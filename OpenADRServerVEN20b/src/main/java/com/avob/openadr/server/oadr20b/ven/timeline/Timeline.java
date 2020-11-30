@@ -20,6 +20,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.JAXBElement;
+
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +31,13 @@ import com.avob.openadr.model.oadr20b.builders.Oadr20bResponseBuilders;
 import com.avob.openadr.model.oadr20b.ei.EiEventSignalType;
 import com.avob.openadr.model.oadr20b.ei.EiEventType;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
+import com.avob.openadr.model.oadr20b.ei.PayloadBaseType;
+import com.avob.openadr.model.oadr20b.ei.PayloadFloatType;
+import com.avob.openadr.model.oadr20b.ei.SignalPayloadType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType;
 import com.avob.openadr.model.oadr20b.oadr.OadrDistributeEventType.OadrEvent;
 import com.avob.openadr.model.oadr20b.strm.Intervals;
+import com.avob.openadr.model.oadr20b.strm.StreamPayloadBaseType;
 import com.avob.openadr.model.oadr20b.xcal.Properties;
 import com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration;
 import com.avob.openadr.server.oadr20b.ven.exception.Oadr20bDistributeEventApplicationLayerException;
@@ -44,6 +50,8 @@ public class Timeline {
 	private TreeMap<Long, Map<String, List<TimelineEvent>>> timeline = new TreeMap<>();
 
 	private Map<String, Map<String, OadrEvent>> events = new HashMap<>();
+	private Map<String, List<ActiveSignal>> activeSignals = new HashMap<>();
+	private Map<String, List<ActiveBaselineSignal>> activeBaselineSignals = new HashMap<>();
 	private Map<String, VtnSessionConfiguration> vtnConfigurations = new HashMap<>();
 
 	private ScheduledFuture<?> scheduledNextTick;
@@ -59,7 +67,7 @@ public class Timeline {
 	public synchronized void synchronizeOadrDistributeEvent(VtnSessionConfiguration vtnConfiguration,
 			OadrDistributeEventType event) throws Oadr20bDistributeEventApplicationLayerException {
 		this.cancelNextTick();
-
+		events.put(vtnConfiguration.getSessionKey(), new HashMap<>());
 		String requestID = event.getRequestID();
 		List<String> knownEventIdList = new ArrayList<>(getEvents(vtnConfiguration).keySet());
 		Iterator<OadrEvent> iterator = event.getOadrEvent().iterator();
@@ -83,6 +91,7 @@ public class Timeline {
 					listener.onUpdatedEvent(vtnConfiguration, next);
 				}
 			}
+
 		}
 
 		knownEventIdList.removeAll(eventIdList);
@@ -94,7 +103,63 @@ public class Timeline {
 			listener.onDeletedEvent(vtnConfiguration, oadrEvent);
 		});
 
+		this.synchronizeActiveSignals(vtnConfiguration);
 		this.scheduleNextTick();
+	}
+
+	private synchronized void synchronizeActiveSignals(VtnSessionConfiguration vtnConfiguration) {
+		Iterator<OadrEvent> iterator = this.getEvents(vtnConfiguration).values().iterator();
+		List<ActiveSignal> activeSignalsList = new ArrayList<>();
+		List<ActiveBaselineSignal> activeBaselineSignalsList = new ArrayList<>();
+		while (iterator.hasNext()) {
+			OadrEvent next = iterator.next();
+			Long now = System.currentTimeMillis();
+			Long eventStart = Oadr20bFactory.xmlCalendarToTimestamp(
+					next.getEiEvent().getEiActivePeriod().getProperties().getDtstart().getDateTime());
+			Long eventEnd = Oadr20bFactory.addXMLDurationToTimestamp(eventStart,
+					next.getEiEvent().getEiActivePeriod().getProperties().getDuration().getDuration());
+			if (now >= eventStart && now < eventEnd) {
+				next.getEiEvent().getEiEventSignals().getEiEventSignal().forEach(signal -> {
+					signal.getIntervals().getInterval().forEach(interval -> {
+						Long intervalStart = Oadr20bFactory.xmlCalendarToTimestamp(interval.getDtstart().getDateTime());
+						Long intervalEnd = Oadr20bFactory.addXMLDurationToTimestamp(intervalStart,
+								interval.getDuration().getDuration());
+
+						if (now >= intervalStart && now < intervalEnd) {
+							ActiveSignal activeSignal = new ActiveSignal(next, signal, interval);
+							activeSignalsList.add(activeSignal);
+						}
+
+					});
+				});
+				if (next.getEiEvent().getEiEventSignals().getEiEventBaseline() != null) {
+					Long baselineStart = Oadr20bFactory.xmlCalendarToTimestamp(
+							next.getEiEvent().getEiActivePeriod().getProperties().getDtstart().getDateTime());
+					Long baselineEnd = Oadr20bFactory.addXMLDurationToTimestamp(eventStart,
+							next.getEiEvent().getEiActivePeriod().getProperties().getDuration().getDuration());
+					if (now >= baselineStart && now < baselineEnd) {
+						next.getEiEvent().getEiEventSignals().getEiEventBaseline().getIntervals().getInterval()
+								.forEach(interval -> {
+									Long intervalStart = Oadr20bFactory
+											.xmlCalendarToTimestamp(interval.getDtstart().getDateTime());
+									Long intervalEnd = Oadr20bFactory.addXMLDurationToTimestamp(intervalStart,
+											interval.getDuration().getDuration());
+
+									if (now >= intervalStart && now < intervalEnd) {
+										ActiveBaselineSignal activeSignal = new ActiveBaselineSignal(next, interval);
+										activeBaselineSignalsList.add(activeSignal);
+									}
+								});
+					}
+
+				}
+			}
+
+		}
+
+		activeSignals.put(vtnConfiguration.getSessionKey(), activeSignalsList);
+		activeBaselineSignals.put(vtnConfiguration.getSessionKey(), activeBaselineSignalsList);
+
 	}
 
 	/**
@@ -143,6 +208,14 @@ public class Timeline {
 			map = new ConcurrentHashMap<>();
 		}
 		return map;
+	}
+
+	public List<ActiveSignal> getActiveSignals(VtnSessionConfiguration vtnConfiguration) {
+		return activeSignals.get(vtnConfiguration.getSessionKey());
+	}
+
+	public List<ActiveBaselineSignal> getActiveBaselineSignals(VtnSessionConfiguration vtnConfiguration) {
+		return activeBaselineSignals.get(vtnConfiguration.getSessionKey());
 	}
 
 	private void putEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
@@ -366,6 +439,7 @@ public class Timeline {
 				List<TimelineEvent> collect = map.values().stream().flatMap(Collection::stream)
 						.collect(Collectors.toList());
 
+				List<VtnSessionConfiguration> toSync = new ArrayList<>();
 				Collections.sort(collect);
 
 				for (TimelineEvent timelineEvent : collect) {
@@ -373,6 +447,7 @@ public class Timeline {
 					String eventId = timelineEvent.eventId;
 
 					VtnSessionConfiguration vtnSessionConfiguration = vtnConfigurations.get(vtnId);
+					toSync.add(vtnSessionConfiguration);
 					OadrEvent oadrEvent = getEvents(vtnSessionConfiguration).get(eventId);
 
 					switch (timelineEvent.type) {
@@ -475,6 +550,10 @@ public class Timeline {
 
 				timeline.remove(tick);
 
+				toSync.forEach(vtnConfig -> {
+					synchronizeActiveSignals(vtnConfig);
+				});
+
 				scheduleNextTick();
 			} catch (Exception e) {
 				LOGGER.error("Can't process tick", e);
@@ -508,6 +587,83 @@ public class Timeline {
 
 		void onUpdatedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event);
 
+	}
+
+	private Float getIntervalFloatValue(IntervalType interval) {
+		Float value = null;
+		for (JAXBElement<? extends StreamPayloadBaseType> payload : interval.getStreamPayloadBase()) {
+			if (payload.getDeclaredType().equals(SignalPayloadType.class)) {
+
+				SignalPayloadType reportPayload = (SignalPayloadType) payload.getValue();
+
+				JAXBElement<? extends PayloadBaseType> payloadBase = reportPayload.getPayloadBase();
+				if (payloadBase.getDeclaredType().equals(PayloadFloatType.class)) {
+
+					PayloadFloatType payloadFloat = (PayloadFloatType) payloadBase.getValue();
+
+					value = payloadFloat.getValue();
+
+				}
+			}
+		}
+		return value;
+	}
+
+	public class ActiveSignal implements Comparable<ActiveSignal> {
+		private OadrEvent event;
+		private EiEventSignalType signal;
+		private IntervalType interval;
+
+		public ActiveSignal(OadrEvent event, EiEventSignalType signal, IntervalType interval) {
+			this.event = event;
+			this.signal = signal;
+			this.interval = interval;
+		}
+
+		@Override
+		public int compareTo(ActiveSignal o) {
+			return this.getEvent().getEiEvent().getEventDescriptor().getPriority()
+					.compareTo(o.getEvent().getEiEvent().getEventDescriptor().getPriority());
+		}
+
+		public OadrEvent getEvent() {
+			return event;
+		}
+
+		public EiEventSignalType getSignal() {
+			return signal;
+		}
+
+		public IntervalType getInterval() {
+			return interval;
+		}
+
+		public Float getValue() {
+			return getIntervalFloatValue(this.interval);
+		}
+
+	}
+
+	public class ActiveBaselineSignal {
+		private OadrEvent event;
+		private IntervalType interval;
+
+		public ActiveBaselineSignal(OadrEvent event, IntervalType interval) {
+			this.event = event;
+			this.interval = interval;
+		}
+
+		public OadrEvent getEvent() {
+			return event;
+		}
+
+		public IntervalType getInterval() {
+			return interval;
+		}
+
+		public Float getValue() {
+			return getIntervalFloatValue(this.interval);
+		}
 	}
 
 	public void clear() {

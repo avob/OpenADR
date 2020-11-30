@@ -1,6 +1,6 @@
  {
  	"activePeriod": {
- 		"duration": "PT2M",
+ 		"duration": "PT4H",
  		"notificationDuration": "P1D",
  		"toleranceDuration": "PT5M"
  	},
@@ -18,7 +18,7 @@
  			"siScaleCode": "none"
  		},
  		"intervals": [{
- 			"duration": "PT2M",
+ 			"duration": "PT4H",
  			"value": 21.0
  		}]
  	},
@@ -30,10 +30,10 @@
  			"targetType": "ENDDEVICE_ASSET"
  		}],
  		"intervals": [{
- 			"duration": "PT1M",
+ 			"duration": "PT2H",
  			"value": 1.0
  		}, {
- 			"duration": "PT1M",
+ 			"duration": "PT2H",
  			"value": 2.0
  		}]
  		
@@ -45,10 +45,10 @@
  			"targetType": "ENDDEVICE_ASSET"
  		}],
  		"intervals": [{
- 			"duration": "PT1M",
+ 			"duration": "PT2H",
  			"value": 1.0
  		}, {
- 			"duration": "PT1M",
+ 			"duration": "PT2H",
  			"value": 2.0
  		}]
  	}]
