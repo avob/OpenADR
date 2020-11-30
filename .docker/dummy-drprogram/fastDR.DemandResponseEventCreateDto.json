@@ -1,8 +1,8 @@
  {
  	"activePeriod": {
- 		"duration": "PT2M",
- 		"notificationDuration": "P1D",
- 		"toleranceDuration": "PT5M"
+ 		"duration": "PT30M",
+ 		"notificationDuration": "PT4H",
+ 		"toleranceDuration": "PT1M"
  	},
  	"descriptor": {
  		"marketContext": "DummyMarketContext",
@@ -17,10 +17,10 @@
  			"targetType": "ENDDEVICE_ASSET"
  		}],
  		"intervals": [{
- 			"duration": "PT1M",
+ 			"duration": "PT15M",
  			"value": 1.0
  		}, {
- 			"duration": "PT1M",
+ 			"duration": "PT15M",
  			"value": 2.0
  		}]
  		
@@ -32,10 +32,10 @@
  			"targetType": "ENDDEVICE_ASSET"
  		}],
  		"intervals": [{
- 			"duration": "PT1M",
+ 			"duration": "PT15M",
  			"value": 800
  		}, {
- 			"duration": "PT1M",
+ 			"duration": "PT15M",
  			"value": 900
  		}]
  	}]

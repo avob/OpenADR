@@ -462,4 +462,27 @@ public class DemandResponseEventService {
 		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size, SORT_ASC_ACTIVEPERIOD));
 	}
 
+	
+	public Page<DemandResponseEvent> searchSendable(List<DemandResponseEventFilter> filters, Long start, Long end, Integer page,
+			Integer size) {
+		if (page == null) {
+			page = 0;
+		}
+		if (size == null) {
+			size = DEFAULT_SEARCH_SIZE;
+		}
+		Specification<DemandResponseEvent> spec = Specification.where(DemandResponseEventSpecification.search(filters));
+
+		if (start != null && end != null) {
+			spec = spec.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrAfter(start)
+					.and(DemandResponseEventSpecification.hasActivePeriodNotificationStartBefore(end)));
+		} else if (start != null) {
+			spec = spec.and(DemandResponseEventSpecification.hasActivePeriodNotificationStartAfter(start));
+		} else if (end != null) {
+			spec = spec.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrBefore(end));
+		}
+
+		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size, SORT_ASC_ACTIVEPERIOD));
+	}
+
 }

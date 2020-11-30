@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.http.HttpStatus;
+import org.apache.logging.log4j.core.appender.rolling.action.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -128,51 +129,55 @@ public class DummyEventManager {
 			return;
 		}
 
-		this.ensureEventAreCreatedForNextHour(truncatedTo, events);
+		this.ensureEventAreCreatedForNextHour(truncatedTo, events, 4);
 
 	}
 
-	private void ensureEventAreCreatedForNextHour(OffsetDateTime start,
-			List<DemandResponseEventReadDto> existingEvents) {
+	private void ensureEventAreCreatedForNextHour(OffsetDateTime start, List<DemandResponseEventReadDto> existingEvents,
+			int nextXHours) {
 
-		OffsetDateTime temp = start;
 		List<Long> existingStart = new ArrayList<>();
 		for (DemandResponseEventReadDto event : existingEvents) {
 			existingStart.add(event.getActivePeriod().getStart());
 		}
 
-		for (int i = 0; i < 5 * 6 * 2; i++) {
-			if (!existingStart.contains(temp.toEpochSecond() * 1000)) {
-				List<DemandResponseEventCreateDto> events = this.createEvent(temp.toEpochSecond() * 1000);
-				for (DemandResponseEventCreateDto createEvent : events) {
-					try {
-						DemandResponseEventReadDto createUsingPOST = demandResponseControllerApi
-								.createUsingPOST(createEvent);
+		Long end = start.toInstant().toEpochMilli() + nextXHours * 60 * 60 * 1000;
 
-						demandResponseControllerApi.publishUsingPOST(createUsingPOST.getId());
+		eventTemplate.forEach(template -> {
 
-					} catch (ApiException e) {
-						LOGGER.error("Event can't be created", e);
-					}
+			OffsetDateTime temp = start;
+
+			String duration = template.getActivePeriod().getDuration();
+
+			Duration parse = Duration.parse(duration);
+
+			long durationMillis = parse.toMillis();
+
+			LOGGER.info(String.format("%s %s %s", temp.toInstant().toEpochMilli(), durationMillis, end));
+
+			while (temp.toInstant().toEpochMilli() + durationMillis < end) {
+
+				template.getActivePeriod().setStart(temp.toInstant().toEpochMilli());
+				if (template.getBaseline() != null) {
+					template.getBaseline().setStart(temp.toInstant().toEpochMilli());
 				}
 
-			}
-			temp = temp.plusMinutes(2);
-		}
+				try {
+					template.setPublished(true);
+					demandResponseControllerApi.createUsingPOST(template);
 
-	}
+//					demandResponseControllerApi.publishUsingPOST(createUsingPOST.getId());
 
-	private List<DemandResponseEventCreateDto> createEvent(Long start) {
-		List<DemandResponseEventCreateDto> events = new ArrayList<>();
-		eventTemplate.forEach(template -> {
-			template.getActivePeriod().setStart(start);
-			if(template.getBaseline() != null) {
-				template.getBaseline().setStart(start);
+				} catch (ApiException e) {
+					LOGGER.error("Event can't be created", e);
+				}
+
+				temp = temp.plus(durationMillis, ChronoUnit.MILLIS);
+
 			}
-			
-			events.add(template);
+
 		});
-		return events;
+
 	}
 
 }

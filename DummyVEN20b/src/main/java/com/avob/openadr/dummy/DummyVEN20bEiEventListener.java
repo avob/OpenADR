@@ -83,8 +83,6 @@ public class DummyVEN20bEiEventListener implements EventTimelineListener {
 
 	}
 
-	
-
 	@Override
 	public void onCreatedEvent(VtnSessionConfiguration vtnConfiguration, OadrEvent event) {
 		LOGGER.info("onCreatedEvent oadrEvent: " + event.getEiEvent().getEventDescriptor().getEventID());

@@ -57,11 +57,11 @@ public class DemandResponseEventSpecification {
 	}
 
 	public static Specification<DemandResponseEvent> hasActivePeriodStartAfter(Long timestamp) {
-		return (event, cq, cb) -> cb.ge(event.get(FIELD_ACTIVE_PERIOD).get(FIELD_START), timestamp);
+		return (event, cq, cb) -> cb.gt(event.get(FIELD_ACTIVE_PERIOD).get(FIELD_START), timestamp);
 	}
 
 	public static Specification<DemandResponseEvent> hasActivePeriodStartBefore(Long timestamp) {
-		return (event, cq, cb) -> cb.lt(event.get(FIELD_ACTIVE_PERIOD).get(FIELD_START), timestamp);
+		return (event, cq, cb) -> cb.le(event.get(FIELD_ACTIVE_PERIOD).get(FIELD_START), timestamp);
 	}
 
 	public static Specification<DemandResponseEvent> hasActivePeriodEndNullOrBefore(Long timestamp) {
@@ -73,6 +73,10 @@ public class DemandResponseEventSpecification {
 
 	public static Specification<DemandResponseEvent> hasActivePeriodNotificationStartBefore(Long timestamp) {
 		return (event, cq, cb) -> cb.le(event.get(FIELD_ACTIVE_PERIOD).get("startNotification"), timestamp);
+	}
+	
+	public static Specification<DemandResponseEvent> hasActivePeriodNotificationStartAfter(Long timestamp) {
+		return (event, cq, cb) -> cb.gt(event.get(FIELD_ACTIVE_PERIOD).get("startNotification"), timestamp);
 	}
 
 	public static Specification<DemandResponseEvent> hasActivePeriodEndNullOrAfter(Long timestamp) {
@@ -104,7 +108,8 @@ public class DemandResponseEventSpecification {
 			Specification<DemandResponseEvent> and = DemandResponseEventSpecification.isPublished()
 					.and(DemandResponseEventSpecification.hasVenUsername(venUsername))
 					.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrAfter(now))
-					.and(DemandResponseEventSpecification.hasActivePeriodNotificationStartBefore(now));
+					.and(DemandResponseEventSpecification.hasActivePeriodNotificationStartBefore(now))
+					;
 			cq.distinct(true);
 			return and.toPredicate(event, cq, cb);
 

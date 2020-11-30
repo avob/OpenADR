@@ -182,7 +182,7 @@ public class VenController {
 			Page<DemandResponseEvent> search;
 			int page = 0;
 			do {
-				search = demandResponseEventService.search(filters, start, null);
+				search = demandResponseEventService.searchSendable(filters, start, null, null, null);
 				for (DemandResponseEvent event : search.getContent()) {
 					boolean targeted = false;
 					for (Target target : event.getTargets()) {
