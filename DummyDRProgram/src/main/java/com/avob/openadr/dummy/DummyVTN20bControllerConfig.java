@@ -55,6 +55,7 @@ public class DummyVTN20bControllerConfig {
 	
 	public static final String MARKET_CONTEXT = "DummyMarketContext";
 	public static final String MARKET_CONTEXT_DESCRIPTION = "DummyVTN20bController Market Context";
+	public static final String MARKET_CONTEXT_COLOR = "#2596be";
 	public static final String OADR_APP_NOTIFICATION_REGISTER_REPORT_TOPIC = "topic.app.notification.registerReport.*";
 	public static final String OADR_APP_NOTIFICATION_UPDATE_REPORT_TOPIC_FLOAT = "topic.app.notification.updateReport.float.*";
 	public static final String OADR_APP_NOTIFICATION_UPDATE_REPORT_TOPIC_RESOURCESTATUS = "topic.app.notification.updateReport.resourcestatus.*";

@@ -40,8 +40,8 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.Dema
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenDto;
+import com.avob.openadr.server.common.vtn.models.ven.VenSearchDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenUpdateDto;
-import com.avob.openadr.server.common.vtn.models.ven.filter.VenFilter;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
@@ -88,9 +88,9 @@ public class VenController {
 
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
 	@ResponseBody
-	public List<VenDto> searchVen(@RequestBody List<VenFilter> filters, @RequestParam("page") int page,
+	public List<VenDto> searchVen(@RequestBody VenSearchDto venSearch, @RequestParam("page") int page,
 			@RequestParam("size") int size, HttpServletResponse response) {
-		Page<Ven> search = venService.search(filters, page, size);
+		Page<Ven> search = venService.search(venSearch.getFilters(), venSearch.getSorts(), page, size);
 		response.addHeader("X-total-page", String.valueOf(search.getTotalPages()));
 		response.addHeader("X-total-count", String.valueOf(search.getTotalElements()));
 		return dtoMapper.mapList(search, VenDto.class);
@@ -275,42 +275,42 @@ public class VenController {
 		return dtoMapper.map(ven, VenDto.class);
 	}
 
-	@RequestMapping(value = "/{venID}", method = RequestMethod.DELETE)
-	@ResponseBody
-	public void deleteVenByUsername(@PathVariable("venID") String venUsername, HttpServletResponse response) {
-		Ven ven = venService.findOneByUsername(venUsername);
-		if (ven == null) {
-			LOGGER.warn("Unknown Ven: " + venUsername);
-			response.setStatus(HttpStatus.NOT_FOUND_404);
-			return;
-		}
-		venService.delete(ven);
-		LOGGER.info("Delete Ven: " + ven.getUsername());
-	}
+//	@RequestMapping(value = "/{venID}", method = RequestMethod.DELETE)
+//	@ResponseBody
+//	public void deleteVenByUsername(@PathVariable("venID") String venUsername, HttpServletResponse response) {
+//		Ven ven = venService.findOneByUsername(venUsername);
+//		if (ven == null) {
+//			LOGGER.warn("Unknown Ven: " + venUsername);
+//			response.setStatus(HttpStatus.NOT_FOUND_404);
+//			return;
+//		}
+//		venService.delete(ven);
+//		LOGGER.info("Delete Ven: " + ven.getUsername());
+//	}
 
-	@RequestMapping(value = "/{venID}/resource", method = RequestMethod.POST)
-	@ResponseBody
-	public VenResourceDto createVenResource(@PathVariable("venID") String venUsername, @RequestBody VenResourceDto dto,
-			HttpServletResponse response) {
-		Ven ven = venService.findOneByUsername(venUsername);
-		if (ven == null) {
-			LOGGER.warn("Unknown Ven: " + venUsername);
-			response.setStatus(HttpStatus.NOT_FOUND_404);
-			return null;
-		}
-		VenResource findByVenAndName = venResourceService.findByVenAndName(ven, dto.getName());
-		if (findByVenAndName != null) {
-			LOGGER.warn("Resource: " + dto.getName() + " already exists for Ven: " + venUsername);
-			response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
-			return null;
-		}
-
-		VenResource prepare = venResourceService.prepare(ven, dto);
-		venResourceService.save(prepare);
-		response.setStatus(HttpStatus.CREATED_201);
-		LOGGER.info("Create Resource: " + dto.getName() + " linked to Ven: " + ven.getUsername());
-		return dtoMapper.map(prepare, VenResourceDto.class);
-	}
+//	@RequestMapping(value = "/{venID}/resource", method = RequestMethod.POST)
+//	@ResponseBody
+//	public VenResourceDto createVenResource(@PathVariable("venID") String venUsername, @RequestBody VenResourceDto dto,
+//			HttpServletResponse response) {
+//		Ven ven = venService.findOneByUsername(venUsername);
+//		if (ven == null) {
+//			LOGGER.warn("Unknown Ven: " + venUsername);
+//			response.setStatus(HttpStatus.NOT_FOUND_404);
+//			return null;
+//		}
+//		VenResource findByVenAndName = venResourceService.findByVenAndName(ven, dto.getName());
+//		if (findByVenAndName != null) {
+//			LOGGER.warn("Resource: " + dto.getName() + " already exists for Ven: " + venUsername);
+//			response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
+//			return null;
+//		}
+//
+//		VenResource prepare = venResourceService.prepare(ven, dto);
+//		venResourceService.save(prepare);
+//		response.setStatus(HttpStatus.CREATED_201);
+//		LOGGER.info("Create Resource: " + dto.getName() + " linked to Ven: " + ven.getUsername());
+//		return dtoMapper.map(prepare, VenResourceDto.class);
+//	}
 
 	@RequestMapping(value = "/{venID}/resource", method = RequestMethod.GET)
 	@ResponseBody
@@ -325,25 +325,25 @@ public class VenController {
 		return dtoMapper.mapList(venResourceService.findByVen(ven), VenResourceDto.class);
 	}
 
-	@RequestMapping(value = "/{venID}/resource/{resourceName}", method = RequestMethod.DELETE)
-	@ResponseBody
-	public void deleteVenResource(@PathVariable("venID") String venUsername,
-			@PathVariable("resourceName") String resourceName, HttpServletResponse response) {
-		Ven ven = venService.findOneByUsername(venUsername);
-		if (ven == null) {
-			LOGGER.warn("Unknown Ven: " + venUsername);
-			response.setStatus(HttpStatus.NOT_FOUND_404);
-			return;
-		}
-		VenResource findByVenAndName = venResourceService.findByVenAndName(ven, resourceName);
-		if (findByVenAndName == null) {
-			LOGGER.warn("Unknown Resource: " + resourceName + " for Ven: " + venUsername);
-			response.setStatus(HttpStatus.NOT_FOUND_404);
-			return;
-		}
-		venResourceService.delete(findByVenAndName);
-		LOGGER.info("Delete Resource: " + resourceName + " from Ven: " + ven.getUsername());
-	}
+//	@RequestMapping(value = "/{venID}/resource/{resourceName}", method = RequestMethod.DELETE)
+//	@ResponseBody
+//	public void deleteVenResource(@PathVariable("venID") String venUsername,
+//			@PathVariable("resourceName") String resourceName, HttpServletResponse response) {
+//		Ven ven = venService.findOneByUsername(venUsername);
+//		if (ven == null) {
+//			LOGGER.warn("Unknown Ven: " + venUsername);
+//			response.setStatus(HttpStatus.NOT_FOUND_404);
+//			return;
+//		}
+//		VenResource findByVenAndName = venResourceService.findByVenAndName(ven, resourceName);
+//		if (findByVenAndName == null) {
+//			LOGGER.warn("Unknown Resource: " + resourceName + " for Ven: " + venUsername);
+//			response.setStatus(HttpStatus.NOT_FOUND_404);
+//			return;
+//		}
+//		venResourceService.delete(findByVenAndName);
+//		LOGGER.info("Delete Resource: " + resourceName + " from Ven: " + ven.getUsername());
+//	}
 
 	@RequestMapping(value = "/{venID}/group", method = RequestMethod.POST)
 	@ResponseBody

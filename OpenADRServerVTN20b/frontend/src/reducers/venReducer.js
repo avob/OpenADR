@@ -19,6 +19,7 @@ export default function venReducer( state = initialState.ven, action ) {
     case types.LOAD_VEN_SUCCESS:
       newState = objectAssign( {}, state, {
         ven: action.payload
+
       } );
       return newState;
 
@@ -29,8 +30,11 @@ export default function venReducer( state = initialState.ven, action ) {
       return state;
 
     case types.SEARCH_VEN_SUCCESS:
+
       newState = objectAssign( {}, state, {
         ven: action.payload
+        , total: action.total
+        , totalPage: action.totalPage
       } );
       return newState;
 
@@ -88,7 +92,12 @@ export default function venReducer( state = initialState.ven, action ) {
       return state;
 
     case types.LOCATION_CHANGE:
-      return initialState.ven;
+    if(action.payload.location.pathname.includes("/ven")){
+        return state;
+      }
+      else {
+        return initialState.ven;
+      }
 
     default:
       return state;

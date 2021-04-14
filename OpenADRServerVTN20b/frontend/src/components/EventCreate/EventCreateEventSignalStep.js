@@ -75,7 +75,7 @@ export class EventCreateEventSignalStep extends React.Component {
                   classes={classes} eventSignal={signal} hasError={hasError} 
                     onChange={that.handleEventSignalChange(index)}
                     onRemove={that.handleRemoveEventSignalChange(index)}
-                    canBeRemoved={eventSignal.length >0}/>
+                    canBeRemoved={eventSignal.length >0} edit={true}/>
                     
                 </div>
             )

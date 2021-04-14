@@ -29,7 +29,7 @@ docker-compose.yml
 
 Dockerfile*
 .dockerignore*
-generate_test_cert.sh
+# generate_test_cert.sh
 
 OpenADRServerVTN20b/frontend/build
 OpenADRServerVTN20b/frontend/node_modules

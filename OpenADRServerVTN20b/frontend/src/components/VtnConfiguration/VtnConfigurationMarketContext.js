@@ -10,14 +10,19 @@ import GridList from '@material-ui/core/GridList';
 
 import ColorPicker from 'material-ui-color-picker'
 
+import TableCell from '@material-ui/core/TableCell';
 
+import Paper from '@material-ui/core/Paper';
 
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import CloseIcon from '@material-ui/icons/Close';
 
 
-
+import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
+import DeleteIcon from '@material-ui/icons/Delete';
+import FilterListIcon from '@material-ui/icons/FilterList';
 
 
 import Divider from '@material-ui/core/Divider';
@@ -25,8 +30,10 @@ import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
 
 import { VtnConfigurationMarketContextCard } from '../common/VtnConfigurationCard'
+import EnhancedTable  from '../common/EnhancedTable'
 
-
+import { history } from '../../store/configureStore';
+import Avatar from '@material-ui/core/Avatar';
 
 
 export class VtnConfigurationMarketContext extends React.Component {
@@ -34,62 +41,21 @@ export class VtnConfigurationMarketContext extends React.Component {
     super( props );
 
     this.state = {}
-    this.state.name = ''
-    this.state.description = ''
-    this.state.color = '';
-    this.state.editMode = false;
 
+    this.state.pagination = {
+      page: 0
+      , size: 5
+    } 
+    this.state.sort = {
+      sort: "asc"
+      , by: "name"
+    }
 
   }
 
 
-  handleCreateMarketContextNameChange = (event) => {
-    this.setState( {
-      name: event.target.value
-    } );
-  };
-
-  handleCreateMarketContextDescriptionChange = (event) => {
-    this.setState( {
-      description: event.target.value
-    } );
-  };
-
-  handleCreateMarketContextColorChange = (color) => {
-    this.setState( {
-      color: color
-    } );
-  };
-
-  handleCancelMarketContextButtonClick = () => {
-    this.setState( {
-      name: '',
-      description: '',
-      color: '',
-      editMode: false
-    } )
-  }
-
-  handleCreateMarketContextButtonClick = (event) => {
-    event.preventDefault();
-    var dto = {
-      name: this.state.name,
-      description: this.state.description,
-      color: this.state.color
-    }
-    if ( !this.state.editMode ) {
-      this.props.createMarketContext( dto )
-    } else {
-      this.props.updateMarketContext( dto )
-    }
-
-
-    this.setState( {
-      name: '',
-      description: '',
-      color: '',
-      editMode: false
-    } )
+  handleCreateMarketContextButtonClick = (e) => {
+    history.push( '/marketcontext/create' )
   }
 
   handleDeleteMarketContext = (id) => {
@@ -101,137 +67,74 @@ export class VtnConfigurationMarketContext extends React.Component {
 
   }
 
-  handleEditMarketContext = (context) => {
-    var that = this;
-    return function ( event ) {
-      event.preventDefault();
-      that.setState( {
-        editMode: true,
-        name: context.name,
-        description: context.description,
-        color: context.color
-      } )
-    }
+  handlePaginationChange = (pagination) => {
+   this.setState( {
+      pagination
+    } );
+  }
+
+  handleSortChange = (sort) => {
+   this.setState( {
+      sort
+    } );
   }
 
 
 
   render() {
     const {classes, marketContext} = this.props;
-    var view = [];
-
-    for (var i in marketContext) {
-      var context = marketContext[ i ];
-
-      view.push(
-
-        <VtnConfigurationMarketContextCard key={ 'marketcontext_card_' + context.id }
-                                           classes={ classes }
-                                           context={ context }
-                                           handleDeleteMarketContext={ this.handleDeleteMarketContext( context.id ) }
-                                           handleEditMarketContext={ this.handleEditMarketContext( context ) } />
-      );
-    }
-
-    var marginTop = 13;
 
 
 
     return (
-    <div className={ classes.root }>
-      <form >
-        <Grid container spacing={ 8 }>
-          <Grid container>
-                
-            <Grid item xs={ 3 }>
-              <TextField label="Name"
-                         value={ this.state.name }
-                         className={ classes.textField }
-                         onChange={ this.handleCreateMarketContextNameChange }
-                         disabled={ this.state.editMode }
-                         style={{width:"95%"}}
-                         InputLabelProps={{
-                          shrink: true,
-                        }}
-
-                        InputProps={{style:{marginTop:24}}} />
-            </Grid>
-            <Grid item xs={ 5 }>
-              <TextField label="Description"
-                         value={ this.state.description }
-                         className={ classes.textField }
-                         style={{width:"95%"}}
-                         onChange={ this.handleCreateMarketContextDescriptionChange }
-                         fullWidth={ true } 
-                         InputLabelProps={{
-                            shrink: true,
-                          }}
-                          InputProps={{style:{marginTop:24}}}/>
-            </Grid>
-            <Grid item xs={ 2 }>
-              <ColorPicker label="Color"
-                           defaultValue='#000'
-                           value={ this.state.color }
-                           TextFieldProps={ { 
-                            className: classes.textField
-                            , style:{width:"95%"}
-                            , InputLabelProps: {
-                              shrink: true,
-                            },
-                            InputProps:{style:{marginTop:24, color: this.state.color}}
-                            } } 
-                           onChange={ this.handleCreateMarketContextColorChange } />
-            </Grid>
-            <Grid item xs={ 1 }>
-              
-
-              {(this.state.editMode) ? <Button key="vtn_cancel"
-                        variant="outlined"
-                        color="secondary"
-                        size="small"
-                        className={ classes.button }
-                        style={ { marginTop } }
-                        onClick={ this.handleCancelMarketContextButtonClick }>
-                  <CloseIcon />
-                </Button>: null}      
-            </Grid>
-            <Grid item xs={ 1 }>
-              {(this.state.editMode) ? <Button key="btn_save"
-                              variant="outlined"
-                              color="primary"
-                              size="small"
-                              className={ classes.button }
-                              style={ { marginTop } }
-                              fullWidth={ true } 
-                              onClick={ this.handleCreateMarketContextButtonClick }>
-                        <AddIcon /> Save
-                      </Button> : null}
-
-              {(!this.state.editMode) ? <Button key="btn_create"
-                            variant="outlined"
-                            color="primary"
-                            size="small"
-                            className={ classes.button }
-                            style={ { marginTop } }
-                            fullWidth={ true } 
-                            onClick={ this.handleCreateMarketContextButtonClick }>
-                      <AddIcon />New
-                    </Button>: null}
-
-            </Grid>
+    <Paper className={ classes.root }>
+      
 
 
+      <EnhancedTable 
+        title="MarketContext"
+        data={marketContext}
+        total={marketContext.length}
+        pagination={this.state.pagination}
+        sort={this.state.sort}
+        handlePaginationChange={this.handlePaginationChange}
+        handleSortChange={this.handleSortChange}
+        rows={[
+          { id: 'name', numeric: false, disablePadding: true, label: 'MarketContext'},
+          { id: 'description', numeric: false, disablePadding: false, label: 'Description' },
+          { id: 'color', numeric: false, disablePadding: false, label: 'Color' },
+        ]} 
+        rowTemplate={n => {
+          return <React.Fragment>
+            <TableCell component="th" scope="row" padding="none">
+              {n.name}
+            </TableCell>
+            <TableCell>{n.description}</TableCell>
+            <TableCell align="right"><Avatar style={{backgroundColor: n.color, width: "15px", height: "15px"}}/></TableCell>
+          </React.Fragment>
+        }}
+        actionSelected={() => {
+          return <React.Fragment>
+            <Tooltip title="Delete">
+            <IconButton aria-label="Delete">
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+          </React.Fragment>
+        }}
+        action={() => {
+          return <React.Fragment>
             
-          </Grid>
-        </Grid>
-      </form>
-      <div >
-        <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
-        <GridList style={ { justifyContent: 'left', } }>
-          { view }
-        </GridList>
-      </div>
-    </div>
+
+                     <Tooltip title="New" onClick={ this.handleCreateMarketContextButtonClick }>
+            <IconButton aria-label="New">
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
+          </React.Fragment>
+        }}
+        />
+    </Paper>
     );
   }
 }

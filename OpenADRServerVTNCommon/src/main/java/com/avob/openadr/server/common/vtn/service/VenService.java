@@ -25,6 +25,7 @@ import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenDao;
 import com.avob.openadr.server.common.vtn.models.ven.VenSpecification;
 import com.avob.openadr.server.common.vtn.models.ven.filter.VenFilter;
+import com.avob.openadr.server.common.vtn.models.ven.sort.VenSort;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDao;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
@@ -37,7 +38,9 @@ import com.avob.openadr.server.common.vtn.security.DigestAuthenticationProvider;
 @Service
 public class VenService extends AbstractUserService<Ven> {
 
-	private static final Integer DEFAULT_SEARCH_SIZE = 20;
+	private static final Integer DEFAULT_SEARCH_SIZE = 10;
+	
+	private static final Sort DEFAULT_SEARCH_SORT = Sort.by(Sort.Order.asc("commonName"));
 
 	@Resource
 	private VenDao venDao;
@@ -173,17 +176,28 @@ public class VenService extends AbstractUserService<Ven> {
 	}
 
 	public Page<Ven> search(List<VenFilter> filters) {
-		return search(filters, null, null);
+		return search(filters, null, null, null);
 	}
 
-	public Page<Ven> search(List<VenFilter> filters, Integer page, Integer size) {
+	public Page<Ven> search(List<VenFilter> filters, List<VenSort> sorts, Integer page, Integer size) {
 		if (page == null) {
 			page = 0;
 		}
 		if (size == null) {
 			size = DEFAULT_SEARCH_SIZE;
 		}
-		Sort sort = Sort.by(Sort.Order.desc("registrationId"), Sort.Order.asc("commonName"));
+		Sort sort = DEFAULT_SEARCH_SORT;
+		if( sorts != null && !sorts.isEmpty()) {
+			sort = null;
+			for(VenSort s : sorts) {
+				Sort by = Sort.by(s.getType(), s.getProperty());
+				if(sort == null) {
+					sort = by;
+				} else {
+					sort= sort.and(by);
+				}
+			}
+		} 
 		PageRequest of = PageRequest.of(page, size, sort);
 		return venDao.findAll(VenSpecification.search(filters), of);
 	}

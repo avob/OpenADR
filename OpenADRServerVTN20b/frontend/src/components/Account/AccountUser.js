@@ -34,14 +34,23 @@ var AccountUserTable = (props) => {
       <Toolbar
       className={classes.root}
     >
-      <div className={classes.title}>
+      <div className={classes.title} style={{ flex: 1 }}>
          <Typography variant="h6" id="tableTitle">
              Users
           </Typography>
       </div>
-      <div className={classes.spacer} />
-      <div className={classes.actions}>
-      </div>
+
+      <Button key="btn_create"
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      className={ classes.button }
+                      onClick={ props.handleCreateUserClick }>
+                New
+              </Button>
+
+
+
     </Toolbar>
       <Table className={classes.table}>
         <TableHead>
@@ -97,29 +106,7 @@ export class AccountUser extends React.Component {
 
     return (
     <div className={ classes.root }>
-      <Grid container spacing={ 8 }>
-          <Grid container
-                >
-
-            <Grid item xs={ 11 }>
-              <FilterPanel classes={classes}  type="VEN" />
-            </Grid>
-            <Grid item xs={ 1 }>
-             <Button key="btn_create"
-                      variant="outlined"
-                      color="primary"
-                      size="small"
-                      className={ classes.button }
-                      fullWidth={ true } 
-                      onClick={ this.handleCreateUserClick }>
-                <AddIcon />New
-              </Button>
-            </Grid>
-           
-          </Grid>
-        </Grid> 
-        <Divider style={ { marginBottom: '30px', marginTop: '20px' } } /> 
-      <AccountUserTable user={user} classes={classes} handleDeleteUser={this.handleDeleteUser}/>
+      <AccountUserTable user={user} classes={classes} handleDeleteUser={this.handleDeleteUser} handleCreateUserClick={this.handleCreateUserClick}/>
       
       
  

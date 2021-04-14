@@ -1,48 +1,29 @@
 import React from 'react';
 
-import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 import InputAdornment from '@material-ui/core/InputAdornment';
 
-import Clear from '@material-ui/icons/Clear';
-import Done from '@material-ui/icons/Done';
-
 import Divider from '@material-ui/core/Divider';
 
+import Grid from '@material-ui/core/Grid';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormLabel from '@material-ui/core/FormLabel';
+
+import {  VtnTextField, VtnFeatureField } from '../common/TextField'
 
 
 
-function VtnConfigurationTextField( props ) {
-  return (
-  <TextField label={ props.field }
-             defaultValue={ props.value }
-             className={ props.className }
-             InputProps={ { readOnly: true, } } />
-
-  );
-}
-
-function VtnConfigurationFeatureField( props ) {
-  var str = (props.value) ? 'Supported' : 'not supported'
-  var ico = (props.value) ? <Done color="action" /> : <Clear color="action" />
-  return (
-  <TextField label={ props.field }
-             defaultValue={ str }
-             className={ props.className }
-             InputProps={ { readOnly: true, endAdornment: ( <InputAdornment> { ico } </InputAdornment> ), } } />
-
-  );
-}
 
 const VtnConfigurationParameter = (props) => {
   const {classes, vtnConfiguration} = props;
-
+  console.log(vtnConfiguration)
   var getTextField = function ( label, field ) {
     var view = null;
     var value = props.vtnConfiguration[ field ];
     if ( props.vtnConfiguration[ field ] != null ) {
       view = (
-        <VtnConfigurationTextField className={ classes.textField }
+        <VtnTextField className={ classes.textField }
                                    field={ label }
                                    value={ value } />
       )
@@ -58,16 +39,13 @@ const VtnConfigurationParameter = (props) => {
       var endpoint20b = 'https://' + vtnConfiguration.host + ':' + vtnConfiguration.port + vtnConfiguration.contextPath + '/OpenADR2/Simple/2.0b';
       var endpoint20a = 'https://' + vtnConfiguration.host + ':' + vtnConfiguration.port + vtnConfiguration.contextPath + '/OpenADR2/Simple';
       view = [
-        <FormControl className={ classes.formControl } key="textfield_endpoint20b">
-          <VtnConfigurationTextField className={ classes.textField }
+          <VtnFeatureField className={ classes.textField }
                                      field="OADR 2.0b Endpoint"
                                      value={ endpoint20b } />
-        </FormControl>,
-        <FormControl className={ classes.formControl } key="textfield_endpoint20a">
-          <VtnConfigurationTextField className={ classes.textField }
+        ,
+          <VtnFeatureField className={ classes.textField }
                                      field="OADR 2.0a Endpoint"
                                      value={ endpoint20a } />
-        </FormControl>
       ]
       return view;
 
@@ -79,7 +57,7 @@ const VtnConfigurationParameter = (props) => {
     var value = props.vtnConfiguration[ field ];
     if ( props.vtnConfiguration[ field ] != null ) {
       view = (
-        <VtnConfigurationFeatureField className={ classes.textField }
+        <VtnFeatureField className={ classes.textField }
                                       field={ label }
                                       value={ value } />
       )
@@ -89,22 +67,55 @@ const VtnConfigurationParameter = (props) => {
 
   return (
   <div className={ classes.root }>
-    <FormControl className={ classes.formControl }>
-      { getTextField( 'Identifiant VTN', 'vtnId' ) }
-    </FormControl>
-    <FormControl className={ classes.formControl }>
-      { getTextField( 'Default Pull Frequency (seconds)', 'pullFrequencySeconds' ) }
-    </FormControl>
-    <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
+  <Grid container style={{margin:"0px 10%"}}>
+  <FormControl component="fieldset" fullWidth>
+      <FormLabel component="legend">Settings</FormLabel>
+      <FormGroup aria-label="position" row>
+  
+            <Grid item xs={ 2 }>
+
+                { getTextField( 'Identifiant VTN', 'vtnId' ) }
+            </Grid>
+
+            <Grid item xs={ 2 } >
+
+            </Grid>
+
+             <Grid item xs={ 2 }>
+
+                { getTextField( 'Default Pull Frequency (seconds)', 'pullFrequencySeconds' ) }
+            </Grid>
+
+   
+   </FormGroup>
+   </FormControl>
+   </Grid>
+   <Divider/>
+   <Grid container style={{margin:"0px 10%"}}>
+                 <FormControl component="fieldset" fullWidth>
+      <FormLabel component="legend">Features</FormLabel>
+      <FormGroup aria-label="position" row>
+            <Grid item xs={ 2 } >
+
+                { getFeatureField( 'HTTPS Push feature', 'supportPush' ) }
+            </Grid>
+            <Grid item xs={ 1 } >
+
+            </Grid>
+
+             <Grid item xs={ 2 }>
+
+                { getFeatureField( 'Unsecured HTTP Push feature', 'supportUnsecuredHttpPush' ) }
+            </Grid>
+ </FormGroup>
+   </FormControl>
+   </Grid>
+    
+    
     { getUrlTextField() }
-    <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
-    <FormControl className={ classes.formControl }>
-      { getFeatureField( 'HTTPS Push feature', 'supportPush' ) }
-    </FormControl>
-    <FormControl className={ classes.formControl }>
-      { getFeatureField( 'Unsecured HTTP Push feature', 'supportUnsecuredHttpPush' ) }
-    </FormControl>
   </div>
+
+  
   );
 };
 

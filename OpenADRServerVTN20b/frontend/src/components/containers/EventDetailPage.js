@@ -14,6 +14,9 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
+import Paper from '@material-ui/core/Paper';
+import Toolbar from '@material-ui/core/Toolbar';
+import Button from '@material-ui/core/Button';
 
 import EventDetailDescriptor from '../EventDetail/EventDetailDescriptor'
 import EventDetailActivePeriod from '../EventDetail/EventDetailActivePeriod'
@@ -25,6 +28,8 @@ import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
 
 import { history } from '../../store/configureStore';
+import { EventActionDialog } from '../common/VtnconfigurationDialog'
+
 
 
 function TabContainer( props ) {
@@ -44,8 +49,8 @@ const styles = theme => ({
     flexWrap: 'wrap',
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginLeft: 0, 
+    marginRight: 0,
   },
   dense: {
     marginTop: 19,
@@ -86,9 +91,7 @@ export class EventDetailPage extends React.Component {
     super()
     this.state = {
       value: 0,
-      copySignals: [],
-      copyTargets: [],
-      editMode: false
+      dialogOpen: false
     };
   }
 
@@ -124,13 +127,6 @@ export class EventDetailPage extends React.Component {
     this.props.eventActions.loadEventDetail(this.props.match.params.id);
     this.props.eventActions.loadEventVenResponse(this.props.match.params.id);
 
-    if(this.props.event_detail.event.signals) {
-      this.setState({copySignals: this.props.event_detail.event.signals});
-    }
-    if(this.props.event_detail.event.targets) {
-      this.setState({copyTargets: this.props.event_detail.event.targets});
-    }
-
     switch(this.props.match.params.panel){
       case "descriptor":
         this.setState({value:0});
@@ -154,59 +150,11 @@ export class EventDetailPage extends React.Component {
 
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if(this.props.event_detail.event.signals !== prevProps.event_detail.event.signals) {
-      this.setState({copySignals: this.props.event_detail.event.signals});
-    }
-    if(this.props.event_detail.event.targets !== prevProps.event_detail.event.targets) {
-      this.setState({copyTargets: this.props.event_detail.event.targets});
-    }
-
-    
-  }
-
-  updateCopySignals = (index, newSignal) => {
-    var copySignals = this.state.copySignals;
-    copySignals[index] = newSignal;
-    this.setState({copySignals: copySignals, editMode: true});
-  }
-
-  removeCopySignals = (index) => {
-    var copySignals = this.state.copySignals;
-    copySignals.splice(index, 1)
-    this.setState({copySignals: copySignals, editMode: true});
-  }
-
-  updateCopyTargets = (newTargets) => {
-    this.setState({copyTargets: newTargets, editMode: true});
-  }
-
-   addCopySignals = (index) => {
-    var copySignals = this.state.copySignals;
-    copySignals.push({
-        signalName: "",
-        signalType: "",
-        unitType: "",
-        intervals: [],
-        currentValue: "",
-      });
-    this.setState({copySignals: copySignals, editMode: true});
-  }
-
-  updateEvent = (published) => {
-    var dto = {
-      published:published,
-      signals: this.state.copySignals,
-      targets: this.state.copyTargets
-    }
-    this.props.eventActions.updateEvent(this.props.match.params.id, dto)
-    this.setState({editMode: false});
-  }
 
   onVenSuggestionsFetchRequested = (e) => {
     var filters = [];
     filters.push({type:"VEN", value:e.value});
-    this.props.venActions.searchVen(filters, 0, 5);
+    this.props.venActions.searchVen(filters, [], 0, 5);
   }
 
   onVenSuggestionsClearRequested = () => {
@@ -219,12 +167,43 @@ export class EventDetailPage extends React.Component {
     this.refreshEvent();
   }
 
+  handleVenClick (event) {
+      history.push( '/ven', { filters: [{type:"EVENT", value: event.id}] });
+    }
+
+  handleActionClick (event) {
+      this.setState({dialogOpen: true})
+    }
+
+  handleDialogClose = () => {
+    this.setState({dialogOpen: false})
+  }
+
+
   render() {
     const {classes, event_detail} = this.props;
     const {value} = this.state;
     if(!event_detail.event.activePeriod ) return null;
     return (
-     <div className={ classes.root }>
+     <Paper className={ classes.root }>
+     <Toolbar>
+            <div style={{flex: '0 0 auto'}}>
+              <Typography variant="h6" id="tableTitle">
+                  {event_detail.event.descriptor.marketContext + " - " + event_detail.event.id}
+                </Typography>
+            </div>
+            <div style={{flex: '1 1 100%'}} />
+            <div style={{ flex: '0 0 auto'}}>
+
+
+                
+                   <Button size="small" color="primary" onClick={() => {this.handleVenClick(event_detail.event) }}>VEN</Button>
+                   <Button size="small" color="primary" onClick={() => {this.handleActionClick(event_detail.event) }}>Action</Button>
+            </div>
+                
+
+
+        </Toolbar>
       <Tabs value={ this.state.value }
             onChange={ this.handleChange }
             indicatorColor="primary"
@@ -236,59 +215,39 @@ export class EventDetailPage extends React.Component {
         <Tab label="Targets" />
         <Tab label="Ven Responses" />
       </Tabs>
-      <Divider variant="middle" />
-      { value === 0 && <TabContainer>
-                <EventDetailDescriptor classes={classes} event={event_detail.event} 
-                  activeEvent={this.props.eventActions.activeEvent}
-                  cancelEvent={this.props.eventActions.cancelEvent}
-                  publishEvent={this.props.eventActions.publishEvent}/>
-                     
-                       </TabContainer> }     
-      { value === 1 && <TabContainer>
-                <EventDetailActivePeriod classes={classes} event={event_detail.event}/>
-                     
-                       </TabContainer> }
-      { value === 2 && <TabContainer>
-                <EventDetailSignal classes={classes} event={event_detail.event} 
-                  updateEvent={this.updateEvent}
-                   
-                  
-                  editMode={this.state.editMode}
-                  copySignals={this.state.copySignals}
-                  updateCopySignals={this.updateCopySignals}
-                 
-                  removeCopySignals={this.removeCopySignals}
-                  addCopySignals={this.addCopySignals}
-                  publishEvent={this.props.eventActions.publishEvent}
-                  />
-                  
-                       </TabContainer> }
-      { value === 3 && <TabContainer>
-                <EventDetailTarget classes={classes} event={event_detail.event}
 
-                  updateEvent={this.updateEvent}
-                  group={event_detail.group}
-                  editMode={this.state.editMode}
-                  copyTargets={this.state.copyTargets}
-                  updateCopyTargets={this.updateCopyTargets}
+      <Divider style={{margin: "20px 0"}}/>
+      { value === 0 && <EventDetailDescriptor classes={classes} event={event_detail.event} 
+                  /> }     
+      { value === 1 && <EventDetailActivePeriod classes={classes} event={event_detail.event}/> }
+      { value === 2 && <EventDetailSignal classes={classes} event={event_detail.event} 
+          group={event_detail.group}
                    ven={event_detail.ven}
                 onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
                 onVenSuggestionsClearRequested={this.onVenSuggestionsClearRequested}
                 onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}
-                  />
-                     
-                       </TabContainer> }
+                /> }
+      { value === 3 && <EventDetailTarget classes={classes} event={event_detail.event}
 
-      { value === 4 && <TabContainer>
-                <EventDetailVenResponse classes={classes} event={event_detail.event} venResponse={event_detail.venResponse}
+                 
+                  group={event_detail.group}
+                   ven={event_detail.ven}
+                onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
+                onVenSuggestionsClearRequested={this.onVenSuggestionsClearRequested}
+                onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}
+                  /> }
+
+      { value === 4 &&  <EventDetailVenResponse classes={classes} event={event_detail.event} venResponse={event_detail.venResponse}
                 refreshVenResponse={() => {this.props.eventActions.loadEventVenResponse(this.props.match.params.id)}}
-               />
-                     
-                       </TabContainer> }
+               />  }
                 
+               <EventActionDialog open={ this.state.dialogOpen }
+             close={ this.handleDialogClose }
+             title="Ven actions" 
+             event={event_detail.event}
+             eventActions={this.props.eventActions}/>
 
-
-    </div>
+    </Paper>
 
     );
   }

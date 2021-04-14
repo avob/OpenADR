@@ -1,11 +1,13 @@
 package com.avob.openadr.server.oadr20b.vtn.models.venreport.capability;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,13 +49,13 @@ public class ReportCapabilityDescription {
 
 	private ItemBase itemBase;
 
-	@ElementCollection
-	@LazyCollection(LazyCollectionOption.FALSE)
-	private List<Target> eiDatasource;
+	@ElementCollection(fetch = FetchType.EAGER)
+	// @LazyCollection(LazyCollectionOption.FALSE)
+	private Set<Target> eiDatasource;
 
-	@ElementCollection
-	@LazyCollection(LazyCollectionOption.FALSE)
-	private List<Target> eiSubject;
+	@ElementCollection(fetch = FetchType.EAGER)
+	// @LazyCollection(LazyCollectionOption.FALSE)
+	private Set<Target> eiSubject;
 
 	public Long getId() {
 		return id;
@@ -95,19 +97,19 @@ public class ReportCapabilityDescription {
 		this.itemBase = itemBase;
 	}
 
-	public List<Target> getEiDatasource() {
+	public Set<Target> getEiDatasource() {
 		return eiDatasource;
 	}
 
-	public void setEiDatasource(List<Target> eiDatasource) {
+	public void setEiDatasource(Set<Target> eiDatasource) {
 		this.eiDatasource = eiDatasource;
 	}
 
-	public List<Target> getEiSubject() {
+	public Set<Target> getEiSubject() {
 		return eiSubject;
 	}
 
-	public void setEiSubject(List<Target> eiSubject) {
+	public void setEiSubject(Set<Target> eiSubject) {
 		this.eiSubject = eiSubject;
 	}
 

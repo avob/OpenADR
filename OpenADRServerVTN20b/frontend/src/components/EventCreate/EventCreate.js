@@ -262,7 +262,7 @@ export class EventCreate extends React.Component {
     }
 
     return (
-    <div className={ classes.root }>
+    <Paper className={ classes.root }>
       <Stepper activeStep={ activeStep } className={ classes.stepper }>
         { steps.map( (label, index) => {
             const props = {};
@@ -317,7 +317,7 @@ export class EventCreate extends React.Component {
             </div>
             ) }
       </div>
-    </div>
+    </Paper>
     );
   }
 }

@@ -94,6 +94,7 @@ public class DummyVENManager {
 				VenMarketContextDto dto = new VenMarketContextDto();
 				dto.setName(DummyVTN20bControllerConfig.MARKET_CONTEXT);
 				dto.setDescription(DummyVTN20bControllerConfig.MARKET_CONTEXT_DESCRIPTION);
+				dto.setColor(DummyVTN20bControllerConfig.MARKET_CONTEXT_COLOR);
 				try {
 					VenMarketContextDto createMarketContextUsingPOST = marketContextControllerApi
 							.createMarketContextUsingPOST(dto);

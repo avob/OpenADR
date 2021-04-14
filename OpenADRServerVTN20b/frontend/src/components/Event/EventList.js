@@ -18,12 +18,43 @@ import EventHeader from './EventHeader'
 
 import moment from 'moment'
 
+import EnhancedTable  from '../common/EnhancedTable'
+import TableCell from '@material-ui/core/TableCell';
+import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
+import DeleteIcon from '@material-ui/icons/Delete';
+import FilterListIcon from '@material-ui/icons/FilterList';
+import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
+import Avatar from '@material-ui/core/Avatar';
+import Typography from '@material-ui/core/Typography';
+import { formatTimestamp} from '../../utils/time'
+
+import Grid from '@material-ui/core/Grid';
+
+
+import FilterPanel from '../common/FilterPanel' 
+import AddIcon from '@material-ui/icons/Add';
+
+
 
 
 export class EventList extends React.Component {
   constructor( props ) {
     super( props );
     this.state = {};
+    
+  }
+
+  handlePaginationChange = (pagination) => {
+   this.setState( {
+      pagination
+    } );
+  }
+
+  handleSortChange = (sort) => {
+   this.setState( {
+      sort
+    } );
   }
 
   handleEditEvent = (id) => () => {
@@ -74,68 +105,89 @@ export class EventList extends React.Component {
     this.props.onCurrentDateChange(date);
   }
 
+  getFormatedDatetime = (datetime) => {
+    var format = formatTimestamp(datetime);
+    return (
+      <span>{format.date} {format.time} {format.tz}</span>
+    );
+  }
+
+  handleCreateEventClick = () => {
+    history.push( '/event/create' )
+  }
+
   render() {
     const {classes, marketContext, event, ven, filters, pagination, onFilterChange, onPaginationChange,
-      onVenSuggestionsFetchRequested, onVenSuggestionsClearRequested, onVenSuggestionsSelect} = this.props;
+      onVenSuggestionsFetchRequested, onVenSuggestionsClearRequested, onVenSuggestionsSelect, total} = this.props;
 
-    var view = [];
-
-
-    for (var i in event) {
-      var v = event[ i ];
-      view.push(
-        <VtnConfigurationEventCard key={ 'event_card_' + v.id }
-                                 classes={ classes }
-                                 event={ v } 
-
-                                  handleEditEvent = {this.handleEditEvent(v.id)}
-                                  handleDeleteEvent = {this.handleDeleteEvent(v.id)} />
-      );
-    }
     return (
       <div className={ classes.root }>
-        <EventHeader classes={classes}  marketContext={marketContext} event={event}
-        filters={filters} pagination={pagination} onFilterChange={onFilterChange} onPaginationChange={onPaginationChange}
-        ven={ven}
-                onVenSuggestionsFetchRequested={onVenSuggestionsFetchRequested}
-                onVenSuggestionsClearRequested={onVenSuggestionsClearRequested}
-                onVenSuggestionsSelect={onVenSuggestionsSelect}/>
-        <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
-        <div className="rbc-calendar">
-              <div className="rbc-toolbar">
-                <span className="rbc-btn-group">
-                  <button type="button"
-                    onClick={this.getToday}>Today</button>
-                  <button type="button"
-                    onClick={this.getBack}>Back</button>
-                  <button type="button"
-                    onClick={this.getNext}>Next</button>
-                </span>  
-               
-                <span className="rbc-toolbar-label ">
-                  
-                  <span style={{paddingTop:10}}>{this.getTitle()}</span>
-                  <span className="rbc-btn-group" style={{float:"right", visibility:"hidden"}}>
-                    <button type="button">Color Status</button>
-                    <button type="button">Color Market</button>
-                  </span>  
-                </span>  
-                <span className="rbc-btn-group">
-                  <button type="button" className={(this.state.view === "month") ? "rbc-active" : ""}
-                    onClick={this.handleViewChange("month")}>Month</button>
-                  <button type="button" className={(this.state.view === "week") ? "rbc-active" : ""}
-                    onClick={this.handleViewChange("week")}>Week</button>
-                  <button type="button" className={(this.state.view === "day") ? "rbc-active" : ""}
-                    onClick={this.handleViewChange("day")}>Day</button>
-                  <button type="button" style={{visibility:"hidden"}}>Agenda</button>
-                </span>
+        <EnhancedTable 
+        title="Events"
+        data={event}
+        total={total}
+        pagination={this.props.pagination}
+        sort={this.props.sort}
+        handlePaginationChange={this.props.onPaginationChange}
+        handleSortChange={this.props.onSortChange}
+        handleClick={n => {history.push( '/event/detail/' + n.id )}}
+        rows={[
+          { id: 'id', numeric: false, disablePadding: true, label: 'Id'},
+          { id: 'descriptor.marketContext', numeric: false, disablePadding: true, label: 'MarketContext'},
+          { id: 'activePeriod.start', numeric: false, disablePadding: false, label: 'Start' },
+          { id: 'activePeriod.duration', numeric: false, disablePadding: false, label: 'Duration' },
+          { id: 'lastUpdateTimestamp', numeric: false, disablePadding: false, label: 'Last Update' },
+        ]} 
+        rowTemplate={n => {
+          return <React.Fragment>
+            <TableCell align="justify">{n.id}</TableCell>
+            <TableCell align="justify">{n.descriptor.marketContext}</TableCell>
+            <TableCell>{(n.activePeriod.start) ? this.getFormatedDatetime(n.activePeriod.start) : null}</TableCell>
+            <TableCell>{(n.activePeriod.duration) ? n.activePeriod.duration : null}</TableCell>
+            <TableCell>{(n.lastUpdateTimestamp) ? this.getFormatedDatetime(n.lastUpdateTimestamp) : null}</TableCell>
+          </React.Fragment>
+        }}
+        actionSelected={() => {
+          return <React.Fragment>
+            <Tooltip title="Delete">
+            <IconButton aria-label="Delete">
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+          </React.Fragment>
+        }}
+        action={() => {
+          return <React.Fragment>
+            
 
-                 
-              </div>
-            </div>
-        <GridList style={ { justifyContent: 'left', } }>
-          { view }
-        </GridList>
+                     <Tooltip title="New" onClick={ this.handleCreateEventClick }>
+            <IconButton aria-label="New">
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
+          
+                    
+          </React.Fragment>
+        }}
+        filter={this.props.filters}
+        filterPanel={() => {
+          return <Grid container>
+        <Grid item xs={ 12 }><FilterPanel classes={classes} type="EVENT" hasFilter={{marketContext:true, ven: true, eventStatus:true, date: true}} 
+                marketContext={marketContext}
+                filter={this.props.filters}
+                start={this.props.start}
+                end={this.props.end}
+                onFilterChange={this.props.onFilterChange}
+                onStartChange={this.props.onStartChange}
+                onEndChange={this.props.onEndChange}
+                ven={ven}
+                onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
+                onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
+                onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}
+                /></Grid>
+      </Grid>
+        }}
+        />
       </div>
     );
   }

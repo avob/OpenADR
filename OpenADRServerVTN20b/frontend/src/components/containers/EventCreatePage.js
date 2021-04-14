@@ -21,9 +21,9 @@ import EventCreate from '../EventCreate/EventCreate'
 
 function TabContainer( props ) {
   return (
-  <Typography component="div" style={ { padding: 8 * 3 } }>
+  <div>
     { props.children }
-  </Typography>
+  </div>
   );
 }
 
@@ -87,7 +87,7 @@ export class EventCreatePage extends React.Component {
   onVenSuggestionsFetchRequested = (e) => {
      var filters = [];
     filters.push({type:"VEN", value:e.value});
-    this.props.venActions.searchVen([], 0, 5);
+    this.props.venActions.searchVen([], [], 0, 5);
   }
 
   onVenSuggestionsClearRequested = () => {
@@ -103,23 +103,14 @@ export class EventCreatePage extends React.Component {
 
     return (
      <div className={ classes.root }>
-      <Tabs value={ this.state.value }
-            onChange={ this.handleChange }
-            indicatorColor="primary"
-            textColor="primary"
-            centered>
-        <Tab label="Event Create" />
-      </Tabs>
       <Divider variant="middle" />
-      { value === 0 && <TabContainer>
-                          <EventCreate classes={classes} marketContext={event_create.marketContext} group={event_create.group} 
+       <EventCreate classes={classes} marketContext={event_create.marketContext} group={event_create.group} 
                           createEvent={this.props.eventActions.createEvent}
                           ven={event_create.ven}
                           onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
                           onVenSuggestionsClearRequested={this.onVenSuggestionsClearRequested}
                           onVenSuggestionsSelect={this.onVenSuggestionsSelect}
                           />
-                       </TabContainer> }
 
     </div>
 

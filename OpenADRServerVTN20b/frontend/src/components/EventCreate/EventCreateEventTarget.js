@@ -56,7 +56,7 @@ export class EventCreateEventTarget extends React.Component {
             ven={ven}
             onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
             onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
-            onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}/>
+            onVenSuggestionsSelect={this.props.onVenSuggestionsSelect} edit={true}/>
           </Grid>
 
           

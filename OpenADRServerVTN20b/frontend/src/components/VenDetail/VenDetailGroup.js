@@ -1,62 +1,19 @@
 import React from 'react';
-
-
-
-
-
-
 import { VtnConfigurationGroupCard } from '../common/VtnConfigurationCard'
 import {  GroupSelectDialog } from '../common/VtnconfigurationDialog'
-
-
-
-
-
-
 import Grid from '@material-ui/core/Grid';
-
-
-
-
 import Divider from '@material-ui/core/Divider';
-
-
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-
-
 import IconButton from '@material-ui/core/IconButton';
-
-
-
 import ChipInput from 'material-ui-chip-input'
-
 import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
-
 import SearchIcon from '@material-ui/icons/Search';
-
-
-
-
-
-
-
 import VenDetailHeader from './VenDetailHeader'
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import EnhancedTable  from '../common/EnhancedTable'
+import TableCell from '@material-ui/core/TableCell';
+import Tooltip from '@material-ui/core/Tooltip';
 
 var GroupGridList = (props) => {
   return (
@@ -83,6 +40,14 @@ export class VenDetailGroup extends React.Component {
     super( props );
     this.state = {};
     this.state.groupSelectDialogOpen = false;
+    this.state.pagination = {
+      page: 0
+      , size: 5
+    } 
+    this.state.sort = {
+      sort: "asc"
+      , by: "name"
+    }
   }
 
   handleGroupSelectOpen = () => {
@@ -110,9 +75,22 @@ export class VenDetailGroup extends React.Component {
     }
   }
 
+  handlePaginationChange = (pagination) => {
+   this.setState( {
+      pagination
+    } );
+  }
+
+  handleSortChange = (sort) => {
+   this.setState( {
+      sort
+    } );
+  }
+
+
 
   render() {
-    const {classes, ven,  group, venGroup} = this.props;
+    const {classes, ven, venActions,  group, venGroup} = this.props;
 
     var notAddedGroup = [];
     var venGroupId = [];
@@ -127,54 +105,46 @@ export class VenDetailGroup extends React.Component {
 
     return (
     <div className={ classes.root } >
-      <VenDetailHeader classes={classes} ven={ven} actions={[
- 
-      ]
-      }/>
-      <Divider style={ { marginTop: '20px'} } />
-      { /* Group Row */ }
-      <Grid container>
-        <Grid container>
-          <Grid item xs={ 8 }>
-            <ChipInput label="Filters"
-                       placeholder="Filters"
-                       value={ this.state.filter }
-                       onAdd={ this.handleAddChip }
-                       onDelete={ this.handleDeleteChip }
-                       fullWidth={ true } />
-          </Grid>
-          <Grid item xs={ 1 }>
-            <IconButton className={ classes.iconButton } aria-label="Search">
-              <SearchIcon />
-            </IconButton>
-          </Grid>
-          <Grid item xs={ 3 }>
-            <Button key="btn_create"
-                    style={ { marginTop: 15 } }
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                    fullWidth={true}
-                    className={ classes.button }
-                    onClick={ this.handleGroupSelectOpen }>
-              <AddIcon />Add to a Group
-            </Button>
-            <GroupSelectDialog group={ notAddedGroup }
-                               open={ this.state.groupSelectDialogOpen }
-                               close={ this.handleGroupSelectClose }
-                               title="Add VEN to group:" />
-          </Grid>
-        </Grid>
-        <Grid container spacing={ 24 }>
-          <Grid item xs={ 12 }>
-            <GroupGridList classes={ classes }
-                           group={ venGroup }
-                           handleRemoveVenGroup={ this.handleRemoveVenGroup } />
-          </Grid>
-        </Grid>
-      </Grid>
 
-     
+      <EnhancedTable 
+        title="Group"
+        data={venGroup}
+        total={venGroup.length}
+        pagination={this.state.pagination}
+        sort={this.state.sort}
+        handlePaginationChange={this.handlePaginationChange}
+        handleSortChange={this.handleSortChange}
+        rows={[
+          { id: 'name', numeric: false, disablePadding: true, label: 'Group'},
+          { id: 'description', numeric: false, disablePadding: false, label: 'Description' },
+          { id: 'color', numeric: false, disablePadding: false, label: 'Color' },
+        ]} 
+        rowTemplate={n => {
+          return <React.Fragment>
+            <TableCell component="th" scope="row" padding="none">
+              {n.name}
+            </TableCell>
+            <TableCell>{n.description}</TableCell>
+            <TableCell align="right">{n.color}</TableCell>
+          </React.Fragment>
+        }}
+        actionSelected={() => {
+       
+        }}
+        action={() => {
+          return <React.Fragment>
+            <Tooltip title="New" onClick={ () => {this.handleGroupSelectOpen() } }>
+            <IconButton aria-label="New">
+            <AddIcon />
+            </IconButton>
+            </Tooltip>
+          </React.Fragment>
+        }}
+        />
+        <GroupSelectDialog group={ notAddedGroup}
+                                         open={ this.state.groupSelectDialogOpen }
+                                         close={ this.handleGroupSelectClose }
+                                         title="Select Group" />
     </div>
     );
   }

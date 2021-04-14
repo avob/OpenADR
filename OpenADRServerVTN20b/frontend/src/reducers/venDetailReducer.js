@@ -9,7 +9,7 @@ import initialState from './initialState';
 // and update values on the copy.
 export default function venDetailReducer( state = initialState.ven_detail, action ) {
   let newState;
-
+console.log(state)
   switch (action.type) {
 
     // VENS
@@ -179,23 +179,62 @@ export default function venDetailReducer( state = initialState.ven_detail, actio
       return state;
 
     case types.LOAD_VEN_REQUESTED_REPORT_SUCCESS:
+    console.log(action)
       newState = objectAssign( {}, state, {
         requestedReport: action.payload,
-        totalRequest: action.total,
-        totalPageRequest: action.totalPage
+        // totalRequest: action.total,
+        // totalPageRequest: action.totalPage
       } );
       return newState;
 
     case types.LOAD_VEN_REQUESTED_REPORT_ERROR:
       return state;
 
+
+
+   // VENS AVAILABLE REPORT DESCRIPTION
+    case types.LOAD_VEN_AVAILABLE_REPORT_DESCRIPTION:
+      return state;
+
+    case types.LOAD_VEN_AVAILABLE_REPORT_DESCRIPTION_SUCCESS:
+      newState = objectAssign( {}, state, {
+        availableReportDescription: action.payload
+      } );
+      return newState;
+
+    case types.LOAD_VEN_AVAILABLE_REPORT_DESCRIPTION_ERROR:
+      return state;
+
+
+
+  // REQUESTS
+      
+    case types.LOAD_VEN_REQUESTED_REPORT_SPECIFIER:
+        return state;
+
+      case types.LOAD_VEN_REQUESTED_REPORT_SPECIFIER_SUCCESS:
+        newState = objectAssign( {}, state, {
+          requestedReportSpecifier: action.payload
+        } );
+        return newState;
+
+      case types.LOAD_VEN_REQUESTED_REPORT_SPECIFIER_ERROR:
+        return state;
+
+
+
+
     case types.LOCATION_CHANGE:
       if(action.payload.location.pathname.includes("/ven/detail")){
         return state;
       }
       else {
-        return initialState.event;
+        return initialState.ven_detail;
       }
+
+
+
+
 
     default:
       return state;

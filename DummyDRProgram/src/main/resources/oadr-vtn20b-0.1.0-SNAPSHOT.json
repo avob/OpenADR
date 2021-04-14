@@ -391,24 +391,21 @@
                 ],
                 "parameters": [
                     {
+                        "in": "body",
+                        "name": "demandResponseEventSearch",
+                        "description": "demandResponseEventSearch",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/DemandResponseEventSearchDto"
+                        }
+                    },
+                    {
                         "name": "end",
                         "in": "query",
                         "description": "end",
                         "required": false,
                         "type": "integer",
                         "format": "int64"
-                    },
-                    {
-                        "in": "body",
-                        "name": "filters",
-                        "description": "filters",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/DemandResponseEventFilter"
-                            }
-                        }
                     },
                     {
                         "name": "page",
@@ -733,7 +730,7 @@
                     "demand-response-controller"
                 ],
                 "summary": "readVenDemandResponseEvent",
-                "operationId": "readVenDemandResponseEventUsingGET_1",
+                "operationId": "readVenDemandResponseEventUsingGET",
                 "produces": [
                     "*/*"
                 ],
@@ -775,8 +772,8 @@
                 "tags": [
                     "demand-response-controller"
                 ],
-                "summary": "readVenDemandResponseEvent",
-                "operationId": "readVenDemandResponseEventUsingGET",
+                "summary": "readOneVenDemandResponseEvent",
+                "operationId": "readOneVenDemandResponseEventUsingGET",
                 "produces": [
                     "*/*"
                 ],
@@ -1523,18 +1520,6 @@
                 ],
                 "parameters": [
                     {
-                        "in": "body",
-                        "name": "filters",
-                        "description": "filters",
-                        "required": true,
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/VenFilter"
-                            }
-                        }
-                    },
-                    {
                         "name": "page",
                         "in": "query",
                         "description": "page",
@@ -1549,6 +1534,15 @@
                         "required": true,
                         "type": "integer",
                         "format": "int32"
+                    },
+                    {
+                        "in": "body",
+                        "name": "venSearch",
+                        "description": "venSearch",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/VenSearchDto"
+                        }
                     }
                 ],
                 "responses": {
@@ -5264,6 +5258,24 @@
             },
             "title": "DemandResponseEventReadDto"
         },
+        "DemandResponseEventSearchDto": {
+            "type": "object",
+            "properties": {
+                "filters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DemandResponseEventFilter"
+                    }
+                },
+                "sorts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DemandResponseEventSort"
+                    }
+                }
+            },
+            "title": "DemandResponseEventSearchDto"
+        },
         "DemandResponseEventSignalDto": {
             "type": "object",
             "properties": {
@@ -5333,6 +5345,22 @@
                 }
             },
             "title": "DemandResponseEventSignalIntervalDto"
+        },
+        "DemandResponseEventSort": {
+            "type": "object",
+            "properties": {
+                "property": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "ASC",
+                        "DESC"
+                    ]
+                }
+            },
+            "title": "DemandResponseEventSort"
         },
         "DemandResponseEventUpdateDto": {
             "type": "object",
@@ -6653,6 +6681,40 @@
                 }
             },
             "title": "VenResourceDto"
+        },
+        "VenSearchDto": {
+            "type": "object",
+            "properties": {
+                "filters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/VenFilter"
+                    }
+                },
+                "sorts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/VenSort"
+                    }
+                }
+            },
+            "title": "VenSearchDto"
+        },
+        "VenSort": {
+            "type": "object",
+            "properties": {
+                "property": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "ASC",
+                        "DESC"
+                    ]
+                }
+            },
+            "title": "VenSort"
         },
         "VenUpdateDto": {
             "type": "object",

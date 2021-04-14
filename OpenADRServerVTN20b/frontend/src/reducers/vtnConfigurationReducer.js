@@ -9,7 +9,7 @@ import initialState from './initialState';
 // and update values on the copy.
 export default function vtnConfigurationReducer( state = initialState.vtnConfiguration, action ) {
   let newState;
-
+  // console.log(state)
   switch (action.type) {
 
     // PARAMETERS
@@ -88,14 +88,82 @@ export default function vtnConfigurationReducer( state = initialState.vtnConfigu
     case types.DELETE_GROUP_ERROR:
       return state;
 
+
+    // ACCOUNTS
+    case types.LOAD_ACCOUNT_USER:
+      return state;
+
+    case types.LOAD_ACCOUNT_USER_SUCCESS:
+      newState = objectAssign( {}, state, {
+        account: {
+          user: action.payload
+          , app:state.account.app
+        }
+      } );
+      return newState;
+
+    case types.LOAD_ACCOUNT_USER_ERROR:
+      return state;
+
+     case types.LOAD_ACCOUNT_APP:
+      return state;
+
+    case types.LOAD_ACCOUNT_APP_SUCCESS:
+      newState = objectAssign( {}, state, {
+        account: {
+          app: action.payload
+          , user:state.account.user
+        }
+      } );
+      return newState;
+
+    case types.LOAD_ACCOUNT_APP_ERROR:
+      return state;
+
+
+
+    // KNOWN
+    case types.SEARCH_KNOWN_UNIT:
+      return state;
+
+    case types.SEARCH_KNOWN_UNIT_SUCCESS:
+      newState = objectAssign( {}, state, {
+        known: {
+          unit: action.payload
+          , signal:state.known.signal
+        }
+      } );
+      return newState;
+
+    case types.SEARCH_KNOWN_UNIT_ERROR:
+      return state;
+
+
+    case types.SEARCH_KNOWN_SIGNAL:
+      return state;
+
+    case types.SEARCH_KNOWN_SIGNAL_SUCCESS:
+      newState = objectAssign( {}, state, {
+        known: {
+          unit: state.known.unit
+          , signal: action.payload
+        }
+      } );
+      return newState;
+
+    case types.SEARCH_KNOWN_SIGNAL_ERROR:
+      return state;
+
+
+
+    // LOCATION
     case types.LOCATION_CHANGE:
       if(action.payload.location.pathname.includes("/vtn_configuration")){
         return state;
       }
       else {
-        return initialState.event;
+        return initialState.vtnConfiguration;
       }
-      
 
     default:
       return state;

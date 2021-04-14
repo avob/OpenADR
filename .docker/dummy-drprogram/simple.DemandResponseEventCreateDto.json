@@ -22,6 +22,16 @@
  		"targets": [{
  			"targetId": "Smart_Energy_Module",
  			"targetType": "ENDDEVICE_ASSET"
+ 		}],
+ 		"itemBase": {
+ 			"itemDescription":"RealPower",
+ 			"itemUnits":"W",
+ 			"siScaleCode":"k",
+ 			"xmlType":"PowerRealType"
+ 		}
+ 	}],
+ 	"targets": [{
+ 			"targetId": "Smart_Energy_Module",
+ 			"targetType": "ENDDEVICE_ASSET"
  		}]
- 	}]
  }

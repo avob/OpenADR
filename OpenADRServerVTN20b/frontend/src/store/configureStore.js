@@ -8,7 +8,6 @@ import swaggerMiddleware from './swaggerMiddleware'
 import swagger from 'swagger-client'
 import rootReducer from '../reducers';
 // publicPath env
-console.log(process.env)
 const publicPath = process.env.REACT_APP_BASENAME || null;
 
 export const history = createBrowserHistory({ basename: publicPath });

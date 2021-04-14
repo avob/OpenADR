@@ -2,13 +2,23 @@ export default {
   vtnConfiguration: {
     parameters: {},
     marketContext: [],
-    group: []
+    group: [],
+    account: {
+      user:[],
+      app: []
+    },
+    known: {
+      unit: [],
+      signal: []
+    }
   },
   ven: {
     marketContext: [],
     group: [],
     ven: [],
-    event: []
+    event: [],
+    total: 0,
+    totalPage: 0
   },
   ven_detail: {
     ven: {},
@@ -22,7 +32,9 @@ export default {
     requestedReport:[],
     totalRequest:0,
     totalPageRequest: 0,
-    venOpt:[]
+    venOpt:[],
+    availableReportDescription:[],
+    requestedReportSpecifier: [],
   },
   ven_detail_create_report: {
     availableReportDescription:[],
@@ -51,7 +63,9 @@ export default {
   event: {
     marketContext: [],
     event: [],
-    ven: []
+    ven: [],
+    total: 0,
+    totalPage: 0
   },
   event_detail: {
     event: {},
@@ -68,6 +82,10 @@ export default {
   user: {
     isConnectionPending: true,
     isConnected: false
+  },
+  resource: {
+    resource: [],
+    event: []
   }
 
 };

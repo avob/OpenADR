@@ -7,6 +7,7 @@ import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions'
 import * as venActions from '../../actions/venActions';
 import * as eventActions from '../../actions/eventActions';
 
+import Paper from '@material-ui/core/Paper';
 
 import VenList from '../Ven/VenList'
 import { withStyles } from '@material-ui/core/styles';
@@ -23,8 +24,8 @@ const styles = theme => ({
     flexWrap: 'wrap',
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginLeft: 0,
+    marginRight: 0,
   },
   dense: {
     marginTop: 19,
@@ -57,70 +58,79 @@ export class VenPage extends React.Component {
 
   constructor(props) {
     super(props);
+    console.log(props)
     this.state = {};
     this.state.filters = [];
-    if(props.location.state && props.location.state.filters.length > 0) {
+    if(this.props.location.state && this.props.location.state.filters && this.props.location.state.filters.length > 0) {
       this.state.filters = this.state.filters.concat(props.location.state.filters)
+    }
+    this.state.sorts = [];
+    if(this.props.location.state && this.props.location.state.sorts && this.props.location.state.sorts.length > 0) {
+      this.state.sorts = this.state.sorts.concat(props.location.state.sorts)
     }
     this.state.pagination = {
       page: 0
-      , size: 20
+      , size: 10
     }
-  }
+    this.state.sort = {
+      sort: "asc"
+      , by: "commonName"
+    }
 
-  componentDidMount() {
-    this.props.vtnConfigurationActions.loadMarketContext();
-    this.props.vtnConfigurationActions.loadGroup();
-    this.props.venActions.searchVen(this.state.filters, this.state.pagination.page, this.state.pagination.size);
-
+    // this.props.vtnConfigurationActions.loadMarketContext();
+    // this.props.vtnConfigurationActions.loadGroup();
+    this.props.venActions.searchVen(this.state.filters, this.state.sorts, this.state.pagination.page, this.state.pagination.size);
   }
 
   onFilterChange = (filters) => {
+    console.log(filters)
     this.setState({filters});
-    this.props.venActions.searchVen(filters, this.state.pagination.page, this.state.pagination.size);
+    this.props.venActions.searchVen(filters, this.state.sorts, this.state.pagination.page, this.state.pagination.size);
+  }
+
+  onSortChange = (sort) => {
+    console.log(sort)
+    const sorts = [{property: sort.by, type: sort.sort.toUpperCase()}];
+    this.setState({sorts: sorts, sort: sort});
+     this.props.venActions.searchVen(this.state.filters, sorts, this.state.pagination.page, this.state.pagination.size);
   }
 
   onPaginationChange = (pagination) => {
+    console.log(pagination)
     this.setState({pagination});
+    this.props.venActions.searchVen(this.state.filters, this.state.sorts, pagination.page, pagination.size);
   }
 
   onEventSuggestionsFetchRequested = (e) => {
-    console.log(e);
     var filters = this.state.filters.splice(0);
-    this.props.eventActions.searchEvent(filters, null, null, 0, 5);
+    // this.props.eventActions.searchEvent(filters, null, null, 0, 5);
   }
 
   onEventSuggestionsClearRequested = () => {
   }
 
   onEventSuggestionsSelect = (event) => {
-    console.log(event)
      var filters = this.state.filters;
     filters.push({type:"EVENT", value:event.descriptor.eventId});
     this.setState({filters});
-    this.props.eventActions.searchEvent(filters, this.state.pagination.page, this.state.pagination.size);
+    this.props.eventActions.searchEvent(filters, this.state.sorts, this.state.pagination.page, this.state.pagination.size);
   }
 
   render() {
     const {classes, ven} = this.props;
     return (
-    <div className={ classes.root }>
-      <Tabs value={ 0 }
-            indicatorColor="primary"
-            textColor="primary"
-            centered>
-        <Tab label="VENs" />
-      </Tabs>
-      <Divider variant="middle" />
-      <Typography component="div" style={ { padding: 8 * 3 } }>
+    <Paper className={ classes.root }>
         <VenList classes={ classes }
-                 ven={ ven.ven }
+                 ven={ ven.ven}
+                 total={ven.total}
                  marketContext={ ven.marketContext }
                  group={ ven.group }
                  deleteVen={ this.props.venActions.deleteVen } 
                  filters={this.state.filters}
+                 sort={this.state.sort}
                  pagination={this.state.pagination}
                  onFilterChange={this.onFilterChange}
+                 onSortChange={this.onSortChange}
                  onPaginationChange={this.onPaginationChange}
 
                  event={ven.event}
@@ -128,8 +138,7 @@ export class VenPage extends React.Component {
                   onEventSuggestionsClearRequested={this.onEventSuggestionsClearRequested}
                   onEventSuggestionsSelect={this.onEventSuggestionsSelect}
                  />
-      </Typography>
-    </div>
+    </Paper>
 
     );
   }

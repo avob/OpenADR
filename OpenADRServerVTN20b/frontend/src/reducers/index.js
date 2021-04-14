@@ -12,6 +12,10 @@ import event from './eventReducer'
 import event_detail from './eventDetailReducer'
 import event_create from './eventCreateReducer';
 import user from './loginReducer';
+import resource from './resourceReducer';
+
+
+
 
 
 
@@ -30,7 +34,8 @@ const rootReducer = combineReducers( {
   event,
   event_detail,
   event_create,
-  user
+  user,
+  resource
 } );
 
 export default rootReducer;

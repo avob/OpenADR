@@ -20,9 +20,9 @@ import VenDetailReportRequest from '../VenDetailReportRequest/VenDetailReportReq
 
 function TabContainer( props ) {
   return (
-  <Typography component="div" style={ { padding: 8 * 3 } }>
+  <div>
     { props.children }
-  </Typography>
+  </div>
   );
 }
 

@@ -85,7 +85,7 @@ export class VenDetailReport extends React.Component {
     return (
     <div className={ classes.root } >
       <VenAvailableReportHeader availableReport={availableReport} classes={classes}/>
-      <Divider style={ { marginBottom: '30px', marginTop: '20px' } } /> 
+      <Divider/>
       <VenAvailableReportDescriptionTable availableReportDescription={availableReportDescription} classes={classes}/>
   
     </div>

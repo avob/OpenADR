@@ -42,6 +42,7 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.sort.DemandResponseEventSort;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenDao;
 import com.avob.openadr.server.common.vtn.models.ven.VenSpecification;
@@ -57,10 +58,10 @@ public class DemandResponseEventService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DemandResponseEventService.class);
 
-	private static final Integer DEFAULT_SEARCH_SIZE = 20;
-
-	private static final Sort SORT_ASC_ACTIVEPERIOD = Sort.by(Sort.Direction.ASC, "activePeriod.start");
-
+private static final Integer DEFAULT_SEARCH_SIZE = 10;
+	
+	private static final Sort DEFAULT_SEARCH_SORT =  Sort.by(Sort.Direction.ASC, "activePeriod.start");
+	
 	@Value("${oadr.supportPush:#{false}}")
 	private Boolean supportPush;
 
@@ -414,7 +415,7 @@ public class DemandResponseEventService {
 		if (size != null && size > 0) {
 			Pageable limit = null;
 			int i = (int) (long) size;
-			limit = PageRequest.of(0, i, SORT_ASC_ACTIVEPERIOD);
+			limit = PageRequest.of(0, i, DEFAULT_SEARCH_SORT);
 
 			Page<DemandResponseEvent> findAll = demandResponseEventDao
 					.findAll(DemandResponseEventSpecification.toSentByVenUsername(username), limit);
@@ -422,7 +423,7 @@ public class DemandResponseEventService {
 
 		} else {
 			return demandResponseEventDao.findAll(DemandResponseEventSpecification.toSentByVenUsername(username),
-					SORT_ASC_ACTIVEPERIOD);
+					DEFAULT_SEARCH_SORT);
 		}
 	}
 
@@ -437,10 +438,10 @@ public class DemandResponseEventService {
 	}
 
 	public Page<DemandResponseEvent> search(List<DemandResponseEventFilter> filters, Long start, Long end) {
-		return search(filters, start, end, null, null);
+		return search(filters, null, start, end, null, null);
 	}
 
-	public Page<DemandResponseEvent> search(List<DemandResponseEventFilter> filters, Long start, Long end, Integer page,
+	public Page<DemandResponseEvent> search(List<DemandResponseEventFilter> filters, List<DemandResponseEventSort> sorts, Long start, Long end, Integer page,
 			Integer size) {
 		if (page == null) {
 			page = 0;
@@ -458,8 +459,21 @@ public class DemandResponseEventService {
 		} else if (end != null) {
 			spec = spec.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrBefore(end));
 		}
+		
+		Sort sort = DEFAULT_SEARCH_SORT;
+		if( sorts != null && !sorts.isEmpty()) {
+			sort = null;
+			for(DemandResponseEventSort s : sorts) {
+				Sort by = Sort.by(s.getType(), s.getProperty());
+				if(sort == null) {
+					sort = by;
+				} else {
+					sort= sort.and(by);
+				}
+			}
+		} 
 
-		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size, SORT_ASC_ACTIVEPERIOD));
+		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size, sort));
 	}
 
 	public Page<DemandResponseEvent> searchSendable(List<DemandResponseEventFilter> filters, Long start, Integer page,
@@ -481,7 +495,7 @@ public class DemandResponseEventService {
 //					.or(DemandResponseEventSpecification.hasActivePeriodStartAfter(start)));
 		}
 
-		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size, SORT_ASC_ACTIVEPERIOD));
+		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size, DEFAULT_SEARCH_SORT));
 	}
 
 }

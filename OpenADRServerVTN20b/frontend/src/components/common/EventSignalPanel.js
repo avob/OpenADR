@@ -16,7 +16,7 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 
 
-
+import Typography from '@material-ui/core/Typography';
 import MenuItem from '@material-ui/core/MenuItem';
 
 import Select from '@material-ui/core/Select';
@@ -38,6 +38,8 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Toolbar from '@material-ui/core/Toolbar';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
+
+import EventTargetPanel from './EventTargetPanel';
 
 
 
@@ -297,21 +299,6 @@ var getAvailableUnitType = (signalName, signalType) => {
   return validUnitType;
 }
 
-const labelStyle = {
-
-  boxSizing: 'border-box',
-  color: 'rgba(0, 0, 0, 0.54)',
-  fontSize: '1rem',
-  fontWeight: 400,
-
-  lineHeight: 1,
-  transition: 'color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms',
-  transform: 'translate(0, 1.5px) scale(0.75)',
-  transformOrigin: 'top left',
-  top: 0,
-  left: 0,
-  marginTop: "-8px"
-}
 
 const toolbarStyles = theme => ({
   root: {
@@ -342,11 +329,15 @@ const toolbarStyles = theme => ({
 });
 
 var SignalIntervalTable = (props) => {
-  const {classes} = props;
+  const {classes, edit} = props;
   return (
-    <Paper >
+    <div >
+
+
+    {edit ? 
       <Toolbar>
         <Grid container spacing={ 24 }>
+
           <Grid item xs={ 4 }>
             <TextField label="Interval Duration (min)" required
                         type="number"
@@ -366,7 +357,7 @@ var SignalIntervalTable = (props) => {
                        InputLabelProps={{ shrink: true }}
                        fullWidth={ true } />
           </Grid> 
-          {(props.needIntervalCreate && props.createIntervalValue !== "" && props.createIntervalDuration !== "") ? <Grid item xs={ 2 }>
+         <Grid item xs={ 2 }>
             <Button key="btn_create"
                             variant="outlined"
                             color="primary"
@@ -375,7 +366,7 @@ var SignalIntervalTable = (props) => {
                             onClick={ props.handleCreateIntervalClick }>
                       <AddIcon />{(props.createIntervalEditMode ) ? "Edit" : "Create"}
                     </Button>
-          </Grid>: null}
+          </Grid>
 
           {(props.needIntervalCreate && props.createIntervalValue !== "" && props.createIntervalDuration !== "") ? <Grid item xs={ 2 }>
             <Button key="btn_create"
@@ -390,12 +381,13 @@ var SignalIntervalTable = (props) => {
           
           
       </Grid>
-      </Toolbar>
-      {(props.intervals.length > 0) ? <Table className={classes.table}>
+      </Toolbar> : null}
+      {(edit && props.intervals.length > 0) ? <Table className={classes.table}>
         <TableHead>
           <TableRow>
-            <TableCell align="right">Duration</TableCell>
-            <TableCell align="right">Value</TableCell>
+            <TableCell align="left">Interval ID</TableCell>
+            <TableCell align="right">Interval Duration</TableCell>
+            <TableCell align="right">Interval Value</TableCell>
             <TableCell align="right"></TableCell>
             <TableCell align="right"></TableCell>
           </TableRow>
@@ -403,8 +395,10 @@ var SignalIntervalTable = (props) => {
         <TableBody>
           {props.intervals.map( (row, index) => (
             <TableRow key={index}>
+              <TableCell scope="row" align="left">{index}</TableCell>
               <TableCell scope="row" align="right">{row.duration}</TableCell>
               <TableCell scope="row" align="right">{row.value}</TableCell>
+
               <TableCell scope="row" align="right">
                   <Button size="small" color="primary" onClick={props.handleEditIntervalClick(row, index)}> EDIT </Button>
               </TableCell>
@@ -415,8 +409,26 @@ var SignalIntervalTable = (props) => {
           ))}
         </TableBody>
       </Table> : null}
+      {(!edit && props.intervals.length > 0) ? <Table className={classes.table}>
+        <TableHead>
+          <TableRow>
+            <TableCell>Interval ID</TableCell>
+            <TableCell>Interval Duration</TableCell>
+            <TableCell>Interval Value</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {props.intervals.map( (row, index) => (
+            <TableRow key={index}>
+              <TableCell>{index}</TableCell>
+              <TableCell>{row.duration}</TableCell>
+              <TableCell>{row.value}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table> : null}
       
-    </Paper>
+    </div>
   );
 }
 
@@ -554,7 +566,7 @@ export class EventSignalPanel extends React.Component {
 
 
   render() {
-    const {classes, hasError, eventSignal} = this.props;
+    const {classes, hasError, eventSignal, edit, index, group, ven} = this.props;
 
     var signalNameView = [];
     var s;
@@ -597,106 +609,113 @@ export class EventSignalPanel extends React.Component {
 
 
     return (
-    <Grid container
-          spacing={ 8 }
-          justify="center">
-
-      <Grid container spacing={ 24 }>
-        <Grid item xs={ 4 }>
+      <div style={{margin:"0 5%"}}>
+      <FormLabel component="legend">
+        Settings
+      </FormLabel>
+      <Grid >
+      <Grid container>
+        <Grid item xs={ 3 }>
           <FormControl className={ classes.formControl }>
-                <FormLabel style={ labelStyle } component="label">
+                
+                {edit ? <React.Fragment><FormLabel component="legend">
                   Signal Name
-                </FormLabel>
-                <Select required value={ eventSignal.signalName} error={ hasError && eventSignal.signalName === ""}
-                              style={ { marginTop: 0 } }
-
+                </FormLabel><Select required value={ eventSignal.signalName} error={ hasError && eventSignal.signalName === ""}
                                onChange={this.handleSignalNameChange}
+                              
                    
-                              inputProps={ { name: 'signal_name_select', id: 'signal_name_select', } }
+                              inputProps={ { name: 'signal_name_select', id: 'signal_name_select'} }
                               >
                       {signalNameView}
-                </Select>
+                </Select> </React.Fragment>: <TextField 
+                       value={ eventSignal.signalName }
+                       className={ classes.textField }
+                       helperText="Signal Name"
+                       fullWidth={ true } />}
+                
               </FormControl>
 
         </Grid> 
-        <Grid item xs={ 4 }>
+        <Grid item xs={ 3 }>
           <FormControl className={ classes.formControl }>
-                <FormLabel style={ labelStyle } component="label">
-                  Signal Name
-                </FormLabel>
-                <Select required disabled={eventSignal.signalName === ""} 
+                
+                
+
+                {edit ? <React.Fragment><FormLabel component="legend">
+                  Signal Type
+                </FormLabel><Select required disabled={eventSignal.signalName === ""} 
                         error={ hasError && eventSignal.signalType === ""}
                         value={ eventSignal.signalType}
-                              style={ { marginTop: 0 } }
 
                                onChange={this.handleSignalTypeChange}
                    
                               inputProps={ { name: 'signal_type_select', id: 'signal_type_select', } }
                               >
                       {signalTypeView}
-                </Select>
+                </Select></React.Fragment>
+                   : <TextField 
+                       value={ eventSignal.signalType }
+                       helperText="Signal Type"
+                       className={ classes.textField }
+                       fullWidth={ true } />}
               </FormControl>
 
         </Grid> 
-        <Grid item xs={ 4 }>
+        <Grid item xs={ 3 }>
           <FormControl className={ classes.formControl }>
-                <FormLabel style={ labelStyle } component="label">
+                
+                
+
+                {edit ? <React.Fragment><FormLabel component="legend">
                   Signal Unit
-                </FormLabel>
-                <Select required disabled={eventSignal.signalName === "" || eventSignal.signalType === ""} value={ eventSignal.unitType}
-                              style={ { marginTop: 0 } }
+                </FormLabel><Select required disabled={eventSignal.signalName === "" || eventSignal.signalType === ""} value={ eventSignal.unitType}
                             error={ hasError && eventSignal.unitType === ""}
                                onChange={this.handleUnitTypeChange}
                    
                               inputProps={ { name: 'unit_type_select', id: 'unit_type_select', } }
                               >
                       {unitTypeView}
-                </Select>
+                </Select></React.Fragment>
+                   : <TextField 
+                       value={ eventSignal.unitType }
+                       helperText="Signal Unit"
+                       className={ classes.textField }
+                       fullWidth={ true } />}
               </FormControl>
         </Grid>
-      </Grid>
-      <Grid container spacing={ 24 }>
-        <Grid item xs={ 4 }>
-            <TextField label="Current Value"
-                       placeholder="Current Value"
-                       error={ hasError && eventSignal.currentValue === "" && eventSignal.intervals.length === 0}
-                       value={ eventSignal.currentValue }
-                       className={ classes.textField }
-                       onChange={ this.handleCurrentValueChange }
-                       fullWidth={ true } />
-          </Grid> 
-        <Grid item xs={4} >
-           <FormControlLabel
-          control={
-            <Checkbox
-              checked={this.state.needIntervalCreate}
-              onChange={this.handleNeedIntervalCreateClick}
-              value="Intervals"
-              color="primary"
-            />
-          }
-          label="Intervals"
-        />
-        </Grid>
-        {(this.props.canBeRemoved) ? <Grid item xs={4} >
-           <Button key="btn_create"
+        <Grid item xs={ 3 }>
+            
+
+
+             <FormControl className={ classes.formControl }>
+                
+
+                {edit ? <React.Fragment><FormLabel component="legend">
+                  Current value
+                </FormLabel> <Button key="btn_create"
                             variant="outlined"
                             color="secondary"
                             size="small"
                             className={ classes.button }
                             onClick={ this.props.onRemove }>
                       <AddIcon />Remove
-                    </Button>
-        </Grid>: null}
-        
-        
+                    </Button></React.Fragment>
+                   : <TextField 
+                       value={ eventSignal.currentValue }
+                       helperText="Current value"
+                       className={ classes.textField }
+                       fullWidth={ true } />}
+              </FormControl>
+          </Grid> 
+      </Grid>
       </Grid>
 
-      
-      {(this.state.needIntervalCreate) ? <Grid container spacing={ 24 }
-         style={ { marginTop: 20 , marginBottom:10 } }>
+      <FormLabel component="legend">
+        Intervals
+      </FormLabel>
+      <Grid container style={{margin:"20px 0"}}>
         <Grid item xs={ 12 }>
-          <SignalIntervalTable intervals={eventSignal.intervals} 
+          <SignalIntervalTable edit={edit} intervals={eventSignal.intervals} 
           handleRemoveSignalIntervalAtIndex={this.handleRemoveSignalIntervalAtIndex}
           needIntervalCreate={this.state.needIntervalCreate}
           createIntervalValue={this.state.createIntervalValue}
@@ -709,10 +728,25 @@ export class EventSignalPanel extends React.Component {
           handleCancelIntervalClick={this.handleCancelIntervalClick}
           />
         </Grid> 
-      </Grid>: null}
-      
+      </Grid>
 
-    </Grid>
+      <FormLabel component="legend">
+        Targets
+      </FormLabel>
+      <Grid container style={{margin:"20px 0"}}>
+        <Grid item xs={ 12 }>
+          <EventTargetPanel classes={classes} eventTarget={eventSignal.targets} group={group} onChange={this.props.onChange}
+        ven={ven}
+        onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
+        onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
+        onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}/>
+        </Grid> 
+      </Grid>
+
+
+      
+      
+      </div>
     );
   }
 }

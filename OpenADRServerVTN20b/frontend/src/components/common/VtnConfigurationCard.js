@@ -33,48 +33,55 @@ import { history } from '../../store/configureStore';
 
 import {formatTimestamp} from '../../utils/time'
 
+import { VenActionDialog } from './VtnconfigurationDialog'
 
 
-
+var icoSize = 35;
+var innerIcoSize = 20;
+var cardContentHeight = 60;
 
 var VtnConfigurationCard = (props) => {
   return (
-  <Card className={ props.classes.card } style={ { margin: 5 } }>
+  <Card className={ props.classes.card }>
     <CardHeader className={ props.classes.media }
                 subheader={ props.cardType }
+                style={{margin:0, padding: 0, paddingLeft: 16, height: 30}}
                 action={ <IconButton size="small"
-                                     onClick={ props.close }
-                                     style={ { padding: 0, margin: '5px 10px' } }>
-                           <CancelIcon />
+                                     onClick={ props.close }>
+                           <CancelIcon style={ { width: '20px', height: '20px'}}/>
                          </IconButton> } />
     <Divider variant="middle" />
     <CardActionArea onClick={ (e) => {
                                 if ( props.edit ) props.edit( e )
                               } }>
-      <CardContent style={ { minHeight: 80, maxHeight: 100 } }>
+      <CardContent style={ { minHeight: cardContentHeight, maxHeight: cardContentHeight,  marginBottom: 5 } }>
         
         <Grid container spacing={ 8 }>
           <Grid container
                 >
             <Grid item xs={ 3 }>
-              <Avatar style={ { backgroundColor: props.color, margin: '0px 10px', height: 50, width: 50 } }>
+              <Avatar style={ { backgroundColor: props.color, margin: '0px 0px', height: icoSize, width: icoSize } }>
                 { props.icon }
               </Avatar>
             </Grid>
             <Grid item xs={ 9 } >
               <Typography gutterBottom
                           variant="title"
-                          component="h2"
+                          component="h1"
                           align="right"
-                          style={{marginRight:10}}>
+                          style={{marginRight:0, marginTop: 0, fontSize: '1.5em'}}>
                 { props.name }
               </Typography>
+           
               <Typography component="p"
                           variant="caption"
                           align="right"
-                          style={{marginRight:10}}>
+                          style={{marginRight:0}}>
                 { props.description }
               </Typography>
+
+         
+              
             </Grid>
           </Grid>
         </Grid>
@@ -112,13 +119,14 @@ export function VtnConfigurationMarketContextCard( props ) {
                         close={ close }
                         edit={ props.handleEditMarketContext }
                         cardType={ "Market Context" }
-                        icon={ <ExtensionIcon style={ { height: 30, width: 30 } } /> }
+                        icon={ <ExtensionIcon style={ { height: innerIcoSize, width: innerIcoSize } } /> }
                         actions={ [ <Button onClick={handleEventClick} key="action_marketcontext_events" size="small" color="primary"> Events </Button>
                         , <Button onClick={handleVenClick} key="action_marketcontext_vens" size="small" color="primary"> Vens </Button> ] } />
   );
 }
 
 export function VtnConfigurationGroupCard( props ) {
+   this.state.dialogOpen=false;
   var close = null;
   if ( props.handleDeleteGroup ) {
     close = props.handleDeleteGroup
@@ -128,6 +136,10 @@ export function VtnConfigurationGroupCard( props ) {
   var handleVenClick = () => {
     history.push( '/ven', { filters: [{type:"GROUP", value: props.group.name}] });
   }
+
+  var handleDialogOpen = () => {
+    this.setState({dialogOpen: true})
+  }
   return (
   <VtnConfigurationCard classes={ props.classes }
                         color="#bbb"
@@ -136,31 +148,89 @@ export function VtnConfigurationGroupCard( props ) {
                         close={ close }
                         edit={ props.handleEditGroup }
                         cardType={ "Group" }
-                        icon={ <GroupWorkIcon style={ { height: 30, width: 30 } } /> }
+                        icon={ <GroupWorkIcon style={ { height: innerIcoSize, width: innerIcoSize } } /> }
                         actions={ [ <Button onClick={handleVenClick}  key="action_group_vens" size="small" color="primary"> Vens </Button> ] } />
   );
 }
 
-export function VtnConfigurationVenCard( props ) {
-  var color = (props.ven.registrationId != null) ? "green" : "#bbb";
-  var handleEventClick = () => {
-    history.push( '/event', { filters: [{type:"VEN", value: props.ven.username}] });
+
+export class VtnConfigurationVenCard extends React.Component {
+  state = {
+    dialogOpen: false,
+  };
+
+
+  componentDidMount() {
   }
 
-  return (
-  <VtnConfigurationCard classes={ props.classes }
+  handleDialogOpen = () => {
+    this.setState({dialogOpen: true})
+  }
+
+  handleDialogClose = () => {
+    this.setState({dialogOpen: false})
+  }
+
+  render() {
+    const {classes, account_create} = this.props;
+    const {value} = this.state;
+    var handleEventClick = () => {
+      history.push( '/event', { filters: [{type:"VEN", value: this.props.ven.username}] });
+    }
+    var color = (this.props.ven.registrationId != null) ? "green" : "#bbb";
+    return (<span>
+  <VtnConfigurationCard classes={ this.props.classes }
                         color={color}
-                        name={ props.ven.commonName }
-                        description={ props.ven.username }
-                        close={ props.handleDeleteVen }
-                        edit={ props.handleEditVen }
+                        name={ this.props.ven.commonName }
+                        description={ this.props.ven.username }
+                        close={ this.props.handleDeleteVen }
+                        edit={ this.props.handleEditVen }
                         cardType={ "VEN" }
-                        icon={ <SettingsInputComponentIcon style={ { height: 30, width: 30} } /> }
-                        actions={ [ <Button onClick={handleEventClick}  key="action_group_vens" size="small" color="primary"> Events </Button> ] } />
+                        icon={ <SettingsInputComponentIcon style={ { height: innerIcoSize, width: innerIcoSize} } /> }
+                        actions={ [ 
+                           <Button onClick={handleEventClick}  key="action_group_vens" size="small" color="primary"> Events </Button> 
+                           , <Button  key="action_vens" size="small" color="primary" onClick={this.handleDialogOpen}> Actions </Button> 
+                           ] } />
+                            <VenActionDialog open={ this.state.dialogOpen }
+                                 close={ this.handleDialogClose }
+                                 title="Ven actions" 
+                                 ven={this.props.ven}
+                                 venActions={this.props.venActions}/>
+                                 </span>
   );
-}
+  }
+ }
+
+// export function VtnConfigurationVenCard( props ) {
+//   var color = (props.ven.registrationId != null) ? "green" : "#bbb";
+  // var handleEventClick = () => {
+  //   history.push( '/event', { filters: [{type:"VEN", value: props.ven.username}] });
+  // }
+
+//   return (<span>
+//   <VtnConfigurationCard classes={ props.classes }
+//                         color={color}
+//                         name={ props.ven.commonName }
+//                         description={ props.ven.username }
+//                         close={ props.handleDeleteVen }
+//                         edit={ props.handleEditVen }
+//                         cardType={ "VEN" }
+//                         icon={ <SettingsInputComponentIcon style={ { height: innerIcoSize, width: innerIcoSize} } /> }
+//                         actions={ [ 
+//                            <Button onClick={handleEventClick}  key="action_group_vens" size="small" color="primary"> Events </Button> 
+//                            , <Button  key="action_group_vens" size="small" color="primary" onClick={() => {
+//                              console.log("panel ven dialog: "+props.ven.username)
+//                            }}> Actions </Button> 
+//                            ] } />
+//                             <VenActionDialog open={ this.state.dialogOpen }
+//                                  close={ this.handleDialogOpen }
+//                                  title="Filter by Market Context" />
+//                                  </span>
+//   );
+// }
 
 export function VtnConfigurationEventCard( props ) {
+ 
   var color;
   switch(props.event.descriptor.state) {
     case "ACTIVE":
@@ -182,6 +252,8 @@ export function VtnConfigurationEventCard( props ) {
     history.push( '/ven', { filters: [{type:"EVENT", value: props.event.id}] });
   }
 
+  
+
   var start = formatTimestamp(props.event.activePeriod.start);
 
   return (
@@ -199,7 +271,7 @@ export function VtnConfigurationEventCard( props ) {
                         close={ props.handleDeleteEvent }
                         edit={ props.handleEditEvent }
                         cardType={ "EVENT" }
-                        icon={ <CalendarTodayIcon style={ { height: 30, width: 30} } /> }
+                        icon={ <CalendarTodayIcon style={ { height: innerIcoSize, width: innerIcoSize} } /> }
                         actions={ [ <Button onClick={handleVenClick} key="action_group_vens" size="small" color="primary"> VENS </Button> ] } />
   );
 }

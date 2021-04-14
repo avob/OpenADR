@@ -45,12 +45,9 @@ import Paper from '@material-ui/core/Paper';
 import { history } from '../../store/configureStore';
 
 import {iCalDurationInSeconds, formatTimestamp} from '../../utils/time'
+import EnhancedTable  from '../common/EnhancedTable'
 
-
-
-var VenRequestedReportTable = (props) => {
-  const {classes, requestedReport, handleDeleteRequestClick, pagination} = props
-  var getActionLabel = (request) => {
+var getActionLabel = (request) => {
     if(request.end != null || request.start != null)  {
       return "DELETE"
     } else if(iCalDurationInSeconds(request.granularity) === 0 || iCalDurationInSeconds(request.reportBackDuration) === 0 )  {
@@ -60,179 +57,76 @@ var VenRequestedReportTable = (props) => {
     }
   }
 
-  var getFormatedCreatedDatetime = (report) => {
-    var format = formatTimestamp(report.createdDatetime);
-    return (
-      <span>{format.date}<br/>{format.time} {format.tz}</span>
-    );
-  }
-  
-
-
-  var onClick = (reportSpecifierId, reportRequestId) => event => props.handleViewReportRequestDetail(reportSpecifierId, reportRequestId)
-
-
-  return (
-    <Paper className={classes.root}>
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            {/* <TableCell align="right">report request ID</TableCell> */}
-            <TableCell align="right">Specifier ID</TableCell>
-            <TableCell align="right">Created<br/>Date/Time</TableCell>
-     
-            <TableCell align="right"></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {requestedReport.map(row => {
-        	  console.log(row)
-            return (
-              <TableRow key={row.reportRequestId+row.reportSpecifierId+row.rid} hover>
-              {/* <TableCell scope="row" onClick={onClick(row.reportSpecifierId, row.reportRequestId)} align="right">{row.reportRequestId}</TableCell>*/}
-                <TableCell scope="row" onClick={onClick(row.reportSpecifierId, row.reportRequestId)} align="right">{row.reportSpecifierId}</TableCell>
-                <TableCell scope="row" onClick={onClick(row.reportSpecifierId, row.reportRequestId)} align="right">{getFormatedCreatedDatetime(row)}</TableCell>
-        
-                <TableCell align="right">
-                  <Button size="small" color="secondary" onClick={function(reportRequestId) {
-                    return () => {handleDeleteRequestClick(reportRequestId)}
-                  }(row.reportRequestId)  }> { getActionLabel(row)} </Button>
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
-      <TablePagination
-      rowsPerPageOptions={pagination.options}
-      component="div"
-      count={props.totalRequest}
-      rowsPerPage={pagination.size}
-      page={pagination.page}
-      backIconButtonProps={{
-        'aria-label': 'Previous Page',
-      }}
-      nextIconButtonProps={{
-        'aria-label': 'Next Page',
-      }}
-      onChangePage={props.handleChangePage}
-      onChangeRowsPerPage={props.handleChangeRowsPerPage}
-    />
-    </Paper>
-  );
-}
-
-
 export class VenDetailRequest extends React.Component {
   constructor( props ) {
     super( props );
-    this.state = {
-    		pagination: {
-        		page: 0,
-        		size: 10,
-        		options: [5, 10, 25]
-        	}
+    this.state = {}
+     this.state.pagination = {
+      page: 0
+      , size: 5
+    } 
+    this.state.sort = {
+      sort: "asc"
+      , by: "name"
     }
   }
   
   componentDidMount() {
 	  this.props.pageVenRequestedReport(this.props.venId, this.state.pagination.page, this.state.pagination.size)
   }
-
-  handleRequestRegisterReportClick = () => {
-    this.props.requestRegisterReport( this.props.ven.username);
-  }
-
-  handleSendRegisterReportClick = () => {
-    this.props.sendRegisterReport( this.props.ven.username);
-  }
   
   handleDeleteRequestClick = (reportRequestId) => {
     this.props.cancelRequestReportSubscription(this.props.ven.username, reportRequestId)
   }
 
-  handleViewReportRequestDetail = (reportSpecifierId, reportRequestId) => {
-    history.push("/ven/detail/"+this.props.ven.username+"/reports/"+reportSpecifierId+"/requests/"+reportRequestId);
+  handleViewReportRequestDetail = (reportRequestId) => {
+    history.push("/ven/detail/"+this.props.ven.username+"/requests/"+reportRequestId);
   }
-  
-  handleChangePage = (e, newPage) => {
-	  var pagination = this.state.pagination;
-	  pagination.page = newPage;
-	  this.setState({pagination});
-	  this.props.pageVenRequestedReport(this.props.venId, newPage, this.state.pagination.size)
+
+  handlePaginationChange = (pagination) => {
+   this.setState( {
+      pagination
+    } );
   }
-  
-  handleChangeRowsPerPage = (e) => {
-	  var pagination = this.state.pagination;
-	  pagination.size = e.target.value;
-	  pagination.page= 0;
-	  this.setState({pagination});
-	  this.props.pageVenRequestedReport(this.props.venId, 0, e.target.value)
+
+  handleSortChange = (sort) => {
+   this.setState( {
+      sort
+    } );
   }
+
 
   render() {
-    const {classes, ven, requestedReport, totalRequest} = this.props;
-
+    const {classes, ven, venActions, requestedReport, totalRequest} = this.props;
+    console.log(this.props)
     return (
     <div className={ classes.root } >
-      <VenDetailHeader classes={classes} ven={ven} actions={[
-         <Grid  key="report_action_first_row" container spacing={ 12 }>
-          <Grid item xs={ 6 }>
-            <Button key="btn_create"
-                    style={ { marginTop: 15 } }
-                    variant="outlined"
-                    color="primary"
-                    fullWidth={true}
-                    size="small"
-                    onClick={this.handleRequestRegisterReportClick}>
-              <CloudDownloadIcon style={ { marginRight: 15 } }/> REQUIRE REPORTS
-            </Button>
-          </Grid>
-          <Grid item xs={ 6 }>
-            <Button key="btn_create"
-                    style={ { marginTop: 15 } }
-                    variant="outlined"
-                    color="primary"
-                    fullWidth={true}
-                    size="small"
-                    onClick={this.handleSendRegisterReportClick}>
-              <CloudDownloadIcon style={ { marginRight: 15 } }/> SEND REQUESTS
-            </Button>
-          </Grid>
-           <Grid item xs={ 6 }>
-          <Button key="btn_create"
-                  style={ { marginTop: 15 } }
-                  variant="outlined"
-                  color="secondary"
-                  fullWidth={true}
-                  size="small">
-            <RemoveIcon style={ { marginRight: 15 } }/> CLEAN REQUESTS
-          </Button>
-        </Grid>
-        <Grid item xs={ 6 }>
-          <Button key="btn_create"
-                  style={ { marginTop: 15 } }
-                  variant="outlined"
-                  color="secondary"
-                  fullWidth={true}
-                  size="small">
-            <RemoveIcon style={ { marginRight: 15 } }/> CLEAN REPORTS
-          </Button>
-        </Grid>
-        </Grid>
-      ]
-      }/>
-      <Divider style={ { marginBottom: '30px', marginTop: '20px' } } />
+       <EnhancedTable 
+        title="Requested Reports"
+        data={requestedReport}
+        total={requestedReport.length}
+        pagination={this.state.pagination}
+        sort={this.state.sort}
+        handlePaginationChange={this.handlePaginationChange}
+        handleSortChange={this.handleSortChange}
+        rows={[
+          { id: 'reportSpecifierId', numeric: false, disablePadding: false, label: 'ReportSpecifierID' },
+          { id: 'createdDatetime', numeric: false, disablePadding: false, label: 'Created' },
+        ]} 
+        rowTemplate={n => {
+          var created = formatTimestamp(n.createdDatetime);
+          return <React.Fragment>
+            <TableCell>{n.reportSpecifierId}</TableCell>
+            <TableCell>{created.date + " " +created.time + " " + created.tz}</TableCell>
+          </React.Fragment>
+        }}
+        handleClick={(n) => {this.handleViewReportRequestDetail(n.reportRequestId)}}
+        action={() => {
+          return <React.Fragment>
 
-      <VenRequestedReportTable ven={ven} requestedReport={requestedReport}
-         handleDeleteRequestClick={this.handleDeleteRequestClick} 
-         handleViewReportRequestDetail={this.handleViewReportRequestDetail} classes={classes}
-   	pagination={this.state.pagination}
-      handleChangePage={this.handleChangePage}
-      handleChangeRowsPerPage={this.handleChangeRowsPerPage}
-      totalRequest={totalRequest}
-      />
-
+          </React.Fragment>
+        }}
+        />
      
     </div>
     );

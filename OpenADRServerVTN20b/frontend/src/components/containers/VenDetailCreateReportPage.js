@@ -21,9 +21,9 @@ import VenDetailCreateReport from '../VenDetailCreateReport/VenDetailCreateRepor
 
 function TabContainer( props ) {
   return (
-  <Typography component="div" style={ { padding: 8 * 3 } }>
+  <div>
     { props.children }
-  </Typography>
+  </div>
   );
 }
 

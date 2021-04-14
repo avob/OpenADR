@@ -22,7 +22,13 @@
  		}, {
  			"duration": "PT15M",
  			"value": 2.0
- 		}]
+ 		}],
+ 		"itemBase": {
+ 			"itemDescription":"RealPower",
+ 			"itemUnits":"W",
+ 			"siScaleCode":"k",
+ 			"xmlType":"PowerRealType"
+ 		}
  		
  	}, {
  		"signalName": "LOAD_DISPATCH",
@@ -37,6 +43,16 @@
  		}, {
  			"duration": "PT15M",
  			"value": 900
- 		}]
- 	}]
+ 		}],
+ 		"itemBase": {
+ 			"itemDescription":"RealPower",
+ 			"itemUnits":"W",
+ 			"siScaleCode":"k",
+ 			"xmlType":"PowerRealType"
+ 		}
+ 	}],
+ 	"targets": [{
+		"targetId": "Smart_Energy_Module",
+		"targetType": "ENDDEVICE_ASSET"
+	}]
  }

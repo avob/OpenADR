@@ -1,5 +1,10 @@
 FROM adoptopenjdk/maven-openjdk11
 
+
+
+
+FROM adoptopenjdk/maven-openjdk11
+
 RUN mkdir /opt/oadr
 RUN mkdir /opt/oadr/lib
 RUN mkdir /opt/oadr/vtn20b
@@ -8,8 +13,17 @@ RUN mkdir /opt/oadr/dummy-drprogram
 RUN mkdir /usr/src/openadr
 
 COPY .docker/build /opt/oadr/build
-COPY cert /opt/oadr/cert
+# COPY cert /opt/oadr/cert
+# COPY --from=0 /opt/oadr/cert /opt/oadr/cert
+
+COPY generate_test_cert.sh /generate_test_cert.sh
+RUN chmod +x /generate_test_cert.sh
+RUN /generate_test_cert.sh
+RUN mv /cert /opt/oadr/
+
 COPY . /usr/src/openadr/
+
+
 
 
 RUN mvn dependency:copy@copy-external-dependency -f /usr/src/openadr/pom.xml

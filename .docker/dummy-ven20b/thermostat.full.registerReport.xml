@@ -9,7 +9,7 @@
     xmlns:oadr="http://openadr.org/oadr-2.0b/2012/07" xmlns:gml="http://www.opengis.net/gml/3.2"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:atom="http://www.w3.org/2005/Atom"
     xmlns:xcal="urn:ietf:params:xml:ns:icalendar-2.0" xmlns:strm="urn:ietf:params:xml:ns:icalendar-2.0:stream">
-    <oadr:oadrReport>
+        <oadr:oadrReport>
         <oadr:oadrReportDescription>
             <ei:rID>Status</ei:rID>
             <ei:reportSubject>

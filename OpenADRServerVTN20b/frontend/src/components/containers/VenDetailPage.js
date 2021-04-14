@@ -20,11 +20,20 @@ import VenDetailOptSchedule from '../VenDetail/VenDetailOptSchedule'
 import VenDetailEnrollment from '../VenDetail/VenDetailEnrollment'
 import VenDetailGroup from '../VenDetail/VenDetailGroup'
 
+import VenDetailReportDescription from '../VenDetail/VenDetailReportDescription'
+import VenDetailRequestSpecifier from '../VenDetail/VenDetailRequestSpecifier'
+
+
+
 
 
 import green from '@material-ui/core/colors/green';
 
 import { history } from '../../store/configureStore';
+import Paper from '@material-ui/core/Paper';
+import Toolbar from '@material-ui/core/Toolbar';
+import Button from '@material-ui/core/Button';
+import { VenActionDialog } from '../common/VtnconfigurationDialog'
 
 
 
@@ -46,8 +55,8 @@ const styles = theme => ({
     flexWrap: 'wrap',
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginLeft: 0,
+    marginRight: 0,
   },
   dense: {
     marginTop: 19,
@@ -58,8 +67,6 @@ const styles = theme => ({
   formControl: {
     margin: theme.spacing.unit,
     minWidth: 500,
-        marginTop: 22
-
   },
   card: {
     maxWidth: 350,
@@ -73,24 +80,9 @@ const styles = theme => ({
   button: {
     margin: theme.spacing.unit,
   },
-
-  gridList: {
-    flexWrap: 'nowrap',
-    // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
-    transform: 'translateZ(0)',
-  },
-  title: {
-    color: theme.palette.primary.light,
-  },
-  success: {
-    backgroundColor: green[600],
-  },
   iconButton: {
     marginTop: 10
   },
-  
-
-
 });
 
 export class VenDetailPage extends React.Component {
@@ -99,9 +91,20 @@ export class VenDetailPage extends React.Component {
     super();
     this.state = {
       value: 0,
-      venId: null
+      venId: null,
+      dialogOpen: false,
+      selectedReportSpecifierId: null
     };
+
     
+  }
+
+  handleDialogOpen = () => {
+    this.setState({dialogOpen: true})
+  }
+
+  handleDialogClose = () => {
+    this.setState({dialogOpen: false})
   }
 
   handleChange = (event, value) => {
@@ -144,7 +147,7 @@ export class VenDetailPage extends React.Component {
     this.props.venActions.loadVenRequestedReport( this.props.match.params.username );
     this.props.venActions.loadVenOpt( this.props.match.params.username );
     this.setState({venId: this.props.match.params.username})
-    
+    console.log(this.props.match.params.panel)
     switch(this.props.match.params.panel){
       case "settings":
         this.setState({value:0});
@@ -170,11 +173,38 @@ export class VenDetailPage extends React.Component {
     }
   }
 
+  handleEventClick (ven) {
+      history.push( '/event', { filters: [{type:"VEN", value: ven.username}] });
+    }
+
+  handleActionClick (ven) {
+      this.setState({dialogOpen: true})
+    }
+
   render() {
     const {classes, ven_detail} = this.props;
     const {value} = this.state;
     return (
     <div className={ classes.root }>
+    <Paper>
+    <Toolbar>
+            <div style={{flex: '0 0 auto'}}>
+              <Typography variant="h6" id="tableTitle">
+                  {ven_detail.ven.commonName}
+                </Typography>
+            </div>
+            <div style={{flex: '1 1 100%'}} />
+            <div style={{ flex: '0 0 auto'}}>
+
+
+                
+                   <Button size="small" color="primary" onClick={() => {this.handleEventClick(ven_detail.ven) }}>Event</Button>
+                   <Button size="small" color="primary" onClick={() => {this.handleActionClick(ven_detail.ven) }}>Action</Button>
+            </div>
+                
+
+
+        </Toolbar>
       <Tabs value={ this.state.value }
             onChange={ this.handleChange }
             indicatorColor="primary"
@@ -187,10 +217,11 @@ export class VenDetailPage extends React.Component {
         <Tab label="Enrollments" />
         <Tab label="Groups" />
       </Tabs>
-      <Divider variant="middle" />
-      { value === 0 && <TabContainer>
+      <Divider style={{margin: "20px 0"}}/>
+      { value === 0 && 
                          <VenDetailSettings classes={ classes }
                                             ven={ ven_detail.ven }
+                                            venActions={ this.props.venActions }
 
                                             group={ ven_detail.group }
                                             venGroup={ ven_detail.venGroup }
@@ -202,10 +233,10 @@ export class VenDetailPage extends React.Component {
                                              />
                                             
                                             
-                       </TabContainer> }
-      { value === 1 && <TabContainer>
-                        <VenDetailReport classes={ classes }
+                     }
+      { value === 1 && !this.props.match.params.reportSpecifierId && <VenDetailReport classes={ classes }
                                             ven={ ven_detail.ven }
+                                            venActions={ this.props.venActions }
                                             marketContext={ ven_detail.marketContext }
                                             availableReport={ven_detail.availableReport}
                         					totalReport={ven_detail.totalReport}
@@ -216,68 +247,85 @@ export class VenDetailPage extends React.Component {
 
                         					pageVenAvailableReport={this.props.venActions.pageVenAvailableReport}
                         					venId={this.state.venId}
-                                             />
-                                          
-        
-                       </TabContainer> }
+
+                                  viewDescription={(reportSpecifierId) => {this.setState({selectedReportSpecifierId: reportSpecifierId, value:6})}}
+                                             /> }
+
+      { value === 1 && this.props.match.params.reportSpecifierId && <VenDetailReportDescription classes={ classes }
+                                            ven={ ven_detail.ven }
+                                            venActions={ this.props.venActions }
+                                             availableReportDescription={ven_detail.availableReportDescription}
+                                             selectedReportSpecifierId={this.props.match.params.reportSpecifierId }
+                                             /> }
       
-      { value === 2 && <TabContainer>
-					      <VenDetailRequest classes={ classes }
+      { value === 2 && !this.props.match.params.reportRequestId && <VenDetailRequest classes={ classes }
 					                          ven={ ven_detail.ven }
+                                    venActions={ this.props.venActions }
 					                          marketContext={ ven_detail.marketContext }
 					                          availableReport={ven_detail.availableReport}
 					                          requestedReport={ven_detail.requestedReport}
-											      totalRequest={ven_detail.totalRequest}
-						      					totalPageRequest={ven_detail.totalPageRequest}
+        											      totalRequest={ven_detail.totalRequest}
+        						      					totalPageRequest={ven_detail.totalPageRequest}
 					                          requestRegisterReport={this.props.venActions.requestRegisterReport}
 					                          sendRegisterReport={this.props.venActions.sendRegisterReport}
 					                          cancelRequestReportSubscription={this.props.venActions.cancelRequestReportSubscription}
-					
-					      						pageVenRequestedReport={this.props.venActions.pageVenRequestedReport}
-					      venId={this.state.venId}
-					                           />
-					                        
-					
-					     </TabContainer> }
+        					      						pageVenRequestedReport={this.props.venActions.pageVenRequestedReport}
+        					                  venId={this.state.venId}
+
+					                           />		}
+
+      { value === 2 && this.props.match.params.reportRequestId && <VenDetailRequestSpecifier classes={ classes }
+                                    ven={ ven_detail.ven }
+                                    venActions={ this.props.venActions }
+                                    marketContext={ ven_detail.marketContext }
+                                    availableReport={ven_detail.availableReport}
+                                    requestedReport={ven_detail.requestedReport}
+                                    totalRequest={ven_detail.totalRequest}
+                                    totalPageRequest={ven_detail.totalPageRequest}
+                                    requestRegisterReport={this.props.venActions.requestRegisterReport}
+                                    sendRegisterReport={this.props.venActions.sendRegisterReport}
+                                    cancelRequestReportSubscription={this.props.venActions.cancelRequestReportSubscription}
+                                    pageVenRequestedReport={this.props.venActions.pageVenRequestedReport}
+                                    venId={this.state.venId}
+                                    selectedReportRequestId={this.props.match.params.reportRequestId}
+                                    requestedReportSpecifier={ven_detail.requestedReportSpecifier}
+                                     />    }
+
       
-      { value === 3 && <TabContainer>
-                      <VenDetailOptSchedule classes={ classes }
+      { value === 3 && <VenDetailOptSchedule classes={ classes }
                                             ven={ ven_detail.ven }
                                             venOpt={ven_detail.venOpt}
                                             marketContext={ ven_detail.marketContext }                                     
-                                             />
-
-
-        
-                       </TabContainer> }
-      { value === 4 && <TabContainer>
-                      <VenDetailEnrollment classes={ classes }
+                                             />}
+      { value === 4 && <VenDetailEnrollment classes={ classes }
                                             ven={ ven_detail.ven }
+                                            venActions={ this.props.venActions }
                                             marketContext={ ven_detail.marketContext }
                                             venMarketContext={ ven_detail.venMarketContext }  
 
                                             addVenMarketContext={ this.props.venActions.addVenMarketContext }
                                             removeVenMarketContext={ this.props.venActions.removeVenMarketContext }                                    
-                                             />
-
-
-        
-                       </TabContainer> }
-      { value === 5 && <TabContainer>
-                      <VenDetailGroup classes={ classes }
+                                             />}
+      { value === 5 && <VenDetailGroup classes={ classes }
                                             ven={ ven_detail.ven }
-                                            
+                                            venActions={ this.props.venActions }
 
                                             group={ ven_detail.group }
                                             venGroup={ ven_detail.venGroup }
 
                                             addVenGroup={ this.props.venActions.addVenGroup }
                                             removeVenGroup={ this.props.venActions.removeVenGroup }                                  
-                                             />
+                                             /> }
 
 
-        
-                       </TabContainer> }
+
+                                             
+      </Paper>
+      <VenActionDialog open={ this.state.dialogOpen }
+             close={ this.handleDialogClose }
+             title="Ven actions" 
+             ven={ven_detail.ven}
+             venActions={this.props.venActions}/>
     </div>
 
     );

@@ -2,7 +2,7 @@ package com.avob.openadr.server.common.vtn.models;
 
 public enum TargetTypeEnum {
 	
-	VEN("ven"), GROUP("group"), ENDDEVICE_ASSET("endDeviceAsset");
+	VEN("ven"), GROUP("group"), ENDDEVICE_ASSET("endDeviceAsset"), RESOURCE("resource");
 	
 	private String label;
 	

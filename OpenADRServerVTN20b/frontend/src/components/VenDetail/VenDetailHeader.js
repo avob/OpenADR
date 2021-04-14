@@ -1,46 +1,10 @@
 import React from 'react';
-
-
-
-
-
-
 import { VtnConfigurationVenCard } from '../common/VtnConfigurationCard'
-
-
-
-
-
-
-
 import Grid from '@material-ui/core/Grid';
-
-
 import Typography from '@material-ui/core/Typography';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import DoneIcon from '@material-ui/icons/Done';
 import CloseIcon from '@material-ui/icons/Close';
-
-
 
 export class VenDetailHeader extends React.Component {
   constructor( props ) {
@@ -50,7 +14,7 @@ export class VenDetailHeader extends React.Component {
 
 
   render() {
-    const {classes, ven} = this.props;
+    const {classes, ven, venActions} = this.props;
 
 
     var SuccessSnackbar = (props) => {
@@ -109,7 +73,8 @@ export class VenDetailHeader extends React.Component {
           <Grid item lg={ 4 } md={ 6 }>
             <VtnConfigurationVenCard key={ 'ven_card_' }
                                      classes={ classes }
-                                     ven={ ven } />
+                                     ven={ ven } 
+                                     venActions={venActions} />
           </Grid>
           <Grid item lg={ 8 } md={ 6 }>
 

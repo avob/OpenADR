@@ -46,6 +46,7 @@ import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandRespo
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventSearchDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalIntervalDto;
@@ -249,11 +250,14 @@ public class DemandResponseControllerTest {
 	@Test
 	public void createTest() throws Exception {
 
+		
+		DemandResponseEventSearchDto demandResponseEventSearchDto = new DemandResponseEventSearchDto();
+		demandResponseEventSearchDto.setFilters(DemandResponseEventFilter.builder()
+				.addVenId(DemandResponseControllerTest.VEN1).build());
 		// perform check
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "/search")
-						.content(mapper.writeValueAsString(DemandResponseEventFilter.builder()
-								.addVenId(DemandResponseControllerTest.VEN1).build()))
+						.content(mapper.writeValueAsString(demandResponseEventSearchDto))
 						.header("Content-Type", "application/json").with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
@@ -294,10 +298,11 @@ public class DemandResponseControllerTest {
 		assertTrue(DemandResponseEventStateEnum.ACTIVE.equals(res.getDescriptor().getState()));
 
 		// perform check
+		demandResponseEventSearchDto.setFilters(DemandResponseEventFilter.builder()
+				.addVenId(DemandResponseControllerTest.VEN1).build());
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "/search")
-						.content(mapper.writeValueAsString(DemandResponseEventFilter.builder()
-								.addVenId(DemandResponseControllerTest.VEN1).build()))
+						.content(mapper.writeValueAsString(demandResponseEventSearchDto))
 						.header("Content-Type", "application/json").with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 
@@ -473,19 +478,23 @@ public class DemandResponseControllerTest {
 
 	@Test
 	public void updateTest() throws Exception {
-		List<DemandResponseEventFilter> filters = DemandResponseEventFilter.builder().addVenId(VEN1).build();
+
+		DemandResponseEventSearchDto demandResponseEventSearchDto = new DemandResponseEventSearchDto();
+		demandResponseEventSearchDto.setFilters(DemandResponseEventFilter.builder()
+				.addVenId(DemandResponseControllerTest.VEN1).build());
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
+						.content(mapper.writeValueAsString(demandResponseEventSearchDto))
 						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		List<DemandResponseEventReadDto> list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(2, list.size());
 
-		filters = DemandResponseEventFilter.builder().addVenId(VEN2).build();
+		demandResponseEventSearchDto.setFilters(DemandResponseEventFilter.builder()
+				.addVenId(DemandResponseControllerTest.VEN2).build());
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
+						.content(mapper.writeValueAsString(demandResponseEventSearchDto))
 						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -577,19 +586,21 @@ public class DemandResponseControllerTest {
 		assertEquals(VEN2, dto.getTargets().get(0).getTargetId());
 		assertEquals(VEN_PARAM, dto.getTargets().get(0).getTargetType());
 
-		filters = DemandResponseEventFilter.builder().addVenId(VEN1).build();
+		demandResponseEventSearchDto.setFilters(DemandResponseEventFilter.builder()
+				.addVenId(DemandResponseControllerTest.VEN1).build());
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
+						.content(mapper.writeValueAsString(demandResponseEventSearchDto))
 						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(1, list.size());
 
-		filters = DemandResponseEventFilter.builder().addVenId(VEN2).build();
+		demandResponseEventSearchDto.setFilters(DemandResponseEventFilter.builder()
+				.addVenId(DemandResponseControllerTest.VEN2).build());
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
+						.content(mapper.writeValueAsString(demandResponseEventSearchDto))
 						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -626,19 +637,21 @@ public class DemandResponseControllerTest {
 		modificationNumber++;
 		assertEquals(modificationNumber, dto.getDescriptor().getModificationNumber());
 
-		filters = DemandResponseEventFilter.builder().addVenId(VEN1).build();
+		demandResponseEventSearchDto.setFilters(DemandResponseEventFilter.builder()
+				.addVenId(DemandResponseControllerTest.VEN1).build());
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
+						.content(mapper.writeValueAsString(demandResponseEventSearchDto))
 						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
 		assertEquals(2, list.size());
 
-		filters = DemandResponseEventFilter.builder().addVenId(VEN2).build();
+		demandResponseEventSearchDto.setFilters(DemandResponseEventFilter.builder()
+				.addVenId(DemandResponseControllerTest.VEN2).build());
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
+						.content(mapper.writeValueAsString(demandResponseEventSearchDto))
 						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		list = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -941,9 +954,13 @@ public class DemandResponseControllerTest {
 
 	private void searchAndExpect(List<DemandResponseEventFilter> filters, int expected)
 			throws JsonProcessingException, Exception {
+		
+		DemandResponseEventSearchDto demandResponseEventSearchDto = new DemandResponseEventSearchDto();
+		demandResponseEventSearchDto.setFilters(filters);
+
 		MvcResult andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(DEMAND_RESPONSE_EVENT_URL + "search")
-						.content(mapper.writeValueAsString(filters))
+						.content(mapper.writeValueAsString(demandResponseEventSearchDto))
 						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		List<DemandResponseEventReadDto> list = convertMvcResultToDemandResponseDtoList(andReturn);
@@ -952,6 +969,8 @@ public class DemandResponseControllerTest {
 
 	private void searchAndExpect(List<DemandResponseEventFilter> filters, Long start, Long end, int expected)
 			throws JsonProcessingException, Exception {
+		DemandResponseEventSearchDto demandResponseEventSearchDto = new DemandResponseEventSearchDto();
+		demandResponseEventSearchDto.setFilters(filters);
 		String url = DEMAND_RESPONSE_EVENT_URL + "search";
 		List<String> params = new ArrayList<>();
 		if (start != null) {
@@ -966,7 +985,7 @@ public class DemandResponseControllerTest {
 		}
 
 		MvcResult andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(url).content(mapper.writeValueAsString(filters))
+				.perform(MockMvcRequestBuilders.post(url).content(mapper.writeValueAsString(demandResponseEventSearchDto))
 						.header(CONTENT_TYPE_HEADER_NAME, APPLICATION_JSON_HEADER_VALUE).with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		List<DemandResponseEventReadDto> list = convertMvcResultToDemandResponseDtoList(andReturn);

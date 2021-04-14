@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventSearchDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -90,9 +91,12 @@ public class OadrMockHttpDemandResponseEventMvc {
 
 	public List<DemandResponseEventReadDto> search(UserRequestPostProcessor authSession,
 			List<DemandResponseEventFilter> filters, int status) throws Exception {
+		DemandResponseEventSearchDto demandResponseEventSearchDto = new DemandResponseEventSearchDto();
+
+		demandResponseEventSearchDto.setFilters(filters);
 		MvcResult andReturn = oadrMockHttpMvc
 				.perform(MockMvcRequestBuilders.post(DEMANDRESPONSEEVENT_ENDPOINT + "/search").with(authSession)
-						.content(mapper.writeValueAsString(filters)).header("Content-Type", "application/json"))
+						.content(mapper.writeValueAsString(demandResponseEventSearchDto)).header("Content-Type", "application/json"))
 				.andExpect(MockMvcResultMatchers.status().is(status)).andReturn();
 		return Oadr20bTestUtils.convertMvcResultToDtoList(andReturn, DemandResponseEventReadDto.class);
 	}

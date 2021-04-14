@@ -38,7 +38,13 @@ import SearchIcon from '@material-ui/icons/Search';
 
 
 
+import EnhancedTable  from '../common/EnhancedTable'
+import TableCell from '@material-ui/core/TableCell';
 
+
+import Tooltip from '@material-ui/core/Tooltip';
+import DeleteIcon from '@material-ui/icons/Delete';
+import FilterListIcon from '@material-ui/icons/FilterList';
 
 
 
@@ -46,41 +52,19 @@ import VenDetailHeader from './VenDetailHeader'
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-var MarketContextGridList = (props) => {
-  return (
-  <div className={ props.classes.root }>
-    <GridList className={ props.classes.gridList }
-              cols={ 3 }
-              spacing={ 0 }
-              cellHeight="auto">
-      { props.marketContext.map( context => (
-          <GridListTile key={ context.id } className={ props.classes.tile }>
-            <VtnConfigurationMarketContextCard classes={ props.classes }
-                                               context={ context }
-                                               handleRemoveVenMarketContext={ props.handleRemoveVenMarketContext( context ) } />
-          </GridListTile>
-        ) ) }
-    </GridList>
-  </div>
-  );
-}
-
 export class VenDetailEnrollment extends React.Component {
   constructor( props ) {
     super( props );
     this.state = {}
      this.state.marketContextSelectDialogOpen = false;
+     this.state.pagination = {
+      page: 0
+      , size: 5
+    } 
+    this.state.sort = {
+      sort: "asc"
+      , by: "name"
+    }
   }
 
   handleMarketContextSelectOpen = () => {
@@ -105,8 +89,21 @@ export class VenDetailEnrollment extends React.Component {
     }
   }
 
+  handlePaginationChange = (pagination) => {
+   this.setState( {
+      pagination
+    } );
+  }
+
+  handleSortChange = (sort) => {
+   this.setState( {
+      sort
+    } );
+  }
+
+
   render() {
-    const {classes, ven, marketContext, venMarketContext} = this.props;
+    const {classes, ven, venActions, marketContext, venMarketContext} = this.props;
 
     var notSubscribedMarketContext = [];
     var venMarketContextId = [];
@@ -122,54 +119,49 @@ export class VenDetailEnrollment extends React.Component {
 
     return (
     <div className={ classes.root } >
-      <VenDetailHeader classes={classes} ven={ven} actions={[
- 
-      ]
-      }/>
-      { /* MarketContext Row */ }
-      <Divider style={ { marginTop: '20px' } } />
-      <Grid container >
-        <Grid container>
-          <Grid item xs={ 8 }>
-            <ChipInput label="Filters"
-                       placeholder="Filters"
-                       value={ this.state.filter }
-                       onAdd={ this.handleAddChip }
-                       onDelete={ this.handleDeleteChip }
-                       fullWidth={ true } />
-          </Grid>
-          <Grid item xs={ 1 }>
-            <IconButton className={ classes.iconButton } aria-label="Search">
-              <SearchIcon />
-            </IconButton>
-          </Grid>
-          <Grid item xs={ 3 }>
-            <Button key="btn_create"
-                    style={ { marginTop: 15 } }
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                    fullWidth={true}
-                    className={ classes.button }
-                    onClick={ this.handleMarketContextSelectOpen }>
-              <AddIcon />Subscribe to a Market Context
-            </Button>
-            <MarketContextSelectDialog marketContext={ notSubscribedMarketContext }
-                                       open={ this.state.marketContextSelectDialogOpen }
-                                       close={ this.handleMarketContextSelectClose }
-                                       title="Add VEN to Market Context" />
-          </Grid>
-        </Grid>
-        <Grid container spacing={ 24 }>
-          <Grid item xs={ 12 }>
-            <MarketContextGridList classes={ classes }
-                                   marketContext={ venMarketContext }
-                                   handleRemoveVenMarketContext={ this.handleRemoveVenMarketContext } />
-          </Grid>
-        </Grid>
-      </Grid>
 
-     
+       <EnhancedTable 
+        title="MarketContext"
+        data={venMarketContext}
+        total={venMarketContext.length}
+        pagination={this.state.pagination}
+        sort={this.state.sort}
+        handlePaginationChange={this.handlePaginationChange}
+        handleSortChange={this.handleSortChange}
+        rows={[
+          { id: 'name', numeric: false, disablePadding: true, label: 'MarketContext'},
+          { id: 'description', numeric: false, disablePadding: false, label: 'Description' },
+          { id: 'color', numeric: false, disablePadding: false, label: 'Color' },
+        ]} 
+        rowTemplate={n => {
+          return <React.Fragment>
+            <TableCell component="th" scope="row" padding="none">
+              {n.name}
+            </TableCell>
+            <TableCell>{n.description}</TableCell>
+            <TableCell align="right">{n.color}</TableCell>
+          </React.Fragment>
+        }}
+        actionSelected={() => {
+       
+        }}
+        action={() => {
+          return <React.Fragment>
+            
+
+                     <Tooltip title="New" onClick={ () => {this.handleMarketContextSelectOpen() } }>
+            <IconButton aria-label="New">
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
+          
+          </React.Fragment>
+        }}
+        />
+        <MarketContextSelectDialog marketContext={ notSubscribedMarketContext}
+                                         open={ this.state.marketContextSelectDialogOpen }
+                                         close={ this.handleMarketContextSelectClose }
+                                         title="Select Market Context" />
     </div>
     );
   }

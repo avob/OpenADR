@@ -1,6 +1,6 @@
 package com.avob.openadr.server.oadr20b.vtn.models.venreport.capability;
 
-import java.util.List;
+import java.util.Set;
 
 import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportEnumeratedType;
@@ -21,9 +21,9 @@ public class ReportCapabilityDescriptionDto {
 
 	private ItemBaseDto itemBase;
 
-	private List<TargetDto> eiDatasource;
+	private Set<TargetDto> eiDatasource;
 
-	private List<TargetDto> eiSubject;
+	private Set<TargetDto> eiSubject;
 
 	public long getId() {
 		return id;
@@ -65,19 +65,19 @@ public class ReportCapabilityDescriptionDto {
 		this.itemBase = itemBase;
 	}
 
-	public List<TargetDto> getEiDatasource() {
+	public Set<TargetDto> getEiDatasource() {
 		return eiDatasource;
 	}
 
-	public void setEiDatasource(List<TargetDto> eiDatasource) {
+	public void setEiDatasource(Set<TargetDto> eiDatasource) {
 		this.eiDatasource = eiDatasource;
 	}
 
-	public List<TargetDto> getEiSubject() {
+	public Set<TargetDto> getEiSubject() {
 		return eiSubject;
 	}
 
-	public void setEiSubject(List<TargetDto> eiSubject) {
+	public void setEiSubject(Set<TargetDto> eiSubject) {
 		this.eiSubject = eiSubject;
 	}
 

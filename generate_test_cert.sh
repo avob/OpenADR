@@ -69,7 +69,7 @@ gen_ecc_key_csr()
 	OPENSSL_CONFIG_FILENAME="openssl.conf"
 	write_openssl_config_file $OPENSSL_CONFIG_FILENAME $2 384
 
-	openssl req -out $1.csr -newkey ec:<(openssl ecparam -name secp384r1) -nodes -keyout $1.key \
+	openssl req -out $1.csr -newkey ec:<$(openssl ecparam -name secp384r1) -nodes -keyout $1.key \
 		-subj "/C=$COUNTRY/ST=$STATE/L=$LOCALITY/O=$ORGANIZATION/OU=$ORGANIZATION/CN=$2" -reqexts req_ext -config $OPENSSL_CONFIG_FILENAME
 
 	openssl x509 -req -sha256  -days $5 -in $1.csr -CA $3.crt -CAkey $3.key -CAcreateserial -out $1.crt \
@@ -153,9 +153,9 @@ gen_java_truststore $VTN_XMPP_NAME-rsa
 ###################################
 # VTN ECC
 ###################################
-gen_ecc_key_csr $VTN_NAME-ecc $VTN_NAME $CA_NAME 03 365
-gen_oadr20b_fingerprint $VTN_NAME-ecc
-gen_oadr20a_fingerprint $VTN_NAME-ecc
+# gen_ecc_key_csr $VTN_NAME-ecc $VTN_NAME $CA_NAME 03 365
+# gen_oadr20b_fingerprint $VTN_NAME-ecc
+# gen_oadr20a_fingerprint $VTN_NAME-ecc
 
 ###################################
 # CLIENT

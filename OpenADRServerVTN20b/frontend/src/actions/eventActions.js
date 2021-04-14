@@ -12,8 +12,9 @@ export const loadEvent = (start, end) => {
   );
 }
 
-export const searchEvent = (filters, start, end, page, size) => {
+export const searchEvent = (filters, sorts, start, end, page, size) => {
   var params = {filters, start, end, page, size};
+  params.demandResponseEventSearch = {filters, sorts}
   return swaggerAction(types.SEARCH_EVENT, 
     (api) => {
       return api.apis[ 'demand-response-controller' ].searchUsingPOST(params, jsonResponseContentType);

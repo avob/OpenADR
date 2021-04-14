@@ -25,6 +25,7 @@ import com.avob.server.oadrvtn20b.model.DemandResponseEventCreateDto;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventFilter;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventFilter.TypeEnum;
 import com.avob.server.oadrvtn20b.model.DemandResponseEventReadDto;
+import com.avob.server.oadrvtn20b.model.DemandResponseEventSearchDto;
 import com.avob.server.oadrvtn20b.model.VenMarketContextDto;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -66,6 +67,7 @@ public class DummyEventManager {
 				VenMarketContextDto dto = new VenMarketContextDto();
 				dto.setName(DummyVTN20bControllerConfig.MARKET_CONTEXT);
 				dto.setDescription(DummyVTN20bControllerConfig.MARKET_CONTEXT_DESCRIPTION);
+				dto.setColor(DummyVTN20bControllerConfig.MARKET_CONTEXT_COLOR);
 				try {
 					VenMarketContextDto createMarketContextUsingPOST = marketContextControllerApi
 							.createMarketContextUsingPOST(dto);
@@ -113,8 +115,10 @@ public class DummyEventManager {
 
 			do {
 
+				DemandResponseEventSearchDto demandResponseEventSearch = new DemandResponseEventSearchDto();
+				demandResponseEventSearch.filters(Arrays.asList(filter));
 				ApiResponse<List<DemandResponseEventReadDto>> response = demandResponseControllerApi
-						.searchUsingPOSTWithHttpInfo(Arrays.asList(filter), end, page, null, start);
+						.searchUsingPOSTWithHttpInfo(demandResponseEventSearch, end, page, null, start);
 				totalCount = Integer.valueOf(response.getHeaders().get(X_TOTAL_COUNT).get(0));
 				page++;
 			} while (events.size() < totalCount);

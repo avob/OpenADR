@@ -2,31 +2,80 @@ package com.avob.openadr.server.common.vtn.models.venresource;
 
 public class VenResourceDto {
 
-    private Long id;
+	private long id;
 
-    private String name;
-    
+	private String name;
 
-    public VenResourceDto() {
-    }
+	private VenResourceType type;
 
-    public VenResourceDto(String name) {
-        this.name = name;
-    }
+	private Long venResourceId;
 
-    public Long getId() {
-        return id;
-    }
+	private String venResourceLabel;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	private VenResourceShortDto parent;
 
-    public String getName() {
-        return name;
-    }
+//	private Set<VenResourceShortDto> children;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public VenResourceDto() {
+	}
+
+	public VenResourceDto(String name) {
+		this.name = name;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public VenResourceType getType() {
+		return type;
+	}
+
+	public void setType(VenResourceType type) {
+		this.type = type;
+	}
+
+	public Long getVenResourceId() {
+		return venResourceId;
+	}
+
+	public void setVenResourceId(Long venResourceId) {
+		this.venResourceId = venResourceId;
+	}
+
+	public String getVenResourceLabel() {
+		return venResourceLabel;
+	}
+
+	public void setVenResourceLabel(String venResourceLabel) {
+		this.venResourceLabel = venResourceLabel;
+	}
+
+	public VenResourceShortDto getParent() {
+		return parent;
+	}
+
+	public void setParent(VenResourceShortDto parent) {
+		this.parent = parent;
+	}
+
+//	public Set<VenResourceShortDto> getChildren() {
+//		return children;
+//	}
+//
+//	public void setChildren(Set<VenResourceShortDto> children) {
+//		this.children = children;
+//	}
 }

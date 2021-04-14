@@ -1,14 +1,20 @@
 package com.avob.openadr.server.common.vtn.models.venresource;
 
 import java.io.Serializable;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PreRemove;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -28,35 +34,51 @@ public class VenResource implements Serializable {
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
+	private Long id;
 
 	@NotNull
-	private String name;
+	@Enumerated(EnumType.STRING)
+	private VenResourceType type;
 
+	private Long venResourceId;
+
+	private String venResourceLabel;
+
+	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "venresource_ven_id")
 	private Ven ven;
 
+	@ManyToOne(optional = true)
+	@JoinColumn(name = "parent_id", referencedColumnName = "id")
+	private VenResource parent;
+
+	private String name;
+
+	@OrderColumn(name = "id")
+	@OneToMany(cascade = { CascadeType.ALL }, orphanRemoval = true, fetch = FetchType.EAGER)
+	@JoinColumn(name = "parent_id")
+	private Set<VenResource> children;
+
+	public VenResource(VenResourceType type, Long venResourceId, String venResourceLabel, Ven ven,
+			Set<VenResource> children, String name) {
+		super();
+		this.type = type;
+		this.venResourceId = venResourceId;
+		this.venResourceLabel = venResourceLabel;
+		this.ven = ven;
+		this.children = children;
+		this.name = name;
+	}
+
 	public VenResource() {
 	}
 
-	public VenResource(String name, Ven ven) {
-		this.name = name;
-		this.ven = ven;
-	}
-
-	@PreRemove
-	public void removeVenResourceFromVen() {
-		if (ven != null) {
-			ven.removeResource(this);
-		}
-	}
-
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -74,6 +96,46 @@ public class VenResource implements Serializable {
 
 	public void setVen(Ven ven) {
 		this.ven = ven;
+	}
+
+	public VenResource getParent() {
+		return parent;
+	}
+
+	public void setParent(VenResource parent) {
+		this.parent = parent;
+	}
+
+	public VenResourceType getType() {
+		return type;
+	}
+
+	public void setType(VenResourceType type) {
+		this.type = type;
+	}
+
+	public Long getVenResourceId() {
+		return venResourceId;
+	}
+
+	public void setVenResourceId(Long venResourceId) {
+		this.venResourceId = venResourceId;
+	}
+
+	public String getVenResourceLabel() {
+		return venResourceLabel;
+	}
+
+	public void setVenResourceLabel(String venResourceLabel) {
+		this.venResourceLabel = venResourceLabel;
+	}
+
+	public Set<VenResource> getChildren() {
+		return children;
+	}
+
+	public void setChildren(Set<VenResource> children) {
+		this.children = children;
 	}
 
 }

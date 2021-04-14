@@ -31,10 +31,8 @@ export class EventHeader extends React.Component {
   render() {
     const {classes, marketContext, ven} = this.props;
     return (
-      <div>
-        <Grid container spacing={ 8 }>
           <Grid container>            
-            <Grid item xs={ 11 }>
+            <Grid item xs={ 12 }>
               <FilterPanel classes={classes} type="EVENT" hasFilter={{marketContext:true, ven: true, eventStatus:true}} 
                 marketContext={marketContext}
                 filter={this.props.filters}
@@ -45,22 +43,7 @@ export class EventHeader extends React.Component {
                 onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}
                 />
             </Grid>
-            <Grid item xs={ 1 }>
-             <Button key="btn_create"
-                      variant="outlined"
-                      color="primary"
-                      size="small"
-                      fullWidth={ true } 
-                      className={ classes.button }
-                      onClick={ this.handleCreateEventClick }>
-                <AddIcon />New
-              </Button>
-            </Grid>
-           
-          </Grid>
-        </Grid>  
-        
-      </div>   
+          </Grid>        
     );
   }
 }

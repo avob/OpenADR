@@ -7,6 +7,7 @@ import HomePage from './components/HomePage';
 import NotFoundPage from './components/NotFoundPage';
 import VtnConfigurationPage from './components/containers/VtnConfigurationPage';
 import VenPage from './components/containers/VenPage'
+import ResourcePage from './components/containers/ResourcePage'
 import AccountPage from './components/containers/AccountPage'
 import AccountUserCreatePage from './components/containers/AccountUserCreatePage'
 import AccountAppCreatePage from './components/containers/AccountAppCreatePage'
@@ -20,6 +21,8 @@ import VenDetailReportRequestPage from './components/containers/VenDetailReportR
 
 
 import VenCreatePage from './components/containers/VenCreatePage'
+import MarketContextCreatePage from './components/containers/MarketContextCreatePage'
+import GroupCreatePage from './components/containers/GroupCreatePage'
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -298,24 +301,36 @@ class App extends React.Component {
           <PrivateRoute path="/account/:panel(user|app)" component={ AccountPage } />
           <PrivateRoute path="/account" component={ AccountPage } />
 
-          AccountAppCreatePage
-
-          <PrivateRoute path="/vtn_configuration/:panel(marketcontext|group|parameter)" component={ VtnConfigurationPage } />
+          <PrivateRoute path="/vtn_configuration/:panel(marketcontext|group|parameter|account|known)" component={ VtnConfigurationPage } />
+          <PrivateRoute path="/vtn_configuration/account/:accountPanel(user|app)" component={ VtnConfigurationPage } />
+          <PrivateRoute path="/vtn_configuration/knwon/:panel(unit|signal)" component={ VtnConfigurationPage } />
           <PrivateRoute path="/vtn_configuration" component={ VtnConfigurationPage } />
           
           <PrivateRoute path="/ven/detail/:username/reports/:reportSpecifierId/requests/:reportRequestId" component={ VenDetailReportRequestPage } />
           <PrivateRoute path="/ven/detail/:username/reports/:reportSpecifierId/create" component={ VenDetailCreateReportPage } />
-          <PrivateRoute path="/ven/detail/:username/reports/:reportSpecifierId" component={ VenDetailReportPage } />
-          <PrivateRoute path="/ven/detail/:username/:panel(settings|reports|optschedules)" component={ VenDetailPage } />
+          <PrivateRoute path="/ven/detail/:username/reports/:reportSpecifierId" component={ VenDetailPage } />
+          <PrivateRoute path="/ven/detail/:username/requests/:reportRequestId" component={ VenDetailPage } />
+
+          <PrivateRoute path="/ven/detail/:username/:panel(settings|reports|requests|optschedules|enrollments|groups)" component={ VenDetailPage } />
           <PrivateRoute path="/ven/detail/:username" component={ VenDetailPage } />
+
           <PrivateRoute path="/ven/create" component={ VenCreatePage } />
+
+         
+ <PrivateRoute path="/ven/resource" component={ ResourcePage } />
+
           <PrivateRoute path="/ven" component={ VenPage } />
+
+         
 
           <PrivateRoute path="/event/detail/:id/:panel(descriptor|activeperiod|signal|target|venresponse)" component={ EventDetailPage } />
           <PrivateRoute path="/event/detail/:id" component={ EventDetailPage } />
           <PrivateRoute path="/event/create" component={ EventCreatePage } />
           <PrivateRoute path="/event/:panel(list|calendar)" component={ EventPage } />
           <PrivateRoute path="/event" component={ EventPage } />
+
+          <PrivateRoute path="/marketcontext/create" component={ MarketContextCreatePage } />
+          <PrivateRoute path="/group/create" component={ GroupCreatePage } />
 
           <Route component={ NotFoundPage } />
 

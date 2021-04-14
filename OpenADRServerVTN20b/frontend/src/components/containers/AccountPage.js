@@ -124,6 +124,7 @@ export class AccountPage extends React.Component {
 
   render() {
     const {classes, account} = this.props;
+
     const {value} = this.state;
     return (
     <div className={ classes.root }>
@@ -136,12 +137,10 @@ export class AccountPage extends React.Component {
         <Tab label="Apps" />
       </Tabs>
       <Divider variant="middle" />
-      { value === 0 && <TabContainer>
-                        <AccountUser classes={classes} user={account.user} deleteUser={this.props.accountActions.deleteUser}/>
-                       </TabContainer> }
-      { value === 1 && <TabContainer>
-                          <AccountApp classes={classes} app={account.app} deleteApp={this.props.accountActions.deleteApp}/>
-                       </TabContainer> }
+      { value === 0 && <AccountUser classes={classes} user={account.user} deleteUser={this.props.accountActions.deleteUser}/>
+                        }
+      { value === 1 && <AccountApp classes={classes} app={account.app} deleteApp={this.props.accountActions.deleteApp}/>
+                       }
     </div>
 
     );

@@ -32,19 +32,11 @@ import Grid from '@material-ui/core/Grid';
 
 import {formatTimestamp} from '../../utils/time'
 
+import {  VtnTextField, VtnFeatureField } from '../common/TextField'
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
 
-var EventTextField = (props) => {
-  var value = (props.value != null) ? props.value : "";
-  return (
-  <TextField label={ props.field }
-             value={ value }
-             className={ props.className }
-             margin="normal"
-             fullWidth={true}
-             InputProps={ { readOnly: true, } } />
-
-  );
-}
 
 export class EventDetailDescriptor extends React.Component {
   constructor( props ) {
@@ -76,91 +68,61 @@ export class EventDetailDescriptor extends React.Component {
 
     return (
     <div className={ classes.root } >
-      <EventDetailHeader classes={classes} event={event} actions={<Grid container spacing={ 24 }>
+    
+         <div  style={{margin: "0px 5%"}}>
 
-        {(!event.published) ? <Grid item xs={ 4 }>
-            <Button key="btn_create"
-                    style={ { marginTop: 15 } }
-                    variant="outlined"
-                    color="primary"
-                    fullWidth={true}
-                    size="small"
-                    onClick={this.handlePublishEventClick}>
-              <CloudDownloadIcon style={ { marginRight: 15 } }/> PUBLISH
-            </Button>
-          </Grid> : null}
-
-        {(event.published && event.descriptor.state === "ACTIVE") ? <Grid item xs={ 4 }>
-            <Button key="btn_create"
-                    style={ { marginTop: 15 } }
-                    variant="outlined"
-                    color="secondary"
-                    fullWidth={true}
-                    size="small"
-                    onClick={this.handleCancelEventClick}>
-              <CloudDownloadIcon style={ { marginRight: 15 } }/> CANCEL
-            </Button>
-          </Grid> : null}
-
-        {(event.published && event.descriptor.state === "CANCELLED") ? <Grid item xs={ 4 }>
-            <Button key="btn_create"
-                    style={ { marginTop: 15 } }
-                    variant="outlined"
-                    color="primary"
-                    fullWidth={true}
-                    size="small"
-                    onClick={this.handleActiveEventClick}>
-              <CloudDownloadIcon style={ { marginRight: 15 } }/> ACTIVE
-            </Button>
-          </Grid> : null}
-          
-      
-      </Grid>}/>
-       <Divider style={ { marginTop: '20px' } } />
-       <Grid>
+        <FormControl fullWidth >
+        <FormLabel>Identitication</FormLabel>
+      <FormGroup aria-label="position" row>
         <Grid container spacing={ 24 }>
           <Grid item xs={ 3 }>
-            <EventTextField className={ classes.textField } field="Event ID" value={ event.id } />
+            <VtnTextField className={ classes.textField } field="Event ID" value={ event.id } />
           </Grid>
           <Grid item xs={ 3 }>
-            <EventTextField className={ classes.textField } field="Modification Number" value={ event.descriptor.modificationNumber } />
+            <VtnTextField className={ classes.textField } field="Modification Number" value={ event.descriptor.modificationNumber } />
           </Grid>
           <Grid item xs={ 3 }>
-            <EventTextField className={ classes.textField } field="Oadr Profile" value={ event.descriptor.oadrProfile } />
+            <VtnTextField className={ classes.textField } field="Oadr Profile" value={ event.descriptor.oadrProfile } />
           </Grid>
           <Grid item xs={ 1 }>
-            <EventTextField className={ classes.textField } field="Priority" value={ event.descriptor.priority } />
+            <VtnTextField className={ classes.textField } field="Priority" value={ event.descriptor.priority } />
           </Grid>
            <Grid item xs={ 2 }>
-            <EventTextField className={ classes.textField } field="State" value={ event.descriptor.state } />
+            <VtnTextField className={ classes.textField } field="State" value={ event.descriptor.state } />
           </Grid>
 
         </Grid>
-
         <Grid container spacing={ 24 }>
           <Grid item xs={ 3 }>
-            <EventTextField className={ classes.textField } field="Created Datetime" 
+            <VtnTextField className={ classes.textField } field="Created Datetime" 
             value={ createdDatetime.date + " " +createdDatetime.time + " " + createdDatetime.tz } />
           </Grid>
           <Grid item xs={ 3 }>
-            <EventTextField className={ classes.textField } field="Last Update Datetime" 
+            <VtnTextField className={ classes.textField } field="Last Update Datetime" 
             value={ lastUpdateDatetime.date + " " +lastUpdateDatetime.time + " " + lastUpdateDatetime.tz } />
           </Grid>
            <Grid item xs={ 3 }>
-              <EventTextField className={ classes.textField } field="Vtn Comment" value={ event.descriptor.vtnComment } />
+              <VtnTextField className={ classes.textField } field="Vtn Comment" value={ event.descriptor.vtnComment } />
             </Grid>
             <Grid item xs={ 1 }>
-              <EventTextField className={ classes.textField } field="Is Test Event" value={ event.descriptor.testEvent } />
+              <VtnTextField className={ classes.textField } field="Is Test Event" value={ event.descriptor.testEvent } />
             </Grid>
             <Grid item xs={ 2 }>
-              <EventTextField className={ classes.textField } field="Response Required" value={ event.descriptor.responseRequired } />
+              <VtnTextField className={ classes.textField } field="Response Required" value={ event.descriptor.responseRequired } />
             </Grid>
         </Grid>
+        </FormGroup>
+   </FormControl>
+       </div>
 
-        
-        
+
+
+
+
+
+
+
      
-      </Grid>
     </div>
     );
   }

@@ -1,34 +1,6 @@
 
 import React from 'react';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import ExtensionIcon from '@material-ui/icons/Extension';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
@@ -36,7 +8,13 @@ import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 
 import ChipInput from 'material-ui-chip-input'
 import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
 
+import {DatePicker } from '../common/TimePicker'
+
+import {formatTimestamp} from '../../utils/time'
+
+import Grid from '@material-ui/core/Grid';
 
 
 import { MarketContextSelectDialog, GroupSelectDialog, VenStatusSelectDialog, VenSelectDialog, EventStatusSelectDialog } from './VtnconfigurationDialog'
@@ -64,6 +42,9 @@ var EventChip = (props) => {
   <span style={ { display: 'flex', alignItems: 'center', marginLeft: '-7px', } }><CalendarTodayIcon color="disabled" style={ { marginRight: '5px' } }/> { props.name }</span>
   );
 }
+
+const deltaStartDays = 7
+const deltaEndDays = 7
 
 export class FilterPanel extends React.Component {
 
@@ -181,6 +162,7 @@ export class FilterPanel extends React.Component {
     this.setState( params );
   }
 
+
   render() {
     const {classes, hasFilter} = this.props;
 
@@ -218,65 +200,82 @@ export class FilterPanel extends React.Component {
           chip = <EventChip name={ filter.value } />
           break; 
 
-        
-
+   
 
     		default:
     			break;
     	}
     	filterChip.push(chip)
     }
-
+    var filter_input_length = 6;
+    if(hasFilter && !hasFilter.date) {
+        filter_input_length += 4;
+    }
+    console.log(this.props.start)
     return (
 
 
-    <span>
-    	<ChipInput label="Filters"
+    <Grid container>
+
+       {(hasFilter && hasFilter.date) ?<React.Fragment><Grid item xs={ 2 }>
+            <DatePicker classes={ classes } field="Start" 
+            value={this.props.start} onChange={this.props.onStartChange} />
+          </Grid>
+          <Grid item xs={ 2 }>
+             <DatePicker classes={ classes } field="End" 
+            value={this.props.end} onChange={this.props.onEndChange} />
+          </Grid>
+          </React.Fragment> : null}
+         
+        <Grid item xs={ filter_input_length }>
+    	  <ChipInput label="Filters"
             			className={classes.textField}
                        value={ filterChip }
                        onDelete={ this.removeFilter }
                        onAdd={this.addFilterFromInput}
-                       fullWidth={true}
                        InputLabelProps={{
-				          shrink: true,
-				        }}
-				        style={{width:"75%"}}
-				       />
-	
-    	{(hasFilter && hasFilter.marketContext) ? <span><IconButton className={ classes.iconButton }
+      				          shrink: true,
+          				        }}
+          				        style={{width:"100%"}}
+          				       />
+
+        </Grid>
+        <Grid item xs={ 2 }>
+	    <span style={{float: "right"}}>
+    	{(hasFilter && hasFilter.marketContext) ? <span><Tooltip title="MarketContext"><IconButton className={ classes.iconButton }
                   aria-label="market_context"
                   onClick={ this.handleMarketContextSelectOpen }>
         <ExtensionIcon />
         
-      </IconButton><MarketContextSelectDialog marketContext={ marketContext}
+      </IconButton></Tooltip><MarketContextSelectDialog marketContext={ marketContext}
                                  open={ this.state.marketContextSelectDialogOpen }
                                  close={ this.handleMarketContextSelectClose }
                                  title="Filter by Market Context" /></span>: null}
 
-      {(hasFilter && hasFilter.group) ? <span><IconButton className={ classes.iconButton }
+      {(hasFilter && hasFilter.group) ? <span><Tooltip title="Group"><IconButton className={ classes.iconButton }
                   aria-label="group"
                   onClick={ this.handleGroupSelectOpen }>
         <GroupWorkIcon />
         
-      </IconButton><GroupSelectDialog group={ group }
+      </IconButton></Tooltip><GroupSelectDialog group={ group }
                          open={ this.state.groupSelectDialogOpen }
                          close={ this.handleGroupSelectClose }
                          title="Filter by Group" /></span> : null}
 
-      {(hasFilter && hasFilter.venStatus) ? <span><IconButton className={ classes.iconButton }
+      {(hasFilter && hasFilter.venStatus) ? <span><Tooltip title="Ven status"><IconButton className={ classes.iconButton }
                   aria-label="group"
                   onClick={ this.handleVenStatusSelectOpen }>
         <SettingsInputComponentIcon />
-      </IconButton><VenStatusSelectDialog open={ this.state.venStatusSelectDialogOpen }
+      </IconButton></Tooltip><VenStatusSelectDialog open={ this.state.venStatusSelectDialogOpen }
                          close={ this.handleVenStatusSelectClose }
                          title="Filter by Ven Status" /></span> : null}
 
 
-      {(hasFilter && hasFilter.ven) ? <span><IconButton className={ classes.iconButton }
+      {(hasFilter && hasFilter.ven) ? <span><Tooltip title="Ven"><IconButton className={ classes.iconButton }
                   aria-label="ven"
                   onClick={ this.handleVenSelectOpen }>
         <SettingsInputComponentIcon />
-      </IconButton><VenSelectDialog open={ this.state.venSelectDialogOpen }
+      </IconButton></Tooltip><VenSelectDialog open={ this.state.venSelectDialogOpen }
                         suggestions={ven}
                         onSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
                         onSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
@@ -284,16 +283,17 @@ export class FilterPanel extends React.Component {
                         close={ this.handleVenSelectClose }
                         title="Filter by Targeted Ven" /></span> : null}
 
-      {(hasFilter && hasFilter.eventStatus) ? <span><IconButton className={ classes.iconButton }
+      {(hasFilter && hasFilter.eventStatus) ? <span><Tooltip title="Event status"><IconButton className={ classes.iconButton }
                   aria-label="eventStatus"
                   onClick={ this.handleEventStatusSelectOpen }>
         <CalendarTodayIcon />
-      </IconButton><EventStatusSelectDialog open={ this.state.eventStatusSelectDialogOpen }
+      </IconButton></Tooltip><EventStatusSelectDialog open={ this.state.eventStatusSelectDialogOpen }
                          close={ this.handleEventStatusSelectClose }
                          title="Filter by Event Status" /></span> : null}
 
-
-    </span>
+      </span>
+      </Grid>
+    </Grid>
     );
   }
 }

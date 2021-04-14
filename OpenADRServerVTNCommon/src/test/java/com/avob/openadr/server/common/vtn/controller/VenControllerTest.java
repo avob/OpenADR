@@ -40,6 +40,7 @@ import com.avob.openadr.server.common.vtn.ApplicationTest;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenDto;
+import com.avob.openadr.server.common.vtn.models.ven.VenSearchDto;
 import com.avob.openadr.server.common.vtn.models.ven.VenUpdateDto;
 import com.avob.openadr.server.common.vtn.models.ven.filter.VenFilter;
 import com.avob.openadr.server.common.vtn.models.ven.filter.VenFilterType;
@@ -191,9 +192,11 @@ public class VenControllerTest {
 		filter.setValue("ven");
 		filters.add(filter);
 
+		VenSearchDto searchDto = new VenSearchDto();
+		searchDto.setFilters(filters);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + "search?page=0&size=10")
-						.header("Content-Type", "application/json").content(mapper.writeValueAsString(filters))
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(searchDto))
 						.with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
@@ -205,50 +208,54 @@ public class VenControllerTest {
 		filter.setType(VenFilterType.VEN);
 		filter.setValue("ven1");
 		filters.add(filter);
-		
+
 		filter = new VenFilter();
 		filter.setType(VenFilterType.VEN);
 		filter.setValue("ven2");
 		filters.add(filter);
-		
+
 		filter = new VenFilter();
 		filter.setType(VenFilterType.IS_REGISTERED);
 		filter.setValue("true");
 		filters.add(filter);
 
+		searchDto.setFilters(filters);
+
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + "search?page=0&size=10")
-						.header("Content-Type", "application/json").content(mapper.writeValueAsString(filters))
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(searchDto))
 						.with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
 		assertNotNull(venDto);
 		assertEquals(0, venDto.size());
-		
+
 		filters = new ArrayList<>();
 		filter = new VenFilter();
 		filter.setType(VenFilterType.VEN);
 		filter.setValue("ven1");
 		filters.add(filter);
-		
+
 		filter = new VenFilter();
 		filter.setType(VenFilterType.VEN);
 		filter.setValue("ven2");
 		filters.add(filter);
-		
+
 		filter = new VenFilter();
 		filter.setType(VenFilterType.IS_REGISTERED);
 		filter.setValue("false");
 		filters.add(filter);
-		
+
 		filter = new VenFilter();
 		filter.setType(VenFilterType.IS_REGISTERED);
 		filter.setValue("true");
 		filters.add(filter);
 
+		searchDto.setFilters(filters);
+
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + "search?page=0&size=10")
-						.header("Content-Type", "application/json").content(mapper.writeValueAsString(filters))
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(searchDto))
 						.with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
@@ -330,15 +337,17 @@ public class VenControllerTest {
 		filter.setType(VenFilterType.GROUP);
 		filter.setValue(groupName);
 		filters.add(filter);
-		
+
 		filter = new VenFilter();
 		filter.setType(VenFilterType.GROUP);
 		filter.setValue("mouaiccool");
 		filters.add(filter);
 
+		searchDto.setFilters(filters);
+
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + "search?page=0&size=10")
-						.header("Content-Type", "application/json").content(mapper.writeValueAsString(filters))
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(searchDto))
 						.with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
@@ -465,29 +474,33 @@ public class VenControllerTest {
 		filter.setValue(marketContextName);
 		filters.add(filter);
 
+		searchDto.setFilters(filters);
+
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + "search?page=0&size=10")
-						.header("Content-Type", "application/json").content(mapper.writeValueAsString(filters))
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(searchDto))
 						.with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
 		assertNotNull(venDto);
 		assertEquals(1, venDto.size());
-		
+
 		filters = new ArrayList<>();
 		filter = new VenFilter();
 		filter.setType(VenFilterType.MARKET_CONTEXT);
 		filter.setValue(marketContextName);
 		filters.add(filter);
-		
+
 		filter = new VenFilter();
 		filter.setType(VenFilterType.MARKET_CONTEXT);
 		filter.setValue("mouaiccool");
 		filters.add(filter);
 
+		searchDto.setFilters(filters);
+
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(VEN_URL + "search?page=0&size=10")
-						.header("Content-Type", "application/json").content(mapper.writeValueAsString(filters))
+						.header("Content-Type", "application/json").content(mapper.writeValueAsString(searchDto))
 						.with(adminSession))
 				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
 		venDto = this.convertMvcResultToDtoList(andReturn, VenDto.class);
@@ -556,96 +569,96 @@ public class VenControllerTest {
 		assertNotNull(marketContexts);
 		assertEquals(0, marketContexts.size());
 
-		// create resource
-		String resourceName = "res1";
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/resource")
-						.header("Content-Type", "application/json")
-						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(venSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+//		// create resource
+//		String resourceName = "res1";
+//		this.mockMvc
+//				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/resource")
+//						.header("Content-Type", "application/json")
+//						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(venSession))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+//
+//		this.mockMvc
+//				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/resource")
+//						.header("Content-Type", "application/json")
+//						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(userSession))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+//
+//		this.mockMvc
+//				.perform(MockMvcRequestBuilders.post(VEN_URL + "mouaiccool" + "/resource")
+//						.header("Content-Type", "application/json")
+//						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+//
+//		andReturn = this.mockMvc
+//				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/resource")
+//						.header("Content-Type", "application/json")
+//						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
+//
+//		VenResourceDto convertMvcResultToDto = convertMvcResultToDto(andReturn, VenResourceDto.class);
+//		assertNotNull(convertMvcResultToDto);
+//		assertNotNull(convertMvcResultToDto.getId());
+//		assertEquals(resourceName, convertMvcResultToDto.getName());
 
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/resource")
-						.header("Content-Type", "application/json")
-						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(userSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+//		// test resource name unique for a ven
+//		this.mockMvc
+//				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/resource")
+//						.header("Content-Type", "application/json")
+//						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
+//
+//		this.mockMvc
+//				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername2 + "/resource")
+//						.header("Content-Type", "application/json")
+//						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201));
+//
+//		// find all resource
+//		andReturn = this.mockMvc
+//				.perform(MockMvcRequestBuilders.get(VEN_URL + venUsername + "/resource").with(adminSession))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+//		resources = this.convertMvcResultToDtoList(andReturn, VenResourceDto.class);
+//		assertNotNull(resources);
+//		assertEquals(1, resources.size());
 
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.post(VEN_URL + "mouaiccool" + "/resource")
-						.header("Content-Type", "application/json")
-						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
-
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/resource")
-						.header("Content-Type", "application/json")
-						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201)).andReturn();
-
-		VenResourceDto convertMvcResultToDto = convertMvcResultToDto(andReturn, VenResourceDto.class);
-		assertNotNull(convertMvcResultToDto);
-		assertNotNull(convertMvcResultToDto.getId());
-		assertEquals(resourceName, convertMvcResultToDto.getName());
-
-		// test resource name unique for a ven
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername + "/resource")
-						.header("Content-Type", "application/json")
-						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
-
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.post(VEN_URL + venUsername2 + "/resource")
-						.header("Content-Type", "application/json")
-						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.CREATED_201));
-
-		// find all resource
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.get(VEN_URL + venUsername + "/resource").with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		resources = this.convertMvcResultToDtoList(andReturn, VenResourceDto.class);
-		assertNotNull(resources);
-		assertEquals(1, resources.size());
-
-		// delete resource
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.delete(VEN_URL + venUsername + "/resource/" + resourceName)
-						.header("Content-Type", "application/json")
-						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(venSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
-
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.delete(VEN_URL + venUsername + "/resource/" + resourceName)
-						.header("Content-Type", "application/json")
-						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(userSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
-
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.delete(VEN_URL + "mouaiccool" + "/resource/" + resourceName)
-						.header("Content-Type", "application/json")
-						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
-
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.delete(VEN_URL + venUsername + "/resource/" + "mouaiccool")
-						.header("Content-Type", "application/json")
-						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
-
-		this.mockMvc
-				.perform(MockMvcRequestBuilders.delete(VEN_URL + venUsername + "/resource/" + resourceName)
-						.header("Content-Type", "application/json")
-						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
-
-		// find all resource
-		andReturn = this.mockMvc
-				.perform(MockMvcRequestBuilders.get(VEN_URL + venUsername + "/resource").with(adminSession))
-				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
-		resources = this.convertMvcResultToDtoList(andReturn, VenResourceDto.class);
-		assertNotNull(resources);
-		assertEquals(0, resources.size());
+//		// delete resource
+//		this.mockMvc
+//				.perform(MockMvcRequestBuilders.delete(VEN_URL + venUsername + "/resource/" + resourceName)
+//						.header("Content-Type", "application/json")
+//						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(venSession))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+//
+//		this.mockMvc
+//				.perform(MockMvcRequestBuilders.delete(VEN_URL + venUsername + "/resource/" + resourceName)
+//						.header("Content-Type", "application/json")
+//						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(userSession))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN_403));
+//
+//		this.mockMvc
+//				.perform(MockMvcRequestBuilders.delete(VEN_URL + "mouaiccool" + "/resource/" + resourceName)
+//						.header("Content-Type", "application/json")
+//						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+//
+//		this.mockMvc
+//				.perform(MockMvcRequestBuilders.delete(VEN_URL + venUsername + "/resource/" + "mouaiccool")
+//						.header("Content-Type", "application/json")
+//						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND_404));
+//
+//		this.mockMvc
+//				.perform(MockMvcRequestBuilders.delete(VEN_URL + venUsername + "/resource/" + resourceName)
+//						.header("Content-Type", "application/json")
+//						.content(mapper.writeValueAsString(new VenResourceDto(resourceName))).with(adminSession))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200));
+//
+//		// find all resource
+//		andReturn = this.mockMvc
+//				.perform(MockMvcRequestBuilders.get(VEN_URL + venUsername + "/resource").with(adminSession))
+//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK_200)).andReturn();
+//		resources = this.convertMvcResultToDtoList(andReturn, VenResourceDto.class);
+//		assertNotNull(resources);
+//		assertEquals(0, resources.size());
 
 		// delete ven
 		this.mockMvc.perform(MockMvcRequestBuilders.delete(VEN_URL + venUsername).with(venSession))

@@ -13,8 +13,11 @@ export const loadVen = () => {
   );
 }
 
-export const searchVen = (filters, page, size) => {
-  var params = {filters, page, size};
+export const searchVen = (filters, sorts, page, size) => {
+  var params = {page, size};
+  params.venSearch = {
+    filters, sorts
+  }
   return swaggerAction(types.SEARCH_VEN, 
     (api) => {
       return api.apis[ 'ven-controller' ].searchVenUsingPOST(params, jsonResponseContentType);

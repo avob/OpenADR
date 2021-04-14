@@ -42,30 +42,28 @@ import {VenAutocomplete} from './Autocomplete'
 var EventTargetTable = (props) => {
   const {classes} = props;
   return (
-    <Paper className={classes.root}>
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
-            <TableCell align="right">Target Type</TableCell>
-            <TableCell align="right">Target ID</TableCell>
-            <TableCell align="right">Targeted Devices</TableCell>
-            <TableCell align="right"></TableCell>
+            <TableCell>Target Type</TableCell>
+            <TableCell>Target ID</TableCell>
+            <TableCell>Targeted Devices</TableCell>
+            <TableCell></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.eventTarget.map( (row, index) => (
+          {props.eventTarget && props.eventTarget.map( (row, index) => (
             <TableRow key={index}>
-              <TableCell scope="row" align="right">{row.targetType}</TableCell>
-              <TableCell scope="row" align="right">{row.targetId}</TableCell>
-              <TableCell scope="row" align="right"></TableCell>
-              <TableCell scope="row" align="right">
+              <TableCell>{row.targetType}</TableCell>
+              <TableCell>{row.targetId}</TableCell>
+              <TableCell></TableCell>
+              <TableCell>
                   <Button size="small" color="secondary" onClick={props.handleRemoveTargetAtIndex(index)}> REMOVE </Button>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-    </Paper>
   );
 }
 
@@ -148,13 +146,11 @@ export class EventTargetPanel extends React.Component {
 
 
   render() {
-    const {classes, hasError, eventTarget, group} = this.props;
+    const {classes, hasError, eventTarget, group, edit} = this.props;
 
     return (
-    <Grid container
-          spacing={ 8 }
-          justify="center">
-      
+      <React.Fragment>
+      {edit ? 
       <Grid container spacing={ 24 }>
           <Grid item xs={ 2 }>
            <TextField label="Select Target Type" error={hasError && eventTarget.marketContext == null}
@@ -163,6 +159,7 @@ export class EventTargetPanel extends React.Component {
                  className={classes.textField}
                  fullWidth={true}
                  onClick={this.handleTargetSelectDialogOpen}
+                 margin="normal"
                  InputProps={ { readOnly: true, } } InputLabelProps={{ shrink: true }}/>
 
               <TargetSelectDialog open={ this.state.targetSelectDialog }
@@ -217,16 +214,15 @@ export class EventTargetPanel extends React.Component {
                       <AddIcon />Cancel
                     </Button>
           </Grid> : null}
-      </Grid>
-      <Grid container spacing={ 24 }
-         style={ { marginTop: 20, marginBottom:10 } }>
+      </Grid> : null}
+      <Grid container >
         <Grid item xs={ 12 }>
           <EventTargetTable classes={classes} eventTarget={eventTarget} 
-          handleRemoveTargetAtIndex={this.handleRemoveTargetAtIndex}/>
+          handleRemoveTargetAtIndex={this.handleRemoveTargetAtIndex} edit={edit}/>
         </Grid> 
-      </Grid>
+      </Grid> 
       
-    </Grid>
+    </React.Fragment>
     );
   }
 }

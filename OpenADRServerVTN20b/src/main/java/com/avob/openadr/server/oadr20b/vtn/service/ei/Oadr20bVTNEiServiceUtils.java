@@ -103,6 +103,9 @@ public class Oadr20bVTNEiServiceUtils {
 		targets.getVenID().forEach(el -> {
 			list.add(new Target(TargetTypeEnum.VEN, el));
 		});
+		targets.getResourceID().forEach(el -> {
+			list.add(new Target(TargetTypeEnum.RESOURCE, el));
+		});
 
 		return list;
 	}
@@ -117,7 +120,11 @@ public class Oadr20bVTNEiServiceUtils {
 
 		ItemBaseXmlTypeEnum xmlType = ItemBaseXmlTypeEnum.fromXmlType(itemBase.getXmlType());
 
-		if (VoltageType.class.equals(xmlType.getKlass())) {
+		if (CurrentType.class.equals(xmlType.getKlass())) {
+			CurrentType createCurrentType = Oadr20bFactory.createCurrentType(siscaleCode);
+			return Oadr20bFactory.createCurrent(createCurrentType);
+
+		} else if (VoltageType.class.equals(xmlType.getKlass())) {
 			VoltageType createVoltageType = Oadr20bFactory.createVoltageType(siscaleCode);
 			return Oadr20bFactory.createVoltage(createVoltageType);
 
@@ -149,16 +156,14 @@ public class Oadr20bVTNEiServiceUtils {
 			BigDecimal voltage = null;
 			boolean isAC = false;
 			PowerRealUnitType powerRealUnit = null;
-			for(PowerRealUnitType type  : PowerRealUnitType.values()) {
-				if(type.getCode().equals(itemBase.getItemUnits())) {
+			for (PowerRealUnitType type : PowerRealUnitType.values()) {
+				if (type.getCode().equals(itemBase.getItemUnits())) {
 					powerRealUnit = type;
 				}
 			}
-			if(powerRealUnit == null) {
-				throw new IllegalStateException("Unknown PowerRealType unit: "+ itemBase.getItemUnits());
+			if (powerRealUnit == null) {
+				throw new IllegalStateException("Unknown PowerRealType unit: " + itemBase.getItemUnits());
 			}
-			
-
 
 			PowerRealType createEnergyRealType = Oadr20bFactory.createPowerRealType(powerRealUnit, siscaleCode, hertz,
 					voltage, isAC);
@@ -219,163 +224,179 @@ public class Oadr20bVTNEiServiceUtils {
 			return Oadr20bFactory.createItemBase(createGBItemBaseType);
 
 		} else {
-			throw new IllegalStateException("Unknown xmlType unit: "+ xmlType.getKlass());
+			throw new IllegalStateException("Unknown xmlType unit: " + xmlType.getKlass());
 		}
 
 	}
 
 	public static ItemBase createItemBase(JAXBElement<? extends ItemBaseType> itemBase) {
+		if (itemBase != null) {
+
+			ItemBaseType value = itemBase.getValue();
+			Class<? extends ItemBaseType> declaredType = itemBase.getDeclaredType();
+
+			try {
+				return Oadr20bVTNEiServiceUtils.createItemBase(value, declaredType);
+			} catch (Oadr20bMarshalException e) {
+				throw new IllegalStateException("Unparsable ItemBase: " + itemBase.getDeclaredType(), e);
+			}
+
+		}
+
+		throw new IllegalStateException("Unknown ItemBase");
+
+	}
+
+	public static ItemBase createItemBase(ItemBaseType value, Class<? extends ItemBaseType> declaredType)
+			throws Oadr20bMarshalException {
 		String itemDescription = null;
 		String itemUnits = null;
 		SiScaleCodeType siScaleCode = null;
 		String xmlType = null;
 		String attributes = null;
-		try {
-			if (itemBase != null) {
 
-				ItemBaseType value = itemBase.getValue();
-				Class<? extends ItemBaseType> declaredType = itemBase.getDeclaredType();
+		if (declaredType.equals(CurrentType.class)) {
+			CurrentType el = (CurrentType) value;
+			itemDescription = el.getItemDescription();
+			itemUnits = el.getItemUnits();
+			siScaleCode = el.getSiScaleCode();
+			xmlType = CurrentType.class.getSimpleName();
 
-				if (declaredType.equals(VoltageType.class)) {
-					VoltageType el = (VoltageType) value;
-					itemDescription = el.getItemDescription();
-					itemUnits = el.getItemUnits();
-					siScaleCode = el.getSiScaleCode();
-					xmlType = VoltageType.class.getSimpleName();
+		} else if (declaredType.equals(VoltageType.class)) {
+			VoltageType el = (VoltageType) value;
+			itemDescription = el.getItemDescription();
+			itemUnits = el.getItemUnits();
+			siScaleCode = el.getSiScaleCode();
+			xmlType = VoltageType.class.getSimpleName();
 
-				} else if (declaredType.equals(EnergyApparentType.class)) {
-					EnergyApparentType el = (EnergyApparentType) value;
-					itemDescription = el.getItemDescription();
-					itemUnits = el.getItemUnits();
-					siScaleCode = el.getSiScaleCode();
-					xmlType = EnergyApparentType.class.getSimpleName();
+		} else if (declaredType.equals(EnergyApparentType.class)) {
+			EnergyApparentType el = (EnergyApparentType) value;
+			itemDescription = el.getItemDescription();
+			itemUnits = el.getItemUnits();
+			siScaleCode = el.getSiScaleCode();
+			xmlType = EnergyApparentType.class.getSimpleName();
 
-				} else if (declaredType.equals(EnergyReactiveType.class)) {
-					EnergyReactiveType el = (EnergyReactiveType) value;
-					itemDescription = el.getItemDescription();
-					itemUnits = el.getItemUnits();
-					siScaleCode = el.getSiScaleCode();
-					xmlType = EnergyReactiveType.class.getSimpleName();
+		} else if (declaredType.equals(EnergyReactiveType.class)) {
+			EnergyReactiveType el = (EnergyReactiveType) value;
+			itemDescription = el.getItemDescription();
+			itemUnits = el.getItemUnits();
+			siScaleCode = el.getSiScaleCode();
+			xmlType = EnergyReactiveType.class.getSimpleName();
 
-				} else if (declaredType.equals(EnergyRealType.class)) {
-					EnergyRealType el = (EnergyRealType) value;
-					itemDescription = el.getItemDescription();
-					itemUnits = el.getItemUnits();
-					siScaleCode = el.getSiScaleCode();
-					xmlType = EnergyRealType.class.getSimpleName();
+		} else if (declaredType.equals(EnergyRealType.class)) {
+			EnergyRealType el = (EnergyRealType) value;
+			itemDescription = el.getItemDescription();
+			itemUnits = el.getItemUnits();
+			siScaleCode = el.getSiScaleCode();
+			xmlType = EnergyRealType.class.getSimpleName();
 
-				} else if (declaredType.equals(PowerApparentType.class)) {
-					PowerApparentType el = (PowerApparentType) value;
-					itemDescription = el.getItemDescription();
-					itemUnits = el.getItemUnits();
-					siScaleCode = el.getSiScaleCode();
-					xmlType = PowerApparentType.class.getSimpleName();
+		} else if (declaredType.equals(PowerApparentType.class)) {
+			PowerApparentType el = (PowerApparentType) value;
+			itemDescription = el.getItemDescription();
+			itemUnits = el.getItemUnits();
+			siScaleCode = el.getSiScaleCode();
+			xmlType = PowerApparentType.class.getSimpleName();
 
-					PowerAttributesType powerAttributes = el.getPowerAttributes();
+			PowerAttributesType powerAttributes = el.getPowerAttributes();
 
-					JAXBElement<PowerAttributesType> createPowerAttributes = Oadr20bFactory
-							.createPowerAttributes(powerAttributes);
+			JAXBElement<PowerAttributesType> createPowerAttributes = Oadr20bFactory
+					.createPowerAttributes(powerAttributes);
 
-					attributes = jaxb.marshal(createPowerAttributes);
+			attributes = jaxb.marshal(createPowerAttributes);
 
-				} else if (declaredType.equals(PowerReactiveType.class)) {
-					PowerReactiveType el = (PowerReactiveType) value;
-					itemDescription = el.getItemDescription();
-					itemUnits = el.getItemUnits();
-					siScaleCode = el.getSiScaleCode();
-					xmlType = PowerReactiveType.class.getSimpleName();
+		} else if (declaredType.equals(PowerReactiveType.class)) {
+			PowerReactiveType el = (PowerReactiveType) value;
+			itemDescription = el.getItemDescription();
+			itemUnits = el.getItemUnits();
+			siScaleCode = el.getSiScaleCode();
+			xmlType = PowerReactiveType.class.getSimpleName();
 
-					PowerAttributesType powerAttributes = el.getPowerAttributes();
+			PowerAttributesType powerAttributes = el.getPowerAttributes();
 
-					JAXBElement<PowerAttributesType> createPowerAttributes = Oadr20bFactory
-							.createPowerAttributes(powerAttributes);
+			JAXBElement<PowerAttributesType> createPowerAttributes = Oadr20bFactory
+					.createPowerAttributes(powerAttributes);
 
-					attributes = jaxb.marshal(createPowerAttributes);
+			attributes = jaxb.marshal(createPowerAttributes);
 
-				} else if (declaredType.equals(PowerRealType.class)) {
-					PowerRealType el = (PowerRealType) value;
-					itemDescription = el.getItemDescription();
-					itemUnits = el.getItemUnits();
-					siScaleCode = el.getSiScaleCode();
-					xmlType = PowerRealType.class.getSimpleName();
+		} else if (declaredType.equals(PowerRealType.class)) {
+			PowerRealType el = (PowerRealType) value;
+			itemDescription = el.getItemDescription();
+			itemUnits = el.getItemUnits();
+			siScaleCode = el.getSiScaleCode();
+			xmlType = PowerRealType.class.getSimpleName();
 
-					PowerAttributesType powerAttributes = el.getPowerAttributes();
+			PowerAttributesType powerAttributes = el.getPowerAttributes();
 
-					JAXBElement<PowerAttributesType> createPowerAttributes = Oadr20bFactory
-							.createPowerAttributes(powerAttributes);
+			JAXBElement<PowerAttributesType> createPowerAttributes = Oadr20bFactory
+					.createPowerAttributes(powerAttributes);
 
-					attributes = jaxb.marshal(createPowerAttributes);
+			attributes = jaxb.marshal(createPowerAttributes);
 
-				} else if (declaredType.equals(BaseUnitType.class)) {
-					BaseUnitType el = (BaseUnitType) value;
-					itemDescription = el.getItemDescription();
-					itemUnits = el.getItemUnits();
-					siScaleCode = el.getSiScaleCode();
-					xmlType = BaseUnitType.class.getSimpleName();
+		} else if (declaredType.equals(BaseUnitType.class)) {
+			BaseUnitType el = (BaseUnitType) value;
+			itemDescription = el.getItemDescription();
+			itemUnits = el.getItemUnits();
+			siScaleCode = el.getSiScaleCode();
+			xmlType = BaseUnitType.class.getSimpleName();
 
-				} else if (declaredType.equals(CurrencyType.class)) {
-					CurrencyType el = (CurrencyType) value;
-					itemDescription = el.getItemDescription().value();
-					itemUnits = el.getItemUnits().value();
-					siScaleCode = el.getSiScaleCode();
-					xmlType = CurrencyType.class.getSimpleName();
+		} else if (declaredType.equals(CurrencyType.class)) {
+			CurrencyType el = (CurrencyType) value;
+			itemDescription = el.getItemDescription().value();
+			itemUnits = el.getItemUnits().value();
+			siScaleCode = el.getSiScaleCode();
+			xmlType = CurrencyType.class.getSimpleName();
 
-				} else if (declaredType.equals(FrequencyType.class)) {
-					FrequencyType el = (FrequencyType) value;
-					itemDescription = el.getItemDescription();
-					itemUnits = el.getItemUnits();
-					siScaleCode = el.getSiScaleCode();
-					xmlType = FrequencyType.class.getSimpleName();
+		} else if (declaredType.equals(FrequencyType.class)) {
+			FrequencyType el = (FrequencyType) value;
+			itemDescription = el.getItemDescription();
+			itemUnits = el.getItemUnits();
+			siScaleCode = el.getSiScaleCode();
+			xmlType = FrequencyType.class.getSimpleName();
 
-				} else if (declaredType.equals(ThermType.class)) {
-					ThermType el = (ThermType) value;
-					itemDescription = el.getItemDescription();
-					itemUnits = el.getItemUnits();
-					siScaleCode = el.getSiScaleCode();
-					xmlType = ThermType.class.getSimpleName();
+		} else if (declaredType.equals(ThermType.class)) {
+			ThermType el = (ThermType) value;
+			itemDescription = el.getItemDescription();
+			itemUnits = el.getItemUnits();
+			siScaleCode = el.getSiScaleCode();
+			xmlType = ThermType.class.getSimpleName();
 
-				} else if (declaredType.equals(TemperatureType.class)) {
-					TemperatureType el = (TemperatureType) value;
-					itemDescription = el.getItemDescription();
-					itemUnits = el.getItemUnits().value();
-					siScaleCode = el.getSiScaleCode();
-					xmlType = TemperatureType.class.getSimpleName();
+		} else if (declaredType.equals(TemperatureType.class)) {
+			TemperatureType el = (TemperatureType) value;
+			itemDescription = el.getItemDescription();
+			itemUnits = el.getItemUnits().value();
+			siScaleCode = el.getSiScaleCode();
+			xmlType = TemperatureType.class.getSimpleName();
 
-				} else if (declaredType.equals(PulseCountType.class)) {
-					PulseCountType el = (PulseCountType) value;
-					itemDescription = el.getItemDescription();
-					itemUnits = el.getItemUnits();
-					siScaleCode = SiScaleCodeType.NONE;
-					xmlType = PulseCountType.class.getSimpleName();
+		} else if (declaredType.equals(PulseCountType.class)) {
+			PulseCountType el = (PulseCountType) value;
+			itemDescription = el.getItemDescription();
+			itemUnits = el.getItemUnits();
+			siScaleCode = SiScaleCodeType.NONE;
+			xmlType = PulseCountType.class.getSimpleName();
 
-				} else if (declaredType.equals(OadrGBItemBase.class)) {
-					OadrGBItemBase el = (OadrGBItemBase) value;
-					itemDescription = "OadrGBItemBase";
-					itemUnits = "OadrGBItemBase";
-					siScaleCode = SiScaleCodeType.NONE;
-					xmlType = "oadrGBItemBase";
+		} else if (declaredType.equals(OadrGBItemBase.class)) {
+			OadrGBItemBase el = (OadrGBItemBase) value;
+			itemDescription = "OadrGBItemBase";
+			itemUnits = "OadrGBItemBase";
+			siScaleCode = SiScaleCodeType.NONE;
+			xmlType = "oadrGBItemBase";
 
-					JAXBElement<OadrGBItemBase> createGBItemBase = Oadr20bFactory.createGBItemBase(el);
+			JAXBElement<OadrGBItemBase> createGBItemBase = Oadr20bFactory.createGBItemBase(el);
 
-					attributes = jaxb.marshal(createGBItemBase);
-				}
-			}
-
-			if (itemDescription != null && itemUnits != null && siScaleCode != null && xmlType != null) {
-				ItemBase res = new ItemBase();
-				res.setItemDescription(itemDescription);
-				res.setItemUnits(itemUnits);
-				res.setSiScaleCode(siScaleCode.value());
-				res.setXmlType(xmlType);
-				res.setAttributes(attributes);
-				return res;
-			}
-
-		} catch (Oadr20bMarshalException e) {
-			throw new IllegalStateException(e);
+			attributes = jaxb.marshal(createGBItemBase);
 		}
 
-		throw new IllegalStateException("Unknown ItemBase: " + itemBase.getDeclaredType());
+		if (itemDescription != null && itemUnits != null && siScaleCode != null && xmlType != null) {
+			ItemBase res = new ItemBase();
+			res.setItemDescription(itemDescription);
+			res.setItemUnits(itemUnits);
+			res.setSiScaleCode(siScaleCode.value());
+			res.setXmlType(xmlType);
+			res.setAttributes(attributes);
+			return res;
+		}
+
+		throw new IllegalStateException("Unknown ItemBase: " + value.toString());
 
 	}
 

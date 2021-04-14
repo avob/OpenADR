@@ -25,6 +25,20 @@ import EventCalendarDayView from './EventCalendarView/EventCalendarDayView'
 import EventCalendarMonthView from './EventCalendarView/EventCalendarMonthView'
 import EventCalendarAgendaView from './EventCalendarView/EventCalendarAgendaView'
 
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TablePagination from '@material-ui/core/TablePagination';
+import TableRow from '@material-ui/core/TableRow';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
+import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
+import FilterListIcon from '@material-ui/icons/FilterList';
+import FilterPanel from '../common/FilterPanel' 
 
 const localizer = BigCalendar.momentLocalizer(moment)
 
@@ -36,6 +50,7 @@ export class EventCalendar extends React.Component {
     this.state = {}
     this.state.eventCalendarDialog = false;
     this.state.selectedEvent = null;
+    this.state.filterable = false;
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -93,6 +108,11 @@ export class EventCalendar extends React.Component {
     history.push( '/event/detail/'+ id);
   }
 
+  handleFilterClick = e => {
+    console.log(this.state.filterable)
+    this.setState({ filterable: !this.state.filterable});
+  }
+
 
 
   render() {
@@ -130,18 +150,54 @@ export class EventCalendar extends React.Component {
 
     
     
-
-
+    console.log(this.props)
+    console.log(this.props.view)
+    console.log(this.props.currentDate)
     return (
       <div className={ classes.root }>
-        <EventHeader classes={classes}  marketContext={marketContext} event={event}
-        filters={filters} pagination={pagination} onFilterChange={onFilterChange} onPaginationChange={onPaginationChange}
-        ven={ven}
-                onVenSuggestionsFetchRequested={onVenSuggestionsFetchRequested}
-                onVenSuggestionsClearRequested={onVenSuggestionsClearRequested}
-                onVenSuggestionsSelect={onVenSuggestionsSelect}/>
-        <Divider style={ { marginBottom: '20px', marginTop: '20px' } } />
-        <BigCalendar style={{height:600}}
+         <Paper >
+         
+         <Toolbar>
+            <div style={{flex: '0 0 auto'}}>
+              <Typography variant="h6" id="tableTitle">
+
+                  Events
+                </Typography>
+            </div>
+            <div style={{flex: '1 1 100%'}} />
+            <div style={{float:"right"}}>
+
+               <Tooltip title="Filter" onClick={this.handleFilterClick}>
+                          <IconButton aria-label="Filter" color={this.props.filters.length != 0 ? "primary" : "default"}>
+                            <FilterListIcon />
+                          </IconButton>
+                        </Tooltip> 
+
+                
+              
+            </div>
+                
+
+
+        </Toolbar>
+        <div style={{margin: "0px 20px"}}>
+        {this.state.filterable ? <FilterPanel classes={classes} type="EVENT" hasFilter={{marketContext:true, ven: true, eventStatus:true, date: true}} 
+                      marketContext={marketContext}
+                      filter={this.props.filters}
+                      start={this.props.start}
+                      end={this.props.end}
+                      onFilterChange={this.props.onFilterChange}
+                      onStartChange={this.props.onStartChange}
+                      onEndChange={this.props.onEndChange}
+                      ven={ven}
+                      onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
+                      onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
+                      onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}
+                      /> : null}
+         </div>
+        <Table className={classes.table} aria-labelledby="tableTitle">
+        <TableBody>
+        <BigCalendar style={{height:600, margin: "20px 20px"}}
           localizer={localizer}
           events={calendarEvent}
           defaultView={this.props.view}
@@ -159,13 +215,15 @@ export class EventCalendar extends React.Component {
             }
           }
         />
+        </TableBody>
 
         {(this.state.selectedEvent) ? <EventCalendarDialog classes={classes} title={(this.state.selectedEvent) ? this.state.selectedEvent.title : ""}
         event={this.state.selectedEvent}
         open={this.state.eventCalendarDialog}
         close={this.handleEventCalendarDialogClose}
         handleEventDetailClick={this.handleEventDetailClick(this.state.selectedEvent.id)}/> : null}
-     
+       </Table>
+       </Paper>
       </div>
     );
   }

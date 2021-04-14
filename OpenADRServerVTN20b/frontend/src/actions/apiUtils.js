@@ -14,7 +14,6 @@ export function swaggerAction (actionType, getAction, getPayload, getNext) {
                 msg.payload = payload;
               }
             }
-            console.log(resp.headers)
             if(resp.headers && resp.headers["x-total-count"] && resp.headers["x-total-page"]) {
             	msg.total = parseInt(resp.headers["x-total-count"]);
             	msg.totalPage = parseInt(resp.headers["x-total-page"]);

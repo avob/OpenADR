@@ -19,7 +19,6 @@ import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
-import com.avob.openadr.server.common.vtn.models.venresource.VenResourceDto;
 import com.avob.openadr.server.common.vtn.service.OadrUserService;
 import com.avob.openadr.server.common.vtn.service.VenGroupService;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
@@ -136,8 +135,8 @@ public class OadrDataBaseSetup {
 		ven.setHttpPullModel(true);
 		venService.save(ven);
 
-		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
-		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
+//		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
+//		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
 
 		ven = venService.prepare(VEN_HTTP_PULL);
 		ven.setOadrName(VEN_HTTP_PULL);
@@ -150,8 +149,8 @@ public class OadrDataBaseSetup {
 		ven.setXmlSignature(false);
 		venService.save(ven);
 
-		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
-		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
+//		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
+//		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
 
 		ven = venService.prepare(VEN_XMPP);
 		ven.setOadrName(VEN_XMPP);
@@ -165,8 +164,8 @@ public class OadrDataBaseSetup {
 		ven.setPushUrl(VEN_XMPP + "@" + vtnConfig.getXmppDomain() + "/client");
 		venService.save(ven);
 
-		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
-		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
+//		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
+//		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
 
 		ven = venService.prepare(VEN_XMPP_DSIG);
 		ven.setOadrName(VEN_XMPP_DSIG);
@@ -180,8 +179,8 @@ public class OadrDataBaseSetup {
 		ven.setPushUrl(VEN_XMPP_DSIG + "@" + vtnConfig.getXmppDomain() + "/client");
 		venService.save(ven);
 
-		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
-		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
+//		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
+//		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
 
 		ven = venService.prepare(VEN_HTTP_PUSH);
 		ven.setOadrName(VEN_HTTP_PUSH);
@@ -195,8 +194,8 @@ public class OadrDataBaseSetup {
 		ven.setPushUrl("https://" + VEN_HTTP_PUSH + ".oadr.com");
 		venService.save(ven);
 
-		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
-		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
+//		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
+//		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
 
 		ven = venService.prepare(VEN_HTTP_PUSH_DSIG);
 		ven.setOadrName(VEN_HTTP_PUSH_DSIG);
@@ -210,8 +209,8 @@ public class OadrDataBaseSetup {
 		ven.setPushUrl("https://" + VEN_HTTP_PUSH_DSIG + ".oadr.com");
 		venService.save(ven);
 
-		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
-		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
+//		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_1)));
+//		venResourceService.save(venResourceService.prepare(ven, new VenResourceDto(VEN_RESOURCE_2)));
 
 		OadrUser user = userService.prepare(USER);
 		userService.save(user);

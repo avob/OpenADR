@@ -13,6 +13,7 @@ import ExtensionIcon from '@material-ui/icons/Extension';
 import GroupWorkIcon from '@material-ui/icons/GroupWork';
 import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
+import SendIcon from '@material-ui/icons/Send';
 
 import Button from '@material-ui/core/Button';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -269,3 +270,144 @@ export function EventCalendarDialog( props ) {
   </Dialog>
   );
 }
+
+export function VenActionDialog( props ) {
+  return (
+  <Dialog open={ props.open } onClose={ () => {
+                                        props.close()
+                                      } }>
+    <DialogTitle>
+      { props.title }
+    </DialogTitle>
+    <div>
+      <List>
+        <ListItem button onClick={() => { props.venActions.requestRegisterReport(props.ven.username); props.close()}}>
+          <ListItemAvatar>
+            <Avatar>
+              <SendIcon fontSize="small"/>
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Request register report"/>
+        </ListItem>
+        <ListItem button onClick={() => { props.venActions.sendRegisterReport(props.ven.username); props.close()}}>
+          <ListItemAvatar>
+            <Avatar>
+              <SendIcon fontSize="small"/>
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Send register report"/>
+        </ListItem>
+        <ListItem button onClick={() => { props.venActions.cleanRegistration(props.ven.username); props.close()}}>
+          <ListItemAvatar>
+            <Avatar>
+              <SendIcon fontSize="small"/>
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Clean registration"/>
+        </ListItem>
+        <ListItem button onClick={() => { props.venActions.registerPartyRequestReregistration(props.ven.username); props.close()}}>
+          <ListItemAvatar>
+            <Avatar>
+              <SendIcon fontSize="small"/>
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Request re-registration"/>
+        </ListItem>
+        <ListItem button onClick={() => { props.venActions.registerPartyCancelPartyRegistration(props.ven.username); props.close()}}>
+          <ListItemAvatar>
+            <Avatar>
+              <SendIcon fontSize="small"/>
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Request cancel registration"/>
+        </ListItem>
+        <ListItem button onClick={() => { props.venActions.requestRegisterReport(props.ven.username); props.close()}}>
+          <ListItemAvatar>
+            <Avatar>
+              <SendIcon fontSize="small"/>
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Request register report"/>
+        </ListItem>
+        <ListItem button onClick={() => { props.venActions.sendRegisterReport(props.ven.username)}}>
+          <ListItemAvatar>
+            <Avatar>
+              <SendIcon fontSize="small"/>
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Push create report"/>
+        </ListItem>
+      </List>
+    </div>
+      <DialogActions>
+        <Button onClick={props.close} color="primary">
+          close
+        </Button>
+      </DialogActions>
+  </Dialog>
+  );
+
+
+}
+
+export function EventActionDialog( props ) {
+  return (
+  <Dialog open={ props.open } onClose={ () => {
+                                        props.close()
+                                      } }>
+    <DialogTitle>
+      { props.title }
+    </DialogTitle>
+    <div>
+      <List>
+        <ListItem button onClick={() => { props.eventActions.publishEvent(props.event.id); props.close()}}>
+          <ListItemAvatar>
+            <Avatar>
+              <SendIcon fontSize="small"/>
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Publish"/>
+        </ListItem>
+        <ListItem button onClick={() => { props.eventActions.publishEvent(props.event.id); props.close()}}>
+          <ListItemAvatar>
+            <Avatar>
+              <SendIcon fontSize="small"/>
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Publish"/>
+        </ListItem>
+        <ListItem button onClick={() => { props.eventActions.publishEvent(props.event.id); props.close()}}>
+          <ListItemAvatar>
+            <Avatar>
+              <SendIcon fontSize="small"/>
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Publish"/>
+        </ListItem>
+        <ListItem button onClick={() => { props.eventActions.activeEvent(props.event.id); props.close()}}>
+          <ListItemAvatar>
+            <Avatar>
+              <SendIcon fontSize="small"/>
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Active"/>
+        </ListItem>
+        <ListItem button onClick={() => { props.eventActions.cancelEvent(props.event.id); props.close()}}>
+          <ListItemAvatar>
+            <Avatar>
+              <SendIcon fontSize="small"/>
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText primary="Cancel"/>
+        </ListItem>
+      </List>
+    </div>
+      <DialogActions>
+        <Button onClick={props.close} color="primary">
+          close
+        </Button>
+      </DialogActions>
+  </Dialog>
+  );
+}
+

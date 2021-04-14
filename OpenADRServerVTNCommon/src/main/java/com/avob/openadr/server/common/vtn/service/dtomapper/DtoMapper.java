@@ -17,6 +17,10 @@ import org.springframework.stereotype.Service;
 
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDescriptor;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventDescriptorDto;
+import com.avob.openadr.server.common.vtn.models.known.KnownSignal;
+import com.avob.openadr.server.common.vtn.models.known.KnownSignalDto;
+import com.avob.openadr.server.common.vtn.models.known.KnownUnit;
+import com.avob.openadr.server.common.vtn.models.known.KnownUnitDto;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDto;
 import com.google.common.collect.Lists;
@@ -30,6 +34,10 @@ public class DtoMapper {
 	protected static final String VEN_RESOURCE_CONVERTER_ID = "venResourceConverter";
 
 	protected static final String ABSTRACT_USER_CONVERTER_ID = "abstractUserConverter";
+
+	protected static final String KNOWN_UNIT_CONVERTER_ID = "knownUnitConverter";
+
+	protected static final String KNOWN_SIGNAL_CONVERTER_ID = "knownSignalConverter";
 
 	@Resource
 	protected MarketContextMapper marketContextConverter;
@@ -46,6 +54,12 @@ public class DtoMapper {
 	@Resource
 	private AbstractUserMapper abstractUserMapper;
 
+	@Resource
+	private KnownUnitMapper knownUnitMapper;
+
+	@Resource
+	private KnownSignalMapper knownSignalMapper;
+
 	protected DozerBeanMapper mapper;
 
 	@PostConstruct
@@ -57,9 +71,13 @@ public class DtoMapper {
 		customConvertersWithId.put(DEMAND_RESPONSE_CONVERTER_ID, demandResponseEventConverter);
 		customConvertersWithId.put(VEN_RESOURCE_CONVERTER_ID, venResourceMapper);
 		customConvertersWithId.put(ABSTRACT_USER_CONVERTER_ID, abstractUserMapper);
+		customConvertersWithId.put(KNOWN_UNIT_CONVERTER_ID, knownUnitMapper);
+		customConvertersWithId.put(KNOWN_SIGNAL_CONVERTER_ID, knownSignalMapper);
 		mapper.setCustomConvertersWithId(customConvertersWithId);
 		mapper.addMapping(demandResponseEventMappingConfiguration());
 		mapper.addMapping(venDemandResponseEventMappingConfiguration());
+		mapper.addMapping(knownUnitMappingConfiguration());
+		mapper.addMapping(knownSignalMappingConfiguration());
 	}
 
 	public <T> T map(Object src, Class<T> klass) {
@@ -94,6 +112,30 @@ public class DtoMapper {
 						.fields("ven", "venId", customConverter(VenMapper.class), customConverterId(VEN_CONVERTER_ID))
 						.fields("event", "eventId", customConverter(DemandResponseEventMapper.class),
 								customConverterId(DEMAND_RESPONSE_CONVERTER_ID));
+
+			}
+		};
+	}
+
+	private BeanMappingBuilder knownUnitMappingConfiguration() {
+
+		return new BeanMappingBuilder() {
+			@Override
+			protected void configure() {
+				mapping(KnownUnit.class, KnownUnitDto.class).fields(this_(), this_(),
+						customConverter(KnownUnitMapper.class), customConverterId(KNOWN_UNIT_CONVERTER_ID));
+
+			}
+		};
+	}
+
+	private BeanMappingBuilder knownSignalMappingConfiguration() {
+
+		return new BeanMappingBuilder() {
+			@Override
+			protected void configure() {
+				mapping(KnownSignal.class, KnownSignalDto.class).fields(this_(), this_(),
+						customConverter(KnownSignalMapper.class), customConverterId(KNOWN_SIGNAL_CONVERTER_ID));
 
 			}
 		};

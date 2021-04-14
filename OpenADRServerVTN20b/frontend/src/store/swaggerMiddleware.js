@@ -7,7 +7,7 @@ import { config, history } from './configureStore';
 var swaggerClient = null;
 
 var responseInterceptor=  (res) => {
-     console.log(res);
+
   }
 
 
@@ -51,7 +51,6 @@ var loadClient = function ( url, dispatch) {
 export default function swaggerMiddleware( opts ) {
   return store => next => action => {
     
-    console.log( action.type )
     if(action.type.indexOf("_ERROR") > -1){
       console.log(action.payload)
     }

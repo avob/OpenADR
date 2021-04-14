@@ -29,10 +29,10 @@ import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventSearchDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventUpdateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.validator.DemandResponseEventCreateDtoValidator;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.validator.DemandResponseEventUpdateDtoValidator;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEventDto;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
@@ -71,12 +71,12 @@ public class DemandResponseController {
 
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
 	@ResponseBody
-	public List<DemandResponseEventReadDto> search(@RequestBody List<DemandResponseEventFilter> filters,
+	public List<DemandResponseEventReadDto> search(@RequestBody DemandResponseEventSearchDto demandResponseEventSearch,
 			@RequestParam(value = "start", required = false) Long start,
 			@RequestParam(value = "end", required = false) Long end,
 			@RequestParam(value = "page", required = false) Integer page,
 			@RequestParam(value = "size", required = false) Integer size, HttpServletResponse response) {
-		Page<DemandResponseEvent> search = demandResponseEventService.search(filters, start, end, page, size);
+		Page<DemandResponseEvent> search = demandResponseEventService.search(demandResponseEventSearch.getFilters(), demandResponseEventSearch.getSorts(), start, end, page, size);
 		response.addHeader("X-total-page", String.valueOf(search.getTotalPages()));
 		response.addHeader("X-total-count", String.valueOf(search.getTotalElements()));
 		return dtoMapper.mapList(search, DemandResponseEventReadDto.class);
@@ -223,7 +223,7 @@ public class DemandResponseController {
 
 	@RequestMapping(value = "/{id}/venResponse/{username}", method = RequestMethod.GET)
 	@ResponseBody
-	public VenDemandResponseEventDto readVenDemandResponseEvent(@PathVariable(value = "id") Long id,
+	public VenDemandResponseEventDto readOneVenDemandResponseEvent(@PathVariable(value = "id") Long id,
 			@PathVariable(value = "username") String username, HttpServletResponse response) {
 
 		try {

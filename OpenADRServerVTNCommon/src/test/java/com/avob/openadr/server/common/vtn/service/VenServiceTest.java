@@ -36,8 +36,6 @@ import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
-import com.avob.openadr.server.common.vtn.models.venresource.VenResource;
-import com.avob.openadr.server.common.vtn.models.venresource.VenResourceDto;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -131,13 +129,13 @@ public class VenServiceTest {
 		Ven ven2 = venService.save(venService.prepare("ven2"));
 		Ven ven3 = venService.save(venService.prepare("ven3"));
 
-		VenResource res1 = venResourceService.prepare(ven, new VenResourceDto(venID + "_res0"));
-		venResourceService.save(res1);
-		VenResource res2 = venResourceService.prepare(ven, new VenResourceDto(venID + "_res1"));
-		venResourceService.save(res2);
+//		VenResource res1 = venResourceService.prepare(ven, new VenResourceDto(venID + "_res0"));
+//		venResourceService.save(res1);
+//		VenResource res2 = venResourceService.prepare(ven, new VenResourceDto(venID + "_res1"));
+//		venResourceService.save(res2);
 
-		List<VenResource> resources = venResourceService.findByVen(ven);
-		assertEquals(2, resources.size());
+//		List<VenResource> resources = venResourceService.findByVen(ven);
+//		assertEquals(2, resources.size());
 
 		List<Ven> vens = venService.findByGroupName(Lists.newArrayList(group.getName()));
 		assertEquals(1, vens.size());

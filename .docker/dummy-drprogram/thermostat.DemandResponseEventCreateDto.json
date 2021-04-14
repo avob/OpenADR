@@ -35,7 +35,13 @@
  		}, {
  			"duration": "PT2H",
  			"value": 2.0
- 		}]
+ 		}],
+ 		"itemBase": {
+ 			"itemDescription":"temperature",
+ 			"itemUnits":"celsius",
+ 			"siScaleCode":"none",
+ 			"xmlType":"TemperatureType"
+ 		}
  		
  	}, {
  		"signalName": "LOAD_CONTROL",
@@ -50,6 +56,16 @@
  		}, {
  			"duration": "PT2H",
  			"value": 2.0
- 		}]
- 	}]
+ 		}],
+ 		"itemBase": {
+ 			"itemDescription":"temperature",
+ 			"itemUnits":"celsius",
+ 			"siScaleCode":"none",
+ 			"xmlType":"TemperatureType"
+ 		}
+ 	}],
+ 	"targets": [{
+		"targetId": "Thermostat",
+ 			"targetType": "ENDDEVICE_ASSET"
+	}]
  }

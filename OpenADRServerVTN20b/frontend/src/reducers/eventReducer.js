@@ -31,6 +31,8 @@ export default function eventReducer( state = initialState.event, action ) {
     case types.SEARCH_EVENT_SUCCESS:
       newState = objectAssign( {}, state, {
         event: action.payload
+        , total: action.total
+        , totalPage: action.totalPage
       } );
       return newState;
 

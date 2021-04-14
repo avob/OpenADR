@@ -53,92 +53,36 @@ export class EventDetailSignal extends React.Component {
 
 
   render() {
-    const {classes, event, copySignals, editMode} = this.props;
+    const {classes, event, editMode, group, ven} = this.props;
     var that = this;
     var hasError = false;
 
     return (
     <div className={ classes.root } >
-      <EventDetailHeader classes={classes} event={event} actions={<Grid container spacing={ 24 }>
-
-        {(!event.published) ? <Grid item xs={ 4 }>
-            <Button key="btn_create"
-                    style={ { marginTop: 15 } }
-                    variant="outlined"
-                    color="primary"
-                    fullWidth={true}
-                    size="small"
-                    onClick={this.handlePublishEventClick}>
-              <CloudDownloadIcon style={ { marginRight: 15 } }/> PUBLISH
-            </Button>
-          </Grid> : null}
-          
-
-        {(editMode) ? <Grid item xs={ 4 }>
-            <Button key="btn_create"
-                    style={ { marginTop: 15 } }
-                    variant="outlined"
-                    color="primary"
-                    fullWidth={true}
-                    size="small"
-                    onClick={() => {this.props.updateEvent(false)}}>
-              <CloudDownloadIcon style={ { marginRight: 15 } }/> UPDATE
-            </Button>
-          </Grid> : null}
-
-        {(editMode) ? <Grid item xs={ 4 }>
-            <Button key="btn_create"
-                    style={ { marginTop: 15 } }
-                    variant="outlined"
-                    color="secondary"
-                    fullWidth={true}
-                    size="small"
-                    onClick={() => {this.props.updateEvent(true)}}>
-              <CloudDownloadIcon style={ { marginRight: 15 } }/> UPDATE AND PUBLISH
-            </Button>
-          </Grid> : null}
-      
-      </Grid>}/>
-
-
-
-       <Divider style={ { marginTop: '20px', marginBottom:20 } } />
-       {copySignals.map((signal, index) => {
+       {event.signals && event.signals.map((signal, index) => {
           return (
             <div key={"signal_panel_"+index}>
-            {(index !==0) ? <Grid container
-                  style={ { marginTop: 20, marginBottom: 20 } }
-                  spacing={ 24 }>
+            {(index !==0) ? <Grid container>
               <Grid item xs={ 12 }>
                 <Divider />
               </Grid>
             </Grid> : null}
 
             <EventSignalPanel 
-              classes={classes} eventSignal={signal} hasError={hasError} 
+              classes={classes} eventSignal={signal} hasError={hasError} index={index}
                 onChange={that.handleEventSignalChange(index)}
                 onRemove={that.handleRemoveEventSignalChange(index)}
-                canBeRemoved={copySignals.length >0}/>
+                canBeRemoved={event.signals.length >0}
+                group={group} onChange={this.props.updateCopyTargets}
+        ven={ven}
+        onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
+        onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
+        onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}/>
                 
             </div>
         )
         })}
 
-        <Divider style={ { marginTop: 30} } />
-        <Grid container
-              style={ { marginTop: 20 } }
-              spacing={ 24 }>
-          <Grid item xs={ 12 }>
-            <Button key="btn_create"
-                            variant="outlined"
-                            color="primary"
-                            size="small"
-                            className={ classes.button }
-                            onClick={ this.handleAddSignalClick }>
-                      <AddIcon />Add New Signal
-                    </Button>
-          </Grid>
-        </Grid>
     </div>
     );
   }

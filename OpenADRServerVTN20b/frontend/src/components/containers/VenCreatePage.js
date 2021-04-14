@@ -20,9 +20,9 @@ import amber from '@material-ui/core/colors/amber';
 
 function TabContainer( props ) {
   return (
-  <Typography component="div" style={ { padding: 8 * 3 } }>
+  <div>
     { props.children }
-  </Typography>
+  </div>
   );
 }
 
@@ -101,19 +101,10 @@ export class VenCreatePage extends React.Component {
     const {value} = this.state;
     return (
     <div className={ classes.root }>
-      <Tabs value={ this.state.value }
-            onChange={ this.handleChange }
-            indicatorColor="primary"
-            textColor="primary"
-            centered>
-        <Tab label="VEN Create" />
-      </Tabs>
       <Divider variant="middle" />
-      { value === 0 && <TabContainer>
-                         <VenCreate classes={ classes }
+       <VenCreate classes={ classes }
                                     vtnConfiguration={ ven_create.parameters }
                                     createVen={ this.props.venActions.createVen } />
-                       </TabContainer> }
     </div>
 
     );
