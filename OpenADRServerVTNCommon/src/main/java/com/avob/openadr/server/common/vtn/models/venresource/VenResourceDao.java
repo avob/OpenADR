@@ -14,6 +14,8 @@ import com.avob.openadr.server.common.vtn.models.ven.Ven;
 
 @Transactional
 public interface VenResourceDao extends CrudRepository<VenResource, Long>, JpaSpecificationExecutor<VenResource > {
+	
+	
 
 	@Query("select count(res) from VenResource res where res.ven.id = :venId")
 	public long countByVenId(@Param("venId") Long venId);
@@ -32,6 +34,16 @@ public interface VenResourceDao extends CrudRepository<VenResource, Long>, JpaSp
 			@Param("name") List<String> name);
 
 	public List<VenResource> findByNameIn(List<String> name);
+	
+	
+	@Query("select res from VenResource res where res.ven.username in :venUsername and res.name in :name")
+	public List<VenResource> findRoot(@Param("venUsername") List<String> venUsername,
+			@Param("name") List<String> name);
+	
+	
+	
+		
+	
 	
 	
 

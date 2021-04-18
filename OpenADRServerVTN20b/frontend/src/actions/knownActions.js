@@ -1,27 +1,36 @@
-import * as types from '../constants/actionTypes';
+import * as types from '../constants/actionTypes'
 
-import { swaggerAction, jsonResponseContentType, multipartResponseContentType, saveData, parseJsonData } from './apiUtils';
-
+import { swaggerAction, jsonResponseContentType, parseJsonData } from './apiUtils'
 
 export const searchKnownUnit = (knownUnit) => {
-  var params = {knownUnit};
+  const params = { knownUnit }
 
-  return swaggerAction(types.SEARCH_KNOWN_UNIT, 
+  return swaggerAction(types.SEARCH_KNOWN_UNIT,
     (api) => {
-      console.log(api.apis[ 'known-unit-controller' ])
-      return api.apis[ 'known-unit-controller' ].searchKnownUnitUsingPOST(params, jsonResponseContentType);
-    }, 
+      return api.apis['known-controller'].searchKnownUnitUsingPOST(params, jsonResponseContentType)
+    },
     parseJsonData
-  );
+  )
 }
 
 export const searchKnownSignal = (knownSignal) => {
-  var params = {knownSignal};
+  const params = { knownSignal }
 
-  return swaggerAction(types.SEARCH_KNOWN_SIGNAL, 
+  return swaggerAction(types.SEARCH_KNOWN_SIGNAL,
     (api) => {
-      return api.apis[ 'known-signal-controller' ].searchKnownSignalUsingPOST(params, jsonResponseContentType);
-    }, 
+      return api.apis['known-controller'].searchKnownSignalUsingPOST(params, jsonResponseContentType)
+    },
     parseJsonData
-  );
+  )
+}
+
+export const searchKnownReport = (knownReport) => {
+  const params = { knownReport }
+
+  return swaggerAction(types.SEARCH_KNOWN_REPORT,
+    (api) => {
+      return api.apis['known-controller'].searchKnownReportUsingPOST(params, jsonResponseContentType)
+    },
+    parseJsonData
+  )
 }

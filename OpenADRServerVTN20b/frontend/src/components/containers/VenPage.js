@@ -11,10 +11,7 @@ import Paper from '@material-ui/core/Paper';
 
 import VenList from '../Ven/VenList'
 import { withStyles } from '@material-ui/core/styles';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
+
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -34,7 +31,7 @@ const styles = theme => ({
     width: 200,
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
     minWidth: 500,
   },
   card: {
@@ -47,7 +44,7 @@ const styles = theme => ({
     paddingRight: 10
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   iconButton: {
     marginTop: 10
@@ -77,33 +74,29 @@ export class VenPage extends React.Component {
       , by: "commonName"
     }
 
-    // this.props.vtnConfigurationActions.loadMarketContext();
-    // this.props.vtnConfigurationActions.loadGroup();
+    this.props.vtnConfigurationActions.loadMarketContext();
+    this.props.vtnConfigurationActions.loadGroup();
     this.props.venActions.searchVen(this.state.filters, this.state.sorts, this.state.pagination.page, this.state.pagination.size);
   }
 
   onFilterChange = (filters) => {
-    console.log(filters)
     this.setState({filters});
     this.props.venActions.searchVen(filters, this.state.sorts, this.state.pagination.page, this.state.pagination.size);
   }
 
   onSortChange = (sort) => {
-    console.log(sort)
     const sorts = [{property: sort.by, type: sort.sort.toUpperCase()}];
     this.setState({sorts: sorts, sort: sort});
      this.props.venActions.searchVen(this.state.filters, sorts, this.state.pagination.page, this.state.pagination.size);
   }
 
   onPaginationChange = (pagination) => {
-    console.log(pagination)
     this.setState({pagination});
     this.props.venActions.searchVen(this.state.filters, this.state.sorts, pagination.page, pagination.size);
   }
 
   onEventSuggestionsFetchRequested = (e) => {
-    var filters = this.state.filters.splice(0);
-    // this.props.eventActions.searchEvent(filters, null, null, 0, 5);
+
   }
 
   onEventSuggestionsClearRequested = () => {

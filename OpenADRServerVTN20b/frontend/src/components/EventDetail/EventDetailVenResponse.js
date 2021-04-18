@@ -1,20 +1,11 @@
 import React from 'react';
 
 
-import EventDetailHeader from './EventDetailHeader'
-import Divider from '@material-ui/core/Divider';
-
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-
-
-import Grid from '@material-ui/core/Grid';
-import Button from '@material-ui/core/Button';
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
 
 import {formatTimestamp} from '../../utils/time'
 
@@ -59,7 +50,7 @@ export class EventDetailVenResponse extends React.Component {
   }
 
   render() {
-   const {classes, event, venResponse} = this.props;
+   const {classes, venResponse} = this.props;
 
     return (
     <div className={ classes.root } >

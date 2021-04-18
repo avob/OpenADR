@@ -64,14 +64,18 @@ public class VenResourceService {
 	}
 
 	@Transactional
-	public List<VenResource> search(VenSearchDto venSearchDto) {
+	public List<VenResource> searchResourceRoot(VenSearchDto venSearchDto) {
 
 		Specification<VenResource> search = VenResourceSpecification.search(venSearchDto.getFilters());
-		Specification<VenResource> typeIn = VenResourceSpecification.typeIn(Arrays.asList(VenResourceType.VEN,
-				VenResourceType.REPORT, VenResourceType.ENDDEVICEASSET, VenResourceType.RESOURCE));
+		Specification<VenResource> typeIn = VenResourceSpecification.typeIn(Arrays.asList(VenResourceType.VEN));
 
 		Specification<VenResource> and = Specification.where(search).and(typeIn);
 		return venResourceDao.findAll(and);
+	}
+
+	public List<VenResource> searchResourceData(Long venInternalId) {
+		return venResourceDao.findAll(VenResourceSpecification.hasVenInternalIdEquals(venInternalId)
+				.and(VenResourceSpecification.notTypeIn(Arrays.asList(VenResourceType.VEN))));
 	}
 
 }

@@ -1,52 +1,9 @@
 import React from 'react';
-
-
-
-import Grid from '@material-ui/core/Grid';
-
-
-
-
-import Divider from '@material-ui/core/Divider';
-
-
-
-
-
-
-
-
-
-
-
-
-import Button from '@material-ui/core/Button';
-
-import RemoveIcon from '@material-ui/icons/Remove';
-
-
-
-
-
-
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
-
-import VenDetailHeader from './VenDetailHeader'
-
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TablePagination from '@material-ui/core/TablePagination';
-
-import Paper from '@material-ui/core/Paper';
-
 
 import { history } from '../../store/configureStore';
 
 import { formatTimestamp} from '../../utils/time'
-import {isActionReport, isHistoryReport, isTelemetryReport, isMetadataReport} from '../../utils/venReport'
 import EnhancedTable  from '../common/EnhancedTable'
 
 export class VenDetailReport extends React.Component {
@@ -96,7 +53,7 @@ export class VenDetailReport extends React.Component {
   }
 
   render() {
-    const {classes, ven, venActions, availableReport, totalReport} = this.props;
+    const {classes, availableReport, totalReport} = this.props;
     console.log(this.props)
     return (
     <div className={ classes.root }>

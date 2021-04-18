@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.annotation.Resource;
 import javax.xml.bind.JAXBElement;
@@ -230,7 +231,7 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 		List<OtherReportCapability> capabilities = Lists.newArrayList();
 		List<OtherReportCapabilityDescription> descriptions = Lists.newArrayList();
 		boolean hasMetadataReport = false;
-		List<VenResource> venChildren = new ArrayList<>();
+		Map<String, List<String>> capToDesc = new HashMap<>();
 		for (OadrReportType oadrReportType : payload.getOadrReport()) {
 
 			boolean created = false;
@@ -264,20 +265,16 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 				otherReportCapability.setCreatedDatetime(Oadr20bFactory.xmlCalendarToTimestamp(createdDateTime));
 			}
 
-			Map<String, List<String>> resourceIdToEndDeviceAssetMap = new HashMap<>();
-			Map<String, List<VenResource>> endDeviceAssetMap = new HashMap<>();
-
 			VenReportCapabilityDto capabilityDto = oadr20bDtoMapper.map(otherReportCapability,
 					VenReportCapabilityDto.class);
 			List<ReportCapabilityDescriptionDto> descriptionDto = new ArrayList<>();
 			capabilities.add(otherReportCapability);
 			List<OtherReportCapabilityDescription> capabilityDescription = new ArrayList<>();
+			List<String> rids = new ArrayList<>();
 			for (OadrReportDescriptionType oadrReportDescriptionType : oadrReportType.getOadrReportDescription()) {
 
-				String endDeviceAsset = "NotSpecified";
-				String resourceId = "NotSpecified";
-
 				String rid = oadrReportDescriptionType.getRID();
+				rids.add(rid);
 				OtherReportCapabilityDescription description = currentVenCapabilityDescriptionMap
 						.get(otherReportCapability.getReportSpecifierId() + rid);
 				if (!created) {
@@ -331,17 +328,6 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 					description.setEiSubject(new HashSet<>(createTargetList));
 
-					List<Target> collect = createTargetList.stream()
-							.filter(t -> TargetTypeEnum.ENDDEVICE_ASSET.equals(t.getTargetType()))
-							.collect(Collectors.toList());
-
-					if (collect.size() != collect.size() || createTargetList.size() > 1) {
-						LOGGER.warn(
-								"reportSpecifierID: %s, rID: %s reportSubject is malformed: should contains at most 'endDeviceAsset' target");
-					} else if (!collect.isEmpty()) {
-						endDeviceAsset = collect.get(0).getTargetId();
-					}
-
 				}
 
 				if (oadrReportDescriptionType.getReportDataSource() != null) {
@@ -351,77 +337,14 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 					List<Target> createTargetList = Oadr20bVTNEiServiceUtils.createTargetList(reportDataSource);
 					description.setEiDatasource(new HashSet<>(createTargetList));
 
-					List<Target> collect = createTargetList.stream()
-							.filter(t -> TargetTypeEnum.RESOURCE.equals(t.getTargetType()))
-							.collect(Collectors.toList());
-
-					if (collect.size() > 1) {
-						LOGGER.warn(
-								"reportSpecifierID: %s, rID: %s reportDatasource is malformed: should contains at most one 'resourceId' target");
-					} else if (!collect.isEmpty()) {
-						resourceId = collect.get(0).getTargetId();
-					}
-
 				}
 
 				descriptionDto.add(oadr20bDtoMapper.map(description, ReportCapabilityDescriptionDto.class));
 				descriptions.add(description);
 				capabilityDescription.add(description);
 
-				VenResource createReportDescription = VenResourceFactory.createReportDescription(ven, description);
-
-				List<String> endDeviceAssetListId = resourceIdToEndDeviceAssetMap.get(resourceId);
-				if (endDeviceAssetListId == null) {
-					endDeviceAssetListId = new ArrayList<>();
-				}
-				if (!endDeviceAssetListId.contains(endDeviceAsset)) {
-					endDeviceAssetListId.add(endDeviceAsset);
-				}
-				resourceIdToEndDeviceAssetMap.put(resourceId, endDeviceAssetListId);
-
-				List<VenResource> endDeviceAssetList = endDeviceAssetMap.get(endDeviceAsset);
-				if (endDeviceAssetList == null) {
-					endDeviceAssetList = new ArrayList<>();
-				}
-				endDeviceAssetList.add(createReportDescription);
-				endDeviceAssetMap.put(endDeviceAsset, endDeviceAssetList);
-
 			}
-
-			List<VenResource> reportChildren = new ArrayList<>();
-			Set<Entry<String, List<String>>> entrySet = resourceIdToEndDeviceAssetMap.entrySet();
-			for (Entry<String, List<String>> resourceIdEntry : entrySet) {
-
-				String resourceId = resourceIdEntry.getKey();
-				List<String> associatedEndDeviceAsset = resourceIdEntry.getValue();
-				List<VenResource> resourceChildren = new ArrayList<>();
-				if (associatedEndDeviceAsset != null) {
-					for (String endDeviceAsset : associatedEndDeviceAsset) {
-
-						List<VenResource> reportDescriptionResource = endDeviceAssetMap.get(endDeviceAsset);
-						if (reportDescriptionResource != null) {
-							VenResource createEndDeviceAsset = VenResourceFactory.createEndDeviceAsset(ven,
-									endDeviceAsset, new HashSet<>(reportDescriptionResource));
-							resourceChildren.add(createEndDeviceAsset);
-						}
-
-					}
-					if (!resourceChildren.isEmpty()) {
-						VenResource createResource = VenResourceFactory.createResource(ven, resourceId,
-								new HashSet<>(resourceChildren));
-						reportChildren.add(createResource);
-					}
-				}
-
-			}
-
-			if (!reportChildren.isEmpty()) {
-
-				VenResource createReport = VenResourceFactory.createReport(ven, otherReportCapability,
-						new HashSet<>(reportChildren));
-				venChildren.add(createReport);
-			}
-
+			capToDesc.put( capabilityDto.getReportSpecifierId(), rids);
 			capabilityDto.setDescriptions(descriptionDto);
 			capabilitiesDto.add(capabilityDto);
 			if (!created) {
@@ -457,17 +380,119 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 			otherReportRequestService.deleteByOtherReportCapabilitySource(ven);
 		}
 
-		venResourceService.deleteByVen(ven);
-		if (!venChildren.isEmpty()) {
-
-			VenResource createVen = VenResourceFactory.createVen(ven, new HashSet<>(venChildren));
-			venResourceService.save(createVen);
-		}
-
 		oadr20bAppNotificationPublisher.notifyRegisterReport(venReportDto, venID);
 
-		otherReportCapabilityService.save(capabilities);
-		otherReportCapabilityDescriptionService.save(descriptions);
+		Iterable<OtherReportCapability> savedCapabilities = otherReportCapabilityService.save(capabilities);
+		Iterable<OtherReportCapabilityDescription> save = otherReportCapabilityDescriptionService.save(descriptions);
+		
+		Map<String, OtherReportCapability> capMap = StreamSupport.stream(savedCapabilities.spliterator(), false)
+				.collect(Collectors.toMap(OtherReportCapability::getReportSpecifierId, cap -> cap));
+		
+		Map<String, OtherReportCapabilityDescription> deskMap = StreamSupport.stream(save.spliterator(), false).collect(Collectors.toMap(
+				desc -> desc.getOtherReportCapability().getReportSpecifierId() + desc.getRid(), desc -> desc));
+		List<VenResource> venChildren = new ArrayList<>();
+		
+		
+
+		for (Entry<String, List<String>> entry : capToDesc.entrySet()) {
+
+			OtherReportCapability cap = capMap.get(entry.getKey());
+			Map<String, List<String>> resourceIdToEndDeviceAssetMap = new HashMap<>();
+			Map<String, List<VenResource>> endDeviceAssetMap = new HashMap<>();
+
+			for (String rid : entry.getValue()) {
+				
+				OtherReportCapabilityDescription desc = deskMap.get(entry.getKey()+rid);
+				
+				String endDeviceAsset = "NotSpecified";
+				String resourceId = "NotSpecified";
+				if (desc.getEiSubject() != null) {
+
+					Set<Target> createTargetList = desc.getEiSubject();
+
+					List<Target> collect = createTargetList.stream()
+							.filter(t -> TargetTypeEnum.ENDDEVICE_ASSET.equals(t.getTargetType()))
+							.collect(Collectors.toList());
+
+					if (collect.size() != collect.size() || createTargetList.size() > 1) {
+						LOGGER.warn(
+								"reportSpecifierID: %s, rID: %s reportSubject is malformed: should contains at most 'endDeviceAsset' target");
+					} else if (!collect.isEmpty()) {
+						endDeviceAsset = collect.get(0).getTargetId();
+					}
+
+				}
+
+				if (desc.getEiDatasource() != null) {
+
+					Set<Target> createTargetList = desc.getEiDatasource();
+
+					List<Target> collect = createTargetList.stream()
+							.filter(t -> TargetTypeEnum.RESOURCE.equals(t.getTargetType()))
+							.collect(Collectors.toList());
+
+					if (collect.size() > 1) {
+						LOGGER.warn(
+								"reportSpecifierID: %s, rID: %s reportDatasource is malformed: should contains at most one 'resourceId' target");
+					} else if (!collect.isEmpty()) {
+						resourceId = collect.get(0).getTargetId();
+					}
+
+				}
+
+				VenResource createReportDescription = VenResourceFactory.createReportDescription(ven, desc);
+
+				List<String> endDeviceAssetListId = resourceIdToEndDeviceAssetMap.get(resourceId);
+				if (endDeviceAssetListId == null) {
+					endDeviceAssetListId = new ArrayList<>();
+				}
+				if (!endDeviceAssetListId.contains(endDeviceAsset)) {
+					endDeviceAssetListId.add(endDeviceAsset);
+				}
+				resourceIdToEndDeviceAssetMap.put(resourceId, endDeviceAssetListId);
+
+				List<VenResource> endDeviceAssetList = endDeviceAssetMap.get(resourceId+endDeviceAsset);
+				if (endDeviceAssetList == null) {
+					endDeviceAssetList = new ArrayList<>();
+				}
+				endDeviceAssetList.add(createReportDescription);
+				endDeviceAssetMap.put(resourceId+endDeviceAsset, endDeviceAssetList);
+
+			}
+
+			List<VenResource> reportChildren = new ArrayList<>();
+			Set<Entry<String, List<String>>> entrySet = resourceIdToEndDeviceAssetMap.entrySet();
+			for (Entry<String, List<String>> resourceIdEntry : entrySet) {
+
+				String resourceId = resourceIdEntry.getKey();
+				List<String> associatedEndDeviceAsset = resourceIdEntry.getValue();
+				List<VenResource> resourceChildren = new ArrayList<>();
+				if (associatedEndDeviceAsset != null) {
+					for (String endDeviceAsset : associatedEndDeviceAsset) {
+
+						List<VenResource> reportDescriptionResource = endDeviceAssetMap.get(resourceId+endDeviceAsset);
+						if (reportDescriptionResource != null) {
+							VenResource createEndDeviceAsset = VenResourceFactory.createEndDeviceAsset(ven,
+									endDeviceAsset, new HashSet<>(reportDescriptionResource));
+							resourceChildren.add(createEndDeviceAsset);
+						}
+
+					}
+					if (!resourceChildren.isEmpty()) {
+						VenResource createResource = VenResourceFactory.createResource(ven, resourceId,
+								new HashSet<>(resourceChildren));
+						reportChildren.add(createResource);
+					}
+				}
+
+			}
+
+			VenResource createReport = VenResourceFactory.createReport(ven, cap, new HashSet<>(reportChildren));
+			venChildren.add(createReport);
+		}
+		venResourceService.deleteByVen(ven);
+		VenResource createVen = VenResourceFactory.createVen(ven, new HashSet<>(venChildren));
+		venResourceService.save(createVen);
 
 		return Oadr20bEiReportBuilders.newOadr20bRegisteredReportBuilder(requestID, responseCode, venID).build();
 

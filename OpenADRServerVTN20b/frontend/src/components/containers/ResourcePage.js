@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions';
-import * as venActions from '../../actions/venActions';
 import * as eventActions from '../../actions/eventActions';
 import * as resourceActions from '../../actions/resourceActions';
 
@@ -14,10 +13,6 @@ import Paper from '@material-ui/core/Paper';
 
 import VenResource from '../Ven/VenResource'
 import { withStyles } from '@material-ui/core/styles';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -27,8 +22,8 @@ const styles = theme => ({
     flexWrap: 'wrap',
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
   },
   dense: {
     marginTop: 19,
@@ -37,7 +32,7 @@ const styles = theme => ({
     width: 200,
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
     minWidth: 500,
   },
   card: {
@@ -50,7 +45,7 @@ const styles = theme => ({
     paddingRight: 10
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   iconButton: {
     marginTop: 10
@@ -75,17 +70,18 @@ export class ResourcePage extends React.Component {
       , size: 10
     }
 
-    this.props.resourceActions.searchResource(this.state.filters);
+    this.props.vtnConfigurationActions.loadMarketContext();
+    this.props.vtnConfigurationActions.loadGroup();
+    this.props.resourceActions.searchResourceRoot(this.state.filters);
   }
 
   onFilterChange = (filters) => {
     this.setState({filters});
-    this.resourceActions.searchResource(filters);
+    this.props.resourceActions.searchResourceRoot(filters);
   }
 
   onEventSuggestionsFetchRequested = (e) => {
-    var filters = this.state.filters.splice(0);
-    // this.props.eventActions.searchEvent(filters, null, null, 0, 5);
+
   }
 
   onEventSuggestionsClearRequested = () => {
@@ -101,12 +97,16 @@ export class ResourcePage extends React.Component {
   render() {
     const {classes, resource} = this.props;
     return (
-    <Paper className={ classes.root }>
+    <Paper className={ classes.root } style={{paddingBottom:"10px"}}>
         <VenResource classes={ classes }
                  resource={ resource.resource}
+                 data={resource.data}
+                 dataId={resource.dataId}
+                  marketContext={ resource.marketContext }
+                 group={ resource.group }
                  filters={this.state.filters}
-                 onFilterChange={this.onFilterChange}
-                
+                   onFilterChange={this.onFilterChange}
+                  resourceActions={this.props.resourceActions}
                   event={resource.event}
                   onEventSuggestionsFetchRequested={this.onEventSuggestionsFetchRequested}
                   onEventSuggestionsClearRequested={this.onEventSuggestionsClearRequested}
@@ -120,19 +120,21 @@ export class ResourcePage extends React.Component {
 
 ResourcePage.propTypes = {
   eventActions: PropTypes.object.isRequired,
-  resourceActions: PropTypes.object.isRequired
+  resourceActions: PropTypes.object.isRequired,
+  vtnConfigurationActions: PropTypes.object.isRequired
 };
 
 function mapStateToProps( state ) {
   return {
-    resource: state.resource
+    resource: state.resource,
   };
 }
 
 function mapDispatchToProps( dispatch ) {
   return {
     eventActions: bindActionCreators( eventActions, dispatch ),
-    resourceActions: bindActionCreators( resourceActions, dispatch )  
+    resourceActions: bindActionCreators( resourceActions, dispatch ),
+    vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch )   
   };
 }
 

@@ -12,8 +12,6 @@ import Tooltip from '@material-ui/core/Tooltip';
 
 import {DatePicker } from '../common/TimePicker'
 
-import {formatTimestamp} from '../../utils/time'
-
 import Grid from '@material-ui/core/Grid';
 
 
@@ -42,9 +40,6 @@ var EventChip = (props) => {
   <span style={ { display: 'flex', alignItems: 'center', marginLeft: '-7px', } }><CalendarTodayIcon color="disabled" style={ { marginRight: '5px' } }/> { props.name }</span>
   );
 }
-
-const deltaStartDays = 7
-const deltaEndDays = 7
 
 export class FilterPanel extends React.Component {
 
@@ -211,7 +206,6 @@ export class FilterPanel extends React.Component {
     if(hasFilter && !hasFilter.date) {
         filter_input_length += 4;
     }
-    console.log(this.props.start)
     return (
 
 

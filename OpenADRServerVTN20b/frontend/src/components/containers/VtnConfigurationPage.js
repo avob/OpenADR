@@ -14,10 +14,6 @@ import VtnConfigurationAccount from '../VtnConfiguration/VtnConfigurationAccount
 import VtnConfigurationKnown from '../VtnConfiguration/VtnConfigurationKnown';
 
 import { withStyles } from '@material-ui/core/styles';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
 
 import { history } from '../../store/configureStore';
 
@@ -30,8 +26,8 @@ const styles = theme => ({
     flexWrap: 'wrap',
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
   },
   dense: {
     marginTop: 19,
@@ -40,7 +36,7 @@ const styles = theme => ({
     width: 200,
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
     minWidth: 500,
   },
   card: {
@@ -53,7 +49,7 @@ const styles = theme => ({
     paddingRight: 10
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   iconButton: {
     marginTop: 10
@@ -99,6 +95,7 @@ export class VtnConfigurationPage extends React.Component {
     this.props.accountActions.loadAccountApp();
     this.props.knownActions.searchKnownUnit({filter:[]});
     this.props.knownActions.searchKnownSignal({filter:[]});
+    this.props.knownActions.searchKnownReport({filter:[]});
     switch(this.props.match.params.panel){
       case "parameter":
         this.setState({value:0});
@@ -121,17 +118,17 @@ export class VtnConfigurationPage extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if(history.location.pathname === "/vtn_configuration" && this.state.value != 0) {
+    if(history.location.pathname === "/vtn_configuration" && this.state.value !== 0) {
       this.setState({value:0});
-    } else if(history.location.pathname === "/vtn_configuration/parameter" && this.state.value != 0) {
+    } else if(history.location.pathname === "/vtn_configuration/parameter" && this.state.value !== 0) {
       this.setState({value:0});
-    } else if(history.location.pathname === "/vtn_configuration/marketcontext" && this.state.value != 1) {
+    } else if(history.location.pathname === "/vtn_configuration/marketcontext" && this.state.value !== 1) {
       this.setState({value:1});
-    } else if(history.location.pathname === "/vtn_configuration/group" && this.state.value != 2) {
+    } else if(history.location.pathname === "/vtn_configuration/group" && this.state.value !== 2) {
       this.setState({value:2});
-    }  else if(history.location.pathname.startsWith('/vtn_configuration/account') && this.state.value != 3) {
+    }  else if(history.location.pathname.startsWith('/vtn_configuration/account') && this.state.value !== 3) {
       this.setState({value:3});
-    } else if(history.location.pathname.startsWith('/vtn_configuration/known') && this.state.value != 4) {
+    } else if(history.location.pathname.startsWith('/vtn_configuration/known') && this.state.value !== 4) {
       this.setState({value:4});
     } 
   }

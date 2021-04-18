@@ -16,7 +16,6 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 
 
-import Typography from '@material-ui/core/Typography';
 import MenuItem from '@material-ui/core/MenuItem';
 
 import Select from '@material-ui/core/Select';
@@ -28,14 +27,11 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
 
 import AddIcon from '@material-ui/icons/Add';
 
 import Button from '@material-ui/core/Button';
 
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Toolbar from '@material-ui/core/Toolbar';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
 
@@ -302,7 +298,7 @@ var getAvailableUnitType = (signalName, signalType) => {
 
 const toolbarStyles = theme => ({
   root: {
-    paddingRight: theme.spacing.unit,
+    paddingRight: theme.spacing(1),
   },
   highlight:
     theme.palette.type === 'light'
@@ -566,7 +562,7 @@ export class EventSignalPanel extends React.Component {
 
 
   render() {
-    const {classes, hasError, eventSignal, edit, index, group, ven} = this.props;
+    const {classes, hasError, eventSignal, edit, group, ven} = this.props;
 
     var signalNameView = [];
     var s;

@@ -1,28 +1,8 @@
 import React from 'react';
-
-
-
-import VenDetailHeader from './VenDetailHeader'
-import Divider from '@material-ui/core/Divider';
-
-
-import Grid from '@material-ui/core/Grid';
-
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TablePagination from '@material-ui/core/TablePagination';
-
-import Paper from '@material-ui/core/Paper';
-
-
-import {DatePicker } from '../common/TimePicker'
 
 import {formatTimestamp} from '../../utils/time'
 
-import FilterPanel from '../common/FilterPanel' 
 import EnhancedTable  from '../common/EnhancedTable'
 
 export class VenDetailOptSchedule extends React.Component {
@@ -53,7 +33,7 @@ export class VenDetailOptSchedule extends React.Component {
 
 
   render() {
-    const {classes, ven, venActions, venOpt, marketContext} = this.props;
+    const {classes, venOpt} = this.props;
 
     return (
     <div className={ classes.root } >

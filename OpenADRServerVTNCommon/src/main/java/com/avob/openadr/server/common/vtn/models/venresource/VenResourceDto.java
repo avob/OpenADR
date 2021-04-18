@@ -14,7 +14,7 @@ public class VenResourceDto {
 
 	private VenResourceShortDto parent;
 
-//	private Set<VenResourceShortDto> children;
+	private Long reportDescriptionCount;
 
 	public VenResourceDto() {
 	}
@@ -71,11 +71,12 @@ public class VenResourceDto {
 		this.parent = parent;
 	}
 
-//	public Set<VenResourceShortDto> getChildren() {
-//		return children;
-//	}
-//
-//	public void setChildren(Set<VenResourceShortDto> children) {
-//		this.children = children;
-//	}
+	public Long getReportDescriptionCount() {
+		return reportDescriptionCount;
+	}
+
+	public void setReportDescriptionCount(Long reportDescriptionCount) {
+		this.reportDescriptionCount = reportDescriptionCount;
+	}
+
 }

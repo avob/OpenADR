@@ -3,7 +3,6 @@ import React from 'react';
 
 import BigCalendar from 'react-big-calendar'
 import moment from 'moment'
-import Divider from '@material-ui/core/Divider';
 // required for react-big-calendar
 // eslint-disable-next-line
 import style from 'react-big-calendar/lib/css/react-big-calendar.css'
@@ -13,8 +12,6 @@ import {iCalDurationInSeconds} from '../../utils/time'
 import { EventCalendarDialog } from '../common/VtnconfigurationDialog'
 
 import { history } from '../../store/configureStore';
-
-import EventHeader from './EventHeader'
 
 import amber from '@material-ui/core/colors/amber';
 import red from '@material-ui/core/colors/red';
@@ -27,11 +24,6 @@ import EventCalendarAgendaView from './EventCalendarView/EventCalendarAgendaView
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
@@ -117,8 +109,8 @@ export class EventCalendar extends React.Component {
 
   render() {
     var that = this;
-    const {classes, marketContext, event, ven, filters, pagination, onFilterChange, onPaginationChange
-      , onVenSuggestionsFetchRequested, onVenSuggestionsClearRequested, onVenSuggestionsSelect} = this.props;
+    const {classes, marketContext, event, ven, filters, onFilterChange
+      , onVenSuggestionsFetchRequested, onVenSuggestionsClearRequested, onVenSuggestionsSelect, start, end, onStartChange, onEndChange, view, currentDate} = this.props;
 
     var calendarEvent = [];
     event.forEach(e => {
@@ -149,10 +141,7 @@ export class EventCalendar extends React.Component {
     EventCalendarAgendaView.color = this.props.color;
 
     
-    
-    console.log(this.props)
-    console.log(this.props.view)
-    console.log(this.props.currentDate)
+  
     return (
       <div className={ classes.root }>
          <Paper >
@@ -168,7 +157,7 @@ export class EventCalendar extends React.Component {
             <div style={{float:"right"}}>
 
                <Tooltip title="Filter" onClick={this.handleFilterClick}>
-                          <IconButton aria-label="Filter" color={this.props.filters.length != 0 ? "primary" : "default"}>
+                          <IconButton aria-label="Filter" color={this.props.filters.length !== 0 ? "primary" : "default"}>
                             <FilterListIcon />
                           </IconButton>
                         </Tooltip> 
@@ -183,16 +172,16 @@ export class EventCalendar extends React.Component {
         <div style={{margin: "0px 20px"}}>
         {this.state.filterable ? <FilterPanel classes={classes} type="EVENT" hasFilter={{marketContext:true, ven: true, eventStatus:true, date: true}} 
                       marketContext={marketContext}
-                      filter={this.props.filters}
-                      start={this.props.start}
-                      end={this.props.end}
-                      onFilterChange={this.props.onFilterChange}
-                      onStartChange={this.props.onStartChange}
-                      onEndChange={this.props.onEndChange}
+                      filter={filters}
+                      start={start}
+                      end={end}
+                      onFilterChange={onFilterChange}
+                      onStartChange={onStartChange}
+                      onEndChange={onEndChange}
                       ven={ven}
-                      onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
-                      onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
-                      onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}
+                      onVenSuggestionsFetchRequested={onVenSuggestionsFetchRequested}
+                      onVenSuggestionsClearRequested={onVenSuggestionsClearRequested}
+                      onVenSuggestionsSelect={onVenSuggestionsSelect}
                       /> : null}
          </div>
         <Table className={classes.table} aria-labelledby="tableTitle">
@@ -200,8 +189,8 @@ export class EventCalendar extends React.Component {
         <BigCalendar style={{height:600, margin: "20px 20px"}}
           localizer={localizer}
           events={calendarEvent}
-          defaultView={this.props.view}
-          defaultDate={this.props.currentDate}
+          defaultView={view}
+          defaultDate={currentDate}
           startAccessor="start"
           endAccessor="end"
           eventPropGetter={this.getEventPropGetter}

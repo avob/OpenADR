@@ -1,18 +1,12 @@
 import React from 'react';
-import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
-import Button from '@material-ui/core/Button';
-import RemoveIcon from '@material-ui/icons/Remove';
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
-import VenDetailHeader from './VenDetailHeader'
 import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 
 
-import {  VtnTextField, VtnFeatureField } from '../common/TextField'
+import {  VtnTextField } from '../common/TextField'
 
 
 
@@ -23,9 +17,8 @@ export class VenDetailSettings extends React.Component {
   }
 
   render() {
-    const {classes, ven, venActions} = this.props;
+    const {classes, ven} = this.props;
 
-    console.log(ven)
     if(!ven || !ven.username) {
       return <div className={ classes.root } />;
     }

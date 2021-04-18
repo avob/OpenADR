@@ -27,8 +27,6 @@ import VenDetailRequestSpecifier from '../VenDetail/VenDetailRequestSpecifier'
 
 
 
-import green from '@material-ui/core/colors/green';
-
 import { history } from '../../store/configureStore';
 import Paper from '@material-ui/core/Paper';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -37,14 +35,6 @@ import { VenActionDialog } from '../common/VtnconfigurationDialog'
 
 
 
-
-function TabContainer( props ) {
-  return (
-  <Typography component="div" style={ { padding: 8 * 3 } }>
-    { props.children }
-  </Typography>
-  );
-}
 
 const styles = theme => ({
   root: {
@@ -65,7 +55,7 @@ const styles = theme => ({
     width: 200,
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
     minWidth: 500,
   },
   card: {
@@ -78,7 +68,7 @@ const styles = theme => ({
     paddingRight: 10
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   iconButton: {
     marginTop: 10

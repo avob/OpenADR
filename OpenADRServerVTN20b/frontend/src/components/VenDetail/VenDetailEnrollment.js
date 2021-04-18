@@ -5,36 +5,17 @@ import React from 'react';
 
 
 
-import {  VtnConfigurationMarketContextCard } from '../common/VtnConfigurationCard'
 import { MarketContextSelectDialog } from '../common/VtnconfigurationDialog'
 
 
-
-
-
-
-import Grid from '@material-ui/core/Grid';
-
-
-
-
-import Divider from '@material-ui/core/Divider';
-
-
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
 
 
 import IconButton from '@material-ui/core/IconButton';
 
 
 
-import ChipInput from 'material-ui-chip-input'
 
-import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
-
-import SearchIcon from '@material-ui/icons/Search';
 
 
 
@@ -43,12 +24,6 @@ import TableCell from '@material-ui/core/TableCell';
 
 
 import Tooltip from '@material-ui/core/Tooltip';
-import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
-
-
-
-import VenDetailHeader from './VenDetailHeader'
 
 
 
@@ -103,7 +78,7 @@ export class VenDetailEnrollment extends React.Component {
 
 
   render() {
-    const {classes, ven, venActions, marketContext, venMarketContext} = this.props;
+    const {classes, marketContext, venMarketContext} = this.props;
 
     var notSubscribedMarketContext = [];
     var venMarketContextId = [];

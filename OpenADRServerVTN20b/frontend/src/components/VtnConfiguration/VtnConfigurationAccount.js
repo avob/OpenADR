@@ -1,34 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-
-import * as accountActions from '../../actions/accountActions';
-
-import { withStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
-
-import amber from '@material-ui/core/colors/amber';
-
-
 import AccountUser from '../Account/AccountUser'
 import AccountApp from '../Account/AccountApp'
-
 import { history } from '../../store/configureStore';
-
-
-
-
-function TabContainer( props ) {
-  return (
-  <Typography component="div" style={ { padding: 8 * 3 } }>
-    { props.children }
-  </Typography>
-  );
-}
 
 export class VtnConfigurationAccount extends React.Component {
   state = {

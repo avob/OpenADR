@@ -2,20 +2,12 @@ import React from 'react';
 
 import Typography from '@material-ui/core/Typography';
 
-import Divider from '@material-ui/core/Divider';
-
 import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
-
 
 
 
 
 import { history } from '../../store/configureStore';
-import Grid from '@material-ui/core/Grid';
-
-
-import FilterPanel from '../common/FilterPanel' 
 
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';

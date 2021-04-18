@@ -24,10 +24,11 @@
     "react-dom": "16.10.2",
     "react-redux": "5.1.2",
     "react-router-dom": "4.3.1",
-    "react-scripts": "3.2.0",
+    "react-scripts": "3.4.4",
     "redux": "4.0.4",
     "redux-thunk": "2.3.0",
-    "swagger-client": "3.8.25"
+    "swagger-client": "3.8.25",
+    "swagger-ui-react": "^3.47.1"
   },
   "scripts": {
     "start": "react-scripts start",

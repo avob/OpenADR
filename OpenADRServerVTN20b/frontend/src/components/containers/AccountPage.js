@@ -8,7 +8,6 @@ import * as accountActions from '../../actions/accountActions';
 import { withStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 
 import amber from '@material-ui/core/colors/amber';
@@ -20,16 +19,6 @@ import AccountApp from '../Account/AccountApp'
 import { history } from '../../store/configureStore';
 
 
-
-
-function TabContainer( props ) {
-  return (
-  <Typography component="div" style={ { padding: 8 * 3 } }>
-    { props.children }
-  </Typography>
-  );
-}
-
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -39,8 +28,8 @@ const styles = theme => ({
     flexWrap: 'wrap',
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
   },
   dense: {
     marginTop: 19,
@@ -49,7 +38,7 @@ const styles = theme => ({
     width: 200,
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   card: {
     maxWidth: 350,
@@ -61,7 +50,7 @@ const styles = theme => ({
     paddingRight: 10
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   stepper: {
     backgroundColor: '#fafafa'
@@ -74,7 +63,7 @@ const styles = theme => ({
   },
   iconVariant: {
     opacity: 0.9,
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
   },
   message: {
     display: 'flex',

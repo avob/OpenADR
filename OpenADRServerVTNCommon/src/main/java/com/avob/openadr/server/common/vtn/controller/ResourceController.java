@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,10 +30,19 @@ public class ResourceController {
 	@Resource
 	private DtoMapper dtoMapper;
 
-	@RequestMapping(value = "/search", method = RequestMethod.POST)
+	@RequestMapping(value = "/search/root", method = RequestMethod.POST)
 	@ResponseBody
-	public List<VenResourceDto> searchResource(@RequestBody VenSearchDto venSearchDto, HttpServletResponse response) {
-		List<VenResource> resources = venResourceService.search(venSearchDto);
+	public List<VenResourceDto> searchResourceRoot(@RequestBody VenSearchDto venSearchDto,
+			HttpServletResponse response) {
+		List<VenResource> resources = venResourceService.searchResourceRoot(venSearchDto);
+		return dtoMapper.mapList(resources, VenResourceDto.class);
+
+	}
+
+	@RequestMapping(value = "/search/{venInternalId}", method = RequestMethod.POST)
+	@ResponseBody
+	public List<VenResourceDto> searchResourceData(@PathVariable("venInternalId") Long venInternalId, HttpServletResponse response) {
+		List<VenResource> resources = venResourceService.searchResourceData(venInternalId);
 		return dtoMapper.mapList(resources, VenResourceDto.class);
 
 	}

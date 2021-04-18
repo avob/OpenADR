@@ -1,18 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-
-import * as accountActions from '../../actions/accountActions';
-
-import { withStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
-
-import amber from '@material-ui/core/colors/amber';
-
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -86,10 +76,7 @@ var KnownSignalTable = (props) => {
             <TableRow key={row.signalName+row.signalType}>
               <TableCell>{row.signalName}</TableCell>
               <TableCell>{row.signalType}</TableCell>
-              <TableCell>{row.units && row.units.map(n => {return <div>{n.itemDescription + "-" + n.itemUnits}</div>})}</TableCell>
-
-
-
+              <TableCell>{row.units && row.units.map(n => {return <div key={n.itemDescription + "-" + n.itemUnits}>{n.itemDescription + "-" + n.itemUnits}</div>})}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -99,13 +86,45 @@ var KnownSignalTable = (props) => {
 
 }
 
-
-function TabContainer( props ) {
+var KnownReportTable = (props) => {
+  const {classes, report} = props
+  console.log(report)
   return (
-  <Typography component="div" style={ { padding: 8 * 3 } }>
-    { props.children }
-  </Typography>
-  );
+    <div className={classes.root}>
+      <Toolbar
+      className={classes.root}
+    >
+      <div className={classes.title} style={{ flex: 1 }}>
+         <Typography variant="h6" id="tableTitle">
+             Reports
+          </Typography>
+      </div>
+    </Toolbar>
+      <Table className={classes.table}>
+        <TableHead>
+          <TableRow>
+            <TableCell>Report name</TableCell>
+            <TableCell>Report type</TableCell>
+            <TableCell>Reading type</TableCell>
+            <TableCell>Payload</TableCell>
+            <TableCell>Report unit</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {report && report.map(row => (
+            <TableRow key={row.reportName+row.reportType}>
+              <TableCell>{row.reportName}</TableCell>
+              <TableCell>{row.reportType}</TableCell>
+              <TableCell>{row.readingType}</TableCell>
+              <TableCell>{row.payloadBase}</TableCell>
+              <TableCell>{row.units && row.units.map(n => {return <div key={n.itemDescription + "-" + n.itemUnits}>{n.itemDescription + "-" + n.itemUnits}</div>})}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  )
+
 }
 
 export class VtnConfigurationKnown extends React.Component {
@@ -124,6 +143,9 @@ export class VtnConfigurationKnown extends React.Component {
       case 1:
         history.push("/vtn_configuration/known/signal")
         break;
+      case 2:
+        history.push("/vtn_configuration/known/report")
+        break;
       default:
         break;
     }
@@ -138,6 +160,9 @@ export class VtnConfigurationKnown extends React.Component {
       case "signal":
         this.setState({value:1});
         break;
+      case "report":
+        this.setState({value:2});
+        break;
       default:
         break;
     }
@@ -147,6 +172,7 @@ export class VtnConfigurationKnown extends React.Component {
   render() {
     const {classes, known} = this.props;
     const {value} = this.state;
+    console.log(known)
     return (
     <div className={ classes.root }>
       <Tabs value={ this.state.value }
@@ -156,11 +182,14 @@ export class VtnConfigurationKnown extends React.Component {
             centered>
         <Tab label="Units" />
         <Tab label="Signals" />
+        <Tab label="Reports" />
       </Tabs>
       <Divider variant="middle" />
       { value === 0 && <KnownUnitTable classes={classes} unit={known.unit}/>
                         }
       { value === 1 && <KnownSignalTable classes={classes} signal={known.signal}/>
+                       }
+      { value === 2 && <KnownReportTable classes={classes} report={known.report}/>
                        }
     </div>
 

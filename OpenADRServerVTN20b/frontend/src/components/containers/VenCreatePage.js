@@ -8,23 +8,11 @@ import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions'
 import * as venActions from '../../actions/venActions';
 
 import { withStyles } from '@material-ui/core/styles';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 
 import VenCreate from '../VenCreate/VenCreate'
 
 import amber from '@material-ui/core/colors/amber';
-
-
-function TabContainer( props ) {
-  return (
-  <div>
-    { props.children }
-  </div>
-  );
-}
 
 const styles = theme => ({
   root: {
@@ -35,8 +23,8 @@ const styles = theme => ({
     flexWrap: 'wrap',
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
   },
   dense: {
     marginTop: 19,
@@ -45,7 +33,7 @@ const styles = theme => ({
     width: 200,
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   card: {
     maxWidth: 350,
@@ -57,7 +45,7 @@ const styles = theme => ({
     paddingRight: 10
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   stepper: {
     backgroundColor: '#fafafa'
@@ -70,7 +58,7 @@ const styles = theme => ({
   },
   iconVariant: {
     opacity: 0.9,
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
   },
   message: {
     display: 'flex',
@@ -82,7 +70,6 @@ const styles = theme => ({
 
 export class VenCreatePage extends React.Component {
   state = {
-    value: 0,
   };
 
   handleChange = (event, value) => {
@@ -98,7 +85,6 @@ export class VenCreatePage extends React.Component {
 
   render() {
     const {classes, ven_create} = this.props;
-    const {value} = this.state;
     return (
     <div className={ classes.root }>
       <Divider variant="middle" />

@@ -1,35 +1,15 @@
 import React from 'react';
-
-import Button from '@material-ui/core/Button';
-
-import GridList from '@material-ui/core/GridList';
-
-
-
-
-
-import ColorPicker from 'material-ui-color-picker'
-
 import TableCell from '@material-ui/core/TableCell';
 
 import Paper from '@material-ui/core/Paper';
 
-import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
-import CloseIcon from '@material-ui/icons/Close';
 
 
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
 
-
-import Divider from '@material-ui/core/Divider';
-
-import Grid from '@material-ui/core/Grid';
-
-import { VtnConfigurationMarketContextCard } from '../common/VtnConfigurationCard'
 import EnhancedTable  from '../common/EnhancedTable'
 
 import { history } from '../../store/configureStore';

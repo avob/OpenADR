@@ -2,6 +2,8 @@ package com.avob.openadr.server.common.vtn.models.venresource;
 
 import java.util.List;
 
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.ListJoin;
@@ -17,6 +19,10 @@ public class VenResourceSpecification {
 
 	public static Specification<VenResource> typeIn(List<VenResourceType> types) {
 		return (event, cq, cb) -> event.get("type").in(types);
+	}
+	
+	public static Specification<VenResource> notTypeIn(List<VenResourceType> types) {
+		return (event, cq, cb) -> Specification.not(VenResourceSpecification.typeIn(types)).toPredicate(event, cq, cb);
 	}
 
 	public static Specification<VenResource> hasMarketContext(String marketContextName) {
@@ -62,6 +68,10 @@ public class VenResourceSpecification {
 	public static Specification<VenResource> hasVenIdEquals(String str) {
 		return (event, cq, cb) -> cb.equal(event.join("ven").get("username"), str);
 	}
+	
+	public static Specification<VenResource> hasVenInternalIdEquals(Long internalId) {
+		return (event, cq, cb) -> cb.equal(event.join("ven").get("id"), internalId);
+	}
 
 	public static Specification<VenResource> hasVenIdContains(String str) {
 		return (event, cq, cb) -> cb.like(event.join("ven").get("username"), "%" + str + "%");
@@ -74,6 +84,23 @@ public class VenResourceSpecification {
 	public static Specification<VenResource> hasVenOadrNameContains(String str) {
 		return (event, cq, cb) -> cb.like(event.join("ven").get("oadrName"), "%" + str + "%");
 	}
+	
+	public static Specification<VenResource> hasParentIdEqual(Long parentId) {
+		return (event, cq, cb) -> cb.equal(event.get("parent").get("id"), parentId);
+	}
+	
+	public static Specification<VenResourceWithChildrenCount> countChildren() {
+		return (event, cq, cb) -> {
+			
+			
+			Expression<Long> count = cb.count(event.get("children"));
+			CriteriaQuery<?> multiselect = cq.multiselect(event.get("id"), count);
+			return multiselect.getRestriction();
+		};
+	}
+	
+	
+	
 
 	public static Specification<VenResource> search(List<VenFilter> filters) {
 		Specification<VenResource> eventIdPredicates = null;

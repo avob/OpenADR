@@ -1,19 +1,6 @@
 import React from 'react';
 
-
-
-import Divider from '@material-ui/core/Divider';
-
-import GridList from '@material-ui/core/GridList';
-
-import { VtnConfigurationEventCard } from '../common/VtnConfigurationCard'
-
-
-
 import { history } from '../../store/configureStore';
-
-import EventHeader from './EventHeader'
-
 
 
 import moment from 'moment'
@@ -23,10 +10,6 @@ import TableCell from '@material-ui/core/TableCell';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
-import Avatar from '@material-ui/core/Avatar';
-import Typography from '@material-ui/core/Typography';
 import { formatTimestamp} from '../../utils/time'
 
 import Grid from '@material-ui/core/Grid';
@@ -117,8 +100,8 @@ export class EventList extends React.Component {
   }
 
   render() {
-    const {classes, marketContext, event, ven, filters, pagination, onFilterChange, onPaginationChange,
-      onVenSuggestionsFetchRequested, onVenSuggestionsClearRequested, onVenSuggestionsSelect, total} = this.props;
+    const {classes, marketContext, event, ven, filters, sort, pagination, onFilterChange, onSortChange, onPaginationChange,
+      onVenSuggestionsFetchRequested, onVenSuggestionsClearRequested, onVenSuggestionsSelect, total, start, end, onStartChange, onEndChange} = this.props;
 
     return (
       <div className={ classes.root }>
@@ -126,10 +109,10 @@ export class EventList extends React.Component {
         title="Events"
         data={event}
         total={total}
-        pagination={this.props.pagination}
-        sort={this.props.sort}
-        handlePaginationChange={this.props.onPaginationChange}
-        handleSortChange={this.props.onSortChange}
+        pagination={pagination}
+        sort={sort}
+        handlePaginationChange={onPaginationChange}
+        handleSortChange={onSortChange}
         handleClick={n => {history.push( '/event/detail/' + n.id )}}
         rows={[
           { id: 'id', numeric: false, disablePadding: true, label: 'Id'},
@@ -169,21 +152,21 @@ export class EventList extends React.Component {
                     
           </React.Fragment>
         }}
-        filter={this.props.filters}
+        filter={filters}
         filterPanel={() => {
           return <Grid container>
         <Grid item xs={ 12 }><FilterPanel classes={classes} type="EVENT" hasFilter={{marketContext:true, ven: true, eventStatus:true, date: true}} 
                 marketContext={marketContext}
-                filter={this.props.filters}
-                start={this.props.start}
-                end={this.props.end}
-                onFilterChange={this.props.onFilterChange}
-                onStartChange={this.props.onStartChange}
-                onEndChange={this.props.onEndChange}
+                filter={filters}
+                start={start}
+                end={end}
+                onFilterChange={onFilterChange}
+                onStartChange={onStartChange}
+                onEndChange={onEndChange}
                 ven={ven}
-                onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
-                onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
-                onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}
+                onVenSuggestionsFetchRequested={onVenSuggestionsFetchRequested}
+                onVenSuggestionsClearRequested={onVenSuggestionsClearRequested}
+                onVenSuggestionsSelect={  onVenSuggestionsSelect}
                 /></Grid>
       </Grid>
         }}

@@ -1,38 +1,10 @@
 import React from 'react';
-import { VtnConfigurationGroupCard } from '../common/VtnConfigurationCard'
 import {  GroupSelectDialog } from '../common/VtnconfigurationDialog'
-import Grid from '@material-ui/core/Grid';
-import Divider from '@material-ui/core/Divider';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
 import IconButton from '@material-ui/core/IconButton';
-import ChipInput from 'material-ui-chip-input'
-import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
-import SearchIcon from '@material-ui/icons/Search';
-import VenDetailHeader from './VenDetailHeader'
 import EnhancedTable  from '../common/EnhancedTable'
 import TableCell from '@material-ui/core/TableCell';
 import Tooltip from '@material-ui/core/Tooltip';
-
-var GroupGridList = (props) => {
-  return (
-  <div className={ props.classes.root }>
-    <GridList className={ props.classes.gridList }
-              cols={ 3 }
-              spacing={ 0 }
-              cellHeight="auto">
-      { props.group.map( g => (
-          <GridListTile key={ g.id } className={ props.classes.tile }>
-            <VtnConfigurationGroupCard classes={ props.classes }
-                                       group={ g }
-                                       handleRemoveVenGroup={ props.handleRemoveVenGroup( g ) } />
-          </GridListTile>
-        ) ) }
-    </GridList>
-  </div>
-  );
-}
 
 
 export class VenDetailGroup extends React.Component {
@@ -90,7 +62,7 @@ export class VenDetailGroup extends React.Component {
 
 
   render() {
-    const {classes, ven, venActions,  group, venGroup} = this.props;
+    const {classes, group, venGroup} = this.props;
 
     var notAddedGroup = [];
     var venGroupId = [];

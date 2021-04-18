@@ -1,13 +1,7 @@
 import React from 'react';
 
-import Divider from '@material-ui/core/Divider';
-
-import Button from '@material-ui/core/Button';
 import AddIcon from '@material-ui/icons/Add';
 
-import GridList from '@material-ui/core/GridList';
-
-import { VtnConfigurationVenCard } from '../common/VtnConfigurationCard'
 
 import { history } from '../../store/configureStore';
 import Grid from '@material-ui/core/Grid';
@@ -20,19 +14,10 @@ import TableCell from '@material-ui/core/TableCell';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
 import Avatar from '@material-ui/core/Avatar';
-import Typography from '@material-ui/core/Typography';
 import { formatTimestamp} from '../../utils/time'
 
 export class VenList extends React.Component {
-  constructor( props ) {
-    super( props );
-    
-  }
-
-  
 
   handleDeleteVen = (username) => {
     var that = this;

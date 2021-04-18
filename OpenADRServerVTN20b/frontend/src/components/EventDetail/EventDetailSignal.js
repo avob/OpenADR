@@ -1,34 +1,7 @@
 import React from 'react';
-
-
-
-
-
-
-
-
-
-import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
-
-
-
-
-import EventDetailHeader from './EventDetailHeader'
 import Divider from '@material-ui/core/Divider';
-
-
 import Grid from '@material-ui/core/Grid';
-
-
-
-
-
-
-
 import {EventSignalPanel} from '../common/EventSignalPanel'
-
 
 export class EventDetailSignal extends React.Component {
 
@@ -53,7 +26,7 @@ export class EventDetailSignal extends React.Component {
 
 
   render() {
-    const {classes, event, editMode, group, ven} = this.props;
+    const {classes, event, group, ven} = this.props;
     var that = this;
     var hasError = false;
 
@@ -73,7 +46,7 @@ export class EventDetailSignal extends React.Component {
                 onChange={that.handleEventSignalChange(index)}
                 onRemove={that.handleRemoveEventSignalChange(index)}
                 canBeRemoved={event.signals.length >0}
-                group={group} onChange={this.props.updateCopyTargets}
+                group={group}
         ven={ven}
         onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
         onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}

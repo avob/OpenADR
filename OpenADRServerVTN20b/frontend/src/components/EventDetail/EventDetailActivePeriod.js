@@ -2,18 +2,13 @@ import React from 'react';
 
 
 
-import EventDetailHeader from './EventDetailHeader'
-import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
 
 import Grid from '@material-ui/core/Grid';
 
-import Checkbox from '@material-ui/core/Checkbox';
-
 import {formatTimestamp} from '../../utils/time'
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
 var EventTextField = (props) => {
   var value = (props.value != null) ? props.value : "";
   return (
@@ -46,7 +41,7 @@ export class EventDetailActivePeriod extends React.Component {
       <div  style={{margin: "0px 5%"}}>
         <FormControl fullWidth >
       <FormGroup aria-label="position" row>
-       <Grid container spacing={ 24 }>
+       <Grid container>
           <Grid item xs={ 3 }>
             <EventTextField className={ classes.textField } field="Start Datetime" 
             value={ startDatetime.date + " " +startDatetime.time + " " + startDatetime.tz } />
@@ -60,7 +55,7 @@ export class EventDetailActivePeriod extends React.Component {
 
    
 
-         <Grid container spacing={ 24 }>
+         <Grid container>
           <Grid item xs={ 3 }>
             <EventTextField className={ classes.textField } field="Notification Duration" value={ event.activePeriod.notificationDuration } />
           </Grid>

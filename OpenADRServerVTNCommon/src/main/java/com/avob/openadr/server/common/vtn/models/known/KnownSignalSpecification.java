@@ -12,9 +12,9 @@ public class KnownSignalSpecification {
 private static final String FILTER_KNOWN_SIGNAL_ID = "knownSignalId";
 	private static final String FILTER_SIGNAL_NAME = "signalName";
 	private static final String FILTER_SIGNAL_TYPE = "signalType";
-
 	private static final Sort DEFAULT_SORT = Sort.by(Direction.ASC, FILTER_KNOWN_SIGNAL_ID + "." + FILTER_SIGNAL_NAME,
 			FILTER_KNOWN_SIGNAL_ID + "." + FILTER_SIGNAL_TYPE);
+	
 	public static Specification<KnownSignal> hasSignalName(DemandResponseEventSignalNameEnum signalName) {
 		if (signalName == null) {
 			return null;

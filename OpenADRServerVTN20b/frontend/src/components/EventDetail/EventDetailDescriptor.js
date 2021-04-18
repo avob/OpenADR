@@ -1,38 +1,11 @@
 import React from 'react';
 
 
-
-
-
-
-
-
-
-
-import Button from '@material-ui/core/Button';
-
-
-
-
-
-
-
-
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
-
-
-import EventDetailHeader from './EventDetailHeader'
-import Divider from '@material-ui/core/Divider';
-import TextField from '@material-ui/core/TextField';
-
 import Grid from '@material-ui/core/Grid';
-
-
-
 
 import {formatTimestamp} from '../../utils/time'
 
-import {  VtnTextField, VtnFeatureField } from '../common/TextField'
+import {  VtnTextField } from '../common/TextField'
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
@@ -68,13 +41,13 @@ export class EventDetailDescriptor extends React.Component {
 
     return (
     <div className={ classes.root } >
-    
+
          <div  style={{margin: "0px 5%"}}>
 
         <FormControl fullWidth >
         <FormLabel>Identitication</FormLabel>
       <FormGroup aria-label="position" row>
-        <Grid container spacing={ 24 }>
+        <Grid container>
           <Grid item xs={ 3 }>
             <VtnTextField className={ classes.textField } field="Event ID" value={ event.id } />
           </Grid>
@@ -92,7 +65,7 @@ export class EventDetailDescriptor extends React.Component {
           </Grid>
 
         </Grid>
-        <Grid container spacing={ 24 }>
+        <Grid container >
           <Grid item xs={ 3 }>
             <VtnTextField className={ classes.textField } field="Created Datetime" 
             value={ createdDatetime.date + " " +createdDatetime.time + " " + createdDatetime.tz } />

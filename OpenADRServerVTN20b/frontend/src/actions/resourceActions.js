@@ -1,15 +1,30 @@
-import * as types from '../constants/actionTypes';
+import * as types from '../constants/actionTypes'
 
-import { swaggerAction, jsonResponseContentType, multipartResponseContentType, saveData, parseJsonData } from './apiUtils';
+import { swaggerAction, jsonResponseContentType, parseJsonData } from './apiUtils'
 
+export const searchResourceRoot = (filters) => {
+  const params = { venSearchDto: { filters: filters } }
 
-export const searchResource = (filters) => {
-  var params = {venSearchDto: {filters: filters}};
-
-  return swaggerAction(types.SEARCH_RESOURCE, 
+  return swaggerAction(types.SEARCH_RESOURCE_ROOT,
     (api) => {
-      return api.apis[ 'resource-controller' ].searchResourceUsingPOST(params, jsonResponseContentType);
-    }, 
+      return api.apis['resource-controller'].searchResourceRootUsingPOST(params, jsonResponseContentType)
+    },
     parseJsonData
-  );
+  )
+}
+
+export const searchResourceData = (venInternalId, dataId) => {
+  const params = { venInternalId }
+
+  return swaggerAction(types.SEARCH_RESOURCE_DATA,
+    (api) => {
+      return api.apis['resource-controller'].searchResourceDataUsingPOST(params, jsonResponseContentType)
+    },
+    (data) => {
+    	return {
+    		data: parseJsonData(data),
+    		dataId: dataId
+    	}
+    }
+  )
 }

@@ -1,52 +1,9 @@
 import React from 'react';
 
-
-
-import Grid from '@material-ui/core/Grid';
-
-
-
-
-import Divider from '@material-ui/core/Divider';
-
-
-
-
-
-
-
-
-
-
-
-
 import Button from '@material-ui/core/Button';
-
-import RemoveIcon from '@material-ui/icons/Remove';
-
-
-
-
-
-
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
-
-import VenDetailHeader from './VenDetailHeader'
-
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TablePagination from '@material-ui/core/TablePagination';
-
-import Paper from '@material-ui/core/Paper';
-
-
 import { history } from '../../store/configureStore';
 
-import { formatTimestamp} from '../../utils/time'
-import {isActionReport, isHistoryReport, isTelemetryReport, isMetadataReport} from '../../utils/venReport'
 import EnhancedTable  from '../common/EnhancedTable'
 
 var formatTargetList = (targets) => {
@@ -54,7 +11,7 @@ var formatTargetList = (targets) => {
 
   for(var i in targets) {
     var target = targets[i];
-    if(view.length == 0) {
+    if(view.length === 0) {
       view.push(<span> {target.targetType + " " + target.targetId} </span>);
     } else {
        view.push(<br/>);
@@ -117,8 +74,7 @@ export class VenDetailReportDescription extends React.Component {
   }
 
   render() {
-    const {classes, ven, venActions, availableReportDescription, selectedReportSpecifierId} = this.props;
-    console.log(this.props)
+    const {classes,  availableReportDescription, selectedReportSpecifierId} = this.props;
     return (
     <div className={ classes.root }>
          <EnhancedTable 
@@ -138,7 +94,6 @@ export class VenDetailReportDescription extends React.Component {
           { id: 'samplingRate', numeric: false, disablePadding: false, label: 'SamplingRate Min/Max/OnChange' },
         ]} 
         rowTemplate={n => {
-          var created = formatTimestamp(n.createdDatetime);
           return <React.Fragment>
 
              <TableCell>{formatTargetList(n.eiSubject)}</TableCell>

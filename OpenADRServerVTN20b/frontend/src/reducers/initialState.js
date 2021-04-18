@@ -4,12 +4,13 @@ export default {
     marketContext: [],
     group: [],
     account: {
-      user:[],
+      user: [],
       app: []
     },
     known: {
       unit: [],
-      signal: []
+      signal: [],
+      report: []
     }
   },
   ven: {
@@ -26,35 +27,35 @@ export default {
     group: [],
     venMarketContext: [],
     venGroup: [],
-    availableReport:[],
-    totalReport:0,
+    availableReport: [],
+    totalReport: 0,
     totalPageReport: 0,
-    requestedReport:[],
-    totalRequest:0,
+    requestedReport: [],
+    totalRequest: 0,
     totalPageRequest: 0,
-    venOpt:[],
-    availableReportDescription:[],
-    requestedReportSpecifier: [],
+    venOpt: [],
+    availableReportDescription: [],
+    requestedReportSpecifier: []
   },
   ven_detail_create_report: {
-    availableReportDescription:[],
+    availableReportDescription: [],
     availableReport: {}
   },
   ven_detail_report: {
-    availableReportDescription:[],
-    availableReport:{}
+    availableReportDescription: [],
+    availableReport: {}
   },
   ven_detail_report_request: {
     requestedReport: [],
     requestedReportSpecifier: [],
-    availableReport: {},
-    
+    availableReport: {}
+
   },
   ven_create: {
     parameters: {}
   },
   account: {
-    user:[],
+    user: [],
     app: []
   },
   account_create: {
@@ -71,7 +72,7 @@ export default {
     event: {},
     marketContext: [],
     group: [],
-    venResponse:[],
+    venResponse: [],
     ven: []
   },
   event_create: {
@@ -85,7 +86,11 @@ export default {
   },
   resource: {
     resource: [],
-    event: []
+    data: [],
+    dataId: null,
+    event: [],
+    marketContext: [],
+    group: []
   }
 
-};
+}

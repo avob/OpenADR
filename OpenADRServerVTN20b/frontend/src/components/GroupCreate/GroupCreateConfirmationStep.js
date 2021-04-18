@@ -12,13 +12,6 @@ import TextField from '@material-ui/core/TextField';
 
 import Grid from '@material-ui/core/Grid';
 
-
-import ColorPicker from 'material-ui-color-picker'
-
-
-
-import Divider from '@material-ui/core/Divider';
-
 import Avatar from '@material-ui/core/Avatar';
 
 

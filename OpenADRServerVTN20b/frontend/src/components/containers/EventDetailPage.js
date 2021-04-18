@@ -31,15 +31,6 @@ import { history } from '../../store/configureStore';
 import { EventActionDialog } from '../common/VtnconfigurationDialog'
 
 
-
-function TabContainer( props ) {
-  return (
-  <Typography component="div" style={ { padding: 8 * 3 } }>
-    { props.children }
-  </Typography>
-  );
-}
-
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -59,7 +50,7 @@ const styles = theme => ({
     width: 200,
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
     display:'flex'
   },
   card: {
@@ -72,7 +63,7 @@ const styles = theme => ({
     paddingRight: 10
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   success: {
     backgroundColor: green[600],

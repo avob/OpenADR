@@ -9,11 +9,6 @@ import * as venActions from '../../actions/venActions';
 
 import { withStyles } from '@material-ui/core/styles';
 
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-
 import EventList from '../Event/EventList'
 import EventCalendar from '../Event/EventCalendar'
 
@@ -21,7 +16,6 @@ import { history } from '../../store/configureStore';
 import Paper from '@material-ui/core/Paper';
 
 import moment from 'moment'
-
 
 const styles = theme => ({
   root: {
@@ -32,8 +26,8 @@ const styles = theme => ({
     flexWrap: 'wrap',
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
   },
   dense: {
     marginTop: 19,
@@ -42,7 +36,7 @@ const styles = theme => ({
     width: 200,
   },
   formControl: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
     minWidth: 500,
   },
   card: {
@@ -55,15 +49,12 @@ const styles = theme => ({
     paddingRight: 10
   },
   button: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
   },
   iconButton: {
     marginTop: 10
   },
 });
-
-const deltaStartDays = 7
-const deltaEndDays = 7
 
 export class EventPage extends React.Component {
 
@@ -135,9 +126,9 @@ export class EventPage extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if(history.location.pathname === "/event" && this.state.value != 0) {
+    if(history.location.pathname === "/event" && this.state.value !== 0) {
       this.setState({value:0});
-    } else if(history.location.pathname === "/event/calendar" && this.state.value != 1) {
+    } else if(history.location.pathname === "/event/calendar" && this.state.value !== 1) {
       this.setState({value:1});
     }
   }
@@ -237,7 +228,6 @@ export class EventPage extends React.Component {
   render() {
     const {classes, event} = this.props;
     const {value} = this.state;
-    console.log(this.state.filters, this.state.sorts, this.state.pagination.page, this.state.pagination.size, event)
 
     return (
      <Paper className={ classes.root }>
@@ -298,7 +288,7 @@ export class EventPage extends React.Component {
                           onViewChange={this.onViewChange}
                           onCurrentDateChange={this.onCurrentDateChange}
                  />}
-        
+
     </Paper>
 
     );

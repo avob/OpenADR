@@ -17,8 +17,6 @@ import MarketContextCreateConfirmationStep from './MarketContextCreateConfirmati
 
 import Paper from '@material-ui/core/Paper';
 
-import {minutesToICalDuration} from '../../utils/time'
-
 import { history } from '../../store/configureStore';
 
 
@@ -32,7 +30,6 @@ function getSteps() {
 export class MarketContextCreate extends React.Component {
   constructor( props ) {
     super( props );
-    var now = new Date()
     this.state = {
         activeStep: 0
         , marketContext: {

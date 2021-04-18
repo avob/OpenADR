@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDescriptor;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventDescriptorDto;
+import com.avob.openadr.server.common.vtn.models.known.KnownReport;
+import com.avob.openadr.server.common.vtn.models.known.KnownReportDto;
 import com.avob.openadr.server.common.vtn.models.known.KnownSignal;
 import com.avob.openadr.server.common.vtn.models.known.KnownSignalDto;
 import com.avob.openadr.server.common.vtn.models.known.KnownUnit;
@@ -36,8 +38,9 @@ public class DtoMapper {
 	protected static final String ABSTRACT_USER_CONVERTER_ID = "abstractUserConverter";
 
 	protected static final String KNOWN_UNIT_CONVERTER_ID = "knownUnitConverter";
-
 	protected static final String KNOWN_SIGNAL_CONVERTER_ID = "knownSignalConverter";
+
+	protected static final String KNOWN_REPORT_CONVERTER_ID = "knownReportConverter";
 
 	@Resource
 	protected MarketContextMapper marketContextConverter;
@@ -60,6 +63,9 @@ public class DtoMapper {
 	@Resource
 	private KnownSignalMapper knownSignalMapper;
 
+	@Resource
+	private KnownReportMapper knownReportMapper;
+
 	protected DozerBeanMapper mapper;
 
 	@PostConstruct
@@ -73,11 +79,14 @@ public class DtoMapper {
 		customConvertersWithId.put(ABSTRACT_USER_CONVERTER_ID, abstractUserMapper);
 		customConvertersWithId.put(KNOWN_UNIT_CONVERTER_ID, knownUnitMapper);
 		customConvertersWithId.put(KNOWN_SIGNAL_CONVERTER_ID, knownSignalMapper);
+		customConvertersWithId.put(KNOWN_REPORT_CONVERTER_ID, knownReportMapper);
+
 		mapper.setCustomConvertersWithId(customConvertersWithId);
 		mapper.addMapping(demandResponseEventMappingConfiguration());
 		mapper.addMapping(venDemandResponseEventMappingConfiguration());
 		mapper.addMapping(knownUnitMappingConfiguration());
 		mapper.addMapping(knownSignalMappingConfiguration());
+		mapper.addMapping(knownReportMappingConfiguration());
 	}
 
 	public <T> T map(Object src, Class<T> klass) {
@@ -136,6 +145,18 @@ public class DtoMapper {
 			protected void configure() {
 				mapping(KnownSignal.class, KnownSignalDto.class).fields(this_(), this_(),
 						customConverter(KnownSignalMapper.class), customConverterId(KNOWN_SIGNAL_CONVERTER_ID));
+
+			}
+		};
+	}
+
+	private BeanMappingBuilder knownReportMappingConfiguration() {
+
+		return new BeanMappingBuilder() {
+			@Override
+			protected void configure() {
+				mapping(KnownReport.class, KnownReportDto.class).fields(this_(), this_(),
+						customConverter(KnownReportMapper.class), customConverterId(KNOWN_REPORT_CONVERTER_ID));
 
 			}
 		};

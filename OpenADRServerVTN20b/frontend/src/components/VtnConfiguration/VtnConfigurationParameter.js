@@ -1,13 +1,11 @@
 import React from 'react';
 
 import FormControl from '@material-ui/core/FormControl';
-import InputAdornment from '@material-ui/core/InputAdornment';
 
 import Divider from '@material-ui/core/Divider';
 
 import Grid from '@material-ui/core/Grid';
 import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
 
 import {  VtnTextField, VtnFeatureField } from '../common/TextField'

@@ -16,13 +16,13 @@ import EventDetailPage from './components/containers/EventDetailPage'
 import EventCreatePage from './components/containers/EventCreatePage'
 import VenDetailPage from './components/containers/VenDetailPage'
 import VenDetailCreateReportPage from './components/containers/VenDetailCreateReportPage'
-import VenDetailReportPage from './components/containers/VenDetailReportPage'
 import VenDetailReportRequestPage from './components/containers/VenDetailReportRequestPage'
 
 
 import VenCreatePage from './components/containers/VenCreatePage'
 import MarketContextCreatePage from './components/containers/MarketContextCreatePage'
 import GroupCreatePage from './components/containers/GroupCreatePage'
+import SwaggerUIPage from './components/containers/SwaggerUIPage'
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -55,6 +55,8 @@ import NavigationMain from './components/Navigation';
 
 
 import { history, config } from './store/configureStore';
+
+
 
 
 
@@ -114,15 +116,15 @@ const styles = theme => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     } ),
-    width: theme.spacing.unit * 7,
+    width: theme.spacing(7),
     [ theme.breakpoints.up( 'sm' )]: {
-      width: theme.spacing.unit * 9,
+      width: theme.spacing(9),
     },
   },
   appBarSpacer: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
-    padding: theme.spacing.unit * 3,
+    padding: theme.spacing(3),
     height: '100vh',
     overflow: 'auto',
   },
@@ -133,7 +135,7 @@ const styles = theme => ({
     height: 320,
   },
   h5: {
-    marginBottom: theme.spacing.unit * 2,
+    marginBottom: theme.spacing(2),
   },
 });
 
@@ -317,7 +319,7 @@ class App extends React.Component {
           <PrivateRoute path="/ven/create" component={ VenCreatePage } />
 
          
- <PrivateRoute path="/ven/resource" component={ ResourcePage } />
+         <PrivateRoute path="/ven/resource" component={ ResourcePage } />
 
           <PrivateRoute path="/ven" component={ VenPage } />
 
@@ -331,6 +333,11 @@ class App extends React.Component {
 
           <PrivateRoute path="/marketcontext/create" component={ MarketContextCreatePage } />
           <PrivateRoute path="/group/create" component={ GroupCreatePage } />
+
+          <PrivateRoute path="/swagger" component={  SwaggerUIPage} />
+
+
+
 
           <Route component={ NotFoundPage } />
 

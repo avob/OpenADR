@@ -27,12 +27,14 @@ public class KnownSignalMapper extends DozerConverter<KnownSignal, KnownSignalDt
 	@Override
 	public KnownSignalDto convertTo(KnownSignal source, KnownSignalDto destination) {
 		if (destination == null) {
+			List<KnownUnitDto> collect = source.getUnits().stream().map(knownUnitMapper::convertTo)
+					.collect(Collectors.toList());
 			destination = new KnownSignalDto();
+			destination.setUnits(collect);
 		}
-		List<KnownUnitDto> collect = source.getUnits().stream().map(knownUnitMapper::convertTo)
-				.collect(Collectors.toList());
+		
 
-		destination.setUnits(collect);
+		
 		destination.setSignalName(source.getKnownSignalId().getSignalName());
 		destination.setSignalType(source.getKnownSignalId().getSignalType());
 		return destination;
@@ -43,10 +45,11 @@ public class KnownSignalMapper extends DozerConverter<KnownSignal, KnownSignalDt
 		if (destination == null) {
 			destination = new KnownSignal();
 			destination.setKnownSignalId(new KnownSignalId());
+			List<KnownUnit> collect = source.getUnits().stream().map(knownUnitMapper::convertFrom)
+					.collect(Collectors.toList());
+			destination.setUnits(collect);
 		}
-		List<KnownUnit> collect = source.getUnits().stream().map(knownUnitMapper::convertFrom)
-				.collect(Collectors.toList());
-		destination.setUnits(collect);
+		
 		destination.getKnownSignalId().setSignalName(source.getSignalName());
 		destination.getKnownSignalId().setSignalType(source.getSignalType());
 

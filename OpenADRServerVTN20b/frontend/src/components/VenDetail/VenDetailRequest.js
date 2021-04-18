@@ -1,61 +1,9 @@
 import React from 'react';
-
-
-
-import Grid from '@material-ui/core/Grid';
-
-
-
-
-import Divider from '@material-ui/core/Divider';
-
-
-
-
-
-
-
-
-
-
-
-
-import Button from '@material-ui/core/Button';
-
-import RemoveIcon from '@material-ui/icons/Remove';
-
-
-
-
-
-
-import CloudDownloadIcon from '@material-ui/icons/CloudDownload';
-
-import VenDetailHeader from './VenDetailHeader'
-
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TablePagination from '@material-ui/core/TablePagination';
-import Paper from '@material-ui/core/Paper';
-
-
 import { history } from '../../store/configureStore';
 
-import {iCalDurationInSeconds, formatTimestamp} from '../../utils/time'
+import {formatTimestamp} from '../../utils/time'
 import EnhancedTable  from '../common/EnhancedTable'
-
-var getActionLabel = (request) => {
-    if(request.end != null || request.start != null)  {
-      return "DELETE"
-    } else if(iCalDurationInSeconds(request.granularity) === 0 || iCalDurationInSeconds(request.reportBackDuration) === 0 )  {
-      return "DELETE"
-    } else if(iCalDurationInSeconds(request.granularity) !== 0 && iCalDurationInSeconds(request.reportBackDuration) !== 0 )  {
-      return "UNSUBSCRIBE"
-    }
-  }
 
 export class VenDetailRequest extends React.Component {
   constructor( props ) {
@@ -97,7 +45,7 @@ export class VenDetailRequest extends React.Component {
 
 
   render() {
-    const {classes, ven, venActions, requestedReport, totalRequest} = this.props;
+    const {classes, requestedReport} = this.props;
     console.log(this.props)
     return (
     <div className={ classes.root } >

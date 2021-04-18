@@ -22,6 +22,7 @@ import com.avob.openadr.server.common.vtn.models.ven.Ven;
 
 @Entity
 @Table(name = "venresource")
+
 public class VenResource implements Serializable {
 
 	/**
@@ -60,8 +61,10 @@ public class VenResource implements Serializable {
 	@JoinColumn(name = "parent_id")
 	private Set<VenResource> children;
 
+	private Long reportDescriptionCount;
+
 	public VenResource(VenResourceType type, Long venResourceId, String venResourceLabel, Ven ven,
-			Set<VenResource> children, String name) {
+			Long reportDescriptionCount, Set<VenResource> children, String name) {
 		super();
 		this.type = type;
 		this.venResourceId = venResourceId;
@@ -69,6 +72,7 @@ public class VenResource implements Serializable {
 		this.ven = ven;
 		this.children = children;
 		this.name = name;
+		this.reportDescriptionCount = reportDescriptionCount;
 	}
 
 	public VenResource() {
@@ -136,6 +140,14 @@ public class VenResource implements Serializable {
 
 	public void setChildren(Set<VenResource> children) {
 		this.children = children;
+	}
+
+	public Long getReportDescriptionCount() {
+		return reportDescriptionCount;
+	}
+
+	public void setReportDescriptionCount(Long reportDescriptionCount) {
+		this.reportDescriptionCount = reportDescriptionCount;
 	}
 
 }
