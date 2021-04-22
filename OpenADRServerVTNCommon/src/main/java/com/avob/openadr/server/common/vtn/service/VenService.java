@@ -39,7 +39,7 @@ import com.avob.openadr.server.common.vtn.security.DigestAuthenticationProvider;
 public class VenService extends AbstractUserService<Ven> {
 
 	private static final Integer DEFAULT_SEARCH_SIZE = 10;
-	
+
 	private static final Sort DEFAULT_SEARCH_SORT = Sort.by(Sort.Order.asc("commonName"));
 
 	@Resource
@@ -50,10 +50,10 @@ public class VenService extends AbstractUserService<Ven> {
 
 	@Resource
 	private VenDemandResponseEventDao venDemandResponseEventDao;
-	
+
 	@Resource
 	private VenGroupDao venGroupDao;
-	
+
 	@Resource
 	private VenMarketContextDao venMarketContextDao;
 
@@ -113,10 +113,14 @@ public class VenService extends AbstractUserService<Ven> {
 
 	}
 
+	public void updateLastUpdateDatetime(Ven ven) {
+		venDao.updateLastUpdateDatetime(System.currentTimeMillis(), ven.getId());
+	}
+
 	@Override
 	@Transactional
 	public void delete(Ven instance) {
-		
+
 		venResourceDao.deleteByVenId(instance.getId());
 		venDemandResponseEventDao.deleteByVenId(instance.getId());
 		venDao.delete(instance);
@@ -124,7 +128,9 @@ public class VenService extends AbstractUserService<Ven> {
 
 	@Override
 	public void delete(Iterable<Ven> instances) {
-		instances.forEach(ven -> { this.delete(ven);});
+		instances.forEach(ven -> {
+			this.delete(ven);
+		});
 	}
 
 	@Override
@@ -187,71 +193,67 @@ public class VenService extends AbstractUserService<Ven> {
 			size = DEFAULT_SEARCH_SIZE;
 		}
 		Sort sort = DEFAULT_SEARCH_SORT;
-		if( sorts != null && !sorts.isEmpty()) {
+		if (sorts != null && !sorts.isEmpty()) {
 			sort = null;
-			for(VenSort s : sorts) {
+			for (VenSort s : sorts) {
 				Sort by = Sort.by(s.getType(), s.getProperty());
-				if(sort == null) {
+				if (sort == null) {
 					sort = by;
 				} else {
-					sort= sort.and(by);
+					sort = sort.and(by);
 				}
 			}
-		} 
+		}
 		PageRequest of = PageRequest.of(page, size, sort);
 		return venDao.findAll(VenSpecification.search(filters), of);
 	}
-	
-	
+
 	public void addVenDemandResponseEvent(Ven ven, DemandResponseEvent event) {
-		VenDemandResponseEvent el = venDemandResponseEventDao
-				.findOneByEventIdAndVenUsername(event.getId(), ven.getUsername());
-		
-		if(el == null) {
+		VenDemandResponseEvent el = venDemandResponseEventDao.findOneByEventIdAndVenUsername(event.getId(),
+				ven.getUsername());
+
+		if (el == null) {
 			el = new VenDemandResponseEvent(event, ven);
 		}
 		venDemandResponseEventDao.save(el);
 	}
-	
+
 	@Transactional
 	public boolean isVenTargetedBy(Ven ven, DemandResponseEvent event) {
-		
+
 		boolean targeted = false;
-		for(Target target : event.getTargets()) {
-			if(TargetTypeEnum.VEN.equals(target.getTargetType())) {
-				
-				if( ven.getUsername().equals(target.getTargetId())) {
+		for (Target target : event.getTargets()) {
+			if (TargetTypeEnum.VEN.equals(target.getTargetType())) {
+
+				if (ven.getUsername().equals(target.getTargetId())) {
 					targeted = true;
 				}
-				
-			} else if(TargetTypeEnum.GROUP.equals(target.getTargetType())) {
-				
-				
+
+			} else if (TargetTypeEnum.GROUP.equals(target.getTargetType())) {
+
 				Set<VenGroup> venGroups = ven.getVenGroups();
-				if(venGroups != null) {
-					for(VenGroup group : venGroups) {
-						if(group.getName().equals(target.getTargetId())) {
+				if (venGroups != null) {
+					for (VenGroup group : venGroups) {
+						if (group.getName().equals(target.getTargetId())) {
 							targeted = true;
 						}
 					}
 				}
-				
-				
-			} 
-			
-			if(event.getDescriptor().getMarketContext() != null) {
 
-				
-				Set<VenMarketContext> venMarketContext =  ven.getVenMarketContexts();
-				if(venMarketContext != null) {
-					for(VenMarketContext marketContext : venMarketContext) {
-						if(marketContext.getName().equals(event.getDescriptor().getMarketContext().getName())) {
+			}
+
+			if (event.getDescriptor().getMarketContext() != null) {
+
+				Set<VenMarketContext> venMarketContext = ven.getVenMarketContexts();
+				if (venMarketContext != null) {
+					for (VenMarketContext marketContext : venMarketContext) {
+						if (marketContext.getName().equals(event.getDescriptor().getMarketContext().getName())) {
 							targeted = true;
 						}
 					}
 				}
 			}
-			
+
 		}
 
 		return targeted;

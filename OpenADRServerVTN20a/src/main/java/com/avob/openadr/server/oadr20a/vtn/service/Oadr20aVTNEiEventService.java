@@ -41,7 +41,7 @@ import com.avob.openadr.model.oadr20a.pyld.EiCreatedEvent;
 import com.avob.openadr.server.common.vtn.exception.OadrVTNInitializationException;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignal;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
@@ -335,7 +335,7 @@ public class Oadr20aVTNEiEventService {
 			}
 
 			Oadr20aEiEventSignalTypeBuilder newOadr20bEiEventSignalTypeBuilder = Oadr20aBuilders
-					.newOadr20aEiEventSignalTypeBuilder("" + signalId, demandResponseEventSignal.getSignalName().getLabel(),
+					.newOadr20aEiEventSignalTypeBuilder("" + signalId, demandResponseEventSignal.getSignalName(),
 							SignalTypeEnumeratedType.fromValue(demandResponseEventSignal.getSignalType().getLabel()),
 							currentValue);
 

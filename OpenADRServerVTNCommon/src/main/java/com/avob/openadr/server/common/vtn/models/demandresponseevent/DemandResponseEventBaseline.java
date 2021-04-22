@@ -15,6 +15,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import com.avob.openadr.server.common.vtn.models.ItemBase;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalInterval;
 
 @Entity
 @Table(name = "demandresponseeventbaseline")

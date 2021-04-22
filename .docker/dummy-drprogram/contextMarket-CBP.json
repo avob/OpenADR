@@ -1,0 +1,75 @@
+ {
+ 	"name": "CapacityBidingProgram",
+ 	"description": "CapacityBidingProgram"
+ 	, "color": ""
+ 	, "activePeriod": {
+ 		"duration": "PT30M",
+ 		"notificationDuration": "PT4H",
+ 		"toleranceDuration": "PT1M"
+ 	},
+ 	"descriptor": {
+ 		"marketContext": "CapacityBidingProgram",
+ 		"oadrProfile": "OADR20B",
+ 		"responseRequired": "ALWAYS",
+ 		"modificationNumber": 0
+ 	},
+ 	"signals": [{
+ 		"signalName": "SIMPLE",
+ 		"signalType": "LEVEL",
+ 		"targets": [{
+ 			"targetId": "Smart_Energy_Module",
+ 			"targetType": "ENDDEVICE_ASSET"
+ 		}],
+ 		"intervals": [{
+ 			"duration": "PT15M",
+ 			"value": 1.0
+ 		}, {
+ 			"duration": "PT15M",
+ 			"value": 2.0
+ 		}],
+ 		"itemBase": {
+ 			"itemDescription":"RealPower",
+ 			"itemUnits":"W",
+ 			"siScaleCode":"k",
+ 			"xmlType":"PowerRealType"
+ 		}
+ 		
+ 	}, {
+ 		"signalName": "LOAD_DISPATCH",
+ 		"signalType": "SETPOINT",
+ 		"targets": [{
+ 			"targetId": "Smart_Energy_Module",
+ 			"targetType": "ENDDEVICE_ASSET"
+ 		}],
+ 		"intervals": [{
+ 			"duration": "PT15M",
+ 			"value": 800
+ 		}, {
+ 			"duration": "PT15M",
+ 			"value": 900
+ 		}],
+ 		"itemBase": {
+ 			"itemDescription":"RealPower",
+ 			"itemUnits":"W",
+ 			"siScaleCode":"k",
+ 			"xmlType":"PowerRealType"
+ 		}
+ 	}],
+ 	"targets": [{
+		"targetId": "Smart_Energy_Module",
+		"targetType": "ENDDEVICE_ASSET"
+	}],
+	"reports": [{
+		"reportName": "TELEMETRY_USAGE",
+		"reportType": "usage",
+		"readingType": "Direct Read",
+		"payloadBase": "PayloadFloatType",
+		"itemBase": {
+			"itemDescription":"RealPower",
+ 			"itemUnits":"W",
+ 			"siScaleCode":"k",
+ 			"xmlType":"PowerRealType"
+		}
+
+	}]
+ }

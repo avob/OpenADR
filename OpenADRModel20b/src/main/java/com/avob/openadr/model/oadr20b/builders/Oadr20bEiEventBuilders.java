@@ -13,7 +13,6 @@ import com.avob.openadr.model.oadr20b.ei.EiResponseType;
 import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.ei.SchemaVersionEnumeratedType;
-import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
 
 public class Oadr20bEiEventBuilders {
@@ -46,8 +45,8 @@ public class Oadr20bEiEventBuilders {
 				status);
 	}
 
-	public static Oadr20bEiEventSignalTypeBuilder newOadr20bEiEventSignalTypeBuilder(String signalId,
-			SignalNameEnumeratedType signalName, SignalTypeEnumeratedType signalType, float currentValue) {
+	public static Oadr20bEiEventSignalTypeBuilder newOadr20bEiEventSignalTypeBuilder(String signalId, String signalName,
+			SignalTypeEnumeratedType signalType, float currentValue) {
 		return new Oadr20bEiEventSignalTypeBuilder(signalId, signalName, signalType, currentValue);
 	}
 

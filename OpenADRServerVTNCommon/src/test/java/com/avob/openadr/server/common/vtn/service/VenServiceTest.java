@@ -21,13 +21,13 @@ import com.avob.openadr.server.common.vtn.ApplicationTest;
 import com.avob.openadr.server.common.vtn.models.TargetDto;
 import com.avob.openadr.server.common.vtn.models.TargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalNameEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventOadrProfileEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalNameEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalTypeEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSimpleValueEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.ven.VenCreateDto;
 import com.avob.openadr.server.common.vtn.models.ven.filter.VenFilter;
@@ -221,7 +221,7 @@ public class VenServiceTest {
 
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
-		signal.setSignalName(DemandResponseEventSignalNameEnum.SIMPLE);
+		signal.setSignalName(DemandResponseEventSignalNameEnum.SIMPLE.getLabel());
 		signal.setSignalType(DemandResponseEventSignalTypeEnum.LEVEL);
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();

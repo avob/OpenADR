@@ -1,4 +1,4 @@
-package com.avob.openadr.server.common.vtn.models.demandresponseevent;
+package com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded;
 
 public enum DemandResponseEventOadrProfileEnum {
     OADR20A("2.0a"), OADR20B("2.0b");

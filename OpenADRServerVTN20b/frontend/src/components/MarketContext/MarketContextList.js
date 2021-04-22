@@ -15,7 +15,7 @@ import { history } from '../../store/configureStore';
 import Avatar from '@material-ui/core/Avatar';
 
 
-export class VtnConfigurationMarketContext extends React.Component {
+export class MarketContextList extends React.Component {
   constructor( props ) {
     super( props );
 
@@ -118,4 +118,4 @@ export class VtnConfigurationMarketContext extends React.Component {
   }
 }
 
-export default VtnConfigurationMarketContext;
+export default MarketContextList;

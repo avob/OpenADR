@@ -59,7 +59,7 @@ public class Oadr20bDistributeEventTest {
 
 		String xmlDuration = "PT1H";
 		String signalId = "";
-		SignalNameEnumeratedType signalName = SignalNameEnumeratedType.BID_PRICE;
+		String signalName = SignalNameEnumeratedType.BID_PRICE.value();
 		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
 		String intervalId = "";
 		long start = 12L;
@@ -69,8 +69,7 @@ public class Oadr20bDistributeEventTest {
 						.newOadr20bSignalIntervalTypeBuilder(intervalId, start, xmlDuration, currentValue).build())
 				.addInterval(Arrays.asList(Oadr20bEiBuilders
 						.newOadr20bSignalIntervalTypeBuilder(intervalId, start, xmlDuration, currentValue).build()))
-				.withEiTarget(
-						Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addVenId(Arrays.asList("ven")).build())
+				.withEiTarget(Oadr20bEiBuilders.newOadr20bEiTargetTypeBuilder().addVenId(Arrays.asList("ven")).build())
 				.withItemBase(Oadr20bFactory
 						.createCurrency(Oadr20bFactory.createCurrencyType(CurrencyItemDescriptionType.CURRENCY,
 								ISO3AlphaCurrencyCodeContentType.EUR, SiScaleCodeType.NONE)))

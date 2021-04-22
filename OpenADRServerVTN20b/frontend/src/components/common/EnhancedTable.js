@@ -17,6 +17,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 
 
@@ -108,7 +109,7 @@ const toolbarStyles = theme => ({
 });
 
 let EnhancedTableToolbar = props => {
-  const { numSelected, classes, action, actionSelected, handleSelectableClick, selectable, filterPanel, handleFilterClick, filter } = props;
+  const { numSelected, classes, action, actionSelected, handleSelectableClick, handleDeleteSelectedClick, selectable, filterPanel, handleFilterClick, filter } = props;
   return (
     <Toolbar
       className={classNames(classes.root, {
@@ -129,11 +130,16 @@ let EnhancedTableToolbar = props => {
       <div className={classes.spacer} />
       <div className={classes.actions}>
 
-        {numSelected > 0 && actionSelected ? actionSelected() : null}
         {numSelected <= 0 && action ? action() : null}
-        {numSelected <= 0 && actionSelected ? <Tooltip title="Selectable" onClick={handleSelectableClick}>
+        {numSelected <= 0 ? <Tooltip title="Selectable" onClick={handleSelectableClick}>
             <IconButton aria-label="Selectable" color={selectable ? "primary" : "default"}> 
               <MoreVertIcon />
+            </IconButton>
+          </Tooltip> : null}
+
+        {numSelected > 0 && handleDeleteSelectedClick ? <Tooltip title="Selectable" onClick={handleDeleteSelectedClick}>
+            <IconButton> 
+              <DeleteIcon />
             </IconButton>
           </Tooltip> : null}
 
@@ -251,6 +257,10 @@ class EnhancedTable extends React.Component {
     this.setState({ filterable: !this.state.filterable});
   }
 
+  handleDeleteSelectedClick = e => {
+    this.props.handleDeleteSelectedClick(this.state.selected);
+  }
+
   render() {
     const { classes, rows, rowTemplate, data, total, pagination, sort, title, action, actionSelected, filterPanel, filter } = this.props;
     const { selected, selectable, filterable } = this.state;
@@ -264,6 +274,7 @@ class EnhancedTable extends React.Component {
         <EnhancedTableToolbar numSelected={selected.length} title={title} action={action}
               actionSelected={actionSelected}
               handleSelectableClick={this.handleSelectableClick}
+              handleDeleteSelectedClick={this.handleDeleteSelectedClick}
               handleFilterClick={this.handleFilterClick}
               selectable={selectable}
               filterable={filterable}

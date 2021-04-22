@@ -1,8 +1,8 @@
 package com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded;
 
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventOadrProfileEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventResponseRequiredEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventStateEnum;
 
 public class DemandResponseEventDescriptorDto {
 

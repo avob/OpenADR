@@ -27,14 +27,14 @@ import com.avob.openadr.server.common.vtn.exception.OadrElementNotFoundException
 import com.avob.openadr.server.common.vtn.models.TargetDto;
 import com.avob.openadr.server.common.vtn.models.TargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalNameEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventOadrProfileEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventOptEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalNameEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalTypeEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSimpleValueEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
@@ -102,7 +102,7 @@ public class DemandResponseEventServiceTest {
 
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
-		signal.setSignalName(DemandResponseEventSignalNameEnum.SIMPLE);
+		signal.setSignalName(DemandResponseEventSignalNameEnum.SIMPLE.getLabel());
 		signal.setSignalType(DemandResponseEventSignalTypeEnum.LEVEL);
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
@@ -210,8 +210,9 @@ public class DemandResponseEventServiceTest {
 			VenDemandResponseEvent next = iterator.next();
 			assertEquals(-1, next.getLastSentModificationNumber());
 			assertNull(next.getVenOpt());
-			//			assertTrue(next.getVen().getUsername() == "ven1" || next.getVen().getUsername() == "ven2"
-			//					|| next.getVen().getUsername() == "ven3");
+			// assertTrue(next.getVen().getUsername() == "ven1" ||
+			// next.getVen().getUsername() == "ven2"
+			// || next.getVen().getUsername() == "ven3");
 		}
 	}
 
@@ -228,8 +229,9 @@ public class DemandResponseEventServiceTest {
 			VenDemandResponseEvent next = iterator.next();
 			assertEquals(-1, next.getLastSentModificationNumber());
 			assertNull(next.getVenOpt());
-			//			assertTrue(next.getVen().getUsername() == "ven1" || next.getVen().getUsername() == "ven2"
-			//					|| next.getVen().getUsername() == "ven3");
+			// assertTrue(next.getVen().getUsername() == "ven1" ||
+			// next.getVen().getUsername() == "ven2"
+			// || next.getVen().getUsername() == "ven3");
 		}
 	}
 

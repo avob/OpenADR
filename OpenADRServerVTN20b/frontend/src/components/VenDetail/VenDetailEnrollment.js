@@ -11,6 +11,7 @@ import { MarketContextSelectDialog } from '../common/VtnconfigurationDialog'
 
 
 import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 
 
@@ -58,10 +59,8 @@ export class VenDetailEnrollment extends React.Component {
   }
 
   handleRemoveVenMarketContext = (context) => {
-    return () => {
-      console.log( context )
-      this.props.removeVenMarketContext( this.props.ven.username, context.id )
-    }
+      this.props.removeVenMarketContext( this.props.ven.username, context )
+    
   }
 
   handlePaginationChange = (pagination) => {
@@ -117,8 +116,10 @@ export class VenDetailEnrollment extends React.Component {
             <TableCell align="right">{n.color}</TableCell>
           </React.Fragment>
         }}
-        actionSelected={() => {
-       
+        handleDeleteSelectedClick={(selected) => {
+          for(var i in selected) {
+                 this.handleRemoveVenMarketContext(selected[i]);
+               }
         }}
         action={() => {
           return <React.Fragment>

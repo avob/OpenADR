@@ -40,7 +40,13 @@ public class VenResourceService {
 	}
 
 	public void deleteByVen(Ven ven) {
-		venResourceDao.deleteByVenId(ven.getId());
+		Specification<VenResource> search = VenResourceSpecification.hasVenIdEquals(ven.getUsername());
+		Specification<VenResource> typeIn = VenResourceSpecification.typeIn(Arrays.asList(VenResourceType.VEN));
+
+		Specification<VenResource> and = Specification.where(search).and(typeIn);
+		Iterable<VenResource> findAll = venResourceDao.findAll(and);
+		venResourceDao.deleteAll(findAll);
+
 	}
 
 	public VenResource findByVenAndName(Ven ven, String name) {

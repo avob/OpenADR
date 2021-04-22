@@ -1,7 +1,7 @@
 package com.avob.openadr.server.oadr20a.vtn.converter;
 
 import com.avob.openadr.model.oadr20a.ei.OptTypeType;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventOptEnum;
 
 public class OptConverter {
 

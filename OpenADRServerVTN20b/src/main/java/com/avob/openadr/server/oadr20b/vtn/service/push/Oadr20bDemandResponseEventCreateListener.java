@@ -29,6 +29,7 @@ public class Oadr20bDemandResponseEventCreateListener {
 
 	@Resource
 	private VenService venService;
+	
 	@Resource
 	private Oadr20bPushService oadr20bPushService;
 

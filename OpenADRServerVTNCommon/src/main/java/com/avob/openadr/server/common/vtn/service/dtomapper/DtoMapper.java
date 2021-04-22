@@ -15,8 +15,8 @@ import org.dozer.DozerBeanMapper;
 import org.dozer.loader.api.BeanMappingBuilder;
 import org.springframework.stereotype.Service;
 
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventDescriptor;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventDescriptorDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventDescriptor;
 import com.avob.openadr.server.common.vtn.models.known.KnownReport;
 import com.avob.openadr.server.common.vtn.models.known.KnownReportDto;
 import com.avob.openadr.server.common.vtn.models.known.KnownSignal;

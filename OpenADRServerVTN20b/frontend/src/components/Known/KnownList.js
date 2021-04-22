@@ -76,7 +76,7 @@ var KnownSignalTable = (props) => {
             <TableRow key={row.signalName+row.signalType}>
               <TableCell>{row.signalName}</TableCell>
               <TableCell>{row.signalType}</TableCell>
-              <TableCell>{row.units && row.units.map(n => {return <div key={n.itemDescription + "-" + n.itemUnits}>{n.itemDescription + "-" + n.itemUnits}</div>})}</TableCell>
+              <TableCell>{row.unit ? row.unit.itemDescription + "-" + row.unit.itemUnits : null}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -117,7 +117,7 @@ var KnownReportTable = (props) => {
               <TableCell>{row.reportType}</TableCell>
               <TableCell>{row.readingType}</TableCell>
               <TableCell>{row.payloadBase}</TableCell>
-              <TableCell>{row.units && row.units.map(n => {return <div key={n.itemDescription + "-" + n.itemUnits}>{n.itemDescription + "-" + n.itemUnits}</div>})}</TableCell>
+              <TableCell>{row.unit ? row.unit.itemDescription + "-" + row.unit.itemUnits : null}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -127,7 +127,7 @@ var KnownReportTable = (props) => {
 
 }
 
-export class VtnConfigurationKnown extends React.Component {
+export class KnownList extends React.Component {
   state = {
     value: 0,
   };
@@ -138,13 +138,13 @@ export class VtnConfigurationKnown extends React.Component {
     } );
     switch(value) {
       case 0:
-        history.push("/vtn_configuration/known/unit")
+        history.push("/marketcontext/known/unit")
         break;
       case 1:
-        history.push("/vtn_configuration/known/signal")
+        history.push("/marketcontext/known/signal")
         break;
       case 2:
-        history.push("/vtn_configuration/known/report")
+        history.push("/marketcontext/known/report")
         break;
       default:
         break;
@@ -170,9 +170,8 @@ export class VtnConfigurationKnown extends React.Component {
 
 
   render() {
-    const {classes, known} = this.props;
+    const {classes, unit, signal, report} = this.props;
     const {value} = this.state;
-    console.log(known)
     return (
     <div className={ classes.root }>
       <Tabs value={ this.state.value }
@@ -185,11 +184,11 @@ export class VtnConfigurationKnown extends React.Component {
         <Tab label="Reports" />
       </Tabs>
       <Divider variant="middle" />
-      { value === 0 && <KnownUnitTable classes={classes} unit={known.unit}/>
+      { value === 0 && <KnownUnitTable classes={classes} unit={unit}/>
                         }
-      { value === 1 && <KnownSignalTable classes={classes} signal={known.signal}/>
+      { value === 1 && <KnownSignalTable classes={classes} signal={signal}/>
                        }
-      { value === 2 && <KnownReportTable classes={classes} report={known.report}/>
+      { value === 2 && <KnownReportTable classes={classes} report={report}/>
                        }
     </div>
 
@@ -197,4 +196,4 @@ export class VtnConfigurationKnown extends React.Component {
   }
 }
 
-export default VtnConfigurationKnown;
+export default KnownList;

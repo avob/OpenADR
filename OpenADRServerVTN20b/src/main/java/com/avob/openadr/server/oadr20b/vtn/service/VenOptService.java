@@ -8,7 +8,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventOptEnum;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venresource.VenResource;

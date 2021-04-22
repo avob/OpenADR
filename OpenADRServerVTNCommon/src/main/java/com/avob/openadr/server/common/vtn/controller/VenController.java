@@ -46,7 +46,6 @@ import com.avob.openadr.server.common.vtn.models.vengroup.VenGroup;
 import com.avob.openadr.server.common.vtn.models.vengroup.VenGroupDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
-import com.avob.openadr.server.common.vtn.models.venresource.VenResource;
 import com.avob.openadr.server.common.vtn.models.venresource.VenResourceDto;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
 import com.avob.openadr.server.common.vtn.service.VenGroupService;
@@ -54,6 +53,7 @@ import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.VenResourceService;
 import com.avob.openadr.server.common.vtn.service.VenService;
 import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
+import com.avob.openadr.server.common.vtn.service.push.MarketContextEventPublisher;
 
 @RestController
 @RequestMapping("/Ven")
@@ -76,6 +76,9 @@ public class VenController {
 
 	@Resource
 	private DemandResponseEventService demandResponseEventService;
+
+	@Resource
+	private MarketContextEventPublisher marketContextEventPublisher;
 
 	@Resource
 	private DtoMapper dtoMapper;
@@ -156,21 +159,6 @@ public class VenController {
 				}
 
 				prepare.setVenGroup(new HashSet<VenGroup>(findByNameIn));
-			}
-
-			if (dto.getResources() != null) {
-				List<VenResource> findByNameIn = venResourceService.findByNameIn(dto.getResources());
-
-				if (dto.getResources().size() != findByNameIn.size()) {
-					List<String> collect = findByNameIn.stream().map(VenResource::getName).collect(Collectors.toList());
-					List<String> missing = new ArrayList<>(dto.getGroups());
-					missing.removeAll(collect);
-
-					throw new OadrElementNotFoundException("Unknown resources: " + String.join(",", missing));
-
-				}
-
-				prepare.setVenResources(new HashSet<VenResource>(findByNameIn));
 			}
 
 			Ven ven = venService.save(prepare);
@@ -275,18 +263,18 @@ public class VenController {
 		return dtoMapper.map(ven, VenDto.class);
 	}
 
-//	@RequestMapping(value = "/{venID}", method = RequestMethod.DELETE)
-//	@ResponseBody
-//	public void deleteVenByUsername(@PathVariable("venID") String venUsername, HttpServletResponse response) {
-//		Ven ven = venService.findOneByUsername(venUsername);
-//		if (ven == null) {
-//			LOGGER.warn("Unknown Ven: " + venUsername);
-//			response.setStatus(HttpStatus.NOT_FOUND_404);
-//			return;
-//		}
-//		venService.delete(ven);
-//		LOGGER.info("Delete Ven: " + ven.getUsername());
-//	}
+	@RequestMapping(value = "/{venID}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public void deleteVenByUsername(@PathVariable("venID") String venUsername, HttpServletResponse response) {
+		Ven ven = venService.findOneByUsername(venUsername);
+		if (ven == null) {
+			LOGGER.warn("Unknown Ven: " + venUsername);
+			response.setStatus(HttpStatus.NOT_FOUND_404);
+			return;
+		}
+		venService.delete(ven);
+		LOGGER.info("Delete Ven: " + ven.getUsername());
+	}
 
 //	@RequestMapping(value = "/{venID}/resource", method = RequestMethod.POST)
 //	@ResponseBody
@@ -420,6 +408,7 @@ public class VenController {
 		}
 		ven.getVenMarketContexts().add(marketContext.get());
 		venService.save(ven);
+		marketContextEventPublisher.publish(ven);
 		response.setStatus(HttpStatus.OK_200);
 		LOGGER.info("Add MarketContext: " + marketContext.get().getName() + " to Ven: " + ven.getUsername());
 		return dtoMapper.map(ven, VenCreateDto.class);
@@ -454,8 +443,11 @@ public class VenController {
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return;
 		}
-		ven.getVenMarketContexts().remove(marketContext.get());
+		Set<VenMarketContext> collect = ven.getVenMarketContexts().stream()
+				.filter(v -> !marketContextId.equals(v.getId())).collect(Collectors.toSet());
+		ven.setVenMarketContexts(collect);
 		venService.save(ven);
+		marketContextEventPublisher.publish(ven);
 		response.setStatus(HttpStatus.OK_200);
 		LOGGER.info("Remove MarketContext: " + marketContext.get().getName() + " from Ven: " + ven.getUsername());
 	}

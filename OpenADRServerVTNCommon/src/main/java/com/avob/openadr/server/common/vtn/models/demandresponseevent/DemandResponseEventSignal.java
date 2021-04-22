@@ -18,6 +18,8 @@ import org.hibernate.annotations.LazyCollectionOption;
 
 import com.avob.openadr.server.common.vtn.models.ItemBase;
 import com.avob.openadr.server.common.vtn.models.Target;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalInterval;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalTypeEnum;
 
 @Entity
 @Table(name = "demandresponseeventsignal")
@@ -30,7 +32,7 @@ public class DemandResponseEventSignal {
 	private Long id;
 
 	@NotNull
-	private DemandResponseEventSignalNameEnum signalName;
+	private String signalName;
 
 	@NotNull
 	private DemandResponseEventSignalTypeEnum signalType;
@@ -53,11 +55,11 @@ public class DemandResponseEventSignal {
 	@JoinColumn(name = "demandresponseevent_id")
 	private DemandResponseEvent event;
 
-	public DemandResponseEventSignalNameEnum getSignalName() {
+	public String getSignalName() {
 		return signalName;
 	}
 
-	public void setSignalName(DemandResponseEventSignalNameEnum signalName) {
+	public void setSignalName(String signalName) {
 		this.signalName = signalName;
 	}
 

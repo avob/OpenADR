@@ -21,6 +21,8 @@ public interface OtherReportRequestDao extends ReportRequestDao<OtherReportReque
 	public List<OtherReportRequest> findBySource(Ven ven);
 
 	public Page<OtherReportRequest> findBySource(Ven ven, Pageable page);
+	
+	public List<OtherReportRequest> findByRequestorIsNullAndSource(Ven ven);
 
 	@Query("select req from OtherReportRequest req left join req.otherReportCapability cap where req.source = :ven and cap.reportSpecifierId like :reportSpecifierId%")
 	public List<OtherReportRequest> findBySourceAndOtherReportCapability_ReportSpecifierIdStartingWith(
@@ -35,6 +37,9 @@ public interface OtherReportRequestDao extends ReportRequestDao<OtherReportReque
 
 	@Transactional(readOnly = false)
 	public void deleteByRequestorAndOtherReportCapabilitySourceUsername(AbstractUser requestor, String username);
+	
+	@Transactional(readOnly = false)
+	public void deleteByRequestorIsNullAndSource(Ven ven);
 
 	public OtherReportRequest findOneBySourceAndReportRequestId(Ven ven, String reportRequestId);
 

@@ -13,6 +13,12 @@ import event_detail from './eventDetailReducer'
 import event_create from './eventCreateReducer'
 import user from './loginReducer'
 import resource from './resourceReducer'
+import marketContext from './marketContextReducer'
+import known from './knownReducer'
+
+
+
+
 
 const rootReducer = combineReducers({
   vtnConfiguration,
@@ -28,7 +34,9 @@ const rootReducer = combineReducers({
   event_detail,
   event_create,
   user,
-  resource
+  resource,
+  marketContext,
+  known
 })
 
 export default rootReducer

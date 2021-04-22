@@ -30,7 +30,7 @@
 					<power:ac>true</power:ac>
 				</power:powerAttributes>
 			</power:powerReal>
-            <ei:readingType>x-notApplicable</ei:readingType>
+            <ei:readingType>Direct Read</ei:readingType>
 			<oadr:oadrSamplingRate>
 				<oadr:oadrMinPeriod>PT10S</oadr:oadrMinPeriod>
 				<oadr:oadrMaxPeriod>PT1M</oadr:oadrMaxPeriod>
@@ -63,7 +63,7 @@
 					<power:ac>true</power:ac>
 				</power:powerAttributes>
 			</power:powerReal>
-            <ei:readingType>x-notApplicable</ei:readingType>
+            <ei:readingType>Direct Read</ei:readingType>
 			<oadr:oadrSamplingRate>
 				<oadr:oadrMinPeriod>PT10S</oadr:oadrMinPeriod>
 				<oadr:oadrMaxPeriod>PT1M</oadr:oadrMaxPeriod>

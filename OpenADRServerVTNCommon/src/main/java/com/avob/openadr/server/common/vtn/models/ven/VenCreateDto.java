@@ -29,8 +29,6 @@ public class VenCreateDto extends AbstractUserCreateDto {
 	
 	private List<String> groups;
 	
-	private List<String> resources;
-
 	public VenCreateDto() {
 	}
 
@@ -108,14 +106,6 @@ public class VenCreateDto extends AbstractUserCreateDto {
 
 	public void setGroups(List<String> groups) {
 		this.groups = groups;
-	}
-
-	public List<String> getResources() {
-		return resources;
-	}
-
-	public void setResources(List<String> resources) {
-		this.resources = resources;
 	}
 
 }

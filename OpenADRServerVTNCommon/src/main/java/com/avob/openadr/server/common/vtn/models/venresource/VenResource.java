@@ -50,14 +50,14 @@ public class VenResource implements Serializable {
 	@JoinColumn(name = "venresource_ven_id")
 	private Ven ven;
 
-	@ManyToOne(optional = true)
+	@ManyToOne(optional = true, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "parent_id", referencedColumnName = "id")
 	private VenResource parent;
 
 	private String name;
 
 	@OrderColumn(name = "id")
-	@OneToMany(cascade = { CascadeType.ALL }, orphanRemoval = true, fetch = FetchType.EAGER)
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent_id")
 	private Set<VenResource> children;
 

@@ -1,5 +1,7 @@
 package com.avob.openadr.dummy;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.lang.reflect.Type;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.jms.ConnectionFactory;
 import javax.net.ssl.KeyManagerFactory;
@@ -18,6 +21,8 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.activemq.ActiveMQSslConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,13 +40,18 @@ import com.avob.server.oadrvtn20b.api.ReportControllerApi;
 import com.avob.server.oadrvtn20b.api.VenControllerApi;
 import com.avob.server.oadrvtn20b.handler.ApiClient;
 import com.avob.server.oadrvtn20b.model.OtherReportDataFloatDto;
+import com.avob.server.oadrvtn20b.model.VenMarketContextDto;
 import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import com.rabbitmq.jms.admin.RMQConnectionFactory;
 import com.squareup.okhttp.OkHttpClient;
 
 @Configuration
 public class DummyVTN20bControllerConfig {
-	
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DummyEventManager.class);
+
 	public static final String PRIVATE_KEY_CONF = "oadr.security.dummy.key";
 	public static final String CERTIFICATE_CONF = "oadr.security.dummy.cert";
 	public static final String TRUSTED_CERTIFICATES_CONF = "oadr.security.dummy.trustcertificate";
@@ -52,7 +62,8 @@ public class DummyVTN20bControllerConfig {
 	public static final String VTN_URL = "oadr.vtn.url";
 	public static final String CONTROLLED_VEN_CERTIFICATES = "oadr.ven.certificate";
 	public static final String EVENT_TEMPLATE = "oadr.event";
-	
+	public static final String CONTEXT_MARKET_TEMPLATE = "oadr.contextMarket";
+
 	public static final String MARKET_CONTEXT = "DummyMarketContext";
 	public static final String MARKET_CONTEXT_DESCRIPTION = "DummyVTN20bController Market Context";
 	public static final String MARKET_CONTEXT_COLOR = "#2596be";
@@ -60,15 +71,11 @@ public class DummyVTN20bControllerConfig {
 	public static final String OADR_APP_NOTIFICATION_UPDATE_REPORT_TOPIC_FLOAT = "topic.app.notification.updateReport.float.*";
 	public static final String OADR_APP_NOTIFICATION_UPDATE_REPORT_TOPIC_RESOURCESTATUS = "topic.app.notification.updateReport.resourcestatus.*";
 	public static final String OADR_APP_NOTIFICATION_UPDATE_REPORT_TOPIC_KEYTOKEN = "topic.app.notification.updateReport.keytoken.*";
-	
 
-	public static final DateTimeFormatter DATE_FORMATTER =  DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 	public static final Type floatListType = new TypeToken<ArrayList<OtherReportDataFloatDto>>() {
 		private static final long serialVersionUID = 1L;
 	}.getType();
-
-	
-
 
 	@Value("${" + CONTROLLED_VEN_CERTIFICATES + "}")
 	private String controlledVenCertificates;
@@ -96,9 +103,12 @@ public class DummyVTN20bControllerConfig {
 
 	@Value("${" + VTN_URL + "}")
 	private String oadrVtnUrl;
-	
+
 	@Value("${" + EVENT_TEMPLATE + "}")
 	private String eventTemplate;
+
+	@Value("${" + CONTEXT_MARKET_TEMPLATE + "}")
+	private String contextMarketTemplate;
 
 	@Bean
 	public ApiClient apiClient() throws OadrSecurityException {
@@ -132,23 +142,23 @@ public class DummyVTN20bControllerConfig {
 	@Bean
 	public ReportControllerApi reportControllerApi(ApiClient apiClient) {
 		return new ReportControllerApi(apiClient);
-	}	
+	}
 
 	@Bean
 	public MarketContextControllerApi marketContextControllerApi(ApiClient apiClient) {
 		return new MarketContextControllerApi(apiClient);
-	}	
+	}
 
 	@Bean
 	public GroupControllerApi groupControllerApi(ApiClient apiClient) {
 		return new GroupControllerApi(apiClient);
-	}	
-	
+	}
+
 	@Bean
 	public DemandResponseControllerApi demandResponseController(ApiClient apiClient) {
 		return new DemandResponseControllerApi(apiClient);
-	}	
-	
+	}
+
 	public List<String> getControlledVenCertificates() {
 		if (controlledVenCertificates != null) {
 			return Arrays.asList(controlledVenCertificates.split(","));
@@ -156,20 +166,27 @@ public class DummyVTN20bControllerConfig {
 			return new ArrayList<>();
 		}
 	}
-	
+
 	public List<String> getEventTemplate() {
-		// load coma separated trust certificate list
 		if (eventTemplate != null) {
 			return Arrays.asList(eventTemplate.split(","));
 		} else {
 			return new ArrayList<>();
 		}
 	}
-	
+
+	public List<String> getContextMarketTemplate() {
+		if (eventTemplate != null) {
+			return Arrays.asList(contextMarketTemplate.split(","));
+		} else {
+			return new ArrayList<>();
+		}
+	}
 
 	@Bean
 	@Profile("external")
-	public ConnectionFactory rabbitmqConnectionFactory() throws NoSuchAlgorithmException, KeyManagementException, OadrSecurityException {
+	public ConnectionFactory rabbitmqConnectionFactory()
+			throws NoSuchAlgorithmException, KeyManagementException, OadrSecurityException {
 		RMQConnectionFactory rmqConnectionFactory = new RMQConnectionFactory();
 		rmqConnectionFactory.setHost(brokerHost);
 		rmqConnectionFactory.setPort(brokerPort);
@@ -192,7 +209,8 @@ public class DummyVTN20bControllerConfig {
 
 		String password = UUID.randomUUID().toString();
 		KeyManagerFactory createKeyManagerFactory = OadrPKISecurity.createKeyManagerFactory(key, cert, password);
-		TrustManagerFactory createTrustManagerFactory = OadrPKISecurity.createTrustManagerFactory( getTrustedCertificates());
+		TrustManagerFactory createTrustManagerFactory = OadrPKISecurity
+				.createTrustManagerFactory(getTrustedCertificates());
 
 		activeMQConnectionFactory.setBrokerURL("ssl://" + brokerHost + ":" + brokerPort);
 		activeMQConnectionFactory.setKeyAndTrustManagers(createKeyManagerFactory.getKeyManagers(),
@@ -214,7 +232,25 @@ public class DummyVTN20bControllerConfig {
 		return factory;
 	}
 
-	
+	@Bean
+	public List<VenMarketContextDto> marketContexts() {
+
+		Gson gson = new Gson();
+
+		return getContextMarketTemplate().stream().map(p -> {
+			JsonReader reader;
+			try {
+				reader = new JsonReader(new FileReader(p));
+				VenMarketContextDto fromJson = gson.fromJson(reader, VenMarketContextDto.class);
+				return fromJson;
+			} catch (FileNotFoundException e) {
+				LOGGER.error("MarketContext template: " + p + " cannot be parsed", e);
+				return null;
+			}
+
+		}).collect(Collectors.toList());
+
+	}
 
 	private List<String> getTrustedCertificates() {
 		// load coma separated trust certificate list
@@ -224,8 +260,5 @@ public class DummyVTN20bControllerConfig {
 			return new ArrayList<>();
 		}
 	}
-	
-	
-	
-	
+
 }

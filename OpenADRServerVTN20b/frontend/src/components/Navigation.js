@@ -40,9 +40,30 @@ class NavigationMain extends React.Component {
     const isEvent = location.pathname === '/event' || location.pathname.includes('/event/')
     const isVen = location.pathname === '/ven' || location.pathname.includes('/ven/')
     const isVtnConfiguration = location.pathname === '/vtn_configuration' || location.pathname.includes('/vtn_configuration/')
+    const isMarketContext = location.pathname === '/marketcontext' || location.pathname.includes('/marketcontext/')
+
 
 		  return (
 		 <div>
+		 	{(hasEventAccess)
+		 		? <span>
+				<ListItem button component={ Link } to="/marketcontext" >
+		            <ListItemIcon fontSize="small">
+		              <ExtensionIcon />
+		            </ListItemIcon>
+		            <ListItemText primary="MarketContexts" />
+		          </ListItem>
+				<Collapse in={isMarketContext} >
+			          <ListItem button component={ Link } to="/marketcontext/known/unit" >
+			            <ListItemIcon fontSize="small">
+			              <AccountBoxIcon color="disabled"/>
+			            </ListItemIcon>
+			            <ListItemText secondary="Known Entities" />
+			          </ListItem>
+			      </Collapse>
+			      </span>
+		  	: null}
+
 		 	{(hasEventAccess)
 		 		? <span>
 				<ListItem button
@@ -95,38 +116,21 @@ class NavigationMain extends React.Component {
 		    <ListItemText primary="VTN Config" />
 		  </ListItem>
 		  <Collapse in={isVtnConfiguration} >
-			          <ListItem button component={ Link }
-						to="/vtn_configuration/parameter">
-			            <ListItemIcon fontSize="small">
-			              <SettingsIcon color="disabled"/>
-			            </ListItemIcon>
-			            <ListItemText secondary="Settings"/>
-			          </ListItem>
-			          <ListItem button component={ Link } to="/vtn_configuration/marketcontext" >
-			            <ListItemIcon fontSize="small">
-			              <ExtensionIcon color="disabled"/>
-			            </ListItemIcon>
-			            <ListItemText secondary="MarketContexts" />
-			          </ListItem>
+			          
 			          <ListItem button component={ Link } to="/vtn_configuration/group" >
 			            <ListItemIcon fontSize="small">
 			              <GroupWorkIcon color="disabled"/>
 			            </ListItemIcon>
 			            <ListItemText secondary="Groups" />
 			          </ListItem>
-			          <ListItem button to="/vtn_configuration/account/user" >
+			          <ListItem button component={ Link } to="/vtn_configuration/account/user" >
 			            <ListItemIcon fontSize="small">
 			              <AccountBoxIcon color="disabled"/>
 			            </ListItemIcon>
 			            <ListItemText secondary="Accounts" />
 			          </ListItem>
-			          <ListItem button component={ Link } to="/vtn_configuration/known/unit" >
-			            <ListItemIcon fontSize="small">
-			              <AccountBoxIcon color="disabled"/>
-			            </ListItemIcon>
-			            <ListItemText secondary="Known Entities" />
-			          </ListItem>
-			          <ListItem button component={ Link } to="/swagger" >
+			          
+			          <ListItem button component={ Link } to="/vtn_configuration/swagger" >
 			            <ListItemIcon fontSize="small">
 			              <AccountBoxIcon color="disabled"/>
 			            </ListItemIcon>

@@ -98,6 +98,9 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 	}
 
 	public void updateReport(VtnSessionConfiguration vtnConfiguration, OadrUpdateReportType payload) {
+
+		LOGGER.info(vtnConfiguration.getVtnId() + " - OadrUpdateReportType");
+
 		try {
 			multiVtnConfig.oadrUpdateReport(vtnConfiguration, payload);
 		} catch (XmppStringprepException | NotConnectedException | Oadr20bException | Oadr20bHttpLayerException
@@ -107,8 +110,10 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 		}
 	}
 
-	public OadrCreatedReportType oadrCreateReport(VtnSessionConfiguration vtnConfig,
+	public OadrCreatedReportType oadrCreateReport(VtnSessionConfiguration vtnConfiguration,
 			OadrCreateReportType oadrCreateReportType) {
+
+		LOGGER.info(vtnConfiguration.getVtnId() + " - OadrCreateReportType");
 
 		String requestID = oadrCreateReportType.getRequestID();
 
@@ -128,9 +133,12 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 							}
 						}
 					} else {
-						multiVtnConfig.checkReportSpecifier(vtnConfig, requestID, reportRequestID, reportSpecifier);
+						multiVtnConfig.checkReportSpecifier(vtnConfiguration, requestID, reportRequestID,
+								reportSpecifier);
 
-						addVenReportRequest(vtnConfig, request);
+						LOGGER.info(String.format("Vtn: '%s' add reportRequestId: %s", vtnConfiguration.getVtnId(),
+								reportRequestID));
+						addVenReportRequest(vtnConfiguration, request);
 					}
 
 				}
@@ -138,17 +146,16 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 			}
 
 			if (sendSelfRegisterReport) {
-				this.registerReport(vtnConfig);
+				this.registerReport(vtnConfiguration);
 			}
 
 			venReportListeners.forEach(listener -> {
-				listener.onCreateReport(vtnConfig, oadrCreateReportType);
+				listener.onCreateReport(vtnConfiguration, oadrCreateReportType);
 			});
 
 			return Oadr20bEiReportBuilders
-					.newOadr20bCreatedReportBuilder(requestID, HttpStatus.OK_200,
-							vtnConfig.getVenId())
-					.addPendingReportRequestId(getExistingVenReportRequest(vtnConfig)).build();
+					.newOadr20bCreatedReportBuilder(requestID, HttpStatus.OK_200, vtnConfiguration.getVenId())
+					.addPendingReportRequestId(getExistingVenReportRequest(vtnConfiguration)).build();
 
 		} catch (Oadr20bInvalidReportRequestException e) {
 			return Oadr20bEiReportBuilders.newOadr20bCreatedReportBuilder(requestID,
@@ -158,20 +165,26 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 
 	}
 
-	public OadrCanceledReportType oadrCancelReport(VtnSessionConfiguration vtnConfig,
+	public OadrCanceledReportType oadrCancelReport(VtnSessionConfiguration vtnConfiguration,
 			OadrCancelReportType oadrCancelReportType) {
+
+		LOGGER.info(vtnConfiguration.getVtnId() + " - OadrCancelReportType");
 
 		String requestID = oadrCancelReportType.getRequestID();
 
-		List<String> existingVenReportRequest = getExistingVenReportRequest(vtnConfig);
+		List<String> existingVenReportRequest = getExistingVenReportRequest(vtnConfiguration);
 		List<String> canceledReportRequest = new ArrayList<>(oadrCancelReportType.getReportRequestID());
 
 		canceledReportRequest.removeAll(existingVenReportRequest);
+		
+		oadrCancelReportType.getReportRequestID().forEach(p -> LOGGER.info(String.format("Vtn: '%s' remove reportRequestId: %s", vtnConfiguration.getVtnId(),
+				p)));
+		
 
 		if (!canceledReportRequest.isEmpty()) {
 			return Oadr20bEiReportBuilders
 					.newOadr20bCanceledReportBuilder(requestID, Oadr20bApplicationLayerErrorCode.NOT_RECOGNIZED_453,
-							vtnConfig.getVenId())
+							vtnConfiguration.getVenId())
 					.withResponseDescription(
 							String.format("Invalid cancel report - Report request id %s not recognized",
 									String.join(",", canceledReportRequest)))
@@ -179,25 +192,26 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 		}
 
 		oadrCancelReportType.getReportRequestID().forEach(canceledReportRequestId -> {
-			removeVenReportRequest(vtnConfig, canceledReportRequestId);
+			removeVenReportRequest(vtnConfiguration, canceledReportRequestId);
 		});
 
 		venReportListeners.forEach(listener -> {
-			listener.onCancelReport(vtnConfig, oadrCancelReportType);
+			listener.onCancelReport(vtnConfiguration, oadrCancelReportType);
 		});
 
 		return Oadr20bEiReportBuilders
-				.newOadr20bCanceledReportBuilder(requestID, HttpStatus.OK_200,
-						vtnConfig.getVenId())
-				.addPendingReportRequestId(getExistingVenReportRequest(vtnConfig)).build();
+				.newOadr20bCanceledReportBuilder(requestID, HttpStatus.OK_200, vtnConfiguration.getVenId())
+				.addPendingReportRequestId(getExistingVenReportRequest(vtnConfiguration)).build();
 
 	}
 
-	public Object oadrRegisteredReport(VtnSessionConfiguration vtnConfig,
+	public Object oadrRegisteredReport(VtnSessionConfiguration vtnConfiguration,
 			OadrRegisteredReportType oadrRegisteredReportType) {
 
+		LOGGER.info(vtnConfiguration.getVtnId() + " - OadrRegisteredReportType");
+
 		venReportListeners.forEach(listener -> {
-			listener.onRegisteredReport(vtnConfig, oadrRegisteredReportType);
+			listener.onRegisteredReport(vtnConfiguration, oadrRegisteredReportType);
 		});
 
 		return Oadr20bResponseBuilders
@@ -205,10 +219,13 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 				.build();
 	}
 
-	public Object oadrUpdatedReport(VtnSessionConfiguration vtnConfig, OadrUpdatedReportType oadrUpdatedReportType) {
+	public Object oadrUpdatedReport(VtnSessionConfiguration vtnConfiguration,
+			OadrUpdatedReportType oadrUpdatedReportType) {
+
+		LOGGER.info(vtnConfiguration.getVtnId() + " - OadrUpdatedReportType");
 
 		venReportListeners.forEach(listener -> {
-			listener.onUpdatedReport(vtnConfig, oadrUpdatedReportType);
+			listener.onUpdatedReport(vtnConfiguration, oadrUpdatedReportType);
 		});
 
 		return Oadr20bResponseBuilders
@@ -216,40 +233,46 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 				.build();
 	}
 
-	public OadrRegisteredReportType oadrRegisterReport(VtnSessionConfiguration vtnConfig,
+	public OadrRegisteredReportType oadrRegisterReport(VtnSessionConfiguration vtnConfiguration,
 			OadrRegisterReportType oadrRegisterReportType) {
+
+		LOGGER.info(vtnConfiguration.getVtnId() + " - OadrRegisterReportType");
 
 		String requestID = oadrRegisterReportType.getRequestID();
 
-		vtnRegisteredReport.put(vtnConfig.getSessionKey(), oadrRegisterReportType);
+		vtnRegisteredReport.put(vtnConfiguration.getSessionKey(), oadrRegisterReportType);
 
 		vtnReportListeners.forEach(listener -> {
-			listener.onRegisterReport(vtnConfig, oadrRegisterReportType);
+			listener.onRegisterReport(vtnConfiguration, oadrRegisterReportType);
 		});
 
-		return Oadr20bEiReportBuilders.newOadr20bRegisteredReportBuilder(requestID, HttpStatus.OK_200,
-				vtnConfig.getVenId()).build();
+		return Oadr20bEiReportBuilders
+				.newOadr20bRegisteredReportBuilder(requestID, HttpStatus.OK_200, vtnConfiguration.getVenId()).build();
 
 	}
 
-	public OadrUpdatedReportType oadrUpdateReport(VtnSessionConfiguration vtnConfig,
+	public OadrUpdatedReportType oadrUpdateReport(VtnSessionConfiguration vtnConfiguration,
 			OadrUpdateReportType oadrUpdateReportType) {
+
+		LOGGER.info(vtnConfiguration.getVtnId() + " - OadrUpdateReportType");
 
 		String requestID = oadrUpdateReportType.getRequestID();
 
 		vtnReportListeners.forEach(listener -> {
-			listener.onUpdateReport(vtnConfig, oadrUpdateReportType);
+			listener.onUpdateReport(vtnConfiguration, oadrUpdateReportType);
 		});
 
-		return Oadr20bEiReportBuilders.newOadr20bUpdatedReportBuilder(requestID, HttpStatus.OK_200,
-				vtnConfig.getVenId()).build();
+		return Oadr20bEiReportBuilders
+				.newOadr20bUpdatedReportBuilder(requestID, HttpStatus.OK_200, vtnConfiguration.getVenId()).build();
 	}
 
-	public OadrResponseType oadrCreatedReport(VtnSessionConfiguration vtnConfig,
+	public OadrResponseType oadrCreatedReport(VtnSessionConfiguration vtnConfiguration,
 			OadrCreatedReportType oadrCreatedReportType) {
 
+		LOGGER.info(vtnConfiguration.getVtnId() + " - OadrCreatedReportType");
+
 		vtnReportListeners.forEach(listener -> {
-			listener.onCreatedReport(vtnConfig, oadrCreatedReportType);
+			listener.onCreatedReport(vtnConfiguration, oadrCreatedReportType);
 		});
 
 		return Oadr20bResponseBuilders
@@ -257,10 +280,13 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 				.build();
 	}
 
-	public OadrResponseType oadrCanceledReport(VtnSessionConfiguration vtnConfig,
+	public OadrResponseType oadrCanceledReport(VtnSessionConfiguration vtnConfiguration,
 			OadrCanceledReportType oadrCanceledReportType) {
+
+		LOGGER.info(vtnConfiguration.getVtnId() + " - OadrCanceledReportType");
+
 		vtnReportListeners.forEach(listener -> {
-			listener.onCanceledReport(vtnConfig, oadrCanceledReportType);
+			listener.onCanceledReport(vtnConfiguration, oadrCanceledReportType);
 		});
 
 		return Oadr20bResponseBuilders
@@ -303,7 +329,7 @@ public class Oadr20bVENEiReportService implements Oadr20bVENEiService {
 			map = new HashMap<>();
 		}
 		map.put(reportRequest.getReportRequestID(), reportRequest);
-		venRequestReport.put(vtnConfig.getVtnId(), map);
+		venRequestReport.put(vtnConfig.getSessionKey(), map);
 	}
 
 	private void removeVenReportRequest(VtnSessionConfiguration vtnConfig, String reportRequestId) {

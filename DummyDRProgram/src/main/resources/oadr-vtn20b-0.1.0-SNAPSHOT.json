@@ -15,7 +15,7 @@
             "url": "API license URL"
         }
     },
-    "host": "vtn.oadr.com:8181",
+    "host": "testlocal:8181",
     "basePath": "/testvtn",
     "tags": [
         {
@@ -29,6 +29,10 @@
         {
             "name": "group-controller",
             "description": "Group Controller"
+        },
+        {
+            "name": "known-controller",
+            "description": "Known Controller"
         },
         {
             "name": "market-context-controller",
@@ -49,6 +53,10 @@
         {
             "name": "report-controller",
             "description": "Report Controller"
+        },
+        {
+            "name": "resource-controller",
+            "description": "Resource Controller"
         },
         {
             "name": "role-controller",
@@ -1013,6 +1021,156 @@
                 "deprecated": false
             }
         },
+        "/Known/report/search": {
+            "post": {
+                "tags": [
+                    "known-controller"
+                ],
+                "summary": "searchKnownReport",
+                "operationId": "searchKnownReportUsingPOST",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "knownReport",
+                        "description": "knownReport",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/KnownReportDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/KnownReportDto"
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/Known/signal/search": {
+            "post": {
+                "tags": [
+                    "known-controller"
+                ],
+                "summary": "searchKnownSignal",
+                "operationId": "searchKnownSignalUsingPOST",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "knownSignal",
+                        "description": "knownSignal",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/KnownSignalDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/KnownSignalDto"
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/Known/unit/search": {
+            "post": {
+                "tags": [
+                    "known-controller"
+                ],
+                "summary": "searchKnownUnit",
+                "operationId": "searchKnownUnitUsingPOST",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "knownUnit",
+                        "description": "knownUnit",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/KnownUnitDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/KnownUnitDto"
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
         "/MarketContext/": {
             "get": {
                 "tags": [
@@ -1365,6 +1523,105 @@
                                 "$ref": "#/definitions/OtherReportCapabilityDto"
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/Resource/search/root": {
+            "post": {
+                "tags": [
+                    "resource-controller"
+                ],
+                "summary": "searchResourceRoot",
+                "operationId": "searchResourceRootUsingPOST",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "venSearchDto",
+                        "description": "venSearchDto",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/VenSearchDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/VenResourceDto"
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/Resource/search/{venInternalId}": {
+            "post": {
+                "tags": [
+                    "resource-controller"
+                ],
+                "summary": "searchResourceData",
+                "operationId": "searchResourceDataUsingPOST",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "*/*"
+                ],
+                "parameters": [
+                    {
+                        "name": "venInternalId",
+                        "in": "path",
+                        "description": "venInternalId",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/VenResourceDto"
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -3218,101 +3475,6 @@
                     },
                     "404": {
                         "description": "Not Found"
-                    }
-                },
-                "deprecated": false
-            },
-            "post": {
-                "tags": [
-                    "ven-controller"
-                ],
-                "summary": "createVenResource",
-                "operationId": "createVenResourceUsingPOST",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "*/*"
-                ],
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "dto",
-                        "description": "dto",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/VenResourceDto"
-                        }
-                    },
-                    {
-                        "name": "venID",
-                        "in": "path",
-                        "description": "venID",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/VenResourceDto"
-                        }
-                    },
-                    "201": {
-                        "description": "Created"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    }
-                },
-                "deprecated": false
-            }
-        },
-        "/Ven/{venID}/resource/{resourceName}": {
-            "delete": {
-                "tags": [
-                    "ven-controller"
-                ],
-                "summary": "deleteVenResource",
-                "operationId": "deleteVenResourceUsingDELETE",
-                "produces": [
-                    "*/*"
-                ],
-                "parameters": [
-                    {
-                        "name": "resourceName",
-                        "in": "path",
-                        "description": "resourceName",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "venID",
-                        "in": "path",
-                        "description": "venID",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    },
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
                     }
                 },
                 "deprecated": false
@@ -5293,20 +5455,7 @@
                     "$ref": "#/definitions/ItemBaseDto"
                 },
                 "signalName": {
-                    "type": "string",
-                    "enum": [
-                        "SIMPLE",
-                        "DEPRECATED_OADR20A_SIMPLE",
-                        "ELECTRICITY_PRICE",
-                        "ENERGY_PRICE",
-                        "DEMAND_CHARGE",
-                        "BID_PRICE",
-                        "BID_LOAD",
-                        "BID_ENERGY",
-                        "CHARGE_STATE",
-                        "LOAD_DISPATCH",
-                        "LOAD_CONTROL"
-                    ]
+                    "type": "string"
                 },
                 "signalType": {
                     "type": "string",
@@ -5471,6 +5620,27 @@
             },
             "title": "InputStreamResource"
         },
+        "ItemBase": {
+            "type": "object",
+            "properties": {
+                "attributes": {
+                    "type": "string"
+                },
+                "itemDescription": {
+                    "type": "string"
+                },
+                "itemUnits": {
+                    "type": "string"
+                },
+                "siScaleCode": {
+                    "type": "string"
+                },
+                "xmlType": {
+                    "type": "string"
+                }
+            },
+            "title": "ItemBase"
+        },
         "ItemBaseDto": {
             "type": "object",
             "properties": {
@@ -5510,6 +5680,73 @@
                 }
             },
             "title": "KeyTokenType"
+        },
+        "KnownReportDto": {
+            "type": "object",
+            "properties": {
+                "payloadBase": {
+                    "type": "string"
+                },
+                "readingType": {
+                    "type": "string"
+                },
+                "reportName": {
+                    "type": "string"
+                },
+                "reportType": {
+                    "type": "string"
+                },
+                "unit": {
+                    "$ref": "#/definitions/KnownUnitDto"
+                }
+            },
+            "title": "KnownReportDto"
+        },
+        "KnownSignalDto": {
+            "type": "object",
+            "properties": {
+                "signalName": {
+                    "type": "string"
+                },
+                "signalType": {
+                    "type": "string",
+                    "enum": [
+                        "DELTA",
+                        "LEVEL",
+                        "MULTIPLIER",
+                        "PRICE",
+                        "PRICE_MULTIPLIER",
+                        "PRICE_RELATIVE",
+                        "SETPOINT",
+                        "X_LOAD_CONTROL_CAPACITY",
+                        "X_LOAD_CONTROL_LEVEL_OFFSET",
+                        "X_LOAD_CONTROL_PERCENT_OFFSET",
+                        "X_LOAD_CONTROL_SETPOINT"
+                    ]
+                },
+                "unit": {
+                    "$ref": "#/definitions/KnownUnitDto"
+                }
+            },
+            "title": "KnownSignalDto"
+        },
+        "KnownUnitDto": {
+            "type": "object",
+            "properties": {
+                "attributes": {
+                    "type": "string"
+                },
+                "itemDescription": {
+                    "type": "string"
+                },
+                "itemUnits": {
+                    "type": "string"
+                },
+                "xmlType": {
+                    "type": "string"
+                }
+            },
+            "title": "KnownUnitDto"
         },
         "OadrAppCreateDto": {
             "type": "object",
@@ -6258,7 +6495,8 @@
                     "enum": [
                         "VEN",
                         "GROUP",
-                        "ENDDEVICE_ASSET"
+                        "ENDDEVICE_ASSET",
+                        "RESOURCE"
                     ]
                 }
             },
@@ -6541,24 +6779,214 @@
             },
             "title": "VenGroupDto"
         },
-        "VenMarketContextDto": {
+        "VenMarketContextActivePeriodDto": {
             "type": "object",
             "properties": {
-                "color": {
+                "duration": {
                     "type": "string"
                 },
-                "description": {
+                "notificationDuration": {
+                    "type": "string"
+                },
+                "rampUpDuration": {
+                    "type": "string"
+                },
+                "recoveryDuration": {
+                    "type": "string"
+                },
+                "toleranceDuration": {
+                    "type": "string"
+                }
+            },
+            "title": "VenMarketContextActivePeriodDto"
+        },
+        "VenMarketContextBaselineDto": {
+            "type": "object",
+            "properties": {
+                "baselineId": {
+                    "type": "string"
+                },
+                "baselineName": {
+                    "type": "string"
+                },
+                "duration": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer",
                     "format": "int64"
                 },
-                "name": {
+                "intervals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DemandResponseEventSignalIntervalDto"
+                    }
+                },
+                "itemBase": {
+                    "$ref": "#/definitions/ItemBase"
+                },
+                "resourceId": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "start": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            },
+            "title": "VenMarketContextBaselineDto"
+        },
+        "VenMarketContextDescriptorDto": {
+            "type": "object",
+            "properties": {
+                "oadrProfile": {
+                    "type": "string",
+                    "enum": [
+                        "OADR20A",
+                        "OADR20B"
+                    ]
+                },
+                "priority": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "responseRequired": {
+                    "type": "string",
+                    "enum": [
+                        "ALWAYS",
+                        "NEVER"
+                    ]
+                },
+                "vtnComment": {
                     "type": "string"
                 }
             },
+            "title": "VenMarketContextDescriptorDto"
+        },
+        "VenMarketContextDto": {
+            "type": "object",
+            "properties": {
+                "activePeriod": {
+                    "$ref": "#/definitions/VenMarketContextActivePeriodDto"
+                },
+                "baseline": {
+                    "$ref": "#/definitions/VenMarketContextBaselineDto"
+                },
+                "color": {
+                    "type": "string"
+                },
+                "createdTimestamp": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "descriptor": {
+                    "$ref": "#/definitions/VenMarketContextDescriptorDto"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "lastUpdateTimestamp": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reports": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/VenMarketContextReportDto"
+                    }
+                },
+                "signals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/VenMarketContextSignalDto"
+                    }
+                },
+                "targets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TargetDto"
+                    }
+                }
+            },
             "title": "VenMarketContextDto"
+        },
+        "VenMarketContextReportDto": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "itemBase": {
+                    "$ref": "#/definitions/ItemBaseDto"
+                },
+                "payloadBase": {
+                    "type": "string"
+                },
+                "readingType": {
+                    "type": "string"
+                },
+                "reportName": {
+                    "type": "string"
+                },
+                "reportType": {
+                    "type": "string"
+                }
+            },
+            "title": "VenMarketContextReportDto"
+        },
+        "VenMarketContextSignalDto": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "intervals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DemandResponseEventSignalIntervalDto"
+                    }
+                },
+                "itemBase": {
+                    "$ref": "#/definitions/ItemBaseDto"
+                },
+                "signalName": {
+                    "type": "string"
+                },
+                "signalType": {
+                    "type": "string",
+                    "enum": [
+                        "DELTA",
+                        "LEVEL",
+                        "MULTIPLIER",
+                        "PRICE",
+                        "PRICE_MULTIPLIER",
+                        "PRICE_RELATIVE",
+                        "SETPOINT",
+                        "X_LOAD_CONTROL_CAPACITY",
+                        "X_LOAD_CONTROL_LEVEL_OFFSET",
+                        "X_LOAD_CONTROL_PERCENT_OFFSET",
+                        "X_LOAD_CONTROL_SETPOINT"
+                    ]
+                },
+                "targets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TargetDto"
+                    }
+                }
+            },
+            "title": "VenMarketContextSignalDto"
         },
         "VenOptDto": {
             "type": "object",
@@ -6678,9 +7106,43 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "parent": {
+                    "$ref": "#/definitions/VenResourceShortDto"
+                },
+                "reportDescriptionCount": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "VEN",
+                        "REPORT",
+                        "RESOURCE",
+                        "ENDDEVICEASSET",
+                        "REPORT_DESCRIPTION"
+                    ]
+                },
+                "venResourceId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "venResourceLabel": {
+                    "type": "string"
                 }
             },
             "title": "VenResourceDto"
+        },
+        "VenResourceShortDto": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            },
+            "title": "VenResourceShortDto"
         },
         "VenSearchDto": {
             "type": "object",

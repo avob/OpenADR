@@ -1,23 +1,20 @@
 package com.avob.openadr.server.common.vtn.models.known;
 
-import java.util.List;
-
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalNameEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalTypeEnum;
 
 public class KnownSignalDto {
 
-	private DemandResponseEventSignalNameEnum signalName;
+	private String signalName;
 
 	private DemandResponseEventSignalTypeEnum signalType;
 
-	private List<KnownUnitDto> units;
+	private KnownUnitDto unit;
 
-	public DemandResponseEventSignalNameEnum getSignalName() {
+	public String getSignalName() {
 		return signalName;
 	}
 
-	public void setSignalName(DemandResponseEventSignalNameEnum signalName) {
+	public void setSignalName(String signalName) {
 		this.signalName = signalName;
 	}
 
@@ -29,12 +26,12 @@ public class KnownSignalDto {
 		this.signalType = signalType;
 	}
 
-	public List<KnownUnitDto> getUnits() {
-		return units;
+	public KnownUnitDto getUnit() {
+		return unit;
 	}
 
-	public void setUnits(List<KnownUnitDto> units) {
-		this.units = units;
+	public void setUnit(KnownUnitDto unit) {
+		this.unit = unit;
 	}
 
 }

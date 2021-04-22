@@ -1,32 +1,18 @@
-package com.avob.openadr.server.common.vtn.models.demandresponseevent;
+package com.avob.openadr.server.common.vtn.models.venmarketcontext;
 
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
 
 @Embeddable
-public class DemandResponseEventActivePeriod {
-
-	@Column(name = "activePeriodStart")
-	@NotNull
-	private Long start;
-
-	@Column(name = "activePeriodEnd")
-	private Long end;
-
-	@NotNull
-	private Long startNotification;
+public class VenMarketContextActivePeriod {
 
 	/**
 	 * Event active state duration as xml duration
 	 */
-	@NotNull
 	private String duration;
 
 	/**
 	 * Event notification duration as xml duration
 	 */
-	@NotNull
 	private String notificationDuration;
 
 	/**
@@ -44,20 +30,20 @@ public class DemandResponseEventActivePeriod {
 	 */
 	private String recoveryDuration;
 
-	public Long getStart() {
-		return start;
-	}
-
-	public void setStart(Long start) {
-		this.start = start;
-	}
-
 	public String getDuration() {
 		return duration;
 	}
 
 	public void setDuration(String duration) {
 		this.duration = duration;
+	}
+
+	public String getNotificationDuration() {
+		return notificationDuration;
+	}
+
+	public void setNotificationDuration(String notificationDuration) {
+		this.notificationDuration = notificationDuration;
 	}
 
 	public String getToleranceDuration() {
@@ -82,30 +68,6 @@ public class DemandResponseEventActivePeriod {
 
 	public void setRecoveryDuration(String recoveryDuration) {
 		this.recoveryDuration = recoveryDuration;
-	}
-
-	public Long getEnd() {
-		return end;
-	}
-
-	public void setEnd(Long end) {
-		this.end = end;
-	}
-
-	public String getNotificationDuration() {
-		return notificationDuration;
-	}
-
-	public void setNotificationDuration(String notificationDuration) {
-		this.notificationDuration = notificationDuration;
-	}
-
-	public Long getStartNotification() {
-		return startNotification;
-	}
-
-	public void setStartNotification(Long startNotification) {
-		this.startNotification = startNotification;
 	}
 
 }

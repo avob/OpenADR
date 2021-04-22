@@ -320,7 +320,7 @@ public class OadrXMLSignatureHandlerTest {
 		float currentValue = 3f;
 		String xmlDuration = "PT1H";
 		String signalId = "0";
-		SignalNameEnumeratedType signalName = SignalNameEnumeratedType.SIMPLE;
+		String signalName = SignalNameEnumeratedType.SIMPLE.value();
 		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
 		String intervalId = "";
 		long timestampStartInterval = 3L;

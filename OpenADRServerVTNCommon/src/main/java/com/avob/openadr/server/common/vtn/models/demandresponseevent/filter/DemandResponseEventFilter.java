@@ -3,7 +3,7 @@ package com.avob.openadr.server.common.vtn.models.demandresponseevent.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventStateEnum;
 
 public class DemandResponseEventFilter {
 	private DemandResponseEventFilterType type;

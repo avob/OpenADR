@@ -1,6 +1,6 @@
 package com.avob.openadr.server.common.vtn.models.vendemandresponseevent;
 
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventOptEnum;
 
 public class VenDemandResponseEventDto {
 	private long id;

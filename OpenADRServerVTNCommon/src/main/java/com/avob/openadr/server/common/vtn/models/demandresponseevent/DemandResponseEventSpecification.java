@@ -7,6 +7,7 @@ import javax.persistence.criteria.ListJoin;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 

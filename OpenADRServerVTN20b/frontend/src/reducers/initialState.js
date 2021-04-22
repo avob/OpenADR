@@ -91,6 +91,14 @@ export default {
     event: [],
     marketContext: [],
     group: []
+  },
+  marketContext: {
+    marketContext: []
+  },
+  known: {
+    unit: [],
+    signal: [],
+    report: []
   }
 
 }

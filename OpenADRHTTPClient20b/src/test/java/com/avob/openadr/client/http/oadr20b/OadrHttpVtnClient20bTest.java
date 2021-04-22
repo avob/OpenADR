@@ -74,7 +74,7 @@ public class OadrHttpVtnClient20bTest {
 				eventXmlDuration, toleranceXmlDuration, notificationXmlDuration).build();
 
 		String signalId = "0";
-		SignalNameEnumeratedType signalName = SignalNameEnumeratedType.SIMPLE;
+		String signalName = SignalNameEnumeratedType.SIMPLE.value();
 		SignalTypeEnumeratedType signalType = SignalTypeEnumeratedType.LEVEL;
 		float currentValue = 0;
 

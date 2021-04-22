@@ -6,11 +6,11 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -71,46 +71,43 @@ public class DummyVENManager {
 	@Resource
 	private ReportControllerApi reportControllerApi;
 
+	@Resource
+	private List<VenMarketContextDto> marketContexts;
+
 	private Gson gson = new GsonBuilder().create();
 
 	@PostConstruct
 	public void init() {
 
-		Long marketcontextId;
+		marketContexts.forEach(marketContext -> {
+			Long marketcontextId;
 
-		try {
-			VenMarketContextDto findMarketContextByNameUsingGET = marketContextControllerApi
-					.findMarketContextByNameUsingGET(DummyVTN20bControllerConfig.MARKET_CONTEXT);
-			marketcontextId = findMarketContextByNameUsingGET.getId();
-			LOGGER.warn(
-					"Ven market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT + " is already provisioned");
-		} catch (ApiException e) {
-			if (e.getCode() != HttpStatus.SC_NOT_FOUND) {
-				LOGGER.error(
-						"Ven market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT + " can't be provisioned",
-						e);
-				return;
-			} else {
-				VenMarketContextDto dto = new VenMarketContextDto();
-				dto.setName(DummyVTN20bControllerConfig.MARKET_CONTEXT);
-				dto.setDescription(DummyVTN20bControllerConfig.MARKET_CONTEXT_DESCRIPTION);
-				dto.setColor(DummyVTN20bControllerConfig.MARKET_CONTEXT_COLOR);
-				try {
-					VenMarketContextDto createMarketContextUsingPOST = marketContextControllerApi
-							.createMarketContextUsingPOST(dto);
-					marketcontextId = createMarketContextUsingPOST.getId();
-				} catch (ApiException e1) {
-					LOGGER.error("Ven market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT
-							+ " can't be provisioned", e1);
+			try {
+				VenMarketContextDto findMarketContextByNameUsingGET = marketContextControllerApi
+						.findMarketContextByNameUsingGET(marketContext.getName());
+				marketcontextId = findMarketContextByNameUsingGET.getId();
+				LOGGER.warn("Ven market context: " + marketContext.getName() + " is already provisioned");
+			} catch (ApiException e) {
+				if (e.getCode() != HttpStatus.SC_NOT_FOUND) {
+					LOGGER.error("Ven market context: " + marketContext.getName() + " can't be provisioned", e);
 					return;
+				} else {
+					try {
+						VenMarketContextDto createMarketContextUsingPOST = marketContextControllerApi
+								.createMarketContextUsingPOST(marketContext);
+						marketcontextId = createMarketContextUsingPOST.getId();
+					} catch (ApiException e1) {
+						LOGGER.error("Ven market context: " + marketContext.getName() + " can't be provisioned", e1);
+						return;
+					}
 				}
 			}
-		}
 
-		if (marketcontextId == null) {
-			LOGGER.error("Ven market context: " + DummyVTN20bControllerConfig.MARKET_CONTEXT + " can't be provisioned");
-			return;
-		}
+			if (marketcontextId == null) {
+				LOGGER.error("Ven market context: " + marketContext.getName() + " can't be provisioned");
+				return;
+			}
+		});
 
 		dummyVTN20bControllerConfig.getControlledVenCertificates().forEach(crt -> {
 
@@ -152,7 +149,8 @@ public class DummyVENManager {
 						dto.setUsername(oadr20bFingerprint);
 
 						dto.setAuthenticationType("x509");
-						dto.setMarketContexts(Arrays.asList(DummyVTN20bControllerConfig.MARKET_CONTEXT));
+						dto.setMarketContexts(
+								marketContexts.stream().map(VenMarketContextDto::getName).collect(Collectors.toList()));
 						venControllerApi.createVenUsingPOST(dto);
 
 					} catch (ApiException e1) {
@@ -168,7 +166,7 @@ public class DummyVENManager {
 	@JmsListener(destination = DummyVTN20bControllerConfig.OADR_APP_NOTIFICATION_REGISTER_REPORT_TOPIC)
 	public void onRegisterReportMessage(final Message<String> message) throws JMSException {
 		VenReportDto fromJson = gson.fromJson(message.getPayload(), VenReportDto.class);
-		subscribe(fromJson);
+//		subscribe(fromJson);
 		LOGGER.info("Receive register from: " + fromJson.getUsername());
 
 	}

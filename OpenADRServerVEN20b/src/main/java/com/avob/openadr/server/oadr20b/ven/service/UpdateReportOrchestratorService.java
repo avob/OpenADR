@@ -75,6 +75,7 @@ public class UpdateReportOrchestratorService {
 
 				orchestration = new ReportRequestOrchestration(vtnConfig, oadrReportRequestType, listener);
 				orchestration.start();
+				reportRequestOrchestration.put(orchestrationUUID, orchestration);
 			}
 		}
 
@@ -277,7 +278,7 @@ public class UpdateReportOrchestratorService {
 		public static BufferValue of(Float value) {
 			return new BufferValue(value);
 		}
-		
+
 		public static BufferValue of(OadrPayloadResourceStatusType value) {
 			return new BufferValue(value);
 		}
@@ -333,6 +334,10 @@ public class UpdateReportOrchestratorService {
 		}
 
 		public void cancel(boolean interrupt) {
+			simulateReadingTask.forEach((rid, task) -> {
+				task.cancel(interrupt);
+			});
+			reportBackTask.cancel(interrupt);
 
 		}
 

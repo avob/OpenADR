@@ -55,16 +55,16 @@ import com.avob.openadr.model.oadr20a.pyld.EiRequestEvent;
 import com.avob.openadr.server.common.vtn.models.TargetDto;
 import com.avob.openadr.server.common.vtn.models.TargetTypeEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOadrProfileEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalNameEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSimpleValueEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventCreateDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.DemandResponseEventReadDto;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.dto.embedded.DemandResponseEventSignalDto;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventOadrProfileEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventOptEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventResponseRequiredEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalNameEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalTypeEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSimpleValueEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.filter.DemandResponseEventFilter;
 import com.avob.openadr.server.common.vtn.models.user.OadrUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
@@ -149,31 +149,32 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// GET not allowed
 		this.mockMvc.perform(MockMvcRequestBuilders.get(EIEVENT_ENDPOINT).with(venSecuritySession))
-		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// PUT not allowed
 		this.mockMvc.perform(MockMvcRequestBuilders.put(EIEVENT_ENDPOINT).with(venSecuritySession))
-		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// DELETE not allowed
 		this.mockMvc.perform(MockMvcRequestBuilders.delete(EIEVENT_ENDPOINT).with(venSecuritySession))
-		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.METHOD_NOT_ALLOWED_405));
 
 		// POST without content
 		String content = "";
 		this.mockMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession).content(content))
-		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST_400));
 
 		// POST without content
 		content = "mouaiccool";
 		this.mockMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession).content(content))
-		.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
+				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
 
 		// POST with not validating content
-		//		OadrRequestEvent build = Oadr20aBuilders.newOadrRequestEventBuilder(null, null).build();
-		//		String marshal = jaxbContext.marshal(build, false);
-		//		this.mockMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession).content(marshal))
-		//				.andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
+		// OadrRequestEvent build = Oadr20aBuilders.newOadrRequestEventBuilder(null,
+		// null).build();
+		// String marshal = jaxbContext.marshal(build, false);
+		// this.mockMvc.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession).content(marshal))
+		// .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_ACCEPTABLE_406));
 
 		venService.delete(ven);
 	}
@@ -252,7 +253,7 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
-		signal.setSignalName(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE);
+		signal.setSignalName(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE.getLabel());
 		signal.setSignalType(DemandResponseEventSignalTypeEnum.LEVEL);
 
 		DemandResponseEventCreateDto eventActive = new DemandResponseEventCreateDto();
@@ -336,10 +337,12 @@ public class Oadr20aVTNEiEventControllerTest {
 
 		// ensure currentValue is set to correct level when event status is
 		// "active" (rule 14)
-		assertEquals(Double.valueOf(2), Double.valueOf(eiEventSignalTypeActive.getCurrentValue().getPayloadFloat().getValue()));
+		assertEquals(Double.valueOf(2),
+				Double.valueOf(eiEventSignalTypeActive.getCurrentValue().getPayloadFloat().getValue()));
 
 		// ensure correct signal name/type (rule 7)
-		assertEquals(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE.getLabel(), eiEventSignalTypeActive.getSignalName());
+		assertEquals(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE.getLabel(),
+				eiEventSignalTypeActive.getSignalName());
 		assertEquals(SignalTypeEnumeratedType.LEVEL, eiEventSignalTypeActive.getSignalType());
 
 		// ensure "canceled" drevent is translated into OadrEvent
@@ -356,7 +359,8 @@ public class Oadr20aVTNEiEventControllerTest {
 		EiEventSignalType eiEventSignalTypeCanceled = eiEventCanceled.getEiEventSignals().getEiEventSignal().get(0);
 
 		// ensure correct signal name/type (rule 7)
-		assertEquals(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE.getLabel(), eiEventSignalTypeCanceled.getSignalName());
+		assertEquals(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE.getLabel(),
+				eiEventSignalTypeCanceled.getSignalName());
 		assertEquals(SignalTypeEnumeratedType.LEVEL, eiEventSignalTypeCanceled.getSignalType());
 
 		demandResponseEventService.delete(eventActivePO.getId());
@@ -462,7 +466,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		// create and send DR Event to DemandResponseEvent API
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
-		signal.setSignalName(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE);
+		signal.setSignalName(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE.getLabel());
 		signal.setSignalType(DemandResponseEventSignalTypeEnum.LEVEL);
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();
@@ -562,7 +566,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		// send invalid opt-out: mismatch between ven/vtn event modification
 		// number
 		oadrCreatedEvent.getEiCreatedEvent().getEventResponses().getEventResponse().get(0)
-		.setOptType(OptTypeType.OPT_OUT);
+				.setOptType(OptTypeType.OPT_OUT);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession)
 						.content(jaxbContext.marshal(oadrCreatedEvent)))
@@ -579,7 +583,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		// send invalid opt-out: mismatch venid with authentication credentials
 		oadrCreatedEvent.getEiCreatedEvent().setVenID("unknown");
 		oadrCreatedEvent.getEiCreatedEvent().getEventResponses().getEventResponse().get(0)
-		.setOptType(OptTypeType.OPT_OUT);
+				.setOptType(OptTypeType.OPT_OUT);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession)
 						.content(jaxbContext.marshal(oadrCreatedEvent)))
@@ -596,10 +600,10 @@ public class Oadr20aVTNEiEventControllerTest {
 		// send valid opt-out
 		oadrCreatedEvent.getEiCreatedEvent().setVenID(venId);
 		oadrCreatedEvent.getEiCreatedEvent().getEventResponses().getEventResponse().get(0).getQualifiedEventID()
-		.setModificationNumber(oadrCreatedEvent.getEiCreatedEvent().getEventResponses().getEventResponse()
-				.get(0).getQualifiedEventID().getModificationNumber() + 1);
+				.setModificationNumber(oadrCreatedEvent.getEiCreatedEvent().getEventResponses().getEventResponse()
+						.get(0).getQualifiedEventID().getModificationNumber() + 1);
 		oadrCreatedEvent.getEiCreatedEvent().getEventResponses().getEventResponse().get(0)
-		.setOptType(OptTypeType.OPT_OUT);
+				.setOptType(OptTypeType.OPT_OUT);
 		andReturn = this.mockMvc
 				.perform(MockMvcRequestBuilders.post(EIEVENT_ENDPOINT).with(venSecuritySession)
 						.content(jaxbContext.marshal(oadrCreatedEvent)))
@@ -669,7 +673,7 @@ public class Oadr20aVTNEiEventControllerTest {
 		// create 'none' and send DR Event to DemandResponseEvent API
 		DemandResponseEventSignalDto signal = new DemandResponseEventSignalDto();
 		signal.setCurrentValue(DemandResponseEventSimpleValueEnum.SIMPLE_SIGNAL_PAYLOAD_HIGH.getValue());
-		signal.setSignalName(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE);
+		signal.setSignalName(DemandResponseEventSignalNameEnum.DEPRECATED_OADR20A_SIMPLE.getLabel());
 		signal.setSignalType(DemandResponseEventSignalTypeEnum.LEVEL);
 
 		DemandResponseEventCreateDto dto = new DemandResponseEventCreateDto();

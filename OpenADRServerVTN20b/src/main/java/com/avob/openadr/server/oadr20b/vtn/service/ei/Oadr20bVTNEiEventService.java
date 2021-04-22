@@ -35,7 +35,6 @@ import com.avob.openadr.model.oadr20b.ei.EventStatusEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.IntervalType;
 import com.avob.openadr.model.oadr20b.ei.OptTypeType;
 import com.avob.openadr.model.oadr20b.ei.QualifiedEventIDType;
-import com.avob.openadr.model.oadr20b.ei.SignalNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.SignalTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.emix.ItemBaseType;
 import com.avob.openadr.model.oadr20b.errorcodes.Oadr20bApplicationLayerErrorCode;
@@ -48,10 +47,10 @@ import com.avob.openadr.model.oadr20b.pyld.EiCreatedEvent;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventBaseline;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventResponseRequiredEnum;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignal;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalInterval;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventStateEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventResponseRequiredEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalInterval;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventStateEnum;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.service.DemandResponseEventService;
@@ -304,8 +303,7 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 			}
 
 			Oadr20bEiEventSignalTypeBuilder newOadr20bEiEventSignalTypeBuilder = Oadr20bEiEventBuilders
-					.newOadr20bEiEventSignalTypeBuilder("" + signalId,
-							SignalNameEnumeratedType.fromValue(demandResponseEventSignal.getSignalName().getLabel()),
+					.newOadr20bEiEventSignalTypeBuilder("" + signalId, demandResponseEventSignal.getSignalName(),
 							SignalTypeEnumeratedType.fromValue(demandResponseEventSignal.getSignalType().getLabel()),
 							currentValue);
 
@@ -328,11 +326,10 @@ public class Oadr20bVTNEiEventService implements Oadr20bVTNEiService {
 				for (DemandResponseEventSignalInterval demandResponseEventSignalInterval : demandResponseEventSignal
 						.getIntervals()) {
 
-					
 					IntervalType interval = Oadr20bEiBuilders.newOadr20bSignalIntervalTypeBuilder("" + intervalId, temp,
 							demandResponseEventSignalInterval.getDuration(),
 							demandResponseEventSignalInterval.getValue()).build();
-					
+
 					temp = Oadr20bFactory.addXMLDurationToTimestamp(temp,
 							demandResponseEventSignalInterval.getDuration());
 					intervalId++;

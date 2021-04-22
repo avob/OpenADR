@@ -1,6 +1,6 @@
 package com.avob.openadr.server.common.vtn.service;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.annotation.Resource;
 
@@ -30,7 +30,7 @@ public class KnownReportService {
 		return knownReportDao.save(entity);
 	}
 
-	public Iterable<KnownReport> save(List<KnownReport> entities) {
+	public Iterable<KnownReport> save(Collection<KnownReport> entities) {
 		return knownReportDao.saveAll(entities);
 	}
 

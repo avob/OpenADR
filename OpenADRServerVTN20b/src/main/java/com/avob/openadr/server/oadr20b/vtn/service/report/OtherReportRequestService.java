@@ -21,7 +21,7 @@ public class OtherReportRequestService extends GenericService<OtherReportRequest
 	@Resource
 	private OtherReportRequestDao otherReportRequestDao;
 
-	public OtherReportRequest findOneBySourceAndReportRequestId(Ven ven,String reportRequestId) {
+	public OtherReportRequest findOneBySourceAndReportRequestId(Ven ven, String reportRequestId) {
 		return otherReportRequestDao.findOneBySourceAndReportRequestId(ven, reportRequestId);
 	}
 
@@ -56,6 +56,14 @@ public class OtherReportRequestService extends GenericService<OtherReportRequest
 
 	public void deleteByRequestorAndOtherReportCapabilitySourceUsername(AbstractUser requestor, String venId) {
 		otherReportRequestDao.deleteByRequestorAndOtherReportCapabilitySourceUsername(requestor, venId);
+	}
+
+	public void deleteByRequestorIsNullAndSource(Ven ven) {
+		otherReportRequestDao.deleteByRequestorIsNullAndSource(ven);
+	}
+
+	public List<OtherReportRequest> findByRequestorIsNullAndSource(Ven ven) {
+		return otherReportRequestDao.findByRequestorIsNullAndSource(ven);
 	}
 
 	@Override

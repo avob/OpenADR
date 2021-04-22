@@ -191,17 +191,8 @@ public class Ven extends AbstractUser {
 
 	}
 
-	public Set<VenResource> getVenResources() {
-		return venResources;
-	}
-
 	public void setVenResources(Set<VenResource> venResources) {
 		this.venResources = venResources;
-	}
-
-	public void removeResource(VenResource venResource) {
-		venResources.remove(venResource);
-
 	}
 
 	public Long getPullFrequencySeconds() {

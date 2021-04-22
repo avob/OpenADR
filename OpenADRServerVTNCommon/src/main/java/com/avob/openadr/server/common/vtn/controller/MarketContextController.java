@@ -54,7 +54,10 @@ public class MarketContextController {
 			response.setStatus(HttpStatus.NOT_ACCEPTABLE_406);
 			return null;
 		}
-		marketContext = venMarketContextService.prepare(dto);
+		marketContext = dtoMapper.map(dto, VenMarketContext.class);
+		Long now = System.currentTimeMillis();
+		marketContext.setCreatedTimestamp(now);
+		marketContext.setLastUpdateTimestamp(now);
 		venMarketContextService.save(marketContext);
 		response.setStatus(HttpStatus.CREATED_201);
 

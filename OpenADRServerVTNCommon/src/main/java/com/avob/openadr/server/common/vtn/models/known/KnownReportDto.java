@@ -12,7 +12,7 @@ public class KnownReportDto {
 
 	private String payloadBase;
 
-	private List<KnownUnitDto> units;
+	private KnownUnitDto unit;
 
 	public KnownReportDto() {
 	}
@@ -34,14 +34,6 @@ public class KnownReportDto {
 		this.reportType = reportType;
 	}
 
-	public List<KnownUnitDto> getUnits() {
-		return units;
-	}
-
-	public void setUnits(List<KnownUnitDto> units) {
-		this.units = units;
-	}
-
 	public String getReadingType() {
 		return readingType;
 	}
@@ -56,6 +48,16 @@ public class KnownReportDto {
 
 	public void setPayloadBase(String payloadBase) {
 		this.payloadBase = payloadBase;
+	}
+
+
+	public KnownUnitDto getUnit() {
+		return unit;
+	}
+
+
+	public void setUnit(KnownUnitDto unit) {
+		this.unit = unit;
 	}
 
 }

@@ -90,6 +90,7 @@ export class VenDetailReportDescription extends React.Component {
           { id: 'eiDatasource', numeric: false, disablePadding: false, label: 'Datasource'},
           { id: 'rid', numeric: false, disablePadding: false, label: 'rID'},
           { id: 'reportType', numeric: false, disablePadding: false, label: 'ReportType' },
+          { id: 'readingType', numeric: false, disablePadding: false, label: 'ReadingType' },
           { id: 'itemBase', numeric: false, disablePadding: false, label: 'Unit'},
           { id: 'samplingRate', numeric: false, disablePadding: false, label: 'SamplingRate Min/Max/OnChange' },
         ]} 
@@ -100,6 +101,7 @@ export class VenDetailReportDescription extends React.Component {
              <TableCell>{formatTargetList(n.eiDatasource)}</TableCell>
               <TableCell>{n.rid}</TableCell>
               <TableCell>{n.reportType}</TableCell>
+              <TableCell>{n.readingType}</TableCell>
               {n.itemBase ? <TableCell>{n.itemBase.itemDescription}<br/>{n.itemBase.itemUnits}<br/>{n.itemBase.siScaleCode}</TableCell> : <TableCell></TableCell>}
               {n.samplingRate ? <TableCell>{n.samplingRate.oadrMinPeriod}/{n.samplingRate.oadrMaxPeriod}/{(n.samplingRate.oadrOnChange) ? "True" : "False"}</TableCell> : <TableCell></TableCell>}
               

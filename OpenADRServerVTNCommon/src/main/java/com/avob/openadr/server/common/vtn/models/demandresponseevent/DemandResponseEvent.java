@@ -18,6 +18,8 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import com.avob.openadr.server.common.vtn.models.Target;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventActivePeriod;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventDescriptor;
 import com.avob.openadr.server.common.vtn.models.vendemandresponseevent.VenDemandResponseEvent;
 
 /**

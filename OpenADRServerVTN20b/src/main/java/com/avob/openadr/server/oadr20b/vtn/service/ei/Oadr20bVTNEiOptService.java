@@ -29,7 +29,7 @@ import com.avob.openadr.model.oadr20b.xcal.AvailableType;
 import com.avob.openadr.model.oadr20b.xcal.VavailabilityType;
 import com.avob.openadr.server.common.vtn.VtnConfig;
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEvent;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventOptEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventOptEnum;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.common.vtn.models.venresource.VenResource;

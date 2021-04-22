@@ -1,4 +1,4 @@
-package com.avob.openadr.server.common.vtn.models.demandresponseevent;
+package com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded;
 
 import javax.persistence.Embeddable;
 

@@ -23,6 +23,10 @@ import VenCreatePage from './components/containers/VenCreatePage'
 import MarketContextCreatePage from './components/containers/MarketContextCreatePage'
 import GroupCreatePage from './components/containers/GroupCreatePage'
 import SwaggerUIPage from './components/containers/SwaggerUIPage'
+import MarketContextPage from './components/containers/MarketContextPage'
+import KnownPage from './components/containers/KnownPage'
+
+
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -303,9 +307,10 @@ class App extends React.Component {
           <PrivateRoute path="/account/:panel(user|app)" component={ AccountPage } />
           <PrivateRoute path="/account" component={ AccountPage } />
 
-          <PrivateRoute path="/vtn_configuration/:panel(marketcontext|group|parameter|account|known)" component={ VtnConfigurationPage } />
+          <PrivateRoute path="/vtn_configuration/swagger" component={  SwaggerUIPage} />
           <PrivateRoute path="/vtn_configuration/account/:accountPanel(user|app)" component={ VtnConfigurationPage } />
-          <PrivateRoute path="/vtn_configuration/knwon/:panel(unit|signal)" component={ VtnConfigurationPage } />
+          <PrivateRoute path="/vtn_configuration/known/:panel(unit|signal)" component={ VtnConfigurationPage } />
+          <PrivateRoute path="/vtn_configuration/:panel(marketcontext|group|parameter|account|known)" component={ VtnConfigurationPage } />
           <PrivateRoute path="/vtn_configuration" component={ VtnConfigurationPage } />
           
           <PrivateRoute path="/ven/detail/:username/reports/:reportSpecifierId/requests/:reportRequestId" component={ VenDetailReportRequestPage } />
@@ -332,9 +337,18 @@ class App extends React.Component {
           <PrivateRoute path="/event" component={ EventPage } />
 
           <PrivateRoute path="/marketcontext/create" component={ MarketContextCreatePage } />
+
+
+          
+          <PrivateRoute path="/marketcontext/known/:panel(unit|signal|report)" component={ KnownPage } />
+          <PrivateRoute path="/marketcontext" component={ MarketContextPage } />
+
+
+
+
           <PrivateRoute path="/group/create" component={ GroupCreatePage } />
 
-          <PrivateRoute path="/swagger" component={  SwaggerUIPage} />
+          
 
 
 

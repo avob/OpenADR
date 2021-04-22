@@ -3,6 +3,7 @@ package com.avob.openadr.server.common.vtn.models.known;
 import java.io.Serializable;
 
 import javax.persistence.Embeddable;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 @Embeddable
@@ -18,13 +19,27 @@ public class KnownReportId implements Serializable {
 
 	@NotNull
 	private String reportType;
-	
-	public KnownReportId() {}
 
-	public KnownReportId(@NotNull String reportName, @NotNull String reportType) {
+	@NotNull
+	private String readingType;
+
+	@NotNull
+	private String payloadBase;
+
+	@OneToOne
+	private KnownUnit unit;
+
+	public KnownReportId() {
+	}
+
+	public KnownReportId(@NotNull String reportName, @NotNull String reportType, @NotNull String readingType,
+			@NotNull String payloadBase, KnownUnit unit) {
 		super();
 		this.reportName = reportName;
 		this.reportType = reportType;
+		this.readingType = readingType;
+		this.payloadBase = payloadBase;
+		this.setUnit(unit);
 	}
 
 	public String getReportName() {
@@ -41,6 +56,30 @@ public class KnownReportId implements Serializable {
 
 	public void setReportType(String reportType) {
 		this.reportType = reportType;
+	}
+
+	public String getReadingType() {
+		return readingType;
+	}
+
+	public void setReadingType(String readingType) {
+		this.readingType = readingType;
+	}
+
+	public String getPayloadBase() {
+		return payloadBase;
+	}
+
+	public void setPayloadBase(String payloadBase) {
+		this.payloadBase = payloadBase;
+	}
+
+	public KnownUnit getUnit() {
+		return unit;
+	}
+
+	public void setUnit(KnownUnit unit) {
+		this.unit = unit;
 	}
 
 }

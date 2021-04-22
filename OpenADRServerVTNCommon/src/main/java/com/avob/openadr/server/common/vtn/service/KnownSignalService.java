@@ -1,6 +1,6 @@
 package com.avob.openadr.server.common.vtn.service;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.annotation.Resource;
 
@@ -29,8 +29,8 @@ public class KnownSignalService {
 	public KnownSignal save(KnownSignal entity) {
 		return knownSignalDao.save(entity);
 	}
-	
-	public Iterable<KnownSignal> save(List<KnownSignal> entities) {
+
+	public Iterable<KnownSignal> save(Collection<KnownSignal> entities) {
 		return knownSignalDao.saveAll(entities);
 	}
 

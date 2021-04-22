@@ -3,10 +3,12 @@ package com.avob.openadr.server.oadr20b.vtn.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
@@ -22,8 +24,8 @@ import com.avob.openadr.model.oadr20b.oadr.OadrPayloadResourceStatusType;
 import com.avob.openadr.model.oadr20b.oadr.TemperatureUnitType;
 import com.avob.openadr.model.oadr20b.siscale.SiScaleCodeType;
 import com.avob.openadr.server.common.vtn.models.ItemBase;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalNameEnum;
-import com.avob.openadr.server.common.vtn.models.demandresponseevent.DemandResponseEventSignalTypeEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalNameEnum;
+import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalTypeEnum;
 import com.avob.openadr.server.common.vtn.models.known.KnownReport;
 import com.avob.openadr.server.common.vtn.models.known.KnownReportId;
 import com.avob.openadr.server.common.vtn.models.known.KnownSignal;
@@ -35,6 +37,7 @@ import com.avob.openadr.server.common.vtn.service.KnownSignalService;
 import com.avob.openadr.server.common.vtn.service.KnownUnitService;
 import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiServiceUtils;
 
+@Profile({ "fake-data-known" })
 @Component
 public class InitKnownController {
 
@@ -152,132 +155,141 @@ public class InitKnownController {
 
 		unit = getRealPowerUnit();
 		unit.addAll(getRealEnergyUnit());
-		reports.add(from("TELEMETRY_USAGE", ReportEnumeratedType.USAGE.value(),
-				ReadingTypeEnumeratedType.DIRECT_READ.value(), PayloadFloatType.class.getName(), unit));
+		reports.addAll(from("TELEMETRY_USAGE", ReportEnumeratedType.USAGE.value(),
+				ReadingTypeEnumeratedType.DIRECT_READ.value(), PayloadFloatType.class.getSimpleName(), unit));
 
 		unit = null;
-		reports.add(from("TELEMETRY_STATUS", ReportEnumeratedType.X_RESOURCE_STATUS.value(),
+		reports.addAll(from("TELEMETRY_STATUS", ReportEnumeratedType.X_RESOURCE_STATUS.value(),
 				ReadingTypeEnumeratedType.X_NOT_APPLICABLE.value(), OadrPayloadResourceStatusType.class.getSimpleName(),
 				unit));
 
 		unit = getRealPowerUnit();
 		unit.addAll(getRealEnergyUnit());
-		reports.add(from("HISTORY_USAGE", ReportEnumeratedType.USAGE.value(),
+		reports.addAll(from("HISTORY_USAGE", ReportEnumeratedType.USAGE.value(),
 				ReadingTypeEnumeratedType.DIRECT_READ.value(), PayloadFloatType.class.getSimpleName(), unit));
 
 		unit = getRealPowerUnit();
 		unit.addAll(getRealEnergyUnit());
-		reports.add(from("HISTORY_GREENBUTTON", ReportEnumeratedType.USAGE.value(),
+		reports.addAll(from("HISTORY_GREENBUTTON", ReportEnumeratedType.USAGE.value(),
 				ReadingTypeEnumeratedType.DIRECT_READ.value(), PayloadFloatType.class.getSimpleName(), unit));
 
 		knownReportService.save(reports);
 	}
 
-	private KnownReport from(String reportName, String reportType, String readingType, String payloadBase,
+	private List<KnownReport> from(String reportName, String reportType, String readingType, String payloadBase,
 			List<KnownUnit> units) {
-		KnownReport knownReport = new KnownReport();
-		KnownReportId knownReportId = new KnownReportId();
-		knownReport.setKnownReportId(knownReportId);
-		knownReport.getKnownReportId().setReportName(reportName);
-		knownReport.getKnownReportId().setReportType(reportType);
-		knownReport.setReadingType(readingType);
-		knownReport.setPayloadBase(payloadBase);
-		knownReport.setUnits(units);
+		return units != null ? units.stream().map(u -> {
+			KnownReport knownReport = new KnownReport();
+			KnownReportId knownReportId = new KnownReportId();
+			knownReport.setKnownReportId(knownReportId);
+			knownReport.getKnownReportId().setReportName(reportName);
+			knownReport.getKnownReportId().setReportType(reportType);
+			knownReport.getKnownReportId().setReadingType(readingType);
+			knownReport.getKnownReportId().setPayloadBase(payloadBase);
+			knownReport.getKnownReportId().setUnit(u);
+			return knownReport;
+		}).collect(Collectors.toList()) : new ArrayList<>();
 
-		return knownReport;
 	}
 
 	private void initKnownSignal() throws Oadr20bMarshalException {
 
 		List<KnownSignal> signals = new ArrayList<>();
 
-		signals.add(from(DemandResponseEventSignalNameEnum.SIMPLE, DemandResponseEventSignalTypeEnum.LEVEL, null));
+		signals.addAll(from(DemandResponseEventSignalNameEnum.SIMPLE.getLabel(),
+				DemandResponseEventSignalTypeEnum.LEVEL, null));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.ELECTRICITY_PRICE, DemandResponseEventSignalTypeEnum.PRICE,
+		signals.addAll(from(DemandResponseEventSignalNameEnum.ELECTRICITY_PRICE.getLabel(),
+				DemandResponseEventSignalTypeEnum.PRICE,
 				getCurrencyUnit(CurrencyItemDescriptionType.CURRENCY_PER_K_WH)));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.ELECTRICITY_PRICE,
+		signals.addAll(from(DemandResponseEventSignalNameEnum.ELECTRICITY_PRICE.getLabel(),
 				DemandResponseEventSignalTypeEnum.PRICE_RELATIVE,
 				getCurrencyUnit(CurrencyItemDescriptionType.CURRENCY_PER_K_WH)));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.ELECTRICITY_PRICE,
+		signals.addAll(from(DemandResponseEventSignalNameEnum.ELECTRICITY_PRICE.getLabel(),
 				DemandResponseEventSignalTypeEnum.PRICE_MULTIPLIER, null));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.ENERGY_PRICE, DemandResponseEventSignalTypeEnum.PRICE,
-				getCurrencyUnit(CurrencyItemDescriptionType.CURRENCY_PER_K_WH)));
-
-		signals.add(
-				from(DemandResponseEventSignalNameEnum.ENERGY_PRICE, DemandResponseEventSignalTypeEnum.PRICE_RELATIVE,
+		signals.addAll(
+				from(DemandResponseEventSignalNameEnum.ENERGY_PRICE.getLabel(), DemandResponseEventSignalTypeEnum.PRICE,
 						getCurrencyUnit(CurrencyItemDescriptionType.CURRENCY_PER_K_WH)));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.ENERGY_PRICE,
+		signals.addAll(from(DemandResponseEventSignalNameEnum.ENERGY_PRICE.getLabel(),
+				DemandResponseEventSignalTypeEnum.PRICE_RELATIVE,
+				getCurrencyUnit(CurrencyItemDescriptionType.CURRENCY_PER_K_WH)));
+
+		signals.addAll(from(DemandResponseEventSignalNameEnum.ENERGY_PRICE.getLabel(),
 				DemandResponseEventSignalTypeEnum.PRICE_MULTIPLIER, null));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.DEMAND_CHARGE, DemandResponseEventSignalTypeEnum.PRICE,
+		signals.addAll(from(DemandResponseEventSignalNameEnum.DEMAND_CHARGE.getLabel(),
+				DemandResponseEventSignalTypeEnum.PRICE, getCurrencyUnit(CurrencyItemDescriptionType.CURRENCY_PER_KW)));
+
+		signals.addAll(from(DemandResponseEventSignalNameEnum.DEMAND_CHARGE.getLabel(),
+				DemandResponseEventSignalTypeEnum.PRICE_RELATIVE,
 				getCurrencyUnit(CurrencyItemDescriptionType.CURRENCY_PER_KW)));
 
-		signals.add(
-				from(DemandResponseEventSignalNameEnum.DEMAND_CHARGE, DemandResponseEventSignalTypeEnum.PRICE_RELATIVE,
-						getCurrencyUnit(CurrencyItemDescriptionType.CURRENCY_PER_KW)));
-
-		signals.add(from(DemandResponseEventSignalNameEnum.DEMAND_CHARGE,
+		signals.addAll(from(DemandResponseEventSignalNameEnum.DEMAND_CHARGE.getLabel(),
 				DemandResponseEventSignalTypeEnum.PRICE_MULTIPLIER, null));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.BID_PRICE, DemandResponseEventSignalTypeEnum.PRICE,
-				getCurrencyUnit(CurrencyItemDescriptionType.CURRENCY)));
+		signals.addAll(from(DemandResponseEventSignalNameEnum.BID_PRICE.getLabel(),
+				DemandResponseEventSignalTypeEnum.PRICE, getCurrencyUnit(CurrencyItemDescriptionType.CURRENCY)));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.BID_LOAD, DemandResponseEventSignalTypeEnum.SETPOINT,
-				getPowerUnit()));
+		signals.addAll(from(DemandResponseEventSignalNameEnum.BID_LOAD.getLabel(),
+				DemandResponseEventSignalTypeEnum.SETPOINT, getPowerUnit()));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.BID_ENERGY, DemandResponseEventSignalTypeEnum.SETPOINT,
-				getEnergyUnit()));
+		signals.addAll(from(DemandResponseEventSignalNameEnum.BID_ENERGY.getLabel(),
+				DemandResponseEventSignalTypeEnum.SETPOINT, getEnergyUnit()));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.CHARGE_STATE, DemandResponseEventSignalTypeEnum.SETPOINT,
-				getEnergyUnit()));
+		signals.addAll(from(DemandResponseEventSignalNameEnum.CHARGE_STATE.getLabel(),
+				DemandResponseEventSignalTypeEnum.SETPOINT, getEnergyUnit()));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.CHARGE_STATE, DemandResponseEventSignalTypeEnum.DELTA,
-				getEnergyUnit()));
+		signals.addAll(from(DemandResponseEventSignalNameEnum.CHARGE_STATE.getLabel(),
+				DemandResponseEventSignalTypeEnum.DELTA, getEnergyUnit()));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.CHARGE_STATE, DemandResponseEventSignalTypeEnum.MULTIPLIER,
-				null));
+		signals.addAll(from(DemandResponseEventSignalNameEnum.CHARGE_STATE.getLabel(),
+				DemandResponseEventSignalTypeEnum.MULTIPLIER, null));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.LOAD_DISPATCH, DemandResponseEventSignalTypeEnum.SETPOINT,
-				getPowerUnit()));
+		signals.addAll(from(DemandResponseEventSignalNameEnum.LOAD_DISPATCH.getLabel(),
+				DemandResponseEventSignalTypeEnum.SETPOINT, getPowerUnit()));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.LOAD_DISPATCH, DemandResponseEventSignalTypeEnum.DELTA,
-				getPowerUnit()));
+		signals.addAll(from(DemandResponseEventSignalNameEnum.LOAD_DISPATCH.getLabel(),
+				DemandResponseEventSignalTypeEnum.DELTA, getPowerUnit()));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.LOAD_DISPATCH, DemandResponseEventSignalTypeEnum.MULTIPLIER,
-				null));
+		signals.addAll(from(DemandResponseEventSignalNameEnum.LOAD_DISPATCH.getLabel(),
+				DemandResponseEventSignalTypeEnum.MULTIPLIER, null));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.LOAD_DISPATCH, DemandResponseEventSignalTypeEnum.LEVEL,
-				getPowerUnit()));
+		signals.addAll(from(DemandResponseEventSignalNameEnum.LOAD_DISPATCH.getLabel(),
+				DemandResponseEventSignalTypeEnum.LEVEL, getPowerUnit()));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.LOAD_CONTROL,
+		signals.addAll(from(DemandResponseEventSignalNameEnum.LOAD_CONTROL.getLabel(),
 				DemandResponseEventSignalTypeEnum.X_LOAD_CONTROL_CAPACITY, null));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.LOAD_CONTROL,
+		signals.addAll(from(DemandResponseEventSignalNameEnum.LOAD_CONTROL.getLabel(),
 				DemandResponseEventSignalTypeEnum.X_LOAD_CONTROL_LEVEL_OFFSET, null));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.LOAD_CONTROL,
+		signals.addAll(from(DemandResponseEventSignalNameEnum.LOAD_CONTROL.getLabel(),
 				DemandResponseEventSignalTypeEnum.X_LOAD_CONTROL_PERCENT_OFFSET, null));
 
-		signals.add(from(DemandResponseEventSignalNameEnum.LOAD_CONTROL,
+		signals.addAll(from(DemandResponseEventSignalNameEnum.LOAD_CONTROL.getLabel(),
 				DemandResponseEventSignalTypeEnum.X_LOAD_CONTROL_SETPOINT, null));
 
 		knownSignalService.save(signals);
 
 	}
 
-	private KnownSignal from(DemandResponseEventSignalNameEnum signalName, DemandResponseEventSignalTypeEnum signalType,
+	private List<KnownSignal> from(String signalName, DemandResponseEventSignalTypeEnum signalType,
 			List<KnownUnit> units) {
-		KnownSignal knownSignal = new KnownSignal();
-		KnownSignalId knownSignalId = new KnownSignalId();
-		knownSignalId.setSignalName(signalName);
-		knownSignalId.setSignalType(signalType);
-		knownSignal.setKnownSignalId(knownSignalId);
-		knownSignal.setUnits(units);
-		return knownSignal;
+		return units != null ? units.stream().map(u -> {
+			KnownSignal knownSignal = new KnownSignal();
+			KnownSignalId knownSignalId = new KnownSignalId();
+			knownSignalId.setSignalName(signalName);
+			knownSignalId.setSignalType(signalType);
+			knownSignalId.setUnit(u);
+			knownSignal.setKnownSignalId(knownSignalId);
+
+			return knownSignal;
+		}).collect(Collectors.toList()) : new ArrayList<>();
+
 	}
 
 }

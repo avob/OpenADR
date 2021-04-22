@@ -3,9 +3,11 @@ package com.avob.openadr.server.common.vtn.models.ven;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 
@@ -35,5 +37,10 @@ public interface VenDao extends CrudRepository<Ven, Long>, JpaSpecificationExecu
 
 	@Query("select ven from Ven ven join ven.venMarketContexts mc where mc.name in :marketContextName")
 	public List<Ven> findByVenMarketContextsName(@Param("marketContextName") List<String> marketContextName);
+
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE Ven v set v.last_update_datetime =?1 where v.id = ?2", nativeQuery = true)
+	void updateLastUpdateDatetime(Long datetime, Long venInternalId);
 
 }

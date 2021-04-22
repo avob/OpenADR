@@ -7,6 +7,7 @@ import javax.persistence.Table;
 
 import com.avob.openadr.server.common.vtn.models.user.AbstractUser;
 import com.avob.openadr.server.common.vtn.models.ven.Ven;
+import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.capability.OtherReportCapability;
 
 @Entity
@@ -24,6 +25,10 @@ public class OtherReportRequest extends ReportRequest {
 	@ManyToOne
 	@JoinColumn(name = "requestor_id")
 	private AbstractUser requestor;
+
+	@ManyToOne
+	@JoinColumn(name = "venmarketcontext_requestor_id")
+	private VenMarketContext venMarketContextRequestor;
 
 	public OtherReportCapability getOtherReportCapability() {
 		return otherReportCapability;
@@ -47,6 +52,14 @@ public class OtherReportRequest extends ReportRequest {
 
 	public void setRequestor(AbstractUser requestor) {
 		this.requestor = requestor;
+	}
+
+	public VenMarketContext getVenMarketContextRequestor() {
+		return venMarketContextRequestor;
+	}
+
+	public void setVenMarketContextRequestor(VenMarketContext venMarketContextRequestor) {
+		this.venMarketContextRequestor = venMarketContextRequestor;
 	}
 
 }

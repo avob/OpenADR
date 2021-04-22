@@ -64,6 +64,7 @@ import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportR
 import com.avob.openadr.server.oadr20b.vtn.models.venreport.request.OtherReportRequestSpecifierSpecification;
 import com.avob.openadr.server.oadr20b.vtn.service.VenDistributeService;
 import com.avob.openadr.server.oadr20b.vtn.service.VenOptService;
+import com.avob.openadr.server.oadr20b.vtn.service.VenRequestReportService;
 import com.avob.openadr.server.oadr20b.vtn.service.dtomapper.Oadr20bDtoMapper;
 import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNEiReportService;
 import com.avob.openadr.server.oadr20b.vtn.service.report.OtherReportCapabilityDescriptionService;
@@ -98,6 +99,9 @@ public class Oadr20bVenController {
 
 	@Resource
 	private VenDistributeService venDistributeService;
+
+	@Resource
+	private VenRequestReportService venRequestReportService;
 
 	@Resource
 	private OtherReportCapabilityService otherReportCapabilityService;
@@ -233,7 +237,7 @@ public class Oadr20bVenController {
 			throws Oadr20bMarshalException, OadrElementNotFoundException, Oadr20bApplicationLayerException {
 		Ven ven = checkVen(venID);
 		AbstractUser requestor = abstractUserDao.findOneByUsername(r.getUserPrincipal().getName());
-		reportService.subscribe(requestor, ven, subscriptions);
+		venRequestReportService.subscribe(requestor, ven, subscriptions);
 	}
 
 	/**
@@ -252,7 +256,7 @@ public class Oadr20bVenController {
 			throws Oadr20bMarshalException, OadrElementNotFoundException, Oadr20bApplicationLayerException {
 		Ven ven = checkVen(venID);
 		AbstractUser requestor = abstractUserDao.findOneByUsername(r.getUserPrincipal().getName());
-		reportService.request(requestor, ven, requests);
+		venRequestReportService.request(requestor, ven, requests);
 	}
 
 	/**
@@ -312,30 +316,30 @@ public class Oadr20bVenController {
 		String[] split = reportRequestId.split(",");
 
 		for (String s : split) {
-			reportService.unsubscribe(ven, s);
+			venRequestReportService.unsubscribe(ven, s);
 		}
 	}
 
 	@RequestMapping(value = "/{venID}/report_action/requestRegister", method = RequestMethod.POST)
 	@ResponseBody
 	public void requestRegisterReport(@PathVariable("venID") String venID)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
+			throws Oadr20bMarshalException, OadrElementNotFoundException, Oadr20bApplicationLayerException {
 
 		LOGGER.debug("Request RegisterReport from VEN: " + venID);
 
 		Ven ven = checkVen(venID);
-		reportService.distributeRequestMetadataOadrCreateReportPayload(ven);
+		venDistributeService.distributeRequestMetadataOadrCreateReportPayload(ven);
 	}
 
 	@RequestMapping(value = "/{venID}/report_action/sendRegister", method = RequestMethod.POST)
 	@ResponseBody
 	public void sendRegisterReport(@PathVariable("venID") String venID)
-			throws Oadr20bMarshalException, OadrElementNotFoundException {
+			throws Oadr20bMarshalException, OadrElementNotFoundException, Oadr20bApplicationLayerException {
 
 		LOGGER.debug("Send RegisterReport to VEN: " + venID);
 
 		Ven ven = checkVen(venID);
-		reportService.distributeOadrRegisterReport(ven);
+		venDistributeService.distributeOadrRegisterReport(ven);
 	}
 
 	@RequestMapping(value = "/{venID}/report_action/cancel", method = RequestMethod.POST)

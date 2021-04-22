@@ -324,10 +324,10 @@ public class MultiVtnConfig {
 								.build());
 					}
 				}
-				if (oadrSamplingRate.getOadrMinPeriod() != null) {
+				if (oadrSamplingRate.getOadrMaxPeriod() != null) {
 					maxSamplingRateMillis = Oadr20bFactory
 							.xmlDurationToMillisecond(oadrSamplingRate.getOadrMaxPeriod());
-					if (reportBackDurationMillis > maxSamplingRateMillis) {
+					if (reportBackDurationMillis < maxSamplingRateMillis) {
 						throw new Oadr20bInvalidReportRequestException(Oadr20bResponseBuilders
 								.newOadr20bResponseBuilder(requestId,
 										Oadr20bApplicationLayerErrorCode.REPORT_NOT_SUPPORTED_461, vtnConfig.getVenId())
