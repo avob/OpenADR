@@ -1,5 +1,7 @@
 package com.avob.openadr.server.common.vtn.models.demandresponseevent;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -13,5 +15,7 @@ public interface DemandResponseEventDao
 		extends PagingAndSortingRepository<DemandResponseEvent, Long>, JpaSpecificationExecutor<DemandResponseEvent> {
 
 	public void deleteByIdIn(Iterable<Long> entities);
+
+	public List<Long> findAllActivePeriodStartByDescriptorMarketContextName(String marketContextName);
 
 }

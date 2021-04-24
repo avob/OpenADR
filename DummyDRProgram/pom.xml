@@ -126,6 +126,16 @@
 							<apiPackage>com.avob.server.oadrvtn20b.api</apiPackage>
 							<modelPackage>com.avob.server.oadrvtn20b.model</modelPackage>
 							<invokerPackage>com.avob.server.oadrvtn20b.handler</invokerPackage>
+
+
+
+							<languageSpecificPrimitives>true</languageSpecificPrimitives>
+							<typeMappings>
+								<typeMapping>ZonedDateTime=java.time.ZonedDateTime</typeMapping>
+							</typeMappings>
+							<importMappings>
+								<importMapping>LocalDateTime=ZonedDateTime</importMapping>
+							</importMappings>
 						</configuration>
 
 					</execution>

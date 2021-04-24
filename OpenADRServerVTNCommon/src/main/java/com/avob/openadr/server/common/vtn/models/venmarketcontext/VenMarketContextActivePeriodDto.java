@@ -1,9 +1,7 @@
 package com.avob.openadr.server.common.vtn.models.venmarketcontext;
 
-import javax.validation.constraints.NotNull;
-
 public class VenMarketContextActivePeriodDto {
-	
+
 	/**
 	 * Event active state duration as xml duration
 	 */

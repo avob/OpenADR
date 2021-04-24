@@ -58,10 +58,10 @@ public class DemandResponseEventService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DemandResponseEventService.class);
 
-private static final Integer DEFAULT_SEARCH_SIZE = 10;
-	
-	private static final Sort DEFAULT_SEARCH_SORT =  Sort.by(Sort.Direction.ASC, "activePeriod.start");
-	
+	private static final Integer DEFAULT_SEARCH_SIZE = 10;
+
+	private static final Sort DEFAULT_SEARCH_SORT = Sort.by(Sort.Direction.ASC, "activePeriod.start");
+
 	@Value("${oadr.supportPush:#{false}}")
 	private Boolean supportPush;
 
@@ -441,8 +441,8 @@ private static final Integer DEFAULT_SEARCH_SIZE = 10;
 		return search(filters, null, start, end, null, null);
 	}
 
-	public Page<DemandResponseEvent> search(List<DemandResponseEventFilter> filters, List<DemandResponseEventSort> sorts, Long start, Long end, Integer page,
-			Integer size) {
+	public Page<DemandResponseEvent> search(List<DemandResponseEventFilter> filters,
+			List<DemandResponseEventSort> sorts, Long start, Long end, Integer page, Integer size) {
 		if (page == null) {
 			page = 0;
 		}
@@ -459,19 +459,19 @@ private static final Integer DEFAULT_SEARCH_SIZE = 10;
 		} else if (end != null) {
 			spec = spec.and(DemandResponseEventSpecification.hasActivePeriodEndNullOrBefore(end));
 		}
-		
+
 		Sort sort = DEFAULT_SEARCH_SORT;
-		if( sorts != null && !sorts.isEmpty()) {
+		if (sorts != null && !sorts.isEmpty()) {
 			sort = null;
-			for(DemandResponseEventSort s : sorts) {
+			for (DemandResponseEventSort s : sorts) {
 				Sort by = Sort.by(s.getType(), s.getProperty());
-				if(sort == null) {
+				if (sort == null) {
 					sort = by;
 				} else {
-					sort= sort.and(by);
+					sort = sort.and(by);
 				}
 			}
-		} 
+		}
 
 		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size, sort));
 	}
@@ -496,6 +496,10 @@ private static final Integer DEFAULT_SEARCH_SIZE = 10;
 		}
 
 		return demandResponseEventDao.findAll(spec, PageRequest.of(page, size, DEFAULT_SEARCH_SORT));
+	}
+
+	public List<Long> findAllActivePeriodStartByDescriptorMarketContextName(String marketContextName) {
+		return demandResponseEventDao.findAllActivePeriodStartByDescriptorMarketContextName(marketContextName);
 	}
 
 }

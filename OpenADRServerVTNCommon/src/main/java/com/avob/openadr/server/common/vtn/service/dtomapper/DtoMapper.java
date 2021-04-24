@@ -3,6 +3,7 @@ package com.avob.openadr.server.common.vtn.service.dtomapper;
 import static org.dozer.loader.api.FieldsMappingOptions.customConverter;
 import static org.dozer.loader.api.FieldsMappingOptions.customConverterId;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +72,7 @@ public class DtoMapper {
 	@PostConstruct
 	public void init() {
 		mapper = new DozerBeanMapper();
+
 		Map<String, CustomConverter> customConvertersWithId = new HashMap<>();
 		customConvertersWithId.put(MARKET_CONTEXT_CONVERTER_ID, marketContextConverter);
 		customConvertersWithId.put(VEN_CONVERTER_ID, venConverter);
@@ -87,6 +89,9 @@ public class DtoMapper {
 		mapper.addMapping(knownUnitMappingConfiguration());
 		mapper.addMapping(knownSignalMappingConfiguration());
 		mapper.addMapping(knownReportMappingConfiguration());
+
+		this.mapper.setMappingFiles(Collections.singletonList("dozerJdk8Converters.xml"));
+
 	}
 
 	public <T> T map(Object src, Class<T> klass) {

@@ -3,6 +3,7 @@ package com.avob.openadr.server.oadr20b.vtn.service.dtomapper;
 import static org.dozer.loader.api.FieldsMappingOptions.customConverter;
 import static org.dozer.loader.api.FieldsMappingOptions.customConverterId;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,6 +57,7 @@ public class Oadr20bDtoMapper extends DtoMapper {
 		this.mapper.addMapping(reportRequestMappingconfiguration());
 		this.mapper.addMapping(venReportRequestCapabilityMappingConfiguration());
 		this.mapper.addMapping(venReportRequestCapabilityDescriptionMappingConfiguration());
+		
 
 	}
 

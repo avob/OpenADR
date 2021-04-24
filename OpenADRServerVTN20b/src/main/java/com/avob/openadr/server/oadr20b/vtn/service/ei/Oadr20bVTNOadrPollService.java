@@ -63,6 +63,9 @@ public class Oadr20bVTNOadrPollService {
 	}
 
 	public Object request(Ven ven, Object payload) {
+
+		venService.updateLastUpdateDatetime(ven);
+
 		if (payload instanceof OadrPollType) {
 
 			LOGGER.info(ven.getUsername() + " - OadrPoll");

@@ -1,8 +1,8 @@
  {
  	"name": "CapacityBidingProgram",
- 	"description": "CapacityBidingProgram"
- 	, "color": ""
- 	, "activePeriod": {
+ 	"description": "CapacityBidingProgram",
+ 	"color": "",
+ 	"activePeriod": {
  		"duration": "PT30M",
  		"notificationDuration": "PT4H",
  		"toleranceDuration": "PT1M"
@@ -28,12 +28,12 @@
  			"value": 2.0
  		}],
  		"itemBase": {
- 			"itemDescription":"RealPower",
- 			"itemUnits":"W",
- 			"siScaleCode":"k",
- 			"xmlType":"PowerRealType"
+ 			"itemDescription": "RealPower",
+ 			"itemUnits": "W",
+ 			"siScaleCode": "k",
+ 			"xmlType": "PowerRealType"
  		}
- 		
+
  	}, {
  		"signalName": "LOAD_DISPATCH",
  		"signalType": "SETPOINT",
@@ -49,27 +49,35 @@
  			"value": 900
  		}],
  		"itemBase": {
- 			"itemDescription":"RealPower",
- 			"itemUnits":"W",
- 			"siScaleCode":"k",
- 			"xmlType":"PowerRealType"
+ 			"itemDescription": "RealPower",
+ 			"itemUnits": "W",
+ 			"siScaleCode": "k",
+ 			"xmlType": "PowerRealType"
  		}
  	}],
  	"targets": [{
-		"targetId": "Smart_Energy_Module",
-		"targetType": "ENDDEVICE_ASSET"
-	}],
-	"reports": [{
-		"reportName": "TELEMETRY_USAGE",
-		"reportType": "usage",
-		"readingType": "Direct Read",
-		"payloadBase": "PayloadFloatType",
-		"itemBase": {
-			"itemDescription":"RealPower",
- 			"itemUnits":"W",
- 			"siScaleCode":"k",
- 			"xmlType":"PowerRealType"
-		}
-
-	}]
+ 		"targetId": "Smart_Energy_Module",
+ 		"targetType": "ENDDEVICE_ASSET"
+ 	}],
+ 	"reports": [{
+ 		"reportName": "TELEMETRY_USAGE",
+ 		"reportType": "usage",
+ 		"readingType": "Direct Read",
+ 		"payloadBase": "PayloadFloatType",
+ 		"itemBase": {
+ 			"itemDescription": "RealPower",
+ 			"itemUnits": "W",
+ 			"siScaleCode": "k",
+ 			"xmlType": "PowerRealType"
+ 		}
+ 	}],
+ 	"demandResponseEventScheduleStrategy": {
+ 		"scheduledCronTimezone": "Europe/Paris",
+ 		"scheduledCronDate": "0 0 12 * * *",
+ 		"scheduledDate": ["2021-04-23T12:00+02:00[Europe/Paris]"]
+ 	},
+ 	"reportSubscriptionStrategy": {
+ 		"preferredGranularity": "",
+ 		"preferredReportBackDuration": ""
+ 	}
  }

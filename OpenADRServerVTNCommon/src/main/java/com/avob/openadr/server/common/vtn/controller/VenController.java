@@ -408,7 +408,7 @@ public class VenController {
 		}
 		ven.getVenMarketContexts().add(marketContext.get());
 		venService.save(ven);
-		marketContextEventPublisher.publish(ven);
+		marketContextEventPublisher.publishMarketContextLinkVenChanged(ven);
 		response.setStatus(HttpStatus.OK_200);
 		LOGGER.info("Add MarketContext: " + marketContext.get().getName() + " to Ven: " + ven.getUsername());
 		return dtoMapper.map(ven, VenCreateDto.class);
@@ -447,7 +447,7 @@ public class VenController {
 				.filter(v -> !marketContextId.equals(v.getId())).collect(Collectors.toSet());
 		ven.setVenMarketContexts(collect);
 		venService.save(ven);
-		marketContextEventPublisher.publish(ven);
+		marketContextEventPublisher.publishMarketContextLinkVenChanged(ven);
 		response.setStatus(HttpStatus.OK_200);
 		LOGGER.info("Remove MarketContext: " + marketContext.get().getName() + " from Ven: " + ven.getUsername());
 	}

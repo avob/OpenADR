@@ -149,27 +149,29 @@ public class VenResourceCreateService {
 
 				}
 
-				VenResource createReportDescription = VenResourceFactory.createReportDescription(ven, desc);
-
-				List<String> endDeviceAssetListId = resourceIdToEndDeviceAssetMap.get(resourceId);
-				if (endDeviceAssetListId == null) {
-					endDeviceAssetListId = new ArrayList<>();
-				}
-				if (!endDeviceAssetListId.contains(endDeviceAsset)) {
-					endDeviceAssetListId.add(endDeviceAsset);
-				}
-				resourceIdToEndDeviceAssetMap.put(resourceId, endDeviceAssetListId);
-
-				List<VenResource> endDeviceAssetList = endDeviceAssetMap.get(resourceId + endDeviceAsset);
-				if (endDeviceAssetList == null) {
-					endDeviceAssetList = new ArrayList<>();
-				}
-				endDeviceAssetList.add(createReportDescription);
-				endDeviceAssetMap.put(resourceId + endDeviceAsset, endDeviceAssetList);
+				
 
 				String key = getReportKey(cap, desc);
 				if (venMarketContextReports.containsKey(key)) {
 					toSubscribe.add(desc);
+					
+					VenResource createReportDescription = VenResourceFactory.createReportDescription(ven, desc);
+
+					List<String> endDeviceAssetListId = resourceIdToEndDeviceAssetMap.get(resourceId);
+					if (endDeviceAssetListId == null) {
+						endDeviceAssetListId = new ArrayList<>();
+					}
+					if (!endDeviceAssetListId.contains(endDeviceAsset)) {
+						endDeviceAssetListId.add(endDeviceAsset);
+					}
+					resourceIdToEndDeviceAssetMap.put(resourceId, endDeviceAssetListId);
+
+					List<VenResource> endDeviceAssetList = endDeviceAssetMap.get(resourceId + endDeviceAsset);
+					if (endDeviceAssetList == null) {
+						endDeviceAssetList = new ArrayList<>();
+					}
+					endDeviceAssetList.add(createReportDescription);
+					endDeviceAssetMap.put(resourceId + endDeviceAsset, endDeviceAssetList);
 				}
 
 			}

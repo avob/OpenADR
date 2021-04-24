@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -82,7 +83,8 @@ public class OadrHttpClientBuilder {
 	/**
 	 * default http headers
 	 */
-	private List<Header> headers = new ArrayList<>();
+	private List<Header> headers = new ArrayList<>(Arrays.asList(new BasicHeader("Content-Type", "application/xml"),
+			new BasicHeader("Accept", "application/xml")));
 
 	/**
 	 * enable http
@@ -113,7 +115,7 @@ public class OadrHttpClientBuilder {
 
 	public static String buildNonce(String key) {
 		// expirationTime + ":" + md5Hex(expirationTime + ":" + key)
-		
+
 		String dateTimeString = Long.toString(OffsetDateTime.now().plusMinutes(5).toEpochSecond() * 1000);
 		String nonce = dateTimeString + ":" + OadrPKISecurity.md5Hex(dateTimeString + ":" + key);
 		return Base64.getEncoder().encodeToString(nonce.getBytes());

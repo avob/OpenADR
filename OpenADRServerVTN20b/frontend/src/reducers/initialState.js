@@ -95,6 +95,7 @@ export default {
   marketContext: {
     marketContext: []
   },
+  marketContextDetail: {},
   known: {
     unit: [],
     signal: [],

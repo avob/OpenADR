@@ -14,7 +14,11 @@ import event_create from './eventCreateReducer'
 import user from './loginReducer'
 import resource from './resourceReducer'
 import marketContext from './marketContextReducer'
+import marketContextDetail from './marketContextDetailReducer'
 import known from './knownReducer'
+
+
+
 
 
 
@@ -36,6 +40,7 @@ const rootReducer = combineReducers({
   user,
   resource,
   marketContext,
+  marketContextDetail,
   known
 })
 

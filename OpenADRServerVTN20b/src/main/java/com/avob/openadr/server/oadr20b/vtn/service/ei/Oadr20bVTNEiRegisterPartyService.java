@@ -234,6 +234,8 @@ public class Oadr20bVTNEiRegisterPartyService implements Oadr20bVTNEiService {
 
 	@Override
 	public Object request(Ven ven, Object payload) {
+		
+		venService.updateLastUpdateDatetime(ven);
 
 		if (payload instanceof OadrCreatePartyRegistrationType) {
 

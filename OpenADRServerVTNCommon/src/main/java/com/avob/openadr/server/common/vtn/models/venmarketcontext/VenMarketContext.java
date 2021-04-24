@@ -79,6 +79,10 @@ public class VenMarketContext implements Serializable {
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private List<Target> targets;
 
+	private VenMarketContextDemandResponseEventScheduleStrategy demandResponseEventScheduleStrategy;
+
+	private VenMarketContextReportSubscriptionStrategy reportSubscriptionStrategy;
+
 	public VenMarketContext() {
 	}
 
@@ -199,5 +203,22 @@ public class VenMarketContext implements Serializable {
 
 	public void setReports(Set<VenMarketContextReport> reports) {
 		this.reports = reports;
+	}
+
+	public VenMarketContextReportSubscriptionStrategy getReportSubscriptionStrategy() {
+		return reportSubscriptionStrategy;
+	}
+
+	public void setReportSubscriptionStrategy(VenMarketContextReportSubscriptionStrategy reportSubscriptionStrategy) {
+		this.reportSubscriptionStrategy = reportSubscriptionStrategy;
+	}
+
+	public VenMarketContextDemandResponseEventScheduleStrategy getDemandResponseEventScheduleStrategy() {
+		return demandResponseEventScheduleStrategy;
+	}
+
+	public void setDemandResponseEventScheduleStrategy(
+			VenMarketContextDemandResponseEventScheduleStrategy demandResponseEventScheduleStrategy) {
+		this.demandResponseEventScheduleStrategy = demandResponseEventScheduleStrategy;
 	}
 }

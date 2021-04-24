@@ -225,6 +225,8 @@ public class Oadr20bVTNEiOptService implements Oadr20bVTNEiService {
 
 	@Override
 	public Object request(Ven ven, Object payload) {
+		
+		venService.updateLastUpdateDatetime(ven);
 
 		if (payload instanceof OadrCreateOptType) {
 

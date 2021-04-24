@@ -22,6 +22,7 @@ import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketConte
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
 import com.avob.openadr.server.common.vtn.service.VenMarketContextService;
 import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
+import com.avob.openadr.server.common.vtn.service.push.MarketContextEventPublisher;
 
 @RestController
 @RequestMapping("/MarketContext")
@@ -31,6 +32,9 @@ public class MarketContextController {
 
 	@Resource
 	private VenMarketContextService venMarketContextService;
+
+	@Resource
+	private MarketContextEventPublisher marketContextEventPublisher;
 
 	@Resource
 	private DtoMapper dtoMapper;
@@ -63,6 +67,8 @@ public class MarketContextController {
 
 		LOGGER.info("create MarketContext: " + marketContext.getName());
 
+		marketContextEventPublisher.publishMarketContextCreate(marketContext);
+
 		return dtoMapper.map(marketContext, VenMarketContextDto.class);
 	}
 
@@ -84,6 +90,8 @@ public class MarketContextController {
 		response.setStatus(HttpStatus.OK_200);
 
 		LOGGER.info("update MarketContext: " + marketContext.getName());
+
+		marketContextEventPublisher.publishMarketContextUpdate(marketContext);
 
 		return dtoMapper.map(marketContext, VenMarketContextDto.class);
 	}
@@ -110,6 +118,8 @@ public class MarketContextController {
 			response.setStatus(HttpStatus.NOT_FOUND_404);
 			return;
 		}
+
+		marketContextEventPublisher.publishMarketContextDelete(findById.get());
 		venMarketContextService.delete(findById.get());
 	}
 

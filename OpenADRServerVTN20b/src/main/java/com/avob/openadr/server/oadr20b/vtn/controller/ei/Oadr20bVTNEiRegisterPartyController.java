@@ -4,6 +4,7 @@ import java.security.Principal;
 
 import javax.annotation.Resource;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +16,7 @@ import com.avob.openadr.model.oadr20b.Oadr20bUrlPath;
 import com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNPayloadService;
 
 @Controller
-@RequestMapping(Oadr20bUrlPath.OADR_BASE_PATH)
+@RequestMapping(value = Oadr20bUrlPath.OADR_BASE_PATH, consumes="application/xml;charset=UTF-8", produces = MediaType.APPLICATION_XML_VALUE)
 public class Oadr20bVTNEiRegisterPartyController {
 
 	@Resource

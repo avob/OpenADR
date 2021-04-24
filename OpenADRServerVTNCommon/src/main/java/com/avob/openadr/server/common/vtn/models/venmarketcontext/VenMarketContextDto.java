@@ -31,6 +31,10 @@ public class VenMarketContextDto {
 
 	private Set<VenMarketContextReportDto> reports;
 
+	private VenMarketContextDemandResponseEventScheduleStrategyDto demandResponseEventScheduleStrategy;
+
+	private VenMarketContextReportSubscriptionStrategyDto reportSubscriptionStrategy;
+
 	public VenMarketContextDto() {
 	}
 
@@ -132,5 +136,23 @@ public class VenMarketContextDto {
 
 	public void setReports(Set<VenMarketContextReportDto> reports) {
 		this.reports = reports;
+	}
+
+	public VenMarketContextReportSubscriptionStrategyDto getReportSubscriptionStrategy() {
+		return reportSubscriptionStrategy;
+	}
+
+	public void setReportSubscriptionStrategy(
+			VenMarketContextReportSubscriptionStrategyDto reportSubscriptionStrategy) {
+		this.reportSubscriptionStrategy = reportSubscriptionStrategy;
+	}
+
+	public VenMarketContextDemandResponseEventScheduleStrategyDto getDemandResponseEventScheduleStrategy() {
+		return demandResponseEventScheduleStrategy;
+	}
+
+	public void setDemandResponseEventScheduleStrategy(
+			VenMarketContextDemandResponseEventScheduleStrategyDto demandResponseEventScheduleStrategy) {
+		this.demandResponseEventScheduleStrategy = demandResponseEventScheduleStrategy;
 	}
 }

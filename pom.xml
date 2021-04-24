@@ -28,11 +28,11 @@
 		<rabbitmq-jms.version>1.11.2</rabbitmq-jms.version>
 		<springfox.version>2.9.2</springfox.version>
 		<dozer.version>5.5.1</dozer.version>
+		<dozer-jdk8-support.version>1.0.6</dozer-jdk8-support.version>
 		<commons-compress.version>1.19</commons-compress.version>
 		<guava.version>21.0	</guava.version>
 		<mokito.version>1.9.5</mokito.version>
 		<common-logging.version>1.2</common-logging.version>
-
 	</properties>
 
 
@@ -125,6 +125,11 @@
 				<groupId>net.sf.dozer</groupId>
 				<artifactId>dozer</artifactId>
 				<version>${dozer.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.craftsman</groupId>
+				<artifactId>dozer-jdk8-support</artifactId>
+				<version>${dozer-jdk8-support.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>

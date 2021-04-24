@@ -15,7 +15,7 @@
             "url": "API license URL"
         }
     },
-    "host": "testlocal:8181",
+    "host": "vtn.oadr.com:8181",
     "basePath": "/testvtn",
     "tags": [
         {
@@ -6271,6 +6271,9 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "itemBase": {
+                    "$ref": "#/definitions/ItemBaseDto"
+                },
                 "lastUpdateDatetime": {
                     "type": "integer",
                     "format": "int64"
@@ -6278,10 +6281,34 @@
                 "lastUpdateValue": {
                     "type": "string"
                 },
+                "readingType": {
+                    "type": "string",
+                    "enum": [
+                        "DIRECT_READ",
+                        "NET",
+                        "ALLOCATED",
+                        "ESTIMATED",
+                        "SUMMED",
+                        "DERIVED",
+                        "MEAN",
+                        "PEAK",
+                        "HYBRID",
+                        "CONTRACT",
+                        "PROJECTED",
+                        "X_RMS",
+                        "X_NOT_APPLICABLE"
+                    ]
+                },
                 "reportRequestId": {
                     "type": "string"
                 },
+                "reportSpecifierId": {
+                    "type": "string"
+                },
                 "rid": {
+                    "type": "string"
+                },
+                "venId": {
                     "type": "string"
                 }
             },
@@ -6643,12 +6670,6 @@
                 "reportOnly": {
                     "type": "boolean"
                 },
-                "resources": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
                 "transport": {
                     "type": "string"
                 },
@@ -6838,6 +6859,24 @@
             },
             "title": "VenMarketContextBaselineDto"
         },
+        "VenMarketContextDemandResponseEventScheduleStrategyDto": {
+            "type": "object",
+            "properties": {
+                "scheduledCronDate": {
+                    "type": "string"
+                },
+                "scheduledCronTimezone": {
+                    "type": "string"
+                },
+                "scheduledDate": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ZonedDateTime"
+                    }
+                }
+            },
+            "title": "VenMarketContextDemandResponseEventScheduleStrategyDto"
+        },
         "VenMarketContextDescriptorDto": {
             "type": "object",
             "properties": {
@@ -6881,6 +6920,9 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "demandResponseEventScheduleStrategy": {
+                    "$ref": "#/definitions/VenMarketContextDemandResponseEventScheduleStrategyDto"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -6897,6 +6939,9 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "reportSubscriptionStrategy": {
+                    "$ref": "#/definitions/VenMarketContextReportSubscriptionStrategyDto"
                 },
                 "reports": {
                     "type": "array",
@@ -6943,6 +6988,18 @@
                 }
             },
             "title": "VenMarketContextReportDto"
+        },
+        "VenMarketContextReportSubscriptionStrategyDto": {
+            "type": "object",
+            "properties": {
+                "preferredGranularity": {
+                    "type": "string"
+                },
+                "preferredReportBackDuration": {
+                    "type": "string"
+                }
+            },
+            "title": "VenMarketContextReportSubscriptionStrategyDto"
         },
         "VenMarketContextSignalDto": {
             "type": "object",

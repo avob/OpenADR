@@ -1,7 +1,5 @@
 package com.avob.openadr.server.common.vtn.models.known;
 
-import java.util.List;
-
 public class KnownReportDto {
 
 	private String reportName;

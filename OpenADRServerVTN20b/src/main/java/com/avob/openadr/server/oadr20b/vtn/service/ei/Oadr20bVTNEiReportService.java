@@ -651,14 +651,14 @@ public class Oadr20bVTNEiReportService implements Oadr20bVTNEiService {
 
 		}
 
-		venService.updateLastUpdateDatetime(ven);
-
 		return Oadr20bEiReportBuilders.newOadr20bUpdatedReportBuilder(requestID, responseCode, venID).build();
 
 	}
 
 	@Override
 	public Object request(Ven ven, Object payload) {
+
+		venService.updateLastUpdateDatetime(ven);
 
 		if (payload instanceof OadrRegisterReportType) {
 

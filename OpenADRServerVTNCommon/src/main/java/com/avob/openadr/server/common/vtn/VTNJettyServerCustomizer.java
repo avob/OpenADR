@@ -17,7 +17,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-
 import org.springframework.boot.web.embedded.jetty.JettyServerCustomizer;
 
 import com.avob.openadr.security.exception.OadrSecurityException;

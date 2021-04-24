@@ -2,10 +2,12 @@ package com.avob.openadr.dummy;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
@@ -39,11 +41,15 @@ import com.avob.server.oadrvtn20b.api.Oadr20bVenControllerApi;
 import com.avob.server.oadrvtn20b.api.ReportControllerApi;
 import com.avob.server.oadrvtn20b.api.VenControllerApi;
 import com.avob.server.oadrvtn20b.handler.ApiClient;
+import com.avob.server.oadrvtn20b.handler.JSON;
 import com.avob.server.oadrvtn20b.model.OtherReportDataFloatDto;
 import com.avob.server.oadrvtn20b.model.VenMarketContextDto;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import com.rabbitmq.jms.admin.RMQConnectionFactory;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -110,6 +116,18 @@ public class DummyVTN20bControllerConfig {
 	@Value("${" + CONTEXT_MARKET_TEMPLATE + "}")
 	private String contextMarketTemplate;
 
+	private Gson gson = new GsonBuilder().registerTypeAdapter(ZonedDateTime.class, new TypeAdapter<ZonedDateTime>() {
+		@Override
+		public void write(JsonWriter out, ZonedDateTime value) throws IOException {
+			out.value(value.toString());
+		}
+
+		@Override
+		public ZonedDateTime read(JsonReader in) throws IOException {
+			return ZonedDateTime.parse(in.nextString());
+		}
+	}).enableComplexMapKeySerialization().create();
+
 	@Bean
 	public ApiClient apiClient() throws OadrSecurityException {
 		ApiClient client = new ApiClient();
@@ -125,6 +143,10 @@ public class DummyVTN20bControllerConfig {
 		client.setHttpClient(okHttpClient);
 
 		client.setBasePath(oadrVtnUrl);
+
+		JSON json = new JSON(client);
+		json.setGson(gson);
+		client.setJSON(json);
 
 		return client;
 	}
@@ -234,8 +256,6 @@ public class DummyVTN20bControllerConfig {
 
 	@Bean
 	public List<VenMarketContextDto> marketContexts() {
-
-		Gson gson = new Gson();
 
 		return getContextMarketTemplate().stream().map(p -> {
 			JsonReader reader;

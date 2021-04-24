@@ -1,5 +1,6 @@
 package com.avob.openadr.server.oadr20b.vtn;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,7 @@ public class SwaggerConfig {
 		build.protocols(Sets.newHashSet("https"));
 		build.apiInfo(apiInfo());
 		build.additionalModels(typeResolver.resolve(VenReportDto.class));
+		build.directModelSubstitute(ZonedDateTime.class, java.util.Date.class);
 		return build;
 	}
 
