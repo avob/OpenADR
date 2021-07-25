@@ -10,11 +10,10 @@ public class KnownReportDto {
 
 	private String payloadBase;
 
-	private KnownUnitDto unit;
+	private KnownUnitDto itemBase;
 
 	public KnownReportDto() {
 	}
-
 
 	public String getReportName() {
 		return reportName;
@@ -48,14 +47,12 @@ public class KnownReportDto {
 		this.payloadBase = payloadBase;
 	}
 
-
-	public KnownUnitDto getUnit() {
-		return unit;
+	public KnownUnitDto getItemBase() {
+		return itemBase;
 	}
 
-
-	public void setUnit(KnownUnitDto unit) {
-		this.unit = unit;
+	public void setItemBase(KnownUnitDto itemBase) {
+		this.itemBase = itemBase;
 	}
 
 }

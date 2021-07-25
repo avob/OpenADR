@@ -26,13 +26,7 @@
  		}, {
  			"duration": "PT15M",
  			"value": 2.0
- 		}],
- 		"itemBase": {
- 			"itemDescription": "RealPower",
- 			"itemUnits": "W",
- 			"siScaleCode": "k",
- 			"xmlType": "PowerRealType"
- 		}
+ 		}]
 
  	}, {
  		"signalName": "LOAD_DISPATCH",

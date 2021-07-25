@@ -32,6 +32,7 @@ import Paper from '@material-ui/core/Paper';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import { VenActionDialog } from '../common/VtnconfigurationDialog'
+import {H1} from '../common/Structure'
 
 
 
@@ -179,9 +180,7 @@ export class VenDetailPage extends React.Component {
     <Paper>
     <Toolbar>
             <div style={{flex: '0 0 auto'}}>
-              <Typography variant="h6" id="tableTitle">
-                  {ven_detail.ven.commonName}
-                </Typography>
+              <H1 value={ven_detail.ven.commonName} />
             </div>
             <div style={{flex: '1 1 100%'}} />
             <div style={{ flex: '0 0 auto'}}>
@@ -195,6 +194,8 @@ export class VenDetailPage extends React.Component {
 
 
         </Toolbar>
+            <Divider/>
+
       <Tabs value={ this.state.value }
             onChange={ this.handleChange }
             indicatorColor="primary"
@@ -207,7 +208,7 @@ export class VenDetailPage extends React.Component {
         <Tab label="Enrollments" />
         <Tab label="Groups" />
       </Tabs>
-      <Divider style={{margin: "20px 0"}}/>
+      <Divider/>
       { value === 0 && 
                          <VenDetailSettings classes={ classes }
                                             ven={ ven_detail.ven }

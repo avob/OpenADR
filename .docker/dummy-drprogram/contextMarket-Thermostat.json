@@ -1,0 +1,101 @@
+ {
+ 	"name": "Thermostat",
+ 	"description": "Thermostat",
+ 	"color": "",
+ 	"activePeriod": {
+ 		"duration": "PT4H",
+ 		"notificationDuration": "P1D",
+ 		"toleranceDuration": "PT5M"
+ 	},
+ 	"descriptor": {
+ 		"marketContext": "DummyMarketContext",
+ 		"oadrProfile": "OADR20B",
+ 		"responseRequired": "ALWAYS"
+ 	},
+ 	"baseline": {
+ 		"baselineId": "0",
+ 		"baselineName": "temperature",
+ 		"itemBase": {
+ 			"itemDescription":"temperature",
+ 			"itemUnits":"celsius",
+ 			"siScaleCode":"none",
+ 			"xmlType":"TemperatureType"
+ 		},
+ 		"intervals": [{
+ 			"duration": "PT4H",
+ 			"value": 21.0
+ 		}]
+ 	},
+ 	"signals": [{
+ 		"signalName": "SIMPLE",
+ 		"signalType": "LEVEL",
+ 		"targets": [{
+ 			"targetId": "Thermostat",
+ 			"targetType": "ENDDEVICE_ASSET"
+ 		}],
+ 		"intervals": [{
+ 			"duration": "PT2H",
+ 			"value": 1.0
+ 		}, {
+ 			"duration": "PT2H",
+ 			"value": 2.0
+ 		}]
+ 		
+ 	}, {
+ 		"signalName": "LOAD_CONTROL",
+ 		"signalType": "X_LOAD_CONTROL_LEVEL_OFFSET",
+ 		"targets": [{
+ 			"targetId": "Thermostat",
+ 			"targetType": "ENDDEVICE_ASSET"
+ 		}],
+ 		"intervals": [{
+ 			"duration": "PT2H",
+ 			"value": 1.0
+ 		}, {
+ 			"duration": "PT2H",
+ 			"value": 2.0
+ 		}],
+ 		"itemBase": {
+ 			"itemDescription":"temperature",
+ 			"itemUnits":"celsius",
+ 			"siScaleCode":"none",
+ 			"xmlType":"TemperatureType"
+ 		}
+ 	}],
+ 	"targets": [{
+		"targetId": "Thermostat",
+ 			"targetType": "ENDDEVICE_ASSET"
+	}],
+ 	"reports": [{
+ 		"reportName": "TELEMETRY_USAGE",
+ 		"reportType": "usage",
+ 		"readingType": "Direct Read",
+ 		"payloadBase": "PayloadFloatType",
+ 		"itemBase": {
+ 			"itemDescription":"temperature",
+ 			"itemUnits":"celsius",
+ 			"siScaleCode":"none",
+ 			"xmlType":"TemperatureType"
+ 		}
+ 	}, {
+ 		"reportName": "TELEMETRY_USAGE",
+ 		"reportType": "usage",
+ 		"readingType": "Direct Read",
+ 		"payloadBase": "PayloadFloatType",
+ 		"itemBase": {
+ 			"itemDescription":"humidity",
+ 			"itemUnits":"percent",
+ 			"siScaleCode":"none",
+ 			"xmlType":"BaseUnitType"
+ 		}
+ 	}],
+ 	"demandResponseEventScheduleStrategy": {
+ 		"scheduledCronTimezone": "Europe/Paris",
+ 		"scheduledCronDate": "0 0 12 * * *",
+ 		"scheduledDate": ["2021-04-23T12:00+02:00[Europe/Paris]"]
+ 	},
+ 	"reportSubscriptionStrategy": {
+ 		"preferredGranularity": "",
+ 		"preferredReportBackDuration": ""
+ 	}
+ }

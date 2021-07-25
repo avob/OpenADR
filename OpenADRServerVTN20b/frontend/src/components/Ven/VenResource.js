@@ -16,6 +16,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import Toolbar from '@material-ui/core/Toolbar';
 import FilterListIcon from '@material-ui/icons/FilterList';
+import { H1 } from '../common/Structure'
 
 import FilterPanel from '../common/FilterPanel' 
 
@@ -458,9 +459,7 @@ export class VenResource extends React.Component {
     <div className={ classes.root }>
     <Toolbar>
       <div style={{flex: '0 0 auto'}}>
-        <Typography variant="h6" id="tableTitle">
-            Resources
-          </Typography>
+         <H1 value="Resources"/>
       </div>
       <div style={{flex: '1 1 100%'}}></div>
       <div style={{flex: '0 0 auto'}}></div>

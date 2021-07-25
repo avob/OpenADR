@@ -8,6 +8,8 @@ public class KnownUnitDto {
 
 	private String xmlType;
 	
+	private String siScaleCode = "none";
+	
 	private String attributes;
 	
 	public String getItemDescription() {
@@ -40,6 +42,14 @@ public class KnownUnitDto {
 
 	public void setAttributes(String attributes) {
 		this.attributes = attributes;
+	}
+
+	public String getSiScaleCode() {
+		return siScaleCode;
+	}
+
+	public void setSiScaleCode(String siScaleCode) {
+		this.siScaleCode = siScaleCode;
 	}
 
 }

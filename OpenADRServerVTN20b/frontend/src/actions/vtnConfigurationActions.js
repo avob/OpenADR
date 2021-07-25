@@ -52,6 +52,33 @@ export const loadMarketContext = () => {
   }
 }
 
+export const getMarketContext = (marketContextName) => {
+  var params = {marketContextName}
+  return (dispatch) => {
+    dispatch({
+      type: types.GET_MARKET_CONTEXT,
+      swagger: function (api) {
+        api.apis['market-context-controller'].findMarketContextByNameUsingGET(params, {
+          responseContentType: 'application/json'
+        })
+          .then(data => {
+            const marketContext = JSON.parse(data.data)
+            dispatch({
+              type: types.GET_MARKET_CONTEXT_SUCCESS,
+              payload: marketContext
+            })
+          })
+          .catch(err => {
+            dispatch({
+              type: types.GET_MARKET_CONTEXT_ERROR,
+              payload: err
+            })
+          })
+      }
+    })
+  }
+}
+
 export const createMarketContext = (marketContext) => {
   return (dispatch, getState) => {
     dispatch({

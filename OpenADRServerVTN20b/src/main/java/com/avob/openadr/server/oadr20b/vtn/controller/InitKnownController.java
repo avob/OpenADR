@@ -143,6 +143,7 @@ public class InitKnownController {
 		knownUnitId.setItemDescription(createItemBase.getItemDescription());
 		knownUnitId.setItemUnits(createItemBase.getItemUnits());
 		knownUnitId.setXmlType(createItemBase.getXmlType());
+		knownUnitId.setSiScaleCode(createItemBase.getSiScaleCode());
 		unit.setKnownUnitId(knownUnitId);
 		unit.setAttributes(createItemBase.getAttributes());
 		return unit;
@@ -186,7 +187,7 @@ public class InitKnownController {
 			knownReport.getKnownReportId().setReportType(reportType);
 			knownReport.getKnownReportId().setReadingType(readingType);
 			knownReport.getKnownReportId().setPayloadBase(payloadBase);
-			knownReport.getKnownReportId().setUnit(u);
+			knownReport.getKnownReportId().setItemBase(u.getKnownUnitId());
 			return knownReport;
 		}).collect(Collectors.toList()) : new ArrayList<>();
 
@@ -284,7 +285,7 @@ public class InitKnownController {
 			KnownSignalId knownSignalId = new KnownSignalId();
 			knownSignalId.setSignalName(signalName);
 			knownSignalId.setSignalType(signalType);
-			knownSignalId.setUnit(u);
+			knownSignalId.setItemBase(u.getKnownUnitId());
 			knownSignal.setKnownSignalId(knownSignalId);
 
 			return knownSignal;

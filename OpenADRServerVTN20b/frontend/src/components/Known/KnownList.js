@@ -10,28 +10,24 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Toolbar from '@material-ui/core/Toolbar';
 
+import UnitPanel from '../common/UnitPanel'
+import SignalTable from '../common/SignalTable'
+import ReportTable from '../common/ReportTable'
+import Paper from '@material-ui/core/Paper';
+import { Panel, H1 } from '../common/Structure'
+
 import { history } from '../../store/configureStore';
 
 var KnownUnitTable = (props) => {
   const {classes, unit} = props
   return (
-    <div className={classes.root}>
-      <Toolbar
-      className={classes.root}
-    >
-      <div className={classes.title} style={{ flex: 1 }}>
-         <Typography variant="h6" id="tableTitle">
-             Units
-          </Typography>
-      </div>
-    </Toolbar>
+    <Panel title="Units">
       <Table className={classes.table}>
         <TableHead>
           <TableRow>
-            <TableCell>Item description</TableCell>
-            <TableCell>Item units</TableCell>
-            <TableCell>Type</TableCell>
-            <TableCell></TableCell>
+            <TableCell>Description</TableCell>
+            <TableCell>Units</TableCell>
+            <TableCell>SiscaleCode</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -39,90 +35,12 @@ var KnownUnitTable = (props) => {
             <TableRow key={row.itemDescription+ row.itemUnits+ row.xmlType}>
               <TableCell>{row.itemDescription}</TableCell>
               <TableCell>{row.itemUnits}</TableCell>
-              <TableCell>{row.xmlType}</TableCell>
-
+              <TableCell>{row.siScaleCode}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-    </div>
-  )
-
-}
-
-var KnownSignalTable = (props) => {
-  const {classes, signal} = props
-  return (
-    <div className={classes.root}>
-      <Toolbar
-      className={classes.root}
-    >
-      <div className={classes.title} style={{ flex: 1 }}>
-         <Typography variant="h6" id="tableTitle">
-             Signals
-          </Typography>
-      </div>
-    </Toolbar>
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Signal name</TableCell>
-            <TableCell>Signal type</TableCell>
-            <TableCell>Signal unit</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {signal && signal.map(row => (
-            <TableRow key={row.signalName+row.signalType}>
-              <TableCell>{row.signalName}</TableCell>
-              <TableCell>{row.signalType}</TableCell>
-              <TableCell>{row.unit ? row.unit.itemDescription + "-" + row.unit.itemUnits : null}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  )
-
-}
-
-var KnownReportTable = (props) => {
-  const {classes, report} = props
-  console.log(report)
-  return (
-    <div className={classes.root}>
-      <Toolbar
-      className={classes.root}
-    >
-      <div className={classes.title} style={{ flex: 1 }}>
-         <Typography variant="h6" id="tableTitle">
-             Reports
-          </Typography>
-      </div>
-    </Toolbar>
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Report name</TableCell>
-            <TableCell>Report type</TableCell>
-            <TableCell>Reading type</TableCell>
-            <TableCell>Payload</TableCell>
-            <TableCell>Report unit</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {report && report.map(row => (
-            <TableRow key={row.reportName+row.reportType}>
-              <TableCell>{row.reportName}</TableCell>
-              <TableCell>{row.reportType}</TableCell>
-              <TableCell>{row.readingType}</TableCell>
-              <TableCell>{row.payloadBase}</TableCell>
-              <TableCell>{row.unit ? row.unit.itemDescription + "-" + row.unit.itemUnits : null}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+      </Panel>
   )
 
 }
@@ -174,6 +92,17 @@ export class KnownList extends React.Component {
     const {value} = this.state;
     return (
     <div className={ classes.root }>
+    <Paper>
+      <Toolbar>
+        <div style={{flex: '0 0 auto'}}>
+          <H1 value="Known Entities" />
+        </div>
+        <div style={{flex: '1 1 100%'}} />
+        <div style={{ flex: '0 0 auto'}}>
+
+        </div>
+      </Toolbar>
+      <Divider/>
       <Tabs value={ this.state.value }
             onChange={ this.handleChange }
             indicatorColor="primary"
@@ -186,10 +115,13 @@ export class KnownList extends React.Component {
       <Divider variant="middle" />
       { value === 0 && <KnownUnitTable classes={classes} unit={unit}/>
                         }
-      { value === 1 && <KnownSignalTable classes={classes} signal={signal}/>
+      { value === 1 && <SignalTable classes={classes} signal={signal}/>
                        }
-      { value === 2 && <KnownReportTable classes={classes} report={report}/>
+      { value === 2 && <ReportTable classes={classes} report={report}/>
+           
                        }
+
+       </Paper>
     </div>
 
     );

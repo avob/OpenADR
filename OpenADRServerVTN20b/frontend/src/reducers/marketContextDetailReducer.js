@@ -14,16 +14,16 @@ export default function marketContextDetailReducer (state = initialState.marketC
 
 
       // MARKET CONTEXT
-    case types.LOAD_MARKET_CONTEXT:
+    case types.GET_MARKET_CONTEXT:
       return state
 
-    case types.LOAD_MARKET_CONTEXT_SUCCESS:
+    case types.GET_MARKET_CONTEXT_SUCCESS:
       newState = objectAssign({}, state, {
         marketContext: action.payload
       })
       return newState
 
-    case types.LOAD_MARKET_CONTEXT_ERROR:
+    case types.GET_MARKET_CONTEXT_ERROR:
       return state
 
     case types.CREATE_MARKET_CONTEXT:
@@ -48,7 +48,7 @@ export default function marketContextDetailReducer (state = initialState.marketC
 
     // LOCATION
     case types.LOCATION_CHANGE:
-      if (action.payload.location.pathname.includes('/marketcontext')) {
+      if (action.payload.location.pathname.includes('/marketcontext/detail')) {
         return state
       } else {
         return initialState.marketContextDetail

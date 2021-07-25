@@ -2,6 +2,13 @@ import React from 'react';
 import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
 import {EventSignalPanel} from '../common/EventSignalPanel'
+import DetailedSignalTable from '../common/DetailedSignalTable'
+import DetailedBaselineTable from '../common/DetailedBaselineTable'
+import TargetTable from '../common/TargetTable'
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
+
+import {Panel} from '../common/Structure'
 
 export class EventDetailSignal extends React.Component {
 
@@ -12,49 +19,29 @@ export class EventDetailSignal extends React.Component {
     this.props.addCopySignals();
   }
 
-  handleEventSignalChange = (index) => (newSignal) => {
-    this.props.updateCopySignals(index, newSignal);
-  }
-
-  handleRemoveEventSignalChange = (index) => () => {
-    this.props.removeCopySignals(index);
-  }
-
-  handlePublishEventClick = () => {
-    this.props.publishEvent(this.props.event.id);
-  }
-
-
   render() {
-    const {classes, event, group, ven} = this.props;
+    const {classes, event} = this.props;
     var that = this;
     var hasError = false;
+    var signals = event.signals;
+    var baseline = event.baseline;
+    var targets = event.targets;
 
     return (
     <div className={ classes.root } >
-       {event.signals && event.signals.map((signal, index) => {
-          return (
-            <div key={"signal_panel_"+index}>
-            {(index !==0) ? <Grid container>
-              <Grid item xs={ 12 }>
-                <Divider />
-              </Grid>
-            </Grid> : null}
+         
+          
+          <Panel classes={classes}  title="Signals">
+            <DetailedSignalTable classes={classes} signal={signals}/>
+          </Panel>
+          <Panel classes={classes}  title="Baseline">
+            <DetailedBaselineTable classes={classes} baseline={baseline}/>
+          </Panel>
+          <Panel classes={classes}  title="Targets">
+            <TargetTable classes={classes} targets={targets}/>
+          </Panel>
+         
 
-            <EventSignalPanel 
-              classes={classes} eventSignal={signal} hasError={hasError} index={index}
-                onChange={that.handleEventSignalChange(index)}
-                onRemove={that.handleRemoveEventSignalChange(index)}
-                canBeRemoved={event.signals.length >0}
-                group={group}
-        ven={ven}
-        onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
-        onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
-        onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}/>
-                
-            </div>
-        )
-        })}
 
     </div>
     );
@@ -62,3 +49,4 @@ export class EventDetailSignal extends React.Component {
 }
 
 export default EventDetailSignal;
+

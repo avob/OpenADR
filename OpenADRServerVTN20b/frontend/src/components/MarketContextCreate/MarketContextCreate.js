@@ -11,6 +11,8 @@ import Typography from '@material-ui/core/Typography';
 
 import MarketContextCreateConfigurationStep from './MarketContextCreateConfigurationStep';
 import MarketContextCreateConfirmationStep from './MarketContextCreateConfirmationStep';
+import MarketContextCreateSignalStep from './MarketContextCreateSignalStep';
+import MarketContextCreateReportStep from './MarketContextCreateReportStep';
 
 
 
@@ -23,7 +25,7 @@ import { history } from '../../store/configureStore';
 
 
 function getSteps() {
-  return [ 'MarketContext settings', 'Confirmation' ];
+  return [ 'Settings', 'Signals', 'Reports', 'Confirmation' ];
 }
 
 
@@ -33,9 +35,36 @@ export class MarketContextCreate extends React.Component {
     this.state = {
         activeStep: 0
         , marketContext: {
-           name: ""
-           , description: ""
-           , color: ""
+          "name": "aaa",
+          "description": "",
+          "color": "",
+          "descriptor": {
+            "oadrProfile": "",
+            "priority": "",
+            "vtnComment": "",
+            "responseRequired": "",
+            "testEvent": false
+          },
+          "activePeriod": {
+            "duration": "",
+            "notificationDuration": "",
+            "toleranceDuration": "",
+            "rampUpDuration": "",
+            "recoveryDuration": ""
+          },
+          "baseline": {},
+          "signals": [],
+          "targets": [],
+          "reports": [],
+          "demandResponseEventScheduleStrategy": {
+            "scheduledCronDate": "",
+            "scheduledCronTimezone": "",
+            "scheduledDate": ""
+          },
+          "reportSubscriptionStrategy": {
+            "preferredGranularity": "",
+            "preferredReportBackDuration": ""
+          }
         }
     };
   }
@@ -69,24 +98,38 @@ export class MarketContextCreate extends React.Component {
     } );
   };
 
-  handleConfigurationChange = (marketContext) => {
+  onChange = (marketContext) => {
     this.setState({marketContext})
   }
 
 
   render() {
-    const {classes} = this.props;
+    const {classes, definition, filterUnit} = this.props;
     const steps = getSteps();
     const {activeStep, marketContext, hasError} = this.state;
     var that = this;
-
-
+   
     var getStepContent = ( step ) => {
       switch (step) {
         case 0:
-          return <MarketContextCreateConfigurationStep classes={classes} marketContext= {marketContext} handleConfigurationChange={this.handleConfigurationChange} hasError={hasError}/>
+          return <MarketContextCreateConfigurationStep classes={classes} marketContext= {marketContext} onChange={this.onChange} hasError={hasError}/>
         case 1:
-          return <MarketContextCreateConfirmationStep classes={classes} marketContext= {marketContext}  hasError={hasError}/>
+          return <MarketContextCreateSignalStep classes={classes} 
+                    marketContext= {marketContext}  
+                    onChange={this.onChange} 
+                    hasError={hasError}
+                    definition={definition}
+                    filterUnit={filterUnit}
+                    group={this.props.group}
+                    ven={this.props.ven}
+                    onVenSuggestionsFetchRequested={this.props.onVenSuggestionsFetchRequested}
+                    onVenSuggestionsClearRequested={this.props.onVenSuggestionsClearRequested}
+                    onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}
+                  />
+        case 2:
+          return <MarketContextCreateReportStep classes={classes} marketContext= {marketContext}  onChange={this.onChange} hasError={hasError}/>
+        case 3:
+          return <MarketContextCreateConfirmationStep classes={classes} marketContext= {marketContext}  onChange={this.onChange} hasError={hasError}/>
         default:
           return 'Unknown step';
       }
@@ -102,8 +145,14 @@ export class MarketContextCreate extends React.Component {
         case 1:
           return true;
 
+        case 2:
+          return true;
+
+        case 3:
+          return true;
+
         default:
-          return false
+          return false;
       }
     }
 

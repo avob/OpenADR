@@ -3,7 +3,6 @@ package com.avob.openadr.server.common.vtn.models.known;
 import java.io.Serializable;
 
 import javax.persistence.Embeddable;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import com.avob.openadr.server.common.vtn.models.demandresponseevent.embedded.DemandResponseEventSignalTypeEnum;
@@ -22,18 +21,17 @@ public class KnownSignalId implements Serializable {
 	@NotNull
 	private DemandResponseEventSignalTypeEnum signalType;
 
-	@OneToOne
-	private KnownUnit unit;
+	private KnownUnitId itemBase;
 
 	public KnownSignalId() {
 	}
 
 	public KnownSignalId(@NotNull String signalName, @NotNull DemandResponseEventSignalTypeEnum signalType,
-			KnownUnit unit) {
+			KnownUnitId itemBase) {
 		super();
 		this.setSignalName(signalName);
 		this.setSignalType(signalType);
-		this.setUnit(unit);
+		this.setItemBase(itemBase);
 	}
 
 	public String getSignalName() {
@@ -52,12 +50,12 @@ public class KnownSignalId implements Serializable {
 		this.signalType = signalType;
 	}
 
-	public KnownUnit getUnit() {
-		return unit;
+	public KnownUnitId getItemBase() {
+		return itemBase;
 	}
 
-	public void setUnit(KnownUnit unit) {
-		this.unit = unit;
+	public void setItemBase(KnownUnitId itemBase) {
+		this.itemBase = itemBase;
 	}
 
 }

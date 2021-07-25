@@ -12,6 +12,8 @@
         <oadr:oadrReport>
         <oadr:oadrReportDescription>
             <ei:rID>Status</ei:rID>
+            <ei:reportType>x-resourceStatus</ei:reportType>
+            <ei:readingType>x-notApplicable</ei:readingType>
             <ei:reportSubject>
                 <power:endDeviceAsset>
                     <power:mrid>Thermostat</power:mrid>
@@ -20,9 +22,6 @@
             <ei:reportDataSource>
                 <ei:resourceID>resource1</ei:resourceID>
             </ei:reportDataSource>
-            <ei:reportType>x-resourceStatus</ei:reportType>
-            <ei:readingType>x-notApplicable</ei:readingType>
-            <emix:marketContext>http://MarketContext1</emix:marketContext>
             <oadr:oadrSamplingRate>
                 <oadr:oadrMinPeriod>PT10S</oadr:oadrMinPeriod>
                 <oadr:oadrMaxPeriod>PT1M</oadr:oadrMaxPeriod>
@@ -37,6 +36,8 @@
     <oadr:oadrReport>
         <oadr:oadrReportDescription>
             <ei:rID>Current Temp</ei:rID>
+            <ei:reportType>usage</ei:reportType>
+            <ei:readingType>Direct Read</ei:readingType>
             <ei:reportSubject>
                 <power:endDeviceAsset>
                     <power:mrid>Thermostat</power:mrid>
@@ -45,14 +46,11 @@
             <ei:reportDataSource>
                 <ei:resourceID>resource1</ei:resourceID>
             </ei:reportDataSource>
-            <ei:reportType>usage</ei:reportType>
             <oadr:temperature>
                 <oadr:itemDescription>temperature</oadr:itemDescription>
                 <oadr:itemUnits>celsius</oadr:itemUnits>
                 <scale:siScaleCode>none</scale:siScaleCode>
             </oadr:temperature>
-            <ei:readingType>x-notApplicable</ei:readingType>
-            <emix:marketContext>http://MarketContext1</emix:marketContext>
             <oadr:oadrSamplingRate>
                 <oadr:oadrMinPeriod>PT10S</oadr:oadrMinPeriod>
                 <oadr:oadrMaxPeriod>PT1M</oadr:oadrMaxPeriod>
@@ -61,6 +59,8 @@
         </oadr:oadrReportDescription>
         <oadr:oadrReportDescription>
             <ei:rID>Heat Temp Setting</ei:rID>
+            <ei:reportType>setPoint</ei:reportType>
+            <ei:readingType>x-notApplicable</ei:readingType>
             <ei:reportSubject>
                 <power:endDeviceAsset>
                     <power:mrid>Thermostat</power:mrid>
@@ -69,14 +69,11 @@
             <ei:reportDataSource>
                 <ei:resourceID>resource1</ei:resourceID>
             </ei:reportDataSource>
-            <ei:reportType>setPoint</ei:reportType>
             <oadr:temperature>
                 <oadr:itemDescription>temperature</oadr:itemDescription>
                 <oadr:itemUnits>celsius</oadr:itemUnits>
                 <scale:siScaleCode>none</scale:siScaleCode>
             </oadr:temperature>
-            <ei:readingType>x-notApplicable</ei:readingType>
-            <emix:marketContext>http://MarketContext1</emix:marketContext>
             <oadr:oadrSamplingRate>
                 <oadr:oadrMinPeriod>PT10S</oadr:oadrMinPeriod>
                 <oadr:oadrMaxPeriod>PT1M</oadr:oadrMaxPeriod>
@@ -85,6 +82,8 @@
         </oadr:oadrReportDescription>
         <oadr:oadrReportDescription>
             <ei:rID>Cool Temp Setting</ei:rID>
+            <ei:reportType>setPoint</ei:reportType>
+            <ei:readingType>x-notApplicable</ei:readingType>
             <ei:reportSubject>
                 <power:endDeviceAsset>
                     <power:mrid>Thermostat</power:mrid>
@@ -93,14 +92,11 @@
             <ei:reportDataSource>
                 <ei:resourceID>resource1</ei:resourceID>
             </ei:reportDataSource>
-            <ei:reportType>setPoint</ei:reportType>
             <oadr:temperature>
                 <oadr:itemDescription>temperature</oadr:itemDescription>
                 <oadr:itemUnits>celsius</oadr:itemUnits>
                 <scale:siScaleCode>none</scale:siScaleCode>
             </oadr:temperature>
-            <ei:readingType>x-notApplicable</ei:readingType>
-            <emix:marketContext>http://MarketContext1</emix:marketContext>
             <oadr:oadrSamplingRate>
                 <oadr:oadrMinPeriod>PT10S</oadr:oadrMinPeriod>
                 <oadr:oadrMaxPeriod>PT1M</oadr:oadrMaxPeriod>
@@ -109,6 +105,8 @@
         </oadr:oadrReportDescription>
         <oadr:oadrReportDescription>
             <ei:rID>HVAC Mode Setting</ei:rID>
+            <ei:reportType>operatingState</ei:reportType>
+            <ei:readingType>x-notApplicable</ei:readingType>
             <ei:reportSubject>
                 <power:endDeviceAsset>
                     <power:mrid>Thermostat</power:mrid>
@@ -117,14 +115,11 @@
             <ei:reportDataSource>
                 <ei:resourceID>resource1</ei:resourceID>
             </ei:reportDataSource>
-            <ei:reportType>operatingState</ei:reportType>
             <oadr:customUnit>
                 <oadr:itemDescription>HVAC settings</oadr:itemDescription>
                 <oadr:itemUnits>0=OFF,1=HEAT,2=COOL,3=AUTO</oadr:itemUnits>
                 <scale:siScaleCode>none</scale:siScaleCode>
             </oadr:customUnit>
-            <ei:readingType>x-notApplicable</ei:readingType>
-            <emix:marketContext>http://MarketContext1</emix:marketContext>
             <oadr:oadrSamplingRate>
                 <oadr:oadrMinPeriod>PT10S</oadr:oadrMinPeriod>
                 <oadr:oadrMaxPeriod>PT1M</oadr:oadrMaxPeriod>
@@ -133,6 +128,8 @@
         </oadr:oadrReportDescription>
         <oadr:oadrReportDescription>
             <ei:rID>Current HVAC Mode</ei:rID>
+            <ei:reportType>operatingState</ei:reportType>
+            <ei:readingType>x-notApplicable</ei:readingType>
             <ei:reportSubject>
                 <power:endDeviceAsset>
                     <power:mrid>Thermostat</power:mrid>
@@ -141,14 +138,11 @@
             <ei:reportDataSource>
                 <ei:resourceID>resource1</ei:resourceID>
             </ei:reportDataSource>
-            <ei:reportType>operatingState</ei:reportType>
             <oadr:customUnit>
                 <oadr:itemDescription>HVAC states</oadr:itemDescription>
                 <oadr:itemUnits>0=OFF,1=HEAT,2=COOL</oadr:itemUnits>
                 <scale:siScaleCode>none</scale:siScaleCode>
             </oadr:customUnit>
-            <ei:readingType>x-notApplicable</ei:readingType>
-            <emix:marketContext>http://MarketContext1</emix:marketContext>
             <oadr:oadrSamplingRate>
                 <oadr:oadrMinPeriod>PT10S</oadr:oadrMinPeriod>
                 <oadr:oadrMaxPeriod>PT1M</oadr:oadrMaxPeriod>
@@ -157,6 +151,8 @@
         </oadr:oadrReportDescription>
         <oadr:oadrReportDescription>
             <ei:rID>Fan Mode Setting</ei:rID>
+            <ei:reportType>operatingState</ei:reportType>
+            <ei:readingType>x-notApplicable</ei:readingType>
             <ei:reportSubject>
                 <power:endDeviceAsset>
                     <power:mrid>Thermostat</power:mrid>
@@ -165,14 +161,11 @@
             <ei:reportDataSource>
                 <ei:resourceID>resource1</ei:resourceID>
             </ei:reportDataSource>
-            <ei:reportType>operatingState</ei:reportType>
             <oadr:customUnit>
                 <oadr:itemDescription>FAN settings</oadr:itemDescription>
                 <oadr:itemUnits>0=OFF,1=ON,2=AUTO</oadr:itemUnits>
                 <scale:siScaleCode>none</scale:siScaleCode>
             </oadr:customUnit>
-            <ei:readingType>x-notApplicable</ei:readingType>
-            <emix:marketContext>http://MarketContext1</emix:marketContext>
             <oadr:oadrSamplingRate>
                 <oadr:oadrMinPeriod>PT10S</oadr:oadrMinPeriod>
                 <oadr:oadrMaxPeriod>PT1M</oadr:oadrMaxPeriod>
@@ -181,6 +174,8 @@
         </oadr:oadrReportDescription>
         <oadr:oadrReportDescription>
             <ei:rID>Current Hold Mode</ei:rID>
+            <ei:reportType>operatingState</ei:reportType>
+            <ei:readingType>x-notApplicable</ei:readingType>
             <ei:reportSubject>
                 <power:endDeviceAsset>
                     <power:mrid>Thermostat</power:mrid>
@@ -189,13 +184,11 @@
             <ei:reportDataSource>
                 <ei:resourceID>resource1</ei:resourceID>
             </ei:reportDataSource>
-            <ei:reportType>operatingState</ei:reportType>
             <oadr:customUnit>
                 <oadr:itemDescription>HOLD states</oadr:itemDescription>
                 <oadr:itemUnits>0=none,1=temporary,2=permanent</oadr:itemUnits>
                 <scale:siScaleCode>none</scale:siScaleCode>
             </oadr:customUnit>
-            <ei:readingType>x-notApplicable</ei:readingType>
             <emix:marketContext>http://MarketContext1</emix:marketContext>
             <oadr:oadrSamplingRate>
                 <oadr:oadrMinPeriod>PT10S</oadr:oadrMinPeriod>
@@ -205,6 +198,8 @@
         </oadr:oadrReportDescription>
         <oadr:oadrReportDescription>
             <ei:rID>Current Away Mode</ei:rID>
+            <ei:reportType>operatingState</ei:reportType>
+            <ei:readingType>Direct Read</ei:readingType>
             <ei:reportSubject>
                 <power:endDeviceAsset>
                     <power:mrid>Thermostat</power:mrid>
@@ -213,14 +208,11 @@
             <ei:reportDataSource>
                 <ei:resourceID>resource1</ei:resourceID>
             </ei:reportDataSource>
-            <ei:reportType>operatingState</ei:reportType>
             <oadr:customUnit>
                 <oadr:itemDescription>Away states</oadr:itemDescription>
                 <oadr:itemUnits>0=OFF,1=ON</oadr:itemUnits>
                 <scale:siScaleCode>none</scale:siScaleCode>
             </oadr:customUnit>
-            <ei:readingType>x-notApplicable</ei:readingType>
-            <emix:marketContext>http://MarketContext1</emix:marketContext>
             <oadr:oadrSamplingRate>
                 <oadr:oadrMinPeriod>PT10S</oadr:oadrMinPeriod>
                 <oadr:oadrMaxPeriod>PT1M</oadr:oadrMaxPeriod>
@@ -229,6 +221,8 @@
         </oadr:oadrReportDescription>
         <oadr:oadrReportDescription>
             <ei:rID>Current Humidity</ei:rID>
+            <ei:reportType>usage</ei:reportType>
+            <ei:readingType>Direct Read</ei:readingType>
             <ei:reportSubject>
                 <power:endDeviceAsset>
                     <power:mrid>Thermostat</power:mrid>
@@ -237,14 +231,11 @@
             <ei:reportDataSource>
                 <ei:resourceID>resource1</ei:resourceID>
             </ei:reportDataSource>
-            <ei:reportType>usage</ei:reportType>
             <oadr:customUnit>
-                <oadr:itemDescription>Current Humidity</oadr:itemDescription>
+                <oadr:itemDescription>humidity</oadr:itemDescription>
                 <oadr:itemUnits>percent</oadr:itemUnits>
                 <scale:siScaleCode>none</scale:siScaleCode>
             </oadr:customUnit>
-            <ei:readingType>x-notApplicable</ei:readingType>
-            <emix:marketContext>http://MarketContext1</emix:marketContext>
             <oadr:oadrSamplingRate>
                 <oadr:oadrMinPeriod>PT10S</oadr:oadrMinPeriod>
                 <oadr:oadrMaxPeriod>PT1M</oadr:oadrMaxPeriod>

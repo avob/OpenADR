@@ -18,7 +18,6 @@ export default function marketContextReducer (state = initialState.marketContext
       return state
 
     case types.LOAD_MARKET_CONTEXT_SUCCESS:
-      console.log(action)
       newState = objectAssign({}, state, {
         marketContext: action.payload
       })
@@ -49,7 +48,7 @@ export default function marketContextReducer (state = initialState.marketContext
 
     // LOCATION
     case types.LOCATION_CHANGE:
-      if (action.payload.location.pathname.includes('/marketcontext')) {
+      if (action.payload.location.pathname === '/marketcontext') {
         return state
       } else {
         return initialState.marketContext

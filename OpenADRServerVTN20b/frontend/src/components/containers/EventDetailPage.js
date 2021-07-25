@@ -18,17 +18,19 @@ import Paper from '@material-ui/core/Paper';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 
-import EventDetailDescriptor from '../EventDetail/EventDetailDescriptor'
-import EventDetailActivePeriod from '../EventDetail/EventDetailActivePeriod'
+
+import EventDetailSettings from '../EventDetail/EventDetailSettings'
 import EventDetailSignal from '../EventDetail/EventDetailSignal'
-import EventDetailTarget from '../EventDetail/EventDetailTarget'
 import EventDetailVenResponse from '../EventDetail/EventDetailVenResponse'
+
+
 
 import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
 
 import { history } from '../../store/configureStore';
 import { EventActionDialog } from '../common/VtnconfigurationDialog'
+import {H1} from '../common/Structure'
 
 
 const styles = theme => ({
@@ -92,21 +94,16 @@ export class EventDetailPage extends React.Component {
     } );
     switch(value) {
       case 0:
-        history.push("/event/detail/"+this.props.match.params.id+"/descriptor")
+        history.push("/event/detail/"+this.props.match.params.id+"/settings")
         break;
       case 1:
-        history.push("/event/detail/"+this.props.match.params.id+"/activeperiod")
-        break;
-      case 2:
         history.push("/event/detail/"+this.props.match.params.id+"/signal")
         break;
-      case 3:
-        history.push("/event/detail/"+this.props.match.params.id+"/target")
-        break;
-      case 4:
+      case 2:
         history.push("/event/detail/"+this.props.match.params.id+"/venresponse")
         break;
       default:
+        history.push("/event/detail/"+this.props.match.params.id+"/settings")
         break;
     }
 
@@ -119,22 +116,17 @@ export class EventDetailPage extends React.Component {
     this.props.eventActions.loadEventVenResponse(this.props.match.params.id);
 
     switch(this.props.match.params.panel){
-      case "descriptor":
+      case "settings":
         this.setState({value:0});
         break;
-      case "activeperiod":
+      case "signal":
         this.setState({value:1});
         break;
-      case "signal":
+      case "venresponse":
         this.setState({value:2});
         break;
-      case "target":
-        this.setState({value:3});
-        break;
-      case "venresponse":
-        this.setState({value:4});
-        break;
       default:
+        this.setState({value:0});
         break;
     }
     
@@ -179,9 +171,7 @@ export class EventDetailPage extends React.Component {
      <Paper className={ classes.root }>
      <Toolbar>
             <div style={{flex: '0 0 auto'}}>
-              <Typography variant="h6" id="tableTitle">
-                  {event_detail.event.descriptor.marketContext + " - " + event_detail.event.id}
-                </Typography>
+               <H1 value={event_detail.event.descriptor.marketContext + " - " + event_detail.event.id} />
             </div>
             <div style={{flex: '1 1 100%'}} />
             <div style={{ flex: '0 0 auto'}}>
@@ -195,40 +185,30 @@ export class EventDetailPage extends React.Component {
 
 
         </Toolbar>
+      <Divider/>
       <Tabs value={ this.state.value }
             onChange={ this.handleChange }
             indicatorColor="primary"
             textColor="primary"
             centered>
-        <Tab label="Descriptor" />
-        <Tab label="Active Period" />
+        <Tab label="Settings" />
         <Tab label="Signals" />
-        <Tab label="Targets" />
         <Tab label="Ven Responses" />
       </Tabs>
 
-      <Divider style={{margin: "20px 0"}}/>
-      { value === 0 && <EventDetailDescriptor classes={classes} event={event_detail.event} 
+      <Divider/>
+      { value === 0 && <EventDetailSettings classes={classes} event={event_detail.event} 
                   /> }     
-      { value === 1 && <EventDetailActivePeriod classes={classes} event={event_detail.event}/> }
-      { value === 2 && <EventDetailSignal classes={classes} event={event_detail.event} 
+      { value === 1 && <EventDetailSignal classes={classes} event={event_detail.event} 
           group={event_detail.group}
                    ven={event_detail.ven}
                 onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
                 onVenSuggestionsClearRequested={this.onVenSuggestionsClearRequested}
                 onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}
                 /> }
-      { value === 3 && <EventDetailTarget classes={classes} event={event_detail.event}
 
-                 
-                  group={event_detail.group}
-                   ven={event_detail.ven}
-                onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
-                onVenSuggestionsClearRequested={this.onVenSuggestionsClearRequested}
-                onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}
-                  /> }
 
-      { value === 4 &&  <EventDetailVenResponse classes={classes} event={event_detail.event} venResponse={event_detail.venResponse}
+      { value === 2 &&  <EventDetailVenResponse classes={classes} event={event_detail.event} venResponse={event_detail.venResponse}
                 refreshVenResponse={() => {this.props.eventActions.loadEventVenResponse(this.props.match.params.id)}}
                />  }
                 

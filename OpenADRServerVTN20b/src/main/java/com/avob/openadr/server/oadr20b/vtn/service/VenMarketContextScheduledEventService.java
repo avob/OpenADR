@@ -125,10 +125,21 @@ public class VenMarketContextScheduledEventService {
 
 		eventRead.setPublished(true);
 
+		if (marketContext.getBaseline() != null) {
+			DemandResponseEventBaselineDto baseline = dtoMapper.map(marketContext.getBaseline(),
+					DemandResponseEventBaselineDto.class);
+
+			baseline.setStart(start);
+			eventRead.setBaseline(baseline);
+		}
+
 		eventRead.setSignals(marketContext.getSignals().stream().map(s -> {
+			
 			DemandResponseEventSignalDto eventSignal = new DemandResponseEventSignalDto();
-			ItemBaseDto itemBase = dtoMapper.map(s.getItemBase(), ItemBaseDto.class);
-			eventSignal.setItemBase(itemBase);
+			if(s.getItemBase() != null) {
+				ItemBaseDto itemBase = dtoMapper.map(s.getItemBase(), ItemBaseDto.class);
+				eventSignal.setItemBase(itemBase);
+			}
 			eventSignal.setIntervals(s.getIntervals().stream().map(i -> {
 				DemandResponseEventSignalIntervalDto eventInterval = new DemandResponseEventSignalIntervalDto();
 				eventInterval.setDuration(i.getDuration());

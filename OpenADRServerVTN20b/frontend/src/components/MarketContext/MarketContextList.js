@@ -58,8 +58,6 @@ export class MarketContextList extends React.Component {
     } );
   }
 
-
-
   render() {
     const {classes, marketContext} = this.props;
 
@@ -76,6 +74,7 @@ export class MarketContextList extends React.Component {
         total={marketContext.length}
         pagination={this.state.pagination}
         sort={this.state.sort}
+        handleClick={n => {history.push( '/marketcontext/detail/' + n.name  +'/settings')}}
         handlePaginationChange={this.handlePaginationChange}
         handleSortChange={this.handleSortChange}
         rows={[

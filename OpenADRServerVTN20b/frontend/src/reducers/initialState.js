@@ -95,7 +95,22 @@ export default {
   marketContext: {
     marketContext: []
   },
-  marketContextDetail: {},
+  marketContextDetail: {
+    marketContext: {}
+  },
+  marketContextCreate: {
+    marketContext: {},
+    definition: {
+      signalName: [],
+      signalType: [],
+      itemDescription: [],
+      itemUnits: [],
+      itemUnitsCurrency: [],
+      siScaleCode: []
+    },
+    ven: [],
+    group: []
+  },
   known: {
     unit: [],
     signal: [],

@@ -23,6 +23,7 @@ public class KnownUnitMapper extends DozerConverter<KnownUnit, KnownUnitDto> {
 		destination.setItemDescription(source.getKnownUnitId().getItemDescription());
 		destination.setItemUnits(source.getKnownUnitId().getItemUnits());
 		destination.setXmlType(source.getKnownUnitId().getXmlType());
+		destination.setSiScaleCode(source.getKnownUnitId().getSiScaleCode());
 		return destination;
 	}
 
@@ -32,9 +33,12 @@ public class KnownUnitMapper extends DozerConverter<KnownUnit, KnownUnitDto> {
 			destination = new KnownUnit();
 			destination.setKnownUnitId(new KnownUnitId());
 		}
-		destination.getKnownUnitId().setItemDescription(source.getItemDescription());
-		destination.getKnownUnitId().setItemUnits(source.getItemUnits());
-		destination.getKnownUnitId().setXmlType(source.getXmlType());
+		if(source != null) {
+			destination.getKnownUnitId().setItemDescription(source.getItemDescription());
+			destination.getKnownUnitId().setItemUnits(source.getItemUnits());
+			destination.getKnownUnitId().setXmlType(source.getXmlType());
+			destination.getKnownUnitId().setSiScaleCode(source.getSiScaleCode());
+		} 
 		return destination;
 	}
 

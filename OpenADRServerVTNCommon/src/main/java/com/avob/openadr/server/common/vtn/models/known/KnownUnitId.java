@@ -3,7 +3,6 @@ package com.avob.openadr.server.common.vtn.models.known;
 import java.io.Serializable;
 
 import javax.persistence.Embeddable;
-import javax.validation.constraints.NotNull;
 
 @Embeddable
 public class KnownUnitId implements Serializable {
@@ -13,14 +12,13 @@ public class KnownUnitId implements Serializable {
 	 */
 	private static final long serialVersionUID = 2166728620931735270L;
 
-	@NotNull
-	private String itemDescription;
+	private String itemDescription = "No Unit";
 
-	@NotNull
-	private String itemUnits;
+	private String itemUnits = "No Unit";
 
-	@NotNull
-	private String xmlType;
+	private String xmlType = "No Unit";
+
+	private String siScaleCode = "none";
 
 	public String getItemDescription() {
 		return itemDescription;
@@ -44,6 +42,14 @@ public class KnownUnitId implements Serializable {
 
 	public void setXmlType(String xmlType) {
 		this.xmlType = xmlType;
+	}
+
+	public String getSiScaleCode() {
+		return siScaleCode;
+	}
+
+	public void setSiScaleCode(String siScaleCode) {
+		this.siScaleCode = siScaleCode;
 	}
 
 }

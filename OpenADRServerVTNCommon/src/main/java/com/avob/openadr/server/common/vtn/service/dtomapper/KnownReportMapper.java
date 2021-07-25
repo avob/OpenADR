@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.avob.openadr.server.common.vtn.models.known.KnownReport;
 import com.avob.openadr.server.common.vtn.models.known.KnownReportDto;
 import com.avob.openadr.server.common.vtn.models.known.KnownReportId;
+import com.avob.openadr.server.common.vtn.models.known.KnownUnit;
 
 @Service
 public class KnownReportMapper extends DozerConverter<KnownReport, KnownReportDto> {
@@ -30,7 +31,7 @@ public class KnownReportMapper extends DozerConverter<KnownReport, KnownReportDt
 		destination.setReportType(source.getKnownReportId().getReportType());
 		destination.setReadingType(source.getKnownReportId().getReadingType());
 		destination.setPayloadBase(source.getKnownReportId().getPayloadBase());
-		destination.setUnit(knownUnitMapper.convertTo(source.getKnownReportId().getUnit()));
+		destination.setItemBase(knownUnitMapper.convertTo(new KnownUnit(source.getKnownReportId().getItemBase())));
 		return destination;
 	}
 
@@ -45,7 +46,7 @@ public class KnownReportMapper extends DozerConverter<KnownReport, KnownReportDt
 		destination.getKnownReportId().setReportType(source.getReportType());
 		destination.getKnownReportId().setReadingType(source.getReadingType());
 		destination.getKnownReportId().setPayloadBase(source.getPayloadBase());
-		destination.getKnownReportId().setUnit(knownUnitMapper.convertFrom(source.getUnit()));
+		destination.getKnownReportId().setItemBase(knownUnitMapper.convertFrom(source.getItemBase()).getKnownUnitId());
 		return destination;
 	}
 

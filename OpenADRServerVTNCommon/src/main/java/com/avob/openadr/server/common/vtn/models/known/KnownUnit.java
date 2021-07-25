@@ -12,6 +12,13 @@ public class KnownUnit {
 	@EmbeddedId
 	private KnownUnitId knownUnitId;
 
+	public KnownUnit() {
+	}
+
+	public KnownUnit(KnownUnitId knownUnitId) {
+		this.knownUnitId = knownUnitId;
+	}
+
 	@Lob
 	private String attributes;
 

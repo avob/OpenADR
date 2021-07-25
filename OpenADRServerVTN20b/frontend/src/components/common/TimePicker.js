@@ -8,6 +8,10 @@ import MenuItem from '@material-ui/core/MenuItem';
 
 import {isoToTimestamp, formatTimestamp} from '../../utils/time'
 import timezone from './timezone'
+import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import InputAdornment from '@material-ui/core/InputAdornment';
 
 export var DatePicker = (props) => {
   const { classes } = props;
@@ -97,6 +101,7 @@ export var DateAndTimePicker = (props) => {
             step: 60, // 5 min
           }}
         />
+
       </span>
   );
 }
@@ -108,20 +113,94 @@ export var DurationPicker = (props) => {
     val = props.value;
   }
 
+  var parseDuration = (str) => {
+    var duration = "min";
+    var number = str.match(/PT([0-9]+)M/);
+
+    if(number != null ) {
+      return {number:number[1], duration}
+    }
+    number = str.match(/PT([0-9]+)H/);
+    if(number != null ) {
+      duration = "hours";
+      return {number:number[1], duration}
+    }
+
+    number = str.match(/P([0-9]+)D/);
+    if(number != null ) {
+      duration = "days";
+      return {number:number[1], duration}
+    }
+    number = "";
+    return {number, duration}
+  }
+
+  const obj = parseDuration(val);
+  
+  var d = 0
+  const possibleDuration = [ "min", "hours", "days"];
+  for(var i in possibleDuration){
+    if(obj.duration === possibleDuration[i]) {
+      d = i;
+    }
+ } 
+  const [steps, setSteps] = React.useState(parseInt(d));
+
+  var incrementStep = () => {
+    var newStep;
+    if(steps === possibleDuration.length - 1) {
+      newStep = 0;
+    } else {
+      newStep = steps + 1;
+    }
+    setSteps(newStep);
+    if(obj.number != "") {
+      var duration = formatDuration(obj.number, possibleDuration[newStep])
+      props.onChange(duration);
+    }
+    
+  }
+
+  var formatDuration = (number, duration) => {
+    if(duration == "min") {
+      return "PT"+number+"M";
+    } else if(duration == "hours") {
+      return "PT"+number+"H";
+    } else if(duration == "days") {
+      return "P"+number+"D";
+    }
+  }
+
+
+ 
   return (
+      <React.Fragment>
+
       <TextField required error={props.error}
         label={props.field}
         type="number"
         className={classes.textField}
-        fullWidth={true}
-        value={val}
+        value={obj.number}
         onChange={(e) => {
-          props.onChange(e.target.value);
+          var duration = formatDuration(e.target.value, possibleDuration[steps])
+
+          props.onChange(duration);
         }}
         InputLabelProps={{
           shrink: true,
         }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start" style={{cursor: 'pointer'}} onClick={incrementStep}>
+              <HourglassEmptyIcon />
+            </InputAdornment>
+          ),
+          endAdornment: (<InputAdornment position="end" style={{cursor: 'pointer'}} 
+                            onClick={incrementStep}>{possibleDuration[steps]}</InputAdornment>)
+        }}
+   
       />
+      </React.Fragment>
   );
 }
 
@@ -177,19 +256,18 @@ export var TimezonePicker = (props) => {
                                    </MenuItem> )
     }
 
-
+    console.log(props.classes)
   return (
-       <FormControl style={{marginLeft:8}}>
-          <FormLabel style={ labelStyle } component="label">
+       <FormControl className={ props.classes.formControl } fullWidth={true}>
+          <InputLabel shrink className={ props.classes.textField }>
             {props.label}
-          </FormLabel>
+          </InputLabel>
           <Select value={ val}
-                        style={ { marginTop: 0 } }
+                      className={ props.classes.textField }
                          onChange={(e) => {
                           props.onChange(e.target.value);
                         }}
-                        
-                        inputProps={ { name: 'timezone', id: 'timezone_select',  } }
+                        inputProps={ { name: 'timezone', id: 'timezone_select', className:"MuiInputBase-input MuiInput-input"} }
                         >
                   { timezoneView }
           </Select>

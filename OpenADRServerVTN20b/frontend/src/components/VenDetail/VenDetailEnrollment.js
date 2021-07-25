@@ -25,6 +25,7 @@ import TableCell from '@material-ui/core/TableCell';
 
 
 import Tooltip from '@material-ui/core/Tooltip';
+import {Panel} from '../common/Structure'
 
 
 

@@ -1,6 +1,7 @@
 package com.avob.openadr.server.common.vtn.service;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -36,6 +37,19 @@ public class KnownUnitService {
 
 	public Iterable<KnownUnit> search(KnownUnitDto dto) {
 		return knownUnitDao.findAll(KnownUnitSpecification.search(dto), KnownUnitSpecification.defaultSort());
+	}
+
+	public List<String> findItemDescription() {
+		return knownUnitDao.findItemDescription();
+	}
+
+	public List<String> findItemUnits(String description) {
+		if (description == null) {
+			return knownUnitDao.findItemUnits();
+		} else {
+			return knownUnitDao.findItemUnitsByItemDescription(description);
+		}
+
 	}
 
 }

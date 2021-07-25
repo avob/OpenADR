@@ -4,6 +4,9 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 import * as vtnConfigurationActions from '../../actions/vtnConfigurationActions';
+import * as definitionActions from '../../actions/definitionActions';
+import * as venActions from '../../actions/venActions';
+
 
 import { withStyles } from '@material-ui/core/styles';
 import Divider from '@material-ui/core/Divider';
@@ -30,10 +33,6 @@ const styles = theme => ({
   },
   menu: {
     width: 200,
-  },
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 500,
   },
   card: {
     maxWidth: 350,
@@ -70,19 +69,51 @@ export class MarketContextCreatePage extends React.Component {
   };
 
   componentDidMount() {
+
+    this.props.definitionActions.findSignalName();
+    this.props.definitionActions.findSignalType();
+    this.props.definitionActions.findUnitItemDescription();
+    this.props.definitionActions.findUnitItemUnits();
+    this.props.definitionActions.findUnitSiScaleCode();
+    this.props.definitionActions.findEndDeviceAsset();
+
+    this.props.vtnConfigurationActions.loadGroup();
+
   
   }
 
-  render() {
-    const {classes} = this.props;
+  onVenSuggestionsFetchRequested = (e) => {
+    this.props.venActions.searchVen([{type:"VEN", value:e.value}], [], 0, 5);
+  }
 
+  onVenSuggestionsClearRequested = () => {
+  }
+
+  onVenSuggestionsSelect = (ven) => {
+     
+  }
+
+  render() {
+    const {classes, marketContextCreate, definitionActions} = this.props;
     return (
     <div className={ classes.root }>
       <Divider variant="middle" />
-      <MarketContextCreate classes={classes} 
+      <MarketContextCreate classes={classes}
+                        definition={marketContextCreate.definition}
+                        filterUnit={(description) => {
+                          this.props.definitionActions.findUnitItemUnits(description);
+                        }}
                         createMarketContext={ this.props.vtnConfigurationActions.createMarketContext }
                         updateMarketContext={ this.props.vtnConfigurationActions.updateMarketContext }
                         deleteMarketContext={ this.props.vtnConfigurationActions.deleteMarketContext } 
+
+                        onVenSuggestionsFetchRequested={this.onVenSuggestionsFetchRequested}
+                        onVenSuggestionsClearRequested={this.onVenSuggestionsClearRequested}
+                        onVenSuggestionsSelect={this.onVenSuggestionsSelect}
+                        ven={marketContextCreate.ven}
+                        group={marketContextCreate.group}
+
+
                         />  
     </div>
 
@@ -92,19 +123,26 @@ export class MarketContextCreatePage extends React.Component {
 
 MarketContextCreatePage.propTypes = {
   vtnConfigurationActions: PropTypes.object.isRequired,
+  definitionActions: PropTypes.object.isRequired
+
+
+  
 
 
 };
 
 function mapStateToProps( state ) {
   return {
-    ven_detail_report: state.ven_detail_report
+    marketContextCreate: state.marketContextCreate,
+
   };
 }
 
 function mapDispatchToProps( dispatch ) {
   return {
     vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch ),
+    definitionActions: bindActionCreators( definitionActions, dispatch ),
+    venActions: bindActionCreators( venActions, dispatch )
   };
 }
 

@@ -1,6 +1,7 @@
 package com.avob.openadr.server.common.vtn.service;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -37,6 +38,10 @@ public class KnownSignalService {
 	public Iterable<KnownSignal> search(KnownSignalDto dto) {
 
 		return knownSignalDao.findAll(KnownSignalSpecification.search(dto), KnownSignalSpecification.defaultSort());
+	}
+
+	public List<String> findSignalName() {
+		return knownSignalDao.findSignalName();
 	}
 
 }

@@ -37,6 +37,8 @@ import { lighten } from '@material-ui/core/styles/colorManipulator';
 
 import EventTargetPanel from './EventTargetPanel';
 
+import IntervalTable from './IntervalTable'
+
 
 
 
@@ -295,7 +297,7 @@ var getAvailableUnitType = (signalName, signalType) => {
   return validUnitType;
 }
 
-
+/*
 const toolbarStyles = theme => ({
   root: {
     paddingRight: theme.spacing(1),
@@ -429,7 +431,7 @@ var SignalIntervalTable = (props) => {
 }
 
 SignalIntervalTable = withStyles(toolbarStyles)(SignalIntervalTable);
-
+*/
 
 export class EventSignalPanel extends React.Component {
 
@@ -711,7 +713,7 @@ export class EventSignalPanel extends React.Component {
       </FormLabel>
       <Grid container style={{margin:"20px 0"}}>
         <Grid item xs={ 12 }>
-          <SignalIntervalTable edit={edit} intervals={eventSignal.intervals} 
+          <IntervalTable edit={edit} intervals={eventSignal.intervals} 
           handleRemoveSignalIntervalAtIndex={this.handleRemoveSignalIntervalAtIndex}
           needIntervalCreate={this.state.needIntervalCreate}
           createIntervalValue={this.state.createIntervalValue}

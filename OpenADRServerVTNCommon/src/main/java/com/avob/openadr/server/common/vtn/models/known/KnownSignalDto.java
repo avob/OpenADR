@@ -8,7 +8,7 @@ public class KnownSignalDto {
 
 	private DemandResponseEventSignalTypeEnum signalType;
 
-	private KnownUnitDto unit;
+	private KnownUnitDto itemBase;
 
 	public String getSignalName() {
 		return signalName;
@@ -26,12 +26,13 @@ public class KnownSignalDto {
 		this.signalType = signalType;
 	}
 
-	public KnownUnitDto getUnit() {
-		return unit;
+	public KnownUnitDto getItemBase() {
+		return itemBase;
 	}
 
-	public void setUnit(KnownUnitDto unit) {
-		this.unit = unit;
+	public void setItemBase(KnownUnitDto itemBase) {
+		this.itemBase = itemBase;
 	}
+
 
 }

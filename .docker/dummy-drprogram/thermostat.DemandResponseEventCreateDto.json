@@ -35,13 +35,7 @@
  		}, {
  			"duration": "PT2H",
  			"value": 2.0
- 		}],
- 		"itemBase": {
- 			"itemDescription":"temperature",
- 			"itemUnits":"celsius",
- 			"siScaleCode":"none",
- 			"xmlType":"TemperatureType"
- 		}
+ 		}]
  		
  	}, {
  		"signalName": "LOAD_CONTROL",

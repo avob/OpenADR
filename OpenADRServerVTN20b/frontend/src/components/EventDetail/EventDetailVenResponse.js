@@ -8,6 +8,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
 import {formatTimestamp} from '../../utils/time'
+import {Panel} from '../common/Structure'
 
 
 
@@ -54,9 +55,10 @@ export class EventDetailVenResponse extends React.Component {
 
     return (
     <div className={ classes.root } >
+      <Panel classes={classes}  title="VENs responses">
 
        <EventVenResponseTable classes={classes} venResponse={venResponse}/>
-
+       </Panel>
 
     </div>
     );

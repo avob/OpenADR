@@ -24,6 +24,7 @@ import MarketContextCreatePage from './components/containers/MarketContextCreate
 import GroupCreatePage from './components/containers/GroupCreatePage'
 import SwaggerUIPage from './components/containers/SwaggerUIPage'
 import MarketContextPage from './components/containers/MarketContextPage'
+import MarketContextDetailPage from './components/containers/MarketContextDetailPage'
 import KnownPage from './components/containers/KnownPage'
 
 
@@ -330,7 +331,7 @@ class App extends React.Component {
 
          
 
-          <PrivateRoute path="/event/detail/:id/:panel(descriptor|activeperiod|signal|target|venresponse)" component={ EventDetailPage } />
+          <PrivateRoute path="/event/detail/:id/:panel(settings|signal|venresponse)" component={ EventDetailPage } />
           <PrivateRoute path="/event/detail/:id" component={ EventDetailPage } />
           <PrivateRoute path="/event/create" component={ EventCreatePage } />
           <PrivateRoute path="/event/:panel(list|calendar)" component={ EventPage } />
@@ -341,6 +342,8 @@ class App extends React.Component {
 
           
           <PrivateRoute path="/marketcontext/known/:panel(unit|signal|report)" component={ KnownPage } />
+          <PrivateRoute path="/marketcontext/detail/:name/:panel(settings|signal|baseline|report)" component={ MarketContextDetailPage } />
+          
           <PrivateRoute path="/marketcontext" component={ MarketContextPage } />
 
 

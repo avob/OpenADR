@@ -18,6 +18,7 @@ import com.avob.openadr.server.common.vtn.models.known.KnownSignalId;
 import com.avob.openadr.server.common.vtn.models.known.KnownUnit;
 import com.avob.openadr.server.common.vtn.models.known.KnownUnitId;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContext;
+import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextBaselineDao;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDao;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextDto;
 import com.avob.openadr.server.common.vtn.models.venmarketcontext.VenMarketContextReport;
@@ -36,6 +37,9 @@ public class VenMarketContextService {
 
 	@Resource
 	private VenMarketContextReportDao venMarketcontextReportDao;
+
+	@Resource
+	private VenMarketContextBaselineDao venMarketContextBaselineDao;
 
 	@Resource
 	private KnownSignalService knownSignalService;
@@ -59,7 +63,12 @@ public class VenMarketContextService {
 		Set<KnownSignal> signals = new HashSet<>();
 		Set<KnownReport> reports = new HashSet<>();
 
+		if (entity.getBaseline() != null) {
+			venMarketContextBaselineDao.save(entity.getBaseline());
+		}
+
 		VenMarketContext save = venMarketcontextDao.save(entity);
+
 		if (entity.getSignals() != null) {
 			entity.getSignals().forEach(sig -> {
 				sig.setVenMarketContext(save);
@@ -71,8 +80,8 @@ public class VenMarketContextService {
 			}).collect(Collectors.toList());
 
 			signals.addAll(collect);
-			units.addAll(signals.stream().map(s -> {
-				return s.getKnownSignalId().getUnit();
+			units.addAll(signals.stream().filter(s -> s.getKnownSignalId().getItemBase() != null).map(s -> {
+				return new KnownUnit(s.getKnownSignalId().getItemBase());
 			}).collect(Collectors.toList()));
 		}
 
@@ -87,8 +96,8 @@ public class VenMarketContextService {
 			}).collect(Collectors.toList());
 
 			reports.addAll(collect);
-			units.addAll(reports.stream().map(r -> {
-				return r.getKnownReportId().getUnit();
+			units.addAll(reports.stream().filter(r -> r.getKnownReportId().getItemBase() != null).map(r -> {
+				return new KnownUnit(r.getKnownReportId().getItemBase());
 			}).collect(Collectors.toList()));
 
 		}
@@ -125,11 +134,15 @@ public class VenMarketContextService {
 	}
 
 	private KnownUnit unitFrom(ItemBase itemBase) {
+		if (itemBase == null) {
+			return null;
+		}
 		KnownUnit unit = new KnownUnit();
 		KnownUnitId knownUnitId = new KnownUnitId();
 		knownUnitId.setItemDescription(itemBase.getItemDescription());
 		knownUnitId.setItemUnits(itemBase.getItemUnits());
 		knownUnitId.setXmlType(itemBase.getXmlType());
+		knownUnitId.setSiScaleCode(itemBase.getSiScaleCode());
 		unit.setKnownUnitId(knownUnitId);
 		unit.setAttributes(itemBase.getAttributes());
 		return unit;
@@ -140,7 +153,12 @@ public class VenMarketContextService {
 		KnownSignalId knownSignalId = new KnownSignalId();
 		knownSignalId.setSignalName(signal.getSignalName());
 		knownSignalId.setSignalType(signal.getSignalType());
-		knownSignalId.setUnit(unitFrom(signal.getItemBase()));
+		if (signal.getItemBase() != null) {
+			knownSignalId.setItemBase(unitFrom(signal.getItemBase()).getKnownUnitId());
+
+		} else {
+			knownSignalId.setItemBase(new KnownUnitId());
+		}
 		sig.setKnownSignalId(knownSignalId);
 		return sig;
 	}
@@ -152,8 +170,12 @@ public class VenMarketContextService {
 		knownReportId.setReportType(report.getReportType());
 		knownReportId.setReadingType(report.getReadingType());
 		knownReportId.setPayloadBase(report.getPayloadBase());
-		knownReportId.setUnit(unitFrom(report.getItemBase()));
+		if (report.getItemBase() != null) {
+			knownReportId.setItemBase(unitFrom(report.getItemBase()).getKnownUnitId());
 
+		} else {
+			knownReportId.setItemBase(new KnownUnitId());
+		}
 		rep.setKnownReportId(knownReportId);
 		return rep;
 	}

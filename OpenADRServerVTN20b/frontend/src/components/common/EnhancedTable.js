@@ -18,6 +18,8 @@ import FilterListIcon from '@material-ui/icons/FilterList';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import DeleteIcon from '@material-ui/icons/Delete';
+import Divider from '@material-ui/core/Divider';
+import {H1} from '../common/Structure'
 
 
 
@@ -116,17 +118,12 @@ let EnhancedTableToolbar = props => {
         [classes.highlight]: numSelected > 0,
       })}
     >
-      <div className={classes.title}>
-        {numSelected > 0 ? (
-          <Typography color="inherit" variant="subtitle1">
-            {numSelected} selected
-          </Typography>
-        ) : (
-          <Typography variant="h6" id="tableTitle">
-            {props.title}
-          </Typography>
-        )}
-      </div>
+      {props.title ? <div className={classes.title}>
+        {numSelected > 0 ? <H1 value={numSelected+" selected" }/>
+         : <H1 value={props.title}/>
+        }
+      </div> : null }
+
       <div className={classes.spacer} />
       <div className={classes.actions}>
 
@@ -262,7 +259,7 @@ class EnhancedTable extends React.Component {
   }
 
   render() {
-    const { classes, rows, rowTemplate, data, total, pagination, sort, title, action, actionSelected, filterPanel, filter } = this.props;
+    const { classes, rows, rowTemplate, data, total, pagination, sort, title, subtitle, action, actionSelected, filterPanel, filter } = this.props;
     const { selected, selectable, filterable } = this.state;
     const rowsPerPage = pagination.size;
     const page = pagination.page;
@@ -271,7 +268,7 @@ class EnhancedTable extends React.Component {
     const orderBy= sort.by;
     return (
       <React.Fragment>
-        <EnhancedTableToolbar numSelected={selected.length} title={title} action={action}
+        <EnhancedTableToolbar numSelected={selected.length} title={title} subtitle={subtitle} action={action}
               actionSelected={actionSelected}
               handleSelectableClick={this.handleSelectableClick}
               handleDeleteSelectedClick={this.handleDeleteSelectedClick}
@@ -281,10 +278,9 @@ class EnhancedTable extends React.Component {
               filterPanel={filterPanel}
               filter={filter}/>
 
-        <div className={classes.tableWrapper} style={{margin: "0px 20px"}}>
-        {filterPanel != null && filterable ? filterPanel() : null}
-        </div>
-        <div className={classes.tableWrapper}>
+        {filterPanel != null && filterable ? <React.Fragment><Divider/>{filterPanel()}</React.Fragment> : null}
+        {title ? <Divider/> : null}
+        
           <Table className={classes.table} aria-labelledby="tableTitle">
             <EnhancedTableHead
               numSelected={selected.length}
@@ -330,7 +326,6 @@ class EnhancedTable extends React.Component {
               )}
             </TableBody>
           </Table>
-        </div>
         <TablePagination
           rowsPerPageOptions={[1, 5, 10, 25]}
           component="div"

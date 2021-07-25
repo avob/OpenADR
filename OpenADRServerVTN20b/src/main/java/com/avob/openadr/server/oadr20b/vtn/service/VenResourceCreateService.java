@@ -149,12 +149,10 @@ public class VenResourceCreateService {
 
 				}
 
-				
-
 				String key = getReportKey(cap, desc);
 				if (venMarketContextReports.containsKey(key)) {
 					toSubscribe.add(desc);
-					
+
 					VenResource createReportDescription = VenResourceFactory.createReportDescription(ven, desc);
 
 					List<String> endDeviceAssetListId = resourceIdToEndDeviceAssetMap.get(resourceId);
@@ -217,7 +215,7 @@ public class VenResourceCreateService {
 		List<OtherReportRequest> findByRequestorIsNullAndSource = otherReportRequestService
 				.findByRequestorIsNullAndSource(ven);
 
-		if(!findByRequestorIsNullAndSource.isEmpty()) {
+		if (!findByRequestorIsNullAndSource.isEmpty()) {
 			venRequestReportService.unsubscribe(ven, findByRequestorIsNullAndSource);
 		}
 		if (!subscriptions.isEmpty()) {
@@ -227,17 +225,31 @@ public class VenResourceCreateService {
 	}
 
 	private String getReportKey(VenMarketContextReport report) {
-		String string = new StringBuilder().append("METADATA_").append(report.getReportName())
-				.append(report.getReportType()).append(report.getReadingType()).toString();
-		return string;
+		StringBuilder append = new StringBuilder().append("METADATA_").append(report.getReportName())
+				.append(report.getReportType()).append(report.getReadingType());
+
+		if (report.getItemBase() != null) {
+			append.append(report.getItemBase().getItemDescription()).append(report.getItemBase().getItemUnits())
+					.append(report.getItemBase().getSiScaleCode()).append(report.getItemBase().getXmlType());
+		}
+
+		return append.toString();
 	}
 
 	private String getReportKey(OtherReportCapability oadrReportType,
 			OtherReportCapabilityDescription oadrReportDescriptionType) {
-		String string = new StringBuilder().append(oadrReportType.getReportName())
+		StringBuilder append = new StringBuilder().append(oadrReportType.getReportName())
 				.append(oadrReportDescriptionType.getReportType().value())
-				.append(oadrReportDescriptionType.getReadingType().value()).toString();
-		return string;
+				.append(oadrReportDescriptionType.getReadingType().value());
+
+		if (oadrReportDescriptionType.getItemBase() != null) {
+			append.append(oadrReportDescriptionType.getItemBase().getItemDescription())
+					.append(oadrReportDescriptionType.getItemBase().getItemUnits())
+					.append(oadrReportDescriptionType.getItemBase().getSiScaleCode())
+					.append(oadrReportDescriptionType.getItemBase().getXmlType()).toString();
+		}
+
+		return append.toString();
 	}
 
 	private List<OtherReportRequestDtoCreateSubscriptionDto> autoSubscribeStrategy(

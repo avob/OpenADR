@@ -13,15 +13,12 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 
-import VenDetailSettings from '../VenDetail/VenDetailSettings'
-import VenDetailReport from '../VenDetail/VenDetailReport'
-import VenDetailRequest from '../VenDetail/VenDetailRequest'
-import VenDetailOptSchedule from '../VenDetail/VenDetailOptSchedule'
-import VenDetailEnrollment from '../VenDetail/VenDetailEnrollment'
-import VenDetailGroup from '../VenDetail/VenDetailGroup'
+import MarketContextDetailSignal from '../MarketContextDetail/MarketContextDetailSignal'
+import MarketContextDetailSettings from '../MarketContextDetail/MarketContextDetailSettings'
+import MarketContextDetailReport from '../MarketContextDetail/MarketContextDetailReport'
 
-import VenDetailReportDescription from '../VenDetail/VenDetailReportDescription'
-import VenDetailRequestSpecifier from '../VenDetail/VenDetailRequestSpecifier'
+
+
 
 
 
@@ -32,6 +29,7 @@ import Paper from '@material-ui/core/Paper';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import { VenActionDialog } from '../common/VtnconfigurationDialog'
+import {H1} from '../common/Structure'
 
 
 
@@ -94,12 +92,20 @@ export class VenDetailPage extends React.Component {
     this.setState({dialogOpen: false})
   }
 
-  handleChange = (event, value) => {
+  handleChange = (marketcontext, value) => {
     this.setState( {
       value
     } );
     switch(value) {
-
+      case 0:
+        history.push("/marketcontext/detail/"+this.props.match.params.name+"/settings")
+        break;
+      case 1:
+        history.push("/marketcontext/detail/"+this.props.match.params.name+"/signal")
+        break;
+      case 2:
+        history.push("/marketcontext/detail/"+this.props.match.params.name+"/report")
+        break;
       default:
         break;
     }
@@ -107,52 +113,95 @@ export class VenDetailPage extends React.Component {
 
 
   componentDidMount() {
+
+    this.props.vtnConfigurationActions.getMarketContext(this.props.match.params.name);
 	  
 
     switch(this.props.match.params.panel){
-      
+      case "settings":
+        this.setState({value:0});
+        break;
+      case "signal":
+        this.setState({value:1});
+        break;
+      case "report":
+        this.setState({value:2});
+        break;
       default:
         this.setState({value:0});
         break;
     }
   }
 
+  handleEventClick (marketContext) {
+      history.push( '/event', { filters: [{type:"MARKET_CONTEXT", value: marketContext.name}] });
+    }
+
+  handleVenClick (marketContext) {
+    history.push( '/ven', { filters: [{type:"MARKET_CONTEXT", value: marketContext.name}] });
+  }
 
   render() {
-    const {classes, ven_detail} = this.props;
+    const {classes, marketContextDetail} = this.props;
     const {value} = this.state;
     return (
     <div className={ classes.root }>
     <Paper>
     <Toolbar>
             <div style={{flex: '0 0 auto'}}>
-              <Typography variant="h6" id="tableTitle">
-                  {ven_detail.ven.commonName}
-                </Typography>
+              <H1 value={marketContextDetail && marketContextDetail.marketContext.name} />
             </div>
             <div style={{flex: '1 1 100%'}} />
             <div style={{ flex: '0 0 auto'}}>
-
+              <Button size="small" color="primary" onClick={() => {this.handleEventClick(marketContextDetail.marketContext) }}>Event</Button>
+               <Button size="small" color="primary" onClick={() => {this.handleVenClick(marketContextDetail.marketContext) }}>VEN</Button>
             </div>
                 
 
 
         </Toolbar>
+      <Divider/>
       <Tabs value={ this.state.value }
             onChange={ this.handleChange }
             indicatorColor="primary"
             textColor="primary"
             centered>
         <Tab label="Settings" />
-        <Tab label="Reports" />
-    	<Tab label="Requests" />
-    	<Tab label="OptSchedules" />
-        <Tab label="Enrollments" />
-        <Tab label="Groups" />
+        <Tab label="Signals" />
+    	  <Tab label="Reports" />
+    	
       </Tabs>
-      <Divider style={{margin: "20px 0"}}/>
+      <Divider/>
+
+      { marketContextDetail.marketContext && value === 0 && 
+                         <MarketContextDetailSettings classes={ classes }
+                                          marketContext={marketContextDetail.marketContext}
+
+                                             />
+                                            
+                                            
+                     }
 
 
+
+      { marketContextDetail.marketContext.signals && value === 1 && 
+                         <MarketContextDetailSignal classes={ classes }
+                                          marketContext={marketContextDetail.marketContext}
+
+                                             />
+
+                     
+                     }
+
+      { marketContextDetail.marketContext.reports && value === 2 && 
+                         <MarketContextDetailReport classes={ classes }
+                                          marketContext={marketContextDetail.marketContext}
+
+                                             />
+
+                     
+                     }
+                     
                                              
       </Paper>
 
@@ -163,7 +212,6 @@ export class VenDetailPage extends React.Component {
 }
 
 VenDetailPage.propTypes = {
-  venActions: PropTypes.object.isRequired,
   vtnConfigurationActions: PropTypes.object.isRequired,
 
 
@@ -171,13 +219,12 @@ VenDetailPage.propTypes = {
 
 function mapStateToProps( state ) {
   return {
-    ven_detail: state.ven_detail
+    marketContextDetail: state.marketContextDetail
   };
 }
 
 function mapDispatchToProps( dispatch ) {
   return {
-    venActions: bindActionCreators( venActions, dispatch ),
     vtnConfigurationActions: bindActionCreators( vtnConfigurationActions, dispatch ),
   };
 }

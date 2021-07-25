@@ -1,6 +1,7 @@
 package com.avob.openadr.server.common.vtn.service;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -37,6 +38,14 @@ public class KnownReportService {
 	public Iterable<KnownReport> search(KnownReportDto dto) {
 
 		return knownReportDao.findAll(KnownReportSpecification.search(dto), KnownReportSpecification.defaultSort());
+	}
+
+	public List<String> findReportName() {
+		return knownReportDao.findReportName();
+	}
+
+	public List<String> findReportType(String reportName) {
+		return knownReportDao.findReportType(reportName);
 	}
 
 }

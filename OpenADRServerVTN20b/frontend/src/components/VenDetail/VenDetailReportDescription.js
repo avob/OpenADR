@@ -5,6 +5,10 @@ import TableCell from '@material-ui/core/TableCell';
 import { history } from '../../store/configureStore';
 
 import EnhancedTable  from '../common/EnhancedTable'
+import UnitPanel  from '../common/UnitPanel'
+
+
+
 
 var formatTargetList = (targets) => {
   var view = []
@@ -102,7 +106,7 @@ export class VenDetailReportDescription extends React.Component {
               <TableCell>{n.rid}</TableCell>
               <TableCell>{n.reportType}</TableCell>
               <TableCell>{n.readingType}</TableCell>
-              {n.itemBase ? <TableCell>{n.itemBase.itemDescription}<br/>{n.itemBase.itemUnits}<br/>{n.itemBase.siScaleCode}</TableCell> : <TableCell></TableCell>}
+              <TableCell><UnitPanel unit={n.itemBase}/></TableCell>              
               {n.samplingRate ? <TableCell>{n.samplingRate.oadrMinPeriod}/{n.samplingRate.oadrMaxPeriod}/{(n.samplingRate.oadrOnChange) ? "True" : "False"}</TableCell> : <TableCell></TableCell>}
               
               

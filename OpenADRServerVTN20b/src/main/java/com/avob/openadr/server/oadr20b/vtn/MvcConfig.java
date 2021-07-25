@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -54,6 +55,7 @@ public class MvcConfig implements WebMvcConfigurer {
 				.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
 		converters.add(new StringHttpMessageConverter());
+		converters.add(new ResourceHttpMessageConverter());
 	}
 
 }

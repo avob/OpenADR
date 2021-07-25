@@ -24,15 +24,15 @@ import com.avob.openadr.server.common.vtn.service.dtomapper.DtoMapper;
 
 @RestController
 @RequestMapping("/Known")
-@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEVICE_MANAGER')")
+@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEVICE_MANAGER') or hasRole('ROLE_DRPROGRAM')")
 public class KnownController {
-	
+
 	@Resource
 	private KnownReportService knownReportService;
-	
+
 	@Resource
 	private KnownSignalService knownSignalService;
-	
+
 	@Resource
 	private KnownUnitService knownUnitService;
 
@@ -43,10 +43,10 @@ public class KnownController {
 	@ResponseBody
 	public List<KnownReportDto> searchKnownReport(@RequestBody KnownReportDto knownReport) {
 		Iterable<KnownReport> findAll = knownReportService.search(knownReport);
-		 List<KnownReportDto> mapList = dtoMapper.mapList(findAll, KnownReportDto.class);
-		 return mapList;
+		List<KnownReportDto> mapList = dtoMapper.mapList(findAll, KnownReportDto.class);
+		return mapList;
 	}
-	
+
 	@RequestMapping(value = "/signal/search", method = RequestMethod.POST)
 	@ResponseBody
 	public List<KnownSignalDto> searchKnownSignal(@RequestBody KnownSignalDto knownSignal) {

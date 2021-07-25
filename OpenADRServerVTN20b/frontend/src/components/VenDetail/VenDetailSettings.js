@@ -7,6 +7,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 
 
 import {  VtnTextField } from '../common/TextField'
+import {Panel} from '../common/Structure'
 
 
 
@@ -25,10 +26,8 @@ export class VenDetailSettings extends React.Component {
     return (
     <div className={ classes.root }>
         
-        <div  style={{margin: "0px 5%"}}>
-        <FormControl fullWidth >
-        <FormLabel>Identitication</FormLabel>
-      <FormGroup aria-label="position" row>
+         <Panel classes={classes}  title="Identitication">
+
           <Grid container spacing={24}>
           <Grid item xs={ 6 }>
             <VtnTextField className={ classes.textField } field="Common Name" value={ ven.commonName } />
@@ -38,16 +37,13 @@ export class VenDetailSettings extends React.Component {
             <VtnTextField className={ classes.textField } field="VenID" value={ ven.username } />
           </Grid>
  </Grid>
-           </FormGroup>
-   </FormControl>
-       </div>
-        <Divider style={{margin: "20px 0"}}/>
+
+       </Panel>
+        <Divider/>
 
 
-       <div  style={{margin: "0px 5%"}}>
-        <FormControl fullWidth>
-        <FormLabel>Registration</FormLabel>
-      <FormGroup aria-label="position" row>
+        <Panel classes={classes}  title="Registration">
+
            <Grid container spacing={24}>
           <Grid item xs={ 6 }>
             <VtnTextField className={ classes.textField } field="Oadr name" value={ ven.oadrName } />
@@ -57,8 +53,7 @@ export class VenDetailSettings extends React.Component {
             <VtnTextField className={ classes.textField } field="RegistrationID" value={ ven.registrationId } />
           </Grid>
             </Grid>
-           </FormGroup>
-           <FormGroup aria-label="position" row>
+   
           <Grid container spacing={24}>
           <Grid item xs={ 3 }>
             <VtnTextField className={ classes.textField } field="Transport" value={ ven.transport } />
@@ -70,8 +65,8 @@ export class VenDetailSettings extends React.Component {
             <VtnTextField className={ classes.textField } field="Push URL" value={ ven.pushUrl } />
           </Grid>
             </Grid>
-           </FormGroup>
-           <FormGroup aria-label="position" row>
+  
+
         <Grid container spacing={24}>
           <Grid item xs={ 3 }>
             <VtnTextField className={ classes.textField } field="Report Only" value={ ven.reportOnly ? "Report only" : "Event / Report" } />
@@ -80,9 +75,8 @@ export class VenDetailSettings extends React.Component {
             <VtnTextField className={ classes.textField } field="Xml Signature" value={ ven.xmlSignature ? "Xml signature" : "No xml signature" } />
           </Grid>
             </Grid>
-           </FormGroup>
-   </FormControl>
-   </div>
+
+   </Panel>
 
 
     </div>

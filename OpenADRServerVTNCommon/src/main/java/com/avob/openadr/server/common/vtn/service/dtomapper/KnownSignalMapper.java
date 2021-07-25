@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.avob.openadr.server.common.vtn.models.known.KnownSignal;
 import com.avob.openadr.server.common.vtn.models.known.KnownSignalDto;
 import com.avob.openadr.server.common.vtn.models.known.KnownSignalId;
+import com.avob.openadr.server.common.vtn.models.known.KnownUnit;
 
 @Service
 public class KnownSignalMapper extends DozerConverter<KnownSignal, KnownSignalDto> {
@@ -28,7 +29,7 @@ public class KnownSignalMapper extends DozerConverter<KnownSignal, KnownSignalDt
 
 		destination.setSignalName(source.getKnownSignalId().getSignalName());
 		destination.setSignalType(source.getKnownSignalId().getSignalType());
-		destination.setUnit(knownUnitMapper.convertTo(source.getKnownSignalId().getUnit()));
+		destination.setItemBase(knownUnitMapper.convertTo(new KnownUnit(source.getKnownSignalId().getItemBase())));
 
 		return destination;
 	}
@@ -42,7 +43,7 @@ public class KnownSignalMapper extends DozerConverter<KnownSignal, KnownSignalDt
 
 		destination.getKnownSignalId().setSignalName(source.getSignalName());
 		destination.getKnownSignalId().setSignalType(source.getSignalType());
-		destination.getKnownSignalId().setUnit(knownUnitMapper.convertFrom(source.getUnit()));
+		destination.getKnownSignalId().setItemBase(knownUnitMapper.convertFrom(source.getItemBase()).getKnownUnitId());
 
 		return destination;
 	}
