@@ -141,6 +141,10 @@ export class VenDetailPage extends React.Component {
     history.push( '/ven', { filters: [{type:"MARKET_CONTEXT", value: marketContext.name}] });
   }
 
+  handleEditClick (marketContext) {
+    history.push( '/marketcontext/update/'+marketContext.name);
+  }
+
   render() {
     const {classes, marketContextDetail} = this.props;
     const {value} = this.state;
@@ -154,10 +158,10 @@ export class VenDetailPage extends React.Component {
             <div style={{flex: '1 1 100%'}} />
             <div style={{ flex: '0 0 auto'}}>
               <Button size="small" color="primary" onClick={() => {this.handleEventClick(marketContextDetail.marketContext) }}>Event</Button>
-               <Button size="small" color="primary" onClick={() => {this.handleVenClick(marketContextDetail.marketContext) }}>VEN</Button>
+              <Button size="small" color="primary" onClick={() => {this.handleVenClick(marketContextDetail.marketContext) }}>VEN</Button>
+              <Button size="small" color="primary" onClick={() => {this.handleEditClick(marketContextDetail.marketContext) }}>Edit</Button>
             </div>
-                
-
+               
 
         </Toolbar>
       <Divider/>

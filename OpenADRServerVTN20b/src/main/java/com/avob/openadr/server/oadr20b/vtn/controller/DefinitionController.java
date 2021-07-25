@@ -17,12 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.avob.openadr.model.oadr20b.Oadr20bFactory;
 import com.avob.openadr.model.oadr20b.builders.eipayload.SignalTargetAllowedEndDeviceType;
 import com.avob.openadr.model.oadr20b.builders.eireport.PowerRealUnitType;
+import com.avob.openadr.model.oadr20b.ei.PayloadFloatType;
+import com.avob.openadr.model.oadr20b.ei.ReadingTypeEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportEnumeratedType;
 import com.avob.openadr.model.oadr20b.ei.ReportNameEnumeratedType;
 import com.avob.openadr.model.oadr20b.emix.ItemBaseType;
 import com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException;
 import com.avob.openadr.model.oadr20b.iso.ISO3AlphaCurrencyCodeContentType;
 import com.avob.openadr.model.oadr20b.oadr.CurrencyItemDescriptionType;
+import com.avob.openadr.model.oadr20b.oadr.OadrPayloadResourceStatusType;
 import com.avob.openadr.model.oadr20b.oadr.TemperatureUnitType;
 import com.avob.openadr.model.oadr20b.siscale.SiScaleCodeType;
 import com.avob.openadr.server.common.vtn.models.ItemBase;
@@ -72,27 +75,43 @@ public class DefinitionController {
 				.map(DemandResponseEventSignalTypeEnum::getLabel).collect(Collectors.toList());
 	}
 
-	@RequestMapping(value = "/report/name", method = RequestMethod.GET)
+	@RequestMapping(value = "/report/reportName", method = RequestMethod.GET)
 	@ResponseBody
 	public List<String> findReportName() {
 
 		List<String> findReportName = knownReportService.findReportName();
-
+		
 		Arrays.asList(ReportNameEnumeratedType.values()).forEach(s -> {
-			if (!findReportName.contains(s.name())) {
-				findReportName.add(s.name());
+			if (!findReportName.contains(s.value())
+					&& !s.value().startsWith("METADATA_")) {
+				findReportName.add(s.value());
 			}
 		});
 
 		return findReportName;
 	}
 
-	@RequestMapping(value = "/report/type", method = RequestMethod.GET)
+	@RequestMapping(value = "/report/reportType", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> findReportType(@RequestParam("reportName") String reportName) {
+	public List<String> findReportType() {
 
-		return Arrays.asList(ReportEnumeratedType.values()).stream().map(ReportEnumeratedType::name)
+		return Arrays.asList(ReportEnumeratedType.values()).stream().map(ReportEnumeratedType::value)
 				.collect(Collectors.toList());
+	}
+	
+	@RequestMapping(value = "/report/readingType", method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> findReadingType() {
+
+		return Arrays.asList(ReadingTypeEnumeratedType.values()).stream().map(ReadingTypeEnumeratedType::value)
+				.collect(Collectors.toList());
+	}
+	
+	@RequestMapping(value = "/report/payloadType", method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> findPayloadType() {
+
+		return Arrays.asList(PayloadFloatType.class.getSimpleName(), OadrPayloadResourceStatusType.class.getSimpleName());
 	}
 
 	@RequestMapping(value = "/unit/itemDescription", method = RequestMethod.GET)

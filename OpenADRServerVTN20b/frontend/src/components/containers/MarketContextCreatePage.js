@@ -66,6 +66,41 @@ const styles = theme => ({
 
 export class MarketContextCreatePage extends React.Component {
   state = {
+    activeStep: 0,
+    marketContext: {
+        
+      "name": "bbb",
+      "description": "",
+      "color": "",
+      "descriptor": {
+        "oadrProfile": "",
+        "priority": "",
+        "vtnComment": "",
+        "responseRequired": "",
+        "testEvent": false
+      },
+      "activePeriod": {
+        "duration": "",
+        "notificationDuration": "",
+        "toleranceDuration": "",
+        "rampUpDuration": "",
+        "recoveryDuration": ""
+      },
+      "baseline": {},
+      "signals": [],
+      "targets": [],
+      "reports": [],
+      "demandResponseEventScheduleStrategy": {
+        "scheduledCronDate": "",
+        "scheduledCronTimezone": "",
+        "scheduledDate": ""
+      },
+      "reportSubscriptionStrategy": {
+        "preferredGranularity": "",
+        "preferredReportBackDuration": ""
+      }
+        
+    }
   };
 
   componentDidMount() {
@@ -76,8 +111,20 @@ export class MarketContextCreatePage extends React.Component {
     this.props.definitionActions.findUnitItemUnits();
     this.props.definitionActions.findUnitSiScaleCode();
     this.props.definitionActions.findEndDeviceAsset();
+    this.props.definitionActions.findReportName();
+    this.props.definitionActions.findReportType();
+    this.props.definitionActions.findReadingType();
+    this.props.definitionActions.findPayloadType();
+
+    
 
     this.props.vtnConfigurationActions.loadGroup();
+
+    
+    if(this.props.match.params.marketContextName != null) {
+      this.props.vtnConfigurationActions.getMarketContext(this.props.match.params.marketContextName);
+    }
+    
 
   
   }
@@ -95,10 +142,16 @@ export class MarketContextCreatePage extends React.Component {
 
   render() {
     const {classes, marketContextCreate, definitionActions} = this.props;
+    var marketContext = this.state.marketContext;
+    if(this.props.match.params.marketContextName != null) {
+      marketContext = marketContextCreate.marketContext;
+    }
+    console.log(marketContext)
     return (
     <div className={ classes.root }>
       <Divider variant="middle" />
       <MarketContextCreate classes={classes}
+                        marketContext={marketContext}
                         definition={marketContextCreate.definition}
                         filterUnit={(description) => {
                           this.props.definitionActions.findUnitItemUnits(description);

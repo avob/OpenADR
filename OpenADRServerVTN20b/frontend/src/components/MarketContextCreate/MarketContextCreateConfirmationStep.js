@@ -21,6 +21,8 @@ export class MarketContextCreateConfirmationStep extends React.Component {
   render() {
     const {classes, marketContext, hasError} = this.props;
 
+
+    console.log(marketContext)
     return (
       <React.Fragment>
       <Grid container style={{margin: "20px 0"}}>

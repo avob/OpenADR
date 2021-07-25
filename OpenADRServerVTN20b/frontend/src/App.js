@@ -338,9 +338,8 @@ class App extends React.Component {
           <PrivateRoute path="/event" component={ EventPage } />
 
           <PrivateRoute path="/marketcontext/create" component={ MarketContextCreatePage } />
+          <PrivateRoute path="/marketcontext/update/:marketContextName" component={ MarketContextCreatePage } />
 
-
-          
           <PrivateRoute path="/marketcontext/known/:panel(unit|signal|report)" component={ KnownPage } />
           <PrivateRoute path="/marketcontext/detail/:name/:panel(settings|signal|baseline|report)" component={ MarketContextDetailPage } />
           

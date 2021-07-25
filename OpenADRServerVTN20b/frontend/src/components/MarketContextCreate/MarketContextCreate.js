@@ -34,43 +34,12 @@ export class MarketContextCreate extends React.Component {
     super( props );
     this.state = {
         activeStep: 0
-        , marketContext: {
-          "name": "aaa",
-          "description": "",
-          "color": "",
-          "descriptor": {
-            "oadrProfile": "",
-            "priority": "",
-            "vtnComment": "",
-            "responseRequired": "",
-            "testEvent": false
-          },
-          "activePeriod": {
-            "duration": "",
-            "notificationDuration": "",
-            "toleranceDuration": "",
-            "rampUpDuration": "",
-            "recoveryDuration": ""
-          },
-          "baseline": {},
-          "signals": [],
-          "targets": [],
-          "reports": [],
-          "demandResponseEventScheduleStrategy": {
-            "scheduledCronDate": "",
-            "scheduledCronTimezone": "",
-            "scheduledDate": ""
-          },
-          "reportSubscriptionStrategy": {
-            "preferredGranularity": "",
-            "preferredReportBackDuration": ""
-          }
-        }
+     
     };
   }
 
   handleFinish = () => {
-      this.props.createMarketContext(this.state.marketContext)
+      this.props.createMarketContext(this.props.marketContext)
       history.push( '/vtn_configuration/marketcontext' )
   }
 
@@ -104,11 +73,11 @@ export class MarketContextCreate extends React.Component {
 
 
   render() {
-    const {classes, definition, filterUnit} = this.props;
+    const {classes, definition, filterUnit, marketContext} = this.props;
     const steps = getSteps();
-    const {activeStep, marketContext, hasError} = this.state;
+    const {activeStep, hasError} = this.state;
     var that = this;
-   
+
     var getStepContent = ( step ) => {
       switch (step) {
         case 0:
@@ -127,7 +96,13 @@ export class MarketContextCreate extends React.Component {
                     onVenSuggestionsSelect={this.props.onVenSuggestionsSelect}
                   />
         case 2:
-          return <MarketContextCreateReportStep classes={classes} marketContext= {marketContext}  onChange={this.onChange} hasError={hasError}/>
+          return <MarketContextCreateReportStep classes={classes} 
+                    marketContext= {marketContext}  
+                    onChange={this.onChange} 
+                    hasError={hasError}
+                    definition={definition}
+                    filterUnit={filterUnit}
+                   />
         case 3:
           return <MarketContextCreateConfirmationStep classes={classes} marketContext= {marketContext}  onChange={this.onChange} hasError={hasError}/>
         default:

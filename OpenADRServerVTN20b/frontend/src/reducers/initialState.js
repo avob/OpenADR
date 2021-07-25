@@ -106,7 +106,11 @@ export default {
       itemDescription: [],
       itemUnits: [],
       itemUnitsCurrency: [],
-      siScaleCode: []
+      siScaleCode: [],
+      reportName: [],
+      reportType: [],
+      readingType: [],
+      payloadType: []
     },
     ven: [],
     group: []

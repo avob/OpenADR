@@ -119,11 +119,7 @@ var DetailedSignalEditTable = (props) => {
     signals.push({
       signalName: "", 
       signalType: "",
-      itemBase: {
-        itemDescription: "No Unit",
-        itemUnits: "No Unit",
-        siScaleCode: "none"
-      },
+      itemBase: null,
       intervals: []
     });
     props.onSignalChange(signals);

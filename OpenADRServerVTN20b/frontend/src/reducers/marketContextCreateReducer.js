@@ -51,7 +51,11 @@ export default function marketContextDetailReducer (state = initialState.marketC
           itemUnits: state.definition.itemUnits,
           itemUnitsCurrency: state.definition.itemUnitsCurrency,
           siScaleCode: state.definition.siScaleCode,
-          endDeviceAsset: state.definition.endDeviceAsset
+          endDeviceAsset: state.definition.endDeviceAsset,
+          reportName: state.definition.reportName,
+          reportType: state.definition.reportType,
+          readingType: state.definition.readingType,
+          payloadType: state.definition.payloadType
         }
       })
       return newState
@@ -71,7 +75,11 @@ export default function marketContextDetailReducer (state = initialState.marketC
           itemUnits: state.definition.itemUnits,
           itemUnitsCurrency: state.definition.itemUnitsCurrency,
           siScaleCode: state.definition.siScaleCode,
-          endDeviceAsset: state.definition.endDeviceAsset
+          endDeviceAsset: state.definition.endDeviceAsset,
+          reportName: state.definition.reportName,
+          reportType: state.definition.reportType,
+          readingType: state.definition.readingType,
+          payloadType: state.definition.payloadType
         }
       })
       return newState
@@ -92,7 +100,11 @@ export default function marketContextDetailReducer (state = initialState.marketC
           itemUnits: state.definition.itemUnits,
           itemUnitsCurrency: state.definition.itemUnitsCurrency,
           siScaleCode: state.definition.siScaleCode,
-          endDeviceAsset: state.definition.endDeviceAsset
+          endDeviceAsset: state.definition.endDeviceAsset,
+          reportName: state.definition.reportName,
+          reportType: state.definition.reportType,
+          readingType: state.definition.readingType,
+          payloadType: state.definition.payloadType
         }
       })
       return newState
@@ -113,7 +125,11 @@ export default function marketContextDetailReducer (state = initialState.marketC
           itemUnits: action.payload,
           itemUnitsCurrency: state.definition.itemUnitsCurrency,
           siScaleCode: state.definition.siScaleCode,
-          endDeviceAsset: state.definition.endDeviceAsset
+          endDeviceAsset: state.definition.endDeviceAsset,
+          reportName: state.definition.reportName,
+          reportType: state.definition.reportType,
+          readingType: state.definition.readingType,
+          payloadType: state.definition.payloadType
         }
       })
       return newState
@@ -134,7 +150,11 @@ export default function marketContextDetailReducer (state = initialState.marketC
           itemUnits: state.definition.itemUnits,
           itemUnitsCurrency: state.definition.itemUnitsCurrency,
           siScaleCode: action.payload,
-          endDeviceAsset: state.definition.endDeviceAsset
+          endDeviceAsset: state.definition.endDeviceAsset,
+          reportName: state.definition.reportName,
+          reportType: state.definition.reportType,
+          readingType: state.definition.readingType,
+          payloadType: state.definition.payloadType
         }
       })
       return newState
@@ -155,12 +175,114 @@ export default function marketContextDetailReducer (state = initialState.marketC
           itemUnits: state.definition.itemUnits,
           itemUnitsCurrency: state.definition.itemUnitsCurrency,
           siScaleCode: state.definition.siScaleCode,
-          endDeviceAsset: action.payload
+          endDeviceAsset: action.payload,
+          reportName: state.definition.reportName,
+          reportType: state.definition.reportType,
+          readingType: state.definition.readingType,
+          payloadType: state.definition.payloadType
         }
       })
       return newState
 
     case types.FIND_TARGET_ENDDEVICEASSET_ERROR:
+      return state
+
+
+    case types.FIND_REPORT_REPORTNAME:
+      return state
+
+    case types.FIND_REPORT_REPORTNAME_SUCCESS:
+      newState = objectAssign({}, state, {
+        definition: {
+          signalName: state.definition.signalName,
+          signalType: state.definition.signalType,
+          itemDescription: state.definition.itemDescription,
+          itemUnits: state.definition.itemUnits,
+          itemUnitsCurrency: state.definition.itemUnitsCurrency,
+          siScaleCode: state.definition.siScaleCode,
+          endDeviceAsset: state.definition.endDeviceAsset,
+          reportName: action.payload,
+          reportType: state.definition.reportType,
+          readingType: state.definition.readingType,
+          payloadType: state.definition.payloadType
+        }
+      })
+      return newState
+
+    case types.FIND_REPORT_REPORTNAME_ERROR:
+      return state
+
+
+    case types.FIND_REPORT_REPORTTYPE:
+      return state
+
+    case types.FIND_REPORT_REPORTTYPE_SUCCESS:
+      newState = objectAssign({}, state, {
+        definition: {
+          signalName: state.definition.signalName,
+          signalType: state.definition.signalType,
+          itemDescription: state.definition.itemDescription,
+          itemUnits: state.definition.itemUnits,
+          itemUnitsCurrency: state.definition.itemUnitsCurrency,
+          siScaleCode: state.definition.siScaleCode,
+          endDeviceAsset: state.definition.endDeviceAsset,
+          reportName:  state.definition.reportName,
+          reportType: action.payload,
+          readingType: state.definition.readingType,
+          payloadType: state.definition.payloadType
+        }
+      })
+      return newState
+
+    case types.FIND_REPORT_REPORTTYPE_ERROR:
+      return state
+
+    case types.FIND_REPORT_READINGTYPE:
+      return state
+
+    case types.FIND_REPORT_READINGTYPE_SUCCESS:
+      newState = objectAssign({}, state, {
+        definition: {
+          signalName: state.definition.signalName,
+          signalType: state.definition.signalType,
+          itemDescription: state.definition.itemDescription,
+          itemUnits: state.definition.itemUnits,
+          itemUnitsCurrency: state.definition.itemUnitsCurrency,
+          siScaleCode: state.definition.siScaleCode,
+          endDeviceAsset: state.definition.endDeviceAsset,
+          reportName:  state.definition.reportName,
+          reportType: state.definition.reportType,
+          readingType: action.payload,
+          payloadType: state.definition.payloadType
+        }
+      })
+      return newState
+
+    case types.FIND_REPORT_READINGTYPE_ERROR:
+      return state
+
+    case types.FIND_REPORT_PAYLOADTYPE:
+      return state
+
+    case types.FIND_REPORT_PAYLOADTYPE_SUCCESS:
+      newState = objectAssign({}, state, {
+        definition: {
+          signalName: state.definition.signalName,
+          signalType: state.definition.signalType,
+          itemDescription: state.definition.itemDescription,
+          itemUnits: state.definition.itemUnits,
+          itemUnitsCurrency: state.definition.itemUnitsCurrency,
+          siScaleCode: state.definition.siScaleCode,
+          endDeviceAsset: state.definition.endDeviceAsset,
+          reportName:  state.definition.reportName,
+          reportType: state.definition.reportType,
+          readingType: state.definition.readingType,
+          payloadType: action.payload
+        }
+      })
+      return newState
+
+    case types.FIND_REPORT_PAYLOADTYPE_ERROR:
       return state
 
 

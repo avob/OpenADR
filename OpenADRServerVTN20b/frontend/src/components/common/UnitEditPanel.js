@@ -36,6 +36,10 @@ var TransitionsModal = (props) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
 
+  var itemDescription = (unit && unit.itemDescription) ? unit.itemDescription : "No Unit"
+  var itemUnits = (unit && unit.itemUnits) ? unit.itemUnits : "No Unit"
+  var siScaleCode = (unit && unit.siScaleCode) ? unit.siScaleCode : "none"
+
   const handleOpen = () => {
     setOpen(true);
   };
@@ -68,22 +72,23 @@ var TransitionsModal = (props) => {
 			      	<EnhancedAutocomplete
 			            creatable
 			            options={definition.itemDescription}
-			            value={unit.itemDescription}
+			            value={itemDescription}
 			            label="Item Description"
 			            onSelected={(value) => {
-			            	unit.itemDescription = value;
-			            	unit.itemUnits = "No Unit";
-			            	unit.siScaleCode = "none";
 			            	filterUnit(value)
-			            	onUnitChange(unit);
+			            	onUnitChange({
+			            		itemDescription: value,
+			            		itemUnits: "No Unit",
+			            		siScaleCode: "none"
+			            	});
 			            }}
 			          />
 		
 			          <EnhancedAutocomplete
 				        creatable
-				        disabled={unit.itemDescription == "No Unit"}
+				        disabled={itemDescription == "No Unit"}
 				        options={!value ? definition.itemUnits : definition.itemUnitsCurrency}
-				        value={unit.itemUnits}
+				        value={itemUnits}
 				        label = "Item Units"
 				        onSelected={(value) => {
 			            	unit.itemUnits = value;
@@ -93,9 +98,9 @@ var TransitionsModal = (props) => {
 		
 				      <EnhancedAutocomplete
 			            creatable
-			            disabled={unit.itemDescription == "No Unit"}
+			            disabled={itemDescription == "No Unit"}
 			            options={definition.siScaleCode}
-			            value={unit.siScaleCode}
+			            value={siScaleCode}
 			            label = "SI Scale Code"
 			            onSelected={(value) => {
 			            	unit.siScaleCode = value;

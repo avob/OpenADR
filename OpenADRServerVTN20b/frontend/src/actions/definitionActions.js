@@ -62,4 +62,46 @@ export const findEndDeviceAsset = () => {
   )
 }
 
+export const findReportName = () => {
+
+  return swaggerAction(types.FIND_REPORT_REPORTNAME,
+    (api) => {
+      return api.apis['definition-controller'].findReportNameUsingGET(jsonResponseContentType)
+    },
+    parseJsonData
+  )
+}
+
+export const findReportType = () => {
+
+  return swaggerAction(types.FIND_REPORT_REPORTTYPE,
+    (api) => {
+      return api.apis['definition-controller'].findReportTypeUsingGET(jsonResponseContentType)
+    },
+    parseJsonData
+  )
+}
+
+export const findReadingType = () => {
+
+  return swaggerAction(types.FIND_REPORT_READINGTYPE,
+    (api) => {
+      return api.apis['definition-controller'].findReadingTypeUsingGET(jsonResponseContentType)
+    },
+    parseJsonData
+  )
+}
+
+export const findPayloadType = () => {
+
+  return swaggerAction(types.FIND_REPORT_PAYLOADTYPE,
+    (api) => {
+      return api.apis['definition-controller'].findPayloadTypeUsingGET(jsonResponseContentType)
+    },
+    parseJsonData
+  )
+}
+
+
+
 
