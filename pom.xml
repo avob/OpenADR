@@ -28,7 +28,7 @@
 		<rabbitmq-jms.version>1.11.2</rabbitmq-jms.version>
 		<springfox.version>2.9.2</springfox.version>
 		<dozer.version>5.5.1</dozer.version>
-		<commons-compress.version>1.19</commons-compress.version>
+		<commons-compress.version>1.21</commons-compress.version>
 		<guava.version>21.0	</guava.version>
 		<mokito.version>1.9.5</mokito.version>
 		<common-logging.version>1.2</common-logging.version>
