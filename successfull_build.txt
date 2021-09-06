@@ -1,0 +1,1276 @@
+MacBook-Pro-de-bertrand:OpenADR bzanni$ docker-compose up --build
+Building build
+[+] Building 2.1s (23/23) FINISHED                                                                                                                                                                                                            
+ => [internal] load build definition from Dockerfile-build                                                                                                                                                                               0.0s
+ => => transferring dockerfile: 43B                                                                                                                                                                                                      0.0s
+ => [internal] load .dockerignore                                                                                                                                                                                                        0.0s
+ => => transferring context: 35B                                                                                                                                                                                                         0.0s
+ => [internal] load metadata for docker.io/adoptopenjdk/maven-openjdk11:latest                                                                                                                                                           0.0s
+ => [ 1/18] FROM docker.io/adoptopenjdk/maven-openjdk11                                                                                                                                                                                  0.0s
+ => [internal] load build context                                                                                                                                                                                                        1.8s
+ => => transferring context: 967.17kB                                                                                                                                                                                                    1.7s
+ => CACHED [ 2/18] RUN mkdir /opt/oadr                                                                                                                                                                                                   0.0s
+ => CACHED [ 3/18] RUN mkdir /opt/oadr/lib                                                                                                                                                                                               0.0s
+ => CACHED [ 4/18] RUN mkdir /opt/oadr/vtn20b                                                                                                                                                                                            0.0s
+ => CACHED [ 5/18] RUN mkdir /opt/oadr/dummy-ven20b                                                                                                                                                                                      0.0s
+ => CACHED [ 6/18] RUN mkdir /opt/oadr/dummy-drprogram                                                                                                                                                                                   0.0s
+ => CACHED [ 7/18] RUN mkdir /usr/src/openadr                                                                                                                                                                                            0.0s
+ => CACHED [ 8/18] COPY .docker/build /opt/oadr/build                                                                                                                                                                                    0.0s
+ => CACHED [ 9/18] COPY cert /opt/oadr/cert                                                                                                                                                                                              0.0s
+ => CACHED [10/18] COPY . /usr/src/openadr/                                                                                                                                                                                              0.0s
+ => CACHED [11/18] RUN mvn dependency:copy@copy-external-dependency -f /usr/src/openadr/pom.xml                                                                                                                                          0.0s
+ => CACHED [12/18] RUN ls -al /usr/src/openadr/target/                                                                                                                                                                                   0.0s
+ => CACHED [13/18] RUN mv /usr/src/openadr/target/* /opt/oadr/lib/                                                                                                                                                                       0.0s
+ => CACHED [14/18] RUN if [ ! -f /usr/src/openadr/OpenADRServerVTN20b/target/OpenADRServerVTN20b-0.1.0-SNAPSHOT.jar ]; then mvn package -P external,frontend -DskipTests=true -f /usr/src/openadr/pom.xml; fi                            0.0s
+ => CACHED [15/18] RUN mv /usr/src/openadr/OpenADRServerVTN20b/target/*.jar /opt/oadr/vtn20b/;                                                                                                                                           0.0s
+ => CACHED [16/18] RUN mv /usr/src/openadr/DummyVEN20b/target/*.jar /opt/oadr/dummy-ven20b/;                                                                                                                                             0.0s
+ => CACHED [17/18] RUN mv /usr/src/openadr/DummyDRProgram/target/*.jar /opt/oadr/dummy-drprogram/;                                                                                                                                       0.0s
+ => CACHED [18/18] RUN rm -rf /usr/src/openadr                                                                                                                                                                                           0.0s
+ => exporting to image                                                                                                                                                                                                                   0.1s
+ => => exporting layers                                                                                                                                                                                                                  0.0s
+ => => writing image sha256:0795e670ea0a5ebc4d97b3591bcaa0511c7d688902041a7ac7fd3276d54095a2                                                                                                                                             0.1s
+ => => naming to docker.io/library/openadr_build                                                                                                                                                                                         0.0s
+Successfully built 0795e670ea0a5ebc4d97b3591bcaa0511c7d688902041a7ac7fd3276d54095a2
+Building postgres
+[+] Building 0.4s (10/10) FINISHED                                                                                                                                                                                                            
+ => [internal] load build definition from Dockerfile                                                                                                                                                                                     0.0s
+ => => transferring dockerfile: 37B                                                                                                                                                                                                      0.0s
+ => [internal] load .dockerignore                                                                                                                                                                                                        0.0s
+ => => transferring context: 2B                                                                                                                                                                                                          0.0s
+ => [internal] load metadata for docker.io/library/postgres:13-alpine                                                                                                                                                                    0.0s
+ => FROM docker.io/library/openadr_build:latest                                                                                                                                                                                          0.0s
+ => [internal] load build context                                                                                                                                                                                                        0.0s
+ => => transferring context: 75B                                                                                                                                                                                                         0.0s
+ => [stage-0 1/4] FROM docker.io/library/postgres:13-alpine                                                                                                                                                                              0.0s
+ => CACHED [stage-0 2/4] COPY --from=openadr_build:latest /opt/oadr/cert/xmpp.vtn.oadr.com-rsa.fingerprint /opt/oadr-vtn20b/cert/xmpp.vtn.oadr.com-rsa.fingerprint                                                                       0.0s
+ => CACHED [stage-0 3/4] COPY init-* /docker-entrypoint-initdb.d/                                                                                                                                                                        0.0s
+ => CACHED [stage-0 4/4] RUN vtnId=$(cat /opt/oadr-vtn20b/cert/xmpp.vtn.oadr.com-rsa.fingerprint);  sed -i 's/%VTN_ID%/'"${vtnId}"'/g' /docker-entrypoint-initdb.d/init-openfire.sh                                                      0.0s
+ => exporting to image                                                                                                                                                                                                                   0.2s
+ => => exporting layers                                                                                                                                                                                                                  0.0s
+ => => writing image sha256:b33f11fa64d285aa1263ebbc2c6e9a4772f35be946797dfc6ee6213f1b34f40f                                                                                                                                             0.1s
+ => => naming to docker.io/library/openadr_postgres                                                                                                                                                                                      0.0s
+Successfully built b33f11fa64d285aa1263ebbc2c6e9a4772f35be946797dfc6ee6213f1b34f40f
+Building openfire
+[+] Building 0.7s (22/22) FINISHED                                                                                                                                                                                                            
+ => [internal] load build definition from Dockerfile                                                                                                                                                                                     0.0s
+ => => transferring dockerfile: 37B                                                                                                                                                                                                      0.0s
+ => [internal] load .dockerignore                                                                                                                                                                                                        0.0s
+ => => transferring context: 2B                                                                                                                                                                                                          0.0s
+ => [internal] load metadata for docker.io/gizmotronic/openfire:4.4.4                                                                                                                                                                    0.0s
+ => https://github.com/avob/openfire-oadr-plugin/releases/download/0.0.2/OpenfireOadrPlugin-openfire-plugin-assembly.jar                                                                                                                 0.5s
+ => FROM docker.io/library/openadr_build:latest                                                                                                                                                                                          0.0s
+ => [internal] load build context                                                                                                                                                                                                        0.0s
+ => => transferring context: 76B                                                                                                                                                                                                         0.0s
+ => [stage-0  1/15] FROM docker.io/gizmotronic/openfire:4.4.4                                                                                                                                                                            0.0s
+ => CACHED [stage-0  2/15] COPY --from=openadr_build:latest /opt/oadr/cert/oadr.com.crt /opt/oadr-vtn20b/cert/oadr.com.crt                                                                                                               0.0s
+ => CACHED [stage-0  3/15] COPY --from=openadr_build:latest /opt/oadr/cert/xmpp.vtn.oadr.com-rsa.p12 /opt/oadr-vtn20b/cert/xmpp.vtn.oadr.com-rsa.p12                                                                                     0.0s
+ => CACHED [stage-0  4/15] COPY available-plugins.xml /etc/openfire/available-plugins.xml                                                                                                                                                0.0s
+ => CACHED [stage-0  5/15] COPY openfire.xml /etc/openfire/openfire.xml                                                                                                                                                                  0.0s
+ => CACHED [stage-0  6/15] ADD https://github.com/avob/openfire-oadr-plugin/releases/download/0.0.2/OpenfireOadrPlugin-openfire-plugin-assembly.jar /usr/share/openfire/plugins/OpenfireOadrPlugin-openfire-plugin-assembly.jar          0.0s
+ => CACHED [stage-0  7/15] RUN keytool -importkeystore -srckeystore "/usr/share/openfire/resources/security/keystore" -srcstorepass changeit    -destkeystore "/usr/share/openfire/resources/security/keystore" -deststorepass changeme  0.0s
+ => CACHED [stage-0  8/15] RUN keytool -v -importkeystore -srcstorepass "changeme" -srckeystore /opt/oadr-vtn20b/cert/xmpp.vtn.oadr.com-rsa.p12 -srcstoretype PKCS12    -deststorepass changeme -destkeystore "/usr/share/openfire/reso  0.0s
+ => CACHED [stage-0  9/15] RUN keytool -importkeystore -srckeystore "/usr/share/openfire/resources/security/truststore" -srcstorepass changeit    -destkeystore "/usr/share/openfire/resources/security/truststore" -deststorepass chan  0.0s
+ => CACHED [stage-0 10/15] RUN keytool -v -import -alias OadrCA -file /opt/oadr-vtn20b/cert/oadr.com.crt    -deststorepass changeme -destkeystore "/usr/share/openfire/resources/security/truststore" -deststoretype JKS -noprompt;      0.0s
+ => CACHED [stage-0 11/15] RUN cp /etc/openfire/security/truststore /usr/share/openfire/resources/security/client.truststore                                                                                                             0.0s
+ => CACHED [stage-0 12/15] RUN chown -R openfire:openfire "/usr/share/openfire/plugins"                                                                                                                                                  0.0s
+ => CACHED [stage-0 13/15] RUN chown -R openfire:openfire "/etc/openfire"                                                                                                                                                                0.0s
+ => CACHED [stage-0 14/15] RUN chown -R openfire:openfire "/var/lib/openfire"                                                                                                                                                            0.0s
+ => CACHED [stage-0 15/15] RUN chown -R openfire:openfire "/usr/share/openfire/resources/security"                                                                                                                                       0.0s
+ => exporting to image                                                                                                                                                                                                                   0.0s
+ => => exporting layers                                                                                                                                                                                                                  0.0s
+ => => writing image sha256:a9630101e9cf29dbbdb1fc8f6d89fc21c794a21f2ee0a3bff4a2b92c0fda49f7                                                                                                                                             0.0s
+ => => naming to docker.io/library/openadr_openfire                                                                                                                                                                                      0.0s
+Successfully built a9630101e9cf29dbbdb1fc8f6d89fc21c794a21f2ee0a3bff4a2b92c0fda49f7
+Building rabbitmq
+[+] Building 0.4s (9/9) FINISHED                                                                                                                                                                                                              
+ => [internal] load build definition from Dockerfile                                                                                                                                                                                     0.0s
+ => => transferring dockerfile: 37B                                                                                                                                                                                                      0.0s
+ => [internal] load .dockerignore                                                                                                                                                                                                        0.0s
+ => => transferring context: 2B                                                                                                                                                                                                          0.0s
+ => [internal] load metadata for docker.io/library/rabbitmq:3.8.9-alpine                                                                                                                                                                 0.0s
+ => [stage-0 1/4] FROM docker.io/library/rabbitmq:3.8.9-alpine                                                                                                                                                                           0.0s
+ => FROM docker.io/library/openadr_build:latest                                                                                                                                                                                          0.0s
+ => CACHED [stage-0 2/4] COPY --from=openadr_build:latest /opt/oadr/cert/vtn.oadr.com-rsa.crt /opt/oadr-vtn20b/cert/vtn.oadr.com-rsa.crt                                                                                                 0.0s
+ => CACHED [stage-0 3/4] COPY --from=openadr_build:latest /opt/oadr/cert/vtn.oadr.com-rsa.key /opt/oadr-vtn20b/cert/vtn.oadr.com-rsa.key                                                                                                 0.0s
+ => CACHED [stage-0 4/4] RUN rabbitmq-plugins enable --offline rabbitmq_amqp1_0 rabbitmq_auth_backend_http rabbitmq_federation rabbitmq_management rabbitmq_tracing rabbitmq_auth_mechanism_ssl rabbitmq_auth_backend_cache              0.0s
+ => exporting to image                                                                                                                                                                                                                   0.2s
+ => => exporting layers                                                                                                                                                                                                                  0.0s
+ => => writing image sha256:11d52e631becc964d003694133a1dca8f4a9b8b7ade13de7b21414f5c3a0f792                                                                                                                                             0.2s
+ => => naming to docker.io/library/openadr_rabbitmq                                                                                                                                                                                      0.0s
+Successfully built 11d52e631becc964d003694133a1dca8f4a9b8b7ade13de7b21414f5c3a0f792
+Building vtn20b
+[+] Building 0.4s (21/21) FINISHED                                                                                                                                                                                                            
+ => [internal] load build definition from Dockerfile                                                                                                                                                                                     0.0s
+ => => transferring dockerfile: 37B                                                                                                                                                                                                      0.0s
+ => [internal] load .dockerignore                                                                                                                                                                                                        0.0s
+ => => transferring context: 2B                                                                                                                                                                                                          0.0s
+ => [internal] load metadata for docker.io/library/openjdk:11.0.9-jre-slim                                                                                                                                                               0.0s
+ => [stage-0  1/15] FROM docker.io/library/openjdk:11.0.9-jre-slim                                                                                                                                                                       0.0s
+ => [internal] load build context                                                                                                                                                                                                        0.0s
+ => => transferring context: 146B                                                                                                                                                                                                        0.0s
+ => FROM docker.io/library/openadr_build:latest                                                                                                                                                                                          0.0s
+ => CACHED [stage-0  2/15] RUN mkdir /opt/oadr-vtn20b/                                                                                                                                                                                   0.0s
+ => CACHED [stage-0  3/15] RUN mkdir /opt/oadr-vtn20b/lib                                                                                                                                                                                0.0s
+ => CACHED [stage-0  4/15] RUN mkdir /var/log/oadr-vtn20b                                                                                                                                                                                0.0s
+ => CACHED [stage-0  5/15] RUN mkdir /var/run/oadr-vtn20b                                                                                                                                                                                0.0s
+ => CACHED [stage-0  6/15] COPY --from=openadr_build:latest /opt/oadr/build/wait-for-it.sh /opt/oadr-vtn20b/wait-for-it.sh                                                                                                               0.0s
+ => CACHED [stage-0  7/15] COPY --from=openadr_build:latest /opt/oadr/cert /opt/oadr-vtn20b/cert                                                                                                                                         0.0s
+ => CACHED [stage-0  8/15] COPY --from=openadr_build:latest /opt/oadr/vtn20b/*.jar /opt/oadr-vtn20b/                                                                                                                                     0.0s
+ => CACHED [stage-0  9/15] COPY --from=openadr_build:latest /opt/oadr/lib/* /opt/oadr-vtn20b/lib/                                                                                                                                        0.0s
+ => CACHED [stage-0 10/15] COPY application.properties /opt/oadr-vtn20b/application.properties                                                                                                                                           0.0s
+ => CACHED [stage-0 11/15] COPY loader.properties /opt/oadr-vtn20b/loader.properties                                                                                                                                                     0.0s
+ => CACHED [stage-0 12/15] COPY log4j2.xml /opt/oadr-vtn20b/log4j2.xml                                                                                                                                                                   0.0s
+ => CACHED [stage-0 13/15] COPY oadr-vtn20b.conf /opt/oadr-vtn20b/oadr-vtn20b.conf                                                                                                                                                       0.0s
+ => CACHED [stage-0 14/15] RUN mv /opt/oadr-vtn20b/*.jar /opt/oadr-vtn20b/oadr-vtn20b.jar                                                                                                                                                0.0s
+ => CACHED [stage-0 15/15] RUN chmod +x /opt/oadr-vtn20b/wait-for-it.sh                                                                                                                                                                  0.0s
+ => exporting to image                                                                                                                                                                                                                   0.1s
+ => => exporting layers                                                                                                                                                                                                                  0.0s
+ => => writing image sha256:4d869d8c74d848411eaa916a037a8bee65bc13ce2678d8cb7a340090c6261c2f                                                                                                                                             0.1s
+ => => naming to docker.io/library/openadr_vtn20b                                                                                                                                                                                        0.0s
+Successfully built 4d869d8c74d848411eaa916a037a8bee65bc13ce2678d8cb7a340090c6261c2f
+Building dummy-drprogram
+[+] Building 0.2s (19/19) FINISHED                                                                                                                                                                                                            
+ => [internal] load build definition from Dockerfile                                                                                                                                                                                     0.0s
+ => => transferring dockerfile: 37B                                                                                                                                                                                                      0.0s
+ => [internal] load .dockerignore                                                                                                                                                                                                        0.0s
+ => => transferring context: 2B                                                                                                                                                                                                          0.0s
+ => [internal] load metadata for docker.io/library/openjdk:11.0.9-jre-slim                                                                                                                                                               0.0s
+ => [internal] load build context                                                                                                                                                                                                        0.0s
+ => => transferring context: 228B                                                                                                                                                                                                        0.0s
+ => FROM docker.io/library/openadr_build:latest                                                                                                                                                                                          0.0s
+ => [stage-0  1/13] FROM docker.io/library/openjdk:11.0.9-jre-slim                                                                                                                                                                       0.0s
+ => CACHED [stage-0  2/13] RUN mkdir /opt/dummy-drprogram                                                                                                                                                                                0.0s
+ => CACHED [stage-0  3/13] RUN mkdir /var/log/dummy-drprogram                                                                                                                                                                            0.0s
+ => CACHED [stage-0  4/13] RUN mkdir /var/run/dummy-drprogram                                                                                                                                                                            0.0s
+ => CACHED [stage-0  5/13] COPY --from=openadr_build:latest /opt/oadr/build/wait-for-it.sh /opt/dummy-drprogram/wait-for-it.sh                                                                                                           0.0s
+ => CACHED [stage-0  6/13] COPY --from=openadr_build:latest /opt/oadr/cert /opt/dummy-drprogram/cert                                                                                                                                     0.0s
+ => CACHED [stage-0  7/13] COPY --from=openadr_build:latest /opt/oadr/dummy-drprogram/*.jar /opt/dummy-drprogram/                                                                                                                        0.0s
+ => CACHED [stage-0  8/13] COPY simple.DemandResponseEventCreateDto.json /opt/dummy-drprogram/simple.DemandResponseEventCreateDto.json                                                                                                   0.0s
+ => CACHED [stage-0  9/13] COPY fastDR.DemandResponseEventCreateDto.json /opt/dummy-drprogram/fastDR.DemandResponseEventCreateDto.json                                                                                                   0.0s
+ => CACHED [stage-0 10/13] COPY thermostat.DemandResponseEventCreateDto.json /opt/dummy-drprogram/thermostat.DemandResponseEventCreateDto.json                                                                                           0.0s
+ => CACHED [stage-0 11/13] COPY application.properties /opt/dummy-drprogram/application.properties                                                                                                                                       0.0s
+ => CACHED [stage-0 12/13] RUN mv /opt/dummy-drprogram/*.jar /opt/dummy-drprogram/dummy-drprogram.jar                                                                                                                                    0.0s
+ => CACHED [stage-0 13/13] RUN chmod +x /opt/dummy-drprogram/wait-for-it.sh                                                                                                                                                              0.0s
+ => exporting to image                                                                                                                                                                                                                   0.0s
+ => => exporting layers                                                                                                                                                                                                                  0.0s
+ => => writing image sha256:1fa0dcaf12e8277a00a7a6e204bd80dfe45af1c87d6124a464f8c507fed39fdd                                                                                                                                             0.0s
+ => => naming to docker.io/library/openadr_dummy-drprogram                                                                                                                                                                               0.0s
+Successfully built 1fa0dcaf12e8277a00a7a6e204bd80dfe45af1c87d6124a464f8c507fed39fdd
+Building dummy-ven20b
+[+] Building 0.3s (20/20) FINISHED                                                                                                                                                                                                            
+ => [internal] load build definition from Dockerfile                                                                                                                                                                                     0.0s
+ => => transferring dockerfile: 37B                                                                                                                                                                                                      0.0s
+ => [internal] load .dockerignore                                                                                                                                                                                                        0.0s
+ => => transferring context: 2B                                                                                                                                                                                                          0.0s
+ => [internal] load metadata for docker.io/library/openjdk:11.0.9-jre-slim                                                                                                                                                               0.0s
+ => [internal] load build context                                                                                                                                                                                                        0.0s
+ => => transferring context: 252B                                                                                                                                                                                                        0.0s
+ => [stage-0  1/14] FROM docker.io/library/openjdk:11.0.9-jre-slim                                                                                                                                                                       0.0s
+ => FROM docker.io/library/openadr_build:latest                                                                                                                                                                                          0.0s
+ => CACHED [stage-0  2/14] RUN mkdir /opt/oadr-ven20b                                                                                                                                                                                    0.0s
+ => CACHED [stage-0  3/14] RUN mkdir /var/log/oadr-ven20b                                                                                                                                                                                0.0s
+ => CACHED [stage-0  4/14] RUN mkdir /var/run/oadr-ven20b                                                                                                                                                                                0.0s
+ => CACHED [stage-0  5/14] COPY --from=openadr_build:latest /opt/oadr/build/wait-for-it.sh /opt/oadr-ven20b/wait-for-it.sh                                                                                                               0.0s
+ => CACHED [stage-0  6/14] COPY --from=openadr_build:latest /opt/oadr/cert /opt/oadr-ven20b/cert                                                                                                                                         0.0s
+ => CACHED [stage-0  7/14] COPY --from=openadr_build:latest /opt/oadr/dummy-ven20b/*.jar /opt/oadr-ven20b/                                                                                                                               0.0s
+ => CACHED [stage-0  8/14] COPY realEnergy.registerReport.xml /opt/oadr-ven20b/realEnergy.registerReport.xml                                                                                                                             0.0s
+ => CACHED [stage-0  9/14] COPY smartEnergyModule.registerReport.xml /opt/oadr-ven20b/smartEnergyModule.registerReport.xml                                                                                                               0.0s
+ => CACHED [stage-0 10/14] COPY thermostat.registerReport.xml /opt/oadr-ven20b/thermostat.registerReport.xml                                                                                                                             0.0s
+ => CACHED [stage-0 11/14] COPY thermostat.full.registerReport.xml /opt/oadr-ven20b/thermostat.full.registerReport.xml                                                                                                                   0.0s
+ => CACHED [stage-0 12/14] COPY application.properties /opt/oadr-ven20b/application.properties                                                                                                                                           0.0s
+ => CACHED [stage-0 13/14] RUN mv /opt/oadr-ven20b/*.jar /opt/oadr-ven20b/oadr-ven20b.jar                                                                                                                                                0.0s
+ => CACHED [stage-0 14/14] RUN chmod +x /opt/oadr-ven20b/wait-for-it.sh                                                                                                                                                                  0.0s
+ => exporting to image                                                                                                                                                                                                                   0.0s
+ => => exporting layers                                                                                                                                                                                                                  0.0s
+ => => writing image sha256:23fcfbe0bed074b4b5fe91cbee1c8e35c4cbe0d37468e989d911cf19df0bf3e1                                                                                                                                             0.0s
+ => => naming to docker.io/library/openadr_dummy-ven20b                                                                                                                                                                                  0.0s
+Successfully built 23fcfbe0bed074b4b5fe91cbee1c8e35c4cbe0d37468e989d911cf19df0bf3e1
+Starting openadr_build_1 ... done
+Starting openadr_rabbitmq_1 ... done
+Starting openadr_postgres_1 ... done
+Starting openadr_openfire_1 ... done
+Starting openadr_vtn20b_1   ... done
+Starting openadr_dummy-drprogram_1 ... done
+Starting openadr_dummy-ven20b_1    ... done
+Attaching to openadr_build_1, openadr_postgres_1, openadr_rabbitmq_1, openadr_openfire_1, openadr_vtn20b_1, openadr_dummy-drprogram_1, openadr_dummy-ven20b_1
+build_1            | total 80
+build_1            | drwxr-xr-x   1 root root 4096 Sep  6 06:08 .
+build_1            | drwxr-xr-x   1 root root 4096 Sep  6 06:08 ..
+build_1            | drwxr-xr-x   2 root root 4096 Sep 12  2019 bin
+build_1            | drwxr-xr-x   2 root root 4096 Apr 24  2018 boot
+build_1            | drwxr-xr-x   5 root root  340 Sep  6 06:14 dev
+build_1            | -rwxr-xr-x   1 root root    0 Sep  6 06:08 .dockerenv
+build_1            | drwxr-xr-x   1 root root 4096 Sep  6 06:08 etc
+build_1            | drwxr-xr-x   2 root root 4096 Apr 24  2018 home
+build_1            | drwxr-xr-x   1 root root 4096 May 23  2017 lib
+build_1            | drwxr-xr-x   2 root root 4096 Sep 12  2019 lib64
+build_1            | drwxr-xr-x   2 root root 4096 Sep 12  2019 media
+build_1            | drwxr-xr-x   2 root root 4096 Sep 12  2019 mnt
+build_1            | drwxr-xr-x   1 root root 4096 Sep  5 15:28 opt
+build_1            | dr-xr-xr-x 127 root root    0 Sep  6 06:14 proc
+build_1            | drwx------   1 root root 4096 Sep  6 06:07 root
+build_1            | drwxr-xr-x   1 root root 4096 Sep 18  2019 run
+build_1            | drwxr-xr-x   1 root root 4096 Sep 18  2019 sbin
+build_1            | drwxr-xr-x   2 root root 4096 Sep 12  2019 srv
+build_1            | dr-xr-xr-x  13 root root    0 Sep  5 15:30 sys
+build_1            | drwxrwxrwt   1 root root 4096 Sep  6 06:07 tmp
+build_1            | drwxr-xr-x   1 root root 4096 Sep 12  2019 usr
+build_1            | drwxr-xr-x   1 root root 4096 Sep 12  2019 var
+dummy-drprogram_1  | wait-for-it.sh: waiting 120 seconds for vtn.oadr.com:8081
+openfire_1         | Initializing /var/lib/openfire...
+postgres_1         | 
+postgres_1         | PostgreSQL Database directory appears to contain a database; Skipping initialization
+postgres_1         | 
+openfire_1         | Initializing /var/log/openfire...
+vtn20b_1           | Application is running as root (UID 0). This is considered insecure.
+postgres_1         | 2021-09-06 06:14:27.225 UTC [1] LOG:  starting PostgreSQL 13.0 on x86_64-pc-linux-musl, compiled by gcc (Alpine 9.3.0) 9.3.0, 64-bit
+postgres_1         | 2021-09-06 06:14:27.225 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres_1         | 2021-09-06 06:14:27.225 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres_1         | 2021-09-06 06:14:27.235 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres_1         | 2021-09-06 06:14:27.249 UTC [22] LOG:  database system was shut down at 2021-09-06 06:12:48 UTC
+postgres_1         | 2021-09-06 06:14:27.259 UTC [1] LOG:  database system is ready to accept connections
+openadr_build_1 exited with code 0
+dummy-ven20b_1     | wait-for-it.sh: waiting 150 seconds for vtn.oadr.com:8081
+postgres_1         | 2021-09-06 06:14:34.717 UTC [29] ERROR:  relation "jiveversion" does not exist at character 8
+postgres_1         | 2021-09-06 06:14:34.717 UTC [29] STATEMENT:  UPDATE jiveVersion SET name='openfire' WHERE name='wildfire'
+openfire_1         | Openfire 4.4.4 [Sep 6, 2021 6:14:36 AM]
+vtn20b_1           | 
+vtn20b_1           |   .   ____          _            __ _ _
+vtn20b_1           |  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+vtn20b_1           | ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+vtn20b_1           |  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+vtn20b_1           |   '  |____| .__|_| |_|_| |_\__, | / / / /
+vtn20b_1           |  =========|_|==============|___/=/_/_/_/
+vtn20b_1           |  :: Spring Boot ::        (v2.3.5.RELEASE)
+vtn20b_1           | 
+rabbitmq_1         | Configuring logger redirection
+vtn20b_1           | [main] INFO  c.a.o.s.o.v.VTN20bApplication - Starting VTN20bApplication v0.1.0-SNAPSHOT on 802beec0609e with PID 22 (/opt/oadr-vtn20b/oadr-vtn20b.jar started by root in /opt/oadr-vtn20b)
+vtn20b_1           | [main] DEBUG c.a.o.s.o.v.VTN20bApplication - Running with Spring Boot v2.3.5.RELEASE, Spring v5.2.10.RELEASE
+vtn20b_1           | [main] INFO  c.a.o.s.o.v.VTN20bApplication - The following profiles are active: fake-data,rabbitmq-broker,external
+openfire_1         | Admin console listening at:
+openfire_1         |   http://xmpp.vtn.oadr.com:9090
+openfire_1         |   https://xmpp.vtn.oadr.com:9091
+openfire_1         | Successfully loaded plugin 'admin'.
+openfire_1         | Successfully loaded plugin 'openfireoadrplugin-openfire-plugin-assembly'.
+openfire_1         | Successfully loaded plugin 'search'.
+openfire_1         | Finished processing all plugins.
+rabbitmq_1         | 2021-09-06 06:14:43.722 [debug] <0.287.0> Lager installed handler error_logger_lager_h into error_logger
+rabbitmq_1         | 2021-09-06 06:14:43.738 [debug] <0.290.0> Lager installed handler lager_forwarder_backend into error_logger_lager_event
+rabbitmq_1         | 2021-09-06 06:14:43.738 [debug] <0.293.0> Lager installed handler lager_forwarder_backend into rabbit_log_lager_event
+rabbitmq_1         | 2021-09-06 06:14:43.738 [debug] <0.296.0> Lager installed handler lager_forwarder_backend into rabbit_log_channel_lager_event
+rabbitmq_1         | 2021-09-06 06:14:43.738 [debug] <0.299.0> Lager installed handler lager_forwarder_backend into rabbit_log_connection_lager_event
+rabbitmq_1         | 2021-09-06 06:14:43.738 [debug] <0.302.0> Lager installed handler lager_forwarder_backend into rabbit_log_feature_flags_lager_event
+rabbitmq_1         | 2021-09-06 06:14:43.738 [debug] <0.305.0> Lager installed handler lager_forwarder_backend into rabbit_log_federation_lager_event
+rabbitmq_1         | 2021-09-06 06:14:43.738 [debug] <0.308.0> Lager installed handler lager_forwarder_backend into rabbit_log_ldap_lager_event
+rabbitmq_1         | 2021-09-06 06:14:43.738 [debug] <0.311.0> Lager installed handler lager_forwarder_backend into rabbit_log_mirroring_lager_event
+rabbitmq_1         | 2021-09-06 06:14:43.738 [debug] <0.317.0> Lager installed handler lager_forwarder_backend into rabbit_log_queue_lager_event
+rabbitmq_1         | 2021-09-06 06:14:43.738 [debug] <0.314.0> Lager installed handler lager_forwarder_backend into rabbit_log_prelaunch_lager_event
+rabbitmq_1         | 2021-09-06 06:14:43.738 [debug] <0.320.0> Lager installed handler lager_forwarder_backend into rabbit_log_ra_lager_event
+rabbitmq_1         | 2021-09-06 06:14:43.738 [debug] <0.323.0> Lager installed handler lager_forwarder_backend into rabbit_log_shovel_lager_event
+rabbitmq_1         | 2021-09-06 06:14:43.738 [debug] <0.326.0> Lager installed handler lager_forwarder_backend into rabbit_log_upgrade_lager_event
+rabbitmq_1         | 2021-09-06 06:14:43.770 [info] <0.44.0> Application lager started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:44.223 [debug] <0.283.0> Lager installed handler lager_backend_throttle into lager_event
+rabbitmq_1         | 2021-09-06 06:14:49.480 [info] <0.44.0> Application mnesia started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:49.481 [info] <0.272.0> 
+rabbitmq_1         |  Starting RabbitMQ 3.8.9 on Erlang 23.1.1
+rabbitmq_1         |  Copyright (c) 2007-2020 VMware, Inc. or its affiliates.
+rabbitmq_1         |  Licensed under the MPL 2.0. Website: https://rabbitmq.com
+rabbitmq_1         | 
+rabbitmq_1         |   ##  ##      RabbitMQ 3.8.9
+rabbitmq_1         |   ##  ##
+rabbitmq_1         |   ##########  Copyright (c) 2007-2020 VMware, Inc. or its affiliates.
+rabbitmq_1         |   ######  ##
+rabbitmq_1         |   ##########  Licensed under the MPL 2.0. Website: https://rabbitmq.com
+rabbitmq_1         | 
+rabbitmq_1         |   Doc guides: https://rabbitmq.com/documentation.html
+rabbitmq_1         |   Support:    https://rabbitmq.com/contact.html
+rabbitmq_1         |   Tutorials:  https://rabbitmq.com/getstarted.html
+rabbitmq_1         |   Monitoring: https://rabbitmq.com/monitoring.html
+rabbitmq_1         | 
+rabbitmq_1         |   Logs: <stdout>
+rabbitmq_1         | 
+rabbitmq_1         |   Config file(s): /etc/rabbitmq/rabbitmq.conf
+rabbitmq_1         |                   /etc/rabbitmq/conf.d/management_agent.disable_metrics_collector.conf
+rabbitmq_1         | 
+rabbitmq_1         |   Starting broker...2021-09-06 06:14:49.486 [info] <0.272.0> 
+rabbitmq_1         |  node           : rabbit@c83cb34d1410
+rabbitmq_1         |  home dir       : /var/lib/rabbitmq
+rabbitmq_1         |  config file(s) : /etc/rabbitmq/rabbitmq.conf
+rabbitmq_1         |                 : /etc/rabbitmq/conf.d/management_agent.disable_metrics_collector.conf
+rabbitmq_1         |  cookie hash    : eQ7TV/ddMkr8UKeAMyjAiQ==
+rabbitmq_1         |  log(s)         : <stdout>
+rabbitmq_1         |  database dir   : /var/lib/rabbitmq/mnesia/rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:49.500 [info] <0.272.0> Running boot step pre_boot defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.500 [info] <0.272.0> Running boot step rabbit_core_metrics defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.502 [info] <0.272.0> Running boot step rabbit_alarm defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.520 [info] <0.396.0> Memory high watermark set to 795 MiB (834016051 bytes) of 1988 MiB (2085040128 bytes) total
+rabbitmq_1         | 2021-09-06 06:14:49.540 [info] <0.420.0> Enabling free disk space monitoring
+rabbitmq_1         | 2021-09-06 06:14:49.540 [info] <0.420.0> Disk free limit set to 50MB
+rabbitmq_1         | 2021-09-06 06:14:49.545 [info] <0.272.0> Running boot step code_server_cache defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.545 [info] <0.272.0> Running boot step file_handle_cache defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.545 [info] <0.441.0> Limiting to approx 1048479 file handles (943629 sockets)
+rabbitmq_1         | 2021-09-06 06:14:49.546 [info] <0.442.0> FHC read buffering:  OFF
+rabbitmq_1         | 2021-09-06 06:14:49.546 [info] <0.442.0> FHC write buffering: ON
+rabbitmq_1         | 2021-09-06 06:14:49.547 [info] <0.272.0> Running boot step worker_pool defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.547 [info] <0.373.0> Will use 4 processes for default worker pool
+rabbitmq_1         | 2021-09-06 06:14:49.547 [info] <0.373.0> Starting worker pool 'worker_pool' with 4 processes in it
+rabbitmq_1         | 2021-09-06 06:14:49.550 [info] <0.272.0> Running boot step database defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.555 [info] <0.272.0> Waiting for Mnesia tables for 30000 ms, 9 retries left
+rabbitmq_1         | 2021-09-06 06:14:49.558 [info] <0.272.0> Successfully synced tables from a peer
+rabbitmq_1         | 2021-09-06 06:14:49.558 [info] <0.272.0> Waiting for Mnesia tables for 30000 ms, 9 retries left
+rabbitmq_1         | 2021-09-06 06:14:49.559 [info] <0.272.0> Successfully synced tables from a peer
+rabbitmq_1         | 2021-09-06 06:14:49.588 [info] <0.272.0> Waiting for Mnesia tables for 30000 ms, 9 retries left
+rabbitmq_1         | 2021-09-06 06:14:49.588 [info] <0.272.0> Successfully synced tables from a peer
+rabbitmq_1         | 2021-09-06 06:14:49.588 [info] <0.272.0> Peer discovery backend rabbit_peer_discovery_classic_config does not support registration, skipping registration.
+rabbitmq_1         | 2021-09-06 06:14:49.589 [info] <0.272.0> Running boot step database_sync defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.589 [info] <0.272.0> Running boot step feature_flags defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.590 [info] <0.272.0> Running boot step codec_correctness_check defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.590 [info] <0.272.0> Running boot step external_infrastructure defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.591 [info] <0.272.0> Running boot step rabbit_registry defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.593 [info] <0.272.0> Running boot step rabbit_auth_mechanism_cr_demo defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.593 [info] <0.272.0> Running boot step rabbit_queue_location_random defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.594 [info] <0.272.0> Running boot step rabbit_event defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.596 [info] <0.272.0> Running boot step rabbit_auth_mechanism_amqplain defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.596 [info] <0.272.0> Running boot step rabbit_auth_mechanism_plain defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.596 [info] <0.272.0> Running boot step rabbit_exchange_type_direct defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.597 [info] <0.272.0> Running boot step rabbit_exchange_type_fanout defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.597 [info] <0.272.0> Running boot step rabbit_exchange_type_headers defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.598 [info] <0.272.0> Running boot step rabbit_exchange_type_topic defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.599 [info] <0.272.0> Running boot step rabbit_mirror_queue_mode_all defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.599 [info] <0.272.0> Running boot step rabbit_mirror_queue_mode_exactly defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.600 [info] <0.272.0> Running boot step rabbit_mirror_queue_mode_nodes defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.601 [info] <0.272.0> Running boot step rabbit_priority_queue defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.601 [info] <0.272.0> Priority queues enabled, real BQ is rabbit_variable_queue
+rabbitmq_1         | 2021-09-06 06:14:49.603 [info] <0.272.0> Running boot step rabbit_queue_location_client_local defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.604 [info] <0.272.0> Running boot step rabbit_queue_location_min_masters defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.604 [info] <0.272.0> Running boot step kernel_ready defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.604 [info] <0.272.0> Running boot step rabbit_sysmon_minder defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.606 [info] <0.272.0> Running boot step rabbit_epmd_monitor defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.608 [info] <0.464.0> epmd monitor knows us, inter-node communication (distribution) port: 25672
+rabbitmq_1         | 2021-09-06 06:14:49.608 [info] <0.272.0> Running boot step guid_generator defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.613 [info] <0.272.0> Running boot step rabbit_node_monitor defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.613 [info] <0.468.0> Starting rabbit_node_monitor
+rabbitmq_1         | 2021-09-06 06:14:49.615 [info] <0.272.0> Running boot step delegate_sup defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.619 [info] <0.272.0> Running boot step rabbit_memory_monitor defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.619 [info] <0.272.0> Running boot step core_initialized defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.620 [info] <0.272.0> Running boot step upgrade_queues defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.641 [info] <0.272.0> Running boot step rabbit_connection_tracking defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.642 [info] <0.272.0> Running boot step rabbit_connection_tracking_handler defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.642 [info] <0.272.0> Running boot step rabbit_exchange_parameters defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.643 [info] <0.272.0> Running boot step rabbit_mirror_queue_misc defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.645 [info] <0.272.0> Running boot step rabbit_policies defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.648 [info] <0.272.0> Running boot step rabbit_policy defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.648 [info] <0.272.0> Running boot step rabbit_queue_location_validator defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.649 [info] <0.272.0> Running boot step rabbit_quorum_memory_manager defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.649 [info] <0.272.0> Running boot step rabbit_vhost_limit defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.649 [info] <0.272.0> Running boot step recovery defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.656 [info] <0.501.0> Making sure data directory '/var/lib/rabbitmq/mnesia/rabbit@c83cb34d1410/msg_stores/vhosts/628WB79CIFDYO9LJI6DKMI09L' for vhost '/' exists
+rabbitmq_1         | 2021-09-06 06:14:49.665 [info] <0.501.0> Starting message stores for vhost '/'
+rabbitmq_1         | 2021-09-06 06:14:49.666 [info] <0.505.0> Message store "628WB79CIFDYO9LJI6DKMI09L/msg_store_transient": using rabbit_msg_store_ets_index to provide index
+rabbitmq_1         | 2021-09-06 06:14:49.671 [info] <0.501.0> Started message store of type transient for vhost '/'
+rabbitmq_1         | 2021-09-06 06:14:49.671 [info] <0.509.0> Message store "628WB79CIFDYO9LJI6DKMI09L/msg_store_persistent": using rabbit_msg_store_ets_index to provide index
+rabbitmq_1         | 2021-09-06 06:14:49.678 [info] <0.501.0> Started message store of type persistent for vhost '/'
+rabbitmq_1         | 2021-09-06 06:14:49.693 [info] <0.272.0> Running boot step empty_db_check defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.693 [info] <0.272.0> Will not seed default virtual host and user: have definitions to load...
+rabbitmq_1         | 2021-09-06 06:14:49.693 [info] <0.272.0> Running boot step rabbit_looking_glass defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.694 [info] <0.272.0> Running boot step rabbit_core_metrics_gc defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.695 [info] <0.272.0> Running boot step background_gc defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.695 [info] <0.272.0> Running boot step connection_tracking defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.696 [info] <0.272.0> Setting up a table for connection tracking on this node: tracked_connection_on_node_rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:49.697 [info] <0.272.0> Setting up a table for per-vhost connection counting on this node: tracked_connection_per_vhost_on_node_rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:49.698 [info] <0.272.0> Running boot step routing_ready defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.698 [info] <0.272.0> Running boot step pre_flight defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.698 [info] <0.272.0> Running boot step notify_cluster defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.698 [info] <0.272.0> Running boot step networking defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.698 [info] <0.272.0> Running boot step definition_import_worker_pool defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.698 [info] <0.373.0> Starting worker pool 'definition_import_pool' with 4 processes in it
+rabbitmq_1         | 2021-09-06 06:14:49.702 [info] <0.272.0> Running boot step cluster_name defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.702 [info] <0.272.0> Running boot step direct_client defined by app rabbit
+rabbitmq_1         | 2021-09-06 06:14:49.704 [info] <0.44.0> Application rabbit started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:51.246 [info] <0.556.0> Feature flags: list of feature flags found:
+rabbitmq_1         | 2021-09-06 06:14:51.246 [info] <0.556.0> Feature flags:   [ ] drop_unroutable_metric
+rabbitmq_1         | 2021-09-06 06:14:51.246 [info] <0.556.0> Feature flags:   [ ] empty_basic_get_metric
+rabbitmq_1         | 2021-09-06 06:14:51.246 [info] <0.556.0> Feature flags:   [x] implicit_default_bindings
+rabbitmq_1         | 2021-09-06 06:14:51.247 [info] <0.556.0> Feature flags:   [x] maintenance_mode_status
+rabbitmq_1         | 2021-09-06 06:14:51.247 [info] <0.556.0> Feature flags:   [x] quorum_queue
+rabbitmq_1         | 2021-09-06 06:14:51.247 [info] <0.556.0> Feature flags:   [x] virtual_host_metadata
+rabbitmq_1         | 2021-09-06 06:14:51.247 [info] <0.556.0> Feature flags: feature flag states written to disk: yes
+rabbitmq_1         | 2021-09-06 06:14:51.659 [info] <0.556.0> Running boot step rabbit_mgmt_db_handler defined by app rabbitmq_management_agent
+rabbitmq_1         | 2021-09-06 06:14:51.660 [info] <0.556.0> Management plugin: using rates mode 'basic'
+rabbitmq_1         | 2021-09-06 06:14:51.668 [info] <0.44.0> Application rabbitmq_management_agent started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:51.710 [info] <0.44.0> Application cowlib started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:51.741 [info] <0.44.0> Application cowboy started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:51.770 [info] <0.44.0> Application rabbitmq_web_dispatch started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:51.798 [info] <0.44.0> Application amqp_client started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:51.823 [info] <0.556.0> Running boot step rabbit_mgmt_reset_handler defined by app rabbitmq_management
+rabbitmq_1         | 2021-09-06 06:14:51.823 [info] <0.556.0> Running boot step rabbit_management_load_definitions defined by app rabbitmq_management
+rabbitmq_1         | 2021-09-06 06:14:51.824 [warning] <0.588.0> Metrics collection disabled in management agent, management only interface started
+rabbitmq_1         | 2021-09-06 06:14:51.889 [info] <0.588.0> Management plugin: HTTP (non-TLS) listener started on port 15672
+rabbitmq_1         | 2021-09-06 06:14:51.889 [info] <0.694.0> Statistics database started.
+rabbitmq_1         | 2021-09-06 06:14:51.889 [info] <0.693.0> Starting worker pool 'management_worker_pool' with 3 processes in it
+rabbitmq_1         | 2021-09-06 06:14:51.892 [info] <0.44.0> Application rabbitmq_management started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:51.923 [info] <0.44.0> Application amqp10_common started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:51.950 [info] <0.44.0> Application rabbitmq_amqp1_0 started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:51.979 [info] <0.44.0> Application rabbitmq_tracing started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:52.057 [info] <0.44.0> Application prometheus started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:52.089 [info] <0.556.0> Running boot step rabbit_federation_supervisor defined by app rabbitmq_federation
+rabbitmq_1         | 2021-09-06 06:14:52.092 [info] <0.556.0> Running boot step rabbit_federation_exchange defined by app rabbitmq_federation
+rabbitmq_1         | 2021-09-06 06:14:52.093 [info] <0.556.0> Running boot step rabbit_federation_parameters defined by app rabbitmq_federation
+rabbitmq_1         | 2021-09-06 06:14:52.094 [info] <0.556.0> Running boot step rabbit_federation_queue defined by app rabbitmq_federation
+rabbitmq_1         | 2021-09-06 06:14:52.094 [info] <0.556.0> Running boot step rabbit_federation_upstream_exchange defined by app rabbitmq_federation
+rabbitmq_1         | 2021-09-06 06:14:52.096 [info] <0.44.0> Application rabbitmq_federation started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:52.140 [info] <0.44.0> Application rabbitmq_auth_backend_cache started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:52.170 [info] <0.44.0> Application rabbitmq_auth_backend_http started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:52.202 [info] <0.556.0> Running boot step rabbit_auth_mechanism_ssl defined by app rabbitmq_auth_mechanism_ssl
+rabbitmq_1         | 2021-09-06 06:14:52.204 [info] <0.44.0> Application rabbitmq_auth_mechanism_ssl started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:52.239 [info] <0.742.0> Prometheus metrics: HTTP (non-TLS) listener started on port 15692
+rabbitmq_1         | 2021-09-06 06:14:52.239 [info] <0.556.0> Ready to start client connection listeners
+rabbitmq_1         | 2021-09-06 06:14:52.239 [info] <0.44.0> Application rabbitmq_prometheus started on node rabbit@c83cb34d1410
+rabbitmq_1         | 2021-09-06 06:14:52.255 [info] <0.861.0> started TCP listener on [::]:5672
+rabbitmq_1         |  completed with 10 plugins.
+rabbitmq_1         | 2021-09-06 06:14:53.016 [info] <0.556.0> Server startup complete; 10 plugins started.
+rabbitmq_1         |  * rabbitmq_prometheus
+rabbitmq_1         |  * rabbitmq_auth_mechanism_ssl
+rabbitmq_1         |  * rabbitmq_auth_backend_http
+rabbitmq_1         |  * rabbitmq_auth_backend_cache
+rabbitmq_1         |  * rabbitmq_federation
+rabbitmq_1         |  * rabbitmq_tracing
+rabbitmq_1         |  * rabbitmq_amqp1_0
+rabbitmq_1         |  * rabbitmq_management
+rabbitmq_1         |  * rabbitmq_web_dispatch
+rabbitmq_1         |  * rabbitmq_management_agent
+rabbitmq_1         | 2021-09-06 06:14:53.017 [info] <0.556.0> Resetting node maintenance status
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "abstract_user_roles" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "demandresponseevent" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "demandresponseevent" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "demand_response_event_targets" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "demand_response_event_baseline_intervals" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "demand_response_event_baseline_resource_id" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "demandresponseeventsignal" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "demand_response_event_signal_intervals" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "demand_response_event_signal_targets" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "oadr_app" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "oadr_user" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "otherreportcapability" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "otherreportcapabilitydescription" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "otherreportcapabilitydescription" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "otherreportrequest" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "otherreportrequest" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "otherreportrequest" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "otherreportrequestspecifier" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "otherreportrequestspecifier" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "selfreportcapabilitydescription" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "selfreportcapabilitydescription" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "selfreportrequest" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "selfreportrequest" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "selfreportrequest" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "ven" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "ven_vengroup" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "ven_vengroup" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "ven_venmarketcontext" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "ven_venmarketcontext" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "vendemandresponseevent" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "vendemandresponseevent" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "venopt" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "venopt" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "venopt" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "venopt" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "venpoll" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - relation "venresource" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "abstract_user" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "abstract_user_roles" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "demandresponseevent" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "demand_response_event_targets" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "demandresponseeventbaseline" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "demand_response_event_baseline_intervals" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "demand_response_event_baseline_resource_id" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "demandresponseeventsignal" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "demand_response_event_signal_intervals" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "demand_response_event_signal_targets" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "hibernate_sequences" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "oadr_app" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "oadr_user" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "otherreportcapability" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "otherreportcapabilitydescription" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "otherreportdata_float" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "otherreportdata_keytoken" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "otherreportdata_payloadresourcestatus" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "otherreportrequest" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "otherreportrequestspecifier" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "report_capability_description" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "report_capability_description_ei_datasource" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "report_capability_description_ei_subject" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "report_data" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "selfreportcapability" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "selfreportcapabilitydescription" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "selfreportrequest" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "ven" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "ven_vengroup" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "ven_venmarketcontext" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "vendemandresponseevent" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "vengroup" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "venmarketcontext" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "venopt" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "venpoll" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "venrequestcount" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - table "venresource" does not exist, skipping
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - SQL Warning Code: 0, SQLState: 00000
+vtn20b_1           | [main] WARN  o.h.e.j.s.SqlExceptionHelper - sequence "hibernate_sequence" does not exist, skipping
+vtn20b_1           | [main] WARN  o.e.j.u.s.S.config - Weak cipher suite TLS_RSA_WITH_AES_128_CBC_SHA256 enabled for Server@36f05595[provider=null,keyStore=null,trustStore=null]
+vtn20b_1           | [main] WARN  o.e.j.u.s.S.config - Weak cipher suite TLS_RSA_WITH_AES_128_GCM_SHA256 enabled for Server@36f05595[provider=null,keyStore=null,trustStore=null]
+rabbitmq_1         | 2021-09-06 06:15:04.160 [info] <0.867.0> accepting AMQP connection <0.867.0> (192.168.16.5:52652 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:15:04.369 [info] <0.867.0> connection <0.867.0> (192.168.16.5:52652 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+rabbitmq_1         | 2021-09-06 06:15:04.386 [info] <0.874.0> accepting AMQP connection <0.874.0> (192.168.16.5:52664 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:15:04.399 [info] <0.874.0> connection <0.874.0> (192.168.16.5:52664 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+vtn20b_1           | [main] DEBUG c.a.o.s.o.v.EmbeddedSqlDatabaseInit - Create User: f34148c9431baf58c84d
+vtn20b_1           | [main] DEBUG c.a.o.s.o.v.EmbeddedSqlDatabaseInit - Create App: 26dfc4b66c94611f99a4
+vtn20b_1           | [main] INFO  c.a.o.s.o.v.VTN20bApplication - Started VTN20bApplication in 28.366 seconds (JVM running for 35.722)
+vtn20b_1           | [main] INFO  c.a.o.s.o.v.x.XmppConnector - Xmpp VTN uplink client successfully initialized
+vtn20b_1           | [main] INFO  c.a.o.s.o.v.x.XmppConnector - Xmpp VTN connectors successfully initialized
+dummy-drprogram_1  | wait-for-it.sh: timeout occurred after waiting 120 seconds for vtn.oadr.com:8081
+dummy-drprogram_1  | SLF4J: Class path contains multiple SLF4J bindings.
+dummy-drprogram_1  | SLF4J: Found binding in [jar:file:/opt/dummy-drprogram/dummy-drprogram.jar!/BOOT-INF/lib/logback-classic-1.2.3.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+dummy-drprogram_1  | SLF4J: Found binding in [jar:file:/opt/dummy-drprogram/dummy-drprogram.jar!/BOOT-INF/lib/log4j-slf4j-impl-2.13.3.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+dummy-drprogram_1  | SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+dummy-drprogram_1  | SLF4J: Actual binding is of type [ch.qos.logback.classic.util.ContextSelectorStaticBinder]
+dummy-drprogram_1  | 
+dummy-drprogram_1  |   .   ____          _            __ _ _
+dummy-drprogram_1  |  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+dummy-drprogram_1  | ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+dummy-drprogram_1  |  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+dummy-drprogram_1  |   '  |____| .__|_| |_|_| |_\__, | / / / /
+dummy-drprogram_1  |  =========|_|==============|___/=/_/_/_/
+dummy-drprogram_1  |  :: Spring Boot ::        (v2.3.5.RELEASE)
+dummy-drprogram_1  | 
+dummy-drprogram_1  | 2021-09-06 06:16:32.106  INFO 1 --- [           main] c.a.o.d.DummyVTN20bControllerApplication : Starting DummyVTN20bControllerApplication v0.1.0-SNAPSHOT on 8ed053f5f440 with PID 1 (/opt/dummy-drprogram/dummy-drprogram.jar started by root in /)
+dummy-drprogram_1  | 2021-09-06 06:16:32.113  INFO 1 --- [           main] c.a.o.d.DummyVTN20bControllerApplication : The following profiles are active: external
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.MarketContextController - create MarketContext: DummyMarketContext
+dummy-drprogram_1  | 2021-09-06 06:16:35.516  INFO 1 --- [           main] c.avob.openadr.dummy.DummyEventManager   : 1630908000000 14400000 1630994400000
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 4
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 8
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 12
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 16
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 20
+dummy-drprogram_1  | 2021-09-06 06:16:35.975  INFO 1 --- [           main] c.avob.openadr.dummy.DummyEventManager   : 1630908000000 1800000 1630994400000
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 24
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 27
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 30
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 33
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 36
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 39
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 42
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 45
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 48
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 51
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 54
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 57
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 60
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 63
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 66
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 69
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 72
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 75
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 78
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 81
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 84
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 87
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 90
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 93
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 96
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 99
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 102
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 105
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 108
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 111
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 114
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 117
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 120
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 123
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 126
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 129
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 132
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 135
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 138
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 141
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 144
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 147
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 150
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 153
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 156
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 159
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.c.v.c.DemandResponseController - create DR event: 162
+dummy-drprogram_1  | 2021-09-06 06:16:37.441  WARN 1 --- [           main] com.avob.openadr.dummy.DummyVENManager   : Ven market context: DummyMarketContext is already provisioned
+vtn20b_1           | [qtp1386440976-52] WARN  c.a.o.s.c.v.c.VenController - Unknown Ven: f5538e6ab76bdde15994
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.VenController - Create Ven: f5538e6ab76bdde15994
+vtn20b_1           | [qtp1386440976-52] WARN  c.a.o.s.c.v.c.VenController - Unknown Ven: 303a2e4a28929b298afa
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.VenController - Create Ven: 303a2e4a28929b298afa
+vtn20b_1           | [qtp1386440976-52] WARN  c.a.o.s.c.v.c.VenController - Unknown Ven: ccbdcc956e253083fe66
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.VenController - Create Ven: ccbdcc956e253083fe66
+vtn20b_1           | [qtp1386440976-52] WARN  c.a.o.s.c.v.c.VenController - Unknown Ven: c9ff4c70ed82b1f7835f
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.c.v.c.VenController - Create Ven: c9ff4c70ed82b1f7835f
+dummy-drprogram_1  | 2021-09-06 06:16:38.606  WARN 1 --- [           main] o.s.b.a.m.MustacheAutoConfiguration      : Cannot find template location: classpath:/templates/ (please add some templates, check your Mustache configuration, or set spring.mustache.check-template-location=false)
+rabbitmq_1         | 2021-09-06 06:16:38.804 [info] <0.911.0> accepting AMQP connection <0.911.0> (192.168.16.6:34152 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:16:38.911 [info] <0.911.0> connection <0.911.0> (192.168.16.6:34152 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+rabbitmq_1         | 2021-09-06 06:16:38.973 [info] <0.923.0> accepting AMQP connection <0.923.0> (192.168.16.6:34154 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:16:38.980 [info] <0.923.0> connection <0.923.0> (192.168.16.6:34154 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+dummy-drprogram_1  | 2021-09-06 06:16:39.023  INFO 1 --- [           main] c.a.o.d.DummyVTN20bControllerApplication : Started DummyVTN20bControllerApplication in 8.034 seconds (JVM running for 9.138)
+dummy-ven20b_1     | wait-for-it.sh: timeout occurred after waiting 150 seconds for vtn.oadr.com:8081
+dummy-ven20b_1     | 
+dummy-ven20b_1     |   .   ____          _            __ _ _
+dummy-ven20b_1     |  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+dummy-ven20b_1     | ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+dummy-ven20b_1     |  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+dummy-ven20b_1     |   '  |____| .__|_| |_|_| |_\__, | / / / /
+dummy-ven20b_1     |  =========|_|==============|___/=/_/_/_/
+dummy-ven20b_1     |  :: Spring Boot ::        (v2.3.5.RELEASE)
+dummy-ven20b_1     | 
+dummy-ven20b_1     | 06:17:04.917 [main] INFO  c.a.o.d.DummyVEN20bApplication - Starting DummyVEN20bApplication v0.1.0-SNAPSHOT on b0689804d3ed with PID 1 (/opt/oadr-ven20b/oadr-ven20b.jar started by root in /)
+dummy-ven20b_1     | 06:17:04.938 [main] DEBUG c.a.o.d.DummyVEN20bApplication - Running with Spring Boot v2.3.5.RELEASE, Spring v5.2.10.RELEASE
+dummy-ven20b_1     | 06:17:04.942 [main] INFO  c.a.o.d.DummyVEN20bApplication - No active profile set, falling back to default profiles: default
+dummy-ven20b_1     | 06:17:09.298 [main] DEBUG c.a.o.s.o.v.MultiVtnConfig - Valid vtn configuration: ven2_xmpp
+dummy-ven20b_1     | 06:17:09.298 [main] INFO  c.a.o.s.o.v.MultiVtnConfig - com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration@469d003c
+dummy-ven20b_1     | 06:17:09.299 [main] INFO  c.a.o.s.o.v.MultiVtnConfig - Init XMPP VEN client
+vtn20b_1           | [qtp1386440976-19] INFO  c.a.o.s.c.v.c.RoleController - Ven [oadrName=ven2.oadr.com, oadrProfil=20b, transport=http, pushUrl=https://ven2.oadr.com, registrationId=null, httpPullModel=false, reportOnly=false, xmlSignature=false, pullFrequencySeconds=null, lastUpdateDatetime=null] roles: [ROLE_VEN]
+dummy-ven20b_1     | 06:17:11.055 [main] DEBUG c.a.o.s.o.v.MultiVtnConfig - Valid vtn configuration: ven3_httppush
+dummy-ven20b_1     | 06:17:11.055 [main] INFO  c.a.o.s.o.v.MultiVtnConfig - com.avob.openadr.server.oadr20b.ven.VtnSessionConfiguration@1542af63
+dummy-ven20b_1     | 06:17:11.055 [main] INFO  c.a.o.s.o.v.MultiVtnConfig - Init HTTP VEN client
+dummy-ven20b_1     | 06:17:13.565 [main] WARN  o.e.j.u.s.S.config - Weak cipher suite TLS_RSA_WITH_AES_128_CBC_SHA256 enabled for Server@42b6d0cc[provider=null,keyStore=null,trustStore=null]
+dummy-ven20b_1     | 06:17:13.566 [main] WARN  o.e.j.u.s.S.config - Weak cipher suite TLS_RSA_WITH_AES_128_GCM_SHA256 enabled for Server@42b6d0cc[provider=null,keyStore=null,trustStore=null]
+dummy-ven20b_1     | 06:17:13.586 [main] WARN  o.e.j.u.s.S.config - Weak cipher suite TLS_RSA_WITH_AES_128_CBC_SHA256 enabled for Server@54cf7c6a[provider=null,keyStore=null,trustStore=null]
+dummy-ven20b_1     | 06:17:13.586 [main] WARN  o.e.j.u.s.S.config - Weak cipher suite TLS_RSA_WITH_AES_128_GCM_SHA256 enabled for Server@54cf7c6a[provider=null,keyStore=null,trustStore=null]
+dummy-ven20b_1     | 06:17:13.609 [main] INFO  c.a.o.d.DummyVEN20bApplication - Started DummyVEN20bApplication in 9.616 seconds (JVM running for 12.116)
+vtn20b_1           | [Smack Cached Executor] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiRegisterPartyService - 303a2e4a28929b298afa - OadrCreatePartyRegistration
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiRegisterPartyService - ccbdcc956e253083fe66 - OadrQueryRegistration
+vtn20b_1           | [qtp1386440976-19] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiRegisterPartyService - ccbdcc956e253083fe66 - OadrCreatePartyRegistration
+rabbitmq_1         | 2021-09-06 06:17:14.164 [info] <0.942.0> accepting AMQP connection <0.942.0> (192.168.16.5:53140 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:17:14.187 [info] <0.942.0> connection <0.942.0> (192.168.16.5:53140 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+rabbitmq_1         | 2021-09-06 06:17:14.309 [info] <0.942.0> closing AMQP connection <0.942.0> (192.168.16.5:53140 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+rabbitmq_1         | 2021-09-06 06:17:14.317 [info] <0.955.0> accepting AMQP connection <0.955.0> (192.168.16.5:53142 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:17:14.327 [info] <0.955.0> connection <0.955.0> (192.168.16.5:53142 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+dummy-ven20b_1     | 06:17:14.335 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENEiRegisterPartyService - bde0182ebf9b2b6d27c1 - OadrCreatedPartyRegistrationType
+dummy-ven20b_1     | 06:17:14.338 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENEiRegisterPartyService - Ven has successfully register using registrationId: 303a2e4a28929b298afa82d20271-e034-4827-87cb-0ff03d70adff
+rabbitmq_1         | 2021-09-06 06:17:14.341 [info] <0.955.0> closing AMQP connection <0.955.0> (192.168.16.5:53142 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-ven20b_1     | 06:17:14.341 [Smack Cached Executor] DEBUG c.a.o.s.o.v.s.Oadr20bVENEiRegisterPartyService -         xmlSignature: false
+dummy-ven20b_1     | 06:17:14.342 [Smack Cached Executor] DEBUG c.a.o.s.o.v.s.Oadr20bVENEiRegisterPartyService -         reportOnly  : false
+dummy-ven20b_1     | 06:17:14.343 [Smack Cached Executor] DEBUG c.a.o.s.o.v.s.Oadr20bVENEiRegisterPartyService -         pullModel   : false
+dummy-ven20b_1     | 06:17:14.354 [main] INFO  c.a.o.s.o.v.s.Oadr20bVENEiRegisterPartyService - Ven has successfully register using registrationId: ccbdcc956e253083fe66dafa37c9-6530-43af-97ab-bcd92c3ac7d6
+dummy-ven20b_1     | 06:17:14.355 [main] DEBUG c.a.o.s.o.v.s.Oadr20bVENEiRegisterPartyService -         xmlSignature: false
+dummy-ven20b_1     | 06:17:14.356 [main] DEBUG c.a.o.s.o.v.s.Oadr20bVENEiRegisterPartyService -         reportOnly  : false
+dummy-ven20b_1     | 06:17:14.356 [main] DEBUG c.a.o.s.o.v.s.Oadr20bVENEiRegisterPartyService -         pullModel   : false
+vtn20b_1           | [Smack Cached Executor] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiReportService - 303a2e4a28929b298afa - OadrCreateReport
+rabbitmq_1         | 2021-09-06 06:17:14.471 [info] <0.968.0> accepting AMQP connection <0.968.0> (192.168.16.5:53144 -> 192.168.16.4:5672)
+vtn20b_1           | [Smack Cached Executor] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiReportService - 303a2e4a28929b298afa - OadrRegisterReport
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiReportService - ccbdcc956e253083fe66 - OadrRegisterReport
+rabbitmq_1         | 2021-09-06 06:17:14.497 [info] <0.968.0> connection <0.968.0> (192.168.16.5:53144 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+vtn20b_1           | [Smack Cached Executor] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiOptService - 303a2e4a28929b298afa - OadrCreateOptType
+rabbitmq_1         | 2021-09-06 06:17:14.521 [info] <0.968.0> closing AMQP connection <0.968.0> (192.168.16.5:53144 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-ven20b_1     | 06:17:14.588 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENPayloadService - bde0182ebf9b2b6d27c1 - OadrCreatedOptType
+dummy-ven20b_1     | 06:17:14.591 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENEiReportService - bde0182ebf9b2b6d27c1 - OadrCreatedReportType
+dummy-ven20b_1     | 06:17:14.592 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiReportListener - Dummy received: OadrCreatedReportType
+dummy-ven20b_1     | 06:17:14.771 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENPayloadService - bde0182ebf9b2b6d27c1 - OadrResponseType
+dummy-ven20b_1     | 06:17:14.831 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENEiEventService - bde0182ebf9b2b6d27c1 - OadrDistributeEventType
+dummy-ven20b_1     | 06:17:14.831 [Smack Cached Executor] WARN  c.a.o.s.o.v.t.Timeline - No schedule du cancel
+dummy-ven20b_1     | 06:17:14.861 [Smack Cached Executor] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=bde0182ebf9b2b6d27c1, eventId=4, signalId=null, intervalId=null, type=EVENT_ACTIVE_PERIOD_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:14.864 [Smack Cached Executor] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=bde0182ebf9b2b6d27c1, eventId=4, signalId=null, intervalId=0, type=BASELINE_INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:14.866 [Smack Cached Executor] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=bde0182ebf9b2b6d27c1, eventId=4, signalId=0, intervalId=0, type=INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:14.868 [Smack Cached Executor] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=bde0182ebf9b2b6d27c1, eventId=4, signalId=1, intervalId=0, type=INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:14.875 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 4
+dummy-ven20b_1     | 06:17:14.877 [Smack Cached Executor] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=bde0182ebf9b2b6d27c1, eventId=24, signalId=null, intervalId=null, type=EVENT_ACTIVE_PERIOD_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:14.879 [Smack Cached Executor] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=bde0182ebf9b2b6d27c1, eventId=24, signalId=0, intervalId=0, type=INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:14.879 [Smack Cached Executor] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=bde0182ebf9b2b6d27c1, eventId=24, signalId=0, intervalId=0, type=INTERVAL_ENDED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:14.880 [Smack Cached Executor] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=bde0182ebf9b2b6d27c1, eventId=24, signalId=0, intervalId=1, type=INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:14.886 [Smack Cached Executor] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=bde0182ebf9b2b6d27c1, eventId=24, signalId=1, intervalId=0, type=INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:14.886 [Smack Cached Executor] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=bde0182ebf9b2b6d27c1, eventId=24, signalId=1, intervalId=0, type=INTERVAL_ENDED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:14.887 [Smack Cached Executor] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=bde0182ebf9b2b6d27c1, eventId=24, signalId=1, intervalId=1, type=INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:14.888 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 24
+dummy-ven20b_1     | 06:17:14.890 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 27
+dummy-ven20b_1     | 06:17:14.894 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 30
+dummy-ven20b_1     | 06:17:14.898 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 33
+dummy-ven20b_1     | 06:17:14.901 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 36
+dummy-ven20b_1     | 06:17:14.906 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 39
+dummy-ven20b_1     | 06:17:14.914 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 42
+dummy-ven20b_1     | 06:17:14.915 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 45
+dummy-ven20b_1     | 06:17:14.917 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 8
+dummy-ven20b_1     | 06:17:14.920 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 48
+dummy-ven20b_1     | 06:17:14.922 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 12
+dummy-ven20b_1     | 06:17:14.924 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 16
+dummy-ven20b_1     | 06:17:14.925 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 20
+dummy-ven20b_1     | 06:17:14.957 [Smack Cached Executor] INFO  c.a.o.s.o.v.t.Timeline - Schedule next tick at :Sep 6, 2021, 6:30:00 AM
+rabbitmq_1         | 2021-09-06 06:17:14.962 [info] <0.981.0> accepting AMQP connection <0.981.0> (192.168.16.5:53146 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:17:14.999 [info] <0.981.0> connection <0.981.0> (192.168.16.5:53146 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+vtn20b_1           | [Smack Cached Executor] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiEventService - 303a2e4a28929b298afa - OadrResponseType
+vtn20b_1           | [Smack Cached Executor] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiEventService - 303a2e4a28929b298afa - OadrCreatedEvent
+rabbitmq_1         | 2021-09-06 06:17:15.032 [info] <0.981.0> closing AMQP connection <0.981.0> (192.168.16.5:53146 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+vtn20b_1           | [Smack Cached Executor] ERROR c.a.o.s.o.v.s.e.Oadr20bVTNPayloadService - Internal error happened when marhsalling VTN message
+vtn20b_1           | com.avob.openadr.model.oadr20b.exception.Oadr20bMarshalException: payload have to be an Oadr20b root element
+vtn20b_1           | 	at com.avob.openadr.model.oadr20b.Oadr20bJAXBContext.marshalRoot(Oadr20bJAXBContext.java:323) ~[OpenADRModel20b-0.1.0-SNAPSHOT.jar!/:0.1.0-SNAPSHOT]
+vtn20b_1           | 	at com.avob.openadr.model.oadr20b.Oadr20bJAXBContext.marshalRoot(Oadr20bJAXBContext.java:223) ~[OpenADRModel20b-0.1.0-SNAPSHOT.jar!/:0.1.0-SNAPSHOT]
+vtn20b_1           | 	at com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNPayloadService.marshall(Oadr20bVTNPayloadService.java:99) [classes!/:0.1.0-SNAPSHOT]
+vtn20b_1           | 	at com.avob.openadr.server.oadr20b.vtn.service.ei.Oadr20bVTNPayloadService.event(Oadr20bVTNPayloadService.java:170) [classes!/:0.1.0-SNAPSHOT]
+vtn20b_1           | 	at com.avob.openadr.server.oadr20b.vtn.xmpp.XmppListener.processStanza(XmppListener.java:55) [classes!/:0.1.0-SNAPSHOT]
+vtn20b_1           | 	at org.jivesoftware.smack.AbstractXMPPConnection$6.run(AbstractXMPPConnection.java:1241) [smack-core-4.3.4.jar!/:4.3.4]
+vtn20b_1           | 	at org.jivesoftware.smack.AbstractXMPPConnection$14.run(AbstractXMPPConnection.java:1813) [smack-core-4.3.4.jar!/:4.3.4]
+vtn20b_1           | 	at java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) [?:?]
+vtn20b_1           | 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) [?:?]
+vtn20b_1           | 	at java.lang.Thread.run(Unknown Source) [?:?]
+rabbitmq_1         | 2021-09-06 06:17:15.106 [info] <0.994.0> accepting AMQP connection <0.994.0> (192.168.16.5:53148 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:17:15.129 [info] <0.994.0> connection <0.994.0> (192.168.16.5:53148 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+rabbitmq_1         | 2021-09-06 06:17:15.151 [info] <0.994.0> closing AMQP connection <0.994.0> (192.168.16.5:53148 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+vtn20b_1           | [qtp1386440976-19] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiReportService - ccbdcc956e253083fe66 - OadrCreateReport
+rabbitmq_1         | 2021-09-06 06:17:15.302 [info] <0.1007.0> accepting AMQP connection <0.1007.0> (192.168.16.5:53152 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:17:15.313 [info] <0.1007.0> connection <0.1007.0> (192.168.16.5:53152 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+dummy-ven20b_1     | 06:17:15.353 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENEiReportService - bde0182ebf9b2b6d27c1 - OadrRegisteredReportType
+dummy-ven20b_1     | 06:17:15.355 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiReportListener - Dummy received: registeredreport
+rabbitmq_1         | 2021-09-06 06:17:15.372 [info] <0.1007.0> closing AMQP connection <0.1007.0> (192.168.16.5:53152 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-ven20b_1     | 06:17:15.426 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENPayloadService - bde0182ebf9b2b6d27c1 - OadrResponseType
+vtn20b_1           | [qtp1386440976-19] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiOptService - ccbdcc956e253083fe66 - OadrCreateOptType
+vtn20b_1           | [qtp1386440976-52] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiRegisterPartyService - ccbdcc956e253083fe66 - OadrCreatePartyRegistration
+dummy-ven20b_1     | 06:17:15.547 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENPayloadService - bde0182ebf9b2b6d27c1 - OadrResponseType
+rabbitmq_1         | 2021-09-06 06:17:15.605 [info] <0.1020.0> accepting AMQP connection <0.1020.0> (192.168.16.5:53156 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:17:15.619 [info] <0.1020.0> connection <0.1020.0> (192.168.16.5:53156 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+rabbitmq_1         | 2021-09-06 06:17:15.636 [info] <0.1020.0> closing AMQP connection <0.1020.0> (192.168.16.5:53156 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-drprogram_1  | 2021-09-06 06:17:15.642  INFO 1 --- [pool-5-thread-1] com.avob.openadr.dummy.DummyVENManager   : Receive register from: 303a2e4a28929b298afa
+rabbitmq_1         | 2021-09-06 06:17:15.696 [info] <0.1033.0> accepting AMQP connection <0.1033.0> (192.168.16.5:53158 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:17:15.711 [info] <0.1033.0> connection <0.1033.0> (192.168.16.5:53158 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+rabbitmq_1         | 2021-09-06 06:17:15.737 [info] <0.1033.0> closing AMQP connection <0.1033.0> (192.168.16.5:53158 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+rabbitmq_1         | 2021-09-06 06:17:15.852 [info] <0.1046.0> accepting AMQP connection <0.1046.0> (192.168.16.5:53160 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:17:15.858 [info] <0.1046.0> connection <0.1046.0> (192.168.16.5:53160 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+rabbitmq_1         | 2021-09-06 06:17:15.868 [info] <0.1046.0> closing AMQP connection <0.1046.0> (192.168.16.5:53160 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-drprogram_1  | 2021-09-06 06:17:15.870  INFO 1 --- [pool-5-thread-1] com.avob.openadr.dummy.DummyVENManager   : Receive register from: ccbdcc956e253083fe66
+dummy-ven20b_1     | 06:17:16.046 [qtp1471019696-30] INFO  c.a.o.s.o.v.s.Oadr20bVENEiEventService - b1f95535ebd4610d15e0 - OadrDistributeEventType
+dummy-ven20b_1     | 06:17:16.048 [qtp1471019696-30] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=b1f95535ebd4610d15e0, eventId=4, signalId=null, intervalId=null, type=EVENT_ACTIVE_PERIOD_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:16.049 [qtp1471019696-30] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=b1f95535ebd4610d15e0, eventId=4, signalId=null, intervalId=0, type=BASELINE_INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:16.050 [qtp1471019696-30] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=b1f95535ebd4610d15e0, eventId=4, signalId=0, intervalId=0, type=INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:16.051 [qtp1471019696-30] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=b1f95535ebd4610d15e0, eventId=4, signalId=1, intervalId=0, type=INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:16.052 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 4
+dummy-ven20b_1     | 06:17:16.053 [qtp1471019696-30] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=b1f95535ebd4610d15e0, eventId=24, signalId=null, intervalId=null, type=EVENT_ACTIVE_PERIOD_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:16.054 [qtp1471019696-30] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=b1f95535ebd4610d15e0, eventId=24, signalId=0, intervalId=0, type=INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:16.054 [qtp1471019696-30] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=b1f95535ebd4610d15e0, eventId=24, signalId=0, intervalId=0, type=INTERVAL_ENDED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:16.055 [qtp1471019696-30] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=b1f95535ebd4610d15e0, eventId=24, signalId=0, intervalId=1, type=INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:16.056 [qtp1471019696-30] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=b1f95535ebd4610d15e0, eventId=24, signalId=1, intervalId=0, type=INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:16.056 [qtp1471019696-30] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=b1f95535ebd4610d15e0, eventId=24, signalId=1, intervalId=0, type=INTERVAL_ENDED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:16.058 [qtp1471019696-30] WARN  c.a.o.s.o.v.t.Timeline - TimelineEvent [vtnId=b1f95535ebd4610d15e0, eventId=24, signalId=1, intervalId=1, type=INTERVAL_STARTED] can't be added to timeline because it already happened (date in past)
+dummy-ven20b_1     | 06:17:16.058 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 24
+dummy-ven20b_1     | 06:17:16.071 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 27
+dummy-ven20b_1     | 06:17:16.073 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 30
+dummy-ven20b_1     | 06:17:16.074 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 33
+dummy-ven20b_1     | 06:17:16.076 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 36
+dummy-ven20b_1     | 06:17:16.077 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 39
+dummy-ven20b_1     | 06:17:16.078 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 42
+dummy-ven20b_1     | 06:17:16.079 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 45
+dummy-ven20b_1     | 06:17:16.080 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 8
+dummy-ven20b_1     | 06:17:16.082 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 48
+dummy-ven20b_1     | 06:17:16.084 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 12
+dummy-ven20b_1     | 06:17:16.086 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 16
+dummy-ven20b_1     | 06:17:16.088 [qtp1471019696-30] INFO  c.a.o.d.DummyVEN20bEiEventListener - onCreatedEvent oadrEvent: 20
+dummy-ven20b_1     | 06:17:16.092 [qtp1471019696-30] INFO  c.a.o.s.o.v.t.Timeline - Schedule next tick at :Sep 6, 2021, 6:30:00 AM
+vtn20b_1           | [qtp1386440976-19] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiEventService - ccbdcc956e253083fe66 - OadrCreatedEvent
+dummy-ven20b_1     | 06:17:16.405 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENEiReportService - bde0182ebf9b2b6d27c1 - OadrRegisterReport
+dummy-ven20b_1     | 06:17:16.407 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiReportListener - Dummy received: OadrRegisterReport
+vtn20b_1           | [Smack Cached Executor] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiReportService - 303a2e4a28929b298afa - OadrRegisteredReport
+dummy-ven20b_1     | 06:17:16.448 [qtp1471019696-29] INFO  c.a.o.s.o.v.s.Oadr20bVENEiReportService - b1f95535ebd4610d15e0 - OadrRegisterReport
+dummy-ven20b_1     | 06:17:16.448 [qtp1471019696-29] INFO  c.a.o.d.DummyVEN20bEiReportListener - Dummy received: OadrRegisterReport
+dummy-ven20b_1     | 06:17:16.458 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENPayloadService - bde0182ebf9b2b6d27c1 - OadrResponseType
+dummy-ven20b_1     | 06:17:16.487 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENEiReportService - bde0182ebf9b2b6d27c1 - OadrCreateReport
+dummy-ven20b_1     | 06:17:16.531 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiReportListener - Dummy received: oadrCreateReport
+dummy-ven20b_1     | 06:17:16.569 [qtp1471019696-30] INFO  c.a.o.s.o.v.s.Oadr20bVENEiEventService - b1f95535ebd4610d15e0 - OadrDistributeEventType
+dummy-ven20b_1     | 06:17:16.574 [qtp1471019696-30] INFO  c.a.o.s.o.v.t.Timeline - Schedule next tick at :Sep 6, 2021, 6:30:00 AM
+vtn20b_1           | [Smack Cached Executor] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiReportService - 303a2e4a28929b298afa - OadrCreatedReport
+vtn20b_1           | [qtp1386440976-20] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiEventService - ccbdcc956e253083fe66 - OadrCreatedEvent
+dummy-ven20b_1     | 06:17:16.621 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENPayloadService - bde0182ebf9b2b6d27c1 - OadrResponseType
+dummy-ven20b_1     | 06:17:16.837 [qtp1471019696-29] INFO  c.a.o.s.o.v.s.Oadr20bVENEiReportService - b1f95535ebd4610d15e0 - OadrCreateReport
+dummy-ven20b_1     | 06:17:16.838 [qtp1471019696-29] INFO  c.a.o.d.DummyVEN20bEiReportListener - Dummy received: oadrCreateReport
+dummy-ven20b_1     | 06:17:26.568 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_energy 3.99
+dummy-ven20b_1     | 06:17:26.568 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-ven20b_1     | 06:17:26.843 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-ven20b_1     | 06:17:26.845 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-ven20b_1     | 06:17:26.847 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-ven20b_1     | 06:17:26.848 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-ven20b_1     | 06:17:26.849 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-ven20b_1     | 06:17:26.851 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Temp 4.4
+dummy-ven20b_1     | 06:17:26.850 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-ven20b_1     | 06:17:26.851 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-ven20b_1     | 06:17:26.852 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-ven20b_1     | 06:17:26.852 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_STATUS Status <oadrPayloadResourceStatus>
+dummy-ven20b_1     | 06:17:36.533 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_energy 2.49
+dummy-ven20b_1     | 06:17:36.533 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-ven20b_1     | 06:17:36.809 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-ven20b_1     | 06:17:36.810 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-ven20b_1     | 06:17:36.813 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-ven20b_1     | 06:17:36.815 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Temp 8.8
+dummy-ven20b_1     | 06:17:36.815 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-ven20b_1     | 06:17:36.817 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-ven20b_1     | 06:17:36.817 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_STATUS Status <oadrPayloadResourceStatus>
+dummy-ven20b_1     | 06:17:36.818 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-ven20b_1     | 06:17:36.819 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-ven20b_1     | 06:17:36.820 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-ven20b_1     | 06:17:46.534 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-ven20b_1     | 06:17:46.535 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_energy 2.5
+dummy-ven20b_1     | 06:17:46.811 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-ven20b_1     | 06:17:46.813 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-ven20b_1     | 06:17:46.814 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-ven20b_1     | 06:17:46.816 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-ven20b_1     | 06:17:46.817 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Temp 13.2
+dummy-ven20b_1     | 06:17:46.817 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-ven20b_1     | 06:17:46.817 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-ven20b_1     | 06:17:46.819 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_STATUS Status <oadrPayloadResourceStatus>
+dummy-ven20b_1     | 06:17:46.819 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-ven20b_1     | 06:17:46.821 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-ven20b_1     | 06:17:56.536 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-ven20b_1     | 06:17:56.536 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_energy 2.5
+dummy-ven20b_1     | 06:17:56.816 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-ven20b_1     | 06:17:56.817 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-ven20b_1     | 06:17:56.818 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-ven20b_1     | 06:17:56.818 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Temp 17.6
+dummy-ven20b_1     | 06:17:56.818 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-ven20b_1     | 06:17:56.819 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-ven20b_1     | 06:17:56.819 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-ven20b_1     | 06:17:56.819 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_STATUS Status <oadrPayloadResourceStatus>
+dummy-ven20b_1     | 06:17:56.820 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-ven20b_1     | 06:17:56.822 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-ven20b_1     | 06:18:06.503 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-ven20b_1     | 06:18:06.503 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_energy 2.49
+dummy-ven20b_1     | 06:18:06.785 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-ven20b_1     | 06:18:06.788 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-ven20b_1     | 06:18:06.788 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-ven20b_1     | 06:18:06.789 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-ven20b_1     | 06:18:06.790 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-ven20b_1     | 06:18:06.791 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_STATUS Status <oadrPayloadResourceStatus>
+dummy-ven20b_1     | 06:18:06.791 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-ven20b_1     | 06:18:06.794 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-ven20b_1     | 06:18:06.790 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Temp 22.0
+dummy-ven20b_1     | 06:18:06.795 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-ven20b_1     | 06:18:16.485 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Report back ven2_xmpp 5798b17b-16f2-47fb-9975-35029c70658d
+dummy-ven20b_1     | 06:18:16.503 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-ven20b_1     | 06:18:16.504 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_energy 2.5
+vtn20b_1           | [Smack Cached Executor] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiReportService - 303a2e4a28929b298afa - OadrUpdateReport
+rabbitmq_1         | 2021-09-06 06:18:16.596 [info] <0.1079.0> accepting AMQP connection <0.1079.0> (192.168.16.5:53162 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:18:16.600 [info] <0.1079.0> connection <0.1079.0> (192.168.16.5:53162 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+rabbitmq_1         | 2021-09-06 06:18:16.618 [info] <0.1079.0> closing AMQP connection <0.1079.0> (192.168.16.5:53162 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-drprogram_1  | 2021-09-06 06:18:16.645  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-drprogram_1  | 2021-09-06 06:18:16.645  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-drprogram_1  | 2021-09-06 06:18:16.646  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-drprogram_1  | 2021-09-06 06:18:16.647  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-drprogram_1  | 2021-09-06 06:18:16.647  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - ReportSpecID120615_122512_481_2 real_power 900.0
+rabbitmq_1         | 2021-09-06 06:18:16.703 [info] <0.1092.0> accepting AMQP connection <0.1092.0> (192.168.16.5:53164 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:18:16.709 [info] <0.1092.0> connection <0.1092.0> (192.168.16.5:53164 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+dummy-drprogram_1  | 2021-09-06 06:18:16.719  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-drprogram_1  | 2021-09-06 06:18:16.719  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-drprogram_1  | 2021-09-06 06:18:16.720  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-drprogram_1  | 2021-09-06 06:18:16.720  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-drprogram_1  | 2021-09-06 06:18:16.720  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-drprogram_1  | 2021-09-06 06:18:16.721  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - ReportSpecID120615_122512_481_2 real_energy 3.99
+dummy-drprogram_1  | 2021-09-06 06:18:16.721  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - ReportSpecID120615_122512_481_2 real_energy 2.49
+dummy-drprogram_1  | 2021-09-06 06:18:16.722  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - ReportSpecID120615_122512_481_2 real_energy 2.5
+dummy-drprogram_1  | 2021-09-06 06:18:16.723  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - ReportSpecID120615_122512_481_2 real_energy 2.5
+dummy-drprogram_1  | 2021-09-06 06:18:16.724  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - ReportSpecID120615_122512_481_2 real_energy 2.49
+rabbitmq_1         | 2021-09-06 06:18:16.718 [info] <0.1092.0> closing AMQP connection <0.1092.0> (192.168.16.5:53164 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-ven20b_1     | 06:18:16.768 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Report back ven3_httppush 623120b5-458f-4034-9075-fbbf57f9d960
+dummy-ven20b_1     | 06:18:16.773 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Report back ven3_httppush 12b46e8b-2b5f-4ed6-90c3-e85a7bfc2425
+dummy-ven20b_1     | 06:18:16.786 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-ven20b_1     | 06:18:16.786 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-ven20b_1     | 06:18:16.788 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-ven20b_1     | 06:18:16.788 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-ven20b_1     | 06:18:16.791 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Temp 22.0
+dummy-ven20b_1     | 06:18:16.791 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-ven20b_1     | 06:18:16.794 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-ven20b_1     | 06:18:16.794 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-ven20b_1     | 06:18:16.794 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_STATUS Status <oadrPayloadResourceStatus>
+dummy-ven20b_1     | 06:18:16.795 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-ven20b_1     | 06:18:16.835 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENEiReportService - bde0182ebf9b2b6d27c1 - OadrUpdatedReportType
+dummy-ven20b_1     | 06:18:16.836 [Smack Cached Executor] INFO  c.a.o.d.DummyVEN20bEiReportListener - Dummy received: oadrUpdatedReport
+vtn20b_1           | [qtp1386440976-19] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiReportService - ccbdcc956e253083fe66 - OadrUpdateReport
+dummy-ven20b_1     | 06:18:16.862 [Smack Cached Executor] INFO  c.a.o.s.o.v.s.Oadr20bVENPayloadService - bde0182ebf9b2b6d27c1 - OadrResponseType
+rabbitmq_1         | 2021-09-06 06:18:16.909 [info] <0.1105.0> accepting AMQP connection <0.1105.0> (192.168.16.5:53168 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:18:16.915 [info] <0.1105.0> connection <0.1105.0> (192.168.16.5:53168 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+rabbitmq_1         | 2021-09-06 06:18:16.933 [info] <0.1105.0> closing AMQP connection <0.1105.0> (192.168.16.5:53168 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+vtn20b_1           | [qtp1386440976-18] INFO  c.a.o.s.o.v.s.e.Oadr20bVTNEiReportService - ccbdcc956e253083fe66 - OadrUpdateReport
+rabbitmq_1         | 2021-09-06 06:18:17.044 [info] <0.1122.0> accepting AMQP connection <0.1122.0> (192.168.16.5:53170 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:18:17.049 [info] <0.1122.0> connection <0.1122.0> (192.168.16.5:53170 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+rabbitmq_1         | 2021-09-06 06:18:17.059 [info] <0.1122.0> closing AMQP connection <0.1122.0> (192.168.16.5:53170 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-drprogram_1  | 2021-09-06 06:18:17.061  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.062  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.062  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.062  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.063  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+rabbitmq_1         | 2021-09-06 06:18:17.146 [info] <0.1135.0> accepting AMQP connection <0.1135.0> (192.168.16.5:53172 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:18:17.152 [info] <0.1135.0> connection <0.1135.0> (192.168.16.5:53172 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+rabbitmq_1         | 2021-09-06 06:18:17.162 [info] <0.1135.0> closing AMQP connection <0.1135.0> (192.168.16.5:53172 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-drprogram_1  | 2021-09-06 06:18:17.163  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.164  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.165  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.166  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.167  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.167  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.168  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.170  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.171  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.171  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+rabbitmq_1         | 2021-09-06 06:18:17.250 [info] <0.1148.0> accepting AMQP connection <0.1148.0> (192.168.16.5:53174 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:18:17.255 [info] <0.1148.0> connection <0.1148.0> (192.168.16.5:53174 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+dummy-drprogram_1  | 2021-09-06 06:18:17.266  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.266  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.268  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.268  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.269  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.269  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.269  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.271  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.271  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+rabbitmq_1         | 2021-09-06 06:18:17.271 [info] <0.1148.0> closing AMQP connection <0.1148.0> (192.168.16.5:53174 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-drprogram_1  | 2021-09-06 06:18:17.271  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.273  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.274  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.275  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.275  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.276  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+rabbitmq_1         | 2021-09-06 06:18:17.357 [info] <0.1161.0> accepting AMQP connection <0.1161.0> (192.168.16.5:53176 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:18:17.362 [info] <0.1161.0> connection <0.1161.0> (192.168.16.5:53176 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+rabbitmq_1         | 2021-09-06 06:18:17.376 [info] <0.1161.0> closing AMQP connection <0.1161.0> (192.168.16.5:53176 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-drprogram_1  | 2021-09-06 06:18:17.376  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.379  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.380  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.381  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.382  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.384  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.385  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.386  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.386  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.387  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.388  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.389  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.389  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.390  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.392  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.392  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.394  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.396  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.399  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.399  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+rabbitmq_1         | 2021-09-06 06:18:17.471 [info] <0.1174.0> accepting AMQP connection <0.1174.0> (192.168.16.5:53178 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:18:17.475 [info] <0.1174.0> connection <0.1174.0> (192.168.16.5:53178 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+rabbitmq_1         | 2021-09-06 06:18:17.484 [info] <0.1174.0> closing AMQP connection <0.1174.0> (192.168.16.5:53178 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-drprogram_1  | 2021-09-06 06:18:17.486  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.486  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.487  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.488  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.489  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.490  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.491  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.491  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.492  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.493  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.494  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.494  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.495  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.496  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.497  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.497  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.498  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.498  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.499  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.499  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.500  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Temp 4.4
+dummy-drprogram_1  | 2021-09-06 06:18:17.500  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Temp 8.8
+dummy-drprogram_1  | 2021-09-06 06:18:17.501  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Temp 13.2
+dummy-drprogram_1  | 2021-09-06 06:18:17.501  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Temp 17.6
+dummy-drprogram_1  | 2021-09-06 06:18:17.502  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Temp 22.0
+rabbitmq_1         | 2021-09-06 06:18:17.591 [info] <0.1187.0> accepting AMQP connection <0.1187.0> (192.168.16.5:53180 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:18:17.595 [info] <0.1187.0> connection <0.1187.0> (192.168.16.5:53180 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+dummy-drprogram_1  | 2021-09-06 06:18:17.606  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.607  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.607  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.608  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.609  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.609  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.610  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.610  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.611  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.611  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.612  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.612  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.613  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.613  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.614  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.615  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.616  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.616  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.617  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.617  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.619  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Temp 4.4
+dummy-drprogram_1  | 2021-09-06 06:18:17.620  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Temp 8.8
+rabbitmq_1         | 2021-09-06 06:18:17.620 [info] <0.1187.0> closing AMQP connection <0.1187.0> (192.168.16.5:53180 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-drprogram_1  | 2021-09-06 06:18:17.620  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Temp 13.2
+dummy-drprogram_1  | 2021-09-06 06:18:17.622  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Temp 17.6
+dummy-drprogram_1  | 2021-09-06 06:18:17.623  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Temp 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.623  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.624  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.625  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.625  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.626  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+rabbitmq_1         | 2021-09-06 06:18:17.751 [info] <0.1200.0> accepting AMQP connection <0.1200.0> (192.168.16.5:53182 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:18:17.760 [info] <0.1200.0> connection <0.1200.0> (192.168.16.5:53182 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+dummy-drprogram_1  | 2021-09-06 06:18:17.784  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+rabbitmq_1         | 2021-09-06 06:18:17.786 [info] <0.1200.0> closing AMQP connection <0.1200.0> (192.168.16.5:53182 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-drprogram_1  | 2021-09-06 06:18:17.785  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.788  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.791  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.792  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.794  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.796  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.798  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.799  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.800  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.800  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.801  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.801  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.802  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.802  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.803  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.804  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.805  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.806  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.806  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.807  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Temp 4.4
+dummy-drprogram_1  | 2021-09-06 06:18:17.807  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Temp 8.8
+dummy-drprogram_1  | 2021-09-06 06:18:17.809  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Temp 13.2
+dummy-drprogram_1  | 2021-09-06 06:18:17.810  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Temp 17.6
+dummy-drprogram_1  | 2021-09-06 06:18:17.811  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Temp 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.812  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.812  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.813  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.814  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.815  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.816  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.817  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.818  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.819  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.820  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+rabbitmq_1         | 2021-09-06 06:18:17.915 [info] <0.1213.0> accepting AMQP connection <0.1213.0> (192.168.16.5:53184 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:18:17.919 [info] <0.1213.0> connection <0.1213.0> (192.168.16.5:53184 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+dummy-drprogram_1  | 2021-09-06 06:18:17.929  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.929  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.930  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.930  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.931  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.932  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.932  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.933  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.933  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.934  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.934  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.934  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.935  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.936  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.937  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.938  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.939  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.941  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+rabbitmq_1         | 2021-09-06 06:18:17.942 [info] <0.1213.0> closing AMQP connection <0.1213.0> (192.168.16.5:53184 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-drprogram_1  | 2021-09-06 06:18:17.943  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.945  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.946  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Temp 4.4
+dummy-drprogram_1  | 2021-09-06 06:18:17.947  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Temp 8.8
+dummy-drprogram_1  | 2021-09-06 06:18:17.948  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Temp 13.2
+dummy-drprogram_1  | 2021-09-06 06:18:17.949  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Temp 17.6
+dummy-drprogram_1  | 2021-09-06 06:18:17.950  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Temp 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.951  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.951  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.952  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.953  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.954  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.955  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.956  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.957  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.958  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.959  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.960  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.961  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.961  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.964  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:17.965  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+rabbitmq_1         | 2021-09-06 06:18:18.085 [info] <0.1226.0> accepting AMQP connection <0.1226.0> (192.168.16.5:53186 -> 192.168.16.4:5672)
+rabbitmq_1         | 2021-09-06 06:18:18.088 [info] <0.1226.0> connection <0.1226.0> (192.168.16.5:53186 -> 192.168.16.4:5672): user 'admin' authenticated and granted access to vhost '/'
+dummy-drprogram_1  | 2021-09-06 06:18:18.097  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.097  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.097  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.098  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.099  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.099  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.100  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.100  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.101  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.101  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.102  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.103  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.104  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.105  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.106  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.106  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.107  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.108  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.109  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.109  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.110  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Temp 4.4
+dummy-drprogram_1  | 2021-09-06 06:18:18.110  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Temp 8.8
+dummy-drprogram_1  | 2021-09-06 06:18:18.111  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Temp 13.2
+dummy-drprogram_1  | 2021-09-06 06:18:18.112  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Temp 17.6
+dummy-drprogram_1  | 2021-09-06 06:18:18.113  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Temp 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.113  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.114  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.115  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.115  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.116  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.116  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.117  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.117  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.118  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.119  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.119  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+rabbitmq_1         | 2021-09-06 06:18:18.119 [info] <0.1226.0> closing AMQP connection <0.1226.0> (192.168.16.5:53186 -> 192.168.16.4:5672, vhost: '/', user: 'admin')
+dummy-drprogram_1  | 2021-09-06 06:18:18.119  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.120  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.121  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.122  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.123  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:00 AM - 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.123  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:10 AM - 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.126  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:20 AM - 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.126  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:30 AM - 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-drprogram_1  | 2021-09-06 06:18:18.127  INFO 1 --- [pool-6-thread-1] com.avob.openadr.dummy.DummyVENManager   : Sep 6, 2021, 6:18:40 AM - 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-ven20b_1     | 06:18:26.505 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_energy 2.5
+dummy-ven20b_1     | 06:18:26.505 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-ven20b_1     | 06:18:26.786 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-ven20b_1     | 06:18:26.787 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-ven20b_1     | 06:18:26.789 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-ven20b_1     | 06:18:26.789 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-ven20b_1     | 06:18:26.791 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Temp 22.0
+dummy-ven20b_1     | 06:18:26.792 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-ven20b_1     | 06:18:26.794 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_STATUS Status <oadrPayloadResourceStatus>
+dummy-ven20b_1     | 06:18:26.795 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-ven20b_1     | 06:18:26.796 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-ven20b_1     | 06:18:26.797 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-ven20b_1     | 06:18:36.471 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_energy 2.49
+dummy-ven20b_1     | 06:18:36.471 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-ven20b_1     | 06:18:36.751 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-ven20b_1     | 06:18:36.754 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-ven20b_1     | 06:18:36.754 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-ven20b_1     | 06:18:36.755 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-ven20b_1     | 06:18:36.757 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Temp 22.0
+dummy-ven20b_1     | 06:18:36.757 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-ven20b_1     | 06:18:36.759 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_STATUS Status <oadrPayloadResourceStatus>
+dummy-ven20b_1     | 06:18:36.759 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-ven20b_1     | 06:18:36.761 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-ven20b_1     | 06:18:36.762 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-ven20b_1     | 06:18:46.473 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-ven20b_1     | 06:18:46.473 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_energy 2.5
+dummy-ven20b_1     | 06:18:46.752 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-ven20b_1     | 06:18:46.754 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-ven20b_1     | 06:18:46.755 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-ven20b_1     | 06:18:46.756 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-ven20b_1     | 06:18:46.759 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Temp 22.0
+dummy-ven20b_1     | 06:18:46.759 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-ven20b_1     | 06:18:46.760 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-ven20b_1     | 06:18:46.760 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_STATUS Status <oadrPayloadResourceStatus>
+dummy-ven20b_1     | 06:18:46.762 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-ven20b_1     | 06:18:46.763 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-ven20b_1     | 06:18:56.475 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-ven20b_1     | 06:18:56.475 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_energy 2.5
+dummy-ven20b_1     | 06:18:56.754 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-ven20b_1     | 06:18:56.755 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-ven20b_1     | 06:18:56.756 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-ven20b_1     | 06:18:56.757 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-ven20b_1     | 06:18:56.759 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Temp 22.0
+dummy-ven20b_1     | 06:18:56.760 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-ven20b_1     | 06:18:56.760 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-ven20b_1     | 06:18:56.762 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_STATUS Status <oadrPayloadResourceStatus>
+dummy-ven20b_1     | 06:18:56.763 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-ven20b_1     | 06:18:56.763 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-ven20b_1     | 06:19:06.441 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_energy 2.49
+dummy-ven20b_1     | 06:19:06.441 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-ven20b_1     | 06:19:06.720 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Hold Mode 0.0
+dummy-ven20b_1     | 06:19:06.720 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current HVAC Mode 0.0
+dummy-ven20b_1     | 06:19:06.722 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Fan Mode Setting 0.0
+dummy-ven20b_1     | 06:19:06.723 [pool-3-thread-1] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Away Mode 0.0
+dummy-ven20b_1     | 06:19:06.725 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Temp 22.0
+dummy-ven20b_1     | 06:19:06.727 [pool-3-thread-5] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Heat Temp Setting 22.0
+dummy-ven20b_1     | 06:19:06.727 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Cool Temp Setting 22.0
+dummy-ven20b_1     | 06:19:06.728 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_STATUS Status <oadrPayloadResourceStatus>
+dummy-ven20b_1     | 06:19:06.729 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE Current Humidity 80.0
+dummy-ven20b_1     | 06:19:06.730 [pool-3-thread-2] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: 0013A20040980FAE_USAGE HVAC Mode Setting 0.0
+dummy-ven20b_1     | 06:19:16.432 [pool-3-thread-4] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Report back ven2_xmpp 5798b17b-16f2-47fb-9975-35029c70658d
+dummy-ven20b_1     | 06:19:16.447 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_power 900.0
+dummy-ven20b_1     | 06:19:16.449 [pool-3-thread-3] INFO  c.a.o.s.o.v.s.UpdateReportOrchestratorService - Reading: ReportSpecID120615_122512_481_2 real_energy 2.5
