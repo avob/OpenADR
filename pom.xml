@@ -25,7 +25,7 @@
 		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
 		<jacoco-plugin.version>0.8.5</jacoco-plugin.version>
 		<postgres.version>42.2.5</postgres.version>
-		<rabbitmq-jms.version>1.11.2</rabbitmq-jms.version>
+		<rabbitmq-jms.version>1.15.2</rabbitmq-jms.version>
 		<springfox.version>2.9.2</springfox.version>
 		<dozer.version>5.5.1</dozer.version>
 		<commons-compress.version>1.19</commons-compress.version>
